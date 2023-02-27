@@ -1,0 +1,42 @@
+<div>
+    <div ng-repeat="section in selectedForm">
+        <div><h4>{{section.text}}</h4></div>
+
+        <div ng-repeat="question in section.questions">
+
+            <div class="row">
+                <div class="col-md-3">
+                    {{question.text}}
+                </div>
+                <div class="col-md-9">
+                    <div ng-switch ="question.type">
+                        <div ng-switch-when="text">
+                            <textarea ng-change="formUpdated()" class="form-control" ng-model="answer[question.linkId]"></textarea>
+                        </div>
+                        <div ng-switch-when="string">
+                            <input type="text" ng-change="formUpdated()" class="form-control" ng-model="answer[question.linkId]"></input>
+                        </div>
+
+                        <div ng-switch-when="integer">
+                            <input type="number" ng-change="formUpdated()" class="form-control" ng-model="answer[question.linkId]"></input>
+                        </div>
+
+                        <div ng-switch-when="choice">
+                            <select ng-model="answer[question.linkId]" class="form-control"
+                                    ng-change="formUpdated()"
+                                    ng-options = "option.valueCoding.display for option in question.answerOption"></select>
+
+                        </div>
+                    </div>
+
+
+
+
+                    <br/>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>Requester</title>
+
+    <script src="js/libs/jquery-1.9.0.min.js"></script>
+    <script src="js/libs/angular.min1-5.js"></script>
+    <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/common.css"/>
+    <script>
+        angular.module("pocApp",['ui.bootstrap']).config(function($locationProvider) {
+
+            // enable html5Mode for pushstate ('#'-less URLs)
+            $locationProvider.html5Mode(true);
+            $locationProvider.hashPrefix('!');
+        });
+
+    </script>
+
+
+    <script src="js/requesterCtrl.js"></script>
+    <script src="js/requesterSvc.js"></script>
+
+    <script src="js/commonSvc.js"></script>
+
+    <script src="directive/QRDisplay/QRDisplayDir.js"></script>
+    <script src="directive/reportDisplay/reportDisplayDir.js"></script>
+
+
+</head>
+<body style="padding: 8px;padding-top: 80px">
+    <div ng-app="pocApp" ng-controller="requesterCtrl" class="container-fluid">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+        <div class="container-fluid">
+            <div class="col-md-5 col-sm-5">
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            Requester
+                        </a>
+                    </span>
+
+            </div>
+
+            <div class="col-md-2 col-sm-2">
+                <div class="navbar-text">
+
+                    selected patient details - name, dob, gender
+
+                </div>
+
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <form class="navbar-form navbar-left">
+                    <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+
+                </form>
+            </div>
+
+            <div class="col-md-2">
+
+            </div>
+
+            <div class="col-md-2">
+                <a href="https://teaho.govt.nz/" target="_blank">
+                    <img width="150" height="auto" class="pull-right"
+                         style="padding: 3px"
+                         src="images/TAK-logo-midgreen.png"/>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+        <div class="row">
+            <div class="col-md-2">
+                List of patients
+                <ul class="list-group">
+                    <li ng-class="{'list-group-item':true,listItemSelected:selectedPatient == entry.resource}" ng-repeat = "entry in allPatients.entry"
+                        style="cursor: pointer"
+                        ng-click="selectPatient(entry.resource)">
+                        {{commonSvc.getPatientName(entry.resource)}}
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-10" ng-show="selectedPatient">
+
+                <uib-tabset>
+                    <uib-tab heading="New request">
+                        <br/>
+
+                        <div class="row">
+                            <div class="col-md-6" >
+
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <select ng-model="selectedTemplate" class="form-control"
+                                                placeholder="Select form"
+                                                ng-change="selectQ(selectedTemplate)"
+                                                ng-options = "item.display for item in templates">
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-primary" ng-click="submitRequest()">Send request</button>
+                                    </div>
+                                </div>
+
+
+                                <div class="alert">
+                                    <br/>
+                                    <div ng-show = "submitStatus == 'pass'">
+                                        <pre class="alert-success" ng-show="oo">{{oo | json}}</pre>
+                                    </div>
+                                    <div ng-show = "submitStatus == 'fail'" >
+                                        <pre class="alert-danger" ng-show="oo">{{oo | json}}</pre>
+                                    </div>
+                                </div>
+
+
+
+
+                                <div ng-hide="oo">
+                                    <ng-include src="'/includes/formDisplay.html'"></ng-include>
+                                </div>
+
+                            </div>
+                            <div class="col-md-6" ng-show="selectedPatient">
+
+
+
+                                <uib-tabset>
+                                    <uib-tab heading="Text">
+                                        <qrdisplay qr="selectedQR"></qrdisplay>
+                                        <!--
+                                        <ng-include src="'/includes/QRdisplay.html'"></ng-include>
+
+-->
+                                    </uib-tab>
+                                    <uib-tab heading="Q">
+                                        <pre>{{selectedTemplate | json}}</pre>
+                                    </uib-tab>
+                                    <uib-tab heading="QR">
+                                        <pre>{{QR | json}}</pre>
+                                    </uib-tab>
+                                    <uib-tab heading="SR">
+                                        <pre>{{SR | json}}</pre>
+                                    </uib-tab>
+                                    <uib-tab heading="Bundle">
+                                        <pre>{{bundle | json}}</pre>
+                                    </uib-tab>
+                                </uib-tabset>
+
+                            </div>
+                        </div>
+                    </uib-tab>
+                    <uib-tab heading="Previous request history">
+                        <br/>
+
+                        <ng-include src="'/includes/SRSummary.html'"></ng-include>
+
+
+                    </uib-tab>
+                    <uib-tab heading="Other clinical data">
+                        <br/>
+                        ACT-NOW meds & regimens
+                        make a directive
+                    </uib-tab>
+                </uib-tabset>
+
+
+
+            </div>
+        </div>
+
+
+
+
+
+        <div class="row">
+            <div class="col-md-4">
+
+            </div>
+            <div class="col-md-4">
+
+            </div>
+            <div class="col-md-4">
+
+            </div>
+        </div>
+
+</div>
+
+</body>
+</html>

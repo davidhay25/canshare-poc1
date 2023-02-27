@@ -1,0 +1,25 @@
+<!-- todo - create directive to display QR-->
+
+<div>
+
+    <div ng-repeat="item in qr.item">
+        <strong>{{item.text}}</strong>
+        <div ng-repeat = "child in item.item">
+            <div class="row">
+                <div class="col-md-4" >
+                    <div style="padding-left: 8px">{{child.text}}</div>
+                </div>
+                <div class="col-md-8">
+                    <div ng-repeat = "ans in child.answer">
+                        {{ans.valueString}}
+                        {{ans.valueCoding.display}}
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <br/>
+    </div>
+    <div ng-show="qr"><em>Template: {{qr.questionnaire}}</em></div>
+</div>

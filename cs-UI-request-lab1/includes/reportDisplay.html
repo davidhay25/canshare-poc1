@@ -1,0 +1,41 @@
+<div>
+
+    <!-- The report  -->
+    <h4>Report header</h4>
+    <table>
+        <tr><td>Issued</td><td>{{selectedReportObject.DR.issued}}</td></tr>
+        <tr><td>Identifier</td>
+            <td>
+                <div ng-repeat="identifier in selectedReportObject.DR.identifier">{{identifier.value}}</div>
+            </td>
+        </tr>
+        <!--
+        <tr><td>DR Id</td><td>{{selectedDRobject.DR.id}}</td></tr>
+        -->
+        <tr><td>Code</td><td>{{selectedReportObject.DR.code.text}}</td></tr>
+        <tr><td>Performer</td>
+            <td>
+                <div ng-repeat="performer in selectedReportObject.DR.performer">{{performer.display}}</div>
+            </td>
+        </tr>
+
+    </table>
+
+    <h4>Observations</h4>
+    <table class="table ">
+        <tr ng-repeat = "obs in selectedReportObject.observations">
+            <!--
+            <td>{{obs.id}}</td>
+
+            <td><div ng-repeat = "identifier in obs.identifier">{{identifier}}</div></td>
+            -->
+            <td><strong>{{obs.code.coding[0].code}}</strong>: </td>
+            <td>{{obs.valueString}}</td>
+        </tr>
+    </table>
+
+
+<!--
+    <pre>{{selectedDRobject | json}}</pre>
+    -->
+</div>

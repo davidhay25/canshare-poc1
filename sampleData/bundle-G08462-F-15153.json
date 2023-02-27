@@ -1,0 +1,4586 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "name": [
+          {
+            "text": "John Doe - G08462-F-15153"
+          }
+        ],
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-patient"
+          ]
+        },
+        "id": "90cb1837-9f05-41c7-9b53-2adfb52486a8",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Patient",
+            "value": "87"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Identifier: 87</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8",
+      "request": {
+        "method": "PUT",
+        "url": "Patient?identifier=http://mosaic.com/Patient|87"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "380a827c-9712-4f43-b5f8-e1a025838253",
+        "status": "revoked",
+        "intent": "order",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-regimen"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "regimen-G08462-F-15153"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-iot",
+            "valueCodeableConcept": {
+              "text": "Palliative"
+            }
+          },
+          {
+            "url": "http://hl7.org.nz/fhir/StructureDefinition/sact-regimen-type",
+            "valueCodeableConcept": {
+              "text": "Trastuzumab"
+            }
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-regimen-discontinued",
+            "extension": [
+              {
+                "url": "reason",
+                "valueCodeableConcept": {
+                  "text": "No reason given"
+                }
+              }
+            ]
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-count",
+            "valueInteger": 20
+          }
+        ],
+        "title": "Trastuzumab",
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "regimenCP"
+              }
+            ]
+          }
+        ],
+        "partOf": [
+          {
+            "reference": "urn:uuid:efb71dad-831b-4259-a833-a1423bf924c0"
+          }
+        ],
+        "period": {
+          "start": "2013-02-14",
+          "end": "2015-01-11"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Regimen plan: revoked</div>"
+        },
+        "addresses": [
+          {
+            "reference": "urn:uuid:c5fd7352-2565-4362-a7f2-a257633edb8b"
+          }
+        ],
+        "supportingInfo": [
+          {
+            "reference": "urn:uuid:d1948384-5634-4de8-b350-a5ef7150b0bb"
+          },
+          {
+            "reference": "urn:uuid:e02914ff-372f-4ff6-bd90-6c8f9c70f37e"
+          },
+          {
+            "reference": "urn:uuid:6f72750d-8ba3-4227-986f-aa4f2d1d5e78"
+          }
+        ]
+      },
+      "fullUrl": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|regimen-G08462-F-15153"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "efb71dad-831b-4259-a833-a1423bf924c0",
+        "status": "active",
+        "intent": "order",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-patient"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "pat-87"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Patient plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "patientCP"
+              }
+            ]
+          }
+        ]
+      },
+      "fullUrl": "urn:uuid:efb71dad-831b-4259-a833-a1423bf924c0",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|pat-87"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "580eaff1-6a3c-467f-bc12-ef42c7ccbae8",
+        "status": "final",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Histology</div>"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-histology"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "histology-G08462-F-15153"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "82231000004111"
+            }
+          ]
+        },
+        "component": [
+          {
+            "code": {
+              "text": "histologyCode"
+            },
+            "valueCodeableConcept": {
+              "text": "85002"
+            }
+          },
+          {
+            "code": {
+              "text": "dxclass"
+            },
+            "valueString": "1"
+          }
+        ]
+      },
+      "fullUrl": "urn:uuid:580eaff1-6a3c-467f-bc12-ef42c7ccbae8",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|histology-G08462-F-15153"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "c5fd7352-2565-4362-a7f2-a257633edb8b",
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-condition"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Condition",
+            "value": "condition-G08462-F-15153"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/sid/icd-9-cm",
+              "code": "C509"
+            }
+          ],
+          "text": "Breast - unspecified"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Breast - unspecified</div>"
+        },
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-laterality-qualifier",
+            "valueString": "1 - Right"
+          }
+        ],
+        "evidence": [
+          {
+            "detail": [
+              {
+                "reference": "urn:uuid:580eaff1-6a3c-467f-bc12-ef42c7ccbae8"
+              }
+            ]
+          }
+        ],
+        "stage": [
+          {
+            "assessment": [
+              {
+                "reference": "urn:uuid:d1948384-5634-4de8-b350-a5ef7150b0bb"
+              }
+            ]
+          }
+        ]
+      },
+      "fullUrl": "urn:uuid:c5fd7352-2565-4362-a7f2-a257633edb8b",
+      "request": {
+        "method": "PUT",
+        "url": "Condition?identifier=http://mosaic.com/Condition|condition-G08462-F-15153"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "d1948384-5634-4de8-b350-a5ef7150b0bb",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "482688f73d12d586d4281405940f01b2"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "c-tnm"
+            }
+          ],
+          "text": "TNM group"
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://cancerstaging.org",
+              "code": "IV"
+            }
+          ]
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-cGroup"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Clinical TNM Group: IV</div>"
+        },
+        "hasMember": [
+          {
+            "reference": "urn:uuid:f8f963f9-8784-439d-8dbc-0c3062902f3a"
+          },
+          {
+            "reference": "urn:uuid:ba2c0d5e-2a95-4417-836d-85ae3a51faf1"
+          },
+          {
+            "reference": "urn:uuid:1a38a0e9-4af7-44bc-999a-b5555e901c93"
+          }
+        ]
+      },
+      "fullUrl": "urn:uuid:d1948384-5634-4de8-b350-a5ef7150b0bb",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|482688f73d12d586d4281405940f01b2"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "f8f963f9-8784-439d-8dbc-0c3062902f3a",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "a0ef4a4a528fe4145aaab5f2a4e771c6"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "c-t"
+            }
+          ]
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://cancerstaging.org",
+              "code": "T1c"
+            }
+          ]
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-cT"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Clinical T: T1c</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:f8f963f9-8784-439d-8dbc-0c3062902f3a",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|a0ef4a4a528fe4145aaab5f2a4e771c6"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "ba2c0d5e-2a95-4417-836d-85ae3a51faf1",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "febbc77379e2b201c09e3af22fc294e2"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "c-n"
+            }
+          ]
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://cancerstaging.org",
+              "code": "NX"
+            }
+          ]
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-cN"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Clinical N: NX</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:ba2c0d5e-2a95-4417-836d-85ae3a51faf1",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|febbc77379e2b201c09e3af22fc294e2"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "1a38a0e9-4af7-44bc-999a-b5555e901c93",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "48f95e0a1287a395612cb20006d2d31f"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "c-m"
+            }
+          ]
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://cancerstaging.org",
+              "code": "M1"
+            }
+          ]
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-cM"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Clinical M: M1</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:1a38a0e9-4af7-44bc-999a-b5555e901c93",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|48f95e0a1287a395612cb20006d2d31f"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "e02914ff-372f-4ff6-bd90-6c8f9c70f37e",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "661ba7ff1bf816c1b4935c7c4cede417"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "code": {
+          "text": "ER",
+          "coding": [
+            {
+              "system": "http://canshare.co.nz/dummy",
+              "code": "ER"
+            }
+          ]
+        },
+        "valueString": "+",
+        "effectiveDateTime": "2013-02-14",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>+</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:e02914ff-372f-4ff6-bd90-6c8f9c70f37e",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|661ba7ff1bf816c1b4935c7c4cede417"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "6f72750d-8ba3-4227-986f-aa4f2d1d5e78",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "f0574c52ead07ee4e770fe8556a7d945"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "code": {
+          "text": "PR",
+          "coding": [
+            {
+              "system": "http://canshare.co.nz/dummy",
+              "code": "PR"
+            }
+          ]
+        },
+        "valueString": "-",
+        "effectiveDateTime": "2013-02-14",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>-</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:6f72750d-8ba3-4227-986f-aa4f2d1d5e78",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|f0574c52ead07ee4e770fe8556a7d945"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "6aed3fd7-82ab-4814-a539-b3ad348bd72d",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-15156"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 4
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2013-04-19",
+          "end": "2013-05-10"
+        }
+      },
+      "fullUrl": "urn:uuid:6aed3fd7-82ab-4814-a539-b3ad348bd72d",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-15156"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "fbbdb9ee-d0d1-4978-a0c6-3bd274321849",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "404dda8aee73c1ef312bc3aa17e933aa"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:6aed3fd7-82ab-4814-a539-b3ad348bd72d"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "450.00 mg",
+          "dose": {
+            "value": 450,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-04-19T12:40:00Z",
+          "end": "2013-04-19T12:16:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:fbbdb9ee-d0d1-4978-a0c6-3bd274321849",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|404dda8aee73c1ef312bc3aa17e933aa"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "ad5a6564-55cc-4a8a-8fab-ef80ecc85d56",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2013-04-20",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "176974da7d8d7206fc99a0605bf4c131"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:6aed3fd7-82ab-4814-a539-b3ad348bd72d"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:ad5a6564-55cc-4a8a-8fab-ef80ecc85d56",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|176974da7d8d7206fc99a0605bf4c131"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "b16002d8-54db-417e-8897-4e0b2f2bee9a",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "0a6fce952912f16a2876755c7df50148"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:6aed3fd7-82ab-4814-a539-b3ad348bd72d"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-04-19T12:50:00Z",
+          "end": "2013-04-19T12:59:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:b16002d8-54db-417e-8897-4e0b2f2bee9a",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|0a6fce952912f16a2876755c7df50148"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "c4bf5631-29bf-4ba4-90a7-536c499ce44e",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-23400"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 18
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2014-02-10",
+          "end": "2014-03-03"
+        }
+      },
+      "fullUrl": "urn:uuid:c4bf5631-29bf-4ba4-90a7-536c499ce44e",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-23400"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "ec42d7ba-2293-4289-ae9b-243f61435c18",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2014-02-10",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "4d2cddc37cfc877069f4c01987a1acbb"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:c4bf5631-29bf-4ba4-90a7-536c499ce44e"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:ec42d7ba-2293-4289-ae9b-243f61435c18",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|4d2cddc37cfc877069f4c01987a1acbb"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "e5fea10b-8502-495a-95b5-3348d6eed9b2",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "a9d49e9bfb0d0d56fd458d616cfd4f39"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:c4bf5631-29bf-4ba4-90a7-536c499ce44e"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2014-02-10T12:05:00Z",
+          "end": "2014-02-10T12:50:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:e5fea10b-8502-495a-95b5-3348d6eed9b2",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|a9d49e9bfb0d0d56fd458d616cfd4f39"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "65d7c0fa-9fea-4374-9b9e-504abf480338",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-15158"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 6
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2013-05-30",
+          "end": "2013-06-20"
+        }
+      },
+      "fullUrl": "urn:uuid:65d7c0fa-9fea-4374-9b9e-504abf480338",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-15158"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "3074cc30-237d-4952-ac61-3518d5a2da9b",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2013-05-30",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "6b7a95c927982c2f5bdcbc270f80517d"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:65d7c0fa-9fea-4374-9b9e-504abf480338"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:3074cc30-237d-4952-ac61-3518d5a2da9b",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|6b7a95c927982c2f5bdcbc270f80517d"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "4aded2cd-e619-47f0-9f62-e7f269e294af",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "8933257675ce2042ff92e6ae11e7a2c8"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:65d7c0fa-9fea-4374-9b9e-504abf480338"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-05-30T12:27:00Z",
+          "end": "2013-05-30T12:45:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:4aded2cd-e619-47f0-9f62-e7f269e294af",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|8933257675ce2042ff92e6ae11e7a2c8"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "ca4b89a8-b829-496c-b5f1-24e04782a032",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "3f939bc5e57805d0ecf995af0960d015"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:65d7c0fa-9fea-4374-9b9e-504abf480338"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "450.00 mg",
+          "dose": {
+            "value": 450,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-05-30T12:27:00Z",
+          "end": "2013-05-30T12:40:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:ca4b89a8-b829-496c-b5f1-24e04782a032",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|3f939bc5e57805d0ecf995af0960d015"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "948ebf46-d6c4-4c12-b024-08be13d98dd2",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-15157"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 5
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2013-05-09",
+          "end": "2013-05-30"
+        }
+      },
+      "fullUrl": "urn:uuid:948ebf46-d6c4-4c12-b024-08be13d98dd2",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-15157"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "1295c15a-f035-4131-bdf8-6f9f24bb3a81",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2013-05-09",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "8f48c5fa72b08f5b62a0c47547a1590a"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:948ebf46-d6c4-4c12-b024-08be13d98dd2"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:1295c15a-f035-4131-bdf8-6f9f24bb3a81",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|8f48c5fa72b08f5b62a0c47547a1590a"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "92f299dc-ec29-4c21-b7e6-2721cac5838f",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "9d0284bf7830e364101cd4950ac55e46"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:948ebf46-d6c4-4c12-b024-08be13d98dd2"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-05-09T10:36:00Z",
+          "end": "2013-05-09T11:00:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:92f299dc-ec29-4c21-b7e6-2721cac5838f",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|9d0284bf7830e364101cd4950ac55e46"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "8e0c7c0f-1821-42f6-b665-8a21afd45982",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "2b8d931c2b5bdb2a57efb5d18de1c5fc"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:948ebf46-d6c4-4c12-b024-08be13d98dd2"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "450.00 mg",
+          "dose": {
+            "value": 450,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-05-09T10:36:00Z",
+          "end": "2013-05-09T11:45:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:8e0c7c0f-1821-42f6-b665-8a21afd45982",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|2b8d931c2b5bdb2a57efb5d18de1c5fc"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "fe5bc620-a806-405d-87b3-f83809c92ff8",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-23401"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 19
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2014-02-10",
+          "end": "2014-03-03"
+        }
+      },
+      "fullUrl": "urn:uuid:fe5bc620-a806-405d-87b3-f83809c92ff8",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-23401"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "39dc74b5-6bd6-4e75-87e4-5a4ac8d57812",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2014-02-10",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "26b9c1ce0969a6e91f87c772bf03254b"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:fe5bc620-a806-405d-87b3-f83809c92ff8"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:39dc74b5-6bd6-4e75-87e4-5a4ac8d57812",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|26b9c1ce0969a6e91f87c772bf03254b"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "be0837db-1457-4ed0-8c00-df2489f10976",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "c877ca50dfb53398e228db983917e436"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:fe5bc620-a806-405d-87b3-f83809c92ff8"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "450.00 mg",
+          "dose": {
+            "value": 450,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2014-02-10T12:05:00Z",
+          "end": "2014-02-10T12:50:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:be0837db-1457-4ed0-8c00-df2489f10976",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|c877ca50dfb53398e228db983917e436"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "d61cb348-fb01-4df4-b7a3-497377a2fc2d",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "4cc4e76bb3947d48e5ee695f3287c846"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:fe5bc620-a806-405d-87b3-f83809c92ff8"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2014-02-10T12:05:00Z",
+          "end": "2014-02-10T12:50:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:d61cb348-fb01-4df4-b7a3-497377a2fc2d",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|4cc4e76bb3947d48e5ee695f3287c846"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "ce1f0a16-5af5-436d-833d-83106c2c20a9",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-15164"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 12
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2013-10-03",
+          "end": "2013-10-24"
+        }
+      },
+      "fullUrl": "urn:uuid:ce1f0a16-5af5-436d-833d-83106c2c20a9",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-15164"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "8011fa7b-e53f-4b90-8dfb-0e59b95acceb",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "f3d173e85fa29a9b9a3199773e9d6330"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:ce1f0a16-5af5-436d-833d-83106c2c20a9"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-10-03T12:38:00Z",
+          "end": "2013-10-03T12:15:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:8011fa7b-e53f-4b90-8dfb-0e59b95acceb",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|f3d173e85fa29a9b9a3199773e9d6330"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "864cb836-13de-4f4b-8a02-f8a8963126d7",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2013-10-03",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "158158d64255425c92de3cf855bbd1ca"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:ce1f0a16-5af5-436d-833d-83106c2c20a9"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:864cb836-13de-4f4b-8a02-f8a8963126d7",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|158158d64255425c92de3cf855bbd1ca"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "481e3cff-ffb7-4fe9-b6fd-8c334dac1cea",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "0665d36aada19928ea6b1cac52e008aa"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:ce1f0a16-5af5-436d-833d-83106c2c20a9"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "450.00 mg",
+          "dose": {
+            "value": 450,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-10-03T12:38:00Z",
+          "end": "2013-10-03T12:15:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:481e3cff-ffb7-4fe9-b6fd-8c334dac1cea",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|0665d36aada19928ea6b1cac52e008aa"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "1d81b5b6-bec8-4ddf-b669-ed6f56e52ce3",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-15162"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 10
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2013-08-22",
+          "end": "2013-09-12"
+        }
+      },
+      "fullUrl": "urn:uuid:1d81b5b6-bec8-4ddf-b669-ed6f56e52ce3",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-15162"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "b112109e-7fe6-4e86-a829-ba7d30362a69",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "67ab2a303929351d43063f0347935c9b"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:1d81b5b6-bec8-4ddf-b669-ed6f56e52ce3"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-dose-adjustment-reason",
+            "valueString": "**Rounding**"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "450.00 mg",
+          "dose": {
+            "value": 450,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-08-22T12:00:00Z",
+          "end": "2013-08-22T12:40:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:b112109e-7fe6-4e86-a829-ba7d30362a69",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|67ab2a303929351d43063f0347935c9b"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "669b0733-5e62-46ff-9db4-5919b08e9b8d",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "f857d327806a5c7375e8d2ebc80c29c9"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:1d81b5b6-bec8-4ddf-b669-ed6f56e52ce3"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-08-22T12:00:00Z",
+          "end": "2013-08-22T12:40:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:669b0733-5e62-46ff-9db4-5919b08e9b8d",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|f857d327806a5c7375e8d2ebc80c29c9"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "3cf551f7-4c2a-45e8-a621-3da7e293fbac",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2013-08-22",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "070c4193922c32fbffb83c51f7707662"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:1d81b5b6-bec8-4ddf-b669-ed6f56e52ce3"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:3cf551f7-4c2a-45e8-a621-3da7e293fbac",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|070c4193922c32fbffb83c51f7707662"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "fa56eda7-1dce-4adb-aeeb-6b5f552226b2",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-15161"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 9
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2013-08-01",
+          "end": "2013-08-22"
+        }
+      },
+      "fullUrl": "urn:uuid:fa56eda7-1dce-4adb-aeeb-6b5f552226b2",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-15161"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "2ae40a5f-6aac-4c4f-9529-3760096b0a1e",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "ad7250d773a6d4c329729a52acdbd7d6"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:fa56eda7-1dce-4adb-aeeb-6b5f552226b2"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "450.00 mg",
+          "dose": {
+            "value": 450,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-08-01T12:41:00Z",
+          "end": "2013-08-01T12:49:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:2ae40a5f-6aac-4c4f-9529-3760096b0a1e",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|ad7250d773a6d4c329729a52acdbd7d6"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "c441276f-2502-4966-9e81-e7fc37232bf2",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "4b4ce17fa4d9bf2db72ef6d3de741bed"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:fa56eda7-1dce-4adb-aeeb-6b5f552226b2"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-08-01T12:41:00Z",
+          "end": "2013-08-01T12:50:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:c441276f-2502-4966-9e81-e7fc37232bf2",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|4b4ce17fa4d9bf2db72ef6d3de741bed"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "8726b69f-75c2-4351-8ab3-8f02392424e6",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2013-08-01",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "4bec615d212ef7c7c4c2a47e5a4606bc"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:fa56eda7-1dce-4adb-aeeb-6b5f552226b2"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:8726b69f-75c2-4351-8ab3-8f02392424e6",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|4bec615d212ef7c7c4c2a47e5a4606bc"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "4494bcb1-af9b-42b8-b2e6-612bdcd91cdc",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-15160"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 8
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2013-07-11",
+          "end": "2013-08-01"
+        }
+      },
+      "fullUrl": "urn:uuid:4494bcb1-af9b-42b8-b2e6-612bdcd91cdc",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-15160"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "223e0a64-e96a-445f-9b99-3f175c7d8e78",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2013-07-11",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "ff486151610ecb4466e38b789b1ffafd"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:4494bcb1-af9b-42b8-b2e6-612bdcd91cdc"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:223e0a64-e96a-445f-9b99-3f175c7d8e78",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|ff486151610ecb4466e38b789b1ffafd"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "79cc2b1e-6133-47f3-bfe4-0ee38d8ac91a",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "64303a0d47b2cf9498277affaf8435c3"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:4494bcb1-af9b-42b8-b2e6-612bdcd91cdc"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-07-11T12:43:00Z",
+          "end": "2013-07-11T12:55:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:79cc2b1e-6133-47f3-bfe4-0ee38d8ac91a",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|64303a0d47b2cf9498277affaf8435c3"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "3b8fab9a-db59-4e84-9cd7-4f7b0c888608",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "db39d289ad75478847808a08626516fc"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:4494bcb1-af9b-42b8-b2e6-612bdcd91cdc"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "450.00 mg",
+          "dose": {
+            "value": 450,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-07-11T12:43:00Z",
+          "end": "2013-07-11T12:55:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:3b8fab9a-db59-4e84-9cd7-4f7b0c888608",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|db39d289ad75478847808a08626516fc"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "7b4951d3-ff5f-46d1-a13f-84c56a32450e",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-15155"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 3
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2013-03-28",
+          "end": "2013-04-18"
+        }
+      },
+      "fullUrl": "urn:uuid:7b4951d3-ff5f-46d1-a13f-84c56a32450e",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-15155"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "0cb68355-0128-4a1e-af7b-0f8ce0de5508",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "5a68636f4aff4d3952a317f3b176d203"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:7b4951d3-ff5f-46d1-a13f-84c56a32450e"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-03-28T12:30:00Z",
+          "end": "2013-03-28T12:40:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:0cb68355-0128-4a1e-af7b-0f8ce0de5508",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|5a68636f4aff4d3952a317f3b176d203"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "61bde95b-c58a-423a-a7cb-c5e1ab1c5f4b",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2013-03-28",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "f496e4ccfb1e75484472e8758a3f4d98"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:7b4951d3-ff5f-46d1-a13f-84c56a32450e"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:61bde95b-c58a-423a-a7cb-c5e1ab1c5f4b",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|f496e4ccfb1e75484472e8758a3f4d98"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "b23aaa4e-1274-4a4f-9183-d7a868a7c67a",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "04db438c10c35bfd1bc97057bf116abe"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:7b4951d3-ff5f-46d1-a13f-84c56a32450e"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "450.00 mg",
+          "dose": {
+            "value": 450,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-03-28T12:29:00Z",
+          "end": "2013-03-28T12:05:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:b23aaa4e-1274-4a4f-9183-d7a868a7c67a",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|04db438c10c35bfd1bc97057bf116abe"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "f40a605d-4381-4c88-8d2a-2a8b044ab0d4",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-15165"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 13
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2013-10-24",
+          "end": "2013-11-14"
+        }
+      },
+      "fullUrl": "urn:uuid:f40a605d-4381-4c88-8d2a-2a8b044ab0d4",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-15165"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "fd8b4719-29f1-4ae3-848e-75a650730544",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "c1e4c508ca84433519efd6e34c387b25"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:f40a605d-4381-4c88-8d2a-2a8b044ab0d4"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-10-24T12:52:00Z",
+          "end": "2013-10-24T12:24:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:fd8b4719-29f1-4ae3-848e-75a650730544",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|c1e4c508ca84433519efd6e34c387b25"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "79682631-47d4-4dc9-8338-9708852fd94d",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "7e6cec85df3fb113a4d02a3cf42b049a"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:f40a605d-4381-4c88-8d2a-2a8b044ab0d4"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "450.00 mg",
+          "dose": {
+            "value": 450,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-10-24T12:52:00Z",
+          "end": "2013-10-24T12:24:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:79682631-47d4-4dc9-8338-9708852fd94d",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|7e6cec85df3fb113a4d02a3cf42b049a"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "4b21206d-49ac-4050-b33d-395c3f9847ed",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2013-10-24",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "69f2f2845f95bcfa668902b9b4492b8a"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:f40a605d-4381-4c88-8d2a-2a8b044ab0d4"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:4b21206d-49ac-4050-b33d-395c3f9847ed",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|69f2f2845f95bcfa668902b9b4492b8a"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "da8c2838-2715-4d04-9849-b656bcc6ac33",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-15169"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 17
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2014-01-20",
+          "end": "2014-02-10"
+        }
+      },
+      "fullUrl": "urn:uuid:da8c2838-2715-4d04-9849-b656bcc6ac33",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-15169"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "6be477d3-d063-4442-97ab-8f27822e53e9",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "2a9edea88c0da28520b43fbc6d73aec2"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:da8c2838-2715-4d04-9849-b656bcc6ac33"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "450.00 mg",
+          "dose": {
+            "value": 450,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2014-01-20T12:45:00Z",
+          "end": "2014-01-20T12:55:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:6be477d3-d063-4442-97ab-8f27822e53e9",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|2a9edea88c0da28520b43fbc6d73aec2"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "f3d6db25-fbf8-4b03-9f43-a02543db94c8",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "3cc6be4ebced49631dd4f9108f59221a"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:da8c2838-2715-4d04-9849-b656bcc6ac33"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2014-01-20T12:00:00Z",
+          "end": "2014-01-20T12:10:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:f3d6db25-fbf8-4b03-9f43-a02543db94c8",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|3cc6be4ebced49631dd4f9108f59221a"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "a6d581ab-6deb-4429-bc1f-eb231b22f1ea",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2014-01-20",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "8010cde5050cab5f9ed8cdfa7ec583ba"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:da8c2838-2715-4d04-9849-b656bcc6ac33"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:a6d581ab-6deb-4429-bc1f-eb231b22f1ea",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|8010cde5050cab5f9ed8cdfa7ec583ba"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "bb7aa3e2-676b-4dbd-8036-2ca6b6656eb2",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-15159"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 7
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2013-06-20",
+          "end": "2013-07-11"
+        }
+      },
+      "fullUrl": "urn:uuid:bb7aa3e2-676b-4dbd-8036-2ca6b6656eb2",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-15159"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "f9efccc2-7636-4b57-aa85-df6da215c8a8",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "3bfe0a35fe86d88001a29fb75779b722"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:bb7aa3e2-676b-4dbd-8036-2ca6b6656eb2"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-06-20T12:45:00Z",
+          "end": "2013-06-20T12:00:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:f9efccc2-7636-4b57-aa85-df6da215c8a8",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|3bfe0a35fe86d88001a29fb75779b722"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "abb945fe-f9d3-4538-a22f-0c235438e6c2",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "3a9f0f40b6ced5108acc061b1c3d3169"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:bb7aa3e2-676b-4dbd-8036-2ca6b6656eb2"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "450.00 mg",
+          "dose": {
+            "value": 450,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-06-20T12:38:00Z",
+          "end": "2013-06-20T12:45:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:abb945fe-f9d3-4538-a22f-0c235438e6c2",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|3a9f0f40b6ced5108acc061b1c3d3169"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "92ba634c-bbdb-4cd9-aa70-cc4cc6ffa626",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2013-06-20",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "830d37d5332510b8800636c2380bea32"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:bb7aa3e2-676b-4dbd-8036-2ca6b6656eb2"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:92ba634c-bbdb-4cd9-aa70-cc4cc6ffa626",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|830d37d5332510b8800636c2380bea32"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "343ce367-e6e9-4786-98dd-757c3fb645cd",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-15163"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 11
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2013-09-12",
+          "end": "2013-10-03"
+        }
+      },
+      "fullUrl": "urn:uuid:343ce367-e6e9-4786-98dd-757c3fb645cd",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-15163"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "00de5f89-4761-4ca1-a119-47dfad4e87d7",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2013-09-12",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "a4da4084044e463ab97ceaa42d7fa411"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:343ce367-e6e9-4786-98dd-757c3fb645cd"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:00de5f89-4761-4ca1-a119-47dfad4e87d7",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|a4da4084044e463ab97ceaa42d7fa411"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "3f7cda8d-c708-4409-bcc9-ac80562ce1c9",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "93ea47c9126d80a07bc5457929f1ee2a"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:343ce367-e6e9-4786-98dd-757c3fb645cd"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "450.00 mg",
+          "dose": {
+            "value": 450,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-09-12T12:25:00Z",
+          "end": "2013-09-12T12:00:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:3f7cda8d-c708-4409-bcc9-ac80562ce1c9",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|93ea47c9126d80a07bc5457929f1ee2a"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "4ff910e1-d1a4-46e2-8a19-3972fc00193b",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "9e7d5028ba66951abc15c7e038f46206"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:343ce367-e6e9-4786-98dd-757c3fb645cd"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-09-12T12:25:00Z",
+          "end": "2013-09-12T12:00:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:4ff910e1-d1a4-46e2-8a19-3972fc00193b",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|9e7d5028ba66951abc15c7e038f46206"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "0702d1af-c203-41f6-a240-9636ec02617f",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-15168"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 16
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2013-12-30",
+          "end": "2014-01-20"
+        }
+      },
+      "fullUrl": "urn:uuid:0702d1af-c203-41f6-a240-9636ec02617f",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-15168"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "fe06258a-ce9d-4542-96bf-28fa9f53be1f",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "2411557e5e5db81e16e21bd685a6b26c"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:0702d1af-c203-41f6-a240-9636ec02617f"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "450.00 mg",
+          "dose": {
+            "value": 450,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-12-30T12:00:00Z",
+          "end": "2013-12-30T12:10:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:fe06258a-ce9d-4542-96bf-28fa9f53be1f",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|2411557e5e5db81e16e21bd685a6b26c"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "8ec19abc-8463-45c3-913a-e4f2c9c35ea2",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "4c29b411e76fe2b3c37affdd5dbf51fa"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:0702d1af-c203-41f6-a240-9636ec02617f"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-12-30T12:00:00Z",
+          "end": "2013-12-30T12:10:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:8ec19abc-8463-45c3-913a-e4f2c9c35ea2",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|4c29b411e76fe2b3c37affdd5dbf51fa"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "3d4bbc53-e7a5-47f7-84a4-b260e51f340b",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2013-12-30",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "5d64b88faadb859fe3fc30fdba9efd1c"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:0702d1af-c203-41f6-a240-9636ec02617f"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:3d4bbc53-e7a5-47f7-84a4-b260e51f340b",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|5d64b88faadb859fe3fc30fdba9efd1c"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "ac57418d-11d1-4b5a-9154-145fc9d39ee3",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-15154"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 2
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2013-03-07",
+          "end": "2013-03-28"
+        }
+      },
+      "fullUrl": "urn:uuid:ac57418d-11d1-4b5a-9154-145fc9d39ee3",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-15154"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "9f3867aa-da19-4aa5-816d-e7857d60ea04",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2013-03-07",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "9c9a92f2bf73bd88009e8fdbf992ca42"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:ac57418d-11d1-4b5a-9154-145fc9d39ee3"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:9f3867aa-da19-4aa5-816d-e7857d60ea04",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|9c9a92f2bf73bd88009e8fdbf992ca42"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "04bc4d4f-fefa-4122-975e-000d12f7179a",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "f0d352a21afdb07e3b028550b2d59ec9"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:ac57418d-11d1-4b5a-9154-145fc9d39ee3"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-03-07T12:55:00Z",
+          "end": "2013-03-07T12:10:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:04bc4d4f-fefa-4122-975e-000d12f7179a",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|f0d352a21afdb07e3b028550b2d59ec9"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "5dd9d7d7-179c-4f3d-8a68-32c900b14740",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "7387d933b70be010e4be1373a6dabddc"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:ac57418d-11d1-4b5a-9154-145fc9d39ee3"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "440.00 mg",
+          "dose": {
+            "value": 440,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-03-07T12:48:00Z",
+          "end": "2013-03-07T12:55:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:5dd9d7d7-179c-4f3d-8a68-32c900b14740",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|7387d933b70be010e4be1373a6dabddc"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "8362fe5b-0041-4ecd-be92-ccbaddf4e3c7",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-15166"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 14
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2013-11-14",
+          "end": "2013-12-05"
+        }
+      },
+      "fullUrl": "urn:uuid:8362fe5b-0041-4ecd-be92-ccbaddf4e3c7",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-15166"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "46b8c9ab-c0c0-4d18-9c8a-5872c4ba2ca1",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2013-11-14",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "dd69b01e8b15da779bc3e2d03baad7f8"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:8362fe5b-0041-4ecd-be92-ccbaddf4e3c7"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:46b8c9ab-c0c0-4d18-9c8a-5872c4ba2ca1",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|dd69b01e8b15da779bc3e2d03baad7f8"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "260bf96a-d366-4cfe-9f8c-79f166a0a8ce",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "ca6e01e531b1a074576083cb40a73b85"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:8362fe5b-0041-4ecd-be92-ccbaddf4e3c7"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-11-14T12:25:00Z",
+          "end": "2013-11-14T12:00:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:260bf96a-d366-4cfe-9f8c-79f166a0a8ce",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|ca6e01e531b1a074576083cb40a73b85"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "d26f6a96-2627-47d5-8ee6-fa7317eec05c",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "42b03bd90235c73d878cf9b3904fc2dc"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:8362fe5b-0041-4ecd-be92-ccbaddf4e3c7"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "450.00 mg",
+          "dose": {
+            "value": 450,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-11-14T12:25:00Z",
+          "end": "2013-11-14T12:00:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:d26f6a96-2627-47d5-8ee6-fa7317eec05c",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|42b03bd90235c73d878cf9b3904fc2dc"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "b6d36b8c-c5bf-4b6c-a2ea-17d822d1a791",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-15153-15167"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 15
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:380a827c-9712-4f43-b5f8-e1a025838253"
+          }
+        ],
+        "period": {
+          "start": "2013-12-05",
+          "end": "2013-12-26"
+        }
+      },
+      "fullUrl": "urn:uuid:b6d36b8c-c5bf-4b6c-a2ea-17d822d1a791",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-15153-15167"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "44c1270a-8f03-45fb-9811-2357f9bc9672",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "authoredOn": "2013-12-05",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "c30e7c9128ae2745c87635608db81563"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:b6d36b8c-c5bf-4b6c-a2ea-17d822d1a791"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:44c1270a-8f03-45fb-9811-2357f9bc9672",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|c30e7c9128ae2745c87635608db81563"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "6dfcca92-0d1c-4863-bb23-fc5a974c7a48",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "eb0525478f43f883c6bf82cd78f94b36"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:b6d36b8c-c5bf-4b6c-a2ea-17d822d1a791"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "450.00 mg",
+          "dose": {
+            "value": 450,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-12-05T12:05:00Z",
+          "end": "2013-12-05T12:10:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:6dfcca92-0d1c-4863-bb23-fc5a974c7a48",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|eb0525478f43f883c6bf82cd78f94b36"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "139ccbd3-99f5-4d15-b63a-699c49a2a873",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "eea064ed19840d414b1ac600426515c5"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:b6d36b8c-c5bf-4b6c-a2ea-17d822d1a791"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-12-05T12:00:00Z",
+          "end": "2013-12-05T12:10:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:139ccbd3-99f5-4d15-b63a-699c49a2a873",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|eea064ed19840d414b1ac600426515c5"
+      }
+    }
+  ],
+  "id": "G08462-F-15153"
+}

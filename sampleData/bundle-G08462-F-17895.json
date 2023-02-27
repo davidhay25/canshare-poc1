@@ -1,0 +1,1253 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "name": [
+          {
+            "text": "John Doe - G08462-F-17895"
+          }
+        ],
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-patient"
+          ]
+        },
+        "id": "ce409f89-3493-4ea6-92b6-7e902b178056",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Patient",
+            "value": "67"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Identifier: 67</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056",
+      "request": {
+        "method": "PUT",
+        "url": "Patient?identifier=http://mosaic.com/Patient|67"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "7023ee2c-3340-45c9-9774-851ddf544641",
+        "status": "completed",
+        "intent": "order",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-regimen"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "regimen-G08462-F-17895"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-iot",
+            "valueCodeableConcept": {
+              "text": "Curative"
+            }
+          },
+          {
+            "url": "http://hl7.org.nz/fhir/StructureDefinition/sact-regimen-type",
+            "valueCodeableConcept": {
+              "text": "Trastuzumab"
+            }
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-count",
+            "valueInteger": 17
+          }
+        ],
+        "title": "Trastuzumab",
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "regimenCP"
+              }
+            ]
+          }
+        ],
+        "partOf": [
+          {
+            "reference": "urn:uuid:48a14e7c-42ec-4825-b722-74eb672f5b55"
+          }
+        ],
+        "period": {
+          "start": "2012-09-20",
+          "end": "2013-09-11"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Regimen plan: completed</div>"
+        },
+        "addresses": [
+          {
+            "reference": "urn:uuid:57489eae-558b-4ef8-b0e0-6c6da67a185e"
+          }
+        ],
+        "supportingInfo": [
+          {
+            "reference": "urn:uuid:a6e5e832-7e0f-46fe-9d63-1f748ef71a32"
+          },
+          {
+            "reference": "urn:uuid:3ddd8f35-571d-472f-8592-1dca7b9a78e5"
+          },
+          {
+            "reference": "urn:uuid:276a2890-0fb0-4027-acf6-ec489ca19b43"
+          },
+          {
+            "reference": "urn:uuid:7cdfe487-78c3-4a40-9481-cf991202626a"
+          },
+          {
+            "reference": "urn:uuid:d4b8a298-6b91-4703-b654-eeb6b6add1b5"
+          }
+        ]
+      },
+      "fullUrl": "urn:uuid:7023ee2c-3340-45c9-9774-851ddf544641",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|regimen-G08462-F-17895"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "48a14e7c-42ec-4825-b722-74eb672f5b55",
+        "status": "active",
+        "intent": "order",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-patient"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "pat-67"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Patient plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "patientCP"
+              }
+            ]
+          }
+        ]
+      },
+      "fullUrl": "urn:uuid:48a14e7c-42ec-4825-b722-74eb672f5b55",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|pat-67"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "26a8ef93-ed0b-4f68-804e-969e915d4a11",
+        "status": "final",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Histology</div>"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-histology"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "histology-G08462-F-17895"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "82231000004111"
+            }
+          ]
+        },
+        "component": [
+          {
+            "code": {
+              "text": "histologyCode"
+            },
+            "valueCodeableConcept": {
+              "text": "85003"
+            }
+          },
+          {
+            "code": {
+              "text": "grade"
+            },
+            "valueString": "2"
+          },
+          {
+            "code": {
+              "text": "dxclass"
+            },
+            "valueString": "1"
+          }
+        ]
+      },
+      "fullUrl": "urn:uuid:26a8ef93-ed0b-4f68-804e-969e915d4a11",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|histology-G08462-F-17895"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "57489eae-558b-4ef8-b0e0-6c6da67a185e",
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-condition"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Condition",
+            "value": "condition-G08462-F-17895"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/sid/icd-9-cm",
+              "code": "C504"
+            }
+          ],
+          "text": "Upper-outer quadrant of breast"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Upper-outer quadrant of breast</div>"
+        },
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-laterality-qualifier",
+            "valueString": "1 - Right"
+          }
+        ],
+        "evidence": [
+          {
+            "detail": [
+              {
+                "reference": "urn:uuid:26a8ef93-ed0b-4f68-804e-969e915d4a11"
+              }
+            ]
+          }
+        ],
+        "stage": [
+          {
+            "assessment": [
+              {
+                "reference": "urn:uuid:a6e5e832-7e0f-46fe-9d63-1f748ef71a32"
+              }
+            ]
+          },
+          {
+            "assessment": [
+              {
+                "reference": "urn:uuid:3ddd8f35-571d-472f-8592-1dca7b9a78e5"
+              }
+            ]
+          }
+        ]
+      },
+      "fullUrl": "urn:uuid:57489eae-558b-4ef8-b0e0-6c6da67a185e",
+      "request": {
+        "method": "PUT",
+        "url": "Condition?identifier=http://mosaic.com/Condition|condition-G08462-F-17895"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "a6e5e832-7e0f-46fe-9d63-1f748ef71a32",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "298f2f14e565955769e654bfe072f2f3"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "21908-9"
+            }
+          ],
+          "text": "TNM group"
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://cancerstaging.org",
+              "code": "IIIB"
+            }
+          ]
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-pGroup"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Pathological TNM Group: IIIB</div>"
+        },
+        "hasMember": [
+          {
+            "reference": "urn:uuid:eb8340d0-bb20-4787-8dce-cf34b9e58fcf"
+          },
+          {
+            "reference": "urn:uuid:0695b7e2-f4bb-4fb2-bf69-f7adac7e91b1"
+          },
+          {
+            "reference": "urn:uuid:851c3cec-1a0b-4bc2-ac8c-a1bf98e2f438"
+          }
+        ]
+      },
+      "fullUrl": "urn:uuid:a6e5e832-7e0f-46fe-9d63-1f748ef71a32",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|298f2f14e565955769e654bfe072f2f3"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "eb8340d0-bb20-4787-8dce-cf34b9e58fcf",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "7d0c53debeb04df3f22aadcc9e99626d"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "21905-5"
+            }
+          ]
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://cancerstaging.org",
+              "code": "T4d"
+            }
+          ]
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-pT"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Pathological T: T4d</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:eb8340d0-bb20-4787-8dce-cf34b9e58fcf",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|7d0c53debeb04df3f22aadcc9e99626d"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "0695b7e2-f4bb-4fb2-bf69-f7adac7e91b1",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "a0576cca63829a1e2e368531f65e2321"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "21906-3"
+            }
+          ]
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://cancerstaging.org",
+              "code": "N2a"
+            }
+          ]
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-pN"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Pathological N: N2a</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:0695b7e2-f4bb-4fb2-bf69-f7adac7e91b1",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|a0576cca63829a1e2e368531f65e2321"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "851c3cec-1a0b-4bc2-ac8c-a1bf98e2f438",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "8f196c16eb77abecd738a7431383da7c"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "21907-3"
+            }
+          ]
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://cancerstaging.org",
+              "code": "M0"
+            }
+          ]
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-pM"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Pathological M: M0</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:851c3cec-1a0b-4bc2-ac8c-a1bf98e2f438",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|8f196c16eb77abecd738a7431383da7c"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "3ddd8f35-571d-472f-8592-1dca7b9a78e5",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "6d47c47841a2ca0528d865fa5cfd4c34"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "c-tnm"
+            }
+          ],
+          "text": "TNM group"
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://cancerstaging.org",
+              "code": "IIIB"
+            }
+          ]
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-cGroup"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Clinical TNM Group: IIIB</div>"
+        },
+        "hasMember": [
+          {
+            "reference": "urn:uuid:ecca1a0b-c340-45fc-91fb-69a401179664"
+          },
+          {
+            "reference": "urn:uuid:0c2857fa-72aa-48cd-bdf4-962efecea998"
+          },
+          {
+            "reference": "urn:uuid:7e4b1a97-b56a-4d1c-a40b-e13656dcd7f6"
+          }
+        ]
+      },
+      "fullUrl": "urn:uuid:3ddd8f35-571d-472f-8592-1dca7b9a78e5",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|6d47c47841a2ca0528d865fa5cfd4c34"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "ecca1a0b-c340-45fc-91fb-69a401179664",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "66e79d05098b8e505430eadbbda4b3c4"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "c-t"
+            }
+          ]
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://cancerstaging.org",
+              "code": "T4d"
+            }
+          ]
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-cT"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Clinical T: T4d</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:ecca1a0b-c340-45fc-91fb-69a401179664",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|66e79d05098b8e505430eadbbda4b3c4"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "0c2857fa-72aa-48cd-bdf4-962efecea998",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "67bebfde822d2fc7acd4dbc7fe6dbd84"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "c-n"
+            }
+          ]
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://cancerstaging.org",
+              "code": "N1NOS"
+            }
+          ]
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-cN"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Clinical N: N1NOS</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:0c2857fa-72aa-48cd-bdf4-962efecea998",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|67bebfde822d2fc7acd4dbc7fe6dbd84"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "7e4b1a97-b56a-4d1c-a40b-e13656dcd7f6",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "de1616cdaed1efdd351384ab34163e16"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "c-m"
+            }
+          ]
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://cancerstaging.org",
+              "code": "M0"
+            }
+          ]
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-cM"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Clinical M: M0</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:7e4b1a97-b56a-4d1c-a40b-e13656dcd7f6",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|de1616cdaed1efdd351384ab34163e16"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "276a2890-0fb0-4027-acf6-ec489ca19b43",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "4d04164c624873b53a2623d8e41b2ae6"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "code": {
+          "text": "ER",
+          "coding": [
+            {
+              "system": "http://canshare.co.nz/dummy",
+              "code": "ER"
+            }
+          ]
+        },
+        "valueString": "-",
+        "effectiveDateTime": "2012-09-20",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>-</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:276a2890-0fb0-4027-acf6-ec489ca19b43",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|4d04164c624873b53a2623d8e41b2ae6"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "7cdfe487-78c3-4a40-9481-cf991202626a",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "ac70ba62cb5d09825cde5caaefbcd603"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "code": {
+          "text": "PR",
+          "coding": [
+            {
+              "system": "http://canshare.co.nz/dummy",
+              "code": "PR"
+            }
+          ]
+        },
+        "valueString": "-",
+        "effectiveDateTime": "2012-09-20",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>-</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:7cdfe487-78c3-4a40-9481-cf991202626a",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|ac70ba62cb5d09825cde5caaefbcd603"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "d4b8a298-6b91-4703-b654-eeb6b6add1b5",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "e9b315032c5a8284284a48fdcca41325"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "code": {
+          "text": "HER2",
+          "coding": [
+            {
+              "system": "http://canshare.co.nz/dummy",
+              "code": "HER2"
+            }
+          ]
+        },
+        "valueString": "+",
+        "effectiveDateTime": "2012-09-20",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>+</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:d4b8a298-6b91-4703-b654-eeb6b6add1b5",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|e9b315032c5a8284284a48fdcca41325"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "009f6366-7f7f-4d2e-947c-fa98bf32f65c",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-17895-17910"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 16
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:7023ee2c-3340-45c9-9774-851ddf544641"
+          }
+        ],
+        "period": {
+          "start": "2013-08-01",
+          "end": "2013-08-22"
+        }
+      },
+      "fullUrl": "urn:uuid:009f6366-7f7f-4d2e-947c-fa98bf32f65c",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-17895-17910"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "15c0ead5-f3b5-47a3-bac1-38f98ee8031c",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "31acadc4ead6004dc3d514dc10e4c382"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:009f6366-7f7f-4d2e-947c-fa98bf32f65c"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-08-01T11:40:00Z",
+          "end": "2013-08-01T12:30:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:15c0ead5-f3b5-47a3-bac1-38f98ee8031c",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|31acadc4ead6004dc3d514dc10e4c382"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "8ed7d8b3-2914-4d37-83ae-a9cb8e243f58",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "authoredOn": "2013-08-01",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "3caa407c11651cb9a2562ca6615b6159"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:009f6366-7f7f-4d2e-947c-fa98bf32f65c"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:8ed7d8b3-2914-4d37-83ae-a9cb8e243f58",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|3caa407c11651cb9a2562ca6615b6159"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "7b798a96-71d1-4826-a6a4-e320ac0249e0",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "42c65f8b5466e5abce2279a2b34872bf"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:009f6366-7f7f-4d2e-947c-fa98bf32f65c"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "440.00 mg",
+          "dose": {
+            "value": 440,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-08-01T11:45:00Z",
+          "end": "2013-08-01T12:20:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:7b798a96-71d1-4826-a6a4-e320ac0249e0",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|42c65f8b5466e5abce2279a2b34872bf"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "8154f852-3a13-4ef5-a9b9-b4198d379ca8",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-17895-17911"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 17
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:7023ee2c-3340-45c9-9774-851ddf544641"
+          }
+        ],
+        "period": {
+          "start": "2013-08-22",
+          "end": "2013-09-12"
+        }
+      },
+      "fullUrl": "urn:uuid:8154f852-3a13-4ef5-a9b9-b4198d379ca8",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-17895-17911"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "02574044-6d0f-44a9-b63e-12b76e251d7c",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "fc31d53111565227d1d4e9cd4b01e498"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:8154f852-3a13-4ef5-a9b9-b4198d379ca8"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "medicationCodeableConcept": {
+          "text": "Trastuzumab"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Trastuzumab</div>"
+        },
+        "dosage": {
+          "text": "450.00 mg",
+          "dose": {
+            "value": 450,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-08-22T11:52:00Z",
+          "end": "2013-08-22T12:25:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:02574044-6d0f-44a9-b63e-12b76e251d7c",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|fc31d53111565227d1d4e9cd4b01e498"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "2a152a0c-c75f-46f1-b2ec-5681f80d47c9",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "authoredOn": "2013-08-22",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "442e195b0bcb76d080ec1b2be93ebfca"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:8154f852-3a13-4ef5-a9b9-b4198d379ca8"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:2a152a0c-c75f-46f1-b2ec-5681f80d47c9",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|442e195b0bcb76d080ec1b2be93ebfca"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "f1335c55-673d-43eb-aa64-81509028451e",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "99c0be597bf0339c32f9c93fad9030d6"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:8154f852-3a13-4ef5-a9b9-b4198d379ca8"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:ce409f89-3493-4ea6-92b6-7e902b178056"
+        },
+        "medicationCodeableConcept": {
+          "text": "Sodium Chloride 0.9% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sodium Chloride 0.9%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-08-22T11:52:00Z",
+          "end": "2013-08-22T12:25:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:f1335c55-673d-43eb-aa64-81509028451e",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|99c0be597bf0339c32f9c93fad9030d6"
+      }
+    }
+  ],
+  "id": "G08462-F-17895"
+}

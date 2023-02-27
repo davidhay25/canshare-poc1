@@ -1,0 +1,2662 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "name": [
+          {
+            "text": "John Doe - G08462-F-18415"
+          }
+        ],
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-patient"
+          ]
+        },
+        "id": "0a705c18-545c-4cae-9355-751bd37bb720",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Patient",
+            "value": "78"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Identifier: 78</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720",
+      "request": {
+        "method": "PUT",
+        "url": "Patient?identifier=http://mosaic.com/Patient|78"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "3ce4c1a2-cb52-43e6-9725-3d955ca09c9b",
+        "status": "revoked",
+        "intent": "order",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-regimen"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "regimen-G08462-F-18415"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-iot",
+            "valueCodeableConcept": {
+              "text": "Palliative"
+            }
+          },
+          {
+            "url": "http://hl7.org.nz/fhir/StructureDefinition/sact-regimen-type",
+            "valueCodeableConcept": {
+              "text": "CAPEOX"
+            }
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-regimen-discontinued",
+            "extension": [
+              {
+                "url": "reason",
+                "valueCodeableConcept": {
+                  "text": "No reason given"
+                }
+              }
+            ]
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-count",
+            "valueInteger": 7
+          }
+        ],
+        "title": "CAPEOX",
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "regimenCP"
+              }
+            ]
+          }
+        ],
+        "partOf": [
+          {
+            "reference": "urn:uuid:b3567def-da62-4ba3-8a97-afeccbc0ff8e"
+          }
+        ],
+        "period": {
+          "start": "2013-08-07",
+          "end": "2014-01-21"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Regimen plan: revoked</div>"
+        },
+        "addresses": [
+          {
+            "reference": "urn:uuid:0900f526-0cc6-4ec1-97d2-bbbca3fd037a"
+          }
+        ],
+        "supportingInfo": [
+          {
+            "reference": "urn:uuid:5f5408bc-e86a-4f06-87bb-cc093d6785b4"
+          }
+        ]
+      },
+      "fullUrl": "urn:uuid:3ce4c1a2-cb52-43e6-9725-3d955ca09c9b",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|regimen-G08462-F-18415"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "b3567def-da62-4ba3-8a97-afeccbc0ff8e",
+        "status": "active",
+        "intent": "order",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-patient"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "pat-78"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Patient plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "patientCP"
+              }
+            ]
+          }
+        ]
+      },
+      "fullUrl": "urn:uuid:b3567def-da62-4ba3-8a97-afeccbc0ff8e",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|pat-78"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "e55aec5b-643c-41b7-8e99-1f6667de1698",
+        "status": "final",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Histology</div>"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-histology"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "histology-G08462-F-18415"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "82231000004111"
+            }
+          ]
+        },
+        "component": [
+          {
+            "code": {
+              "text": "dxclass"
+            },
+            "valueString": "1"
+          }
+        ]
+      },
+      "fullUrl": "urn:uuid:e55aec5b-643c-41b7-8e99-1f6667de1698",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|histology-G08462-F-18415"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "0900f526-0cc6-4ec1-97d2-bbbca3fd037a",
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-condition"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Condition",
+            "value": "condition-G08462-F-18415"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/sid/icd-9-cm",
+              "code": "C187"
+            }
+          ],
+          "text": "Sigmoid colon"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Sigmoid colon</div>"
+        },
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-laterality-qualifier",
+            "valueString": "Central"
+          }
+        ],
+        "evidence": [
+          {
+            "detail": [
+              {
+                "reference": "urn:uuid:e55aec5b-643c-41b7-8e99-1f6667de1698"
+              }
+            ]
+          }
+        ],
+        "stage": [
+          {
+            "assessment": [
+              {
+                "reference": "urn:uuid:5f5408bc-e86a-4f06-87bb-cc093d6785b4"
+              }
+            ]
+          }
+        ]
+      },
+      "fullUrl": "urn:uuid:0900f526-0cc6-4ec1-97d2-bbbca3fd037a",
+      "request": {
+        "method": "PUT",
+        "url": "Condition?identifier=http://mosaic.com/Condition|condition-G08462-F-18415"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "5f5408bc-e86a-4f06-87bb-cc093d6785b4",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "31783faa0e7d61eb9864a42d20d951d1"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "c-tnm"
+            }
+          ],
+          "text": "TNM group"
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://cancerstaging.org",
+              "code": "IVB"
+            }
+          ]
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-cGroup"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Clinical TNM Group: IVB</div>"
+        },
+        "hasMember": [
+          {
+            "reference": "urn:uuid:52bad29e-2e21-4b9c-84d6-8f16a8818454"
+          },
+          {
+            "reference": "urn:uuid:32915f26-5baa-4b38-bd23-0b960d722c7a"
+          },
+          {
+            "reference": "urn:uuid:ff7f5ef2-c2f1-440d-b262-597f2fe5a79c"
+          }
+        ]
+      },
+      "fullUrl": "urn:uuid:5f5408bc-e86a-4f06-87bb-cc093d6785b4",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|31783faa0e7d61eb9864a42d20d951d1"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "52bad29e-2e21-4b9c-84d6-8f16a8818454",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "19ea3ad95ca6ff4205a3c10b916b701b"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "c-t"
+            }
+          ]
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://cancerstaging.org",
+              "code": "TX"
+            }
+          ]
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-cT"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Clinical T: TX</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:52bad29e-2e21-4b9c-84d6-8f16a8818454",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|19ea3ad95ca6ff4205a3c10b916b701b"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "32915f26-5baa-4b38-bd23-0b960d722c7a",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "ee2f11c348c97bdfae67ee6305291175"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "c-n"
+            }
+          ]
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://cancerstaging.org",
+              "code": "NX"
+            }
+          ]
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-cN"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Clinical N: NX</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:32915f26-5baa-4b38-bd23-0b960d722c7a",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|ee2f11c348c97bdfae67ee6305291175"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "ff7f5ef2-c2f1-440d-b262-597f2fe5a79c",
+        "status": "final",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "9073d430dadf976c6d53b8dc3683eacd"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "c-m"
+            }
+          ]
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://cancerstaging.org",
+              "code": "M1b"
+            }
+          ]
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-cM"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Clinical M: M1b</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:ff7f5ef2-c2f1-440d-b262-597f2fe5a79c",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|9073d430dadf976c6d53b8dc3683eacd"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "42d11138-832d-4c8c-8257-c18241e6268c",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-18415-18416"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 2
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:3ce4c1a2-cb52-43e6-9725-3d955ca09c9b"
+          }
+        ],
+        "period": {
+          "start": "2013-08-28",
+          "end": "2013-09-18"
+        }
+      },
+      "fullUrl": "urn:uuid:42d11138-832d-4c8c-8257-c18241e6268c",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-18415-18416"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "ba9b4797-e661-449c-a228-8c0ab4a78423",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Loperamide Hydrochloride"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-08-28",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "901687d14c5ef0e6fa30727bb594db62"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:42d11138-832d-4c8c-8257-c18241e6268c"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Loperamide Hydrochloride</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:ba9b4797-e661-449c-a228-8c0ab4a78423",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|901687d14c5ef0e6fa30727bb594db62"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "18f8f809-664f-4dd0-8fa4-3b2db2866b68",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-08-28",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "828207cebaf1bdd0ab6ffe659da6fc5b"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:42d11138-832d-4c8c-8257-c18241e6268c"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:18f8f809-664f-4dd0-8fa4-3b2db2866b68",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|828207cebaf1bdd0ab6ffe659da6fc5b"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "d66ac38b-3bba-4255-9c51-fa799a5d317a",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Dexamethasone"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-08-28",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "34a23de5be2bb25823ba8d5ae75a12b4"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:42d11138-832d-4c8c-8257-c18241e6268c"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Dexamethasone</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:d66ac38b-3bba-4255-9c51-fa799a5d317a",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|34a23de5be2bb25823ba8d5ae75a12b4"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "56bca458-6d43-4718-a7b1-d92ed61247b1",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "d817289ef2849879d1206440de9e7d75"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:42d11138-832d-4c8c-8257-c18241e6268c"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "medicationCodeableConcept": {
+          "text": "Glucose 5% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Glucose 5%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-08-28T10:10:00Z",
+          "end": "2013-08-28T12:45:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:56bca458-6d43-4718-a7b1-d92ed61247b1",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|d817289ef2849879d1206440de9e7d75"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "1097588c-3765-400e-ab11-8643510aafde",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "e51497a42ef390bf213c05f441f36139"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:42d11138-832d-4c8c-8257-c18241e6268c"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "medicationCodeableConcept": {
+          "text": "Oxaliplatin"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Oxaliplatin</div>"
+        },
+        "dosage": {
+          "text": "290.00 mg",
+          "dose": {
+            "value": 290,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-08-28T10:20:00Z",
+          "end": "2013-08-28T12:20:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:1097588c-3765-400e-ab11-8643510aafde",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|e51497a42ef390bf213c05f441f36139"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "ec1d900f-6bf8-45c3-a807-c58c1d64f30d",
+        "status": "final",
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "e51497a42ef390bf213c05f441f36139"
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "urn:uuid:42d11138-832d-4c8c-8257-c18241e6268c"
+          }
+        ],
+        "code": {
+          "text": "BSA",
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8277-6"
+            }
+          ]
+        },
+        "valueQuantity": {
+          "unit": "m2",
+          "value": 2.22,
+          "system": "http://unitsofmeasure.org"
+        },
+        "effectiveDateTime": "2013-08-28T10:20:00Z",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>BSA 2.22</div>"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-bsa"
+          ]
+        }
+      },
+      "fullUrl": "urn:uuid:ec1d900f-6bf8-45c3-a807-c58c1d64f30d",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|e51497a42ef390bf213c05f441f36139"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "98687d1f-efe0-4d29-b538-379df379cf84",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Ondansetron"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-08-28",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "47f7a690cb310ad2be8e8db73061e1ca"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:42d11138-832d-4c8c-8257-c18241e6268c"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Ondansetron</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:98687d1f-efe0-4d29-b538-379df379cf84",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|47f7a690cb310ad2be8e8db73061e1ca"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "3127bea7-e975-4d78-8666-c6dd9bb86e77",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Capecitabine"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-08-28",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "c5fce0e23e5858f879706bdec5f9de06"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:42d11138-832d-4c8c-8257-c18241e6268c"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Capecitabine</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:3127bea7-e975-4d78-8666-c6dd9bb86e77",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|c5fce0e23e5858f879706bdec5f9de06"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "88e91fc1-e656-4e7d-bf37-f99c22f2da7d",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-18415-18418"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 4
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:3ce4c1a2-cb52-43e6-9725-3d955ca09c9b"
+          }
+        ],
+        "period": {
+          "start": "2013-10-09",
+          "end": "2013-10-30"
+        }
+      },
+      "fullUrl": "urn:uuid:88e91fc1-e656-4e7d-bf37-f99c22f2da7d",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-18415-18418"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "fb797331-ed2b-495c-9a34-88e6877e57bb",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Loperamide Hydrochloride"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-10-09",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "5b26b4204026dc277ad70d907e2347dc"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:88e91fc1-e656-4e7d-bf37-f99c22f2da7d"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Loperamide Hydrochloride</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:fb797331-ed2b-495c-9a34-88e6877e57bb",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|5b26b4204026dc277ad70d907e2347dc"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "3530c303-56e7-4059-a012-53403c37611a",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Ondansetron"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-10-09",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "6762834c698a311c1f170284b96aee3a"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:88e91fc1-e656-4e7d-bf37-f99c22f2da7d"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Ondansetron</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:3530c303-56e7-4059-a012-53403c37611a",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|6762834c698a311c1f170284b96aee3a"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "02d39cb0-72eb-4521-8b7f-4fddd4f1c067",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Dexamethasone"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-10-09",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "fae2ed965f2d5eced9c388d685731d1b"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:88e91fc1-e656-4e7d-bf37-f99c22f2da7d"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Dexamethasone</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:02d39cb0-72eb-4521-8b7f-4fddd4f1c067",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|fae2ed965f2d5eced9c388d685731d1b"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "6a5606e8-6ef4-440c-8848-01759bc34903",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "c2ccff368944ca3cd5b367b15b33a9da"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:88e91fc1-e656-4e7d-bf37-f99c22f2da7d"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "medicationCodeableConcept": {
+          "text": "Oxaliplatin"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Oxaliplatin</div>"
+        },
+        "dosage": {
+          "text": "290.00 mg",
+          "dose": {
+            "value": 290,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-10-09T09:45:00Z",
+          "end": "2013-10-09T11:45:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:6a5606e8-6ef4-440c-8848-01759bc34903",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|c2ccff368944ca3cd5b367b15b33a9da"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "0f674775-b384-40bd-9c47-2b3aa6764afd",
+        "status": "final",
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "c2ccff368944ca3cd5b367b15b33a9da"
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "urn:uuid:88e91fc1-e656-4e7d-bf37-f99c22f2da7d"
+          }
+        ],
+        "code": {
+          "text": "BSA",
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8277-6"
+            }
+          ]
+        },
+        "valueQuantity": {
+          "unit": "m2",
+          "value": 2.21,
+          "system": "http://unitsofmeasure.org"
+        },
+        "effectiveDateTime": "2013-10-09T09:45:00Z",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>BSA 2.21</div>"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-bsa"
+          ]
+        }
+      },
+      "fullUrl": "urn:uuid:0f674775-b384-40bd-9c47-2b3aa6764afd",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|c2ccff368944ca3cd5b367b15b33a9da"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "5bf78b29-9129-43ea-835c-fe93fa69d0fa",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-10-09",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "c1e4bb59d5df4f986b719fbff3e28957"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:88e91fc1-e656-4e7d-bf37-f99c22f2da7d"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:5bf78b29-9129-43ea-835c-fe93fa69d0fa",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|c1e4bb59d5df4f986b719fbff3e28957"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "a605c789-fe66-4e81-90f2-6cdfb28df826",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Capecitabine"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-10-09",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "4004a64bf7cd4a9673fc79c07c185d01"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:88e91fc1-e656-4e7d-bf37-f99c22f2da7d"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Capecitabine</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:a605c789-fe66-4e81-90f2-6cdfb28df826",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|4004a64bf7cd4a9673fc79c07c185d01"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "220e34cb-b9f4-4baf-a2d2-f28457e396de",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "6b1f9627090233825e81fc7d40aa5729"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:88e91fc1-e656-4e7d-bf37-f99c22f2da7d"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "medicationCodeableConcept": {
+          "text": "Glucose 5% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Glucose 5%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-10-09T09:30:00Z",
+          "end": "2013-10-09T12:10:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:220e34cb-b9f4-4baf-a2d2-f28457e396de",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|6b1f9627090233825e81fc7d40aa5729"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "6b5d44f0-3e68-4eba-81f7-d1bc089b597f",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-18415-18415"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 1
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:3ce4c1a2-cb52-43e6-9725-3d955ca09c9b"
+          }
+        ],
+        "period": {
+          "start": "2013-08-07",
+          "end": "2013-08-28"
+        }
+      },
+      "fullUrl": "urn:uuid:6b5d44f0-3e68-4eba-81f7-d1bc089b597f",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-18415-18415"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "cee43e64-73d1-43f8-b871-377470023bc9",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Loperamide Hydrochloride"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-08-07",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "9ce9ddb27a703d56a4c9eff2e89fb60e"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:6b5d44f0-3e68-4eba-81f7-d1bc089b597f"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Loperamide Hydrochloride</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:cee43e64-73d1-43f8-b871-377470023bc9",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|9ce9ddb27a703d56a4c9eff2e89fb60e"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "2941802f-6bda-49b5-8ba1-e5b49e63eecd",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Capecitabine"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-08-07",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "0671f1fcef803e1615ffb17838457776"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:6b5d44f0-3e68-4eba-81f7-d1bc089b597f"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Capecitabine</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:2941802f-6bda-49b5-8ba1-e5b49e63eecd",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|0671f1fcef803e1615ffb17838457776"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "c6d38a71-2206-49dc-9938-0d2d351324e6",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "05a9dfedff3f88d73f9b97b05700d88b"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:6b5d44f0-3e68-4eba-81f7-d1bc089b597f"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "medicationCodeableConcept": {
+          "text": "Oxaliplatin"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Oxaliplatin</div>"
+        },
+        "dosage": {
+          "text": "290.00 mg",
+          "dose": {
+            "value": 290,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-08-07T12:48:00Z",
+          "end": "2013-08-07T12:00:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:c6d38a71-2206-49dc-9938-0d2d351324e6",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|05a9dfedff3f88d73f9b97b05700d88b"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "a9454a3a-3b93-4357-9ddd-c69e1273005c",
+        "status": "final",
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "05a9dfedff3f88d73f9b97b05700d88b"
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "urn:uuid:6b5d44f0-3e68-4eba-81f7-d1bc089b597f"
+          }
+        ],
+        "code": {
+          "text": "BSA",
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8277-6"
+            }
+          ]
+        },
+        "valueQuantity": {
+          "unit": "m2",
+          "value": 2.22,
+          "system": "http://unitsofmeasure.org"
+        },
+        "effectiveDateTime": "2013-08-07T12:48:00Z",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>BSA 2.22</div>"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-bsa"
+          ]
+        }
+      },
+      "fullUrl": "urn:uuid:a9454a3a-3b93-4357-9ddd-c69e1273005c",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|05a9dfedff3f88d73f9b97b05700d88b"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "16923bfe-aa4b-4997-b1ae-cbbe8f4ed27a",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-08-07",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "075129ad396d3e71c8a675f22f687877"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:6b5d44f0-3e68-4eba-81f7-d1bc089b597f"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:16923bfe-aa4b-4997-b1ae-cbbe8f4ed27a",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|075129ad396d3e71c8a675f22f687877"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "baccd4e9-c685-49b0-83a8-7af64d64228a",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Ondansetron"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-08-07",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "b4251c17d5b0677d692baaed97d24205"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:6b5d44f0-3e68-4eba-81f7-d1bc089b597f"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Ondansetron</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:baccd4e9-c685-49b0-83a8-7af64d64228a",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|b4251c17d5b0677d692baaed97d24205"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "cef67eaa-4639-486f-8d4a-329c80a1e0ea",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Dexamethasone"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-08-07",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "a7b31cde9d12cc4398557734b96c4c7b"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:6b5d44f0-3e68-4eba-81f7-d1bc089b597f"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Dexamethasone</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:cef67eaa-4639-486f-8d4a-329c80a1e0ea",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|a7b31cde9d12cc4398557734b96c4c7b"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "08a660e9-8e05-4682-adc5-6c4e4c9c3bed",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "669aff104e6d4aae71d320de5de04511"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:6b5d44f0-3e68-4eba-81f7-d1bc089b597f"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "medicationCodeableConcept": {
+          "text": "Glucose 5% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Glucose 5%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-08-07T12:48:00Z",
+          "end": "2013-08-07T12:00:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:08a660e9-8e05-4682-adc5-6c4e4c9c3bed",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|669aff104e6d4aae71d320de5de04511"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "45809fc1-7a1d-414c-980a-940e6712d798",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-18415-18419"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 5
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:3ce4c1a2-cb52-43e6-9725-3d955ca09c9b"
+          }
+        ],
+        "period": {
+          "start": "2013-10-30",
+          "end": "2013-11-20"
+        }
+      },
+      "fullUrl": "urn:uuid:45809fc1-7a1d-414c-980a-940e6712d798",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-18415-18419"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "6337f649-3ca8-4e1d-846b-84fdd86efe7c",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Capecitabine"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-10-30",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "576f08b6ace223ea422cd04f72332063"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:45809fc1-7a1d-414c-980a-940e6712d798"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Capecitabine</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:6337f649-3ca8-4e1d-846b-84fdd86efe7c",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|576f08b6ace223ea422cd04f72332063"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "a6ab4bd8-04ab-4537-a8b8-9707bd18ff7b",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "5b94654da774d8b3179a73f87f4bc10e"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:45809fc1-7a1d-414c-980a-940e6712d798"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "medicationCodeableConcept": {
+          "text": "Glucose 5% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Glucose 5%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-10-30T09:55:00Z",
+          "end": "2013-10-30T12:30:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:a6ab4bd8-04ab-4537-a8b8-9707bd18ff7b",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|5b94654da774d8b3179a73f87f4bc10e"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "b2e7471f-2902-4f8f-89a9-cbdc988265ba",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Loperamide Hydrochloride"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-10-30",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "4c1aa39eb0684386a57eef28b9393c6b"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:45809fc1-7a1d-414c-980a-940e6712d798"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Loperamide Hydrochloride</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:b2e7471f-2902-4f8f-89a9-cbdc988265ba",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|4c1aa39eb0684386a57eef28b9393c6b"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "d4230ae4-adf5-4853-a40e-1dad5e811c89",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Ondansetron"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-10-30",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "97b25e7d2b8dd7fc9fbf5465bc1d576c"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:45809fc1-7a1d-414c-980a-940e6712d798"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Ondansetron</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:d4230ae4-adf5-4853-a40e-1dad5e811c89",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|97b25e7d2b8dd7fc9fbf5465bc1d576c"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "b1255d3a-33e5-49f2-9084-3dacc166d7de",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "3359e8f6c953e8ba9e941bde6257d532"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:45809fc1-7a1d-414c-980a-940e6712d798"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-dose-adjustment-reason",
+            "valueString": "Neuropathy"
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "medicationCodeableConcept": {
+          "text": "Oxaliplatin"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Oxaliplatin</div>"
+        },
+        "dosage": {
+          "text": "210.00 mg",
+          "dose": {
+            "value": 210,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-10-30T10:00:00Z",
+          "end": "2013-10-30T12:05:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:b1255d3a-33e5-49f2-9084-3dacc166d7de",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|3359e8f6c953e8ba9e941bde6257d532"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "75a7b8bd-d200-4323-a9af-019fe165f71e",
+        "status": "final",
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "3359e8f6c953e8ba9e941bde6257d532"
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "urn:uuid:45809fc1-7a1d-414c-980a-940e6712d798"
+          }
+        ],
+        "code": {
+          "text": "BSA",
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8277-6"
+            }
+          ]
+        },
+        "valueQuantity": {
+          "unit": "m2",
+          "value": 2.18,
+          "system": "http://unitsofmeasure.org"
+        },
+        "effectiveDateTime": "2013-10-30T10:00:00Z",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>BSA 2.18</div>"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-bsa"
+          ]
+        }
+      },
+      "fullUrl": "urn:uuid:75a7b8bd-d200-4323-a9af-019fe165f71e",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|3359e8f6c953e8ba9e941bde6257d532"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "3e5c6eb4-0f14-45ce-ad95-a54377e63cd3",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-10-30",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "ed7d6305629d46abbfa9a166613e4736"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:45809fc1-7a1d-414c-980a-940e6712d798"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:3e5c6eb4-0f14-45ce-ad95-a54377e63cd3",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|ed7d6305629d46abbfa9a166613e4736"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "6f9e2a7c-74cf-4527-a85a-67a35c5bbcb8",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Dexamethasone"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-10-30",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "a5bbff89d49426773e87d588e2a563a3"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:45809fc1-7a1d-414c-980a-940e6712d798"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Dexamethasone</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:6f9e2a7c-74cf-4527-a85a-67a35c5bbcb8",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|a5bbff89d49426773e87d588e2a563a3"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "7d6af79f-d9f5-44ed-ac32-ecf95dd5bc58",
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://unknown.org",
+                "code": "cycleCP"
+              }
+            ]
+          }
+        ],
+        "identifier": [
+          {
+            "system": "http://mosaic.com/CarePlan",
+            "value": "G08462-F-18415-18417"
+          }
+        ],
+        "title": "Plan for cycle",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+            "valueInteger": 3
+          },
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+            "valueInteger": 21
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Cycle plan</div>"
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "partOf": [
+          {
+            "reference": "urn:uuid:3ce4c1a2-cb52-43e6-9725-3d955ca09c9b"
+          }
+        ],
+        "period": {
+          "start": "2013-09-18",
+          "end": "2013-10-09"
+        }
+      },
+      "fullUrl": "urn:uuid:7d6af79f-d9f5-44ed-ac32-ecf95dd5bc58",
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan?identifier=http://mosaic.com/CarePlan|G08462-F-18415-18417"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "ab000c61-feb7-4435-aaf7-d27b2e73bdd1",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Capecitabine"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-09-18",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "1799192ca40b7c876b8824afe3f2d40e"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:7d6af79f-d9f5-44ed-ac32-ecf95dd5bc58"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Capecitabine</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:ab000c61-feb7-4435-aaf7-d27b2e73bdd1",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|1799192ca40b7c876b8824afe3f2d40e"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "f3bd053a-b701-4ae1-b705-360f9773ee4e",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Metoclopramide"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-09-18",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "7fd7ece5e5ce50e68c3728581d24b362"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:7d6af79f-d9f5-44ed-ac32-ecf95dd5bc58"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Metoclopramide</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:f3bd053a-b701-4ae1-b705-360f9773ee4e",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|7fd7ece5e5ce50e68c3728581d24b362"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "1b3f5243-d857-4b05-8e56-e5b929befaec",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Loperamide Hydrochloride"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-09-18",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "db87f55401f1b80feff77b1fc2634a9e"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:7d6af79f-d9f5-44ed-ac32-ecf95dd5bc58"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Loperamide Hydrochloride</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:1b3f5243-d857-4b05-8e56-e5b929befaec",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|db87f55401f1b80feff77b1fc2634a9e"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "080df2be-2480-4032-bb95-de610bfe8234",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "ef95f7a0af997e36022821f8b7b9f3fb"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:7d6af79f-d9f5-44ed-ac32-ecf95dd5bc58"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "medicationCodeableConcept": {
+          "text": "Glucose 5% "
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Glucose 5%</div>"
+        },
+        "dosage": {
+          "text": "500.00 mL",
+          "dose": {
+            "value": 500,
+            "unit": "mL"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-09-18T09:50:00Z",
+          "end": "2013-09-18T12:45:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:080df2be-2480-4032-bb95-de610bfe8234",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|ef95f7a0af997e36022821f8b7b9f3fb"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "00c483ae-614b-4cba-9506-42057171b49c",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Dexamethasone"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-09-18",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "6120771f12ffbaa091e46197143e5ffd"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:7d6af79f-d9f5-44ed-ac32-ecf95dd5bc58"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Dexamethasone</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:00c483ae-614b-4cba-9506-42057171b49c",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|6120771f12ffbaa091e46197143e5ffd"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "25737e0d-885d-40e7-b385-1d440d859a69",
+        "status": "active",
+        "intent": "plan",
+        "medicationCodeableConcept": {
+          "text": "Ondansetron"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-request"
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "authoredOn": "2013-09-18",
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationRequest",
+            "value": "180f39fef6c1a903573eed0a1f7f0d80"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:7d6af79f-d9f5-44ed-ac32-ecf95dd5bc58"
+          }
+        ],
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Ondansetron</div>"
+        }
+      },
+      "fullUrl": "urn:uuid:25737e0d-885d-40e7-b385-1d440d859a69",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest?identifier=http://mosaic.com/MedicationRequest|180f39fef6c1a903573eed0a1f7f0d80"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationAdministration",
+        "id": "8e841412-b05e-4bf5-ad50-4d550a7a430c",
+        "status": "completed",
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-medication-administration"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/MedicationAdministration",
+            "value": "0133a2c626d992fb5de2d3bcf98b16c8"
+          }
+        ],
+        "supportingInformation": [
+          {
+            "reference": "urn:uuid:7d6af79f-d9f5-44ed-ac32-ecf95dd5bc58"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-day",
+            "extension": [
+              {
+                "url": "administered",
+                "valueInteger": 1
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "medicationCodeableConcept": {
+          "text": "Oxaliplatin"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>Oxaliplatin</div>"
+        },
+        "dosage": {
+          "text": "290.00 mg",
+          "dose": {
+            "value": 290,
+            "unit": "mg"
+          },
+          "route": {
+            "text": "IV"
+          }
+        },
+        "effectivePeriod": {
+          "start": "2013-09-18T09:57:00Z",
+          "end": "2013-09-18T12:35:00Z"
+        }
+      },
+      "fullUrl": "urn:uuid:8e841412-b05e-4bf5-ad50-4d550a7a430c",
+      "request": {
+        "method": "PUT",
+        "url": "MedicationAdministration?identifier=http://mosaic.com/MedicationAdministration|0133a2c626d992fb5de2d3bcf98b16c8"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "ab2b7ba6-e40f-47c2-9fb8-931e295cd2ad",
+        "status": "final",
+        "subject": {
+          "reference": "urn:uuid:0a705c18-545c-4cae-9355-751bd37bb720"
+        },
+        "identifier": [
+          {
+            "system": "http://mosaic.com/Observation",
+            "value": "0133a2c626d992fb5de2d3bcf98b16c8"
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "urn:uuid:7d6af79f-d9f5-44ed-ac32-ecf95dd5bc58"
+          }
+        ],
+        "code": {
+          "text": "BSA",
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8277-6"
+            }
+          ]
+        },
+        "valueQuantity": {
+          "unit": "m2",
+          "value": 2.21,
+          "system": "http://unitsofmeasure.org"
+        },
+        "effectiveDateTime": "2013-09-18T09:57:00Z",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns='http://www.w3.org/1999/xhtml'>BSA 2.21</div>"
+        },
+        "meta": {
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-bsa"
+          ]
+        }
+      },
+      "fullUrl": "urn:uuid:ab2b7ba6-e40f-47c2-9fb8-931e295cd2ad",
+      "request": {
+        "method": "PUT",
+        "url": "Observation?identifier=http://mosaic.com/Observation|0133a2c626d992fb5de2d3bcf98b16c8"
+      }
+    }
+  ],
+  "id": "G08462-F-18415"
+}

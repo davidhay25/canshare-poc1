@@ -1,0 +1,44 @@
+# starts all the components of the POC
+version: '3.7'
+services:
+  cs-ops:
+    build: ./cs-customOps
+    init: true
+    ports:
+      - 9300:9300
+    environment:
+      - LOGDB=mongo-log
+      - SERVERBASE=http://hapi-data:8080/fhir/
+    networks:
+      - poc-net
+  cs-dashboard:
+    build: ./cs-dashboard
+    init: true
+    ports:
+      - 9400:9400
+    environment:
+      - LOGDB=mongo-log
+      - SERVERBASE=http://hapi-data:8080/fhir/
+    networks:
+      - poc-net
+  mongo-log:
+    image: mongo:latest
+    networks:
+      - poc-net
+    ports:
+      - 27017:27017
+  hapi-data:
+    image: hapiproject/hapi
+    ports:
+      - 8080:8080
+    networks:
+      - poc-net
+  #hapi-conformance:
+  #  image: hapiproject/hapi
+  #  ports:
+  #    - 8091:8080
+  #  networks:
+  #    - poc-net
+networks:
+  poc-net:
+    

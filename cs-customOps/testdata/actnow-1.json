@@ -1,0 +1,175 @@
+{
+    "resourceType": "Bundle",
+    "type": "transaction",
+    "entry": [
+        {
+            "fullUrl": "urn:uuid:96f39226-7936-482f-96a3-6dacab10f2df",
+            "resource": {
+                "resourceType": "Patient",
+                "id": "96f39226-7936-482f-96a3-6dacab10f2df",
+                "meta": {
+                    "profile": [
+                        "http://canshare.co.nz/fhir/StructureDefinition/an-patient"
+                    ]
+                },
+                "text": {
+                    "status": "generated",
+                    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Bond , James</div>"
+                },
+                "identifier": [
+                    {
+                        "system": "https://standards.digital.health.nz/ns/nhi-id",
+                        "value": "DFR1894"
+                    }
+                ],
+                "name": [
+                    {
+                        "text": "Bond , James",
+                        "family": "Bond",
+                        "given": [
+                            "James"
+                        ]
+                    }
+                ],
+                "gender": "male",
+                "birthDate": "2000-01-26"
+            },
+            "request": {
+                "method": "PUT",
+                "url": "Patient?identifier=https://standards.digital.health.nz/ns/nhi-id|DFR1894"
+            }
+        },
+        {
+            "fullUrl": "urn:uuid:ed0b1fb3-b877-4177-a575-e44e3b3a6236",
+            "resource": {
+                "resourceType": "CarePlan",
+                "id": "ed0b1fb3-b877-4177-a575-e44e3b3a6236",
+                "meta": {
+                    "profile": [
+                        "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-regimen"
+                    ]
+                },
+                "text": {
+                    "status": "generated",
+                    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Regimen Careplan 70</div>"
+                },
+                "extension": [
+                    {
+                        "url": "http://canshare.co.nz/fhir/StructureDefinition/an-iot",
+                        "valueCodeableConcept": {
+                            "coding": [
+                                {
+                                    "system": "http://snomed.info/sct",
+                                    "code": "373846009"
+                                }
+                            ],
+                            "text": "Curative Adjuvant"
+                        }
+                    },
+                    {
+                        "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-count",
+                        "valueInteger": 3
+                    },
+                    {
+                        "url": "http://hl7.org.nz/fhir/StructureDefinition/sact-regimen-type",
+                        "valueCodeableConcept": {
+                            "coding": [
+                                {
+                                    "system": "https://standards.digital.health.nz/ns/sact-regimen-code",
+                                    "code": "BEAM"
+                                }
+                            ],
+                            "text": "BEAM"
+                        }
+                    }
+                ],
+                "identifier": [
+                    {
+                        "system": "https://fhir.indici.nz",
+                        "value": "regimen-careplan-70"
+                    }
+                ],
+                "status": "unknown",
+                "intent": "plan",
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://unknown.org",
+                                "code": "regimenCP"
+                            }
+                        ]
+                    }
+                ],
+                "title": "IT Testing DM",
+                "subject": {
+                    "reference": "urn:uuid:96f39226-7936-482f-96a3-6dacab10f2df"
+                }
+            },
+            "request": {
+                "method": "PUT",
+                "url": "CarePlan?identifier=https://fhir.indici.nz|regimen-careplan-70"
+            }
+        },
+        {
+            "fullUrl": "urn:uuid:adf5ffc7-d7b4-4413-8bb8-64e25919b74a",
+            "resource": {
+                "resourceType": "CarePlan",
+                "id": "adf5ffc7-d7b4-4413-8bb8-64e25919b74a",
+                "meta": {
+                    "profile": [
+                        "http://canshare.co.nz/fhir/StructureDefinition/an-careplan-cycle"
+                    ]
+                },
+                "text": {
+                    "status": "generated",
+                    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Cycle Careplan 321</div>"
+                },
+                "extension": [
+                    {
+                        "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-planned-length",
+                        "valueInteger": 0
+                    },
+                    {
+                        "url": "http://canshare.co.nz/fhir/StructureDefinition/an-cycle-number",
+                        "valueInteger": 2
+                    }
+                ],
+                "identifier": [
+                    {
+                        "system": "https://fhir.indici.nz",
+                        "value": "cycle-careplan-321"
+                    }
+                ],
+                "partOf": [
+                    {
+                        "reference": "urn:uuid:ed0b1fb3-b877-4177-a575-e44e3b3a6236"
+                    }
+                ],
+                "status": "unknown",
+                "intent": "plan",
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://unknown.org",
+                                "code": "cycleCP"
+                            }
+                        ]
+                    }
+                ],
+                "title": "Cycle Careplan Cycle 2",
+                "subject": {
+                    "reference": "urn:uuid:96f39226-7936-482f-96a3-6dacab10f2df"
+                },
+                "period": {
+                    "start": "2022-10-01"
+                }
+            },
+            "request": {
+                "method": "PUT",
+                "url": "CarePlan?identifier=https://fhir.indici.nz|cycle-careplan-321"
+            }
+        }
+    ]
+}

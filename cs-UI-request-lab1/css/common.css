@@ -1,0 +1,37 @@
+
+.listItemSelected {
+    background-color: lightsteelblue;
+}
+
+.banner {
+
+    border: 1px solid #b8b9b5;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    text-align: center;
+    padding: 2px;
+    margin-bottom: 5px;
+    background-color: #F6F6F6;
+    font-weight: bold;
+}
+
+.rounded-box {
+    border: 1px solid gainsboro;
+    padding : 3px;
+    margin: 4px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.rounded-box-filled {
+    border : 1px solid #eeeeee;
+    padding : 5px;
+    margin: 0px;
+    /*margin-left : 10px;*/
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    background-color:#F6F6F6;
+}
