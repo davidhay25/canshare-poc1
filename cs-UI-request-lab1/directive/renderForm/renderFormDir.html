@@ -1,0 +1,180 @@
+<div>
+  <div class="row">
+    <div class="col-md-3">
+
+      <div>
+        <h4>Sections</h4>
+        <div class="list-group">
+          <div ng-class="{'list-group-item':true,'listItemSelected':selectedSection.linkId==section.linkId}"
+               ng-click = "selectSection(section)"
+               style="cursor: pointer"
+               ng-show="showConditional(section)"
+               ng-repeat="section in formTemplate">
+
+            {{section.text}}
+
+            <span class = "badge pull-right" ng-show="section.item.repeats"> Mult</span>
+
+          </div>
+        </div>
+
+        <br/>
+
+        <div ng-show = "objFormTemplate.hiddenSections.length > 0">
+          <checkbox ng-model="input.showHidden"></checkbox>
+          Show hidden sections
+        </div>
+
+        <div ng-show = "objFormTemplate.hiddenFields[selectedSection.linkId].length > 0">
+          <checkbox ng-model="input.showHidden"></checkbox>
+          Show hidden fields ({{objFormTemplate.hiddenFields[selectedSection.linkId].length}})
+        </div>
+
+        <div ng-show="objFormTemplate.attachments.length > 0">
+          <h4>Attachments</h4>
+
+          <div ng-repeat ="att in objFormTemplate.attachments">
+            <a ng-href="{{att.url}}" target="_blank">{{att.title}}</a>
+          </div>
+
+          <br/>
+          <em>Attachments open in a new tab</em>
+
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-md-9">
+
+      <br/>
+      <div ng-repeat="row in selectedSection.rows track by $index">
+
+        <!-- This is a check for group level showhide. If not a group then will be shown (but each item is checked as well)
+        Note that each row created from the group (eg if col count is used) has the group attached to the row
+        so that it can be checked -->
+        <div ng-show="showConditionalGroup(row.group)">
+
+
+          <span ng-class="{bold:true,required:row.group.required}">{{row.text}}</span>
+
+          <div class="row">
+
+
+
+            <!-- 1 columns  - Aug-18-->
+
+            <div ng-if = "row.meta.columnCount == 1 ">
+              <div class="col-md-12">
+                <div ng-repeat="cell in row.col1 track by $index">
+                  <div style="margin-bottom: 8px">
+                    <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+
+
+            <!-- 2 columns -->
+            <div ng-if = "row.meta.columnCount == 2 || ! row.meta.columnCount">
+              <div class="col-md-6">
+                <div ng-repeat="cell in row.col1 track by $index">
+                  <div style="margin-bottom: 8px">
+                    <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div ng-repeat="cell in row.col2 track by $index">
+                  <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3 columns -->
+            <div ng-if = "row.meta.columnCount == 3">
+              <div class="col-md-4">
+                <div ng-repeat="cell in row.col1  track by $index">
+                  <div style="margin-bottom: 8px">
+                    <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div ng-repeat="cell in row.col2 track by $index">
+                  <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div ng-repeat="cell in row.col3 track by $index">
+                  <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4 columns -->
+            <div ng-if = "row.meta.columnCount == 4">
+              <div class="col-md-3">
+                <div ng-repeat="cell in row.col1 track by $index">
+                  <div style="margin-bottom: 8px">
+                    <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <div ng-repeat="cell in row.col2 track by $index">
+                  <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <div ng-repeat="cell in row.col3 track by $index">
+                  <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <div ng-repeat="cell in row.col4 track by $index">
+                  <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <!-- - 9 sep 2022
+                          <hr style="margin: 2px"/>
+          -->
+        </div>
+
+        <!--
+                    <div ng-show = "row.group.code[0].code == 'ancillary'">
+                        <div ng-controller="renderAncillaryCtrl">
+                            <ng-include src = "'includes/renderAncillary.html'"></ng-include>
+                        </div>
+
+                    </div>
+                    -->
+
+
+
+      </div>
+
+
+    </div>
+  </div>
+
+
+
+
+
+
+</div>

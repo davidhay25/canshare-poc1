@@ -25,8 +25,8 @@ services:
     image: mongo:latest
     networks:
       - poc-net
-    ports:
-      - 27017:27017
+    # ports:    don't allow access to log outside the docker network
+    #  - 27017:27017
   hapi-data:
     image: hapiproject/hapi
     ports:

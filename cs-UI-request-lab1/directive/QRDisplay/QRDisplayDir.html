@@ -4,13 +4,14 @@
 
     <div ng-repeat="item in qr.item">
         <strong>{{item.text}}</strong>
-        <div ng-repeat = "child in item.item">
+
+        <div ng-repeat = "section in item.item">
             <div class="row">
                 <div class="col-md-4" >
-                    <div style="padding-left: 8px">{{child.text}}</div>
+                    <div style="padding-left: 8px">{{section.text}}</div>
                 </div>
                 <div class="col-md-8">
-                    <div ng-repeat = "ans in child.answer">
+                    <div ng-repeat = "ans in section.answer">
                         {{ans.valueString}}
                         {{ans.valueCoding.display}}
 
@@ -18,7 +19,43 @@
                 </div>
             </div>
 
+            <div ng-repeat = "child in section.item">
+                <div class="row">
+                    <div class="col-md-4" >
+                        <div style="padding-left: 8px">{{child.text}}</div>
+                    </div>
+                    <div class="col-md-8">
+                        <div ng-repeat = "ans in child.answer">
+                            {{ans.valueString}}
+                            {{ans.valueCoding.display}}
+
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-repeat = "gc in child.item">
+                    <div class="row">
+                        <div class="col-md-4" >
+                            <div style="padding-left: 8px">{{gc.text}}</div>
+                        </div>
+                        <div class="col-md-8">
+                            <div ng-repeat = "ans in gc.answer">
+                                {{ans.valueString}}
+                                {{ans.valueCoding.display}}
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
         </div>
+
+
+
+
         <br/>
     </div>
     <div ng-show="qr"><em>Template: {{qr.questionnaire}}</em></div>

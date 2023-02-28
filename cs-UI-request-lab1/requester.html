@@ -9,11 +9,10 @@
     <script src="js/libs/angular.min1-5.js"></script>
     <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
 
-
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/common.css"/>
     <script>
-        angular.module("pocApp",['ui.bootstrap']).config(function($locationProvider) {
+        angular.module("pocApp",['ui.bootstrap','ui.checkbox']).config(function($locationProvider) {
 
             // enable html5Mode for pushstate ('#'-less URLs)
             $locationProvider.html5Mode(true);
@@ -22,15 +21,16 @@
 
     </script>
 
-
+    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/requesterCtrl.js"></script>
     <script src="js/requesterSvc.js"></script>
+    <script src="directive/renderForm/renderFormSvc.js"></script>
 
     <script src="js/commonSvc.js"></script>
 
     <script src="directive/QRDisplay/QRDisplayDir.js"></script>
     <script src="directive/reportDisplay/reportDisplayDir.js"></script>
-
+    <script src="directive/renderForm/renderFormDir.js"></script>
 
 </head>
 <body style="padding: 8px;padding-top: 80px">
@@ -96,51 +96,42 @@
                         <br/>
 
                         <div class="row">
-                            <div class="col-md-6" >
 
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <select ng-model="selectedTemplate" class="form-control"
-                                                placeholder="Select form"
-                                                ng-change="selectQ(selectedTemplate)"
-                                                ng-options = "item.display for item in templates">
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <button class="btn btn-primary" ng-click="submitRequest()">Send request</button>
-                                    </div>
-                                </div>
-
-
-                                <div class="alert">
-                                    <br/>
-                                    <div ng-show = "submitStatus == 'pass'">
-                                        <pre class="alert-success" ng-show="oo">{{oo | json}}</pre>
-                                    </div>
-                                    <div ng-show = "submitStatus == 'fail'" >
-                                        <pre class="alert-danger" ng-show="oo">{{oo | json}}</pre>
-                                    </div>
-                                </div>
-
-
-
-
-                                <div ng-hide="oo">
-                                    <ng-include src="'/includes/formDisplay.html'"></ng-include>
-                                </div>
-
-                            </div>
-                            <div class="col-md-6" ng-show="selectedPatient">
-
-
-
+                            <div class="col-md-12" >
                                 <uib-tabset>
-                                    <uib-tab heading="Text">
-                                        <qrdisplay qr="selectedQR"></qrdisplay>
-                                        <!--
-                                        <ng-include src="'/includes/QRdisplay.html'"></ng-include>
+                                    <uib-tab heading="Form">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <select ng-model="selectedTemplate" class="form-control"
+                                                        placeholder="Select form"
+                                                        ng-change="selectQ(selectedTemplate)"
+                                                        ng-options = "item.display for item in templates">
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <button class="btn btn-primary" ng-click="submitRequest()">Send request</button>
+                                            </div>
+                                        </div>
 
--->
+
+                                        <div class="alert" ng-show="oo">
+                                            <br/>
+                                            <div ng-show = "submitStatus == 'pass'">
+                                                <pre class="alert-success" ng-show="oo">{{oo | json}}</pre>
+                                            </div>
+                                            <div ng-show = "submitStatus == 'fail'" >
+                                                <pre class="alert-danger" ng-show="oo">{{oo | json}}</pre>
+                                            </div>
+                                        </div>
+
+                                        <div ng-hide="oo">
+                                            <renderform q="selectedTemplate.Q" qr="QR"></renderform>
+                                        </div>
+
+                                    </uib-tab>
+                                    <uib-tab heading="Text">
+                                        <qrdisplay qr="QR"></qrdisplay>
+
                                     </uib-tab>
                                     <uib-tab heading="Q">
                                         <pre>{{selectedTemplate | json}}</pre>
@@ -155,9 +146,10 @@
                                         <pre>{{bundle | json}}</pre>
                                     </uib-tab>
                                 </uib-tabset>
-
                             </div>
+
                         </div>
+
                     </uib-tab>
                     <uib-tab heading="Previous request history">
                         <br/>
