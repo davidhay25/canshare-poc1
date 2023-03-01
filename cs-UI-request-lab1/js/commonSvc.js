@@ -93,12 +93,17 @@ angular.module("pocApp")
                 return deferred.promise
             },
             getAllPatients : function() {
+                let that=this
                 let deferred = $q.defer()
                 let url = `${this.config.canShare.fhirServer.url}/Patient`
                 $http.get(url).then(
                     function (data) {
+                        let lst = []
+                        data.data.entry.forEach(function (entry) {
+                            lst.push({display:that.getPatientName(entry.resource),patient:entry.resource})
 
-                        deferred.resolve(data.data)
+                        })
+                        deferred.resolve(lst)
 
                     }
                 ), function(err) {

@@ -278,7 +278,7 @@ angular.module("pocApp")
                 QR.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>QR resource</div>"
                 QR.questionnaire = Q.url
                 QR.authored = new Date().toISOString()
-
+/*
                 //the author will always be a PR
                 let PR = {resourceType:"PractitionerRole",id:"pr1"}
 
@@ -310,8 +310,8 @@ angular.module("pocApp")
                 QR.contained = [PR]
                 QR.author = {reference:'#pr1',display:display}
 
-
-
+*/
+/*
                 let patientName = "No patient supplied"
                 if (patient) {
                     if (patient.name) {
@@ -322,7 +322,7 @@ angular.module("pocApp")
                     QR.subject = {display:patientName}
                 }
 
-
+*/
                 QR.item = []
 
                 //the top level items - sections - directly off the Q root...

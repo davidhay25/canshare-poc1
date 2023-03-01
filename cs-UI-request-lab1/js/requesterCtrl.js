@@ -15,7 +15,17 @@ angular.module("pocApp")
                             $scope.allPatients = patients
                         }
                     )
+            })
 
+
+            //when a form is being created, the QR representing that form is generated immediately. However, as
+            //this is in a directlve, the scopes are complicated to to simplify things the QR is emitted by the
+            //directive so that it can be captured and ultimately sent to the server. This process happens
+            //as soon as any change in the form is made (using ng-change)
+            $scope.$on('qrCreated',function(event,data){
+                $scope.createdQR = data
+                makeBundle()
+                //console.log(data)
             })
 
 
@@ -37,7 +47,7 @@ angular.module("pocApp")
             )
 
             //this is emitted by the form template - formDisplay.html
-            $scope.formUpdated = function () {
+            $scope.formUpdatedDEP = function () {
 
                 $scope.QR = commonSvc.makeQR($scope.selectedQ,$scope.answer);
                 $scope.QR.subject = {reference:`urn:uuid:${$scope.selectedPatient.id}`}
@@ -54,7 +64,9 @@ angular.module("pocApp")
 
 
 
-            $scope.selectPatient = function (patient) {
+            //When a patient is selected, get the previous SR's
+            $scope.selectPatient = function (vo) {
+                let patient = vo.patient
                 //There really should be an NHI. Will remove this eventually.
                 if (! patient.identifier) {
                     patient.identifier = [{system:"http://canshare.co.nz/identifier/bundle",value:new Date().toISOString()}]
@@ -68,7 +80,7 @@ angular.module("pocApp")
 
                 let identifierQuery = `${patient.identifier[0].system}|${patient.identifier[0].value}`
 
-                //load ServiceRequests. Go straight to hapi server
+                //load ServiceRequests via the server proxy
 
                 let qry = encodeURIComponent(`ServiceRequest?subject.identifier=${identifierQuery}`)
                 $http.get(`/proxy?qry=${qry}`).then(
@@ -78,20 +90,11 @@ angular.module("pocApp")
                     }
                 )
 
-/*
-                let url = `${$scope.config.canShare.fhirServer.url}/ServiceRequest?subject.identifier=${identifierQuery}`
-                $http.get(url).then(
-                    function (data) {
-                        $scope.allSRonePatient = data.data
-                        console.log($scope.allSRonePatient)
-                    }
-                )
-*/
 
 
             }
 
-            //a historical SR is selected
+            //a historical SR is selected. Get all the details and display it.
             $scope.selectHistoricalSR = function(SR){
                 $scope.selectedSR = SR
 
@@ -106,38 +109,20 @@ angular.module("pocApp")
                     }
                 )
 
-/*
-                //retrieve the referenced QR
-                let QRReference
-                SR.supportingInfo.forEach(function (si) {
-                    if (si.reference.startsWith("QuestionnaireResponse")) {
-                        QRReference = si.reference
-
-                    }
-                })
-
-                if (QRReference) {
-                    let url = `${$scope.config.canShare.fhirServer.url}/${QRReference}`
-                    $http.get(url).then(
-                        function (data) {
-                            $scope.selectedQR = data.data
-                    })
-                }
-
-                //retrieve
-
-*/
-
-
             }
 
             //select the request form
             $scope.selectQ = function(template) {
+
+                //clear any previous form
+
+
                 $scope.selectedQ = template.Q
                 let formTemplate = commonSvc.parseQ(template.Q)     //the actual data source for the rendered form
                 console.log(formTemplate)
                 $scope.selectedForm = formTemplate
 
+                /* not sure this is needed nere
                 //now create the relationship between the item.code and linkId in the Q. This is needed
                 //as the Observations that will be generated will use the code from the item...
                 //This code is simle, and assumes that the Q has 2 level structure of Sections / items. It will need to be
@@ -150,18 +135,13 @@ angular.module("pocApp")
 
                     })
                 })
+                */
             }
-/*
-            //order is important as SR has a reference to QR
-            $scope.patient = makePatient()
-            $scope.qr = makeQR();
-            $scope.sr = makeSR()
-            $scope.bundle = makeBundle()
-            */
+
             $scope.submitRequest = function () {
                 if (confirm("Are you sure you wish to send this request?")) {
                     delete $scope.submitStatus
-                    let bundle = makeBundle()   //should already have been done actually...
+                    let bundle = makeBundle()   //create the transaction bundle
                     delete $scope.oo
                     let url = "/requester/makerequest"
 
@@ -191,38 +171,35 @@ angular.module("pocApp")
 
             }
 
-            //send the request through to canshare (via the IE)
-            $scope.sendRequestDEP = function(){
-                let bundle = makeBundle();
-                delete $scope.oo
-                let url = "/requester/makerequest"
 
-                $http.post(url,bundle).then(
-                    function(data){
-                        //console.log(data)
-                        $scope.oo = data.data    //temp
-                    }, function(err) {
-                        //the response should be a OO explaining the error
-                        $scope.oo = err.data
-                        console.log(err)
-                    }
-                )
-            }
-
+            //create the transaction bundle containing Patient, QR & SR. todo Others (like Practitoioner, Organization) to be added
             function makeBundle() {
+
+                //first, add the references to the QR (at this point it only has direct data like items & Q url
+                let QR = $scope.createdQR       //this is
+                QR.subject = {reference : `urn:uuid:${$scope.selectedPatient.id}`}
+                QR.identifier = [{system:'http://canshare.co.nz/NamingSystem/pathIdentifier',value: new Date().toISOString()}]
+
+                let SR = makeSR()   //create the service request. it will have a reference to the QR
+                $scope.createdSR = SR   //just for the display
                 let bundle = {"resourceType":"Bundle",type:'transaction',entry:[]}
                 bundle.identifier = {system:"http://canshare.co.nz/identifier/bundle",value:new Date().toISOString()}
 
                 addEntry(bundle,$scope.selectedPatient)     //this will have the NHI as the identifer
-
-                addEntry(bundle,$scope.QR)
-                addEntry(bundle,$scope.SR)
+                addEntry(bundle,QR)           //thus
+                addEntry(bundle,SR)
                 $scope.bundle = bundle
                 return bundle
             }
 
             //add the resource as an entry to the bundle. Assume id is a UUID. Always conditional update.
             function addEntry(bundle,resource) {
+
+                if (! resource.identifier) {
+                    alert("The " + resource.resourceType + " resource has no identifier")
+                    return
+                }
+
                 let entry = {fullUrl:`urn:uuid:${resource.id}`,resource:resource,request:{}}
                 entry.request.method = "PUT"
                 let identifierString = `${resource.identifier[0].system}|${resource.identifier[0].value}`
@@ -231,27 +208,7 @@ angular.module("pocApp")
             }
 
 
-
-            function makePatientDEP() {
-                let patient = {resourceType:"Patient",id:commonSvc.createUUID(),name:[{text:"John Doe"}]}
-                return patient
-            }
-
-/*
-            function makeQRDEP() {
-                let qr = {resourceType:"QuestionnaireResponse",id:createUUID(),status:"completed",item:[]}
-                qr.subject = {reference:`urn:uuid:${$scope.selectedPatient.id}`}
-                let itemHx = {linkId:"history",text:"History",item:[]}
-                qr.item.push(itemHx)
-                itemHx.item.push({"linkId":"hx",text:"History of Complaint", answer:[{valueString:"Noted breast lump R) breast"}] })
-                itemHx.item.push({"linkId":"pmh",text:"Past Medical History", answer:[{valueString:"Nil of note"}] })
-                let itemFinding = {linkId:"findings",text:"Findings",item:[]}
-                qr.item.push(itemFinding)
-
-                itemFinding.item.push({"linkId":"find",text:"Findings", answer:[{valueString:"Lump R) breast 3 o'clock 3cm from nipple"}] })
-                return qr
-            }
-*/
+            //create the ServiceRequest
             function makeSR() {
                 let sr = {resourceType:"ServiceRequest",id:commonSvc.createUUID(),status:"active",intent:"order"}
                 sr.authoredOn = new Date().toISOString()
@@ -259,16 +216,8 @@ angular.module("pocApp")
                 sr.category = [{text:"CS order"}]
                 sr.subject = {reference:`urn:uuid:${$scope.selectedPatient.id}`}
                 sr.identifier = [{system:"http://canshare.co.nz/identifier",value: new Date().toISOString()}]
-                sr.supportingInfo = [{reference:"urn:uuid:"+$scope.QR.id}]
+                sr.supportingInfo = [{reference:"urn:uuid:"+$scope.createdQR.id}]
                 return sr
             }
 
-            function createUUIDDEP() {
-                return commonSvc.createUUID()
-                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                    return v.toString(16);
-                });
-
-            }
         })

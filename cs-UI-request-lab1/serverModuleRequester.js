@@ -20,9 +20,6 @@ function setup(app,inDb) {
         } catch (ex) {
             res.status(500).json(ex)
         }
-
-
-
     })
 
 
@@ -32,7 +29,7 @@ function setup(app,inDb) {
             console.log("/requester/makerequest invoked")
         }
         let body = req.body
-         //console.log("body",body)
+
         let url = config.canShare.requestEndPoint.url
         try {
             let response = await axios.post(url,body)
@@ -48,8 +45,6 @@ function setup(app,inDb) {
                 res.status(400).send(err)
             }
         }
-
-
 
     })
 

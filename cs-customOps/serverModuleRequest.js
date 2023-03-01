@@ -27,8 +27,13 @@ function setup(app) {
 
         //todo perform profile validation - ? optional
 
+        //extract resources. Add them to the bundle.
+        extractObservations(bundle)
+
+
+
         //add a Communication to the bundle for the notification if there is a SR with a performer
-        addCommunication(bundle)
+        //addCommunication(bundle)
         //POST the bundle to the FHIR server
         metrics.end = new Date()
         utilModule.postBundleToServer(bundle,metrics,res,"request",req)
@@ -37,6 +42,10 @@ function setup(app) {
         //res.json({})
 
     })
+}
+
+//If the Q defines that Observations should be extratced, the do so and add the observations to the bundle
+function extractObservations(bundle) {
 
 }
 

@@ -26,16 +26,25 @@ app.get('/config', async function(req,res){
     res.json(config)
 })
 
+
+
 app.get('/proxy',async function(req,res){
+
+    //the query was url encoded so it could be passed to the server
     let query = decodeURIComponent(req.query.qry);
-    console.log(query)
-    let qry = config.canShare.fhirServer.url + "/" + query
+
+    //now we need to replace any | with %. Only this character should be encoded. Not sure why...
+    query = query.replace("|","%7C")    //there will only ever be one...
+
+
+    let qry = config.canShare.fhirServer.url + "/" +query
+    console.log(qry)
     try {
         let response = await axios.get(qry)
         let bundle = response.data
         res.json(bundle)
     } catch (ex) {
-        console.log(ex)
+        console.log(ex.code)
         res.status(500).json(ex)
     }
 })

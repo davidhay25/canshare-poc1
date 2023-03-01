@@ -37,8 +37,9 @@ angular.module('pocApp')
 
                 $scope.makeQR = function() {
                     $scope.qr = renderFormsSvc.makeQR($scope.q, $scope.form)
-                    console.log($scope.QR)
-                    ///$scope.$emit('qrCreated',$scope.formQR)
+                    console.log($scope.qr)
+                    //emit the QR so it can be captured by the containing hierarchy. Otherwise the scopes get complicated...
+                    $scope.$emit('qrCreated',$scope.qr)
 
                 }
 

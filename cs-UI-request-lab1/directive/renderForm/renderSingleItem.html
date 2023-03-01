@@ -68,7 +68,7 @@
 
                     <input type="text" class="form-control" uib-datepicker-popup="dd-MMMM-yyyy"
                            ng-model="form[cell.item.linkId]" is-open="datePopup[cell.item.linkId].opened"
-                           ng-blur="makeQR(cell.item.linkId)"/>
+                           ng-change="makeQR(cell.item.linkId)"/>
 
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" ng-click="openDate(cell.item.linkId)">
@@ -104,14 +104,14 @@
                     <textarea ng-class="{'form-control':true,userComment:cell.item.code[0].system=='http://clinfhir.com/fhir/CodeSystem/review-comment' }"
                               ng-model="form[cell.item.linkId]" class="form-control"
                               placeholder="{{cell.meta.placeholder}}"
-                              ng-blur="makeQR(cell.item.linkId)"></textarea>
+                              ng-change="makeQR(cell.item.linkId)"></textarea>
                 </div>
 
 
             </div>
 
             <div ng-switch-when="boolean">
-                <checkbox ng-model="form[cell.item.linkId]"  ng-blur="makeQR(cell.item.linkId)"></checkbox> {{cell.item.text}}
+                <checkbox ng-model="form[cell.item.linkId]"  ng-change="makeQR(cell.item.linkId)"></checkbox> {{cell.item.text}}
             </div>
 
 
@@ -291,7 +291,7 @@
                 </div>
 
                 <div ng-hide = "cell.item.answerOption.length > 0">
-                    <input type="number"  ng-blur="makeQR(cell.item.linkId)"
+                    <input type="number"  ng-change="makeQR(cell.item.linkId)"
                            placeholder="{{cell.meta.placeholder}}"
                            ng-model="form[cell.item.linkId]" class="form-control"/>
                 </div>
@@ -300,7 +300,7 @@
 
 
             <div ng-switch-when = "decimal" >
-                <input type="number"  ng-blur="makeQR(cell.item.linkId)"
+                <input type="number"  ng-change="makeQR(cell.item.linkId)"
                        placeholder="{{cell.meta.placeholder}}"
                        ng-model="form[cell.item.linkId]" class="form-control"/>
 
@@ -335,7 +335,7 @@
 
                 </div>
                 <div ng-hide = "cell.item.answerOption.length > 0">
-                    <input type="text"  ng-blur="makeQR(cell.item.linkId)"
+                    <input type="text"  ng-change="makeQR(cell.item.linkId)"
                            placeholder="{{cell.meta.placeholder}}"
                            ng-class="{'form-control':true,userComment:cell.item.code[0].system=='http://clinfhir.com/fhir/CodeSystem/review-comment' }"
                            ng-model="form[cell.item.linkId]" />
@@ -345,7 +345,7 @@
 
 
             <div ng-switch-default>
-                <input type="text"  ng-blur="makeQR(cell.item.linkId)"
+                <input type="text"  ng-change="makeQR(cell.item.linkId)"
                        placeholder="{{cell.meta.placeholder}}"
                        ng-model="form[cell.item.linkId]" class="form-control"/>
             </div>
