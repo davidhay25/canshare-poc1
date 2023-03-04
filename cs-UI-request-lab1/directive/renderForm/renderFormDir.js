@@ -35,9 +35,11 @@ angular.module('pocApp')
                 );
 
 
+                //note that this is called every time there is a change (eg keypress) in the forms component
+                //this is to ensure that the QR is always up to date. onBlur could miss the most recently updated firld...
                 $scope.makeQR = function() {
                     $scope.qr = renderFormsSvc.makeQR($scope.q, $scope.form)
-                    console.log($scope.qr)
+                    //console.log($scope.qr)
                     //emit the QR so it can be captured by the containing hierarchy. Otherwise the scopes get complicated...
                     $scope.$emit('qrCreated',$scope.qr)
 

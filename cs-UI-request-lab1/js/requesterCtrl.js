@@ -21,13 +21,18 @@ angular.module("pocApp")
             //when a form is being created, the QR representing that form is generated immediately. However, as
             //this is in a directlve, the scopes are complicated to to simplify things the QR is emitted by the
             //directive so that it can be captured and ultimately sent to the server. This process happens
-            //as soon as any change in the form is made (using ng-change)
+            //as soon as any change in the form is made (using ng-change) - so it gets called a lot!
             $scope.$on('qrCreated',function(event,data){
                 $scope.createdQR = data
                 makeBundle()
                 //console.log(data)
             })
 
+
+            //call the 'test extraction' endpoint to return the extracted resources
+            $scope.testExtraction = function (QR) {
+
+            }
 
             //load the list of possible report templates (questionnaires)
             $http.get("/requester/templates").then(

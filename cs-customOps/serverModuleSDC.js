@@ -1,17 +1,24 @@
-
+let serverBase = process.env.SERVERBASE
 
 const { default: axios } = require("axios")
+const utilModule = require("./serverModuleUtil");
+
+let debug = false
+
+
 
 async function extractResources(QR) {
+
 
     //get the Questionnaire. for now, get it derectly from the hapi server...
     let qUrl = QR.questionnaire
     if (! qUrl) {
-        return makeOO("No questionnaire element in the QR")
+        throw("No questionnaire element in the QR")
+       // return utilModule.makeOO(["No questionnaire element in the QR"])
     }
 
     //retrieve the Q
-    let url = serverRoot + "Questionnaire?url=" + qUrl // + "&status=active"
+    let url = serverBase + "Questionnaire?url=" + qUrl // + "&status=active"
     let response = await axios.get(url)
 
     let bundle = response.data
@@ -19,57 +26,73 @@ async function extractResources(QR) {
     if (bundle.entry && bundle.entry.length == 1) {
         //the Q was retrieved
         let Q = bundle.entry[0].resource    //todo - assume only 1
+        console.log("found Q with url " + qUrl)
 
         //retrieve Observations (and potentially other resources)
-        let resources = performObservationExtraction(Q,QR)
-
-        // now create other resources (and track with provenance). The provenance was created and populated during resource extraction
-        let provenance = resources.provenance
-
-        let cp = null
-
-        //the service request for a revire request - always added ATM as being used for forms development
-        //could add other SR's as needed - or a task
-
-        let sr = createServiceRequest(QR,globals.reviewRefer,cp,"Review request",Q)      //todo refactor names of vo returned
-        //provenance.target = provenance.target || []
-        //provenance.target.push({reference: "urn:uuid:"+ sr.id})
-        provenance.target.push({reference: "ServiceRequest/"+ sr.id})
-        resources.obs.push(sr)          //not really all obs...
-
-        //to support more sophisticated workflow
-        let task = createTask(QR,sr)
-        //provenance.target.push({reference: "urn:uuid:"+ task.id})
-        provenance.target.push({reference: "Task/"+ task.id})
-        resources.obs.push(task)          //not really all obs...
-
-        /* not used now, but keep...
-                //generate MDM referral (servicerequest) if requested by QR
-                if (resources.QRHash['mdmreferral']) {
-                    let srMDM =  createServiceRequest(QR,globals.mdmrefer,cp,"MDM referral",Q)      //todo refactor names of vo returned
-                    provenance.target.push({reference: "urn:uuid:"+ srMDM.id})
-                    resources.obs.push(srMDM)          //not really all obs...
-                }
-        */
+        let arExtractedResources = performResourceExtraction(Q,QR)
+        addProvenance(QR,arExtractedResources)
 
 
-        return resources
+
+
+        return arExtractedResources
 
 
     } else {
-        return makeOO("There needs to be a single Q with the url: " + qUrl + ". " + bundle.entry.length + " were found.")
+        console.log(`No Q with url ${qUrl} found`)
+
+        throw "There needs to be a single Q with the url: " + qUrl + ". " + bundle.entry.length + " were found."
+        //return utilModule.makeOO(["There needs to be a single Q with the url: " + qUrl + ". " + bundle.entry.length + " were found."])
+    }
+
+}
+
+//create a provenance resource that identifies the QR from which the observations were created.
+function addProvenance(QR,lst) {
+    if (lst.length > 0) {
+
+        let provenance = {resourceType:"Provenance"}
+        provenance.id = createId()  // createUUID()   //will be ignored by fhir server
+        //the subject might be a reference to a contained PR resource...
+        if (QR.author && QR.author.reference && QR.author.reference.substring(0,1) == '#') {
+            provenance.contained = QR.contained
+        }
+
+        provenance.text= {status:"generated",div:"<div xmlns='http://www.w3.org/1999/xhtml'>Resources extracted from QR</div>"}
+        provenance.recorded = new Date().toISOString()
+        provenance.entity = []
+        provenance.agent = []
+        provenance.target = []
+
+        //provenance.entity.push({role:"source",what:{reference:"urn:uuid:" + QR.id}})
+        provenance.entity.push({role:"source",what:{reference:"QuestionnaireResponse/" + QR.id}})
+        //set the agent to the author of the QR todo ?should this be to a 'Device' representing the forms receiver
+        //provenance.agent.push({who:QR.author}) todo - what's the best way to do this...
+
+        lst.forEach(function (resource) {
+            provenance.target.push({reference:  `${capitalize(resource.resourceType)}/${resource.id}`})
+        })
+
+
+        lst.push(provenance)
+
+
+
+    }
+
+    function capitalize(s) {
+        return s[0].toUpperCase() + s.substring(1)
     }
 
 }
 
 
-
-function performObservationExtraction(Q,QR) {
+//Extract observations and other resources from the QR.
+function performResourceExtraction(Q,QR) {
     const extractDefinitionUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
-
     const extractObsUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
     const unitsUrl = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
-    let arObservations = []     //the extracted observations
+    let arExtractedResources = []     //the extracted observations
 
     //iterate over the Q to create a hash (by linkId) of items with the Observation extraction set
     let hashQ = {}      //hash of items that have the Observation extract extension set
@@ -80,24 +103,27 @@ function performObservationExtraction(Q,QR) {
     //recursive algorithm to create hash of items that are Observation extraction
     function parseQ(hashQ,item) {
         if (item.item) {
+            //Observation extraction will not be applied to group type items (ie those that contain other items)
             //still need to check for definition based extraction...
             //we're assuming that the extension is on the parent - child items use 'definition' with the resource elements
 
             //look for definition extractions
-            let ar1 = findExtension(item,extractDefinitionUrl)
+            let ar1 = utilModule.findExtension(item,extractDefinitionUrl)
             //console.log(item.linkId,item.extension,ar1.length)
             if (ar1.length > 0) {
                 let resourceType = ar1[0].valueCode
                 hashQDefinition[item.linkId] = {item:item,resourceType:resourceType}
             }
 
+            //recurse through the child items
             item.item.forEach(function(child){
                 parseQ(hashQ,child)
             })
 
         } else {
-            //look for the extract Observation extension
-            let ar = findExtension(item,extractObsUrl)
+            //this is a leaf item so can uave the Observation extraction set
+
+            let ar = utilModule.findExtension(item,extractObsUrl)
             //console.log(item.linkId)
             if (ar.length > 0) {
                 //in this case the extension is a boolean. Assume only 1
@@ -117,7 +143,7 @@ function performObservationExtraction(Q,QR) {
         })
     }
 
-    //go through the QR and generate a hash or response items keyed by linkId
+    //go through the QR and generate a hash of answers keyed by linkId
     function parseQR(hashQR,item) {
         if (item.item) {
             item.item.forEach(function(child){
@@ -137,54 +163,36 @@ function performObservationExtraction(Q,QR) {
         })
     }
 
-    //the provenance resource for this action
-    let provenance = {resourceType:"Provenance"}
-    provenance.id = createId()  // createUUID()   //will be ignored by fhir server
-    //the subject might be a reference to a contained PR resource...
-    if (QR.author && QR.author.reference && QR.author.reference.substring(0,1) == '#') {
-        provenance.contained = QR.contained
-    }
-
-    provenance.text= {status:"generated",div:"<div xmlns='http://www.w3.org/1999/xhtml'>Resources extracted from QR</div>"}
-    provenance.recorded = new Date().toISOString()
-    provenance.entity = []
-    provenance.agent = []
-    provenance.target = []
-
-    //provenance.entity.push({role:"source",what:{reference:"urn:uuid:" + QR.id}})
-    provenance.entity.push({role:"source",what:{reference:"QuestionnaireResponse/" + QR.id}})
-    //set the agent to the author of the QR todo ?should this be to a 'Device' representing the forms receiver
-    provenance.agent.push({who:QR.author})
 
     //now we can match the answers to the questions. Iterate over the hash from Q that has possible extracts and look for a matching QR
     if (debug) {console.log('hashQ',hashQ)}
-    Object.keys(hashQ).forEach(function (key){
+
+    //iterate over the items from the Q that can have an observation extraction...
+    Object.keys(hashQ).forEach(function (key){      //hashQ is the hash of items in the Q that have the extract observation extension set
         let QItem = hashQ[key]  //the Q item that this QR item is an answer to
+
         //is there a QR item with a matching linkId?
-        //console.log(key)
         if (hashQR[key]) {
-            // yes there is. Create an observation for each answer.
+            // yes there is. Create an observation for each answer. (In theory there can be multiple answers)
             let QRItem = hashQR[key]    //the item from the QR
             if (QRItem.answer){
                 QRItem.answer.forEach(function (theAnswer) {  //there can be multiple answers for an item
                     //theAnswer is a single answer value...
                     let observation = {resourceType: 'Observation'}
 
-                    //the subject might be a reference to a contained PR resource...
-                    if (QR.author && QR.author.reference && QR.author.reference.substring(0, 1) == '#') {
-                        observation.contained = QR.contained
-                    }
-
                     observation.id = createId() // createUUID()
                     observation.text = {status: 'generated'}
-                    let text = ""
+
                     observation.status = "final"
                     observation.effectiveDateTime = QR.authored
                     observation.subject = QR.subject
+                    if (QR.author) {
+                        observation.performer = [QR.author]
+                    }
 
-                    observation.performer = [QR.author]
                     //the code comes from the Q
                     //The Q.code is an array of coding. Add them all to Observation.code as per the IG
+                    let text = ""
                     let oCode = {coding: []}
                     if (QItem.code) {
                         QItem.code.forEach(function (coding) {
@@ -203,9 +211,11 @@ function performObservationExtraction(Q,QR) {
 
                     //console.log(theAnswer)
                     //todo - the dtatypes for Observation and Questionnaire aren't the same!
+
+
                     if (theAnswer.valueDecimal) {
                         //if a decimal, then look for the unit extension to create a Quantity
-                        let ar = findExtension(QItem, unitsUrl)
+                        let ar = utilModule.findExtension(QItem, unitsUrl)
                         if (ar.length > 0) {
                             let coding = ar[0].valueCoding
                             //Can create a Quantity. should only be 1 really...
@@ -229,11 +239,10 @@ function performObservationExtraction(Q,QR) {
 
                     observation.text.div = "<div xmlns='http://www.w3.org/1999/xhtml'>" + text + "</div>"
 
-                    arObservations.push(observation)
-                    //provenance.target = provenance.target || []
+                    arExtractedResources.push(observation)
 
-                    //provenance.target.push({reference: "urn:uuid:"+ observation.id})
-                    provenance.target.push({reference: "Observation/" + observation.id})
+
+
 
                 })
             }
@@ -279,22 +288,36 @@ function performObservationExtraction(Q,QR) {
 
                 }
             })
+
+
             if (canBeAdded) {
-                arObservations.push(resource)
-                provenance.target = provenance.target || []
-                //provenance.target.push({reference: "urn:uuid:"+ resource.id})
-                provenance.target.push({reference: resource.resourceType +  "/"+ resource.id})
+                arExtractedResources.push(resource)
+
             }
 
         }
 
     })
 
-    arObservations.push(provenance)
 
-    return {'obs':arObservations,provenance:provenance,QHash:hashQ,QRHash:hashQR};
+
+    return arExtractedResources //{'obs':arExtractedResources,provenance:provenance,QHash:hashQ,QRHash:hashQR};
 
 }
+
+function createId() {
+    let id = 'id-' + new Date().getTime() + '-' + Math.floor(Math.random() * 1000)
+    return id
+}
+
+
+function createUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
 
 module.exports = {
     extractResources : extractResources

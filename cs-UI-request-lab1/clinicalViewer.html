@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>Clinical Viewer</title>
+
+    <script src="js/libs/jquery-1.9.0.min.js"></script>
+    <script src="js/libs/angular.min1-5.js"></script>
+    <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/common.css"/>
+    <script>
+        angular.module("pocApp",['ui.bootstrap','ui.checkbox']).config(function($locationProvider) {
+
+            // enable html5Mode for pushstate ('#'-less URLs)
+            $locationProvider.html5Mode(true);
+            $locationProvider.hashPrefix('!');
+        });
+
+    </script>
+
+    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
+    <script src="js/clinicalViewerCtrl.js"></script>
+
+    <script src="directive/renderForm/renderFormSvc.js"></script>
+
+    <script src="js/commonSvc.js"></script>
+
+    <script src="directive/QRDisplay/QRDisplayDir.js"></script>
+    <script src="directive/reportDisplay/reportDisplayDir.js"></script>
+    <script src="directive/renderForm/renderFormDir.js"></script>
+
+</head>
+<body style="padding: 8px;padding-top: 80px">
+    <div ng-app="pocApp" ng-controller="clinicalViewerCtrl" class="container-fluid">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+        <div class="container-fluid">
+            <div class="col-md-3 col-sm-3">
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            Clinical Viewer
+                        </a>
+                    </span>
+
+            </div>
+
+            <div class="col-md-4">
+                <div class="navbar-text">
+
+
+                </div>
+
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <form class="navbar-form navbar-left">
+                    <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+
+                </form>
+            </div>
+
+            <div class="col-md-2">
+
+            </div>
+
+            <div class="col-md-2">
+                <a href="https://teaho.govt.nz/" target="_blank">
+                    <img width="150" height="auto" class="pull-right"
+                         style="padding: 3px"
+                         src="images/TAK-logo-midgreen.png"/>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+        <div class="row">
+            <div class="col-md-1">
+                Select patient
+            </div>
+            <div class="col-md-2">
+                <select ng-model="input.pat" class="form-control"
+                        ng-change="selectPatient(input.pat)"
+                        ng-options="item.display for item in allPatients">
+
+                </select>
+            </div>
+            <div class="col-md-3">
+
+                NHI: {{selectedPatient.identifier[0].value}}
+                <span ng-show="selectedPatient.gender">Gender: {{selectedPatient.gender}}</span>
+                <span ng-show="selectedPatient.birthDate">BirthDate: {{selectedPatient.birthDate}}</span>
+            </div>
+        </div>
+        <hr/>
+
+        <div class="row" ng-show="selectedPatient">
+
+            <div class="col-md-12" >
+
+                panes to show request forms (as text display) path reports (also as text)
+                also show actnow data - charts & display from current actnow UI
+
+
+            </div>
+        </div>
+
+
+
+
+
+        <div class="row">
+            <div class="col-md-4">
+
+            </div>
+            <div class="col-md-4">
+
+            </div>
+            <div class="col-md-4">
+
+            </div>
+        </div>
+
+</div>
+
+</body>
+</html>

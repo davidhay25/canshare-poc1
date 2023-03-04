@@ -1,8 +1,13 @@
 //endpoints used by the requester component
 
 const axios = require("axios");
-const config = require("./config.json")
+//const config = require("./config.json")
 const showLog = true
+
+let serverBase = process.env.SERVERBASE
+let requestEndpoint = process.env.CUSTOMOPS + "$acceptRequest"
+
+
 let db
 //set the database, source server and backup API points
 function setup(app,inDb) {
@@ -12,7 +17,7 @@ function setup(app,inDb) {
     //the request templates
     app.get('/requester/templates',async function(req,res){
 
-        let qry = config.canShare.fhirServer.url + "/Questionnaire?context=request"
+        let qry = serverBase + "/Questionnaire?context=request"
         try {
             let response = await axios.get(qry)
             let bundle = response.data
@@ -30,9 +35,10 @@ function setup(app,inDb) {
         }
         let body = req.body
 
-        let url = config.canShare.requestEndPoint.url
+        //let url = config.canShare.requestEndPoint.url
+        //post the request transaction to the custom endpoint
         try {
-            let response = await axios.post(url,body)
+            let response = await axios.post(requestEndpoint,body)
 
             res.send(response.data)
         } catch (err) {

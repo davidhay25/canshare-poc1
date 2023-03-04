@@ -1,3 +1,6 @@
+//The server for the example UI - requester and lab
+
+
 let fs = require('fs')
 let http = require('http');
 const axios = require("axios");
@@ -6,11 +9,16 @@ let port = 9500
 
 const bodyParser = require('body-parser')
 
+console.log(`FHIR server root from env is ${process.env.SERVERBASE}`)
+console.log(`Log database from env is ${process.env.LOGDB}`)
+console.log(`Custom ops from env is ${process.env.CUSTOMOPS}`)
+
+let serverBase = process.env.SERVERBASE
+
 const requesterModule = require("./serverModuleRequester.js")
 const labModule = require("./serverModuleLab.js")
 
-
-let config = require("./config.json")
+//let config = require("./config.json")
 
 let express = require('express');
 let app = express();
@@ -23,6 +31,12 @@ labModule.setup(app)
 
 //common calls (not specifically related to requester or lab. ?move to separate module
 app.get('/config', async function(req,res){
+
+    let config = {
+        "SERVERBASE":process.env.SERVERBASE,
+        "CUSTOMOPS":process.env.CUSTOMOPS
+    }
+
     res.json(config)
 })
 
@@ -37,7 +51,10 @@ app.get('/proxy',async function(req,res){
     query = query.replace("|","%7C")    //there will only ever be one...
 
 
-    let qry = config.canShare.fhirServer.url + "/" +query
+    //let qry = config.canShare.fhirServer.url + "/" +query
+    let qry = serverBase + query
+
+
     console.log(qry)
     try {
         let response = await axios.get(qry)

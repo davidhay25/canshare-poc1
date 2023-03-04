@@ -27,6 +27,25 @@ function makeOO(lstIssues) {
     
 }
 
+
+function findExtension(item,url) {
+    let ar = []
+    //console.log(item)
+    if (item.extension) {
+
+        for (var i=0; i <  item.extension.length; i++){
+            let ext = item.extension[i]
+
+            if (ext.url == url) {
+                ar.push(ext)
+            }
+        }
+    }
+    return ar
+
+}
+
+
 async function postBundleToServer(bundle,metrics,res,collectionName,req) {
     let response
     try {
@@ -93,5 +112,6 @@ module.exports = {
     level1Validate : level1Validate,
     logger: logger,
     makeOO : makeOO,
-    postBundleToServer:postBundleToServer
+    postBundleToServer:postBundleToServer,
+    findExtension : findExtension
 };

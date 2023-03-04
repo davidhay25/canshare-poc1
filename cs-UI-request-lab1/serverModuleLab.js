@@ -5,9 +5,15 @@
 *
 */
 const axios = require("axios");
-const config = require("./config.json")
+//const config = require("./config.json")
 const showLog = true
 let db
+
+console.log(`FHIR server root from env is ${process.env.SERVERBASE}`)
+console.log(`Log database from env is ${process.env.LOGDB}`)
+console.log(`Custom ops from env is ${process.env.CUSTOMOPS}`)
+
+let serverBase = process.env.SERVERBASE
 
 //import { MongoClient } from "mongodb";
 let MongoClient = require('mongodb').MongoClient;
@@ -22,6 +28,8 @@ function setup(app) {
 
     //receive a SR - FHIR compliant
     //todo - needs better error checking.
+
+    /* - no longer impementing the notification
     app.post('/lab/ServiceRequest', async function(req,res){
         if (showLog) {
             console.log("/lab/ServiceRequest invoked")
@@ -31,7 +39,8 @@ function setup(app) {
         let identifierQuery = sr.identifier[0].system + "|" + sr.identifier[0].value
         //the received SR is a minimal one - need to retrieve the full version from the Server based on the identifier
         try {
-            let qry = config.canShare.fhirServer.url + "/ServiceRequest?identifier=" + identifierQuery
+            //let qry = config.canShare.fhirServer.url + "/ServiceRequest?identifier=" + identifierQuery
+            let qry = serverBase + "ServiceRequest?identifier=" + identifierQuery
             let response = await axios.get(qry)
             let bundle = response.data
             let SR = getFirstResourceFromBundle(bundle)
@@ -103,6 +112,8 @@ function setup(app) {
 
     })
 
+
+    */
     //return the active ServiceRequests. not FHIR compliant (it's a local call used to display the SR's that are still outstanding)
     //accesses the local (mongo) store...  The object holds SR & QR
     app.get('/lab/activeSR', function(req,res){

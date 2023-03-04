@@ -200,7 +200,7 @@
                                     <uib-tab heading="Q">
                                         <pre>{{selectedTemplate | json}}</pre>
                                     </uib-tab>
-                                    <uib-tab heading="patient">
+                                    <uib-tab heading="Patient">
                                         <pre>{{selectedPatient | json}}</pre>
                                     </uib-tab>
                                     <uib-tab heading="QR">
@@ -208,6 +208,14 @@
                                     </uib-tab>
                                     <uib-tab heading="SR">
                                         <pre>{{createdSR | json}}</pre>
+                                    </uib-tab>
+                                    <uib-tab heading="Extract">
+                                        <button class="btn btn-link" ng-click="testExtraction(QR)">
+
+                                        </button>
+
+
+                                        <pre>{{extractedResources | json}}</pre>
                                     </uib-tab>
                                     <uib-tab heading="Bundle">
                                         <pre>{{bundle | json}}</pre>

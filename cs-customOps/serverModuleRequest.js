@@ -3,8 +3,26 @@
  * 
  */
 const utilModule = require("./serverModuleUtil.js")
+const sdcModule = require("./serverModuleSDC.js")
 
 function setup(app) {
+
+    //console.log('setup')
+
+    //test the observation extraction
+    app.post("/testObservations",(async function (req,res) {
+        let QR = req.body
+        //console.log(QR)
+        let response
+        try {
+            response = await sdcModule.extractResources(QR)     //throw an exception if there was an error, or an array of extracted resources if not
+            res.json(response)
+        } catch(ex) {
+            console.log(ex)
+            res.json(ex)
+        }
+
+    }))
 
     app.post("/([$])acceptRequest",async function(req,res){
 
@@ -28,7 +46,7 @@ function setup(app) {
         //todo perform profile validation - ? optional
 
         //extract resources. Add them to the bundle.
-        extractObservations(bundle)
+        //extractObservations(bundle)
 
 
 

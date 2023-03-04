@@ -78,10 +78,15 @@ angular.module("pocApp")
                 //initialization code - currently loading the config...
                 let deferred = $q.defer()
                 let that = this
-
+                /*
+                let config = {
+                    "SERVERBASE":process.env.SERVERBASE,
+                    "CUSTOMOPS":process.env.CUSTOMOPS
+                }
+*/
                 $http.get("/config").then(
                     function(data) {
-                        that.config = data.data
+                        that.config = data.data  // save in service {SERVERBASE: CUSTOMOPS}}
                         deferred.resolve(that.config)
                         //load all the patients
 
@@ -95,7 +100,8 @@ angular.module("pocApp")
             getAllPatients : function() {
                 let that=this
                 let deferred = $q.defer()
-                let url = `${this.config.canShare.fhirServer.url}/Patient`
+                //let url = `${this.config.canShare.fhirServer.url}/Patient`
+                let url = `${that.config.SERVERBASE}/Patient`
                 $http.get(url).then(
                     function (data) {
                         let lst = []
@@ -127,13 +133,17 @@ angular.module("pocApp")
                 })
 
                 if (QRReference) {
-                    let url = `${that.config.canShare.fhirServer.url}/${QRReference}`
+                    //let url = `${that.config.canShare.fhirServer.url}/${QRReference}`
+
+                    let url = `${that.config.SERVERBASE}/${QRReference}`
+
                     $http.get(url).then(
                         function (data) {
                             vo.QR = data.data
 
                             //now get any DR/obs. - todo - may need to move to $q.all() if there is more to be done...
-                            let url1 = `${that.config.canShare.fhirServer.url}/DiagnosticReport?based-on=${SR.id}&_include=DiagnosticReport:result`
+                            //let url1 = `${that.config.canShare.fhirServer.url}/DiagnosticReport?based-on=${SR.id}&_include=DiagnosticReport:result`
+                            let url1 = `${that.config.SERVERBASE}/DiagnosticReport?based-on=${SR.id}&_include=DiagnosticReport:result`
                             $http.get(url1).then(
                                 function (data) {
                                     let obj = {observations:[], other:[]}
