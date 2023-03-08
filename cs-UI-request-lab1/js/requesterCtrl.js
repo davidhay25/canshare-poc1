@@ -17,13 +17,20 @@ angular.module("pocApp")
                     )
             })
 
+            //create the author resource. The identifier (HPI) is required
+            $scope.author = {resourceType:"Practitioner", name:[{text:"Sally Surgeon"}]}
+            $scope.author.id = commonSvc.createUUID()
+            $scope.author.identifier = [{system:"http://canshare.co.nz/ns",value:"ABC1234"}]
 
             //when a form is being created, the QR representing that form is generated immediately. However, as
             //this is in a directlve, the scopes are complicated to to simplify things the QR is emitted by the
             //directive so that it can be captured and ultimately sent to the server. This process happens
             //as soon as any change in the form is made (using ng-change) - so it gets called a lot!
+
             $scope.$on('qrCreated',function(event,data){
                 $scope.createdQR = data
+                //add the author to the QR. (it also gets added to the SR)
+                $scope.createdQR.author = {reference:`urn:uuid:${$scope.author.id}`}
                 makeBundle()
                 //console.log(data)
             })
@@ -31,7 +38,15 @@ angular.module("pocApp")
 
             //call the 'test extraction' endpoint to return the extracted resources
             $scope.testExtraction = function (QR) {
-
+                $http.post("/requester/extract",QR).then(
+                    function (data) {
+                        $scope.testExtractionResult = data.data
+                        console.log(data.data)
+                    }, function (err) {
+                        $scope.testExtractionResult = err.data
+                        console.log(err.data)
+                    }
+                )
             }
 
             //load the list of possible report templates (questionnaires)
@@ -143,6 +158,20 @@ angular.module("pocApp")
                 */
             }
 
+            $scope.validateBundle = function() {
+                delete $scope.validationResult
+                let bundle = makeBundle()   //create the transaction bundle
+                delete $scope.oo
+                let url = "/csValidate"
+
+                $http.post(url,bundle).then(
+                    function(data){
+                        $scope.validationResult = data.data
+
+                    }
+                )
+            }
+
             $scope.submitRequest = function () {
                 if (confirm("Are you sure you wish to send this request?")) {
                     delete $scope.submitStatus
@@ -185,7 +214,7 @@ angular.module("pocApp")
                 QR.subject = {reference : `urn:uuid:${$scope.selectedPatient.id}`}
                 QR.identifier = [{system:'http://canshare.co.nz/NamingSystem/pathIdentifier',value: new Date().toISOString()}]
 
-                let SR = makeSR()   //create the service request. it will have a reference to the QR
+                let SR = makeSR()   //create the service request. it will have a reference to the QR & author
                 $scope.createdSR = SR   //just for the display
                 let bundle = {"resourceType":"Bundle",type:'transaction',entry:[]}
                 bundle.identifier = {system:"http://canshare.co.nz/identifier/bundle",value:new Date().toISOString()}
@@ -193,7 +222,9 @@ angular.module("pocApp")
                 addEntry(bundle,$scope.selectedPatient)     //this will have the NHI as the identifer
                 addEntry(bundle,QR)           //thus
                 addEntry(bundle,SR)
+                addEntry(bundle,$scope.author)
                 $scope.bundle = bundle
+                console.log(JSON.stringify(bundle))
                 return bundle
             }
 
@@ -219,6 +250,7 @@ angular.module("pocApp")
                 sr.authoredOn = new Date().toISOString()
                 sr.code = {text:"Histology request"}
                 sr.category = [{text:"CS order"}]
+                sr.author = {reference:`urn:uuid:${$scope.author.id}`}
                 sr.subject = {reference:`urn:uuid:${$scope.selectedPatient.id}`}
                 sr.identifier = [{system:"http://canshare.co.nz/identifier",value: new Date().toISOString()}]
                 sr.supportingInfo = [{reference:"urn:uuid:"+$scope.createdQR.id}]

@@ -1,11 +1,11 @@
-//endpoints used by the requester component
+//endpoints used by the requester UI component
 
 const axios = require("axios");
-//const config = require("./config.json")
 const showLog = true
 
 let serverBase = process.env.SERVERBASE
-let requestEndpoint = process.env.CUSTOMOPS + "$acceptRequest"
+let requestEndpoint = process.env.CUSTOMOPS + "$acceptRequest"  //where the request bundle is sent
+let testExtractEndpoint = process.env.CUSTOMOPS + "testExtraction"  //the EP that will extract the resources
 
 
 let db
@@ -13,6 +13,37 @@ let db
 function setup(app,inDb) {
 
     db = inDb
+
+    app.get('/requester/validate',async function(req,res){
+        let bundle = req.body
+        let qry = serverBase + "/csValidate"
+        try {
+            let response = await axios.post(qry,bundle)
+            let bundle = response.data
+            res.json(bundle)
+        } catch (ex) {
+            res.json(ex.response.data)
+        }
+    })
+
+    //tests the extraction from the QR
+    app.post('/requester/extract',async function(req,res){
+        let QR = req.body
+
+        console.log("Posting to " + testExtractEndpoint)
+
+        try {
+            //returns a list of resources (ie not a FHIR endpoint ATM)
+            let response = await axios.post(testExtractEndpoint,QR)
+            let list = response.data
+            res.json(list)
+        } catch (ex) {
+            res.json(ex.response.data)
+        }
+    })
+
+
+
 
     //the request templates
     app.get('/requester/templates',async function(req,res){
@@ -31,7 +62,7 @@ function setup(app,inDb) {
     //send a request from the requester UI to the IE. Assume that this is a bundle, so just send it
     app.post('/requester/makerequest', async function(req,res){
         if (showLog) {
-            console.log("/requester/makerequest invoked")
+            console.log("local UI function /requester/makerequest invoked")
         }
         let body = req.body
 

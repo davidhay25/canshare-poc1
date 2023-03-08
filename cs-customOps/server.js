@@ -25,6 +25,7 @@ let port = 9300
 const bodyParser = require('body-parser')
 
 let express = require('express');
+const utilModule = require("./serverModuleUtil");
 let app = express();
 
 app.use(bodyParser.json({limit:'50mb',type:['application/fhir+json','application/json+fhir','application/json']}))
@@ -32,6 +33,19 @@ app.use(bodyParser.json({limit:'50mb',type:['application/fhir+json','application
 requestModule.setup(app,serverBase)    //$acceptRequest
 reportModule.setup(app,serverBase)     //$acceptReport
 actnowModule.setup(app,serverBase)     //$acceptActNow
+
+//A generic validation routine
+app.post("/csValidate",async function (req,res) {
+    let bundle = req.body
+    try {
+        let oo = await utilModule.profileValidation(bundle)
+        res.json(oo)
+    } catch (ex) {
+        //there was a validation failure.
+        res.status("400").json(ex.data)
+    }
+
+})
 
 
 server = http.createServer(app).listen(port);

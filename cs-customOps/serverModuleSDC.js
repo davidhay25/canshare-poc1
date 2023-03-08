@@ -3,10 +3,11 @@ let serverBase = process.env.SERVERBASE
 const { default: axios } = require("axios")
 const utilModule = require("./serverModuleUtil");
 
+
 let debug = false
 
 
-
+//extract resources from the QR. Returns an array of resources
 async function extractResources(QR) {
 
 
@@ -30,18 +31,21 @@ async function extractResources(QR) {
 
         //retrieve Observations (and potentially other resources)
         let arExtractedResources = performResourceExtraction(Q,QR)
+
+        console.log(arExtractedResources)
+
         addProvenance(QR,arExtractedResources)
-
-
-
-
         return arExtractedResources
 
 
     } else {
-        console.log(`No Q with url ${qUrl} found`)
+        let numQ = 0
+        if (bundle.entry) {
+            numQ = bundle.entry.length
+        }
+        console.log(`${numQ} Q with url ${qUrl} found`)
 
-        throw "There needs to be a single Q with the url: " + qUrl + ". " + bundle.entry.length + " were found."
+        throw "There needs to be a single Q with the url: " + qUrl + ". " +numQ + " were found."
         //return utilModule.makeOO(["There needs to be a single Q with the url: " + qUrl + ". " + bundle.entry.length + " were found."])
     }
 
@@ -52,7 +56,7 @@ function addProvenance(QR,lst) {
     if (lst.length > 0) {
 
         let provenance = {resourceType:"Provenance"}
-        provenance.id = createId()  // createUUID()   //will be ignored by fhir server
+        provenance.id =  createUUID()   //will be ignored by fhir server
         //the subject might be a reference to a contained PR resource...
         if (QR.author && QR.author.reference && QR.author.reference.substring(0,1) == '#') {
             provenance.contained = QR.contained
@@ -64,13 +68,14 @@ function addProvenance(QR,lst) {
         provenance.agent = []
         provenance.target = []
 
-        //provenance.entity.push({role:"source",what:{reference:"urn:uuid:" + QR.id}})
-        provenance.entity.push({role:"source",what:{reference:"QuestionnaireResponse/" + QR.id}})
+        provenance.entity.push({role:"source",what:{reference:"urn:uuid:" + QR.id}})
+        //provenance.entity.push({role:"source",what:{reference:"QuestionnaireResponse/" + QR.id}})
         //set the agent to the author of the QR todo ?should this be to a 'Device' representing the forms receiver
         //provenance.agent.push({who:QR.author}) todo - what's the best way to do this...
 
         lst.forEach(function (resource) {
-            provenance.target.push({reference:  `${capitalize(resource.resourceType)}/${resource.id}`})
+            //provenance.target.push({reference:  `${capitalize(resource.resourceType)}/${resource.id}`})
+            provenance.target.push({reference:  `urn:uuid:${resource.id}`})
         })
 
 
@@ -113,6 +118,7 @@ function performResourceExtraction(Q,QR) {
             if (ar1.length > 0) {
                 let resourceType = ar1[0].valueCode
                 hashQDefinition[item.linkId] = {item:item,resourceType:resourceType}
+                console.log(`definition extraction found - ${item.linkId}`)
             }
 
             //recurse through the child items
@@ -180,7 +186,7 @@ function performResourceExtraction(Q,QR) {
                     //theAnswer is a single answer value...
                     let observation = {resourceType: 'Observation'}
 
-                    observation.id = createId() // createUUID()
+                    observation.id = utilModule.createUUID()
                     observation.text = {status: 'generated'}
 
                     observation.status = "final"
@@ -205,8 +211,8 @@ function performResourceExtraction(Q,QR) {
                     }
 
                     observation.code = oCode
-                    //observation.derivedFrom = [{reference:"urn:uuid:" + QR.id}]
-                    observation.derivedFrom = [{reference: "QuestionnaireResponse/" + QR.id}]
+                    observation.derivedFrom = [{reference:"urn:uuid:" + QR.id}]
+                    //observation.derivedFrom = [{reference: "QuestionnaireResponse/" + QR.id}]
 
 
                     //console.log(theAnswer)
@@ -241,9 +247,6 @@ function performResourceExtraction(Q,QR) {
 
                     arExtractedResources.push(observation)
 
-
-
-
                 })
             }
         }
@@ -251,15 +254,18 @@ function performResourceExtraction(Q,QR) {
 
 
 
-    //now go through and pull out any items that use definition based
+    //now go through and pull out any items that use definition based - eg Procedures
+    //note that this routine is not generic - it specifically looks for Procedures.
+
     Object.keys(hashQDefinition).forEach(function (key){
         let vo = hashQDefinition[key]   //{item: resourceType:}
         let resourceType = vo.resourceType
         let item = vo.item
+        console.log(`definition extraction ${key}`)
 
         if (item.item){     //assume that any contents of the resource are child elements
             let resource = {resourceType:resourceType}
-            resource.id = createId()  // createUUID()
+            resource.id =  createUUID()
             resource.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>Specimen from Pathology request form</div>",status:"additional"}
             resource.subject = QR.subject;      //todo - may need to figure out if the type *has* a subject
             let canBeAdded = false      //only add if there is at least one child element entry
@@ -270,11 +276,19 @@ function performResourceExtraction(Q,QR) {
                     if (QRItem && QRItem.answer) {
                         //there is an answer
                         canBeAdded = true
-                        //assume this is a fhirpath expression - 2 level only - eg specimen.type
-                        //todo - need a better algorithm here. For now, assume that any value is a top level element....
-                        let ar = child.definition.split('.')
-                        let elementName = ar[1]
+                        //assume this is a fhirpath expression - 2 level only - eg http://hl7.org/fhir/specimen.type
+                        //todo - need a better and more robust algorithm here. For now, assume that any value is a top level element....
 
+                        //path will be something like Procedure.code
+                        //console.log("definition: " + child.definition)
+                        let path = child.definition.replace("http://hl7.org/fhir/","") //remove the url base - only support HL7 paths.
+                        //console.log(`path: ${path}`)
+
+                        let ar = path.split('.')
+                        //assume that the element is a 'top level' - ie off the root
+                        let elementName = ar[1]     //remove the resource type - eg Procedure.code becomes just code.
+
+                        //console.log(`element name: ${elementName}`)
                         //todo - support all the answer types that could be used...
                         //todo - think about multiple answers...
                         if (QRItem.answer[0].valueCoding) {
@@ -283,8 +297,6 @@ function performResourceExtraction(Q,QR) {
                         }
 
                     }
-
-
 
                 }
             })
@@ -305,7 +317,7 @@ function performResourceExtraction(Q,QR) {
 
 }
 
-function createId() {
+function createIdDEP() {
     let id = 'id-' + new Date().getTime() + '-' + Math.floor(Math.random() * 1000)
     return id
 }

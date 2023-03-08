@@ -15,7 +15,7 @@ console.log(`Custom ops from env is ${process.env.CUSTOMOPS}`)
 
 let serverBase = process.env.SERVERBASE
 
-const requesterModule = require("./serverModuleRequester.js")
+const requesterModule = require("./serverModuleRequesterUI.js")
 const labModule = require("./serverModuleLab.js")
 
 //let config = require("./config.json")

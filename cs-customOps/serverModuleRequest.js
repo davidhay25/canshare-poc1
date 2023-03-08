@@ -9,8 +9,9 @@ function setup(app) {
 
     //console.log('setup')
 
+
     //test the observation extraction
-    app.post("/testObservations",(async function (req,res) {
+    app.post("/testExtraction",(async function (req,res) {
         let QR = req.body
         //console.log(QR)
         let response
@@ -24,34 +25,86 @@ function setup(app) {
 
     }))
 
+
+
     app.post("/([$])acceptRequest",async function(req,res){
 
         let bundle = req.body
+
         let metrics = {}
         metrics.start = new Date()
 
-
         utilModule.logger("request",{content:bundle})
 
-        //if lstIssues length is 0 then no issues were found
-        let lstIssues = utilModule.level1Validate(bundle)
-        if (lstIssues.length > 0) {
-            //There were validation issues. These cannot be ignored.
-            let oo = utilModule.makeOO(lstIssues)
+        //if lstErrors length is 0 then no errors were found. Any errors will cause the bundle to be rejected
+        let lstErrors = utilModule.level1Validate(bundle)
+        if (lstErrors.length > 0) {
+            //There were validation errors. These cannot be ignored.
+            let oo = utilModule.makeOO(lstErrors)
             res.status("400").json(oo)
             return
-            
         }
 
-        //todo perform profile validation - ? optional
+        //todo perform profile validation - ? optional reject if there are errors
+        let profileValidationOO
+        try {
+            let profileValidationOO = await utilModule.profileValidation(bundle)
+            console.log(profileValidationOO)
+        } catch (ex) {
+            //there was a validation failure.
+            console.log(ex)
+            res.status("400").json(ex)
+        }
+
+
+        //the device represents this app
+        let device = {resourceType:"Device",identifier:[{system:'http://canshare.co.nz/ns',value:"requesterOp"}]}
+        device.id = utilModule.createUUID()
+        utilModule.addResourcesToBundle(bundle,[device])
+
+
 
         //extract resources. Add them to the bundle.
-        //extractObservations(bundle)
+        let arResources = utilModule.findResourceInBundleByType(bundle,"QuestionnaireResponse")
+        let QR = arResources[0] //note that the L1 check above will ensure 1 QR in the bundle
+        let arExtractedResources = []
+        try {
+            //If any resources are extracted, then a specific provenance will be added and included in the list.
+            //todo is this overkill - ie do we only need the single provenance that refers to all resources?
+            arExtractedResources = await sdcModule.extractResources(QR)     //throw an exception if there was an error, or an array of extracted resources if not
+            utilModule.addResourcesToBundle(bundle,arExtractedResources)
 
+        } catch(ex) {
+            console.log(ex)
+            res.status("500").json(ex)
+            return
+        }
 
+        //add the provenance resource. This needs to be done after any created resources have been added
+        //
+        let ar = utilModule.findResourceInBundleByType(bundle,"QuestionnaireResponse")
+        if (ar.length == 1) {
+            //should only be a single QR...
 
-        //add a Communication to the bundle for the notification if there is a SR with a performer
-        //addCommunication(bundle)
+            if (ar[0].author && ar[0].author.reference) {
+                let authorReference = ar[0].author.reference  //this will be a uuid reference
+                let authorId = authorReference.replace("urn:uuid:","")
+                let author = utilModule.findResourceInBundleById(bundle,authorId)
+
+                if (author) {
+                    utilModule.addProvenanceToBundle(bundle,author,device)
+                } else {
+                    console.log(`the author id ${authorId} was not in the bundle`)
+                }
+            }
+
+            //the validation rules will check for an author...
+
+        } else {
+            //todo ?? what to do here
+            console.log(`Looking for QuestionnaireResponse in bundle and found ${ar.length}`)
+        }
+
         //POST the bundle to the FHIR server
         metrics.end = new Date()
         utilModule.postBundleToServer(bundle,metrics,res,"request",req)

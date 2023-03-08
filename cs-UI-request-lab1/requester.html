@@ -116,8 +116,11 @@
                                                 ng-options = "item.display for item in templates">
                                         </select>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-2">
                                         <button class="btn btn-primary" ng-click="submitRequest()">Send request</button>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-primary" ng-click="validateBundle()">Validate</button>
                                     </div>
                                 </div>
 
@@ -193,6 +196,8 @@
 
                             <div class="col-md-4">
 
+                                <pre>{{validationResult | json}}</pre>
+
                                 <uib-tabset>
                                     <uib-tab heading="Request text">
                                         <qrdisplay qr="QR"></qrdisplay>
@@ -210,12 +215,12 @@
                                         <pre>{{createdSR | json}}</pre>
                                     </uib-tab>
                                     <uib-tab heading="Extract">
-                                        <button class="btn btn-link" ng-click="testExtraction(QR)">
+                                        <button class="btn btn-link" ng-click="testExtraction(QR)">Extract
 
                                         </button>
 
 
-                                        <pre>{{extractedResources | json}}</pre>
+                                        <pre>{{testExtractionResult | json}}</pre>
                                     </uib-tab>
                                     <uib-tab heading="Bundle">
                                         <pre>{{bundle | json}}</pre>
