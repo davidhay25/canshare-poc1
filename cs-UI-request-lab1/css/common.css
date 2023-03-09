@@ -3,6 +3,16 @@
     background-color: lightsteelblue;
 }
 
+.activeFhirDisplay {
+    background-color: lightsteelblue;
+}
+
+.myScroll {
+    height: 700px;
+    overflow-y: scroll;
+
+}
+
 .banner {
 
     border: 1px solid #b8b9b5;

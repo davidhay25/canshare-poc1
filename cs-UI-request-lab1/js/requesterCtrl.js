@@ -22,6 +22,18 @@ angular.module("pocApp")
             $scope.author.id = commonSvc.createUUID()
             $scope.author.identifier = [{system:"http://canshare.co.nz/ns",value:"ABC1234"}]
 
+            //the options for the fhir display
+            $scope.fhirDisplayOptions = []
+            $scope.fhirDisplayOptions.push({code:'text',display:'Request text'})
+            $scope.fhirDisplayOptions.push({code:'Q',display:'Questionnaire'})
+            $scope.fhirDisplayOptions.push({code:'patient',display:'Patient'})
+            $scope.fhirDisplayOptions.push({code:'QR',display:'QuestionnaireResponse'})
+            $scope.fhirDisplayOptions.push({code:'SR',display:'ServiceRequest'})
+            $scope.fhirDisplayOptions.push({code:'extract',display:'Test extraction'})
+            $scope.fhirDisplayOptions.push({code:'bundle',display:'Bundle'})
+            $scope.fhirDisplayOptions.push({code:'validate',display:'Validate bundle'})
+            $scope.input.selectedFhirDisplayOption = 'text'
+
             //when a form is being created, the QR representing that form is generated immediately. However, as
             //this is in a directlve, the scopes are complicated to to simplify things the QR is emitted by the
             //directive so that it can be captured and ultimately sent to the server. This process happens

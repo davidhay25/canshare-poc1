@@ -39,7 +39,7 @@
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
         <div class="container-fluid">
-            <div class="col-md-3 col-sm-3">
+            <div class="col-md-2 col-sm-3">
                     <span>
                         <a class="navbar-brand" href="#">
                             Requester
@@ -48,13 +48,32 @@
 
             </div>
 
-            <div class="col-md-4">
+
+
+            <div class="col-md-2">
+                <div class="navbar-text">
+                <select ng-model="input.pat" class="form-control"
+                        ng-change="selectPatient(input.pat)"
+                        ng-options="item.display for item in allPatients">
+                    <option value="" disabled selected>Select patient</option>
+                </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="navbar-text">
+                NHI: {{selectedPatient.identifier[0].value}}
+                <span ng-show="selectedPatient.gender">Gender: {{selectedPatient.gender}}</span>
+                <span ng-show="selectedPatient.birthDate">BirthDate: {{selectedPatient.birthDate}}</span>
+                </div>
+            </div>
+
+
+            <div class="col-md-2">
                 <div class="navbar-text">
 
-
                 </div>
-
             </div>
+
 
             <div class="col-md-1 col-sm-1">
                 <form class="navbar-form navbar-left">
@@ -63,9 +82,7 @@
                 </form>
             </div>
 
-            <div class="col-md-2">
 
-            </div>
 
             <div class="col-md-2">
                 <a href="https://teaho.govt.nz/" target="_blank">
@@ -77,7 +94,7 @@
         </div>
     </nav>
 
-        <div class="row">
+        <div ng-show="false" class="row">
             <div class="col-md-1">
                 Select patient
             </div>
@@ -95,7 +112,7 @@
                 <span ng-show="selectedPatient.birthDate">BirthDate: {{selectedPatient.birthDate}}</span>
             </div>
         </div>
-        <hr/>
+
 
         <div class="row">
 
@@ -105,43 +122,12 @@
                     <uib-tab heading="New request">
                         <br/>
 
-                        <div class="row">
-
-                            <div class="col-md-8" >
+                        <uib-tabset>
+                            <uib-tab heading="Enter request data">
+                                <br/>
                                 <div class="row">
-                                    <div class="col-md-4">
-                                        <select ng-model="selectedTemplate" class="form-control"
-                                                placeholder="Select form"
-                                                ng-change="selectQ(selectedTemplate)"
-                                                ng-options = "item.display for item in templates">
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <button class="btn btn-primary" ng-click="submitRequest()">Send request</button>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <button class="btn btn-primary" ng-click="validateBundle()">Validate</button>
-                                    </div>
-                                </div>
 
-                                <div class="alert" ng-show="oo">
-                                    <br/>
-                                    <div ng-show = "submitStatus == 'pass'">
-                                        <pre class="alert-success" ng-show="oo">{{oo | json}}</pre>
-                                    </div>
-                                    <div ng-show = "submitStatus == 'fail'" >
-                                        <pre class="alert-danger" ng-show="oo">{{oo | json}}</pre>
-                                    </div>
-                                </div>
-
-                                <div ng-hide="oo">
-                                    <renderform q="selectedTemplate.Q" qr="QR"></renderform>
-                                </div>
-
-                                <!--
-
-                                <uib-tabset>
-                                    <uib-tab heading="Form">
+                                    <div class="col-md-8" >
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <select ng-model="selectedTemplate" class="form-control"
@@ -150,11 +136,13 @@
                                                         ng-options = "item.display for item in templates">
                                                 </select>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-2">
                                                 <button class="btn btn-primary" ng-click="submitRequest()">Send request</button>
                                             </div>
+                                            <div class="col-md-2">
+                                                <button class="btn btn-primary" ng-click="validateBundle()">Validate</button>
+                                            </div>
                                         </div>
-
 
                                         <div class="alert" ng-show="oo">
                                             <br/>
@@ -170,35 +158,157 @@
                                             <renderform q="selectedTemplate.Q" qr="QR"></renderform>
                                         </div>
 
-                                        <pre>{{QR | json}}</pre>
+                                        <!--
 
-                                    </uib-tab>
-                                    <uib-tab heading="Text">
+                                        <uib-tabset>
+                                            <uib-tab heading="Form">
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <select ng-model="selectedTemplate" class="form-control"
+                                                                placeholder="Select form"
+                                                                ng-change="selectQ(selectedTemplate)"
+                                                                ng-options = "item.display for item in templates">
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <button class="btn btn-primary" ng-click="submitRequest()">Send request</button>
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="alert" ng-show="oo">
+                                                    <br/>
+                                                    <div ng-show = "submitStatus == 'pass'">
+                                                        <pre class="alert-success" ng-show="oo">{{oo | json}}</pre>
+                                                    </div>
+                                                    <div ng-show = "submitStatus == 'fail'" >
+                                                        <pre class="alert-danger" ng-show="oo">{{oo | json}}</pre>
+                                                    </div>
+                                                </div>
+
+                                                <div ng-hide="oo">
+                                                    <renderform q="selectedTemplate.Q" qr="QR"></renderform>
+                                                </div>
+
+                                                <pre>{{QR | json}}</pre>
+
+                                            </uib-tab>
+                                            <uib-tab heading="Text">
+                                                <qrdisplay qr="QR"></qrdisplay>
+
+                                            </uib-tab>
+                                            <uib-tab heading="Q">
+                                                <pre>{{selectedTemplate | json}}</pre>
+                                            </uib-tab>
+                                            <uib-tab heading="QR">
+                                                <pre>{{QR | json}}</pre>
+                                            </uib-tab>
+                                            <uib-tab heading="SR">
+                                                <pre>{{SR | json}}</pre>
+                                            </uib-tab>
+                                            <uib-tab heading="Bundle">
+                                                <pre>{{bundle | json}}</pre>
+                                            </uib-tab>
+                                        </uib-tabset>
+
+                                        -->
+                                    </div>
+
+                                    <div class="col-md-4">
+
                                         <qrdisplay qr="QR"></qrdisplay>
+<!--
+                                        <pre>{{validationResult | json}}</pre>
 
-                                    </uib-tab>
-                                    <uib-tab heading="Q">
-                                        <pre>{{selectedTemplate | json}}</pre>
-                                    </uib-tab>
-                                    <uib-tab heading="QR">
-                                        <pre>{{QR | json}}</pre>
-                                    </uib-tab>
-                                    <uib-tab heading="SR">
-                                        <pre>{{SR | json}}</pre>
-                                    </uib-tab>
-                                    <uib-tab heading="Bundle">
-                                        <pre>{{bundle | json}}</pre>
-                                    </uib-tab>
-                                </uib-tabset>
+                                        <uib-tabset>
+                                            <uib-tab heading="Request text">
+                                                <qrdisplay qr="QR"></qrdisplay>
+                                            </uib-tab>
+                                            <uib-tab heading="Q">
+                                                <pre>{{selectedTemplate | json}}</pre>
+                                            </uib-tab>
+                                            <uib-tab heading="Patient">
+                                                <pre>{{selectedPatient | json}}</pre>
+                                            </uib-tab>
+                                            <uib-tab heading="QR">
+                                                <pre>{{QR | json}}</pre>
+                                            </uib-tab>
+                                            <uib-tab heading="SR">
+                                                <pre>{{createdSR | json}}</pre>
+                                            </uib-tab>
+                                            <uib-tab heading="Extract">
+                                                <button class="btn btn-link" ng-click="testExtraction(QR)">Extract
 
-                                -->
-                            </div>
+                                                </button>
 
-                            <div class="col-md-4">
 
-                                <pre>{{validationResult | json}}</pre>
+                                                <pre>{{testExtractionResult | json}}</pre>
+                                            </uib-tab>
+                                            <uib-tab heading="Bundle">
+                                                <pre>{{bundle | json}}</pre>
+                                            </uib-tab>
+                                        </uib-tabset>
 
-                                <uib-tabset>
+-->
+
+                                    </div>
+
+                                </div>
+                            </uib-tab>
+                            <uib-tab heading="FHIR resources">
+                                <br/>
+
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <div class="list-group">
+
+
+                                            <div ng-class="{'list-group-item':true,activeFhirDisplay:input.selectedFhirDisplayOption == f.code}"
+                                                ng-repeat = "f in fhirDisplayOptions"
+                                                 style="cursor: pointer"
+                                                ng-click = "input.selectedFhirDisplayOption = f.code">
+                                                {{f.display}}
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <div class="myScroll">
+
+
+                                        <div ng-show = "input.selectedFhirDisplayOption == 'text'">
+                                            <qrdisplay qr="QR"></qrdisplay>
+                                        </div>
+                                        <div ng-show = "input.selectedFhirDisplayOption == 'Q'">
+                                            <pre>{{selectedTemplate | json}}</pre>
+                                        </div>
+                                        <div ng-show = "input.selectedFhirDisplayOption == 'patient'">
+                                            <pre>{{selectedPatient | json}}</pre>
+                                        </div>
+
+                                        <div ng-show = "input.selectedFhirDisplayOption == 'QR'">
+                                            <pre>{{QR | json}}</pre>
+                                        </div>
+
+                                        <div ng-show = "input.selectedFhirDisplayOption == 'SR'">
+                                            <pre>{{createdSR | json}}</pre>
+                                        </div>
+
+                                        <div ng-show = "input.selectedFhirDisplayOption == 'extract'">
+                                            <button class="btn btn-link" ng-click="testExtraction(QR)">Extract</button>
+                                            <pre>{{testExtractionResult | json}}</pre>
+                                        </div>
+
+                                        <div ng-show = "input.selectedFhirDisplayOption == 'bundle'">
+                                            <pre>{{bundle | json}}</pre>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!--
+                                <uib-tabset vertical="true">
                                     <uib-tab heading="Request text">
                                         <qrdisplay qr="QR"></qrdisplay>
                                     </uib-tab>
@@ -227,13 +337,18 @@
                                     </uib-tab>
                                 </uib-tabset>
 
+                                -->
+
+                            </uib-tab>
+
+                        </uib-tabset>
 
 
-                            </div>
-
-                        </div>
 
                     </uib-tab>
+
+
+
                     <uib-tab heading="Previous request history">
                         <br/>
 
