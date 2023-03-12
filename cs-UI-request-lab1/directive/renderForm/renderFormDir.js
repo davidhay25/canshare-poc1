@@ -25,7 +25,7 @@ angular.module('pocApp')
                 $scope.$watch(
                     function() {return $scope.q},
                     function() {
-                        console.log(renderFormsSvc.makeFormTemplate($scope.q))
+                        //console.log(renderFormsSvc.makeFormTemplate($scope.q))
                         let vo = renderFormsSvc.makeFormTemplate($scope.q)
                         if (vo) {
                             $scope.formTemplate = vo.template
@@ -39,7 +39,6 @@ angular.module('pocApp')
                 //this is to ensure that the QR is always up to date. onBlur could miss the most recently updated firld...
                 $scope.makeQR = function() {
                     $scope.qr = renderFormsSvc.makeQR($scope.q, $scope.form)
-                    //console.log($scope.qr)
                     //emit the QR so it can be captured by the containing hierarchy. Otherwise the scopes get complicated...
                     $scope.$emit('qrCreated',$scope.qr)
 
@@ -72,9 +71,6 @@ angular.module('pocApp')
                     }
 
                     return show
-
-
-
                 }
 
                 //code to show (or not) a conditional group - limited to Coding comparisons ATM

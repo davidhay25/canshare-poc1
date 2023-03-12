@@ -60,6 +60,35 @@ angular.module("pocApp")
 
         return {
 
+            expandVS : function(url,filter) {
+                let deferred = $q.defer()
+                //for now, go directly to the term server. Might want to bounce it through the nodejs server eventually
+                let qry = `${termServer}ValueSet/$expand?url=${url}`
+                if (filter){
+                    qry += `&filter=${filter}`
+                }
+
+                $http.get(qry).then(
+                    function (data) {
+                        deferred.resolve(data.data)     //the expanded VS
+
+                    }, function (err) {
+                        deferred.reject(err.data)
+                    }
+                )
+
+                return deferred.promise
+
+                let encodedQry = encodeURIComponent(qry)
+
+                $http.get(`/proxy?qry=${encodedQry}`).then(
+                    function (data) {
+                        $scope.expandedVS = data.data
+                        console.log($scope.expandedVS)
+                    }
+                )
+            },
+
             findExtension : function(item,url) {
                 //return an array with all matching extensions
                 let ar = []
@@ -509,8 +538,6 @@ angular.module("pocApp")
                         case "dateTime":
 
                             result = {valueDateTime: moment(value).format("YYYY-MM-DDThh:mm:ssZ")}
-
-
                             break;
 
 
@@ -540,6 +567,10 @@ angular.module("pocApp")
 
 
 
+            //return vo {template, hiddenFields, hiddenSections}
+            //template is an array of section objects
+            //section has rows array where a row has
+
             makeFormTemplate : function(Q) {
                 if (!Q) {
                     return
@@ -567,7 +598,6 @@ angular.module("pocApp")
                         template.push(section)
 
                         //now look at the items below the section level.
-
                         if (sectionItem.item) {
                             sectionItem.item.forEach(function (item) {
                                 let meta = that.getMetaInfoForItem(item)
@@ -591,7 +621,7 @@ angular.module("pocApp")
                                         if (meta.columnCount) {
                                             //if there's a column count, then fill rows left -> right
                                             let col = 1
-                                            //let rowHasBeenAdded =
+
                                             item.item.forEach(function (child,inx) {
 
                                                 let side = 'col' + col
@@ -685,9 +715,6 @@ angular.module("pocApp")
 
                                         section.rows.push(row)
                                     }
-
-
-
 
                                 }
 

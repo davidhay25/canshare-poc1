@@ -10,18 +10,35 @@ function setup(app) {
     //console.log('setup')
 
 
-    //test the observation extraction
+    //test the observation extraction. Returns an array of all resources including those in the bundle
     app.post("/testExtraction",(async function (req,res) {
-        let QR = req.body
-        //console.log(QR)
-        let response
-        try {
-            response = await sdcModule.extractResources(QR)     //throw an exception if there was an error, or an array of extracted resources if not
-            res.json(response)
-        } catch(ex) {
-            console.log(ex)
-            res.json(ex)
+
+        let bundle = req.body
+
+
+        let arResources = utilModule.findResourceInBundleByType(bundle,"QuestionnaireResponse")
+        if (arResources.length == 1) {
+            try {
+                let QR = arResources[0]
+                let ar = await sdcModule.extractResources(QR)     //throw an exception if there was an error, or an array of extracted resources if not
+
+                //now add the resources from the bundle into the array so there's a complete list returned to the client
+                bundle.entry.forEach(function (entry) {
+                    ar.push(entry.resource)
+                })
+
+                res.json(ar)
+            } catch(ex) {
+                console.log(ex)
+                res.status(400).json(ex.message)
+            }
+        } else {
+            res.status(400).json("Must be one QR resource")
         }
+
+        //console.log(QR)
+
+
 
     }))
 

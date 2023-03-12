@@ -3,7 +3,11 @@
 const axios = require("axios");
 const showLog = true
 
-let serverBase = process.env.SERVERBASE
+let serverBase = process.env.SERVERBASE         //the location of the FHIR server
+//ensure serverBase has the trailing slash
+if (serverBase[serverBase.length-1] !== '/') {
+    serverBase += '/'
+}
 let requestEndpoint = process.env.CUSTOMOPS + "$acceptRequest"  //where the request bundle is sent
 let testExtractEndpoint = process.env.CUSTOMOPS + "testExtraction"  //the EP that will extract the resources
 
@@ -14,11 +18,17 @@ function setup(app,inDb) {
 
     db = inDb
 
-    app.get('/requester/validate',async function(req,res){
-        let bundle = req.body
-        let qry = serverBase + "/csValidate"
+
+
+    //validate endpoint. will call the $validate operation on the server
+    app.post('/requester/validate',async function(req,res){
+        let resource = req.body         //may be a single resource or a bundle
+        let type = resource.resourceType
+
+        let qry = `${serverBase}${type}/$validate`
+        //let qry = serverBase + "/csValidate"
         try {
-            let response = await axios.post(qry,bundle)
+            let response = await axios.post(qry,resource)
             let bundle = response.data
             res.json(bundle)
         } catch (ex) {
@@ -28,21 +38,19 @@ function setup(app,inDb) {
 
     //tests the extraction from the QR
     app.post('/requester/extract',async function(req,res){
-        let QR = req.body
+        let body = req.body
 
         console.log("Posting to " + testExtractEndpoint)
 
         try {
             //returns a list of resources (ie not a FHIR endpoint ATM)
-            let response = await axios.post(testExtractEndpoint,QR)
+            let response = await axios.post(testExtractEndpoint,body)
             let list = response.data
             res.json(list)
         } catch (ex) {
             res.json(ex.response.data)
         }
     })
-
-
 
 
     //the request templates

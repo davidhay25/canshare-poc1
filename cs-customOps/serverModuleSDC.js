@@ -266,14 +266,15 @@ function performResourceExtraction(Q,QR) {
         if (item.item){     //assume that any contents of the resource are child elements
             let resource = {resourceType:resourceType}
             resource.id =  createUUID()
-            resource.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>Specimen from Pathology request form</div>",status:"additional"}
+            resource.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>Extracted resource</div>",status:"additional"}
             resource.subject = QR.subject;      //todo - may need to figure out if the type *has* a subject
             let canBeAdded = false      //only add if there is at least one child element entry
 
+            //each child element has the content of a resource element (defined by the definition)
             item.item.forEach(function (child){
                 if (child.definition) {
                     let QRItem = hashQR[child.linkId]
-                    if (QRItem && QRItem.answer) {
+                    if (QRItem && QRItem.answer && QRItem.answer.length > 0)  {
                         //there is an answer
                         canBeAdded = true
                         //assume this is a fhirpath expression - 2 level only - eg http://hl7.org/fhir/specimen.type
@@ -291,10 +292,19 @@ function performResourceExtraction(Q,QR) {
                         //console.log(`element name: ${elementName}`)
                         //todo - support all the answer types that could be used...
                         //todo - think about multiple answers...
+
+                       // if ()
+
+
+
                         if (QRItem.answer[0].valueCoding) {
-                            //assume a codeableconcept
+                            //if there's a Coding as the answer, assume it is the
                             resource[elementName] = {coding:[QRItem.answer[0].valueCoding]}
                         }
+                        if (QRItem.answer[0].valueBoolean) {
+
+                        }
+
 
                     }
 
