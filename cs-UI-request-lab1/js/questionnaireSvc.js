@@ -245,7 +245,6 @@ angular.module("pocApp")
                 let ar6 = this.findExtension(item,extColumnCount)
                 if (ar6.length > 0) {
                     meta.columnCount = ar6[0].valueInteger
-
                 }
 
                 //form control
@@ -257,7 +256,6 @@ angular.module("pocApp")
                     if (meta.itemControl.coding) {
                         meta.renderVS = meta.itemControl.coding[0].code
                     }
-
                 }
 
                 //hidden
@@ -266,14 +264,6 @@ angular.module("pocApp")
                     meta.hidden = ar8[0].valueBoolean
                 }
 
-                /*
-                                //hiso code
-                                let ar10 = this.findExtension(item,extHisoClass)
-                                if (ar10.length > 0) {
-                                    meta.hisoClass = ar10[0].valueString
-                                }
-                               */
-//hiso code
                 let ar11 = this.findExtension(item,extHisoLength)
                 if (ar11.length > 0) {
                     meta.hisoLength= ar11[0].valueInteger

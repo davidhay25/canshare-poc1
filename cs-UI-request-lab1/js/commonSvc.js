@@ -13,7 +13,36 @@ angular.module("pocApp")
 
         return {
 
-            
+            summarizeValidation : function(OO,bundle) {
+                //present the validation issues in the OO with the bundle entry
+
+                //create an index of resources in the bundle
+                let totalErrors = 0
+                let lstResources = []
+                bundle.entry.forEach(function (entry,inx) {
+                    lstResources.push({resource:entry.resource,pos:inx,issues:[]})
+                })
+
+                //add all the issues in the OO to the list
+                OO.issue.forEach(function (iss) {
+                    let loc = iss.location[0]  //Bundle.entry[2].resource
+                    let ar = loc.split('[')
+                    let l = ar[1]   // 2].resource
+                    let g = l.indexOf(']')
+                    let pos = l.slice(0,g)
+                    console.log(pos,loc)
+
+                    let resourceAtIndex = lstResources[pos]
+                    let item = {severity:iss.severity,location:loc,pos:pos,diagnostics:iss.diagnostics}
+                    if (iss.severity == 'error') {
+                        totalErrors++
+                    }
+                    resourceAtIndex.issues.push(item)
+                })
+
+                return {resources:lstResources,totalErrors:totalErrors}
+
+            },
 
             //todo - convert to server side function that follows paging...
             retrieveAllDRforPatient : function (patient) {

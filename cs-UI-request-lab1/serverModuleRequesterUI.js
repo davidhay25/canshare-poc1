@@ -43,10 +43,10 @@ function setup(app,inDb) {
         console.log("Posting to " + testExtractEndpoint)
 
         try {
-            //returns a list of resources (ie not a FHIR endpoint ATM)
+            //returns a bundle & validation OO (ie not a FHIR endpoint ATM) {bundle: , oo:}
             let response = await axios.post(testExtractEndpoint,body)
-            let list = response.data
-            res.json(list)
+            let vo = response.data
+            res.json(vo)
         } catch (ex) {
             res.json(ex.response.data)
         }

@@ -1,0 +1,37 @@
+<div>
+
+  <style>
+    .error {
+      background-color: #ffafad;
+    }
+  </style>
+
+  <div ng-repeat="row in validationobject">
+
+    <strong>{{row.resource.resourceType}}</strong>
+    <span class="clickable" ng-click = "showResource(row.pos)">Show/Hide resource</span>
+
+    <div class="row">
+      <div class="col-md-12">
+        <table class="table-condensed table table-bordered">
+          <tr ng-repeat="iss in row.issues" ng-class="{error: iss.severity == 'error'}">
+            <td>{{iss.severity}}</td>
+            <td>{{iss.diagnostics}}
+              <div><em>{{iss.location}}</em></div>
+            </td>
+
+          </tr>
+        </table>
+
+        <pre ng-show="input.showhide[row.pos]">{{row.resource | json}}</pre>
+
+      </div>
+      <div class="col-md-0">
+      </div>
+    </div>
+
+  </div>
+
+
+
+</div>

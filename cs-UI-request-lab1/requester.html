@@ -44,6 +44,7 @@
     <script src="directive/QRDisplay/QRDisplayDir.js"></script>
     <script src="directive/reportDisplay/reportDisplayDir.js"></script>
     <script src="directive/renderForm/renderFormDir.js"></script>
+    <script src="directive/viewValidation/viewValidationDir.js"></script>
 
     <style>
         #graph {
@@ -277,10 +278,9 @@
                                 <div class="col-md-10">
                                     <div class="myScroll">
 
-
-
                                     <div ng-show = "input.selectedFhirDisplayOption == 'text'">
                                         <qrdisplay qr="QR"></qrdisplay>
+
                                     </div>
                                     <div ng-show = "input.selectedFhirDisplayOption == 'Q'">
 
@@ -352,11 +352,7 @@
 
 
                                     </div>
-                                        <!--
-                                    <div ng-show = "finput.selectedFhirDisplayOption == 'patient'">
-                                        <pre>{{selectedPatient | json}}</pre>
-                                    </div>
--->
+
                                     <div ng-show = "input.selectedFhirDisplayOption == 'QR'">
 
                                         <uib-tabset>
@@ -434,56 +430,22 @@
                                                 </div>
 
                                             </uib-tab>
-                                            <!--
-                                            <uib-tab heading="Json">
-                                                <pre>{{createdQR | json}}</pre>
+
+                                            <uib-tab heading="Form data">
+                                                <table class="table table-bordered table-condensed">
+                                                    <tr><th>Key (LinkId)</th><th>Answer</th></tr>
+                                                    <tr ng-repeat="(k,v) in formData ">
+                                                        <td>{{k}}</td>
+                                                        <td><pre>{{v | json}}</pre></td>
+                                                        <td><pre>{{hashItem[k] | json}}</pre></td>
+                                                    </tr>
+                                                </table>
                                             </uib-tab>
-                                            <uib-tab heading="Textual tree">
-                                               <div id="qrTextTree"></div>
-                                            </uib-tab>
-                                            <uib-tab heading="Tree">
-                                                <div class="row">
-                                                    <div class="col-md-4">
-                                                        <div id="qrTree"></div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div ng-show="selectedQRTreeNode">
-                                                            <strong>QuestionnaireResponse item</strong>
-                                                            <pre>{{selectedQRTreeNode.data.item | json}}</pre>
-
-                                                            <strong>Defining Questionnaire item</strong>
-                                                            <pre>{{selectedQRTreeNode.data.qItem | json}}</pre>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-
-
-
-
-
-                                            </uib-tab>
-
-
-                                            <uib-tab heading="Formatted Json">
-                                                <json-formatter json="QR" open="1"></json-formatter>
-                                            </uib-tab>
--->
-
-
 
                                         </uib-tabset>
 
-
-
-
                                     </div>
 
-                                        <!--
-                                    <div ng-show = "input.selectedFhirDisplayOption == 'SR'">
-                                        <pre>{{createdSR | json}}</pre>
-                                    </div>
--->
                                     <div ng-show = "input.selectedFhirDisplayOption == 'extract'">
 
                                         <div class="alert alert-info" ng-show="input.showHelp">
@@ -516,19 +478,16 @@
                                                     </div>
                                                 </div>
 
-
-
-
                                             </uib-tab>
                                             <uib-tab heading = "List">
                                                 <div class="row">
                                                     <div class="col-md-3">
                                                         <div class="list-group">
-                                                            <div ng-class="{'list-group-item':true,listItemSelected:input.selectedExtractResource == resource}"
-                                                                 ng-click = "input.selectedExtractResource = resource"
+                                                            <div ng-class="{'list-group-item':true,listItemSelected:input.selectedExtractResource == entry.resource}"
+                                                                 ng-click = "input.selectedExtractResource = entry.resource"
                                                                  style="cursor: pointer"
-                                                                 ng-repeat ="resource in testExtractionResult">
-                                                                {{resource.resourceType}}
+                                                                 ng-repeat ="entry in testExtractionResult.entry">
+                                                                {{entry.resource.resourceType}}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -541,8 +500,15 @@
                                                 </div>
 
                                             </uib-tab>
-                                            <uib-tab heading = "Json">
+                                            <uib-tab heading = "Bundle Json">
                                                 <pre>{{testExtractionResult | json}}</pre>
+                                            </uib-tab>
+                                            <uib-tab heading = "">
+                                                <uib-tab-heading>Validation result <span class="badge">{{extractionValidationErrorCount}}</span> </uib-tab-heading>
+
+                                                <br/>
+                                                <viewvalidation validationobject="extractionValidationObject"></viewvalidation>
+
                                             </uib-tab>
                                         </uib-tabset>
 

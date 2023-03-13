@@ -19,7 +19,7 @@ angular.module('pocApp')
                     // $scope.datePopup.opened = true
                 }
 
-                $scope.form = {}
+                $scope.form = {}        //a hash containing form data entered by the user
                 $scope.input = {};
 
                 $scope.$watch(
@@ -29,6 +29,8 @@ angular.module('pocApp')
                         let vo = renderFormsSvc.makeFormTemplate($scope.q,$scope.form)
                         if (vo) {
                             $scope.formTemplate = vo.template
+                            $scope.hashItem = vo.hashItem
+
                         }
                     }
                 );
@@ -39,7 +41,7 @@ angular.module('pocApp')
                 $scope.makeQR = function() {
                     $scope.qr = renderFormsSvc.makeQR($scope.q, $scope.form)
                     //emit the QR so it can be captured by the containing hierarchy. Otherwise the scopes get complicated...
-                    $scope.$emit('qrCreated',$scope.qr)
+                    $scope.$emit('qrCreated',{QR:$scope.qr,formData:$scope.form,hashItem:$scope.hashItem})
 
                 }
 

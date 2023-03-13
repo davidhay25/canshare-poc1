@@ -98,12 +98,12 @@ function level1Validate(bundle) {
     return lstErrors
 }
 
-//Validate the bundle using the FHIR server $validate function. Returns the OO & status
+//Validate the bundle using the FHIR server $validate function. Returns the OO
 async function profileValidation(bundle) {
-    let url = checkUrlSlash(serverBase) + "$validate"
+    let url = checkUrlSlash(serverBase) + "Bundle/$validate"
 
     try {
-        response = await axios.post(serverBase,bundle)
+        response = await axios.post(url,bundle)
         return response.data    //this will be a OO - potentially with informational issues
     } catch (err) {
         if (err.response) {

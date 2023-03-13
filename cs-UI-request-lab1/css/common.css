@@ -1,4 +1,9 @@
 
+.clickable {
+    color: rgb(79, 155, 214);
+    cursor: pointer;
+}
+
 .listItemSelected {
     background-color: lightsteelblue;
 }

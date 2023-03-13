@@ -45,8 +45,13 @@ angular.module("pocApp")
             //directive so that it can be captured and ultimately sent to the server. This process happens
             //as soon as any change in the form is made (using ng-change) - so it gets called a lot!
 
-            $scope.$on('qrCreated',function(event,data){
-                $scope.createdQR = data
+            $scope.$on('qrCreated',function(event,vo1){
+
+                $scope.createdQR = vo1.QR
+                $scope.formData = vo1.formData
+                $scope.hashItem = vo1.hashItem
+
+
 /* don't create these views. Leave the code in until I'm sure...
                 //create the text treeview of the QR
                 let qrTextTreeData = questionnaireSvc.buildResourceTree(data)
@@ -77,10 +82,17 @@ angular.module("pocApp")
                 delete $scope.testExtractionResult
                 $http.post("/requester/extract",bundle).then(
                     function (data) {
-                        $scope.testExtractionResult = data.data
-                        createGraph(data.data)
+                        let vo = data.data
 
-                        console.log(data.data)
+                        $scope.testExtractionResult = vo.bundle
+                        $scope.testExtractionOO = vo.oo
+
+                        let vo1 = commonSvc.summarizeValidation(vo.oo,vo.bundle)
+                        $scope.extractionValidationObject = vo1.resources
+                        $scope.extractionValidationErrorCount = vo1.totalErrors
+                        createGraph($scope.testExtractionResult)
+
+                        console.log(vo)
                     }, function (err) {
                         $scope.testExtractionResult = err.data
                         console.log(err.data)
@@ -369,8 +381,11 @@ angular.module("pocApp")
             }
 
 
-            function createGraph(arResources) {
-
+            function createGraph(bundle) {
+                let arResources = []
+                bundle.entry.forEach(function (entry) {
+                    arResources.push(entry.resource)
+                })
                 let vo = graphSvc.makeGraph({arResources: arResources})  //actually entries...
 
                 let container = document.getElementById('graph');

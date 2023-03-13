@@ -3,10 +3,6 @@
 
 <div>
     <style>
-        .requiredDEP {
-           color: red;
-           background-color: white;
-        }
         .bold {
             font-weight: bold;
         }
@@ -24,16 +20,12 @@
                    ng-click="selectResourceFromService(cell.item)"></i>
             </span>
 
-
-
             <div ng-hide = "cell.item.type == 'boolean'">
-                <span>{{cell.item.prefix}}. </span>
-                    <span ng-class="{bold:true,required:cell.required}">{{cell.item.text}}</span>
+                <span ng-class="{bold:true,required:cell.required}">{{cell.item.text}}</span>
                 <span ng-show = "cell.item.required"> * </span>
                 <span ng-show = "cell.item.repeats"> <span style="color:purple">(Multiple are allowed)</span>  </span>
 
                 <span ng-show = "cell.meta.description">
-
                     <i class="glyphicon glyphicon-info-sign"
                        uib-popover="{{cell.meta.description}}"
                        popover-placement="top"
@@ -41,7 +33,6 @@
                 </span>
 
                 <span ng-show = "cell.meta.verification">
-
                     <i class="glyphicon glyphicon-chevron-down"
                        uib-popover="{{cell.meta.verification}}"
                        popover-placement="top"

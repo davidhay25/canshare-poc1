@@ -14,26 +14,53 @@ function setup(app) {
     app.post("/testExtraction",(async function (req,res) {
 
         let bundle = req.body
-
-
         let arResources = utilModule.findResourceInBundleByType(bundle,"QuestionnaireResponse")
         if (arResources.length == 1) {
             try {
                 let QR = arResources[0]
                 let ar = await sdcModule.extractResources(QR)     //throw an exception if there was an error, or an array of extracted resources if not
 
+                //add the extracted resources to the original bundle
+                ar.forEach(function (resource) {
+                    let entry = {resource:resource}
+                    entry.fullUrl = `urn:uuid:${resource.id}`
+                    //It's a transaction bundle, and so needs the request
+                    entry.request = {method:'POST',url:`${resource.resourceType}`}
+                    bundle.entry.push(entry)
+                })
+
+                //now validate the bundle
+                let profileValidationOO
+                try {
+                    profileValidationOO = await utilModule.profileValidation(bundle)
+                    console.log(profileValidationOO)
+                } catch (ex) {
+                    //there was a validation failure.
+                    //todo - not sure what the best approach is...
+                    console.log(ex)
+                    profileValidationOO = ex
+                    //res.status("400").json(ex)
+                }
+
+
+
+                res.json({bundle:bundle,oo:profileValidationOO})
+                /*
                 //now add the resources from the bundle into the array so there's a complete list returned to the client
                 bundle.entry.forEach(function (entry) {
                     ar.push(entry.resource)
                 })
 
+
+
                 res.json(ar)
+                */
             } catch(ex) {
                 console.log(ex)
                 res.status(400).json(ex.message)
             }
         } else {
-            res.status(400).json("Must be one QR resource")
+            res.status(400).json("Must be just one QR resource")
         }
 
         //console.log(QR)
@@ -65,7 +92,7 @@ function setup(app) {
         //todo perform profile validation - ? optional reject if there are errors
         let profileValidationOO
         try {
-            let profileValidationOO = await utilModule.profileValidation(bundle)
+            profileValidationOO = await utilModule.profileValidation(bundle)
             console.log(profileValidationOO)
         } catch (ex) {
             //there was a validation failure.

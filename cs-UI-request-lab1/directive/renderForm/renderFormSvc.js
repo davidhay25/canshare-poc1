@@ -488,14 +488,13 @@ angular.module("pocApp")
                                 result = {valueCoding : value}
                                 //itemToAdd.answer.push({valueCoding : value})
                             }
-                            //itemToAdd.answer.push({valueCoding : value})    //will be a coding
-                            //itemToAdd.answer.push(value)    //will be a coding
+
                             break;
                         case "decimal" :
                             let v = parseFloat(value)
                             if (v) {
                                 result = {valueDecimal : v }
-                                //itemToAdd.answer.push({valueDecimal : v })
+
                             } else {
                                 alert("Item: " + item.text + " must be a number")
                             }
@@ -532,9 +531,7 @@ angular.module("pocApp")
                     }
 
                     return result
-                    //node.item = node.item || []
-                    //node.item.push({answer: answer})
-                    //node.item.push(itemToAdd)
+
 
 
                 }
@@ -555,20 +552,23 @@ angular.module("pocApp")
                 let that = this;
                 let hiddenFields = {}
                 let hiddenSections = []
+                let hashItem = {}   //a hash of all items in the Q - useful for the data display tab in the owner... item & meta
                 //let termServer = that.termServer
 
                 //create a template suitable for rendering in up to 4 columns
                 //is a collection of sections. Each section contains an array of rows,
                 // each row is an array with up to 4 elements (col1-4) and the cell has an array of items
 
-                //if the item has answerValueSet then call fillFromValueSet() to populate meta.expandedVSOptions
+                //if the item has answerValueSet then call fillFromValueSet() to populate meta.expandedVSOptions (hope its not too big)
 
                 let template = []
 
                 if (Q.item) {
                     Q.item.forEach(function (sectionItem) {
+
                         let section = {linkId:sectionItem.linkId,text:sectionItem.text,rows:[],item:sectionItem}
                         section.meta = that.getMetaInfoForItem(sectionItem)
+                        hashItem[sectionItem.linkId] = {item:sectionItem,meta:section.meta}
                         if (section.meta.hidden) {
                             hiddenSections.push(section)
                         }
@@ -577,7 +577,9 @@ angular.module("pocApp")
                         //now look at the items below the section level.
                         if (sectionItem.item) {
                             sectionItem.item.forEach(function (item) {
+
                                 let meta = that.getMetaInfoForItem(item)
+                                hashItem[item.linkId] = {item:item,meta:meta}
                                 if (meta.hidden) {
                                     hiddenFields[sectionItem.linkId] = hiddenFields[sectionItem.linkId] || []
                                     hiddenFields[sectionItem.linkId].push(item)
@@ -600,9 +602,11 @@ angular.module("pocApp")
                                             let col = 1
 
                                             item.item.forEach(function (child,inx) {
+                                                let childMeta = that.getMetaInfoForItem(child)
+                                                hashItem[child.linkId] = {item:child,meta:childMeta}
 
                                                 let side = 'col' + col
-                                                let cell = {item:child,meta:that.getMetaInfoForItem(child)}
+                                                let cell = {item:child,meta:childMeta}
                                                 fillFromValueSet(cell,termServer)
                                                 setDecoration(cell,child)
                                                 setDefaultValue(child,formData)
@@ -633,15 +637,28 @@ angular.module("pocApp")
 
                                             //when the columnCount is not present or 0, use the strategy first in left, others in right
                                             //this is to make it easier to have the 'control' item in the left column and the others in th eright
+                                            //Note changed in this version - if columnCount is not specified then everything is in a single column
                                             item.item.forEach(function (child,inx) {
+
                                                 let childMeta = that.getMetaInfoForItem(child)
+                                                hashItem[child.linkId] = {item:child,meta:childMeta}
                                                 if (childMeta.hidden) {
                                                     hiddenFields[sectionItem.linkId] = hiddenFields[sectionItem.linkId] || []
                                                     hiddenFields[sectionItem.linkId].push(item)
-
                                                 }
-                                                //ignore any item entries on the child - we don't go any deeper atm
 
+                                                let side = 'col1'
+
+                                                let cell = {item:child,meta:childMeta}
+                                                fillFromValueSet(cell,termServer)
+                                                //,that.getMetaInfoForItem(child)
+                                                setDecoration(cell,child)
+                                                setDefaultValue(child,formData)
+                                                row[side] = row[side] || []
+                                                row[side].push(cell)
+
+
+/*
                                                 if (inx == 0) {
                                                     //this is the first item in the group - it goes in the left
                                                     let cell = {item:child,meta:childMeta}      //to allow for ither elements like control type...
@@ -654,10 +671,7 @@ angular.module("pocApp")
                                                     //this is a subsequent item - it will go in the right col by default
                                                     //let side = "right"
                                                     let side = 'col2'
-                                                    /* for now, ignore the column number. re-visit when I think more about fill startegies...
-                                                    if (childMeta.column ) {
-                                                        side = 'col' + childMeta.column
-                                                    }*/
+
 
 
                                                     let cell = {item:child,meta:childMeta}
@@ -668,6 +682,7 @@ angular.module("pocApp")
                                                     row[side] = row[side] || []
                                                     row[side].push(cell)
                                                 }
+                                                */
                                             })
                                             //section.rows.push(row)   //assume that the whole group fits in a single row...
                                         }
@@ -687,7 +702,6 @@ angular.module("pocApp")
                                     fillFromValueSet(cell,termServer)
                                     setDecoration(cell,item)
                                     setDefaultValue(item,formData)
-                                    //row.left = [cell]             //make it an array to match the group
                                     row['col1'] = [cell] //make it an array to match the group
 
                                     section.rows.push(row)
@@ -703,7 +717,8 @@ angular.module("pocApp")
 
                 return {template:template,
                     hiddenFields:hiddenFields,
-                    hiddenSections: hiddenSections
+                    hiddenSections: hiddenSections,
+                    hashItem : hashItem
                 }
 
                 //if the element has a .initial value, then set that in the form
