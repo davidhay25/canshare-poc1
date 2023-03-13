@@ -388,18 +388,47 @@
 
                                             <uib-tab heading="JSON & Validate">
                                                 <div class="row">
-                                                    <div class="col-md-6">
-                                                        <pre>{{QR | json}}</pre>
+                                                    <div class="col-md-7">
+                                                        <uib-tabset>
+                                                            <uib-tab heading="Json">
+                                                                <pre>{{QR | json}}</pre>
+                                                            </uib-tab>
+                                                            <uib-tab heading="Tree">
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <div id="qrTree"></div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div ng-show="selectedQRTreeNode">
+
+                                                                            <strong>Defining Questionnaire item</strong>
+                                                                            <pre>{{selectedQRTreeNode.data.qItem | json}}</pre>
+
+                                                                            <strong>QuestionnaireResponse item</strong>
+                                                                            <pre>{{selectedQRTreeNode.data.item | json}}</pre>
+
+
+                                                                        </div>
+
+                                                                    </div>
+                                                                </div>
+                                                            </uib-tab>
+                                                        </uib-tabset>
+
                                                     </div>
 
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-5">
                                                         <div>
                                                             <button class="btn-link btn pull-right"
                                                                     ng-click="validateQR(QR)">
                                                                 Validate
                                                             </button>
                                                         </div>
-                                                        <pre>{{QRValidationResult | json}}</pre>
+                                                        <div class="clearfix"></div>
+                                                        <div class="myScroll">
+                                                            <pre>{{QRValidationResult | json}}</pre>
+                                                        </div>
+
                                                     </div>
 
                                                 </div>

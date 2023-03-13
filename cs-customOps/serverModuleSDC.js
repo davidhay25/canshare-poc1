@@ -27,12 +27,12 @@ async function extractResources(QR) {
     if (bundle.entry && bundle.entry.length == 1) {
         //the Q was retrieved
         let Q = bundle.entry[0].resource    //todo - assume only 1
-        console.log("found Q with url " + qUrl)
+        //console.log("found Q with url " + qUrl)
 
         //retrieve Observations (and potentially other resources)
         let arExtractedResources = performResourceExtraction(Q,QR)
 
-        console.log(arExtractedResources)
+        //console.log(arExtractedResources)
 
         addProvenance(QR,arExtractedResources)
         return arExtractedResources
@@ -171,7 +171,7 @@ function performResourceExtraction(Q,QR) {
 
 
     //now we can match the answers to the questions. Iterate over the hash from Q that has possible extracts and look for a matching QR
-    if (debug) {console.log('hashQ',hashQ)}
+    //if (debug) {console.log('hashQ',hashQ)}
 
     //iterate over the items from the Q that can have an observation extraction...
     Object.keys(hashQ).forEach(function (key){      //hashQ is the hash of items in the Q that have the extract observation extension set
@@ -266,24 +266,28 @@ function performResourceExtraction(Q,QR) {
         if (item.item){     //assume that any contents of the resource are child elements
             let resource = {resourceType:resourceType}
             resource.id =  createUUID()
-            resource.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>Extracted resource</div>",status:"additional"}
+            //resource.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>Extracted resource</div>",status:"additional"}
+
             resource.subject = QR.subject;      //todo - may need to figure out if the type *has* a subject
             let canBeAdded = false      //only add if there is at least one child element entry
 
             //each child element has the content of a resource element (defined by the definition)
+            //NOTE: Right now this is optimized for Procedure extraction (Condition planned) in our implementation. May not work well for other types.
             item.item.forEach(function (child){
                 if (child.definition) {
-                    let QRItem = hashQR[child.linkId]
+                    let QRItem = hashQR[child.linkId]       //the actual QR item containing the answer
                     if (QRItem && QRItem.answer && QRItem.answer.length > 0)  {
                         //there is an answer
                         canBeAdded = true
                         //assume this is a fhirpath expression - 2 level only - eg http://hl7.org/fhir/specimen.type
                         //todo - need a better and more robust algorithm here. For now, assume that any value is a top level element....
 
-                        //path will be something like Procedure.code
+                        //path will be something like http://hl7.org/fhir/Procedure#Procedure.status
                         //console.log("definition: " + child.definition)
-                        let path = child.definition.replace("http://hl7.org/fhir/","") //remove the url base - only support HL7 paths.
-                        //console.log(`path: ${path}`)
+                        let ar1 = child.definition.split("#")
+                        let path = ar1[1]       //ep Procedure.code
+                        //let path = child.definition.replace("http://hl7.org/fhir/","") //remove the url base - only support HL7 paths.
+                        console.log(`${resourceType}: path: ${path}`)
 
                         let ar = path.split('.')
                         //assume that the element is a 'top level' - ie off the root
@@ -293,17 +297,34 @@ function performResourceExtraction(Q,QR) {
                         //todo - support all the answer types that could be used...
                         //todo - think about multiple answers...
 
-                       // if ()
+                        //processing is resource type specific
+                        if (resourceType == 'Procedure') {
 
 
+                            if (elementName == 'status') {
+                                if (QRItem.answer[0].valueBoolean !== undefined) {  //there is a value...
+                                    let value = QRItem.answer[0].valueBoolean //this will be the actual value - true or false
+                                    //in this implementation a boolean true for procedure means completed, false means not-done
+                                    //todo - unsure if we should be creating these at all when false
+                                    resource.status = value ? "completed" : "not-done"
+                                }
 
-                        if (QRItem.answer[0].valueCoding) {
-                            //if there's a Coding as the answer, assume it is the
-                            resource[elementName] = {coding:[QRItem.answer[0].valueCoding]}
+                                if (QRItem.answer[0].valueCoding !== undefined) {  //whether the procedire was performed or not is specified by coding
+                                    //the value of the status is the code
+                                    resource.status = QRItem.answer[0].valueCoding.code
+
+                                }
+                            } else {
+                                //any element that has a valeuCoding just gets that value added. Status may override this value
+                                if (QRItem.answer[0].valueCoding) {
+                                    //if there's a Coding as the answer, assign it to the path (generally the code
+                                    resource[elementName] = {coding:[QRItem.answer[0].valueCoding]}
+                                }
+                            }
+
                         }
-                        if (QRItem.answer[0].valueBoolean) {
 
-                        }
+                        //the status element needs specialized handling...
 
 
                     }
@@ -311,6 +332,21 @@ function performResourceExtraction(Q,QR) {
                 }
             })
 
+            //at this point the resource has been created from the data in the QR - the individual elements coming from child QR items
+            //now try to create a meaningful text
+            if (resource['code']) {
+                //in theory, procedures and conditions should always have a code
+                let ccCode = resource['code']
+                if (ccCode.coding) {
+                    let coding = ccCode.coding[0]
+                    let text = coding.display || coding.code
+                    resource.text = {div:`<div xmlns='http://www.w3.org/1999/xhtml'>${text}</div>`,status:"additional"}
+                } else {
+                    resource.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>Extracted resource - no Coding in .code</div>",status:"additional"}
+                }
+            } else {
+                resource.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>Extracted resource - no Code</div>",status:"additional"}
+            }
 
             if (canBeAdded) {
                 arExtractedResources.push(resource)

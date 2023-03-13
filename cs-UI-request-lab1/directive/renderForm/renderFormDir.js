@@ -26,11 +26,10 @@ angular.module('pocApp')
                     function() {return $scope.q},
                     function() {
                         //console.log(renderFormsSvc.makeFormTemplate($scope.q))
-                        let vo = renderFormsSvc.makeFormTemplate($scope.q)
+                        let vo = renderFormsSvc.makeFormTemplate($scope.q,$scope.form)
                         if (vo) {
                             $scope.formTemplate = vo.template
                         }
-
                     }
                 );
 

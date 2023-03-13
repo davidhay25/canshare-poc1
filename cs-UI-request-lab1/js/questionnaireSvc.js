@@ -397,7 +397,7 @@ angular.module("pocApp")
 
             },
 
-            makeTreeFromQrDEP : function (QR,Q) {
+            makeTreeFromQr : function (QR,Q) {
                 //a tree view for the QR. similar to Q but also has the Q item that defines the QR item
                 //specifically 3 levels. Not recursive
                 //levels root, section, child, grandchild

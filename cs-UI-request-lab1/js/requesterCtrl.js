@@ -54,12 +54,12 @@ angular.module("pocApp")
 
                 //redraw the qrTextTree. This may have too much overhead - may need to have refresh or 'onopen' in the tree tab...
                 drawQrTextTree(qrTextTreeData)
-
+*/
                 //now create the jstree - May remove this
                 let vo = questionnaireSvc.makeTreeFromQr($scope.createdQR,$scope.selectedQ)
                 console.log(vo)
                 drawQrTree(vo.treeData)
-*/
+
                 //now the QR summary
                 $scope.QRSummary = questionnaireSvc.makeQrSummary($scope.createdQR,$scope.selectedQ)
                 console.log($scope.QRSummary)

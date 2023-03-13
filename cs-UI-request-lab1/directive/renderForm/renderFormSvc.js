@@ -307,51 +307,7 @@ angular.module("pocApp")
                 QR.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>QR resource</div>"
                 QR.questionnaire = Q.url
                 QR.authored = new Date().toISOString()
-/*
-                //the author will always be a PR
-                let PR = {resourceType:"PractitionerRole",id:"pr1"}
 
-                let display = ""
-
-                if (practitioner) {
-                    PR.practitioner = {reference:practitioner}
-                    if (practitioner.name) {
-                        display += getHN(practitioner.name[0])
-                    }
-                } else {
-                    let practitionerName = reviewerName || "No practitioner supplied"
-                    PR.practitioner = {display: practitionerName}
-                    display += practitionerName
-                }
-
-                if (reviewOrganization) {
-                    PR.organization = {display:reviewOrganization}
-                    display += " at " + reviewOrganization
-                }
-
-                if (reviewerEmail) {
-                    PR.telecom = [{system:'email',value:reviewerEmail}]
-
-                }
-                PR.text = {status:'generated'}
-                PR.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>"+display+"</div>"
-
-                QR.contained = [PR]
-                QR.author = {reference:'#pr1',display:display}
-
-*/
-/*
-                let patientName = "No patient supplied"
-                if (patient) {
-                    if (patient.name) {
-                        patientName = getHN(patient.name[0])
-                    }
-                    QR.subject = {reference:"Patient/"+patient.id,display:patientName}
-                } else {
-                    QR.subject = {display:patientName}
-                }
-
-*/
                 QR.item = []
 
                 //the top level items - sections - directly off the Q root...
@@ -362,22 +318,30 @@ angular.module("pocApp")
                         section.item.forEach(function (child) {
                             //items off the section. they will either be data elements, or groups
 
-                            let itemToAdd = {linkId : child.linkId,answer:[],text:child.text}
-
+                            let itemToAdd = {linkId : child.linkId,text:child.text}
+                            //let itemToAdd = {linkId : child.linkId,answer:[],text:child.text}
                             let key = child.linkId  //the key for this Q item
                             let value = form[key]
                             let arValues = hashFormValues[key]
 
 
-                            if (arValues) {        //is there a value for this item. Won't be if this is a group...
-                                if (! parentItem) {
+                            if (arValues !== undefined) {        //is there a value for this item. Won't be if this is a group...
+                               /* if (! parentItem) {
                                     parentItem = {linkId : section.linkId,text:section.text,item: []}
                                     QR.item.push(parentItem)
                                 }
-
+*/
                                 arValues.forEach(function (value) {
                                     let result = getValue(child,value)
                                     if (result ) {
+
+                                        if (! parentItem) {
+                                            parentItem = {linkId : section.linkId,text:section.text,item: []}
+                                            QR.item.push(parentItem)
+                                        }
+
+
+                                        itemToAdd.answer = itemToAdd.answer || []
                                         itemToAdd.answer.push(result)
                                     }
 
@@ -405,7 +369,7 @@ angular.module("pocApp")
 
                                     let arValues = hashFormValues[gcItem.linkId]
 
-                                    if (arValues) {
+                                    if (arValues !== undefined) {
 
                                         //the parent (off the section) may not have been created yet
                                         if (! parentItem) {
@@ -421,16 +385,28 @@ angular.module("pocApp")
                                         }
 
 
-                                        let gcItemToInsert = {linkId:gcItem.linkId,text:gcItem.text,answer:[]}
+                                        //let gcItemToInsert = {linkId:gcItem.linkId,text:gcItem.text,answer:[]}
+                                        let gcItemToInsert = {linkId:gcItem.linkId,text:gcItem.text}
 
                                         arValues.forEach(function (v) {
                                             let result = getValue(gcItem,v)
                                             if (result) {
+/*
+                                                if (! gcRootItem) {
+                                                    //the root hasn't been created
+                                                    gcRootItem = {linkId:child.linkId,text:child.text}
+                                                    parentItem.item = parentItem.item || []
+                                                    parentItem.item.push(gcRootItem)
+                                                }
+*/
+
+                                                gcItemToInsert.answer = gcItemToInsert.answer ||[]
                                                 gcItemToInsert.answer.push(result)
                                             }
 
                                         })
 
+                                        gcRootItem.item = gcRootItem.item || []
                                         gcRootItem.item.push(gcItemToInsert)
 
 
@@ -482,7 +458,7 @@ angular.module("pocApp")
                 return QR
 
                 function getValue(item,value) {
-                    if (!value) {
+                    if (value == undefined) {       //can't just use 'if value' as booleans can be false
                         return
                     }
                     let result;
@@ -570,8 +546,9 @@ angular.module("pocApp")
             //return vo {template, hiddenFields, hiddenSections}
             //template is an array of section objects
             //section has rows array where a row has
+            //pass in the formdata to allow initial values to be set....
 
-            makeFormTemplate : function(Q) {
+            makeFormTemplate : function(Q,formData) {
                 if (!Q) {
                     return
                 }
@@ -628,6 +605,7 @@ angular.module("pocApp")
                                                 let cell = {item:child,meta:that.getMetaInfoForItem(child)}
                                                 fillFromValueSet(cell,termServer)
                                                 setDecoration(cell,child)
+                                                setDefaultValue(child,formData)
                                                 row[side] = row[side] || []
                                                 row[side].push(cell)
 
@@ -669,6 +647,7 @@ angular.module("pocApp")
                                                     let cell = {item:child,meta:childMeta}      //to allow for ither elements like control type...
                                                     fillFromValueSet(cell,termServer)
                                                     setDecoration(cell,child)        //sets things like control type
+                                                    setDefaultValue(child,formData)
                                                     //row.left = [cell]
                                                     row['col1'] = [cell]
                                                 } else {
@@ -685,6 +664,7 @@ angular.module("pocApp")
                                                     fillFromValueSet(cell,termServer)
                                                     //,that.getMetaInfoForItem(child)
                                                     setDecoration(cell,child)
+                                                    setDefaultValue(child,formData)
                                                     row[side] = row[side] || []
                                                     row[side].push(cell)
                                                 }
@@ -699,22 +679,19 @@ angular.module("pocApp")
                                 } else {
                                     //2023-01-24
 
-                                    //if the item has a colcount > 0, and it's a choice then add a new row
-                                    if (false && meta.columnCount > 0) {
+                                    //if the item isn't a group, then add it to column 1.
+                                    let row = {}   //will have a single entry - left
+                                    row.item = item
+                                    row.meta = meta
+                                    let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
+                                    fillFromValueSet(cell,termServer)
+                                    setDecoration(cell,item)
+                                    setDefaultValue(item,formData)
+                                    //row.left = [cell]             //make it an array to match the group
+                                    row['col1'] = [cell] //make it an array to match the group
 
-                                    } else {
-                                        //if the item isn't a group, then add it to column 1.
-                                        let row = {}   //will have a single entry - left
-                                        row.item = item
-                                        row.meta = meta
-                                        let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
-                                        fillFromValueSet(cell,termServer)
-                                        setDecoration(cell,item)
-                                        //row.left = [cell]             //make it an array to match the group
-                                        row['col1'] = [cell] //make it an array to match the group
+                                    section.rows.push(row)
 
-                                        section.rows.push(row)
-                                    }
 
                                 }
 
@@ -724,11 +701,24 @@ angular.module("pocApp")
                     })
                 }
 
-
-
                 return {template:template,
                     hiddenFields:hiddenFields,
                     hiddenSections: hiddenSections
+                }
+
+                //if the element has a .initial value, then set that in the form
+                function setDefaultValue(item,formData) {
+                    console.log(item)
+                    if (item.initial && item.initial.length > 0) {
+                        //right now, only coding
+                        let iCoding = item.initial[0].valueCoding
+                        if (iCoding) {
+                            formData[item.linkId] = {valueCoding:iCoding}
+                        }
+
+
+                    }
+
                 }
 
                 //looks for specific instructions from the Q about an item - eg render as radio
