@@ -2,7 +2,7 @@
 
 angular.module("pocApp")
 
-    .service('renderFormsSvc', function($q,$http) {
+    .service('renderFormsSvc', function($q,$http,moment) {
 
         arExpandedVsCache = {}
         //formData = {}
@@ -325,7 +325,7 @@ angular.module("pocApp")
                             let arValues = hashFormValues[key]
 
 
-                            if (arValues !== undefined) {        //is there a value for this item. Won't be if this is a group...
+                            if (arValues !== undefined && arValues.length > 0) {        //is there a value for this item. Won't be if this is a group...
                                /* if (! parentItem) {
                                     parentItem = {linkId : section.linkId,text:section.text,item: []}
                                     QR.item.push(parentItem)
@@ -346,8 +346,12 @@ angular.module("pocApp")
                                     }
 
                                 })
-                                parentItem.item = parentItem.item || []
-                                parentItem.item.push(itemToAdd)
+                                //if parentItem is not set, that implies there is no child data
+                                if (parentItem) {
+                                    parentItem.item = parentItem.item || []
+                                    parentItem.item.push(itemToAdd)
+                                }
+
 
                             }
 
@@ -651,7 +655,7 @@ angular.module("pocApp")
 
                                                 let cell = {item:child,meta:childMeta}
                                                 fillFromValueSet(cell,termServer)
-                                                //,that.getMetaInfoForItem(child)
+
                                                 setDecoration(cell,child)
                                                 setDefaultValue(child,formData)
                                                 row[side] = row[side] || []

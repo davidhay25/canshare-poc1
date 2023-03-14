@@ -6,6 +6,7 @@ angular.module('pocApp')
                 //@ reads the attribute value, = provides two-way binding, & works with functions
 
                 validationobject: '=',
+                unknownissues: '='
             },
 
             templateUrl: 'directive/viewValidation/viewValidationDir.html',

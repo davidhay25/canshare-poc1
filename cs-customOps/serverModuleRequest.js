@@ -33,11 +33,11 @@ function setup(app) {
                 let profileValidationOO
                 try {
                     profileValidationOO = await utilModule.profileValidation(bundle)
-                    console.log(profileValidationOO)
+
                 } catch (ex) {
                     //there was a validation failure.
                     //todo - not sure what the best approach is...
-                    console.log(ex)
+                    //console.log(ex)
                     profileValidationOO = ex
                     //res.status("400").json(ex)
                 }
@@ -45,16 +45,7 @@ function setup(app) {
 
 
                 res.json({bundle:bundle,oo:profileValidationOO})
-                /*
-                //now add the resources from the bundle into the array so there's a complete list returned to the client
-                bundle.entry.forEach(function (entry) {
-                    ar.push(entry.resource)
-                })
 
-
-
-                res.json(ar)
-                */
             } catch(ex) {
                 console.log(ex)
                 res.status(400).json(ex.message)
@@ -63,13 +54,7 @@ function setup(app) {
             res.status(400).json("Must be just one QR resource")
         }
 
-        //console.log(QR)
-
-
-
     }))
-
-
 
     app.post("/([$])acceptRequest",async function(req,res){
 
@@ -95,18 +80,10 @@ function setup(app) {
             profileValidationOO = await utilModule.profileValidation(bundle)
             console.log(profileValidationOO)
         } catch (ex) {
-            //there was a validation failure.
+            //there was a validation failure - of the function, not that a resource failed validation....
             console.log(ex)
             res.status("400").json(ex)
         }
-
-
-        //the device represents this app
-        let device = {resourceType:"Device",identifier:[{system:'http://canshare.co.nz/ns',value:"requesterOp"}]}
-        device.id = utilModule.createUUID()
-        utilModule.addResourcesToBundle(bundle,[device])
-
-
 
         //extract resources. Add them to the bundle.
         let arResources = utilModule.findResourceInBundleByType(bundle,"QuestionnaireResponse")
@@ -124,6 +101,7 @@ function setup(app) {
             return
         }
 
+        /*
         //add the provenance resource. This needs to be done after any created resources have been added
         //
         let ar = utilModule.findResourceInBundleByType(bundle,"QuestionnaireResponse")
@@ -149,7 +127,9 @@ function setup(app) {
             console.log(`Looking for QuestionnaireResponse in bundle and found ${ar.length}`)
         }
 
-        //POST the bundle to the FHIR server
+        */
+
+        //POST the bundle to the FHIR server. Will return the response to the client
         metrics.end = new Date()
         utilModule.postBundleToServer(bundle,metrics,res,"request",req)
 

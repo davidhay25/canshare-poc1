@@ -90,6 +90,7 @@ angular.module("pocApp")
                         let vo1 = commonSvc.summarizeValidation(vo.oo,vo.bundle)
                         $scope.extractionValidationObject = vo1.resources
                         $scope.extractionValidationErrorCount = vo1.totalErrors
+                        $scope.extractionValidationUnknownIssues = vo1.unknownIssues
                         createGraph($scope.testExtractionResult)
 
                         console.log(vo)
@@ -373,7 +374,7 @@ angular.module("pocApp")
                 sr.authoredOn = new Date().toISOString()
                 sr.code = {text:"Histology request"}
                 sr.category = [{text:"CS order"}]
-                sr.author = {reference:`urn:uuid:${$scope.author.id}`}
+                sr.requester = {reference:`urn:uuid:${$scope.author.id}`}
                 sr.subject = {reference:`urn:uuid:${$scope.selectedPatient.id}`}
                 sr.identifier = [{system:"http://canshare.co.nz/identifier",value: new Date().toISOString()}]
                 sr.supportingInfo = [{reference:"urn:uuid:"+$scope.createdQR.id}]

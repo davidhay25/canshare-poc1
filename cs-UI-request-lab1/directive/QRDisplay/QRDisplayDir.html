@@ -2,15 +2,64 @@
 
 <div>
 
-    <div ng-repeat="item in qr.item">
-        <strong>{{item.text}}</strong>
+    <div ng-repeat="section in qr.item">
+        <strong>{{section.text}}</strong>
 
-        <div ng-repeat = "section in item.item">
+        <div ng-repeat = "child in section.item">
+
+            <div ng-hide = "child.item.length > 0">    <!-- THis is an item - it has no items itself-->
+                <div class="row">
+                    <div class="col-md-6" >
+                        {{child.text}}
+                    </div>
+                    <div class="col-md-6" >
+                        <div ng-repeat = "ans in child.answer">
+                            {{ans.valueString}}
+                            {{ans.valueCoding.display}}
+                            {{ans.valueDecimal}}
+                            {{ans.valueDate}}
+                            {{ans.valueDateTime}}
+                            {{ans.valueBoolean}}
+                            {{ans.valueInteger}}
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div ng-show = "child.item">    <!-- this is a group - it has child items itself-->
+                <em>{{child.text}}</em>
+
+                <div ng-repeat = "gc in child.item">
+                    <div class="row">
+                        <div class="col-md-6" >
+                            <div style="padding-left: 8px">{{gc.text}}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div ng-repeat = "ans in gc.answer">
+                                {{ans.valueString}}
+                                {{ans.valueCoding.display}}
+                                {{ans.valueDecimal}}
+                                {{ans.valueDate}}
+                                {{ans.valueDateTime}}
+                                {{ans.valueBoolean}}
+                                {{ans.valueInteger}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+
+<!--
             <div class="row">
                 <div class="col-md-6" >
                     <div style="padding-left: 8px">{{section.text}}</div>
                 </div>
                 <div class="col-md-6">
+                    a section never has values
                     <div ng-repeat = "ans in section.answer">
                         {{ans.valueString}}
                         {{ans.valueCoding.display}}
@@ -20,10 +69,16 @@
                         {{ans.valueBoolean}}
                         {{ans.valueInteger}}
                     </div>
+
                 </div>
             </div>
+            -->
 
             <div ng-repeat = "child in section.item">
+
+
+
+<!-- temp
                 <div class="row">
                     <div class="col-md-6" >
                         <div style="padding-left: 8px">{{child.text}}</div>
@@ -60,6 +115,8 @@
                     </div>
                 </div>
 
+
+                -->
             </div>
 
 

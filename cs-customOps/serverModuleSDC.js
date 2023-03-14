@@ -27,14 +27,23 @@ async function extractResources(QR) {
     if (bundle.entry && bundle.entry.length == 1) {
         //the Q was retrieved
         let Q = bundle.entry[0].resource    //todo - assume only 1
-        //console.log("found Q with url " + qUrl)
+
 
         //retrieve Observations (and potentially other resources)
         let arExtractedResources = performResourceExtraction(Q,QR)
 
-        //console.log(arExtractedResources)
 
-        addProvenance(QR,arExtractedResources)
+        //the device represents this app - it is going to be the agent that pefroms the extraction
+        let device = {resourceType:"Device",identifier:[{system:'http://canshare.co.nz/ns',value:"requesterOp"}]}
+        device.deviceName = [{name:"Resource extractor",type:"other"}]
+        device.id = utilModule.createUUID()
+
+       // utilModule.addResourcesToBundle(bundle,[device])
+        arExtractedResources.push(device)
+
+
+
+        addProvenance(QR,arExtractedResources,device)
         return arExtractedResources
 
 
@@ -43,7 +52,7 @@ async function extractResources(QR) {
         if (bundle.entry) {
             numQ = bundle.entry.length
         }
-        console.log(`${numQ} Q with url ${qUrl} found`)
+        //console.log(`${numQ} Q with url ${qUrl} found`)
 
         throw "There needs to be a single Q with the url: " + qUrl + ". " +numQ + " were found."
         //return utilModule.makeOO(["There needs to be a single Q with the url: " + qUrl + ". " + bundle.entry.length + " were found."])
@@ -52,7 +61,7 @@ async function extractResources(QR) {
 }
 
 //create a provenance resource that identifies the QR from which the observations were created.
-function addProvenance(QR,lst) {
+function addProvenance(QR,lst,device) {
     if (lst.length > 0) {
 
         let provenance = {resourceType:"Provenance"}
@@ -71,7 +80,8 @@ function addProvenance(QR,lst) {
         provenance.entity.push({role:"source",what:{reference:"urn:uuid:" + QR.id}})
         //provenance.entity.push({role:"source",what:{reference:"QuestionnaireResponse/" + QR.id}})
         //set the agent to the author of the QR todo ?should this be to a 'Device' representing the forms receiver
-        //provenance.agent.push({who:QR.author}) todo - what's the best way to do this...
+
+        provenance.agent.push({who:{reference: "urn:uuid:" +device.id}})
 
         lst.forEach(function (resource) {
             //provenance.target.push({reference:  `${capitalize(resource.resourceType)}/${resource.id}`})
@@ -114,7 +124,7 @@ function performResourceExtraction(Q,QR) {
 
             //look for definition extractions
             let ar1 = utilModule.findExtension(item,extractDefinitionUrl)
-            //console.log(item.linkId,item.extension,ar1.length)
+
             if (ar1.length > 0) {
                 let resourceType = ar1[0].valueCode
                 hashQDefinition[item.linkId] = {item:item,resourceType:resourceType}
@@ -130,7 +140,7 @@ function performResourceExtraction(Q,QR) {
             //this is a leaf item so can uave the Observation extraction set
 
             let ar = utilModule.findExtension(item,extractObsUrl)
-            //console.log(item.linkId)
+
             if (ar.length > 0) {
                 //in this case the extension is a boolean. Assume only 1
                 if (ar[0].valueBoolean) {
@@ -215,7 +225,7 @@ function performResourceExtraction(Q,QR) {
                     //observation.derivedFrom = [{reference: "QuestionnaireResponse/" + QR.id}]
 
 
-                    //console.log(theAnswer)
+
                     //todo - the dtatypes for Observation and Questionnaire aren't the same!
 
 
@@ -283,7 +293,7 @@ function performResourceExtraction(Q,QR) {
                         //todo - need a better and more robust algorithm here. For now, assume that any value is a top level element....
 
                         //path will be something like http://hl7.org/fhir/Procedure#Procedure.status
-                        //console.log("definition: " + child.definition)
+
                         let ar1 = child.definition.split("#")
                         let path = ar1[1]       //ep Procedure.code
                         //let path = child.definition.replace("http://hl7.org/fhir/","") //remove the url base - only support HL7 paths.
@@ -312,7 +322,6 @@ function performResourceExtraction(Q,QR) {
                                 if (QRItem.answer[0].valueCoding !== undefined) {  //whether the procedire was performed or not is specified by coding
                                     //the value of the status is the code
                                     resource.status = QRItem.answer[0].valueCoding.code
-
                                 }
                             } else {
                                 //any element that has a valeuCoding just gets that value added. Status may override this value
@@ -323,9 +332,6 @@ function performResourceExtraction(Q,QR) {
                             }
 
                         }
-
-                        //the status element needs specialized handling...
-
 
                     }
 

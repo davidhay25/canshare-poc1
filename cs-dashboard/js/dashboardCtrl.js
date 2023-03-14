@@ -4,6 +4,11 @@ angular.module("pocApp")
 
             $scope.input = {};
 
+
+
+
+
+
             function getLogs() {
                 $http.get("/logs").then(
                     function (data) {

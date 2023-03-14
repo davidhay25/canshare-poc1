@@ -88,33 +88,42 @@
     </nav>
 
 
-    <div class="row">
-        <div class="col-md-4">
-            Log entries
-            <div class="list-group">
-                <div class="list-group-item" ng-repeat = "log in logs"
-                    style="cursor: pointer;"
-                    ng-click="selectLog(log)">
-                    
-                    {{log.sender}}
-                    <div>{{log.date}}</div>
+    <uib-tabset>
+        <uib-tab heading="Log">
+            <div class="row">
+                <div class="col-md-4">
+                    Log entries
+                    <div class="list-group">
+                        <div class="list-group-item" ng-repeat = "log in logs"
+                             style="cursor: pointer;"
+                             ng-click="selectLog(log)">
+
+                            {{log.sender}}
+                            <div>{{log.date}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <uib-tabset>
+                        <uib-tab heading="Outcome">
+                            <pre>{{selectedLog.outcome | json}}</pre>
+                        </uib-tab>
+                        <uib-tab heading="Content">
+                            <pre>{{selectedLog.content | json}}</pre>
+                        </uib-tab>
+                        <uib-tab heading="Raw Log Json">
+                            <pre>{{selectedLog | json}}</pre>
+                        </uib-tab>
+                    </uib-tabset>
                 </div>
             </div>
-        </div>
-        <div class="col-md-8">
-           <uib-tabset>
-                <uib-tab heading="Outcome">
-                    <pre>{{selectedLog.outcome | json}}</pre>
-                </uib-tab>
-                <uib-tab heading="Content">
-                    <pre>{{selectedLog.content | json}}</pre>
-                </uib-tab>
-                <uib-tab heading="Raw Log Json">
-                    <pre>{{selectedLog | json}}</pre>
-                </uib-tab>
-           </uib-tabset>
-        </div>
-    </div>
+        </uib-tab>
+        <uib-tab heading="Questionnaire">
+
+        </uib-tab>
+    </uib-tabset>
+
+
 
 </div>
 </body>

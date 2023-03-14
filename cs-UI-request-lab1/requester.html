@@ -8,6 +8,8 @@
     <script src="js/libs/jquery-1.9.0.min.js"></script>
     <script src="js/libs/angular.min1-5.js"></script>
     <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+    <script src="js/libs/moment.min.js"></script>
+
 
     <script src="js/libs/json-formatter.min.js"></script>
 
@@ -29,6 +31,7 @@
             $locationProvider.html5Mode(true);
             $locationProvider.hashPrefix('!');
         });
+        angular.module("pocApp").constant("moment", moment);
 
     </script>
 
@@ -190,7 +193,9 @@
                                     </div>
 
                                     <div ng-hide="oo">
-                                        <renderform q="selectedTemplate.Q" qr="QR"></renderform>
+                                        <div class="myScroll">
+                                            <renderform q="selectedTemplate.Q" qr="QR"></renderform>
+                                        </div>
                                     </div>
 
                                     <!--
@@ -507,7 +512,7 @@
                                                 <uib-tab-heading>Validation result <span class="badge">{{extractionValidationErrorCount}}</span> </uib-tab-heading>
 
                                                 <br/>
-                                                <viewvalidation validationobject="extractionValidationObject"></viewvalidation>
+                                                <viewvalidation validationobject="extractionValidationObject" unknownissues="extractionValidationUnknownIssues"></viewvalidation>
 
                                             </uib-tab>
                                         </uib-tabset>

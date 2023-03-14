@@ -6,6 +6,19 @@
     }
   </style>
 
+
+
+  <div ng-show="unknownissues.length > 0">
+    There were some issues that could not be associated with a specific resource:
+    <table class="table table-bordered table-condensed">
+      <tr ng-repeat = "iss in unknownissues">
+        <td><pre>{{iss | json}}</pre></td>
+      </tr>
+    </table>
+    Generally this means that no other validation will be performed until this is fixed.
+  </div>
+
+
   <div ng-repeat="row in validationobject">
 
     <strong>{{row.resource.resourceType}}</strong>

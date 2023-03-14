@@ -4,8 +4,8 @@ const { default: axios } = require("axios")
 //set up the logging database
 let dbAddress = process.env.LOGDB || "localhost"
 console.log(`Logger database name is ${dbAddress}`)
-const uri = `mongodb://${dbAddress}:27017`;
-const client = new MongoClient(uri);
+const uri = `mongodb://${dbAddress}:27017`
+const client = new MongoClient(uri)
 const database = client.db("logger")    //all logs are in the same database
 
 //get the hapi server base 
@@ -24,9 +24,7 @@ function makeOO(lstIssues) {
     })
     
     return oo
-    
 }
-
 
 function findExtension(item,url) {
     let ar = []
@@ -42,7 +40,6 @@ function findExtension(item,url) {
         }
     }
     return ar
-
 }
 
 
@@ -71,7 +68,7 @@ async function postBundleToServer(bundle,metrics,res,collectionName,req) {
              oo = makeOO([{msg:msg,severity:'error'}])
         }
 
-        logger("actnow",{content:bundle,oo:oo})
+        logger(collectionName,{content:bundle,oo:oo})
         res.status(500).json(oo)
     }
 
@@ -106,6 +103,7 @@ async function profileValidation(bundle) {
         response = await axios.post(url,bundle)
         return response.data    //this will be a OO - potentially with informational issues
     } catch (err) {
+        //console.log("exception from validate")
         if (err.response) {
             throw(err.response.data)
             //return {ok:true,oo:err.response.data}
