@@ -12,7 +12,7 @@
     </style>
 
 
-    <div  style="margin-bottom: 15px"  ng-show="showConditional(cell)">
+    <div  style="margin-bottom: 15px" ng-show="showConditional(cell)">
 
         <div ng-hide="cell.item.type == 'display'">
             <span ng-show="cell.item.type == 'reference'">
@@ -21,7 +21,7 @@
             </span>
 
             <div ng-hide = "cell.item.type == 'boolean'">
-                <span ng-class="{bold:true,required:cell.required}">{{cell.item.text}}</span>
+                <span ng-class="{bold:false,required:cell.required}">{{cell.item.text}}</span>
                 <span ng-show = "cell.item.required"> * </span>
                 <span ng-show = "cell.item.repeats"> <span style="color:purple">(Multiple are allowed)</span>  </span>
 

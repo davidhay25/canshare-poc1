@@ -8,23 +8,21 @@
     <script src="js/libs/jquery-1.9.0.min.js"></script>
     <script src="js/libs/angular.min1-5.js"></script>
     <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+    <script src="js/libs/moment.min.js"></script>
 
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/common.css"/>
 
     <script>
-        angular.module("pocApp",['ui.bootstrap']).config(function($locationProvider) {
+        angular.module("pocApp",['ui.bootstrap','ui.checkbox']).config(function($locationProvider) {
 
             // enable html5Mode for pushstate ('#'-less URLs)
             $locationProvider.html5Mode(true);
             $locationProvider.hashPrefix('!');
         });
-
+        angular.module("pocApp").constant("moment", moment);
 
     </script>
-
-
-
 
     <script src="js/labCtrl.js"></script>
     <script src="js/labSvc.js"></script>
@@ -32,6 +30,11 @@
 
     <script src="directive/QRDisplay/QRDisplayDir.js"></script>
     <script src="directive/reportDisplay/reportDisplayDir.js"></script>
+
+    <script src="directive/renderForm/renderFormSvc.js"></script>
+    <script src="directive/renderForm/renderFormDir.js"></script>
+
+    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
 
 </head>
 
@@ -50,13 +53,22 @@
 
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="navbar-text">
 
+                    <select style="margin-top: 8px" class="form-control" ng-model="input.request"
+                            ng-change = "selectRequest(input.request)"
+                            ng-options="commonSvc.getPatientName(request.pat) for request in activeRequests"></select>
 
 
                 </div>
 
+            </div>
+
+            <div class="col-md-3">
+                <div class="navbar-text">
+                    {{commonSvc.getPatientName(selectedRequest.pat)}} {{selectedRequest.pat.gender}} {{selectedRequest.pat.birthDate}}
+                </div>
             </div>
 
             <div class="col-md-1 col-sm-1">
@@ -75,13 +87,7 @@
 
 
 
-            <div class="col-md-2 col-sm-2">
-                <div class="navbar-text">
 
-                </div>
-
-
-            </div>
 
             <div class="col-md-2">
                 <a href="https://teaho.govt.nz/" target="_blank">
@@ -93,7 +99,7 @@
         </div>
     </nav>
 
-
+<!--
     <div style="background-color: #e9e9e9; height: 50px" class="row">
         <div class="col-md-2">
             <div style="margin-top: 12px">Currently active requests</div>
@@ -102,7 +108,7 @@
 
             <select style="margin-top: 8px" class="form-control" ng-model="input.request"
                     ng-change = "selectRequest(input.request)"
-                    ng-options="commonSvc.getPatientName(request.Pat) for request in activeRequests"></select>
+                    ng-options="commonSvc.getPatientName(request.pat) for request in activeRequests"></select>
         </div>
         <div class="col-md-4">
             <div style="margin-top: 12px">
@@ -114,34 +120,19 @@
 
         </div>
     </div>
+        -->
 
-        <div class="row" style="margin-top: 8px">
-            <div class="col-md-4">
-                <div class="banner">Request</div>
-            </div>
-            <div class="col-md-8">
-                <div class="banner">Report</div>
-            </div>
-
+    <div class="row" style="margin-top: 8px">
+        <div class="col-md-4">
+            <div class="banner">Request</div>
         </div>
+        <div class="col-md-8">
+            <div class="banner">Report</div>
+        </div>
+
+    </div>
 
     <div class="row">
-        <div ng-show="false" class="col-md-2">
-
-            <h3>Active requests</h3>
-
-            <ul class="list-group" >
-                <li ng-repeat="request in activeRequests" ng-class="{'list-group-item':true,listItemSelected: request == selectedRequest}"
-                    style="cursor: pointer"
-                    ng-click = "selectRequest(request)">
-                    {{commonSvc.getPatientName(request.Pat)}}
-                </li>
-            </ul>
-
-
-
-
-        </div>
 
         <div class="col-md-4">
             <br/>
@@ -156,19 +147,16 @@
             <uib-tabset ng-show="selectedRequest">
 
                 <uib-tab heading="Request text">
-
-                    <qrdisplay qr="selectedQR"></qrdisplay>
-
-
+                    <qrdisplay qr="selectedRequest.qr"></qrdisplay>
                 </uib-tab>
 
                 <uib-tab heading = "SR">
-                    <pre>{{selectedRequest.SR | json}}</pre>
+                    <pre>{{selectedRequest.sr | json}}</pre>
                 </uib-tab>
 
 
                 <uib-tab heading = "QR">
-                    <pre>{{selectedQR | json}}</pre>
+                    <pre>{{selectedRequest.qr | json}}</pre>
                 </uib-tab>
 
 
@@ -183,7 +171,7 @@
                 <uib-tab heading="Report">
                     <br/>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
 
 
                             <div class="row">
@@ -199,21 +187,35 @@
                                 </div>
                                 <div class="col-md-2">
                                     <button class="btn btn-primary"
-                                            ng-show="selectedRequest && selectedQ"
+                                            ng-show="selectedRequest && selectedReportQ"
                                             ng-click="submitReport()">Submit report</button>
                                 </div>
                             </div>
 
+                            <div class="myScroll">
+                                <renderform q="selectedReportQ" qr="QR"></renderform>
+                            </div>
+                            <!--
                             <ng-include src="'/includes/formDisplay.html'"></ng-include>
+                            -->
 
                         </div>
-                        <div class="col-md-6">
+                        <!--
+                        <div class="col-md-0">
                             <div class="banner">Report text</div>
                             <qrdisplay qr="reportQR"></qrdisplay>
                         </div>
+                        -->
                     </div>
                 </uib-tab>
-                <uib-tab heading="CanShare data">
+                <uib-tab heading="Report Preview">
+                    <qrdisplay qr="createdQR" q="selectedReportQ"></qrdisplay>
+                </uib-tab>
+                <uib-tab heading="Report resources">
+
+                </uib-tab>
+
+                <uib-tab heading="Previous reports">
                     <div class="row">
                         <div class="col-md-4">
 

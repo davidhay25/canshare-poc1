@@ -62,12 +62,12 @@ angular.module("pocApp")
 */
                 //now create the jstree - May remove this
                 let vo = questionnaireSvc.makeTreeFromQr($scope.createdQR,$scope.selectedQ)
-                console.log(vo)
+                //console.log(vo)
                 drawQrTree(vo.treeData)
 
                 //now the QR summary
                 $scope.QRSummary = questionnaireSvc.makeQrSummary($scope.createdQR,$scope.selectedQ)
-                console.log($scope.QRSummary)
+                //console.log($scope.QRSummary)
 
                 //add the author to the QR. (it also gets added to the SR)
                 $scope.createdQR.author = {reference:`urn:uuid:${$scope.author.id}`}

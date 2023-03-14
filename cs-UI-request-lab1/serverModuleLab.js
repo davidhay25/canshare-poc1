@@ -29,94 +29,100 @@ function setup(app) {
     //receive a SR - FHIR compliant
     //todo - needs better error checking.
 
-    /* - no longer impementing the notification
-    app.post('/lab/ServiceRequest', async function(req,res){
-        if (showLog) {
-            console.log("/lab/ServiceRequest invoked")
-        }
 
-        let sr = req.body
-        let identifierQuery = sr.identifier[0].system + "|" + sr.identifier[0].value
-        //the received SR is a minimal one - need to retrieve the full version from the Server based on the identifier
+    //return the SR and associated QR. use the identifier as the key. This is the kind of query the lab would do
+    app.get('/lab/SRDetails', async function(req,res){
+
+        //console.log(req.params)
+        let identifier = req.query.identifier
+        let qry = `${serverBase}ServiceRequest?identifier=${identifier}&_include=ServiceRequest:supportingInfo&_include=ServiceRequest:subject`
+
         try {
-            //let qry = config.canShare.fhirServer.url + "/ServiceRequest?identifier=" + identifierQuery
-            let qry = serverBase + "ServiceRequest?identifier=" + identifierQuery
             let response = await axios.get(qry)
-            let bundle = response.data
-            let SR = getFirstResourceFromBundle(bundle)
-
-            //todo check that SR not already in requests - that could be a duplicated notification
-
-            //we're going to save the resources as a request object in the mongodb (representing the local datastore)
-            // structire: {SR: Pat: QR: others:[]}
-            let requestObj = {currentStatus:'active',srIdentifier:identifierQuery,SR:SR,others:[]}
-
-            //now retrieve all the supporting resources using a transaction search. This would be unnessecary with a custom searchparameter
-            //as we could retrieve them with using _include
-            let bundleRequest = {resourceType:"Bundle","type":"collection",entry:[]}
-
-            //first, create the batch request bundle
-            let batchRequest = {resourceType:"Bundle",type:"batch",entry:[]}
-
-            //now retrieve add the patient query to the search
-            //todo should check that the subject is present
-            //let patientId = SR.subject.reference
-            batchRequest.entry.push({request:{method:"GET",url:SR.subject.reference}})
-
-            if (SR.supportingInfo) {
-                SR.supportingInfo.forEach(function (ref) {
-                    let entry = {request:{method:"GET",url:ref.reference}}
-                    batchRequest.entry.push(entry)
-                })
-            }
-
-            //now execute it. Will return a bundle of matching resources
-            if (batchRequest.entry.length > 0) {
-                let qry = `${config.canShare.fhirServer.url}/`
-                let response = await axios.post(qry,batchRequest)
-                let bundle = response.data
-                if (bundle && bundle.entry &&  bundle.entry.length > 0) {
-                    bundle.entry.forEach(function(entry){
-
-                        let resource = entry.resource
-                        let type = resource.resourceType
-                        switch (type) {
-                            case "Patient" :
-                                requestObj.Pat = resource
-                                break
-                            case "QuestionnaireResponse" :
-                                requestObj.QR = resource
-                                break
-                            default :
-                                requestObj.others.push(resource)
-                                break
-                        }
-                        //requestObj.resources.push(entry.resource)
-                    })
+            let bundle = response.data      //should have the Pat, SR & SR
+            let vo = {}
+            bundle.entry.forEach(function (entry) {
+                let resource = entry.resource
+                switch (resource.resourceType) {
+                    case "ServiceRequest" :
+                        vo.sr = resource
+                        break
+                    case "QuestionnaireResponse" :
+                        vo.qr = resource
+                        break
+                    case "Patient" :
+                        vo.pat = resource
+                        break
                 }
-            }
+            })
 
-            //finally, we can save the set of resources in the local mongo db
-            database.collection("labRequests").insertOne(requestObj, function (err, result) {
-                if (err) {
-                    console.log('Error saving request resources ',err)
-                    res.status(500).json()
-                } else {
-                    res.json()
-                }
-            });
+            res.json(vo)
 
-        } catch (ex) {
-            console.log('error',ex)
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex)
         }
+
+
+       // console.log(identifier)
+
+
+
 
     })
 
+    //return the active ServiceRequests, including patient. todo: create generic routine for following paging
+    //though in practice the lab would be querying based on identifier...
 
-    */
-    //return the active ServiceRequests. not FHIR compliant (it's a local call used to display the SR's that are still outstanding)
-    //accesses the local (mongo) store...  The object holds SR & QR
-    app.get('/lab/activeSR', function(req,res){
+
+
+    app.get('/lab/activeSR', async function(req,res){
+
+        //http://localhost:8080/fhir/ServiceRequest?status=active&_count=50&_include=ServiceRequest:supportingInfo&_include=ServiceRequest:subject
+        //http://localhost:8080/fhir/ServiceRequest?status=active&_count=50&_include=ServiceRequest:subject
+        //let qry = `${serverBase}ServiceRequest?status=active&_count=50&_include=ServiceRequest:subject&_include=ServiceRequest:supportingInfo`
+
+        let qry = `${serverBase}ServiceRequest?status=active&_count=50&_include=ServiceRequest:subject`
+
+        console.log(qry)
+        try {
+            let response = await axios.get(qry)
+
+            //assemble into a custom object  {pat: , sr:}
+
+            let bundle = response.data
+            //create a hash of the patient
+            let hashPatient = {}
+
+            bundle.entry.forEach(function (entry) {
+                let resource = entry.resource
+                if (resource.resourceType == 'Patient') {
+                    hashPatient[`Patient/${resource.id}`] = resource
+                }
+            })
+
+            let result = []     //an array of {pat: , sr:}
+
+            bundle.entry.forEach(function (entry) {
+                let resource = entry.resource
+                if (resource.resourceType == 'ServiceRequest') {
+                    let obj = {sr:resource}
+                    obj.pat = hashPatient[resource.subject.reference]
+                    result.push(obj)
+                }
+            })
+
+
+
+            res.json(result)
+
+        } catch (ex) {
+            console.log(ex)
+            res.status(500).json(ex)
+        }
+
+
+        /*
         let query = { currentStatus :  "active"}
 
         database.collection("labRequests").find(query).toArray(function(err,doc){
@@ -128,6 +134,7 @@ function setup(app) {
                 res.json(doc)
             }
         })
+        */
 
     })
 
@@ -212,7 +219,7 @@ console.log(updateResult)
     //the Q themselves are developed in the IG cs-datastandarddesigner
     app.get('/lab/templates',async function(req,res){
 
-        let qry = config.canShare.fhirServer.url + "/Questionnaire?context=report"
+        let qry = serverBase + "/Questionnaire?context=report"
         try {
             let response = await axios.get(qry)
             let bundle = response.data

@@ -1,16 +1,13 @@
 
 
 angular.module("pocApp")
-
     .service('renderFormsSvc', function($q,$http,moment) {
 
         arExpandedVsCache = {}
-        //formData = {}
+
 
         //termServer = "https://r4.ontoserver.csiro.au/fhir/"
         termServer = "https://terminz.azurewebsites.net/fhir/"
-
-
 
         extItemControl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
         extUrlObsExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
@@ -84,7 +81,7 @@ angular.module("pocApp")
                 $http.get(`/proxy?qry=${encodedQry}`).then(
                     function (data) {
                         $scope.expandedVS = data.data
-                        console.log($scope.expandedVS)
+                       // console.log($scope.expandedVS)
                     }
                 )
             },
@@ -590,9 +587,6 @@ angular.module("pocApp")
                                     // hiddenFields.push(item)
                                 }
                                 if (item.type == 'group') {
-                                    //groups has a specific structure ATM
-                                    //the first item goes in col 1
-                                    //other items go in col 2 - and will often have conditionals on them
 
                                     let row = {}    //will have multiple columns
 
@@ -727,7 +721,7 @@ angular.module("pocApp")
 
                 //if the element has a .initial value, then set that in the form
                 function setDefaultValue(item,formData) {
-                    console.log(item)
+                    //console.log(item)
                     if (item.initial && item.initial.length > 0) {
                         //right now, only coding
                         let iCoding = item.initial[0].valueCoding

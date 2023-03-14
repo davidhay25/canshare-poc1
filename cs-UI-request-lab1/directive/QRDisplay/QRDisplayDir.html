@@ -6,11 +6,15 @@
         <strong>{{section.text}}</strong>
 
         <div ng-repeat = "child in section.item">
+            <div ng-hide = "child.item.length > 0">    <!-- This is an item - it has no items itself-->
+                <div class="row" ng-show="child.answer.length > 0">
 
-            <div ng-hide = "child.item.length > 0">    <!-- THis is an item - it has no items itself-->
-                <div class="row">
+                    <div ng-hide="input.hiddenFields[child.linkId]">
+
                     <div class="col-md-6" >
-                        {{child.text}}
+                        <div uib-popover="{{child.linkId}}"
+                             popover-placement="left"
+                             popover-trigger="'mouseenter'">{{child.text}}</div>
                     </div>
                     <div class="col-md-6" >
                         <div ng-repeat = "ans in child.answer">
@@ -23,17 +27,23 @@
                             {{ans.valueInteger}}
                         </div>
                     </div>
+                    </div>
                 </div>
 
 
             </div>
             <div ng-show = "child.item">    <!-- this is a group - it has child items itself-->
-                <em>{{child.text}}</em>
+                <em  uib-popover="{{child.linkId}}"
+                     popover-placement="left"
+                     popover-trigger="'mouseenter'">{{child.text}}</em>
 
                 <div ng-repeat = "gc in child.item">
-                    <div class="row">
+                    <div class="row" ng-show="gc.answer.length > 0">
+                        <div ng-hide="input.hiddenFields[gc.linkId]">
                         <div class="col-md-6" >
-                            <div style="padding-left: 8px">{{gc.text}}</div>
+                            <div style="padding-left: 8px"  uib-popover="{{gc.linkId}}"
+                                 popover-placement="top"
+                                 popover-trigger="'mouseenter'">{{gc.text}}</div>
                         </div>
                         <div class="col-md-6">
                             <div ng-repeat = "ans in gc.answer">
@@ -45,6 +55,7 @@
                                 {{ans.valueBoolean}}
                                 {{ans.valueInteger}}
                             </div>
+                        </div>
                         </div>
                     </div>
                 </div>

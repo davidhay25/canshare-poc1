@@ -3,12 +3,24 @@
 
 const axios = require('axios')
 let fs = require('fs')
-let designerServer = "http://localhost:9099/baseR4/"
+// let designerServer = "http://localhost:9099/baseR4/"
+let designerServer = "http://canshare.co.nz:9099/baseR4/"
+
+
+//let id = "cf-1651524261297"
+//let contextType = "request"
+
+let id = "cf-1652818555820"
+let contextType = "report"
+
 let RIServer = "http://localhost:8080/fhir/"
 
-let id = "cf-1651524261297"
-let keeplist = {}      //a list of all the extension urls to keep
 
+let keeplist = {}      //a list of all the extension urls to keep
+keeplist["http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"] = true
+keeplist["http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"] = true
+keeplist["http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"] = true
+keeplist["http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"] = true
 
 
 async function process(id) {
@@ -37,7 +49,7 @@ async function process(id) {
         //add the request context
         let context = {}
         context.code = {code:'focus',system:"http://terminology.hl7.org/CodeSystem/usage-context-type"}
-        context.valueCodeableConcept = {coding:[{code:'request',system:"http://canshare.co.nz/CodeSystem/Qtypes"}]}
+        context.valueCodeableConcept = {coding:[{code:contextType,system:"http://canshare.co.nz/CodeSystem/Qtypes"}]}
         Q.useContext = [context]
 
         Q.title = Q.title + "-clean"
@@ -58,7 +70,18 @@ async function process(id) {
         }
 */
         function cleanItem(item) {
-            delete item.extension
+            if (item.extension) {
+                let extCopy = JSON.parse(JSON.stringify(item.extension))
+                delete item.extension
+                extCopy.forEach(function (ext) {
+                    if (keeplist[ext.url]) {
+                        item.extension = item.extension || []
+                        item.extension.push(ext)
+                    }
+
+                })
+            }
+
 
         }
 
