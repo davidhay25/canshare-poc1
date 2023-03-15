@@ -30,6 +30,8 @@
 
     <script src="directive/QRDisplay/QRDisplayDir.js"></script>
     <script src="directive/reportDisplay/reportDisplayDir.js"></script>
+    <script src="directive/viewBundle/viewBundleDir.js"></script>
+    <script src="directive/viewValidation/viewValidationDir.js"></script>
 
     <script src="directive/renderForm/renderFormSvc.js"></script>
     <script src="directive/renderForm/renderFormDir.js"></script>
@@ -58,7 +60,7 @@
 
                     <select style="margin-top: 8px" class="form-control" ng-model="input.request"
                             ng-change = "selectRequest(input.request)"
-                            ng-options="commonSvc.getPatientName(request.pat) for request in activeRequests"></select>
+                            ng-options="request.sr.id + ' ' + commonSvc.getPatientName(request.pat) for request in activeRequests"></select>
 
 
                 </div>
@@ -168,50 +170,62 @@
         <div ng-show="selectedRequest" class="col-md-8">
             <br/>
             <uib-tabset>
-                <uib-tab heading="Report">
+                <uib-tab heading="New report">
                     <br/>
                     <div class="row">
                         <div class="col-md-12">
 
+                            <div ng-show = "submissionOO">
+                                <pre>{{submissionOO | json}}</pre>
+                            </div>
 
-                            <div class="row">
-                                <div class="col-md-3">
-                                    Template
+                            <div ng-hide="submissionOO">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        Template
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select ng-model="selectedTemplate" class="form-control"
+                                                placeholder="Select form"
+                                                ng-change="selectQ(selectedTemplate)"
+                                                ng-options = "item.display for item in templates">
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-primary"
+                                                ng-show="selectedRequest && selectedReportQ"
+                                                ng-click="submitReport()">Submit report</button>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <select ng-model="selectedTemplate" class="form-control"
-                                            placeholder="Select form"
-                                            ng-change="selectQ(selectedTemplate)"
-                                            ng-options = "item.display for item in templates">
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <button class="btn btn-primary"
-                                            ng-show="selectedRequest && selectedReportQ"
-                                            ng-click="submitReport()">Submit report</button>
+
+                                <div class="myScroll">
+                                    <renderform q="selectedReportQ" qr="QR"></renderform>
                                 </div>
                             </div>
 
-                            <div class="myScroll">
-                                <renderform q="selectedReportQ" qr="QR"></renderform>
-                            </div>
-                            <!--
-                            <ng-include src="'/includes/formDisplay.html'"></ng-include>
-                            -->
+
+
 
                         </div>
-                        <!--
-                        <div class="col-md-0">
-                            <div class="banner">Report text</div>
-                            <qrdisplay qr="reportQR"></qrdisplay>
-                        </div>
-                        -->
+
                     </div>
                 </uib-tab>
                 <uib-tab heading="Report Preview">
                     <qrdisplay qr="createdQR" q="selectedReportQ"></qrdisplay>
                 </uib-tab>
-                <uib-tab heading="Report resources">
+                <uib-tab heading="View report bundle">
+
+                    <viewbundle bundle="reportBundle"></viewbundle>
+                </uib-tab>
+                <uib-tab heading="Validate report bundle">
+
+
+                    <br/>
+                    <div>
+                        <button class="btn btn-link pull-right" ng-click="validate()">Perform validation</button>
+                    </div>
+                    <viewvalidation validationobject="labValidationObject"
+                                    unknownissues="labValidationUnknownIssues"></viewvalidation>
 
                 </uib-tab>
 

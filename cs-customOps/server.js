@@ -29,6 +29,11 @@ const utilModule = require("./serverModuleUtil");
 let app = express();
 
 app.use(bodyParser.json({limit:'50mb',type:['application/fhir+json','application/json+fhir','application/json']}))
+//disable any cache - https://stackoverflow.com/questions/22632593/how-to-disable-webpage-caching-in-expressjs-nodejs
+app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store')
+    next()
+})
 
 requestModule.setup(app,serverBase)    //$acceptRequest
 reportModule.setup(app,serverBase)     //$acceptReport

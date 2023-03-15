@@ -252,7 +252,7 @@ angular.module("pocApp")
             $scope.submitRequest = function () {
                 if (confirm("Are you sure you wish to send this request?")) {
                     delete $scope.QRValidationResult
-                    //perform validation of the QR
+                    //perform validation of the QR before sending. In theory this is unnecessary as the custom op will do this
                     let validateUrl = "/requester/validate"
                     $http.post(validateUrl,$scope.createdQR).then(
                         function(data){

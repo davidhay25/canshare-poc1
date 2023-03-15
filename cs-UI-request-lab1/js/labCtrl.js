@@ -17,13 +17,27 @@ angular.module("pocApp")
             //called when there is any change in the form
             $scope.$on('qrCreated',function(event,vo1) {
 
-                //$scope.createdQR = vo1.QR
+                $scope.createdQR = vo1.QR   //used for the preview tab
                 //$scope.formData = vo1.formData
-                $scope.hashItem = vo1.hashItem
+                //$scope.hashItem = vo1.hashItem
                 console.log(vo1)
 
-                makeReport(vo1.QR)
+                makeReport(vo1.QR, $scope.selectedRequest, $scope.selectedReportQ)  //sets $scope.reportBundle
+
             })
+
+            $scope.validate = function() {
+                $http.post('/lab/validate',$scope.reportBundle).then(
+                    function(data) {
+                        let oo = data.data
+                        let vo1 = commonSvc.summarizeValidation(oo,$scope.reportBundle)
+                        $scope.labValidationObject = vo1.resources
+                        $scope.labValidationErrorCount = vo1.totalErrors
+                        $scope.labValidationUnknownIssues = vo1.unknownIssues
+
+                    }
+                )
+            }
 
                 //load the list of possible report templates (questionnaires)
             //returns bundle of Q
@@ -45,7 +59,8 @@ angular.module("pocApp")
             //in practice the lab will query based on identifier rather than a request like this one
             //but will still use the custom operation
             $scope.getActiveRequests = function() {
-                $http.get("/lab/activeSR").then(
+                let url = `/lab/activeSR`
+                $http.get(url).then(
                     function(data) {
                         //returns an array of custom objects - {pat: , sr:}
                         //console.log(data.data)
@@ -102,46 +117,30 @@ angular.module("pocApp")
             //retrieve the details for that sr
 
             $scope.selectRequest = function(request) {
-                let srIdentifier = request.sr.identifier[0].value
+                if (request && request.sr && request.sr.identifier) {
+                    let srIdentifier = request.sr.identifier[0].value
+                    //returns an object {sr:, qr:}
+                    let qry = `/lab/SRDetails?identifier=${srIdentifier}`
+                    $http.get(qry).then(
+                        function(data) {
+                            console.log(data.data)
+                            let vo = data.data
+                            $scope.selectedRequest = vo
+                        },
+                        function(err) {
+                            console.log(err.data)
+                        }
+                    )
+                }
 
-
-                //returns an object {sr:, qr:}
-                let qry = `/lab/SRDetails?identifier=${srIdentifier}`
-                $http.get(qry).then(
-                    function(data) {
-                        console.log(data.data)
-                        let vo = data.data
-
-
-                        $scope.selectedRequest = vo
-
-                    },
-                    function(err) {
-                        console.log(err.data)
-                    }
-                )
-
-
-
-
-
-                /* this is previous reports
-                commonSvc.retrieveAllDRforPatient(request.Pat).then(
-                    function (data ){
-                        console.log(data)
-                        $scope.previousReports = data
-
-                    }
-                )
-                */
 
 
 
             }
 
             //generate the report bundle from the QR and the currrent reques object ({pat:, sr:, qr:}
-            let makeReport = function(QR) {
-                $scope.reportBundle = labSvc.makeReport(QR, $scope.selectedRequest)
+            let makeReport = function(QR,request,reportQ) {
+                $scope.reportBundle = labSvc.makeReport(QR, request,reportQ)
                 console.log($scope.reportBundle)
             }
 
@@ -160,15 +159,15 @@ angular.module("pocApp")
 
                 //finally, we can send the report to the CS Server
 
-                $http.post("/lab/submitreport",bundle).then(
+                $http.post("/lab/submitreport",$scope.reportBundle).then(
                     function(data){
-                        alert("Report has been submitted")
+                        //alert("Report has been submitted")
+
+                        $scope.submissionOO = data.data
+
                         $scope.getActiveRequests()
                         console.log(data)
 
-                        delete $scope.selectedRequest
-
-                        $scope.answer = {}
 
                     }, function(err) {
                         console.log(err)

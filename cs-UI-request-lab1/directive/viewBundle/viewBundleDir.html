@@ -1,0 +1,28 @@
+
+Bundle
+
+<uib-tabset>
+    <uib-tab heading="List">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="list-group">
+                    <div ng-class="{'list-group-item':true,activeFhirDisplay:entry == input.selectedBundleEntry}"
+                         ng-repeat="entry in bundle.entry"
+                         style="cursor:pointer;"
+                         ng-click="input.selectedBundleEntry = entry">
+                        {{entry.resource.resourceType}}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <pre>{{input.selectedBundleEntry | json}}</pre>
+
+            </div>
+        </div>
+
+    </uib-tab>
+    <uib-tab heading="Json">
+        <pre>{{bundle | json}} </pre>
+    </uib-tab>
+</uib-tabset>
+

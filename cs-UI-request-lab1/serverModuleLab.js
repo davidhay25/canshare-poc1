@@ -14,6 +14,9 @@ console.log(`Log database from env is ${process.env.LOGDB}`)
 console.log(`Custom ops from env is ${process.env.CUSTOMOPS}`)
 
 let serverBase = process.env.SERVERBASE
+if (serverBase[serverBase.length-1] !== '/') {
+    serverBase += '/'
+}
 
 //import { MongoClient } from "mongodb";
 let MongoClient = require('mongodb').MongoClient;
@@ -26,9 +29,25 @@ const database = client.db("labDataStore")
 function setup(app) {
 
 
-    //receive a SR - FHIR compliant
-    //todo - needs better error checking.
+//$scope.reportBundle
+    //https://stackabuse.com/handling-errors-with-axios/
+    app.post('/lab/validate', async function(req,res){
+        let resource = req.body
+        let qry = `${serverBase}${resource.resourceType}/$validate`
+        console.log(qry)
+        try {
+            let result = await axios.post(qry,resource)
+            res.json(result.data)
+        } catch (ex) {
+            //regardless, return the response
+            if (ex.response) {
+                res.json(ex.response.data)
+            } else {
+                res.status(500).json(ex)
+            }
 
+        }
+    })
 
     //return the SR and associated QR. use the identifier as the key. This is the kind of query the lab would do
     app.get('/lab/SRDetails', async function(req,res){
@@ -37,6 +56,7 @@ function setup(app) {
         let identifier = req.query.identifier
         let qry = `${serverBase}ServiceRequest?identifier=${identifier}&_include=ServiceRequest:supportingInfo&_include=ServiceRequest:subject`
 
+        console.log(qry)
         try {
             let response = await axios.get(qry)
             let bundle = response.data      //should have the Pat, SR & SR
@@ -59,7 +79,12 @@ function setup(app) {
             res.json(vo)
 
         } catch(ex) {
-            console.log(ex)
+            //https://stackabuse.com/handling-errors-with-axios/
+            console.log(ex.code)
+            if (ex.response) {
+                console.log(ex.response.data)
+            }
+
             res.status(500).json(ex)
         }
 
@@ -86,14 +111,24 @@ function setup(app) {
 
         console.log(qry)
         try {
-            let response = await axios.get(qry)
+
+            let config = {headers:{'cache-control':'no-cache'}}
+            let response = await axios.get(qry,config)
 
             //assemble into a custom object  {pat: , sr:}
 
             let bundle = response.data
+
+            if (bundle && ! bundle.entry) {
+                res.json('[]')
+                return
+            }
+
+
             //create a hash of the patient
             let hashPatient = {}
 
+            //create a hash of patients
             bundle.entry.forEach(function (entry) {
                 let resource = entry.resource
                 if (resource.resourceType == 'Patient') {
@@ -101,8 +136,8 @@ function setup(app) {
                 }
             })
 
+            //now create the summary arrab
             let result = []     //an array of {pat: , sr:}
-
             bundle.entry.forEach(function (entry) {
                 let resource = entry.resource
                 if (resource.resourceType == 'ServiceRequest') {
@@ -111,6 +146,8 @@ function setup(app) {
                     result.push(obj)
                 }
             })
+
+            console.log(`${bundle.entry.length} resources (SR & patient) retrieved`)
 
 
 
@@ -144,48 +181,26 @@ function setup(app) {
         let bundle = req.body
 
         //get the SR from the bundle. Its id is in the reports
-        let sr = getSRFromBundle(bundle)    //todo check not null
+        //let sr = getSRFromBundle(bundle)    //todo check not null
 
 
 
         //send the bundle to the server
-        let url = config.lab.reportEndpoint.url
+        let url = serverBase
+        console.log(`POST report to ${url}`)
 
+        try {
+            let result = await axios.post(url,bundle)
+            res.json(result.data)
+        } catch(ex) {
+           if (ex.response) {
+               res.json(ex.response.data)
+           } else {
+               console.log(ex)
+               res.status(500).json(ex)
+           }
+        }
 
-        axios.post(url,bundle).then(
-            function(data){
-                console.log(data.data)
-                //the message has been received by the server
-
-                //update the local store to indicate that the request nas been completed
-                let identifier = sr.identifier[0].system + "|" + sr.identifier[0].value
-                //save the bundle to the local data store
-                let createResult = database.collection("labReports").insertOne(bundle)  //todo should check the response
-                //update local store (setting SR status to completed)
-                let filter = {srIdentifier:identifier}
-                let update = {$set:{currentStatus:"completed"}}
-
-
-                //let updateResult = await database.collection("labRequests").updateOne(filter, update);
-
-                database.collection("labRequests").updateOne(filter, update).then(
-                    function(data) {
-                        console.log(filter,update,data)
-                        res.json(data)
-
-                    }, function (err) {
-
-                    }
-                )
-
-            },
-            function(err) {
-                console.log(err.data)
-            }
-        )
-
-
-        //let submitResult = await axios.post(url,bundle)
 
 
 
@@ -238,7 +253,7 @@ console.log(updateResult)
 
 //retrieve the first respource in the bundle.
 //todo - this is something to consider - do we require conditional create from the requester
-function getFirstResourceFromBundle(bundle) {
+function getFirstResourceFromBundleDEP(bundle) {
     let resource
     if (bundle && bundle.entry && bundle.entry.length > 0) {
         resource = bundle.entry[0].resource
@@ -246,7 +261,7 @@ function getFirstResourceFromBundle(bundle) {
     return resource
 }
 
-function getSRFromBundle(bundle) {
+function getSRFromBundleDEP(bundle) {
     let resource
     if (bundle && bundle.entry && bundle.entry.length > 0) {
 

@@ -2,24 +2,28 @@ angular.module("pocApp")
 
     .service('labSvc', function($q,commonSvc) {
 
-
-
         return {
-            makeReport : function(QR,request) {
+            makeReport : function(QR,request,reportQ) {
                 //return a bundle with the generated resources...
+
+
+                let fhirServerUrl = "http://test"   //todo - need to get thos from config somewhere...
 
                 let SR = request.sr     //the service reqest
                 let patient = request.pat   //the patient
 
-                let bundle = {resourceType:"Bundle",entry:[]}
+                let bundle = {resourceType:"Bundle",type:'transaction',entry:[]}
+
                 let DR = {resourceType:"DiagnosticReport",id:commonSvc.createUUID(), status:"final",result:[]}
                 DR.identifier = [commonSvc.createUUIDIdentifier()]
-                DR.basedOn = {reference:'ServiceRequest/'+ SR.id}
+                DR.basedOn = [{reference:'ServiceRequest/'+ SR.id}]
                 DR.subject = {reference:'Patient/' + patient.id}
-                DR.basedOn = {reference: `ServiceRequest/${SR.id}`}
+                DR.basedOn = [{reference: `ServiceRequest/${SR.id}`}]
                 DR.performer = [{display:"Pertinent Pathology"}]
                 DR.issued = new Date().toISOString()
                 DR.code = {text:"Histology report"}
+
+                bundle.entry.push(commonSvc.makePOSTEntry(DR))
 
                 //strategy is to iterate through the Q and generate an Observation wherever there is an answer in the QR
 
@@ -34,51 +38,83 @@ angular.module("pocApp")
                             })
                         } else {
                             //a leaf
-                            hashAnswers[gc.linkId] = gc.answer
+                            hashAnswers[child.linkId] = child.answer
                         }
                     })
                 })
 
-                //create a hash for the codes that correspond to linkIds
-                let hashLinkIdCodes = this.getCodingForLinkId()
+                //create a hash for the codes that correspond to linkIds - keyed on linkId
+                let hashLinkIdCodes = this.getCodingForLinkId(reportQ)
 
                 //so now we have all the answers. Create an observation for each one
+                Object.keys(hashAnswers).forEach(function (linkId) {
+                    let arAnswers = hashAnswers[linkId]    //array of answers
+                    let answer = arAnswers[0]
+                    let issuedDate = new Date().toISOString()
+
+
+                    let obs = {"resourceType":"Observation",id:commonSvc.createUUID(),status:"final"}
+                    obs.identifier = [commonSvc.createUUIDIdentifier()]
+                    obs.subject = {reference:'Patient/' + patient.id}
+                    obs.performer = [{display:"Pertinent Pathology"}]
+                    obs.basedOn = [{reference:'ServiceRequest/'+ SR.id}]
+
+                    //the code is defined in the Q item (along with the linkId which is the key)
+                    //todo - do we need to check that there is a code?
+                    obs.code =  {coding:[hashLinkIdCodes[linkId]]}
+
+                    obs.effectiveDateTime = issuedDate
+                    obs.issued = issuedDate
+
+                    //obs.valueString = value
+                    let newObs = {...obs, ...answer}
+
+console.log(newObs)
+                    DR.result.push({reference:"urn:uuid:"+ obs.id})
+
+                    bundle.entry.push(commonSvc.makePOSTEntry(newObs))
+
+                })
+
+              /*
+                //iterate through the QR. For all those with an answer, create an observation
+                QR.item.forEach(function (section) {
+                    if (section.item) {
+                        section.item.forEach(function (child) {
+                            if (child.item) {
+                                //group
+                            } else {
+                                //leaf
+                                makeObservation(child)
+                            }
+
+                        })
+                    }
+                })
 
 
                 Object.keys($scope.answer).forEach(function (key) {
-                    let issuedDate = new Date().toISOString()
-                    let value = $scope.answer[key]
-                    if (value) {
-                        let obs = {"resourceType":"Observation",id:commonSvc.createUUID(),status:"final"}
-                        obs.identifier = [commonSvc.createUUIDIdentifier()]
-                        obs.subject = {reference:'Patient/' + $scope.selectedRequest.Pat.id}
-                        obs.performer = [{text:"Pertinent Pathology"}]
-                        obs.basedOn = {reference:'ServiceRequest/'+ $scope.selectedRequest.SR.id}
-                        //the code is defined in the Q item (along with the linkId which is the key)
-                        obs.code =  {coding:[$scope.hashLinkIdCodes[key]]}
 
-                        obs.effectiveDateTime = issuedDate
-                        obs.issued = issuedDate
-                        obs.valueString = value
-                        DR.result.push({reference:"urn:uuid:"+ obs.id})
-                        bundle.entry.push(commonSvc.makePOSTEntry(obs))
-                    }
                 })
-                bundle.entry.push(commonSvc.makePOSTEntry(DR))
+
+               */
 
                 //also need to update and add the SR to the bundle.
                 //it should be safe to use the one we retrieved first time as no one else should have updated it
-                $scope.selectedRequest.SR.status = "completed"
+                SR.status = "completed"
 
                 //add to the bundle - note that it's a PUT, and it has a real id (the one on the CS server)
                 //todo - should this be a conditional update
-                let entry = {resource:$scope.selectedRequest.SR}
-                entry.fullUrl = $scope.config.canShare.fhirServer.url + "/ServiceRequest/"+ $scope.selectedRequest.SR.id
-                entry.request = {method:"PUT",url:"ServiceRequest/"+$scope.selectedRequest.SR.id}
+                let entry = {resource:SR}
+                entry.fullUrl = fhirServerUrl + "/ServiceRequest/"+ SR.id
+                entry.request = {method:"PUT",url:"ServiceRequest/"+SR.id}
                 bundle.entry.push(entry)
 
                 console.log(bundle)
                 return bundle
+
+
+
 
             },
             getCodingForLinkId : function(Q) {

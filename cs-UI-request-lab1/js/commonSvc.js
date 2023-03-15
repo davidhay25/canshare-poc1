@@ -29,17 +29,23 @@ angular.module("pocApp")
                     if (iss.location) {
                         let loc = iss.location[0]  //Bundle.entry[2].resource
                         let ar = loc.split('[')
-                        let l = ar[1]   // 2].resource
-                        let g = l.indexOf(']')
-                        let pos = l.slice(0,g)
-                        //console.log(pos,loc)
+                        if (ar.length > 1) {
+                            let l = ar[1]   // 2].resource
+                            let g = l.indexOf(']')
+                            let pos = l.slice(0,g)
+                            //console.log(pos,loc)
 
-                        let resourceAtIndex = lstResources[pos]
-                        let item = {severity:iss.severity,location:loc,pos:pos,diagnostics:iss.diagnostics}
-                        if (iss.severity == 'error') {
-                            totalErrors++
+                            let resourceAtIndex = lstResources[pos]
+                            let item = {severity:iss.severity,location:loc,pos:pos,diagnostics:iss.diagnostics}
+                            if (iss.severity == 'error') {
+                                totalErrors++
+                            }
+                            resourceAtIndex.issues.push(item)
+                        } else {
+                            unknownIssues.push(iss)
                         }
-                        resourceAtIndex.issues.push(item)
+
+
                     } else {
                         //this is an OO with no location. I didn't think this should happen & we don't know which resource caused it...
                         unknownIssues.push(iss)
@@ -108,7 +114,8 @@ angular.module("pocApp")
             },
             createUUIDIdentifier : function() {
                 //described in the spec - http://hl7.org/fhir/datatypes.html#Identifier
-                return {system:"urn:ietf:rfc:3986",value:this.createUUID()}
+                return {system:"urn:ietf:rfc:3986",value:`urn:uuid:${this.createUUID()}`}
+                
             },
             init : function(){
                 //initialization code - currently loading the config...
@@ -304,7 +311,7 @@ angular.module("pocApp")
                 let entry = {}
                 entry.fullUrl = "urn:uuid:"+ resource.id
                 entry.resource = resource
-                entry.request = {method:"POST",url:"urn:uuid:"+ resource.id}
+                entry.request = {method:"POST",url:`${resource.resourceType}`}
                 return entry
 
 
