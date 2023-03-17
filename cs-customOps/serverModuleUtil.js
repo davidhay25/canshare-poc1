@@ -84,7 +84,8 @@ async function postBundleToServer(bundle,metrics,res,collectionName,req) {
 //? check for profile claim in metadata? The profile validation won't work unless they do.
 //todo may need to adapt the routine to allow non-failing issues and add to the OO to return
 
-function level1Validate(bundle) {
+//todo add check for required resources - SR & QR (lstRequiredTypes)
+function level1Validate(bundle,lstRequiredTypes) {
     lstErrors = []
     bundle.entry.forEach(function (entry,inx) {
         let resource = entry.resource
@@ -278,10 +279,15 @@ function checkUrlSlash(url) {
     } else {
         return url
     }
-
-
 }
 
+function makePOSTEntry(resource) {
+    let entry = {resource:resource}
+    entry.fullUrl = `urn:uuid:${resource.id}`
+    //It's a transaction bundle, and so needs the request
+    entry.request = {method:'POST',url:`${resource.resourceType}`}
+    return entry
+}
 module.exports = {
     level1Validate : level1Validate,
     logger: logger,
@@ -294,5 +300,7 @@ module.exports = {
     findResourceInBundleById : findResourceInBundleById,
     addResourcesToBundle : addResourcesToBundle,
     createUUID : createUUID,
-    profileValidation : profileValidation
+    profileValidation : profileValidation,
+    checkUrlSlash : checkUrlSlash,
+    makePOSTEntry : makePOSTEntry
 };

@@ -15,6 +15,10 @@ angular.module("pocApp")
                 let bundle = {resourceType:"Bundle",type:'transaction',entry:[]}
 
                 let DR = {resourceType:"DiagnosticReport",id:commonSvc.createUUID(), status:"final",result:[]}
+
+                //There's a bug in the hapi narrative generator for DR, so make sure there's on there...
+                DR.text= {status:"generated",div:"<div xmlns='http://www.w3.org/1999/xhtml'>Lab report</div>"}
+
                 DR.identifier = [commonSvc.createUUIDIdentifier()]
                 DR.basedOn = [{reference:'ServiceRequest/'+ SR.id}]
                 DR.subject = {reference:'Patient/' + patient.id}
@@ -49,30 +53,33 @@ angular.module("pocApp")
                 //so now we have all the answers. Create an observation for each one
                 Object.keys(hashAnswers).forEach(function (linkId) {
                     let arAnswers = hashAnswers[linkId]    //array of answers
-                    let answer = arAnswers[0]
-                    let issuedDate = new Date().toISOString()
 
+                    if (arAnswers && arAnswers.length > 0) {
+                        let answer = arAnswers[0]
+                        let issuedDate = new Date().toISOString()
 
-                    let obs = {"resourceType":"Observation",id:commonSvc.createUUID(),status:"final"}
-                    obs.identifier = [commonSvc.createUUIDIdentifier()]
-                    obs.subject = {reference:'Patient/' + patient.id}
-                    obs.performer = [{display:"Pertinent Pathology"}]
-                    obs.basedOn = [{reference:'ServiceRequest/'+ SR.id}]
+                        let obs = {"resourceType":"Observation",id:commonSvc.createUUID(),status:"final"}
+                        obs.identifier = [commonSvc.createUUIDIdentifier()]
+                        obs.subject = {reference:'Patient/' + patient.id}
+                        obs.performer = [{display:"Pertinent Pathology"}]
+                        obs.basedOn = [{reference:'ServiceRequest/'+ SR.id}]
 
-                    //the code is defined in the Q item (along with the linkId which is the key)
-                    //todo - do we need to check that there is a code?
-                    obs.code =  {coding:[hashLinkIdCodes[linkId]]}
+                        //the code is defined in the Q item (along with the linkId which is the key)
+                        //todo - do we need to check that there is a code?
+                        obs.code =  {coding:[hashLinkIdCodes[linkId]]}
 
-                    obs.effectiveDateTime = issuedDate
-                    obs.issued = issuedDate
+                        obs.effectiveDateTime = issuedDate
+                        obs.issued = issuedDate
 
-                    //obs.valueString = value
-                    let newObs = {...obs, ...answer}
+                        //obs.valueString = value
+                        let newObs = {...obs, ...answer}
 
-console.log(newObs)
-                    DR.result.push({reference:"urn:uuid:"+ obs.id})
+                        console.log(newObs)
+                        DR.result.push({reference:"urn:uuid:"+ obs.id})
 
-                    bundle.entry.push(commonSvc.makePOSTEntry(newObs))
+                        bundle.entry.push(commonSvc.makePOSTEntry(newObs))
+
+                    }
 
                 })
 
@@ -109,6 +116,13 @@ console.log(newObs)
                 entry.fullUrl = fhirServerUrl + "/ServiceRequest/"+ SR.id
                 entry.request = {method:"PUT",url:"ServiceRequest/"+SR.id}
                 bundle.entry.push(entry)
+
+                //add the patient
+                let patEntry = {resource:patient}
+                patEntry.fullUrl = fhirServerUrl + "/Patient/"+ patient.id
+                patEntry.request = {method:"PUT",url:"Patient/"+patient.id}
+                bundle.entry.push(patEntry)
+
 
                 console.log(bundle)
                 return bundle

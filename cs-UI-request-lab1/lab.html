@@ -12,6 +12,7 @@
 
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
 
     <script>
         angular.module("pocApp",['ui.bootstrap','ui.checkbox']).config(function($locationProvider) {
@@ -31,12 +32,15 @@
     <script src="directive/QRDisplay/QRDisplayDir.js"></script>
     <script src="directive/reportDisplay/reportDisplayDir.js"></script>
     <script src="directive/viewBundle/viewBundleDir.js"></script>
+    <script src="directive/viewBundle/viewBundleSvc.js"></script>
     <script src="directive/viewValidation/viewValidationDir.js"></script>
 
     <script src="directive/renderForm/renderFormSvc.js"></script>
     <script src="directive/renderForm/renderFormDir.js"></script>
 
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
+    <script src="js/libs/vis.min.js"></script>
+
 
 </head>
 
@@ -149,16 +153,23 @@
             <uib-tabset ng-show="selectedRequest">
 
                 <uib-tab heading="Request text">
-                    <qrdisplay qr="selectedRequest.qr"></qrdisplay>
+                    <div class="myScroll">
+                        <qrdisplay qr="selectedRequest.qr"></qrdisplay>
+                    </div>
+
                 </uib-tab>
 
                 <uib-tab heading = "SR">
-                    <pre>{{selectedRequest.sr | json}}</pre>
+                    <div class="myScroll">
+                        <pre>{{selectedRequest.sr | json}}</pre>
+                    </div>
                 </uib-tab>
 
 
                 <uib-tab heading = "QR">
-                    <pre>{{selectedRequest.qr | json}}</pre>
+                    <div class="myScroll">
+                        <pre>{{selectedRequest.qr | json}}</pre>
+                    </div>
                 </uib-tab>
 
 

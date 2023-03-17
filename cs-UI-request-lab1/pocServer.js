@@ -23,17 +23,20 @@ const labModule = require("./serverModuleLab.js")
 let express = require('express');
 let app = express();
 app.use(bodyParser.json({limit:'50mb',type:['application/fhir+json','application/json']}))
-
+/*
 //disable any cache - https://stackoverflow.com/questions/22632593/how-to-disable-webpage-caching-in-expressjs-nodejs
 app.use((req, res, next) => {
     res.set('Cache-Control', 'no-store')
     next()
 })
 
+*/
+
 requesterModule.setup(app)
 labModule.setup(app)
 
 
+//app.get('')
 
 //common calls (not specifically related to requester or lab. ?move to separate module
 app.get('/config', async function(req,res){
@@ -55,21 +58,65 @@ app.get('/proxy',async function(req,res){
 
     //now we need to replace any | with %. Only this character should be encoded. Not sure why...
     query = query.replace("|","%7C")    //there will only ever be one...
-
-
-    //let qry = config.canShare.fhirServer.url + "/" +query
     let qry = serverBase + query
 
+    console.log('qry=',qry)
+    let config = {headers:{'cache-control':'no-cache'}}     //otherwise the hapi server will cache for a minute
 
-    console.log(qry)
     try {
-        let response = await axios.get(qry)
-        let bundle = response.data
+        let response = await axios.get(qry,config)
+        let ctr = 0
+        let bundle = response.data       //the first bundle
+
+        //console.log(ctr++,bundle.entry.length)
+
+        let nextPageUrl = getNextPageUrl(bundle)
+        while (nextPageUrl) {
+            let nextResponse = await axios.get(nextPageUrl,config)
+            let nextBundle = nextResponse.data
+            if (nextBundle.entry) {
+                nextBundle.entry.forEach(function (entry) {
+                    bundle.entry.push(entry)
+                })
+            }
+            console.log(ctr++,nextBundle.entry.length)
+            nextPageUrl = getNextPageUrl(nextBundle)
+        }
+        bundle.total = 0
+        if (bundle.entry) {
+            bundle.total = bundle.entry.length
+        }
+
+
         res.json(bundle)
     } catch (ex) {
-        console.log(ex.code)
-        res.status(500).json(ex)
+        if (ex.response && ex.response.status == 404) {
+            //if it's a 404 then just return an empty bundle
+            res.json({responseType:"Bundle"})
+
+        } else {
+            console.log(ex)
+            res.status(500).json(ex)
+        }
+
     }
+
+
+    function getNextPageUrl(bundle) {
+        //console.log('gm' + bundle.resourceType)
+        let url = null
+        if (bundle && bundle.link) {
+            bundle.link.forEach(function (link){
+                if (link.relation == 'next') {
+                    url = link.url
+                }
+            })
+        }
+        console.log('next',url)
+        return url
+
+    }
+
 })
 
 server = http.createServer(app).listen(port);

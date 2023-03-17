@@ -48,7 +48,12 @@ function setup(app,inDb) {
             let vo = response.data
             res.json(vo)
         } catch (ex) {
-            res.json(ex.response.data)
+            if (ex.response) {
+                res.json(ex.response.data)
+            } else {
+                res.json(ex)
+            }
+
         }
     })
 

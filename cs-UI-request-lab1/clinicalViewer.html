@@ -11,6 +11,8 @@
 
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+
     <script>
         angular.module("pocApp",['ui.bootstrap','ui.checkbox']).config(function($locationProvider) {
 
@@ -31,6 +33,9 @@
     <script src="directive/QRDisplay/QRDisplayDir.js"></script>
     <script src="directive/reportDisplay/reportDisplayDir.js"></script>
     <script src="directive/renderForm/renderFormDir.js"></script>
+    <script src="directive/viewBundle/viewBundleDir.js"></script>
+    <script src="directive/viewBundle/viewBundleSvc.js"></script>
+    <script src="js/libs/vis.min.js"></script>
 
 </head>
 <body style="padding: 8px;padding-top: 80px">
@@ -39,7 +44,7 @@
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
         <div class="container-fluid">
-            <div class="col-md-3 col-sm-3">
+            <div class="col-md-2">
                     <span>
                         <a class="navbar-brand" href="#">
                             Clinical Viewer
@@ -47,10 +52,22 @@
                     </span>
 
             </div>
+            <div class="col-md-2">
+                <div class="navbar-text">
+                <select ng-model="input.pat" class="form-control"
+                        ng-change="selectPatient(input.pat)"
+                        ng-options="item.display for item in allPatients">
+
+                </select>
+                </div>
+            </div>
 
             <div class="col-md-4">
                 <div class="navbar-text">
 
+                    NHI: {{selectedPatient.identifier[0].value}}
+                    <span ng-show="selectedPatient.gender">Gender: {{selectedPatient.gender}}</span>
+                    <span ng-show="selectedPatient.birthDate">BirthDate: {{selectedPatient.birthDate}}</span>
 
                 </div>
 
@@ -63,7 +80,7 @@
                 </form>
             </div>
 
-            <div class="col-md-2">
+            <div class="col-md-1">
 
             </div>
 
@@ -77,35 +94,55 @@
         </div>
     </nav>
 
-        <div class="row">
-            <div class="col-md-1">
-                Select patient
-            </div>
-            <div class="col-md-2">
-                <select ng-model="input.pat" class="form-control"
-                        ng-change="selectPatient(input.pat)"
-                        ng-options="item.display for item in allPatients">
-
-                </select>
-            </div>
-            <div class="col-md-3">
-
-                NHI: {{selectedPatient.identifier[0].value}}
-                <span ng-show="selectedPatient.gender">Gender: {{selectedPatient.gender}}</span>
-                <span ng-show="selectedPatient.birthDate">BirthDate: {{selectedPatient.birthDate}}</span>
-            </div>
-        </div>
-        <hr/>
-
-        <div class="row" ng-show="selectedPatient">
-
-            <div class="col-md-12" >
-
-                panes to show request forms (as text display) path reports (also as text)
-                also show actnow data - charts & display from current actnow UI
 
 
-            </div>
+        <div ng-show="selectedPatient">
+
+            <uib-tabset>
+                <uib-tab heading="Structured Pathology requests">
+                   <br/>
+                    <div class="row">
+                        <div class="col-md-3" >
+                            Service Requests
+                            <div class="myScroll">
+                                <div class="list-group">
+                                    <div class="list-group-item" ng-click="selectSR(entry.resource)"
+                                         ng-repeat="entry in bundleSR.entry">
+                                            <div ng-repeat="cat in entry.resource.category">{{cat.text}}</div>
+
+                                        {{entry.resource.authoredOn | date}}
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                        <div class="col-md-9" >
+
+                            <uib-tabset>
+
+                                <uib-tab heading="Request text">
+                                    <qrdisplay qr="QR"></qrdisplay>
+                                </uib-tab>
+
+
+                                <uib-tab heading="Resources">
+                                    <br/>
+                                    <viewbundle bundle="allResourcesForSR" validationoo="validationResults"></viewbundle>
+                                </uib-tab>
+                            </uib-tabset>
+                        </div>
+                    </div>
+
+                </uib-tab>
+                <uib-tab heading="ACT-NOW chemotherapy treatment">
+                    <br/>
+                </uib-tab>
+            </uib-tabset>
+
+
         </div>
 
 

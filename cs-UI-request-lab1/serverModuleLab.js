@@ -1,22 +1,26 @@
 /*
 *
-* These are all endpoints that support the Lab application. They are generally not FHIR compliant.
-* The only FHIR compliant one is the POST ServiceRequest which receives the SR 'notification' from the CS server
-*
+* These are all endpoints that support the Lab application. They are generally not FHIR compliant as they serve the local application
 */
 const axios = require("axios");
-//const config = require("./config.json")
 const showLog = true
 let db
+
+//the utils module is stored in the cs-customops folder. todo ?should we move it to a separate 'common' folder?
+const utilModule = require("../cs-customOps/serverModuleUtil.js")
 
 console.log(`FHIR server root from env is ${process.env.SERVERBASE}`)
 console.log(`Log database from env is ${process.env.LOGDB}`)
 console.log(`Custom ops from env is ${process.env.CUSTOMOPS}`)
 
+/*
 let serverBase = process.env.SERVERBASE
 if (serverBase[serverBase.length-1] !== '/') {
     serverBase += '/'
 }
+*/
+
+let serverBase = utilModule.checkUrlSlash(process.env.SERVERBASE)
 
 //import { MongoClient } from "mongodb";
 let MongoClient = require('mongodb').MongoClient;
@@ -100,23 +104,16 @@ function setup(app) {
     //though in practice the lab would be querying based on identifier...
 
 
-
+    //get all the currently active SR. Just for the RI
     app.get('/lab/activeSR', async function(req,res){
+        let qry = `${serverBase}ServiceRequest?status=active&_count=100&_include=ServiceRequest:subject`
 
-        //http://localhost:8080/fhir/ServiceRequest?status=active&_count=50&_include=ServiceRequest:supportingInfo&_include=ServiceRequest:subject
-        //http://localhost:8080/fhir/ServiceRequest?status=active&_count=50&_include=ServiceRequest:subject
-        //let qry = `${serverBase}ServiceRequest?status=active&_count=50&_include=ServiceRequest:subject&_include=ServiceRequest:supportingInfo`
-
-        let qry = `${serverBase}ServiceRequest?status=active&_count=50&_include=ServiceRequest:subject`
-
-        console.log(qry)
+        //console.log(qry)
         try {
-
             let config = {headers:{'cache-control':'no-cache'}}
             let response = await axios.get(qry,config)
 
             //assemble into a custom object  {pat: , sr:}
-
             let bundle = response.data
 
             if (bundle && ! bundle.entry) {
@@ -124,11 +121,8 @@ function setup(app) {
                 return
             }
 
-
             //create a hash of the patient
             let hashPatient = {}
-
-            //create a hash of patients
             bundle.entry.forEach(function (entry) {
                 let resource = entry.resource
                 if (resource.resourceType == 'Patient') {
@@ -136,7 +130,7 @@ function setup(app) {
                 }
             })
 
-            //now create the summary arrab
+            //now create the summary array of objects
             let result = []     //an array of {pat: , sr:}
             bundle.entry.forEach(function (entry) {
                 let resource = entry.resource
@@ -148,41 +142,72 @@ function setup(app) {
             })
 
             console.log(`${bundle.entry.length} resources (SR & patient) retrieved`)
-
-
-
             res.json(result)
 
         } catch (ex) {
             console.log(ex)
             res.status(500).json(ex)
         }
-
-
-        /*
-        let query = { currentStatus :  "active"}
-
-        database.collection("labRequests").find(query).toArray(function(err,doc){
-            if (err) {
-                res.status(500);
-                res.json({err:err});
-            } else {
-               // console.log(doc)
-                res.json(doc)
-            }
-        })
-        */
-
     })
 
     //post the report to the CS server (actually nodeRed) and update the local store plus save report.
     app.post("/lab/submitreport",async function(req,res){
-
         let bundle = req.body
 
         //get the SR from the bundle. Its id is in the reports
         //let sr = getSRFromBundle(bundle)    //todo check not null
 
+        //if lstErrors length is 0 then no errors were found. Any errors will cause the bundle to be rejected
+        let lstRequiredTypes = ['ServiceRequest','DiagnosticReport']
+        let lstErrors = utilModule.level1Validate(bundle,lstRequiredTypes)
+        if (lstErrors.length > 0) {
+            //There were validation errors. These cannot be ignored.
+            let oo = utilModule.makeOO(lstErrors)
+            res.status("400").json(oo)
+            return
+        }
+
+
+
+        //Unlike the request, there's no additional processing todo (beyond report updates that need further thought
+        //But still want to add a provenance resource that refers between the SR and the DR / Obs
+
+        let ar1 = utilModule.findResourceInBundleByType(bundle,"ServiceRequest")
+        let SR = ar1[0] //note that the L1 check above should ensure 1 SR in the bundle
+
+        let provenance = {resourceType:"Provenance"}
+        provenance.id =  utilModule.createUUID
+
+        provenance.text= {status:"generated",div:"<div xmlns='http://www.w3.org/1999/xhtml'>Lab report</div>"}
+        provenance.recorded = new Date().toISOString()
+        provenance.entity = []
+        //provenance.agent = []
+        provenance.target = []
+
+        //provenance.entity.push({role:"source",what:{reference:"urn:uuid:" + QR.id}})
+        provenance.entity.push({role:"source",what:{reference:`ServiceRequest/${SR.id}`}})
+        //set the agent to the author of the QR todo ?should this be to a 'Device' representing the forms receiver
+
+        //the SR has a real id as it was retrieved from the server
+        //provenance.entity.push({who:{reference:`ServiceRequest/${SR.id}` }})
+
+        //now add references to all the DR / Obs resources in the lab bundle
+        bundle.entry.forEach(function (entry) {
+            let resource = entry.resource
+            if (resource.resourceType == 'Observation' || resource.resourceType == 'DiagnosticReport') {
+                provenance.target.push({reference:  `urn:uuid:${resource.id}`})
+            }
+        })
+
+        //add the provenance to the bundle. It's a POST..
+        /*
+        let entry = {resource:provenance}
+        entry.fullUrl = `urn:uuid:${provenance.id}`
+        //It's a transaction bundle, and so needs the request
+        entry.request = {method:'POST',url:`${resource.provenance}`}
+        */
+
+        bundle.entry.push(utilModule.makePOSTEntry(provenance))
 
 
         //send the bundle to the server
@@ -203,29 +228,6 @@ function setup(app) {
 
 
 
-
-       // console.log(submitResult.data)
-
-      //  res.json(submitResult.data)
-
-
-        //let r = await  database.collection("labRequests").find(filter).toArray()
-        //console.log(r)
-        /*
-
-        let updateDoc = {$set:{"SR.status":"completed"}}
-        let options = {}
-        let updateResult = await database.collection("labRequests").updateOne(filter, updateDoc, options);
-console.log(updateResult)
-        //send the bundle to the server
-        let url = config.lab.reportEndpoint.url
-        let submitResult = await axios.post(url,bundle)
-
-
-*/
-
-
-
     })
 
     //get the potential report templates (Q) that can be used.
@@ -242,37 +244,8 @@ console.log(updateResult)
         } catch (ex) {
             res.status(500).json(ex)
         }
-
-
-
     })
 
-}
-
-// ----------------- support ing functions -----------------
-
-//retrieve the first respource in the bundle.
-//todo - this is something to consider - do we require conditional create from the requester
-function getFirstResourceFromBundleDEP(bundle) {
-    let resource
-    if (bundle && bundle.entry && bundle.entry.length > 0) {
-        resource = bundle.entry[0].resource
-    }
-    return resource
-}
-
-function getSRFromBundleDEP(bundle) {
-    let resource
-    if (bundle && bundle.entry && bundle.entry.length > 0) {
-
-        bundle.entry.forEach(function (entry) {
-            if (entry.resource.resourceType == "ServiceRequest") {
-                resource = entry.resource
-            }
-        })
-        //resource = bundle.entry[0].resource
-    }
-    return resource
 }
 
 

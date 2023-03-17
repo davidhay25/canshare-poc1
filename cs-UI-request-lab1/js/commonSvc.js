@@ -5,7 +5,6 @@
 
 angular.module("pocApp")
 
-
     .service('commonSvc', function($q,$http) {
 
         let config= {}
@@ -20,6 +19,9 @@ angular.module("pocApp")
                 let totalErrors = 0
                 let lstResources = []
                 let unknownIssues = []      //issues that can't be associated with a specific resource
+                if (! bundle.entry) {
+                    return {}
+                }
                 bundle.entry.forEach(function (entry,inx) {
                     lstResources.push({resource:entry.resource,pos:inx,issues:[]})
                 })
@@ -118,15 +120,10 @@ angular.module("pocApp")
                 
             },
             init : function(){
-                //initialization code - currently loading the config...
+                //initialization code - returns the env. variables for the server and the customops
                 let deferred = $q.defer()
                 let that = this
-                /*
-                let config = {
-                    "SERVERBASE":process.env.SERVERBASE,
-                    "CUSTOMOPS":process.env.CUSTOMOPS
-                }
-*/
+
                 $http.get("/config").then(
                     function(data) {
                         that.config = data.data  // save in service {SERVERBASE: CUSTOMOPS}}
@@ -138,6 +135,35 @@ angular.module("pocApp")
                     }
 
                 )
+                return deferred.promise
+            },
+            getSRForPatient : function(patientId) {
+                let that=this
+                let deferred = $q.defer()
+
+                let qry = encodeURIComponent(`ServiceRequest?patient=${patientId}`)
+                $http.get(`/proxy?qry=${qry}`).then(
+                    function (data) {
+                        console.log(data.data)
+                        deferred.resolve(data.data)
+                        // console.log($scope.expandedVS)
+                    }, function(err) {
+                        deferred.reject(err)
+                    }
+                )
+                /*
+                //let url = `${this.config.canShare.fhirServer.url}/Patient`
+                let url = `${that.config.SERVERBASE}/ServiceRequest?patient=${patientId}&_count=100`
+                $http.get(url).then(
+                    function (data) {
+                        console.log(url,data.data)
+                        deferred.resolve(data.data)
+
+                    }
+                ), function(err) {
+                    deferred.reject(err)
+                }
+                */
                 return deferred.promise
             },
             getAllPatients : function() {

@@ -10,8 +10,8 @@ let designerServer = "http://canshare.co.nz:9099/baseR4/"
 //let id = "cf-1651524261297"
 //let contextType = "request"
 
-let id = "cf-1652818555820"
-let contextType = "report"
+//let id = "cf-1652818555820"
+//let contextType = "report"
 
 let RIServer = "http://localhost:8080/fhir/"
 
@@ -93,4 +93,13 @@ async function process(id) {
 
 }
 
+let id = "cf-1652818555820"
+let contextType = "report"
 process(id)
+
+/*
+id = "cf-1651524261297"
+contextType = "request"
+process(id)
+
+*/

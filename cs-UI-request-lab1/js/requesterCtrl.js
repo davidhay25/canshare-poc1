@@ -373,7 +373,7 @@ angular.module("pocApp")
                 let sr = {resourceType:"ServiceRequest",id:commonSvc.createUUID(),status:"active",intent:"order"}
                 sr.authoredOn = new Date().toISOString()
                 sr.code = {text:"Histology request"}
-                sr.category = [{text:"CS order"}]
+                sr.category = [{text:"Histology order"}]
                 sr.requester = {reference:`urn:uuid:${$scope.author.id}`}
                 sr.subject = {reference:`urn:uuid:${$scope.selectedPatient.id}`}
                 sr.identifier = [{system:"http://canshare.co.nz/identifier",value: new Date().toISOString()}]

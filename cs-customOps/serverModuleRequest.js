@@ -14,45 +14,62 @@ function setup(app) {
     app.post("/testExtraction",(async function (req,res) {
 
         let bundle = req.body
-        let arResources = utilModule.findResourceInBundleByType(bundle,"QuestionnaireResponse")
-        if (arResources.length == 1) {
-            try {
-                let QR = arResources[0]
-                let ar = await sdcModule.extractResources(QR)     //throw an exception if there was an error, or an array of extracted resources if not
+        console.log(bundle)
 
-                //add the extracted resources to the original bundle
-                ar.forEach(function (resource) {
-                    let entry = {resource:resource}
-                    entry.fullUrl = `urn:uuid:${resource.id}`
-                    //It's a transaction bundle, and so needs the request
-                    entry.request = {method:'POST',url:`${resource.resourceType}`}
-                    bundle.entry.push(entry)
-                })
-
-                //now validate the bundle
-                let profileValidationOO
-                try {
-                    profileValidationOO = await utilModule.profileValidation(bundle)
-
-                } catch (ex) {
-                    //there was a validation failure.
-                    //todo - not sure what the best approach is...
-                    //console.log(ex)
-                    profileValidationOO = ex
-                    //res.status("400").json(ex)
-                }
-
-
-
-                res.json({bundle:bundle,oo:profileValidationOO})
-
-            } catch(ex) {
-                console.log(ex)
-                res.status(400).json(ex.message)
-            }
-        } else {
-            res.status(400).json("Must be just one QR resource")
+        //if lstErrors length is 0 then no errors were found. Any errors will cause the bundle to be rejected
+        let lstRequiredTypes = ['ServiceRequest','QuestionnaireResponse']
+        let lstErrors = utilModule.level1Validate(bundle,lstRequiredTypes)
+        if (lstErrors.length > 0) {
+            //There were validation errors. These cannot be ignored.
+            let oo = utilModule.makeOO(lstErrors)
+            res.status("400").json(oo)
+            return
         }
+
+        let arResources = utilModule.findResourceInBundleByType(bundle,"QuestionnaireResponse")
+        let QR = arResources[0]
+
+        try {
+
+
+            //get the SR. Assume its there todo - fix this
+            let ar1 = utilModule.findResourceInBundleByType(bundle,"ServiceRequest")
+            let SR = ar1[0] //note that the L1 check above should ensure 1 SR in the bundle
+            console.log("SR=",SR)
+
+
+            let ar = await sdcModule.extractResources(QR,SR)     //throw an exception if there was an error, or an array of extracted resources if not
+
+            //add the extracted resources to the original bundle
+            ar.forEach(function (resource) {
+                let entry = {resource:resource}
+                entry.fullUrl = `urn:uuid:${resource.id}`
+                //It's a transaction bundle, and so needs the request
+                entry.request = {method:'POST',url:`${resource.resourceType}`}
+                bundle.entry.push(entry)
+            })
+
+            //now validate the bundle
+            let profileValidationOO
+            try {
+                profileValidationOO = await utilModule.profileValidation(bundle)
+
+            } catch (ex) {
+                //there was a validation failure.
+                //todo - not sure what the best approach is...
+                console.log(ex)
+                profileValidationOO = ex
+                //res.status("400").json(ex)
+            }
+
+
+            res.json({bundle:bundle,oo:profileValidationOO})
+
+        } catch(ex) {
+            console.log(ex)
+            res.status(400).json(ex.message)
+        }
+
 
     }))
 
@@ -66,7 +83,8 @@ function setup(app) {
         utilModule.logger("request",{content:bundle})
 
         //if lstErrors length is 0 then no errors were found. Any errors will cause the bundle to be rejected
-        let lstErrors = utilModule.level1Validate(bundle)
+        let lstRequiredTypes = ['ServiceRequest','QuestionnaireResponse']
+        let lstErrors = utilModule.level1Validate(bundle,lstRequiredTypes)
         if (lstErrors.length > 0) {
             //There were validation errors. These cannot be ignored.
             let oo = utilModule.makeOO(lstErrors)
@@ -79,20 +97,38 @@ function setup(app) {
         try {
             profileValidationOO = await utilModule.profileValidation(bundle)
             console.log(profileValidationOO)
+            //todo - what to do with OO ? should we examine all issues and reject if there are errors
+
         } catch (ex) {
             //there was a validation failure - of the function, not that a resource failed validation....
             console.log(ex)
             res.status("400").json(ex)
+            return
         }
 
+        //at this point, the bundle has passed validation
+
         //extract resources. Add them to the bundle.
+        //first, get the QR
         let arResources = utilModule.findResourceInBundleByType(bundle,"QuestionnaireResponse")
-        let QR = arResources[0] //note that the L1 check above will ensure 1 QR in the bundle
+        /*
+        if (arResources.length == 0) {
+            let oo = utilModule.makeOO(['The bundle must have a QR'])
+            res.status(400).json(oo)
+            return
+        }
+        */
+        let QR = arResources[0] //note that the L1 check above should ensure 1 QR in the bundle
+
+        //Get the SR
+        let ar1 = utilModule.findResourceInBundleByType(bundle,"ServiceRequest")
+        let SR = ar1[0] //note that the L1 check above should ensure 1 SR in the bundle
+        console.log("SR=",SR)
+
         let arExtractedResources = []
         try {
-            //If any resources are extracted, then a specific provenance will be added and included in the list.
-            //todo is this overkill - ie do we only need the single provenance that refers to all resources?
-            arExtractedResources = await sdcModule.extractResources(QR)     //throw an exception if there was an error, or an array of extracted resources if not
+            //If any resources are extracted, then a specific provenance and device will be added and included in the list.
+            arExtractedResources = await sdcModule.extractResources(QR,SR)     //throw an exception if there was an error, or an array of extracted resources if not
             utilModule.addResourcesToBundle(bundle,arExtractedResources)
 
         } catch(ex) {
@@ -133,8 +169,6 @@ function setup(app) {
         metrics.end = new Date()
         utilModule.postBundleToServer(bundle,metrics,res,"request",req)
 
-
-        //res.json({})
 
     })
 }

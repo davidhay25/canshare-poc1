@@ -63,8 +63,6 @@ angular.module("pocApp")
                 $http.get(url).then(
                     function(data) {
                         //returns an array of custom objects - {pat: , sr:}
-                        //console.log(data.data)
-
                         $scope.activeRequests = data.data   // {SR:{}, QR: Pat: others:[]
 
                     }, function (err) {
@@ -132,9 +130,6 @@ angular.module("pocApp")
                         }
                     )
                 }
-
-
-
 
             }
 

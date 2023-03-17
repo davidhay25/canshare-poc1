@@ -3,13 +3,11 @@ let serverBase = process.env.SERVERBASE
 const { default: axios } = require("axios")
 const utilModule = require("./serverModuleUtil");
 
-
 let debug = false
 
 
 //extract resources from the QR. Returns an array of resources
-async function extractResources(QR) {
-
+async function extractResources(QR,SR) {
 
     //get the Questionnaire. for now, get it derectly from the hapi server...
     let qUrl = QR.questionnaire
@@ -39,11 +37,22 @@ async function extractResources(QR) {
         device.id = utilModule.createUUID()
 
        // utilModule.addResourcesToBundle(bundle,[device])
-        arExtractedResources.push(device)
+        let provenance = addProvenance(QR,arExtractedResources,device)
+console.log('provenance',provenance)
+        //add the device to the list of extracted resources after the provenance is added so there isn't a target reference to it....
 
 
+        //add an entity reference from Provenance to SR.
 
-        addProvenance(QR,arExtractedResources,device)
+        // a provenance is only created if resources are extracted
+        if (provenance) {
+            provenance.entity.push({role:"source",what:{reference:`urn:uuid:${SR.id}`}})
+            arExtractedResources.push(device)
+        }
+
+        //provenance.agent.push({who:{reference: "urn:uuid:" + SR.id}})
+
+
         return arExtractedResources
 
 
@@ -67,9 +76,9 @@ function addProvenance(QR,lst,device) {
         let provenance = {resourceType:"Provenance"}
         provenance.id =  createUUID()   //will be ignored by fhir server
         //the subject might be a reference to a contained PR resource...
-        if (QR.author && QR.author.reference && QR.author.reference.substring(0,1) == '#') {
-            provenance.contained = QR.contained
-        }
+        //if (QR.author && QR.author.reference && QR.author.reference.substring(0,1) == '#') {
+         //   provenance.contained = QR.contained
+      //  }
 
         provenance.text= {status:"generated",div:"<div xmlns='http://www.w3.org/1999/xhtml'>Resources extracted from QR</div>"}
         provenance.recorded = new Date().toISOString()
@@ -83,15 +92,15 @@ function addProvenance(QR,lst,device) {
 
         provenance.agent.push({who:{reference: "urn:uuid:" +device.id}})
 
+        //todo - incorrectly adding reference to Device...? should only be specific types (Procedure, Observation)
         lst.forEach(function (resource) {
             //provenance.target.push({reference:  `${capitalize(resource.resourceType)}/${resource.id}`})
             provenance.target.push({reference:  `urn:uuid:${resource.id}`})
         })
 
-
         lst.push(provenance)
 
-
+        return provenance
 
     }
 
