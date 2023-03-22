@@ -25,13 +25,20 @@ angular.module('pocApp')
                 $scope.$watch(
                     function() {return $scope.q},
                     function() {
-                        //console.log(renderFormsSvc.makeFormTemplate($scope.q))
-                        let vo = renderFormsSvc.makeFormTemplate($scope.q,$scope.form)
-                        if (vo) {
-                            $scope.formTemplate = vo.template
-                            $scope.hashItem = vo.hashItem
+                       
+                        delete $scope.selectedSection       //c;ears the current section display
+                        if ($scope.q) {
+                            let vo = renderFormsSvc.makeFormTemplate($scope.q,$scope.form)
+                            if (vo) {
+                                $scope.formTemplate = vo.template
+                                $scope.hashItem = vo.hashItem
 
+                            }
+                        } else {
+                           // delete $scope.formTemplate
+                            //delete $scope.hashItem
                         }
+
                     }
                 );
 

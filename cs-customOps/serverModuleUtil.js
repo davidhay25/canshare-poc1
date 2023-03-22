@@ -132,7 +132,6 @@ function logger(collection,msg) {
         msg.sender = msg.headers['x-sender']
     }
 
-
     database.collection(collection).insertOne(msg, function (err, result) {
         if (err) {
             console.log('Error updating log ',err)

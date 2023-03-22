@@ -33,8 +33,12 @@
     <script src="directive/QRDisplay/QRDisplayDir.js"></script>
     <script src="directive/reportDisplay/reportDisplayDir.js"></script>
     <script src="directive/renderForm/renderFormDir.js"></script>
+
     <script src="directive/viewBundle/viewBundleDir.js"></script>
     <script src="directive/viewBundle/viewBundleSvc.js"></script>
+
+    <script src="directive/displayMeds/displayMedsDir.js"></script>
+
     <script src="js/libs/vis.min.js"></script>
 
 </head>
@@ -139,6 +143,9 @@
                 </uib-tab>
                 <uib-tab heading="ACT-NOW chemotherapy treatment">
                     <br/>
+
+                    <displaymeds meds="allMeds"></displaymeds>
+
                 </uib-tab>
             </uib-tabset>
 

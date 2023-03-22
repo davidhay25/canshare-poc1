@@ -5,12 +5,9 @@ angular.module("pocApp")
             $scope.input = {};
 
 
-
-
-
-
             function getLogs() {
-                $http.get("/logs").then(
+                let module = 'request'      //todo - support other modules
+                $http.get(`/logs/${module}`).then(
                     function (data) {
                         $scope.logs = data.data
                     }, function(err) {

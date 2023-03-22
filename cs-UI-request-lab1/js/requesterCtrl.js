@@ -23,20 +23,16 @@ angular.module("pocApp")
             $scope.author.id = commonSvc.createUUID()
             $scope.author.identifier = [{system:"http://canshare.co.nz/ns",value:"ABC1234"}]
 
-            //the options for the fhir display
+            //the options for the technical options & fhir display
             $scope.fhirDisplayOptions = []
             $scope.fhirDisplayOptions.push({code:'extract',display:'Test extraction'})
             //$scope.fhirDisplayOptions.push({code:'validate',display:'Validate bundle'})
             $scope.fhirDisplayOptions.push({code:'text',display:'Request text'})
-
-
             $scope.fhirDisplayOptions.push({code:'bundle',display:'Submission bundle'})
             $scope.fhirDisplayOptions.push({code:'Q',display:'Questionnaire'})
             //$scope.fhirDisplayOptions.push({code:'patient',display:'Patient'})
             $scope.fhirDisplayOptions.push({code:'QR',display:'QuestionnaireResponse'})
             //$scope.fhirDisplayOptions.push({code:'SR',display:'ServiceRequest'})
-
-
 
             $scope.input.selectedFhirDisplayOption = 'extract'
 
@@ -165,6 +161,7 @@ angular.module("pocApp")
 
                 let identifierQuery = `${patient.identifier[0].system}|${patient.identifier[0].value}`
 
+                /* - not loading previous stuff
                 //load ServiceRequests via the server proxy
                 let qry = encodeURIComponent(`ServiceRequest?subject.identifier=${identifierQuery}`)
                 $http.get(`/proxy?qry=${qry}`).then(
@@ -174,12 +171,14 @@ angular.module("pocApp")
                     }
                 )
 
+                */
+
 
 
             }
 
             //a historical SR is selected. Get all the details and display it.
-            $scope.selectHistoricalSR = function(SR){
+            $scope.selectHistoricalSRDEP = function(SR){
                 $scope.selectedSR = SR
 
                 commonSvc.retrieveSRandDetails(SR).then(
@@ -492,8 +491,5 @@ angular.module("pocApp")
 
 
             }
-
-
-
 
         })

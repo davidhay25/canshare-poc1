@@ -11,17 +11,11 @@ const database = client.db("logger")    //all logs are in the same database
 function setup(app) {
     console.log('setup')
 
+    app.get("/logs/:module",async function(req,res){
 
-
-
-
-
-
-    app.get("/logs",async function(req,res){
-        console.log('logs')
         let qry = {}    //retre
-        let collection = "actnow"
-
+        let collection = req.params.module
+        console.log(`${collection} logs`)
         try {
             let entries = await database.collection(collection).find(qry).toArray()
             res.json(entries)

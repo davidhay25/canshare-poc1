@@ -4,65 +4,77 @@
  */
 const utilModule = require("./serverModuleUtil.js")
 const sdcModule = require("./serverModuleSDC.js")
+const {logger} = require("./serverModuleUtil");
 
 function setup(app) {
-
-    //console.log('setup')
-
 
     //test the observation extraction. Returns an array of all resources including those in the bundle
     app.post("/testExtraction",(async function (req,res) {
 
         let bundle = req.body
-        console.log(bundle)
+        //console.log(bundle)
 
+        let logObject = {mode:'test',bundle:bundle}
+
+        //Level 1 validation - errors that cannot be ignored like missing identifiers or required resources
         //if lstErrors length is 0 then no errors were found. Any errors will cause the bundle to be rejected
-        let lstRequiredTypes = ['ServiceRequest','QuestionnaireResponse']
+        let lstRequiredTypes = ['ServiceRequest','QuestionnaireResponse','Patient']
         let lstErrors = utilModule.level1Validate(bundle,lstRequiredTypes)
         if (lstErrors.length > 0) {
             //There were validation errors. These cannot be ignored.
+            logObject.l1errors = lstErrors
+            logObject.success = false
+            utilModule.logger("request",logObject)
+
             let oo = utilModule.makeOO(lstErrors)
             res.status("400").json(oo)
             return
         }
 
-        let arResources = utilModule.findResourceInBundleByType(bundle,"QuestionnaireResponse")
-        let QR = arResources[0]
+        //now extract any resources
+        //let arResources = utilModule.findResourceInBundleByType(bundle,"QuestionnaireResponse")
+        //get the SR - we know it's there
+        let QR = utilModule.findResourceInBundleByType(bundle,"QuestionnaireResponse")[0] //arResources[0]
+
+        //we know there's a patient in the bundle...
+        logObject.patient = utilModule.findResourceInBundleByType(bundle,"Patient")[0]
 
         try {
 
-
-            //get the SR. Assume its there todo - fix this
-            let ar1 = utilModule.findResourceInBundleByType(bundle,"ServiceRequest")
-            let SR = ar1[0] //note that the L1 check above should ensure 1 SR in the bundle
-            console.log("SR=",SR)
-
+            //get the SR. We know it's there
+            let SR = utilModule.findResourceInBundleByType(bundle,"ServiceRequest")[0] //note that the L1 check above should ensure 1 SR in the bundle
+            //console.log("SR=",SR)
 
             let ar = await sdcModule.extractResources(QR,SR)     //throw an exception if there was an error, or an array of extracted resources if not
 
-            //add the extracted resources to the original bundle
+
+
+            //add the extracted resources to the original bundle. There's a Provenance in there
+            //that records the resources that were extracted compared to the ones submitted...
             ar.forEach(function (resource) {
                 let entry = {resource:resource}
                 entry.fullUrl = `urn:uuid:${resource.id}`
-                //It's a transaction bundle, and so needs the request
+                //It's a transaction bundle, and so needs the request. They will all be new resources to be created.
                 entry.request = {method:'POST',url:`${resource.resourceType}`}
                 bundle.entry.push(entry)
             })
 
-            //now validate the bundle
+            //now perform profile validation. This is done after response extraction so that the extracted resources are included
             let profileValidationOO
             try {
                 profileValidationOO = await utilModule.profileValidation(bundle)
-
             } catch (ex) {
                 //there was a validation failure.
-                //todo - not sure what the best approach is...
-                console.log(ex)
+                //console.log(ex)
                 profileValidationOO = ex
-                //res.status("400").json(ex)
             }
 
+            logObject.validation = profileValidationOO
 
+            //save the log object
+            utilModule.logger("request",logObject)
+
+            //and return
             res.json({bundle:bundle,oo:profileValidationOO})
 
         } catch(ex) {

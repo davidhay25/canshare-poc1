@@ -35,3 +35,6 @@ Manually upload to server after initial creation
 act-now copied from clinfhir\actnow\mosaicdata\out
 
 POCBundle.json from cs-dataStandardDesigner
+
+
+https://serverfault.com/questions/171678/nginx-config-front-end-reverse-proxy-to-another-port

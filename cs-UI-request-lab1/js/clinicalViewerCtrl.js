@@ -34,6 +34,8 @@ angular.module("pocApp")
             $scope.selectSR = function (SR) {
                 //get all the resources associated with a SR based on provenance resources
 
+
+
                 let bundle
                 let url1 = `ServiceRequest?_id=${SR.id}&_include=ServiceRequest:supportingInfo&_include=ServiceRequest:subject&_include=ServiceRequest:requester`
 
@@ -118,11 +120,82 @@ angular.module("pocApp")
                 let patient = vo.patient
                 $scope.selectedPatient = vo.patient
 
+                // get all the medications data for the patient.
+                //todo ?add a date filter
+                getMedications(patient)
+                getRegimens(patient)
                 //get all the SR for this patient
                 commonSvc.getSRForPatient(patient.id).then(
                     function (bundle) {
                         $scope.bundleSR = bundle
                         console.log(bundle)
+                    }
+                )
+
+            }
+
+
+            //get all the regimen careplans for a patient
+            function getRegimens(patient)  {
+                let ar = [`CarePlan?category=${patient.id}&category=regimenCP`]
+                $http.post('multiquery',ar).then(
+                    function (data) {
+                        console.log(data.data)
+                        $scope.regimens = data.data
+                        console.log(data.data)
+                    }, function (err) {
+                        console.log(err.data)
+                    }
+                )
+
+            }
+
+            //get all the data associated with a regimenCP
+            function getActNowData(careplan) {
+                //first, get the careplans
+
+                let url1 = `CarePlan?category=regimenCP,cycleCP&subject=${patient.id}`
+
+
+                let ar = []
+                ar.push(url1)
+
+                $http.post('multiquery',ar).then(
+                    function (data) {
+                        console.log(data.data)
+                        //$scope.allMeds = data.data
+                        console.log(data.data)
+                    }, function (err) {
+                        console.log(err.data)
+                    }
+                )
+
+
+            }
+
+            //get all the medication resources for a patient
+            function getMedications(patient) {
+                let ar = []
+                //ar.push(`MedicationAdministration?subject=${$scope.selectedPatient.id}`)
+                //ar.push(`MedicationRequest?subject=${$scope.selectedPatient.id}`)
+
+                //get all the resources for
+                ar.push(`MedicationAdministration?subject=${$scope.selectedPatient.id}`)
+                ar.push(`MedicationRequest?subject=${$scope.selectedPatient.id}`)
+
+                //ar.push(`MedicationAdministration?subject=Patient3`)
+                //ar.push(`MedicationRequest?subject=Patient3`)
+
+                //ar.push(`MedicationAdministration?subject=Patient1`)
+                //ar.push(`MedicationRequest?subject=Patient1`)
+
+                $http.post('multiquery',ar).then(
+                    function (data) {
+                        console.log(data.data)
+                        $scope.allMeds = data.data
+                        console.log($scope.allMeds)
+                    }, function (err) {
+                        console.log(err.data)
                     }
                 )
 

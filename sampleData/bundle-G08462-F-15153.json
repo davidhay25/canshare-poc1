@@ -18,8 +18,9 @@
         "id": "90cb1837-9f05-41c7-9b53-2adfb52486a8",
         "identifier": [
           {
-            "system": "http://mosaic.com/Patient",
-            "value": "87"
+            "system": "https://standards.digital.health.nz/ns/nhi-id",
+            "value": "XXX6535"
+
           }
         ],
         "text": {
@@ -30,7 +31,7 @@
       "fullUrl": "urn:uuid:90cb1837-9f05-41c7-9b53-2adfb52486a8",
       "request": {
         "method": "PUT",
-        "url": "Patient?identifier=http://mosaic.com/Patient|87"
+        "url": "Patient?identifier=https://standards.digital.health.nz/ns/nhi-id|XXX6535"
       }
     },
     {

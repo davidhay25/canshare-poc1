@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>DashBoard</title>
+
+    <script src="js/libs/jquery-1.9.0.min.js"></script>
+    <script src="js/libs/angular.min1-5.js"></script>
+    <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+    <script src="js/libs/moment.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+
+    <script>
+        angular.module("pocApp",['ui.bootstrap','ui.checkbox']).config(function($locationProvider) {
+            $locationProvider.html5Mode(true);
+            $locationProvider.hashPrefix('!');
+        });
+        angular.module("pocApp").constant("moment", moment);
+
+    </script>
+
+    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
+
+    <script src="js/questionnaireSvc.js"></script>
+
+    <script src="js/dashboardCtrl.js"></script>
+    <script src="js/dashboardSvc.js"></script>
+
+    <script src="directive/viewBundle/viewBundleDir.js"></script>
+    <script src="directive/viewBundle/viewBundleSvc.js"></script>
+    <script src="js/libs/vis.min.js"></script>
+
+    <script src="directive/renderForm/renderFormDir.js"></script>
+    <script src="directive/renderForm/renderFormSvc.js"></script>
+<!--
+    <script src="directive/showQTree/showQTreeDir.html"></script>
+    -->
+    <script src="directive/showQTree/showQTreeDir.js"></script>
+
+    <script src="directive/QRDisplay/QRDisplayDir.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
+    <script src="js/libs/jstree.min.js"></script>
+
+</head>
+<body style="padding: 8px;padding-top: 80px">
+<div ng-app="pocApp" ng-controller="dashboardCtrl" class="container-fluid">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+        <div class="container-fluid">
+            <div class="col-md-2 col-sm-2">
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            Dashboard
+                        </a>
+                    </span>
+
+            </div>
+
+            <div class="col-md-5 col-sm-5">
+                <div class="navbar-text">
+
+                    <button class="btn btn-primary" ng-click="input.command = commands[0]">{{commands[0].display}}</button>
+                    <button class="btn btn-primary" ng-click="input.command = commands[1]">{{commands[1].display}}</button>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <form class="navbar-form navbar-left">
+                    <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+
+                </form>
+            </div>
+
+            <div class="col-md-2">
+
+            </div>
+
+            <div class="col-md-2">
+                <a href="https://teaho.govt.nz/" target="_blank">
+                    <img width="150" height="auto" class="pull-right"
+                         style="padding: 3px"
+                         src="images/TAK-logo-midgreen.png"/>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+
+    <div ng-show="input.command.key == 'forms'">
+
+
+        <div class="row">
+            <div class="col-md-3">
+
+                <checkbox ng-model="input.fsOnly" ng-change="checkBoxChange()">
+
+                </checkbox> Show only on Forms Server (<span class="badge">FS</span>)
+                <br/><br/>
+                <div class="myScroll">
+                    <div class="list-group">
+                        <div ng-class="{'list-group-item':true,listItemSelected:miniQ==selectedMiniQ}"
+                             ng-click = "selectMiniQ(miniQ)"
+                             ng-show = "showInList(miniQ)"
+                             ng-repeat="miniQ in allMiniQ">
+                            {{miniQ.name}}
+                            <span class="pull-right badge" ng-show="miniQ.existsOnFormsServer">
+                                FS
+                            </span>
+                            <div>{{miniQ.title}}</div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+            <div class="col-md-9">
+                <uib-tabset ng-show="selectedQ">
+                    <uib-tab heading="Tree">
+                        <showqtree q="selectedQ"></showqtree>
+                    </uib-tab>
+                    <uib-tab heading="Form">
+                        <uib-tabset>
+                            <uib-tab heading="Edit form">
+                                <renderform q="selectedQ" qr="createdQR"></renderform>
+                            </uib-tab>
+                            <uib-tab heading="Display form">
+
+                                <qrdisplay q="selectedQ" qr="createdQR"></qrdisplay>
+                            </uib-tab>
+                        </uib-tabset>
+                    </uib-tab>
+                    <uib-tab heading="Manage">
+
+                    </uib-tab>
+
+
+
+
+                </uib-tabset>
+
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div ng-show="input.command.key == 'log'">
+
+        <div class="row">
+            <div class="col-md-2">
+                <strong>Log Entries</strong>
+                <div class="list-group">
+                    <div ng-class="{'list-group-item':true,listItemSelected:log==input.selectedLog}" ng-repeat="log in logs"
+                        style="cursor: pointer"
+                        ng-click="input.selectedLog = log">
+                        {{log.date | date}}
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-10">
+                <uib-tabset ng-show="input.selectedLog">
+                   <br/>
+                    <uib-tab heading="Bundle">
+                        <br/>
+                        <viewbundle bundle="input.selectedLog.bundle"
+                                    validationoo="input.selectedLog.validation">
+
+                        </viewbundle>
+                    </uib-tab>
+
+                    <uib-tab heading="L1 validation errors">
+                        <pre>{{input.selectedLog.l1errors | json}}</pre>
+                    </uib-tab>
+
+                    <uib-tab ng-show="false" heading="Json">
+                        <pre>{{input.selectedLog | json}}</pre>
+                    </uib-tab>
+
+                </uib-tabset>
+
+            </div>
+        </div>
+
+<!--
+        display from log (mongo)
+
+        each CS submission has
+            bundle submitted (use viewBundle dir.)
+            bundle generated
+            processing outcome
+            validation reslult
+-->
+
+    </div>
+
+
+
+
+
+</div>
+</body>

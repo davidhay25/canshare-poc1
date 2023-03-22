@@ -17,7 +17,8 @@ let serverBase = process.env.SERVERBASE
 
 const requesterModule = require("./serverModuleRequesterUI.js")
 const labModule = require("./serverModuleLab.js")
-
+const dashBoardModule = require("./serverModuleDashboard.js")
+const commonModule = require("./serverModuleCommon.js")
 //let config = require("./config.json")
 
 let express = require('express');
@@ -34,7 +35,7 @@ app.use((req, res, next) => {
 
 requesterModule.setup(app)
 labModule.setup(app)
-
+dashBoardModule.setup(app)
 
 //app.get('')
 
@@ -49,12 +50,52 @@ app.get('/config', async function(req,res){
     res.json(config)
 })
 
+//send in an array of queries. Execute them and add all the results into a single bundle
+//todo - if we want to, could change to parallel execution...
+//https://javascript.plainenglish.io/running-multiple-requests-with-async-await-and-promise-all-e178ae318654
+app.post('/multiquery',async function(req,res){
+    let arQueries = req.body
+    let fullBundle = {resourceType : "Bundle", type :'collection', entry:[]}
+
+    if (arQueries.length > 0) {
+        for (const qry of arQueries) {
+            //await executeQuery(fullBundle,qry)
+            let bundle = await commonModule.singleQuery(qry)  //will follow any paging
+            if (bundle.entry) {
+                console.log('multi query:',qry,bundle.entry.length)
+                bundle.entry.forEach(function (entry) {
+                    fullBundle.entry.push(entry)
+                })
+            }
+
+        }
+    }
+
+    res.json(fullBundle)
+
+    async function executeQueryDEP(fullBundle,qry) {
+
+        let bundle = await commonModule.singleQuery(qry)
+        if (bundle.entry) {
+            console.log('multi query:',qry,bundle.entry.length)
+            bundle.entry.forEach(function (entry) {
+                fullBundle.entry.push(entry)
+            })
+        }
+    }
+})
+
+
 
 
 app.get('/proxy',async function(req,res){
 
     //the query was url encoded so it could be passed to the server
     let query = decodeURIComponent(req.query.qry);
+
+    let result = await commonModule.singleQuery(query)
+    res.json(result)
+    return
 
     //now we need to replace any | with %. Only this character should be encoded. Not sure why...
     query = query.replace("|","%7C")    //there will only ever be one...
