@@ -20,6 +20,8 @@ function setup(app) {
         //if lstErrors length is 0 then no errors were found. Any errors will cause the bundle to be rejected
         let lstRequiredTypes = ['ServiceRequest','QuestionnaireResponse','Patient']
         let lstErrors = utilModule.level1Validate(bundle,lstRequiredTypes)
+
+        console.log(lstErrors)
         if (lstErrors.length > 0) {
             //There were validation errors. These cannot be ignored.
             logObject.l1errors = lstErrors
@@ -36,8 +38,10 @@ function setup(app) {
         //get the SR - we know it's there
         let QR = utilModule.findResourceInBundleByType(bundle,"QuestionnaireResponse")[0] //arResources[0]
 
+
         //we know there's a patient in the bundle...
         logObject.patient = utilModule.findResourceInBundleByType(bundle,"Patient")[0]
+
 
         try {
 
@@ -45,7 +49,21 @@ function setup(app) {
             let SR = utilModule.findResourceInBundleByType(bundle,"ServiceRequest")[0] //note that the L1 check above should ensure 1 SR in the bundle
             //console.log("SR=",SR)
 
-            let ar = await sdcModule.extractResources(QR,SR)     //throw an exception if there was an error, or an array of extracted resources if not
+            //in some cases (eg the designer) the Q is passed in as well - as it is being updated...
+            let arQ = utilModule.findResourceInBundleByType(bundle,"Questionnaire")
+            let Q
+            if (arQ.length > 0) {
+                Q = arQ[0]
+            }
+
+            let ar
+            try {
+                ar = await sdcModule.extractResources(QR,SR, Q)     //throw an exception if there was an error, or an array of extracted resources if not
+            } catch (ex) {
+                let oo = utilModule.makeOO([ex])
+                res.status("400").json(oo)
+                return
+            }
 
 
 
@@ -79,6 +97,9 @@ function setup(app) {
 
         } catch(ex) {
             console.log(ex)
+            //the
+
+
             res.status(400).json(ex.message)
         }
 

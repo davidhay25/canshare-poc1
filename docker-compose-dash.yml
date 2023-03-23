@@ -11,11 +11,11 @@ services:
       - SERVERBASE=http://hapi-data:8080/fhir/
     networks:
       - poc-net
-  cs-ui:
-    build: ./cs-UI-request-lab1
+  cs-dashboard:
+    build: ./cs-dashboard
     init: true
     ports:
-      - 9500:9500
+      - 9400:9400
     environment:
       - LOGDB=mongo-log
       - SERVERBASE=http://hapi-data:8080/fhir/

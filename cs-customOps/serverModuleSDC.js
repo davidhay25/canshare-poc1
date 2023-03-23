@@ -7,7 +7,14 @@ let debug = false
 
 
 //extract resources from the QR. Returns an array of resources
-async function extractResources(QR,SR) {
+async function extractResources(QR,SR, Q) {
+
+    //If a Q was passed in, we can progress immediately to resource extraction and creation.
+    if (Q) {
+        return performExtraction(QR,SR, Q)
+    }
+
+    //Otherwise, we need to retrieve it from the forme server
 
     //get the Questionnaire. for now, get it derectly from the hapi server...
     let qUrl = QR.questionnaire
@@ -25,20 +32,34 @@ async function extractResources(QR,SR) {
     if (bundle.entry && bundle.entry.length == 1) {
         //the Q was retrieved
         let Q = bundle.entry[0].resource    //todo - assume only 1
+        return performExtraction(QR,SR, Q)
 
+    } else {
+        let numQ = 0
+        if (bundle.entry) {
+            numQ = bundle.entry.length
+        }
+        //console.log(`${numQ} Q with url ${qUrl} found`)
+
+        throw "There needs to be a single Q with the url: " + qUrl + ". " +numQ + " were found."
+        //return utilModule.makeOO(["There needs to be a single Q with the url: " + qUrl + ". " + bundle.entry.length + " were found."])
+    }
+
+    //perform the extraction and add a provenance and device resource
+    function performExtraction(QR,SR, Q) {
+        //perform the actual extraction and resource creation
 
         //retrieve Observations (and potentially other resources)
         let arExtractedResources = performResourceExtraction(Q,QR)
-
 
         //the device represents this app - it is going to be the agent that pefroms the extraction
         let device = {resourceType:"Device",identifier:[{system:'http://canshare.co.nz/ns',value:"requesterOp"}]}
         device.deviceName = [{name:"Resource extractor",type:"other"}]
         device.id = utilModule.createUUID()
 
-       // utilModule.addResourcesToBundle(bundle,[device])
+        // utilModule.addResourcesToBundle(bundle,[device])
         let provenance = addProvenance(QR,arExtractedResources,device)
-console.log('provenance',provenance)
+        console.log('provenance',provenance)
         //add the device to the list of extracted resources after the provenance is added so there isn't a target reference to it....
 
 
@@ -55,17 +76,8 @@ console.log('provenance',provenance)
 
         return arExtractedResources
 
-
-    } else {
-        let numQ = 0
-        if (bundle.entry) {
-            numQ = bundle.entry.length
-        }
-        //console.log(`${numQ} Q with url ${qUrl} found`)
-
-        throw "There needs to be a single Q with the url: " + qUrl + ". " +numQ + " were found."
-        //return utilModule.makeOO(["There needs to be a single Q with the url: " + qUrl + ". " + bundle.entry.length + " were found."])
     }
+
 
 }
 
@@ -137,7 +149,7 @@ function performResourceExtraction(Q,QR) {
             if (ar1.length > 0) {
                 let resourceType = ar1[0].valueCode
                 hashQDefinition[item.linkId] = {item:item,resourceType:resourceType}
-                console.log(`definition extraction found - ${item.linkId}`)
+                console.log(`definition extraction found - ${item.linkId} - ${resourceType}`)
             }
 
             //recurse through the child items
@@ -146,7 +158,7 @@ function performResourceExtraction(Q,QR) {
             })
 
         } else {
-            //this is a leaf item so can uave the Observation extraction set
+            //this is a leaf item so can have the Observation extraction set
 
             let ar = utilModule.findExtension(item,extractObsUrl)
 

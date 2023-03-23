@@ -17,7 +17,7 @@ function makeOO(lstIssues) {
 
     let oo = {resourceType:"OperationOutcome",issue:[]}
     lstIssues.forEach(function(item){
-        let iss = {details:{text:item.msg}}
+        let iss = {details:{text:item}}
         iss.code = item.code || "invalid"
         iss.severity = item.severity || "information"
         oo.issue.push(iss)
@@ -86,13 +86,31 @@ async function postBundleToServer(bundle,metrics,res,collectionName,req) {
 
 //todo add check for required resources - SR & QR (lstRequiredTypes)
 function level1Validate(bundle,lstRequiredTypes) {
-    lstErrors = []
+    let lstErrors = []
+    let hashTypes = {}
+
+
     bundle.entry.forEach(function (entry,inx) {
         let resource = entry.resource
+        let resourceType = resource.resourceType
+        hashTypes[resourceType] = hashTypes[resourceType] || 0
+        hashTypes[resourceType] ++
+        //is this a required resourcetype
+
         if (! resource.identifier) {
             lstErrors.push(`Entry #${inx} ${resource.resourceType} resource with the id ${resource.id} has no identifier`)
         }
     })
+
+    //now check for the required types
+    lstRequiredTypes.forEach(function (type) {
+        if (! hashTypes[type]) {
+            lstErrors.push(`No resource with the type ${type} was found in the bundle, and it is required.`)
+        }
+
+    })
+
+
     return lstErrors
 }
 
