@@ -35,9 +35,8 @@ function setup(app) {
 
         //now extract any resources
         //let arResources = utilModule.findResourceInBundleByType(bundle,"QuestionnaireResponse")
-        //get the SR - we know it's there
+        //get the SR - we know it's there as we checked in the L1 validation
         let QR = utilModule.findResourceInBundleByType(bundle,"QuestionnaireResponse")[0] //arResources[0]
-
 
         //we know there's a patient in the bundle...
         logObject.patient = utilModule.findResourceInBundleByType(bundle,"Patient")[0]
@@ -45,7 +44,7 @@ function setup(app) {
 
         try {
 
-            //get the SR. We know it's there
+            //get the SR. We also know it's there
             let SR = utilModule.findResourceInBundleByType(bundle,"ServiceRequest")[0] //note that the L1 check above should ensure 1 SR in the bundle
             //console.log("SR=",SR)
 
@@ -206,15 +205,12 @@ function setup(app) {
     })
 }
 
-//If the Q defines that Observations should be extratced, the do so and add the observations to the bundle
-function extractObservations(bundle) {
 
-}
 
 //If the bundle has a SR, and the SR has a performer then add a Communication resource
 //to the bundle. The notification app will use that to send the notification to the 
 //endpoint of the performer
-function addCommunication(bundle) {
+function addCommunicationDEP(bundle) {
 
     let ar = bundle.entry.filter(entry => entry.resource.resourceType == 'ServiceRequest')
 

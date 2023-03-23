@@ -9,26 +9,22 @@ let debug = false
 //extract resources from the QR. Returns an array of resources
 async function extractResources(QR,SR, Q) {
 
-    //If a Q was passed in, we can progress immediately to resource extraction and creation.
+    //If a Q was passed in, we can progress immediately to resource extraction and creation. This happens with the Q designer
     if (Q) {
         return performExtraction(QR,SR, Q)
     }
 
-    //Otherwise, we need to retrieve it from the forme server
-
-    //get the Questionnaire. for now, get it derectly from the hapi server...
+    //Otherwise, we need to retrieve the Q from the forms server. This is the usual pattern
     let qUrl = QR.questionnaire
     if (! qUrl) {
         throw("No questionnaire element in the QR")
-       // return utilModule.makeOO(["No questionnaire element in the QR"])
     }
 
-    //retrieve the Q
+    //retrieve the Q. For now, the single hapi server is acting as the forms server
     let url = serverBase + "Questionnaire?url=" + qUrl // + "&status=active"
     let response = await axios.get(url)
 
     let bundle = response.data
-    //if (debug) {console.log('arResources',arResources)}
     if (bundle.entry && bundle.entry.length == 1) {
         //the Q was retrieved
         let Q = bundle.entry[0].resource    //todo - assume only 1
@@ -57,22 +53,18 @@ async function extractResources(QR,SR, Q) {
         device.deviceName = [{name:"Resource extractor",type:"other"}]
         device.id = utilModule.createUUID()
 
-        // utilModule.addResourcesToBundle(bundle,[device])
+
+        // a provenance is only created if resources are extracted - ie arExtractedResources.length > 0
         let provenance = addProvenance(QR,arExtractedResources,device)
         console.log('provenance',provenance)
+
+
         //add the device to the list of extracted resources after the provenance is added so there isn't a target reference to it....
-
-
-        //add an entity reference from Provenance to SR.
-
-        // a provenance is only created if resources are extracted
+        //add an entity reference from Provenance to the SR. a provenance was only created if resources are extracted
         if (provenance) {
             provenance.entity.push({role:"source",what:{reference:`urn:uuid:${SR.id}`}})
             arExtractedResources.push(device)
         }
-
-        //provenance.agent.push({who:{reference: "urn:uuid:" + SR.id}})
-
 
         return arExtractedResources
 
@@ -81,16 +73,13 @@ async function extractResources(QR,SR, Q) {
 
 }
 
-//create a provenance resource that identifies the QR from which the observations were created.
+//create a provenance resource that identifies the QR from which the resources were created.
 function addProvenance(QR,lst,device) {
     if (lst.length > 0) {
 
         let provenance = {resourceType:"Provenance"}
-        provenance.id =  createUUID()   //will be ignored by fhir server
-        //the subject might be a reference to a contained PR resource...
-        //if (QR.author && QR.author.reference && QR.author.reference.substring(0,1) == '#') {
-         //   provenance.contained = QR.contained
-      //  }
+        provenance.id =  createUUID()
+
 
         provenance.text= {status:"generated",div:"<div xmlns='http://www.w3.org/1999/xhtml'>Resources extracted from QR</div>"}
         provenance.recorded = new Date().toISOString()
@@ -99,14 +88,9 @@ function addProvenance(QR,lst,device) {
         provenance.target = []
 
         provenance.entity.push({role:"source",what:{reference:"urn:uuid:" + QR.id}})
-        //provenance.entity.push({role:"source",what:{reference:"QuestionnaireResponse/" + QR.id}})
-        //set the agent to the author of the QR todo ?should this be to a 'Device' representing the forms receiver
-
         provenance.agent.push({who:{reference: "urn:uuid:" +device.id}})
 
-        //todo - incorrectly adding reference to Device...? should only be specific types (Procedure, Observation)
         lst.forEach(function (resource) {
-            //provenance.target.push({reference:  `${capitalize(resource.resourceType)}/${resource.id}`})
             provenance.target.push({reference:  `urn:uuid:${resource.id}`})
         })
 
@@ -116,7 +100,7 @@ function addProvenance(QR,lst,device) {
 
     }
 
-    function capitalize(s) {
+    function capitalizeDEP(s) {
         return s[0].toUpperCase() + s.substring(1)
     }
 
@@ -285,8 +269,8 @@ function performResourceExtraction(Q,QR) {
 
 
 
-    //now go through and pull out any items that use definition based - eg Procedures
-    //note that this routine is not generic - it specifically looks for Procedures.
+    //now go through and pull out any items that use definition based - eg Procedures or Condition
+    //note that this routine is not generic - it specifically looks for Procedure and Condition resources.
 
     Object.keys(hashQDefinition).forEach(function (key){
         let vo = hashQDefinition[key]   //{item: resourceType:}
@@ -294,18 +278,16 @@ function performResourceExtraction(Q,QR) {
         let item = vo.item
         console.log(`definition extraction ${key}`)
 
-        if (item.item){     //assume that any contents of the resource are child elements
+        if (item.item){     //assume that any contents of the resource are representes as child elements in the QR
             let resource = {resourceType:resourceType}
             resource.id =  createUUID()
-            //resource.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>Extracted resource</div>",status:"additional"}
-
             resource.subject = QR.subject;      //todo - may need to figure out if the type *has* a subject
             let canBeAdded = false      //only add if there is at least one child element entry
 
-            //each child element has the content of a resource element (defined by the definition)
+            //each child element has the content of a resource element (defined by the 'definition' element in the item)
             //NOTE: Right now this is optimized for Procedure extraction (Condition planned) in our implementation. May not work well for other types.
-            item.item.forEach(function (child){
-                if (child.definition) {
+            item.item.forEach(function (child){     //get all the resource elements
+                if (child.definition) {             //... but only if the item has a definition element
                     let QRItem = hashQR[child.linkId]       //the actual QR item containing the answer
                     if (QRItem && QRItem.answer && QRItem.answer.length > 0)  {
                         //there is an answer
@@ -313,11 +295,10 @@ function performResourceExtraction(Q,QR) {
                         //assume this is a fhirpath expression - 2 level only - eg http://hl7.org/fhir/specimen.type
                         //todo - need a better and more robust algorithm here. For now, assume that any value is a top level element....
 
-                        //path will be something like http://hl7.org/fhir/Procedure#Procedure.status
+                        //path/definition will be something like http://hl7.org/fhir/Procedure#Procedure.status
 
                         let ar1 = child.definition.split("#")
                         let path = ar1[1]       //ep Procedure.code
-                        //let path = child.definition.replace("http://hl7.org/fhir/","") //remove the url base - only support HL7 paths.
                         console.log(`${resourceType}: path: ${path}`)
 
                         let ar = path.split('.')
@@ -328,11 +309,11 @@ function performResourceExtraction(Q,QR) {
                         //todo - support all the answer types that could be used...
                         //todo - think about multiple answers...
 
-                        //processing is resource type specific
+                        //processing is resource type specific ATM todo - tidy all this code up when it meets current requirements
                         if (resourceType == 'Procedure') {
 
-
                             if (elementName == 'status') {
+                                //there are a couple of patterns for status. It can be true or false for done/note done or the actual status as a Coding
                                 if (QRItem.answer[0].valueBoolean !== undefined) {  //there is a value...
                                     let value = QRItem.answer[0].valueBoolean //this will be the actual value - true or false
                                     //in this implementation a boolean true for procedure means completed, false means not-done
@@ -341,13 +322,39 @@ function performResourceExtraction(Q,QR) {
                                 }
 
                                 if (QRItem.answer[0].valueCoding !== undefined) {  //whether the procedire was performed or not is specified by coding
-                                    //the value of the status is the code
+                                    //the value of the status is the code value of the coding
                                     resource.status = QRItem.answer[0].valueCoding.code
                                 }
                             } else {
-                                //any element that has a valeuCoding just gets that value added. Status may override this value
+                                //any element that has a valueCoding just gets that value added. Status may override this value
                                 if (QRItem.answer[0].valueCoding) {
-                                    //if there's a Coding as the answer, assign it to the path (generally the code
+                                    //if there's a Coding as the answer, assign it to the path (generally the code)
+                                    resource[elementName] = {coding:[QRItem.answer[0].valueCoding]}
+                                }
+                            }
+
+                        }
+
+                        if (resourceType == 'Condition') {
+
+                            if (elementName == 'verificationStatus') {
+
+                                //there are a couple of patterns for verificationstatus. It can be true or false for done/note done or the actual status as a Coding
+                                if (QRItem.answer[0].valueBoolean !== undefined) {  //there is a value...
+                                    let value = QRItem.answer[0].valueBoolean //this will be the actual value - true or false
+                                    //in this implementation a boolean true for procedure means completed, false means not-done
+                                    //todo - unsure if we should be creating these at all when false
+                                    resource.verificationStatus = value ? "confirmed" : "unconfirmed"
+                                }
+
+                                if (QRItem.answer[0].valueCoding !== undefined) {  //whether the condition was present or not is specified by coding
+                                    //the value of the status is the code value of the coding
+                                    resource.status = QRItem.answer[0].valueCoding.code
+                                }
+                            } else {
+                                //any element that has a valueCoding just gets that value added. Status may override this value
+                                if (QRItem.answer[0].valueCoding) {
+                                    //if there's a Coding as the answer, assign it to the path (generally the code)
                                     resource[elementName] = {coding:[QRItem.answer[0].valueCoding]}
                                 }
                             }
@@ -359,7 +366,7 @@ function performResourceExtraction(Q,QR) {
                 }
             })
 
-            //at this point the resource has been created from the data in the QR - the individual elements coming from child QR items
+            //at this point the resource (Procedure or Condition) has been created from the data in the QR - the individual elements coming from child QR items
             //now try to create a meaningful text
             if (resource['code']) {
                 //in theory, procedures and conditions should always have a code
@@ -376,12 +383,16 @@ function performResourceExtraction(Q,QR) {
             }
 
             if (canBeAdded) {
-                arExtractedResources.push(resource)
+                //canBeAdded simply means that there was one or more resource elements specified in the QR.
+                // todo - this might be refined - eg check for status rather than a separate variable
 
+                //todo for now, we're only going to add the procedure resource if the status was 'completed'
+                //further thought is needed - possibly there can be could be an extension - 'add regardless of status' perhaps
+                if (resource.status == 'completed' || resource.status == 'confirmed') {   //to accomodate Procedure or Condition
+                    arExtractedResources.push(resource)
+                }
             }
-
         }
-
     })
 
 
