@@ -312,6 +312,37 @@ function performResourceExtraction(Q,QR) {
                         //processing is resource type specific ATM todo - tidy all this code up when it meets current requirements
                         if (resourceType == 'Procedure') {
 
+
+                            switch (elementName) {
+                                case 'status' :
+                                    //there are a couple of patterns for status. It can be true or false for done/note done or the actual status as a Coding
+                                    if (QRItem.answer[0].valueBoolean !== undefined) {  //there is a value...
+                                        let value = QRItem.answer[0].valueBoolean //this will be the actual value - true or false
+                                        //in this implementation a boolean true for procedure means completed, false means not-done
+                                        //todo - unsure if we should be creating these at all when false
+                                        resource.status = value ? "completed" : "not-done"
+                                    }
+
+                                    if (QRItem.answer[0].valueCoding !== undefined) {  //whether the procedire was performed or not is specified by coding
+                                        //the value of the status is the code value of the coding
+                                        resource.status = QRItem.answer[0].valueCoding.code
+                                    }
+                                    break
+                                case 'bodySite' :
+                                    if (QRItem.answer[0].valueCoding) {
+                                        resource[elementName] = [{coding:[QRItem.answer[0].valueCoding]}]
+                                    }
+                                    break
+                                default:
+                                    //any element that has a valueCoding just gets that value added. Status may override this value
+                                    if (QRItem.answer[0].valueCoding) {
+                                        //if there's a Coding as the answer, assign it to the path (generally the code)
+                                        resource[elementName] = {coding:[QRItem.answer[0].valueCoding]}
+                                    }
+                                    break
+                            }
+
+                            /*
                             if (elementName == 'status') {
                                 //there are a couple of patterns for status. It can be true or false for done/note done or the actual status as a Coding
                                 if (QRItem.answer[0].valueBoolean !== undefined) {  //there is a value...
@@ -332,6 +363,7 @@ function performResourceExtraction(Q,QR) {
                                     resource[elementName] = {coding:[QRItem.answer[0].valueCoding]}
                                 }
                             }
+                            */
 
                         }
 
