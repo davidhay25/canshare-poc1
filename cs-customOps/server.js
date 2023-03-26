@@ -17,6 +17,7 @@ let http = require('http');
 const requestModule = require("./serverModuleRequest.js")
 const reportModule = require("./serverModuleReport.js")
 const actnowModule = require("./serverModuleActNow.js")
+const formModule = require("./serverModuleForm.js")
 
 const axios = require("axios");
 
@@ -38,6 +39,7 @@ app.use((req, res, next) => {
 requestModule.setup(app,serverBase)    //$acceptRequest
 reportModule.setup(app,serverBase)     //$acceptReport
 actnowModule.setup(app,serverBase)     //$acceptActNow
+formModule.setup(app,serverBase)     //$acceptForm
 
 //A generic validation routine
 app.post("/csValidate",async function (req,res) {

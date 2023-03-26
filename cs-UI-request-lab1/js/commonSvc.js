@@ -316,6 +316,9 @@ angular.module("pocApp")
             },
             parseQ : function(Q) {
                 //parse a Q into a simple display structure - sections holding questions. 2 level only.
+                if (!Q) {
+                    return []
+                }
 
                 let arSections = []
                 Q.item.forEach(function (sectionItem) {

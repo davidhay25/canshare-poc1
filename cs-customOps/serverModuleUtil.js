@@ -82,12 +82,19 @@ async function postBundleToServer(bundle,metrics,res,collectionName,req) {
 //only a single QR & SR
 
 //? check for profile claim in metadata? The profile validation won't work unless they do.
-//todo may need to adapt the routine to allow non-failing issues and add to the OO to return
+//Checks:
+// that the resource is a transaction
+// That all resources have an identifier
+// That the specified resources (at least 1) exists in the bindle
+//todo check for conditional update or create
 
-//todo add check for required resources - SR & QR (lstRequiredTypes)
 function level1Validate(bundle,lstRequiredTypes) {
     let lstErrors = []
     let hashTypes = {}
+
+    if (bundle.type !== 'transaction') {
+        lstErrors.push("The bundle must be of type 'transaction'")
+    }
 
 
     bundle.entry.forEach(function (entry,inx) {
@@ -100,6 +107,9 @@ function level1Validate(bundle,lstRequiredTypes) {
         if (! resource.identifier) {
             lstErrors.push(`Entry #${inx} ${resource.resourceType} resource with the id ${resource.id} has no identifier`)
         }
+
+
+
     })
 
     //now check for the required types

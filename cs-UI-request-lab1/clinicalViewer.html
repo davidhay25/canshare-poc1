@@ -8,6 +8,7 @@
     <script src="js/libs/jquery-1.9.0.min.js"></script>
     <script src="js/libs/angular.min1-5.js"></script>
     <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+    <script src="js/libs/moment.min.js"></script>
 
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/common.css"/>
@@ -20,12 +21,13 @@
             $locationProvider.html5Mode(true);
             $locationProvider.hashPrefix('!');
         });
+        angular.module("pocApp").constant("moment", moment);
 
     </script>
 
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/clinicalViewerCtrl.js"></script>
-
+    <script src="js/clinicalViewerSvc.js"></script>
     <script src="directive/renderForm/renderFormSvc.js"></script>
 
     <script src="js/commonSvc.js"></script>
@@ -104,13 +106,16 @@
 
             <uib-tabset>
                 <uib-tab heading="Structured Pathology requests">
+
                    <br/>
                     <div class="row">
                         <div class="col-md-3" >
                             Service Requests
                             <div class="myScroll">
                                 <div class="list-group">
-                                    <div class="list-group-item" ng-click="selectSR(entry.resource)"
+                                    <div ng-class="{'list-group-item':true,listItemSelected:entry.resource == selectedSR} "
+                                         style="cursor: pointer"
+                                         ng-click="selectSR(entry.resource)"
                                          ng-repeat="entry in bundleSR.entry">
                                             <div ng-repeat="cat in entry.resource.category">{{cat.text}}</div>
 
@@ -141,6 +146,77 @@
                     </div>
 
                 </uib-tab>
+
+                <uib-tab >
+                    <uib-tab-heading>Clinical Documents <span class="badge">{{docRefs.length}}</span> </uib-tab-heading>
+                    <br/>
+                    <uib-tabset>
+                        <uib-tab>
+                            <uib-tab-heading>Current documents</uib-tab-heading>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="list-group" >
+                                        <div ng-class="{'list-group-item':true,listItemSelected:dr == selectedDR} "
+                                             style="cursor: pointer"
+                                             ng-repeat="dr in docRefs"
+                                            ng-click="selectDR(dr)">
+                                            {{dr.description || "Unknown"}}
+                                            <div><em>{{dr.date | date}}</em></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+
+                                    <qrdisplay qr="QRfromDR"></qrdisplay>
+
+<!--
+                                    <pre>{{docRefs | json}}</pre>
+                                    -->
+                                </div>
+                            </div>
+
+
+                        </uib-tab>
+                        <uib-tab heading="New document">
+                            <br/>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <select ng-model="input.template" class="form-control"
+                                            ng-change="selectTemplate(input.template)"
+                                            ng-options = "template.title for template in templates">
+
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn-primary btn" ng-click="submitBundle()">Submit</button>
+                                </div>
+
+                            </div>
+                            <br/>
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <div class="myScroll">
+                                        <renderform q="selectedQ" qr="QR"></renderform>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="rounded-box">
+                                        <div class="myScroll">
+                                            <qrdisplay qr="QR" q="selectedTemplate.Q"></qrdisplay>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </uib-tab>
+
+                    </uib-tabset>
+
+
+                </uib-tab>
+
                 <uib-tab heading="ACT-NOW chemotherapy treatment">
                     <br/>
 

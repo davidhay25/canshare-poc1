@@ -23,6 +23,7 @@ if (serverBase[serverBase.length-1] !== '/') {
 let serverBase = utilModule.checkUrlSlash(process.env.SERVERBASE)
 
 
+//todo ? copy from pocServer
 async function multiQuery(lst) {
 
 }

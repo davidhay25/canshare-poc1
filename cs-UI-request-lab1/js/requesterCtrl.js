@@ -198,9 +198,12 @@ angular.module("pocApp")
             $scope.selectQ = function(template) {
 
                 $scope.selectedQ = template.Q
+
                 let formTemplate = commonSvc.parseQ(template.Q)     //the actual data source for the rendered form
+
+
                 console.log(formTemplate)
-                $scope.selectedForm = formTemplate
+                //$scope.selectedFormTemplate = formTemplate
 
 
                 //generate the tree view of the Questionnaire

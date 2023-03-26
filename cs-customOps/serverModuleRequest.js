@@ -9,10 +9,9 @@ const {logger} = require("./serverModuleUtil");
 function setup(app) {
 
     //test the observation extraction. Returns an array of all resources including those in the bundle
-    app.post("/testExtraction",(async function (req,res) {
+    app.post("/testExtraction", async function (req,res) {
 
         let bundle = req.body
-        //console.log(bundle)
 
         let logObject = {mode:'test',bundle:bundle}
 
@@ -103,7 +102,7 @@ function setup(app) {
         }
 
 
-    }))
+    })
 
     app.post("/([$])acceptRequest",async function(req,res){
 

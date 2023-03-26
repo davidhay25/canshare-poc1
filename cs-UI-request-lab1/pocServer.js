@@ -19,6 +19,7 @@ const requesterModule = require("./serverModuleRequesterUI.js")
 const labModule = require("./serverModuleLab.js")
 const dashBoardModule = require("./serverModuleDashboard.js")
 const commonModule = require("./serverModuleCommon.js")
+const clinicalViewerModule = require("./serverModuleClinicalViewer")
 //let config = require("./config.json")
 
 let express = require('express');
@@ -36,7 +37,7 @@ app.use((req, res, next) => {
 requesterModule.setup(app)
 labModule.setup(app)
 dashBoardModule.setup(app)
-
+clinicalViewerModule.setup(app)
 //app.get('')
 
 //common calls (not specifically related to requester or lab. ?move to separate module
@@ -50,6 +51,8 @@ app.get('/config', async function(req,res){
     res.json(config)
 })
 
+
+
 //send in an array of queries. Execute them and add all the results into a single bundle
 //todo - if we want to, could change to parallel execution...
 //https://javascript.plainenglish.io/running-multiple-requests-with-async-await-and-promise-all-e178ae318654
@@ -60,13 +63,27 @@ app.post('/multiquery',async function(req,res){
     if (arQueries.length > 0) {
         for (const qry of arQueries) {
             //await executeQuery(fullBundle,qry)
-            let bundle = await commonModule.singleQuery(qry)  //will follow any paging
-            if (bundle.entry) {
-                console.log('multi query:',qry,bundle.entry.length)
-                bundle.entry.forEach(function (entry) {
+
+            let resource = await commonModule.singleQuery(qry)  //will follow any paging
+
+            //the response will either be a bundle (if a query) or a single resource (if a GET)
+            if (resource) {
+                if (resource.resourceType == 'Bundle') {
+                    if (resource.entry) {
+                        console.log('multi query:',qry,resource.entry.length)
+                        resource.entry.forEach(function (entry) {
+                            fullBundle.entry.push(entry)
+                        })
+                    }
+                } else {
+                    let entry = {resource:resource}
                     fullBundle.entry.push(entry)
-                })
+                }
             }
+
+
+
+
 
         }
     }
@@ -84,8 +101,6 @@ app.post('/multiquery',async function(req,res){
         }
     }
 })
-
-
 
 
 app.get('/proxy',async function(req,res){
