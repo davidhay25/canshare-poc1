@@ -22,7 +22,7 @@ angular.module("pocApp")
             })
 
             //retrieve all the templates that could be used to create a general document
-            //currently getting the fill Q - todo get miniQ and load real one when selected
+            //currently getting the full Q - todo get miniQ and load real one when selected
             clinicalViewerSvc.getGeneralDocumentTemplates().then(
                 function (list) {
                     $scope.templates = list

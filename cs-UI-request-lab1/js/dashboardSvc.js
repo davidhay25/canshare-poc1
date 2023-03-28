@@ -70,10 +70,12 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http) {
         getQfromFormsServer : function() {
             //retrieve a description of the Q on the forms  server. return a simple list of custom objects
             let deferred = $q.defer()
-            let url = `${formsServer}Questionnaire?_elements=url&_count=50`
+
+            let qry = `${formsServer}Questionnaire?_elements=url&_count=50`
+            let encodedQry = encodeURIComponent(qry)
 
             let hash = {}
-            $http.get(url).then(
+            $http.get(`proxy?qry=${encodedQry}`).then(
                 function (data) {
                     if (data.data.entry) {
                         data.data.entry.forEach(function (entry) {
@@ -93,17 +95,16 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http) {
         },
 
         getQFromDesigner:  function (hash) {
-            //retrieve a description of the Q on the server. return a simple list of custom objects
+            //retrieve a description of the Q on the designer server. return a simple list of custom objects
             //the hash has the urls already on the forms server
             let deferred = $q.defer()
             let myHash = angular.copy(hash)
 
-            //first, get the urls of the Q's already on
-
-            let url = `${designerServer}Questionnaire?_elements=url,title,name,description,extension&_sort=name&status:not=retired&_count=50`
-
+            let qry = `${designerServer}Questionnaire?_elements=url,title,name,version,description,extension,context-type-value&_sort=name&status:not=retired`
+            let encodedQry = encodeURIComponent(qry)
             let lst = []
-            $http.get(url).then(
+            $http.get(`proxy?qry=${encodedQry}`).then(
+            //$http.get(url).then(
                 function (data) {
                     if (data.data.entry) {
                         data.data.entry.forEach(function (entry) {

@@ -10,15 +10,15 @@ angular.module("pocApp")
 
             $scope.input.command = $scope.commands[0]
 
+            //when the form is updated. Used by the display form tab
             $scope.$on('qrCreated',function(event,vo1) {
-
                 $scope.createdQR = vo1.QR
-                //$scope.formData = vo1.formData
-                //$scope.hashItem = vo1.hashItem
             })
 
+            $scope.contexts = ["All","Request","Report","General"]
+
             $scope.checkBoxChange = function () {
-                delete $scope.selectedQ
+                delete $scope.selectedQfromDesigner
                 delete $scope.createdQR
             }
 
@@ -37,14 +37,14 @@ angular.module("pocApp")
 
             $scope.selectMiniQ = function (miniQ) {
                 $scope.selectedMiniQ = miniQ
-                delete $scope.selectedQ
+                delete $scope.selectedQfromDesigner
                 delete $scope.createdQR
 
 
                 //retrieve  the Q from the designer / public site
                 dashboardSvc.getSingleQFromDesigner(miniQ).then(
                     function (Q) {
-                        $scope.selectedQ = Q
+                        $scope.selectedQfromDesigner = Q
                     }, function (err) {
                         console.log(err)
                     }
@@ -52,6 +52,9 @@ angular.module("pocApp")
 
             }
 
+            //retrieve a mini version of all Q on the Designer
+            //first, get a hash containing key data from the forms server, then get a mini version from the designer
+            //idea is that we can say which Q are on both (based on the url)
             dashboardSvc.getQfromFormsServer().then(
                 function (hash){
                     //returns a hash of urls that are currently on the forms server. Now get the QW from the

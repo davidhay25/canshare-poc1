@@ -107,9 +107,17 @@ app.get('/proxy',async function(req,res){
 
     //the query was url encoded so it could be passed to the server
     let query = decodeURIComponent(req.query.qry);
+console.log(query)
+    try {
+        let bundle = await commonModule.singleQuery(query)
+        //console.log(bundle)
+        res.json(bundle)
+    } catch (ex) {
 
-    let result = await commonModule.singleQuery(query)
-    res.json(result)
+        res.status(400).json(ex)
+    }
+
+
     return
 
     //now we need to replace any | with %. Only this character should be encoded. Not sure why...

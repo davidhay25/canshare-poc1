@@ -16,13 +16,11 @@ angular.module("pocApp").service('clinicalViewerSvc', function($q,$http,commonSv
 
     }
 
-
-
-
     return {
 
         makeSubmissionBundle : function (vo) {
             //make a submission bundle with the patient, QR and a DocRef
+            //used by document creator
             let patient = vo.patient
             let QR = vo.QR
             let Q = vo.Q

@@ -30,7 +30,16 @@ async function multiQuery(lst) {
 
 async function singleQuery(query) {
 
-    let qry = serverBase + query
+    let qry = query
+    if (! query.startsWith('http')) {
+        qry = serverBase + query
+    }
+
+    if (qry.indexOf('_count') == -1) {
+        qry += "&_count=50"
+    }
+
+    let bundle
 
     console.log('qry=',qry)
     let config = {headers:{'cache-control':'no-cache'}}     //otherwise the hapi server will cache for a minute
@@ -38,11 +47,12 @@ async function singleQuery(query) {
     try {
         let response = await axios.get(qry,config)
         let ctr = 0
-        let bundle = response.data       //the first bundle
+         bundle = response.data       //the first bundle
 
-        //console.log(ctr++,bundle.entry.length)
+        console.log(ctr++,bundle.entry.length)
 
         let nextPageUrl = getNextPageUrl(bundle)
+
         while (nextPageUrl) {
             let nextResponse = await axios.get(nextPageUrl,config)
             let nextBundle = nextResponse.data
@@ -53,6 +63,7 @@ async function singleQuery(query) {
             }
             console.log(ctr++,nextBundle.entry.length)
             nextPageUrl = getNextPageUrl(nextBundle)
+            //console.log(nextPageUrl)
         }
         bundle.total = 0
         if (bundle.entry) {
@@ -62,12 +73,20 @@ async function singleQuery(query) {
 
          return bundle
     } catch (ex) {
-        if (ex.response && ex.response.status == 404) {
-            //if it's a 404 then just return an empty bundle
-            return {responseType:"Bundle"}
+        if (ex.response) {
+            if (ex.response.status == 404) {
+                //if it's a 404 then just return an empty bundle
+                return {responseType:"Bundle"}
+            } else {
+                //the cli hapi server has a problem with paging. This can return to being thrown when I stop using that...
+                return bundle
+                //throw (ex)
+            }
+
 
         } else {
-            throw (ex)
+            return bundle
+            //throw (ex)
 
         }
 

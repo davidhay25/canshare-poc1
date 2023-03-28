@@ -103,14 +103,18 @@
             <div class="col-md-3">
 
                 <checkbox ng-model="input.fsOnly" ng-change="checkBoxChange()">
-
-                </checkbox> Show only on Forms Server (<span class="badge">FS</span>)
+                </checkbox> Show already on Forms Server (<span class="badge">FS</span>)
                 <br/><br/>
+
+                <select class="form-control" ng-model="input.context"
+                        ng-options = "ctx for ctx in contexts"></select>
+                <br/>
                 <div class="myScroll">
                     <div class="list-group">
                         <div ng-class="{'list-group-item':true,listItemSelected:miniQ==selectedMiniQ}"
                              ng-click = "selectMiniQ(miniQ)"
                              ng-show = "showInList(miniQ)"
+                             style="cursor: pointer"
                              ng-repeat="miniQ in allMiniQ">
                             {{miniQ.name}}
                             <span class="pull-right badge" ng-show="miniQ.existsOnFormsServer">
@@ -125,28 +129,70 @@
 
             </div>
             <div class="col-md-9">
-                <uib-tabset ng-show="selectedQ">
+                <uib-tabset ng-show="selectedMiniQ">
                     <uib-tab heading="Tree">
-                        <showqtree q="selectedQ"></showqtree>
+                        <showqtree q="selectedQfromDesigner"></showqtree>
                     </uib-tab>
                     <uib-tab heading="Form">
                         <uib-tabset>
                             <uib-tab heading="Edit form">
-                                <renderform q="selectedQ" qr="createdQR"></renderform>
+                                <renderform q="selectedQfromDesigner" qr="createdQR"></renderform>
                             </uib-tab>
                             <uib-tab heading="Display form">
 
-                                <qrdisplay q="selectedQ" qr="createdQR"></qrdisplay>
+                                <qrdisplay q="selectedQfromDesigner" qr="createdQR"></qrdisplay>
                             </uib-tab>
                         </uib-tabset>
                     </uib-tab>
                     <uib-tab heading="Manage">
+                        <br/>
+                        <div>Url: {{selectedMiniQ.url}}</div>
+                        <br/><br/>
+                        <div ng-show = "selectedMiniQ.existsOnFormsServer">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    This template already exists on the forms server.
 
-                        set the context type when publishing to forms server - request, report, general
-                        No - add to designer
+                                    <br/><br/>
+
+                                    <table class="table table-bordered">
+                                        <tr><th>Property</th><th>Designer</th><th>Forms Server</th></tr>
+                                        <tr>
+                                            <td>Version</td>
+                                            <td>{{selectedQfromDesigner.version}}</td>
+                                            <td>{{selectedQfromFS.version}}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div ng-hide = "selectedMiniQ.existsOnFormsServer">
+                            <div class="col-md-6">
+                                This action will copy the selected template to the Forms Server,
+                                making it available to applications in the Reference Implementation.
+
+
+
+
+                            </div>
+                            <div class="col-md-6">
+
+                            </div>
+                        </div>
+
+
 
                     </uib-tab>
-
+                    <uib-tab heading="Json">
+                        <pre>{{selectedQfromDesigner | json}}</pre>
+                    </uib-tab>
+                    <uib-tab heading="miniQ Json">
+                        <pre>{{selectedminiQ | json}}</pre>
+                    </uib-tab>
 
 
 
