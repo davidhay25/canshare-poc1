@@ -119,15 +119,18 @@ function performResourceExtraction(Q,QR) {
     let hashQR = {}     //hash of items in QR with an answer
     let hashQDefinition = {}    //hash of items that have the definition extraction set. {item: resourceType:}
 
+    let hashQItem = {}          //hash or all items in the Q by linkId
+
 
     //recursive algorithm to create hash of items that are Observation extraction
     function parseQ(hashQ,item) {
+        hashQItem[item.linkId] = item
         if (item.item) {
             //Observation extraction will not be applied to group type items (ie those that contain other items)
             //still need to check for definition based extraction...
             //we're assuming that the extension is on the parent - child items use 'definition' with the resource elements
 
-            //look for definition extractions
+            //look for definition extractions. These should only be on group level elements
             let ar1 = utilModule.findExtension(item,extractDefinitionUrl)
 
             if (ar1.length > 0) {
@@ -174,7 +177,6 @@ function performResourceExtraction(Q,QR) {
         } else {
             //It's assumed that there is only an item if it has a value
             hashQR[item.linkId] = item
-
         }
     }
 
@@ -268,30 +270,51 @@ function performResourceExtraction(Q,QR) {
     })
 
 
-
     //now go through and pull out any items that use definition based - eg Procedures or Condition
+    //hashQDefinition is from the Q - it contains all elmments that might be extracted to a resource
     //note that this routine is not generic - it specifically looks for Procedure and Condition resources.
 
     Object.keys(hashQDefinition).forEach(function (key){
-        let vo = hashQDefinition[key]   //{item: resourceType:}
-        let resourceType = vo.resourceType
-        let item = vo.item
-        console.log(`definition extraction ${key}`)
 
-        if (item.item){     //assume that any contents of the resource are representes as child elements in the QR
+
+        let vo = hashQDefinition[key]   //{item: resourceType:}  //this should always refer to a group...
+        let resourceType = vo.resourceType
+        let groupItem = vo.item   //this is the group item (from the Q) - assuming the Q is correct of course
+
+        console.log(`looking for ${resourceType}`)
+
+        //let groupItemFromQ = hashQItem[groupItem.linkId]     //this is the corresponding group item from the Q. It may have the .code...
+
+
+        if (groupItem.item){     //assume that any contents of the resource are representes as child elements in the Q / QR
             let resource = {resourceType:resourceType}
             resource.id =  createUUID()
             resource.subject = QR.subject;      //todo - may need to figure out if the type *has* a subject
-            let canBeAdded = false      //only add if there is at least one child element entry
+
+            //if there is a .code on the group item from the Q, then add it to the resource
+            //this is the pattern where the group has the code, and a child element for the status
+            if (groupItem.code) {
+                resource.code = {coding:[groupItem.code[0]]}       //note it's a codeable concept
+            }
+
+            /*
+            if (groupItemFromQ && groupItemFromQ.code) {
+                resource.code = {coding:[groupItemFromQ.code[0]]}       //note it's a codeable concept
+            }
+            */
+
+            let canBeAdded = false      //only add if there is at least one child element entry in the QR
 
             //each child element has the content of a resource element (defined by the 'definition' element in the item)
             //NOTE: Right now this is optimized for Procedure extraction (Condition planned) in our implementation. May not work well for other types.
-            item.item.forEach(function (child){     //get all the resource elements
+            //And remember we're iterating over the Q
+            groupItem.item.forEach(function (child){     //get all the resource elements
                 if (child.definition) {             //... but only if the item has a definition element
+
                     let QRItem = hashQR[child.linkId]       //the actual QR item containing the answer
                     if (QRItem && QRItem.answer && QRItem.answer.length > 0)  {
                         //there is an answer
-                        canBeAdded = true
+                        canBeAdded = true       //we do overrite this later on - checking for status
                         //assume this is a fhirpath expression - 2 level only - eg http://hl7.org/fhir/specimen.type
                         //todo - need a better and more robust algorithm here. For now, assume that any value is a top level element....
 
@@ -372,19 +395,26 @@ function performResourceExtraction(Q,QR) {
                             if (elementName == 'verificationStatus') {
 
                                 //there are a couple of patterns for verificationstatus. It can be true or false for done/note done or the actual status as a Coding
-                                if (QRItem.answer[0].valueBoolean !== undefined) {  //there is a value...
+                                if (QRItem.answer[0].valueBoolean !== undefined) {  //there is a value in the boolean...
                                     let value = QRItem.answer[0].valueBoolean //this will be the actual value - true or false
                                     //in this implementation a boolean true for procedure means completed, false means not-done
                                     //todo - unsure if we should be creating these at all when false
-                                    resource.verificationStatus = value ? "confirmed" : "unconfirmed"
+                                    if (value) {
+                                        //boolean is true - set verificationStatus to 'confirmed'
+                                        resource.verificationStatus = {coding:[{system:'http://terminology.hl7.org/CodeSystem/condition-ver-status',code:'confirmed'}]}
+                                    } else {
+                                        resource.verificationStatus = {coding:[{system:'http://terminology.hl7.org/CodeSystem/condition-ver-status',code:'unconfirmed'}]}
+                                    }
                                 }
+
+
 
                                 if (QRItem.answer[0].valueCoding !== undefined) {  //whether the condition was present or not is specified by coding
                                     //the value of the status is the code value of the coding
-                                    resource.status = QRItem.answer[0].valueCoding.code
+                                    resource.verificationStatus = {coding:[QRItem.answer[0].valueCoding]}
                                 }
                             } else {
-                                //any element that has a valueCoding just gets that value added. Status may override this value
+                                //any element that has a valueCoding just gets that value added as a CC. Status may override this value
                                 if (QRItem.answer[0].valueCoding) {
                                     //if there's a Coding as the answer, assign it to the path (generally the code)
                                     resource[elementName] = {coding:[QRItem.answer[0].valueCoding]}
@@ -414,15 +444,17 @@ function performResourceExtraction(Q,QR) {
                 resource.text = {div:"<div xmlns='http://www.w3.org/1999/xhtml'>Extracted resource - no Code</div>",status:"additional"}
             }
 
-            if (canBeAdded) {
-                //canBeAdded simply means that there was one or more resource elements specified in the QR.
-                // todo - this might be refined - eg check for status rather than a separate variable
+            //we'll check the resource status to see if this resource can be added.
+            // todo right now this is hard coded and ugly, but we'll look to refine and potentially support an 'always extract' extension
+            canBeAdded = false
+            if (resource.code && resource.status == 'completed' ||
+                (resource.verificationStatus && resource.verificationStatus.coding && resource.verificationStatus.coding[0].code == 'confirmed')) {
+                canBeAdded = true
+            }
 
-                //todo for now, we're only going to add the procedure resource if the status was 'completed'
-                //further thought is needed - possibly there can be could be an extension - 'add regardless of status' perhaps
-                if (resource.status == 'completed' || resource.status == 'confirmed') {   //to accomodate Procedure or Condition
-                    arExtractedResources.push(resource)
-                }
+            if (canBeAdded) {
+                arExtractedResources.push(resource)
+
             }
         }
     })

@@ -21,6 +21,7 @@ function setup(app) {
         let lstErrors = utilModule.level1Validate(bundle,lstRequiredTypes)
 
         console.log(lstErrors)
+
         if (lstErrors.length > 0) {
             //There were validation errors. These cannot be ignored.
             logObject.l1errors = lstErrors
@@ -52,6 +53,7 @@ function setup(app) {
             let Q
             if (arQ.length > 0) {
                 Q = arQ[0]
+                console.log ("Q passed in bundle")
             }
 
             let ar

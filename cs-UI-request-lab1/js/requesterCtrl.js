@@ -84,6 +84,7 @@ angular.module("pocApp")
                         $scope.testExtractionOO = vo.oo
 
                         let vo1 = commonSvc.summarizeValidation(vo.oo,vo.bundle)
+
                         $scope.extractionValidationObject = vo1.resources
                         $scope.extractionValidationErrorCount = vo1.totalErrors
                         $scope.extractionValidationUnknownIssues = vo1.unknownIssues
