@@ -36,6 +36,125 @@ angular.module("pocApp")
 
             $scope.input.selectedFhirDisplayOption = 'extract'
 
+            // -------------------
+            //code to draw circle on image - thanks to chatGPT!
+
+            $scope.canvasWidth = 200;
+            $scope.canvasHeight = 186;
+            $scope.imageUrl = 'images/left-breast.png';
+            $scope.annotations = [];
+
+            var canvas = document.getElementById('canvas');
+            var context = canvas.getContext('2d');
+
+            //context.drawImage(document.getElementsByTagName('img')[0], 0, 0, $scope.canvasWidth, $scope.canvasHeight);
+            context.drawImage(document.getElementById('myDrawing'), 0, 0, $scope.canvasWidth, $scope.canvasHeight);
+
+            var isDrawing = false;
+            var startX, startY;
+            //var shapeType = 'circle';
+
+            canvas.addEventListener('mousedown', function(event) {
+                isDrawing = true;
+                startX = event.offsetX;
+                startY = event.offsetY;
+                context.beginPath();
+            });
+
+            canvas.addEventListener('mousemove', function(event) {
+                if (isDrawing) {
+                    var endX = event.offsetX;
+                    var endY = event.offsetY;
+                    context.clearRect(0, 0, $scope.canvasWidth, $scope.canvasHeight);
+
+                    //context.drawImage(document.getElementsByTagName('img')[0], 0, 0, $scope.canvasWidth, $scope.canvasHeight);
+                    context.drawImage(document.getElementById('myDrawing'), 0, 0, $scope.canvasWidth, $scope.canvasHeight);
+                    context.beginPath();
+
+                    var radius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+                    context.arc(startX, startY, radius, 0, 2 * Math.PI);
+
+                    /*
+                    switch (shapeType) {
+                        case 'line':
+                            context.moveTo(startX, startY);
+                            context.lineTo(endX, endY);
+                            break;
+                        case 'rectangle':
+                            var width = endX - startX;
+                            var height = endY - startY;
+                            context.rect(startX, startY, width, height);
+                            break;
+                        case 'circle':
+                            var radius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+                            context.arc(startX, startY, radius, 0, 2 * Math.PI);
+                            break;
+                    }
+                    */
+                    context.stroke();
+                }
+            });
+
+            canvas.addEventListener('mouseup', function(event) {
+                if (isDrawing) {
+                    isDrawing = false;
+                    var endX = event.offsetX;
+                    var endY = event.offsetY;
+
+                    var radius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+
+                    $scope.annotation = {type: 'circle',x: startX,y: startY,radius: radius}
+                    console.log($scope.annotation)
+                    /*
+                    $scope.annotations.push({
+                        type: 'circle',
+                        x: startX,
+                        y: startY,
+                        radius: radius
+                    });
+
+
+                    switch (shapeType) {
+                        case 'line':
+                            $scope.annotations.push({
+                                type: 'line',
+                                startX: startX,
+                                startY: startY,
+                                endX: endX,
+                                endY: endY
+                            });
+                            break;
+                        case 'rectangle':
+                            var width = endX - startX;
+                            var height = endY - startY;
+                            $scope.annotations.push({
+                                type: 'rectangle',
+                                x: startX,
+                                y: startY,
+                                width: width,
+                                height: height
+                            });
+                            break;
+                        case 'circle':
+                            var radius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+                            $scope.annotations.push({
+                                type: 'circle',
+                                x: startX,
+                                y: startY,
+                                radius: radius
+                            });
+                            break;
+                    }
+
+                    */
+                }
+            });
+
+            // --------------------
+
+
+
+
             //when a form is being created, the QR representing that form is generated immediately. However, as
             //this is in a directive, the scopes are complicated to to simplify things the QR is emitted by the
             //directive so that it can be captured and ultimately sent to the server. This process happens

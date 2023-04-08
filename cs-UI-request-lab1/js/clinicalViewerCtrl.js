@@ -4,7 +4,6 @@ angular.module("pocApp")
 
             $scope.input = {};
 
-
             //load the config. We need this for the fullUrl in the request bundle and server interactions
             commonSvc.init().then(
                 function(data){
@@ -27,7 +26,6 @@ angular.module("pocApp")
                 function (list) {
                     $scope.templates = list
                 }
-
             )
 
             $scope.selectTemplate = function (Q) {

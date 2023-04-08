@@ -12,13 +12,9 @@
 
 
     <script src="js/libs/json-formatter.min.js"></script>
-
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/common.css"/>
-
     <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
-
-
     <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
     <link rel="stylesheet" type="text/css" href="css/json-formatter.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
@@ -59,6 +55,18 @@
         }
         th {
             background-color: lightgray;
+        }
+
+        #myDrawing {
+            position: absolute;
+            top: 150px;
+            left: 100px;
+        }
+        #canvas {
+            position: absolute;
+            top: 150px;
+            left: 100px;
+            z-index: 1;
         }
 
     </style>
@@ -104,6 +112,7 @@
 
             <div class="col-md-1 col-sm-1">
                 <form class="navbar-form navbar-left">
+
                     <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
 
                 </form>
@@ -149,6 +158,13 @@
         FHIR server. As it does, it will create a ServiceRequest resource that the recipient Laboratory
         can use to retrieve the request details prior to generating a report.</div>
         <div></div>
+
+
+        <img id = "myDrawing" ng-src="{{imageUrl}}" />
+        <canvas id="canvas" width="{{canvasWidth}}" height="{{canvasHeight}}"></canvas>
+
+
+
 
     </div>
 
