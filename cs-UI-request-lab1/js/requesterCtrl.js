@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('requesterCtrl',
-        function ($scope,$http,commonSvc,graphSvc,questionnaireSvc,renderFormsSvc) {
+        function ($scope,$http,commonSvc,graphSvc,questionnaireSvc,renderFormsSvc,drawingSvc,$timeout) {
 
             $scope.input = {};
             $scope.commonSvc = commonSvc
@@ -17,6 +17,14 @@ angular.module("pocApp")
                         }
                     )
             })
+
+            //load the list of diagrams {display: fileName}
+            drawingSvc.getDiagrams().then (
+                function data(data) {
+                    $scope.diagrams = data
+                }
+            )
+
 
             //create the author resource. The identifier (HPI) is required
             $scope.author = {resourceType:"Practitioner", name:[{text:"Sally Surgeon"}]}
@@ -36,16 +44,118 @@ angular.module("pocApp")
 
             $scope.input.selectedFhirDisplayOption = 'extract'
 
+/*
+            //------------
+            //this is a new one
+
+            let canvas
+            let context
+
+            $scope.reset = function() {
+                //var canvas = document.getElementById('canvas1');
+               // var context = canvas.getContext('2d');
+                const image = new Image()
+                image.src = $scope.imageSrc
+                image.onload = function () {
+                    context.drawImage(image, 0, 0)
+                }
+            }
+
+            $scope.save = function() {
+                //let dataUrl = canvas.toDataURL()
+                let canvas1 = document.getElementById('canvas1');
+
+                let dataURL = canvas1.toDataURL()
+                console.log(dataURL)
+
+                //using the dataUrl to draw the image
+                let canvas2 = document.getElementById('canvas2');
+                let context2 = canvas2.getContext('2d')
+                let img = new Image()
+                img.src = dataURL
+                img.onload = function(){
+                    context2.drawImage(img,0,0)
+                }
+
+
+            }
+
+            $scope.imageSrc = 'images/left-breast.png';
+
+            $timeout(function(){
+                canvas = document.getElementById('canvas1');
+
+                console.log(canvas.height,canvas.width)
+
+                canvas.addEventListener('mousedown', function(event) {
+                    console.log('dn',event.offsetX,event.offsetY)
+                   // isDrawing = true;
+                    startX = event.offsetX;
+                    startY = event.offsetY;
+                    context.beginPath();
+                    context.arc(startX, startY, 7, 0, 2 * Math.PI);
+                    context.stroke();
+                });
+
+                context = canvas.getContext('2d');
+                const image = new Image()
+                image.src = $scope.imageSrc
+                image.onload = function () {
+                    context.drawImage(image,0,0)
+
+                    context.beginPath();
+                    context.arc(10, 10, 10, 0, 2 * Math.PI);
+                    context.stroke();
+
+
+                    var isDrawing = false;
+
+
+
+                    canvas.addEventListener('mousemove', function(event) {
+                        if (isDrawing) {
+                            var endX = event.offsetX;
+                            var endY = event.offsetY;
+
+                            context.clearRect(0, 0, $scope.canvasWidth, $scope.canvasHeight);
+
+                            //context.drawImage(document.getElementsByTagName('img')[0], 0, 0, $scope.canvasWidth, $scope.canvasHeight);
+                            context.drawImage(document.getElementById('canvas1'), 0, 0, $scope.canvasWidth, $scope.canvasHeight);
+                            context.beginPath();
+
+                            var radius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+                            context.arc(startX, startY, radius, 0, 2 * Math.PI);
+
+
+                            context.stroke();
+                        }
+                    });
+
+
+                }
+
+
+            },500)
+
+
+            */
             // -------------------
             //code to draw circle on image - thanks to chatGPT!
+
+
+/*
 
             $scope.canvasWidth = 200;
             $scope.canvasHeight = 186;
             $scope.imageUrl = 'images/left-breast.png';
             $scope.annotations = [];
 
+
+
             var canvas = document.getElementById('canvas');
             var context = canvas.getContext('2d');
+
+
 
             //context.drawImage(document.getElementsByTagName('img')[0], 0, 0, $scope.canvasWidth, $scope.canvasHeight);
             context.drawImage(document.getElementById('myDrawing'), 0, 0, $scope.canvasWidth, $scope.canvasHeight);
@@ -74,23 +184,7 @@ angular.module("pocApp")
                     var radius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
                     context.arc(startX, startY, radius, 0, 2 * Math.PI);
 
-                    /*
-                    switch (shapeType) {
-                        case 'line':
-                            context.moveTo(startX, startY);
-                            context.lineTo(endX, endY);
-                            break;
-                        case 'rectangle':
-                            var width = endX - startX;
-                            var height = endY - startY;
-                            context.rect(startX, startY, width, height);
-                            break;
-                        case 'circle':
-                            var radius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
-                            context.arc(startX, startY, radius, 0, 2 * Math.PI);
-                            break;
-                    }
-                    */
+
                     context.stroke();
                 }
             });
@@ -105,51 +199,12 @@ angular.module("pocApp")
 
                     $scope.annotation = {type: 'circle',x: startX,y: startY,radius: radius}
                     console.log($scope.annotation)
-                    /*
-                    $scope.annotations.push({
-                        type: 'circle',
-                        x: startX,
-                        y: startY,
-                        radius: radius
-                    });
 
-
-                    switch (shapeType) {
-                        case 'line':
-                            $scope.annotations.push({
-                                type: 'line',
-                                startX: startX,
-                                startY: startY,
-                                endX: endX,
-                                endY: endY
-                            });
-                            break;
-                        case 'rectangle':
-                            var width = endX - startX;
-                            var height = endY - startY;
-                            $scope.annotations.push({
-                                type: 'rectangle',
-                                x: startX,
-                                y: startY,
-                                width: width,
-                                height: height
-                            });
-                            break;
-                        case 'circle':
-                            var radius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
-                            $scope.annotations.push({
-                                type: 'circle',
-                                x: startX,
-                                y: startY,
-                                radius: radius
-                            });
-                            break;
-                    }
-
-                    */
                 }
             });
 
+
+            */
             // --------------------
 
 

@@ -156,7 +156,7 @@ function setup(app) {
         //Get the SR
         let ar1 = utilModule.findResourceInBundleByType(bundle,"ServiceRequest")
         let SR = ar1[0] //note that the L1 check above should ensure 1 SR in the bundle
-        console.log("SR=",SR)
+        //console.log("SR=",SR)
 
         let arExtractedResources = []
         try {

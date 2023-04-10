@@ -6,7 +6,20 @@ let dbAddress = process.env.LOGDB || "localhost"
 console.log(`Logger database name is ${dbAddress}`)
 const uri = `mongodb://${dbAddress}:27017`
 const client = new MongoClient(uri)
-const database = client.db("logger")    //all logs are in the same database
+let database
+
+client.connect().then(
+    function () {
+        console.log('connected')
+        database = client.db("logger")
+    }).catch(function () {
+        console.log('not connected to the Mongo database. Unable to make log entries')
+    }
+)
+
+
+//const database = client.db("logger")    //all logs are in the same database
+
 
 //get the hapi server base 
 let serverBase = process.env.SERVERBASE
@@ -160,11 +173,16 @@ function logger(collection,msg) {
         msg.sender = msg.headers['x-sender']
     }
 
-    database.collection(collection).insertOne(msg, function (err, result) {
-        if (err) {
-            console.log('Error updating log ',err)
-        } 
-    });
+    if (database) {
+        database.collection(collection).insertOne(msg, function (err, result) {
+            if (err) {
+                console.log('Error updating log ',err)
+            }
+        });
+    } else {
+        console.log("Unable to aceess the MongoDb for logging. Is it available?")
+    }
+
 }
 
 //create a provenance and add references to all resources in the bundle, and the author

@@ -1,4 +1,4 @@
-angular.module('formsApp')
+angular.module('pocApp')
     .directive('displaymeds', function () {
         return {
             restrict: 'EA', //E = element, A = attribute, C = class, M = comment

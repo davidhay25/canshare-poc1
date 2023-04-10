@@ -1,5 +1,5 @@
 
-angular.module("formsApp")
+angular.module("pocApp")
 
     .service('viewBundleSvc', function() {
 

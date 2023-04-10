@@ -1,203 +1,61 @@
 
 
-angular.module("formsApp")
+angular.module("pocApp")
     .service('renderFormsSvc', function($q,$http,moment) {
 
-        let arExpandedVsCache = {}
+        arExpandedVsCache = {}
 
 
         //termServer = "https://r4.ontoserver.csiro.au/fhir/"
-        let termServer = "https://terminz.azurewebsites.net/fhir/"
+        termServer = "https://terminz.azurewebsites.net/fhir/"
 
-        let extItemControl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
-        let extUrlObsExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
-        let extResourceReference = "http://hl7.org/fhir/StructureDefinition/questionnaire-referenceResource"
-        let extHidden = "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
+        extItemControl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
+        extUrlObsExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
+        extResourceReference = "http://hl7.org/fhir/StructureDefinition/questionnaire-referenceResource"
+        extHidden = "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
 
 
         //todo fsh doesn't underatnd expression extension...
         //extPrepop = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-prepop"
 
-        let extPrepop = "http://canshare.com/fhir/StructureDefinition/sdc-questionnaire-initialExpression"
+        extPrepop = "http://canshare.com/fhir/StructureDefinition/sdc-questionnaire-initialExpression"
 
-        let extExtractNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractNotes"
-        let extExtractPath = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractPath"
-        let extExtractType = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
-        let extExtractNone = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractNone"
+        extExtractNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractNotes"
+        extExtractPath = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractPath"
+        extExtractType = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractType"
+        extExtractNone = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-extractNone"
 
-        let extUsageNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-usageNotes"
+        extUsageNotes = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-usageNotes"
 
-        let extVerification= "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-verification"
-        let extNotes= "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-notes"
+        extVerification= "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-verification"
+        extNotes= "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-notes"
 
-        let extSourceStandard = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-sourceStandard"
+        extSourceStandard = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-sourceStandard"
 
-        let extHisoClass = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-class"
-        let extHisoLength = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-length"
-        let extHisoDT = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-dt"
-        let extHisoLayout = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-layout"
+        extHisoClass = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-class"
+        extHisoLength = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-length"
+        extHisoDT = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-dt"
+        extHisoLayout = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hiso-layout"
 
-        let extColumn = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column"
-        let extColumnCount = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"
-        let extDescription = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-item-description"
+        extColumn = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column"
+        extColumnCount = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"
+        extDescription = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-item-description"
 
         // extAuthor = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-author"
-        let extQAttachment = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-attachment"
-        let extHL7v2Mapping = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-v2mapping"
-        let extCheckOutQ = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-check-out"
+        extQAttachment = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-attachment"
+        extHL7v2Mapping = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-v2mapping"
+        extCheckOutQ = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-check-out"
 
-        let extHisoStatus = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hisostatus"
-        let extHisoUOM = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-unit-of-measure"
+        extHisoStatus = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-hisostatus"
+        extHisoUOM = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-unit-of-measure"
 
-        let extFolderTag = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-folder-tag"
+        extFolderTag = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-folder-tag"
 
-        let extPlaceholder = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-placeholder"
-        let extExclude = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-exclude"
+        extPlaceholder = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-placeholder"
+        extExclude = "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-exclude"
 
 
         return {
-
-            setControls : function (template,data) {
-                //set the values for dropdowns
-
-
-                function setOneControl(item) {
-                    if (item.type == 'choice' && item.answerOption && data[item.linkId]) {
-                        console.log(item.linkId,data[item.linkId])
-                        item.answerOption.forEach(function (ao) {
-                            if (data[item.linkId] && data[item.linkId].valueCoding) {
-                                if (ao.valueCoding.code == data[item.linkId].valueCoding.code) {
-                                    data[item.linkId].valueCoding = ao.valueCoding
-                                }
-                            }
-
-                        })
-
-                    }
-
-                    if (item.item) {
-                        console.log(item.item)
-                        item.item.forEach(function (child) {
-                            setOneControl(child)
-                        })
-                    }
-
-                }
-
-                template.forEach(function (section) {
-                    setOneControl(section.item)
-                })
-
-            },
-
-            makeTreeFromQ : function(Q) {
-                // a recursive form of the tree generation
-
-                let that = this
-
-                let hashItem = {}
-                let treeData = []
-                let root = {id:'root',text:Q.title || 'Root',parent:'#',state:{}}
-                treeData.push(root)
-
-
-
-                function addItemToTree(parent,item,level,sectionItem) {
-                    let idForThisItem =  item.linkId
-                    hashItem[item.linkId] = item
-
-                    let thisItem = angular.copy(item)
-                    delete thisItem.item
-
-                    //check to see if this item is a review item. If so, add it to the list of all review items this section
-                    if (item.code) {
-                        console.log(item.code)
-                        item.code.forEach(function (code) {
-                            if (code.system == 'http://clinfhir.com/fhir/CodeSystem/review-comment') {
-                                sectionItem.reviewItem.push(item)
-                            }
-                        })
-                    }
-
-                    let text = item.text
-                    if (text.length > 50) {
-                        text = text.slice(0,47) + "..."
-                    }
-
-                    let node = {id:idForThisItem,text:text,parent:parent,data:{section:sectionItem,item:item}}
-
-                    node.data.meta = that.getMetaInfoForItem(item)
-
-
-                    let iconFile = "icons/icon-q-" + item.type + ".png"
-                    node.icon = iconFile
-
-                    //if this is a review item text box then don't add to the tree
-                    let canAdd = true
-                    if (item.code) {
-                        console.log(item.code)
-                        item.code.forEach(function (code) {
-                            if (code.system == 'http://clinfhir.com/fhir/CodeSystem/review-comment') {
-                                canAdd = false
-                            }
-                        })
-                    }
-
-                    if (canAdd) {
-                        treeData.push(node)
-                    }
-
-
-
-                    //now look at any sub children
-                    if (item.item) {
-                        item.item.forEach(function (child) {
-                            let newLevel = "item"
-                            if (child.item) {
-                                newLevel = 'group'
-                            }
-                            addItemToTree(idForThisItem,child,newLevel,sectionItem)
-                        })
-                    }
-                }
-
-                function addQToTree(Q) {
-                    //create a parent for this Q
-                    let qParentId = `root`
-                    //let node = {id:qParentId,text:Q.title || `q${ctr}`,parent:"root",data:{level:'chapter'}}
-
-                   // treeData.push(node)
-                    Q.item.forEach(function (item) {
-                        let section = angular.copy(item)
-                        delete section.item
-                        section.reviewItem = []
-                        addItemToTree(qParentId,item,'section',section)
-                    })
-                }
-
-
-                addQToTree(Q)
-
-                //now that we have completed the tree array (and populated hashItem)
-                //we can make the conditional display a bit nicer by adding the text for the question
-
-                treeData.forEach(function (node) {
-                    if (node.data && node.data.item.enableWhen) {
-                        node.data.item.enableWhen.forEach(function (ew) {
-                            if (hashItem[ew.question]) {
-                                ew.questionText = hashItem[ew.question].text
-                            }
-
-                        })
-                    }
-                })
-
-                return {treeData: treeData,hashItem:hashItem}
-
-
-
-
-            },
 
             expandVS : function(url,filter) {
                 let deferred = $q.defer()
@@ -404,6 +262,7 @@ angular.module("formsApp")
                     meta.exclude = ar19[0].valueBoolean
                 }
 
+
                 return meta
 
                 function getSingleExtValueTypeDEP(meta,item,url,type) {
@@ -415,95 +274,8 @@ angular.module("formsApp")
                 }
             },
 
-            makeQR :  function(Q,form,dataUrl) {
+            makeQR :  function(Q,form) {
                 let that = this
-
-                //new script...
-
-                //first assemble a hash of values by key. A value will remain if it is not hidden due to conditional, or the item has a definitiomhas the de
-                let hashValues = {}
-                Object.keys(form).forEach(function (linkId) {
-                    let dataItem = form[linkId]
-                    let canShow = that.checkConditional(dataItem,form)
-                    hashValues[linkId] = dataItem
-                })
-
-                //console.log(hashValues)
-
-                let QR1 = {resourceType:"QuestionnaireResponse",status:'completed',item:[]}
-                QR1.questionnaire = Q.url
-
-                //the top level items - sections - directly off the Q root...
-                Q.item.forEach(function (section) {
-                    let sectionItem = null
-                    if (section.item) {
-                        section.item.forEach(function (child) {
-                            //a child can be a group or a leaf element
-                            if (child.item) {
-                                //this is a group. it won't have a value (though can have other attributes like a code)
-                                let groupItem = null
-                                child.item.forEach(function (gc) {
-                                    //this is a child (grandchild) grandchild of the group
-                                    if (hashValues[gc.linkId]) {
-                                        //this grandchild has a value. Before we can add it, we need to check whether a section& group exist
-                                        if (! sectionItem) {
-                                            //no there isn't - add it to the top level of the QR
-                                            sectionItem = {linkId : section.linkId, text:section.text,item: []}
-                                            QR1.item.push(sectionItem)
-                                        }
-
-                                        if (! groupItem) {
-                                            groupItem = {linkId : child.linkId, text:child.text,item: []}
-                                            sectionItem.item.push(groupItem)
-                                        }
-
-                                        let leafItem = {linkId:gc.linkId,  answer:[]}
-                                        groupItem.item.push(leafItem)
-
-                                        let v = hashValues[gc.linkId]        //the value in the form
-                                        let result = getValue(gc,v)
-                                        if (result) {
-                                            leafItem.answer = leafItem.answer ||[]
-                                            leafItem.answer.push(result)
-                                        }
-
-                                    }
-
-                                })
-
-                            } else {
-                                //this is a leaf directly off the section
-                                if (hashValues[child.linkId]) {
-                                    //there is a value, so it should be added to the QR (as a child of he section.
-                                    //First, is there a seciton item?
-                                    if (! sectionItem) {
-                                        //no there isn't - add it to the top level of the QR
-                                        sectionItem = {linkId : section.linkId,text:section.text,item: []}
-                                        QR1.item.push(sectionItem)
-                                    }
-                                    //now craete an item that can be added to the section
-                                    let leafItem = {linkId:child.linkId, text: child.text,answer:[]}
-                                    sectionItem.item.push(leafItem)      //add the leaf item to the section
-
-                                    let v = hashValues[child.linkId]        //the value in the form
-                                    let result = getValue(child,v)
-                                    if (result) {
-                                        leafItem.answer = leafItem.answer ||[]
-                                        leafItem.answer.push(result)
-                                    }
-                                }
-                            }
-
-                        })
-                    }
-
-
-                })
-
-
-                return QR1
-
-                        //---------------------
 
 
                 //todo - working on multiple values for a single linkId.
@@ -547,11 +319,8 @@ angular.module("formsApp")
                             //let itemToAdd = {linkId : child.linkId,answer:[],text:child.text}
                             let key = child.linkId  //the key for this Q item
                             let value = form[key]
-
                             let arValues = hashFormValues[key]
 
-                            //mar 27 check the show
-                            //let canShow = that.checkConditional(child,)
 
                             if (arValues !== undefined && arValues.length > 0) {        //is there a value for this item. Won't be if this is a group...
                                /* if (! parentItem) {
@@ -567,6 +336,8 @@ angular.module("formsApp")
                                             parentItem = {linkId : section.linkId,text:section.text,item: []}
                                             QR.item.push(parentItem)
                                         }
+
+
                                         itemToAdd.answer = itemToAdd.answer || []
                                         itemToAdd.answer.push(result)
                                     }
@@ -577,6 +348,7 @@ angular.module("formsApp")
                                     parentItem.item = parentItem.item || []
                                     parentItem.item.push(itemToAdd)
                                 }
+
 
                             }
 
@@ -754,13 +526,6 @@ angular.module("formsApp")
                             result = {valueInteger : parseInt(value)}
                             break
 
-                        case "attachment" :
-
-                            result = {valueAttachment: {contentType:"image/png",data:btoa(value)}}
-
-                            //result = attValue
-                            break
-
                         default :
                             result = {valueString : value}
                         //itemToAdd.answer.push({valueString : value})
@@ -779,7 +544,7 @@ angular.module("formsApp")
             //return vo {template, hiddenFields, hiddenSections}
             //template is an array of section objects
             //section has rows array where a row has
-            //pass in the formdata to allow  values to be set....
+            //pass in the formdata to allow initial values to be set....
 
             makeFormTemplate : function(Q,formData) {
                 if (!Q) {
@@ -804,7 +569,6 @@ angular.module("formsApp")
 
                         let section = {linkId:sectionItem.linkId,text:sectionItem.text,rows:[],item:sectionItem}
                         section.meta = that.getMetaInfoForItem(sectionItem)
-
                         hashItem[sectionItem.linkId] = {item:sectionItem,meta:section.meta}
                         if (section.meta.hidden) {
                             hiddenSections.push(section)
@@ -837,31 +601,29 @@ angular.module("formsApp")
 
                                             item.item.forEach(function (child,inx) {
                                                 let childMeta = that.getMetaInfoForItem(child)
-                                                //hidden items don't apper in the form at all.
-                                                if (! meta.hidden) {
-                                                    hashItem[child.linkId] = {item:child,meta:childMeta}
+                                                hashItem[child.linkId] = {item:child,meta:childMeta}
 
-                                                    let side = 'col' + col
-                                                    let cell = {item:child,meta:childMeta}
-                                                    fillFromValueSet(cell,termServer)
-                                                    setDecoration(cell,child)
-                                                    setDefaultValue(child,formData)
-                                                    row[side] = row[side] || []
-                                                    row[side].push(cell)
+                                                let side = 'col' + col
+                                                let cell = {item:child,meta:childMeta}
+                                                fillFromValueSet(cell,termServer)
+                                                setDecoration(cell,child)
+                                                setDefaultValue(child,formData)
+                                                row[side] = row[side] || []
+                                                row[side].push(cell)
 
-                                                    if (col % meta.columnCount == 0) {
-                                                        //add the current row, and move on to the next..
-                                                        section.rows.push(row)
-                                                        row = {}
-                                                        row.meta = meta
-                                                        row.group = item        //need to group to be able to check show/hide for all rows in a group...
-                                                        col = 1
+                                                //dirty = true
 
-                                                    } else {
-                                                        col++
-                                                    }
+                                                if (col % meta.columnCount == 0) {
+                                                    //add the current row, and move on to the next..
+                                                    section.rows.push(row)
+                                                    row = {}
+                                                    row.meta = meta
+                                                    row.group = item        //need to group to be able to check show/hide for all rows in a group...
+                                                    col = 1
+
+                                                } else {
+                                                    col++
                                                 }
-
                                             })
 
                                             if (row.col1) {
@@ -930,27 +692,17 @@ angular.module("formsApp")
                                 } else {
                                     //2023-01-24
 
-                                    //if the type is 'attachment' then assume it's a drawing. A drawing can't be in a group
-                                    if (item.type == 'attachment') {
-                                        section.imageDetails = {linkId:item.linkId,imageName:item.text}     //todo is text the right element to use?
+                                    //if the item isn't a group, then add it to column 1.
+                                    let row = {}   //will have a single entry - left
+                                    row.item = item
+                                    row.meta = meta
+                                    let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
+                                    fillFromValueSet(cell,termServer)
+                                    setDecoration(cell,item)
+                                    setDefaultValue(item,formData)
+                                    row['col1'] = [cell] //make it an array to match the group
 
-                                    } else {
-                                        //if the item isn't a group, then add it to column 1.
-                                        let row = {}   //will have a single entry - left
-                                        row.item = item
-                                        row.meta = meta
-                                        let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
-                                        fillFromValueSet(cell,termServer)
-                                        setDecoration(cell,item)
-                                        setDefaultValue(item,formData)
-                                        row['col1'] = [cell] //make it an array to match the group
-
-                                        section.rows.push(row)
-
-                                    }
-
-
-
+                                    section.rows.push(row)
 
 
                                 }
@@ -971,33 +723,10 @@ angular.module("formsApp")
                 function setDefaultValue(item,formData) {
                     //console.log(item)
                     if (item.initial && item.initial.length > 0) {
-                        //right now, only coding & bool, and only a single initial
-
-
-                        if (item.initial[0].valueCoding) {
-                            let iCoding = item.initial[0].valueCoding
-                            if (iCoding) {
-                               // formData[item.linkId] = {valueCoding:iCoding}
-
-                                //need to set it to the answeroption for the dropdown to display the result
-                                if (item.answerOption) {
-                                    item.answerOption.forEach(function (opt) {
-                                        if (opt.valueCoding) {
-                                            if (opt.valueCoding.code == iCoding.code && opt.valueCoding.system == iCoding.system) {
-                                                formData[item.linkId] = opt //{valueCoding:opt}
-                                            }
-                                        }
-
-                                    })
-                                }
-
-
-
-
-                            }
-                        }
-                        if (item.initial[0].valueBoolean) {
-                            formData[item.linkId] = true
+                        //right now, only coding
+                        let iCoding = item.initial[0].valueCoding
+                        if (iCoding) {
+                            formData[item.linkId] = {valueCoding:iCoding}
                         }
 
 

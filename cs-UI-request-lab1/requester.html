@@ -29,6 +29,12 @@
         });
         angular.module("pocApp").constant("moment", moment);
 
+
+        //this allows the directives (which are in the formsApp) to be used. see https://stackoverflow.com/questions/15641730/angular-js-directives-in-different-modules
+        angular.module("formsApp",[])
+        angular.module('topApp', ['pocApp', 'formsApp'])
+
+
     </script>
 
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
@@ -37,6 +43,7 @@
 
     <script src="js/libs/vis.min.js"></script>
     <script src="js/commonSvc.js"></script>
+    <script src="js/drawingSvc.js"></script>
     <script src="js/graphSvc.js"></script>
 
 
@@ -73,7 +80,7 @@
 
 </head>
 <body style="padding: 8px;padding-top: 80px">
-    <div ng-app="pocApp" ng-controller="requesterCtrl" class="container-fluid">
+    <div ng-app="topApp" ng-controller="requesterCtrl" class="container-fluid">
 
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
@@ -160,10 +167,20 @@
         <div></div>
 
 
-        <img id = "myDrawing" ng-src="{{imageUrl}}" />
-        <canvas id="canvas" width="{{canvasWidth}}" height="{{canvasHeight}}"></canvas>
+        <!--
+                <canvas id="canvas1" width="200" height="200" style="border: #c9302c" ></canvas>
 
+                <hr/>
 
+                <button ng-click="reset()">reset</button>
+                <button ng-click="save()">save</button>
+
+                <canvas id="canvas2" width="200" height="200" style="border: #c9302c" ></canvas>
+
+                <img id = "myDrawing" ng-src="{{imageUrl}}" />
+                <canvas id="canvas" width="{{canvasWidth}}" height="{{canvasHeight}}"></canvas>
+
+        -->
 
 
     </div>

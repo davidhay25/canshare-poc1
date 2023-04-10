@@ -12,6 +12,7 @@ angular.module("pocApp")
 
         return {
 
+
             summarizeValidation : function(OO,bundle) {
                 //present the validation issues in the OO with the bundle entry
 
@@ -255,7 +256,7 @@ angular.module("pocApp")
                 return deferred.promise
             },
 
-            makeQR : function (Q,formData) {
+            makeQRDEP : function (Q,formData) {
                 //construct a QR
                 let QR = {resourceType:"QuestionnaireResponse",questionnaire:Q.url,status:'completed',item:[]}
                 QR.id = this.createUUID()
