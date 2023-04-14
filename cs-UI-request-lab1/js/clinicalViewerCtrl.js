@@ -3,6 +3,7 @@ angular.module("pocApp")
         function ($scope,$http,commonSvc,clinicalViewerSvc) {
 
             $scope.input = {};
+            $scope.input.anClinicalSummary = {}
 
             //load the config. We need this for the fullUrl in the request bundle and server interactions
             commonSvc.init().then(
@@ -46,11 +47,12 @@ angular.module("pocApp")
                     $http.post(url,bundle).then(
                         function (data) {
                             console.log(data)
-                            //reload document list - todo: could just update docRefs - but this does proove a successful save...
+                            alert("Document has been saved")
+                            //reload document list - todo: could just update docRefs - but this does prove a successful save...
                             clinicalViewerSvc.getDocumentsForPatient(vo.patient).then(
                                 function (docRefs) {
                                     $scope.docRefs = docRefs
-                                    console.log(docRefs)
+                                   // console.log(docRefs)
                                 }, function (err) {
                                     //what to do?
                                 }
@@ -58,29 +60,92 @@ angular.module("pocApp")
 
 
                         }, function (err) {
+                            alert(angular.toJson(err.data))
                             console.log(err)
                         }
                     )
                 }
 
-
-
             }
 
 
+            //for the selected SR, find the DR (if any). There should only be 1 as it is updated for DR updates
+            //then, create an array of versions so that we can display the reports and previous versions
+            $scope.getDR = function(){
+                //locate the DR (only 1)
+                $scope.allResourcesForSR.entry.forEach(function (entry) {
+                    let resource = entry.resource
+                    if (resource.resourceType == 'DiagnosticReport') {
+                        //now, get all the versions of this resource
+                        let url = `DiagnosticReport/${resource.id}/_history`
+                        let encodedQry = encodeURIComponent(url)
+                        $http.get(`/proxy?qry=${encodedQry}`).then(
+                            function (data) {
+                                console.log(data.data)
+                                $scope.DRhistory = data.data    //a bundle containing all the DR versions
+                            }, function(err) {
+
+                            })
+                    }
+
+                })
+            }
+
+            // a specific version of a DR
+            $scope.selectDRVersion = function(DR) {
+                $scope.selectedDRVersion = DR
+
+                //create the query that will return the Observations references by this version of the DR.
+                //we can't use _include as it's not version aware
+                let qry = "Observation?_id="
+                if (DR.result) {
+                    DR.result.forEach(function (ref) {
+                        let ar = ref.reference.split('/')
+                        qry += ar[ar.length-1] + ","
+                    })
+                }
+
+
+
+
+                let encodedQry = encodeURIComponent(qry)
+                $http.get(`/proxy?qry=${encodedQry}`).then(
+                    function (data) {
+                        console.log(data.data)
+                        //$scope.DRhistory = data.data    //a bundle containing all the DR versions
+                        //generate the report object needed by the reportdisplay directive
+                        $scope.reportObject = {DR:DR,observations:[]}
+                        data.data.entry.forEach(function (entry) {
+                            $scope.reportObject.observations.push(entry.resource)
+                        })
+
+                    }, function(err) {
+
+                    })
+
+            }
+
             $scope.selectSR = function (SR) {
                 //get all the resources associated with a SR based on provenance resources
+                //This is a complex set of queries as we want all associated resources. There are simpler ways of getting specific resources
+                //and even these queries cold probably be simplified (eg the Provenance resources could use _revincldue...
                 //todo - move to service
+
+                delete $scope.DRhistory
+                delete $scope.reportObject
+                delete $scope.selectedDRVersion
+
                 $scope.selectedSR = SR
 
 
                 let bundle
+                //supportingInfo is a custom operation
+                //First, retrieve the ServiceRequest, QR, subject & requester
                 let url1 = `ServiceRequest?_id=${SR.id}&_include=ServiceRequest:supportingInfo&_include=ServiceRequest:subject&_include=ServiceRequest:requester`
 
                 let encodedQry = encodeURIComponent(url1)
                 $http.get(`/proxy?qry=${encodedQry}`).then(
 
-                //$http.get(url1).then(
                     function (data) {
                         //console.log(data)
                         bundle = data.data
@@ -91,7 +156,9 @@ angular.module("pocApp")
                                 $scope.QR = entry.resource
                             }
                         })
+                        //todo - shouldn't this go to the proxy as well?
 
+                        //Now, retrieve the any DR associated with this SR, and the results associated with the DR
                         let url2 = `${$scope.config.SERVERBASE}DiagnosticReport?based-on=ServiceRequest/${SR.id}&_include=DiagnosticReport:result`
                         $http.get(url2).then(
                             function (data) {
@@ -101,6 +168,7 @@ angular.module("pocApp")
                                     })
                                 }
 
+                                //Finally retrieve the Proveenance resource/s
                                 let url2 = encodeURIComponent(`Provenance?entity=${SR.id}&_include=Provenance:target`)
                                 $http.get(`/proxy?qry=${url2}`).then(
                                     function (data) {
@@ -110,7 +178,25 @@ angular.module("pocApp")
                                                 bundle.entry.push(entry)
                                             })
                                         }
-                                        $scope.allResourcesForSR = bundle
+
+                                        //we're getting duplicated respurces from the queries so only add 1. This is not a version thing...
+                                        let hash={}
+                                        $scope.allResourcesForSR = {resourceType:"Bundle",type:"collection",entry:[]}
+                                        bundle.entry.forEach(function (entry) {
+                                            let key = `${entry.resource.resourceType}/${entry.resource.id}`
+                                            if (! hash[key]) {
+                                                hash[key] = true
+                                                $scope.allResourcesForSR.entry.push(entry)
+                                            }
+
+
+                                        })
+                                        //find the DR in the bundle and then get all versions of it. Used for displaying the report & versions
+                                        $scope.getDR()
+
+                                        //$scope.allResourcesForSR = bundle
+
+
 
 
                                         //and now validate the bundle
@@ -173,7 +259,7 @@ angular.module("pocApp")
                 getMedications(patient)
 
                 //get the regiments
-                getRegimens(patient)
+               // getRegimens(patient)
                 //get all the SR for this patient
                 commonSvc.getSRForPatient(patient.id).then(
                     function (bundle) {
@@ -201,7 +287,7 @@ angular.module("pocApp")
             }
 
             //get all the regimen careplans for a patient
-            function getRegimens(patient)  {
+            function getRegimensDEP(patient)  {
                 let ar = [`CarePlan?category=${patient.id}&category=regimenCP`]
                 $http.post('multiquery',ar).then(
                     function (data) {
@@ -217,11 +303,10 @@ angular.module("pocApp")
 
 
             //get all the data associated with a regimenCP
-            function getActNowData(careplan) {
+            function getActNowDataDEP(careplan) {
                 //first, get the careplans
 
                 let url1 = `CarePlan?category=regimenCP,cycleCP&subject=${patient.id}`
-
 
                 let ar = []
                 ar.push(url1)

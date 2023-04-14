@@ -1,6 +1,6 @@
 /*
 *
-* These are all endpoints that support the Lab application. They are generally not FHIR compliant as they serve the local application
+* These are all endpoints that support the Lab application. They do not need to be FHIR compliant as they serve the local application
 */
 const axios = require("axios");
 const showLog = true
@@ -9,9 +9,18 @@ let db
 //the utils module is stored in the cs-customops folder. todo ?should we move it to a separate 'common' folder?
 const utilModule = require("../cs-customOps/serverModuleUtil.js")
 
+//The lab system can make queries to the FHIR server. In this implementation it os assumed
+//that the lab system is dorectly interacting with the FHIR sever (via this module) - ie it doesn't have it's own data storage
+//In a real application, the lab system will likely store stuff locally as well as sending it to the fhir server
 console.log(`FHIR server root from env is ${process.env.SERVERBASE}`)
+let serverBase = utilModule.checkUrlSlash(process.env.SERVERBASE)
+
 console.log(`Log database from env is ${process.env.LOGDB}`)
+
+//The location of the custom operations module (a specific docker container).
+//Used when submitting a report
 console.log(`Custom ops from env is ${process.env.CUSTOMOPS}`)
+let reportEndpoint = process.env.CUSTOMOPS + "$acceptReport"  //where the request bundle is sent
 
 /*
 let serverBase = process.env.SERVERBASE
@@ -20,7 +29,11 @@ if (serverBase[serverBase.length-1] !== '/') {
 }
 */
 
-let serverBase = utilModule.checkUrlSlash(process.env.SERVERBASE)
+
+
+//This is the location of the custom operation endpoint for processing reports.
+
+
 
 //import { MongoClient } from "mongodb";
 let MongoClient = require('mongodb').MongoClient;
@@ -35,6 +48,7 @@ function setup(app) {
 
 //$scope.reportBundle
     //https://stackabuse.com/handling-errors-with-axios/
+    //used by the lab UI to validate the bundle as it is being created...
     app.post('/lab/validate', async function(req,res){
         let resource = req.body
         let qry = `${serverBase}${resource.resourceType}/$validate`
@@ -53,13 +67,19 @@ function setup(app) {
         }
     })
 
-    //return the SR and associated QR. use the identifier as the key. This is the kind of query the lab would do
+    //return a specific SR based on its identifier and associated resources
+    // resources returned are the QR, Patient and any previous report resources (DR / Obs) that may have been created
+    // This is to support interim and final reports
+    //when a report is submitted, any previous DR is updated and Observations are set to 'cancelled' status. This could be improved...
     app.get('/lab/SRDetails', async function(req,res){
 
         //console.log(req.params)
         let identifier = req.query.identifier
+        //note that the 'supportingInfo' parameter is a custom request
         let qry = `${serverBase}ServiceRequest?identifier=${identifier}&_include=ServiceRequest:supportingInfo&_include=ServiceRequest:subject`
 
+        //retrieve any DiagnosticReport & Observations that have references to the SR
+        qry += "&_revinclude=DiagnosticReport:based-on&_revinclude=Observation:based-on"
         console.log(qry)
         try {
             let response = await axios.get(qry)
@@ -76,6 +96,18 @@ function setup(app) {
                         break
                     case "Patient" :
                         vo.pat = resource
+                        break
+                    case "DiagnosticReport" :
+                        vo.dr = resource
+                        break
+                    case "Observation" :
+                        vo.obs = vo.obs || []
+                        vo.obs.push(resource)
+                        break
+                    default :
+                        //shouldn't be any others, but you never know...
+                        vo.other = vo.other || []
+                        vo.other.push(resource)
                         break
                 }
             })
@@ -104,7 +136,8 @@ function setup(app) {
     //though in practice the lab would be querying based on identifier...
 
 
-    //get all the currently active SR. Just for the RI
+    //get all the currently active SR. Right now, the SR are not directed to any lab
+    //the assumption is that the
     app.get('/lab/activeSR', async function(req,res){
         let qry = `${serverBase}ServiceRequest?status=active&_count=100&_include=ServiceRequest:subject`
 
@@ -150,15 +183,35 @@ function setup(app) {
         }
     })
 
-    //post the report to the CS server (actually nodeRed) and update the local store plus save report.
+    //post the report to the CS server and update the local store plus save report.
+    //this function (represnting the lab system) simply sends the transaction to the custom operation and retruns the result
     app.post("/lab/submitreport",async function(req,res){
         let bundle = req.body
+
+        try {
+            let response = await axios.post(reportEndpoint,bundle)
+            res.send(response.data)
+        } catch (err) {
+            //the server returned an error status code.
+//console.log(err)
+            if (err.response) {
+                //console.log('resp')
+                res.status(err.response.status).send(err.response.data)
+            } else {
+                res.status(400).send(err)
+            }
+        }
+
+
+        /*
+
+
 
         //get the SR from the bundle. Its id is in the reports
         //let sr = getSRFromBundle(bundle)    //todo check not null
 
         //if lstErrors length is 0 then no errors were found. Any errors will cause the bundle to be rejected
-        let lstRequiredTypes = ['ServiceRequest','DiagnosticReport']
+        let lstRequiredTypes = ['DiagnosticReport','ServiceRequest']       //there can be bundles withoud an SR - eg interim reports
         let lstErrors = utilModule.level1Validate(bundle,lstRequiredTypes)
         if (lstErrors.length > 0) {
             //There were validation errors. These cannot be ignored.
@@ -166,7 +219,6 @@ function setup(app) {
             res.status("400").json(oo)
             return
         }
-
 
 
         //Unlike the request, there's no additional processing todo (beyond report updates that need further thought
@@ -195,17 +247,19 @@ function setup(app) {
         bundle.entry.forEach(function (entry) {
             let resource = entry.resource
             if (resource.resourceType == 'Observation' || resource.resourceType == 'DiagnosticReport') {
-                provenance.target.push({reference:  `urn:uuid:${resource.id}`})
+                //the resources may or may not be uuids
+                if (resource.id.indexOf('-') > -1) {
+                    provenance.target.push({reference:  `urn:uuid:${resource.id}`})
+                } else {
+                    provenance.target.push({reference:  `${resource.resourceType}/${resource.id}`})
+                }
+
+
             }
         })
 
         //add the provenance to the bundle. It's a POST..
-        /*
-        let entry = {resource:provenance}
-        entry.fullUrl = `urn:uuid:${provenance.id}`
-        //It's a transaction bundle, and so needs the request
-        entry.request = {method:'POST',url:`${resource.provenance}`}
-        */
+
 
         bundle.entry.push(utilModule.makePOSTEntry(provenance))
 
@@ -219,14 +273,14 @@ function setup(app) {
             res.json(result.data)
         } catch(ex) {
            if (ex.response) {
-               res.json(ex.response.data)
+               res.status(400).json(ex.response.data)
            } else {
                console.log(ex)
                res.status(500).json(ex)
            }
         }
 
-
+*/
 
     })
 

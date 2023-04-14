@@ -52,33 +52,41 @@ angular.module("formsApp")
                 })
 
                 //add all the issues in the OO to the list
-                OO.issue.forEach(function (iss) {
-                    if (iss.location) {
-                        let loc = iss.location[0]  //Bundle.entry[2].resource
-                        let ar = loc.split('[')
-                        if (ar.length > 1) {
-                            let l = ar[1]   // 2].resource
-                            let g = l.indexOf(']')
-                            let pos = l.slice(0,g)
-                            //console.log(pos,loc)
+                if (OO && OO.issue) {
+                    OO.issue.forEach(function (iss) {
+                        if (iss.location) {
+                            let loc = iss.location[0]  //Bundle.entry[2].resource
+                            let ar = loc.split('[')
+                            if (ar.length > 1) {
+                                let l = ar[1]   // 2].resource
+                                let g = l.indexOf(']')
+                                let pos = l.slice(0,g)
 
-                            let resourceAtIndex = lstResources[pos]
-                            let item = {severity:iss.severity,location:loc,pos:pos,diagnostics:iss.diagnostics}
-                            if (iss.severity == 'error') {
-                                totalErrors++
+
+                                let resourceAtIndex = lstResources[pos]
+                                if (resourceAtIndex) {
+                                    let item = {severity:iss.severity,location:loc,pos:pos,diagnostics:iss.diagnostics}
+                                    if (iss.severity == 'error') {
+                                        totalErrors++
+                                    }
+                                    resourceAtIndex.issues.push(item)
+                                } else {
+                                    unknownIssues.push(iss)
+                                }
+
+                            } else {
+                                unknownIssues.push(iss)
                             }
-                            resourceAtIndex.issues.push(item)
+
+
                         } else {
+                            //this is an OO with no location. I didn't think this should happen & we don't know which resource caused it...
                             unknownIssues.push(iss)
                         }
 
+                    })
+                }
 
-                    } else {
-                        //this is an OO with no location. I didn't think this should happen & we don't know which resource caused it...
-                        unknownIssues.push(iss)
-                    }
-
-                })
 
                 return {resources:lstResources,totalErrors:totalErrors,unknownIssues:unknownIssues}
 
@@ -91,8 +99,13 @@ angular.module("formsApp")
 
                 //let objColours = {}
                 let missingReferences = {}      //where a resource references a missing entry...
+                let focusResourceRef
+                if (options.focusResource) {    //this is an actual resource instance
+                    focusResourceRef = `${options.focusResource.resourceType}/${options.focusResource.id}`
+                }
 
-                var arNodes = [], arEdges = [];
+
+                var arNodes = [], arEdges = [], edge;
                 var objNodes = {};
 
                 var allReferences = [];
@@ -146,29 +159,80 @@ angular.module("formsApp")
 
                 });
 
-                console.log(objNodes)
+               // console.log(objNodes)
 
+                //if there's a focusResource, then assemble a hash of all resources that it references, or that reference it
+
+                let hashResourcesToInclude = {}     //when there is a focus resource, this will be a hash of resources that have a reference with it
+                hashResourcesToInclude[focusResourceRef] = true     //include the focus resource
+                let refToInclude = []  //references to include
                 allReferences.forEach(function(ref){
-                    let targetNode = objNodes[ref.targ];
+                    let targetNode = objNodes[ref.targ];    //the node that the reference points to...
                     if (targetNode) {
                         //var label = $filter('dropFirstInPath')(ref.path);
                         let ar = ref.path.split('.')
                         ar.splice(0,1)
                         let label = ar.join('.')
-                        arEdges.push({id: 'e' + arEdges.length +1,
+                        edge = {id: 'e' + arEdges.length +1,
                             from: ref.src.id,
                             to: ref.targ, // targetNode.id,
-                            label: label,arrows : {to:true}})
+                            label: label,arrows : {to:true}}
+                      //  arEdges.push(edge)
+                     //   arEdges.push({id: 'e' + arEdges.length +1,
+                      //      from: ref.src.id,
+                       //     to: ref.targ, // targetNode.id,
+                           // label: label,arrows : {to:true}})
+
+
+                        //console.log(focusResourceRef, ref.src.id,ref.targ)
+                        if (focusResourceRef) {
+                            if (ref.src.id == focusResourceRef) {
+                                hashResourcesToInclude[ref.targ] = true
+                                refToInclude.push(ref)
+                                //console.log('include src')
+                                arEdges.push(edge)
+                            }
+
+                            if ( ref.targ == focusResourceRef) {
+                                hashResourcesToInclude[ref.src.id] = true
+                                refToInclude.push(ref)
+                                //console.log('include targ')
+                                arEdges.push(edge)
+                            }
+
+                        } else {
+                            arEdges.push(edge)
+                        }
+
                     } else {
+
                         console.log('>>>>>>> error Node Id '+ref.targ + ' is not present')
                     }
                 });
+
+                //console.log(focusResourceRef,hashResourcesToInclude)
+
+                //create an array of nodes, excluding those that don't have a refence with the focus resource
+                let arNodes1 = []
+
+                arNodes.forEach(function (node) {
+                    if (focusResourceRef) {
+                        if (hashResourcesToInclude[node.id]) {
+                            arNodes1.push(node)
+                        }
+                    } else {
+                        arNodes1.push(node)
+                     //   edge.id = 'e' + arEdges.length + 1
+                      //  arEdges.push(edge)
+                    }
+
+                })
 
                 let nodes;
                 let edges;
 
                 //nodes = new vis.DataSet(arNodes);
-                nodes = new vis.DataSet(arNodes)
+                nodes = new vis.DataSet(arNodes1)
                 edges = new vis.DataSet(arEdges);
 
 

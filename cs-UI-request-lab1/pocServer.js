@@ -16,10 +16,11 @@ console.log(`Custom ops from env is ${process.env.CUSTOMOPS}`)
 let serverBase = process.env.SERVERBASE
 
 const requesterModule = require("./serverModuleRequesterUI.js")
-const labModule = require("./serverModuleLab.js")
-const dashBoardModule = require("./serverModuleDashboard.js")
-const commonModule = require("./serverModuleCommon.js")
-const clinicalViewerModule = require("./serverModuleClinicalViewer")
+const labModule = require("./serverModuleLabUI.js")
+const dashBoardModule = require("./serverModuleDashboardUI.js")
+const commonModule = require("./serverModuleCommonUI.js")
+const clinicalViewerModule = require("./serverModuleClinicalViewerUI")
+const terminologyModule = require("./serverModuleTerminologyUI")
 //let config = require("./config.json")
 
 let express = require('express');
@@ -38,7 +39,8 @@ requesterModule.setup(app)
 labModule.setup(app)
 dashBoardModule.setup(app)
 clinicalViewerModule.setup(app)
-//app.get('')
+terminologyModule.setup(app)
+
 
 //common calls (not specifically related to requester or lab. ?move to separate module
 app.get('/config', async function(req,res){

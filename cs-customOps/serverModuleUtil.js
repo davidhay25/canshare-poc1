@@ -10,7 +10,7 @@ let database
 
 client.connect().then(
     function () {
-        console.log('connected')
+        console.log('connected to Mongo database')
         database = client.db("logger")
     }).catch(function () {
         console.log('not connected to the Mongo database. Unable to make log entries')

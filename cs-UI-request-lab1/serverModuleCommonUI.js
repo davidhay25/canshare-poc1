@@ -35,7 +35,8 @@ async function singleQuery(query) {
         qry = serverBase + query
     }
 
-    if (qry.indexOf('_count') == -1) {
+    //add the count if it's not already there, and the query is not a history one...
+    if (qry.indexOf('_count') == -1 && qry.indexOf('_history') == 1) {
         qry += "&_count=50"
     }
 

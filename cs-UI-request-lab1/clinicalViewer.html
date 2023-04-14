@@ -46,7 +46,12 @@
 
     <script src="directive/displayMeds/displayMedsDir.js"></script>
 
+    <script src="directive/actNow/actNowDir.js"></script>
+    <script src="directive/actNow/actNowDirSvc.js"></script>
+
     <script src="js/libs/vis.min.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/sharedServiceSvc.js"></script>
 
 </head>
 <body style="padding: 8px;padding-top: 80px">
@@ -124,6 +129,7 @@
                                          ng-repeat="entry in bundleSR.entry">
                                             <div ng-repeat="cat in entry.resource.category">{{cat.text}}</div>
 
+                                        <div class="pull-right">{{entry.resource.id}}</div>
                                         {{entry.resource.authoredOn | date}}
 
                                     </div>
@@ -137,8 +143,34 @@
 
                             <uib-tabset>
 
-                                <uib-tab heading="Request text">
+                                <uib-tab heading="Request">
                                     <qrdisplay qr="QR"></qrdisplay>
+                                </uib-tab>
+
+                                <uib-tab heading="Report">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <strong>Report versions</strong>
+                                            <div class="list-group">
+                                                <div class="list-group-item"
+                                                     ng-click="selectDRVersion(entry.resource)"
+                                                     ng-repeat="entry in DRhistory.entry">
+                                                    {{entry.resource.meta.versionId}}
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-md-9">
+                                            <div ng-show="reportObject">
+                                                <reportdisplay reportobject="reportObject"></reportdisplay>
+                                            </div>
+<!--
+                                            <pre>{{selectedDRVersion | json}}</pre>
+                                            -->
+                                        </div>
+                                    </div>
+
                                 </uib-tab>
 
 
@@ -224,8 +256,22 @@
 
                 <uib-tab heading="ACT-NOW chemotherapy treatment">
                     <br/>
+                    <uib-tabset>
+                        <uib-tab heading="Chemotherapy treatment">
+                            <actnow patient = "selectedPatient" clinsumm="input.anClinicalSummary"></actnow>
+                        </uib-tab>
+                        <uib-tab heading="Medications">
+                            <displaymeds meds="allMeds"></displaymeds>
+                        </uib-tab>
 
-                    <displaymeds meds="allMeds"></displaymeds>
+                        <uib-tab heading="Graph">
+                            <!--
+                            <viewbundle bundle="input.anClinicalSummary"></viewbundle>
+                            -->
+                        </uib-tab>
+                    </uib-tabset>
+
+
 
                 </uib-tab>
             </uib-tabset>

@@ -10,9 +10,16 @@ angular.module("pocApp")
             commonSvc.init().then(
                 function(data){
                     $scope.config = data
-
-
                 })
+
+            $scope.submitLabel = function() {
+                if ($scope.input.final) {
+
+                    return "Submit final report"
+                } else {
+                    return "Submit draft report"
+                }
+            }
 
             //called when there is any change in the form
             $scope.$on('qrCreated',function(event,vo1) {
@@ -22,7 +29,7 @@ angular.module("pocApp")
                 //$scope.hashItem = vo1.hashItem
                 console.log(vo1)
 
-                makeReport(vo1.QR, $scope.selectedRequest, $scope.selectedReportQ)  //sets $scope.reportBundle
+                makeReport($scope.createdQR, $scope.selectedRequest, $scope.selectedReportQ)  //sets $scope.reportBundle
 
             })
 
@@ -39,8 +46,7 @@ angular.module("pocApp")
                 )
             }
 
-                //load the list of possible report templates (questionnaires)
-            //returns bundle of Q
+            //load the list of possible report templates (questionnaires)
             $http.get("/lab/templates").then(
                 function(data) {
                     //returns a bundle in data.data
@@ -87,7 +93,7 @@ angular.module("pocApp")
                 //now create the relationship between the item.code and linkId in the Q. This is needed
                 //as the Observations that will be generated will use the code from the item...
 
-                $scope.hashLinkIdCodes = labSvc.getCodingForLinkId($scope.selectedReportQ)
+                $scope.hashLinkIdCodes = labSvc.getCodingForLinkId($scope.selectedReportQ)  //note these are CC
 
 
 
@@ -113,17 +119,19 @@ angular.module("pocApp")
 
             //a single request object {pat:, sr:} is selected.
             //retrieve the details for that sr
-
             $scope.selectRequest = function(request) {
                 if (request && request.sr && request.sr.identifier) {
                     let srIdentifier = request.sr.identifier[0].value
-                    //returns an object {sr:, qr:}
+                    //returns an object {pat:, sr:, qr:, dr: obs:}
+                    //dr (DiagnosticReport) and obs will be populated if there was an interim report that is being updated.
+
                     let qry = `/lab/SRDetails?identifier=${srIdentifier}`
                     $http.get(qry).then(
                         function(data) {
                             console.log(data.data)
                             let vo = data.data
                             $scope.selectedRequest = vo
+                            //todo - if observations were returned, we can pre-populate the form...
                         },
                         function(err) {
                             console.log(err.data)
@@ -135,38 +143,41 @@ angular.module("pocApp")
 
             //generate the report bundle from the QR and the currrent reques object ({pat:, sr:, qr:}
             let makeReport = function(QR,request,reportQ) {
-                $scope.reportBundle = labSvc.makeReport(QR, request,reportQ)
-                console.log($scope.reportBundle)
+                let status = 'preliminary'
+                if ($scope.input.final) {
+                    status = 'final'
+                }
+//console.log(request)
+                //todo add any previous DR / Obs - set their status to 'cancelled'. A smarter implementation could update them...
+                //if the status is not final, then don't update the SR
+                $scope.reportBundle = labSvc.makeReport(QR, request,reportQ,status)
+               // console.log($scope.reportBundle)
             }
 
             //create a set of DR / Obs and send to the CS Server
             $scope.submitReport = function() {
-                //assume that the Patient resource (from the CS server). For now, we won't include the Patient resource - could potentially add the identifier to the reference as well, not sure why...
-                //in the bundle, but will include a reference and NHI from all the resources
+
                 //assume that there is only a single answer per item - no multiples...
 
                 if (! confirm("Are you sure you wish to submit this report")) {
                     return
                 }
-
-                //All
-
-
-                //finally, we can send the report to the CS Server
+                //make the report again (in case the status was changed after the form was created. sets $scope.reportBundle
+                makeReport($scope.createdQR, $scope.selectedRequest, $scope.selectedReportQ)
 
                 $http.post("/lab/submitreport",$scope.reportBundle).then(
                     function(data){
                         //alert("Report has been submitted")
 
                         $scope.submissionOO = data.data
-
                         $scope.getActiveRequests()
                         console.log(data)
 
 
                     }, function(err) {
+                        $scope.errorOO = err.data
                         console.log(err)
-                        alert("There was an error: " + angular.toJson(err.data))
+                       // alert("There was an error: " + angular.toJson(err.data))
                     }
                 )
 

@@ -10,10 +10,22 @@ angular.module("pocApp")
 
             $scope.input.command = $scope.commands[0]
 
+            $scope.formData = {}
+
             //when the form is updated. Used by the display form tab
             $scope.$on('qrCreated',function(event,vo1) {
                 $scope.createdQR = vo1.QR
             })
+
+            $scope.copyFormToFormsServer = function (Q) {
+                console.log(Q)
+
+                let cleanedQ = dashboardSvc.cleanQ(Q)
+                console.log(cleanedQ)
+
+
+            }
+
 
             $scope.contexts = ["All","Request","Report","General"]
 

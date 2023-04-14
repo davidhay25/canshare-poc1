@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>Query</title>
+
+    <script src="js/libs/jquery-1.9.0.min.js"></script>
+    <script src="js/libs/angular.min1-5.js"></script>
+    <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+    <script src="js/libs/moment.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+
+    <script>
+        angular.module("pocApp",['ui.bootstrap','ui.checkbox']).config(function($locationProvider) {
+            $locationProvider.html5Mode(true);
+            $locationProvider.hashPrefix('!');
+        });
+        angular.module("pocApp").constant("moment", moment);
+
+        angular.module("formsApp",[])
+        angular.module('topApp', ['pocApp', 'formsApp'])
+
+    </script>
+
+    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
+
+    <script src="js/questionnaireSvc.js"></script>
+
+    <script src="js/queryCtrl.js"></script>
+
+
+    <script src="directive/viewBundle/viewBundleDir.js"></script>
+    <script src="directive/viewBundle/viewBundleSvc.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+
+
+
+</head>
+<body style="padding: 8px;padding-top: 80px">
+<div ng-app="topApp" ng-controller="queryCtrl" class="container-fluid">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+        <div class="container-fluid">
+            <div class="col-md-2 col-sm-2">
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            Query
+                        </a>
+                    </span>
+
+            </div>
+
+            <div class="col-md-5 col-sm-5">
+                <div class="navbar-text">
+
+
+
+                </div>
+
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <form class="navbar-form navbar-left">
+                    <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+
+                </form>
+            </div>
+
+            <div class="col-md-2">
+
+            </div>
+
+            <div class="col-md-2">
+                <a href="https://teaho.govt.nz/" target="_blank">
+                    <img width="150" height="auto" class="pull-right"
+                         style="padding: 3px"
+                         src="images/TAK-logo-midgreen.png"/>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <uib-tabset>
+        <uib-tab heading="ValueSet finder">
+            <div class="row">
+                <div class="col-md-3">
+                    <br/>
+                    <label>Type of ValueSet</label>
+                    <div>
+                        <select class="form-control" ng-model="vsType"
+                                ng-disabled="vsCustom.length > 0"
+                                ng-options = "option.display for option in vsTypes">
+                            <option></option>
+
+                        </select>
+                    </div>
+                    <br/>
+                    <label>Tumour type</label>
+                    <div>
+                        <select class="form-control" ng-model="vsTumourType"
+                                ng-disabled="vsCustom.length > 0"
+                                ng-options = "option.display for option in vsTumourTypes">
+                            <option></option>
+                        </select>
+                    </div>
+
+                    <br/>
+                    <label>Custom Search</label>
+                    <input type="text" class="form-control" ng-model="vsCustom"/>
+
+
+                    <button class="btn-primary btn" ng-click="findVS(vsType,vsTumourType,vsCustom)">Find</button>
+
+                </div>
+                <div class="col-md-9">
+                    <div ng-show="query" class="rounded-box">Query: {{query}}</div>
+                    <br/>
+
+                    <div ng-show="oo">
+                        <div class="alert alert-danger">
+                            <pre>{{oo | json}}</pre>
+                        </div>
+
+                    </div>
+
+                    <div ng-hide="oo" class="row">
+                        <div class="col-md-3">
+                            <div class="list-group">
+                                <div class="list-group-item" ng-click="selectVS(entry.resource)"
+                                     style="cursor: pointer"
+                                    ng-repeat="entry in vsBundle.entry">
+                                        {{entry.resource.title || getLastPartOfUrl(entry.resource.url)}}
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-md-9" ng-show="selectedVS">
+                            <div class="banner">{{selectedVS.url}}</div>
+                            <uib-tabset>
+                                <uib-tab heading="Json">
+                                    <pre>{{selectedVS | json}}</pre>
+                                </uib-tab>
+                                <uib-tab heading="Expand">
+                                    <br/>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <input type="text" placeholder="Filter text" class="form-control" ng-model="filter"/>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button class="btn-primary btn" ng-click="expandVS(selectedVS,filter)">Expand</button>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <pre ng-show="ooExpand">{{ooExpand | json}}</pre>
+                                    <pre ng-show="vsExpanded">{{vsExpanded.expansion | json}}</pre>
+
+                                </uib-tab>
+                            </uib-tabset>
+
+
+                        </div>
+
+
+
+                    </div>
+
+                </div>
+            </div>
+        </uib-tab>
+    </uib-tabset>
+
+
+</div>
+</body>

@@ -23,6 +23,10 @@
         });
         angular.module("pocApp").constant("moment", moment);
 
+        //this allows the directives (which are in the formsApp) to be used. see https://stackoverflow.com/questions/15641730/angular-js-directives-in-different-modules
+        angular.module("formsApp",[])
+        angular.module('topApp', ['pocApp', 'formsApp'])
+
     </script>
 
     <script src="js/labCtrl.js"></script>
@@ -45,7 +49,7 @@
 </head>
 
 <body style="padding: 8px;padding-top: 80px">
-    <div ng-app="pocApp" ng-controller="labCtrl" class="container-fluid">
+    <div ng-app="topApp" ng-controller="labCtrl" class="container-fluid">
 
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
@@ -186,16 +190,32 @@
                     <div class="row">
                         <div class="col-md-12">
 
-                            <div ng-show = "submissionOO">
-                                <pre>{{submissionOO | json}}</pre>
+
+                            <div ng-show="selectedRequest.dr">
+                                <div class="alert alert-warning">
+                                    There was a previous report
+                                </div>
                             </div>
 
-                            <div ng-hide="submissionOO">
+                            <div ng-show = "submissionOO">
+                                <div class="alert alert-success">
+                                    <pre>{{submissionOO | json}}</pre>
+                                </div>
+                            </div>
+
+                            <div ng-show = "errorOO">
+                                <div class="alert alert-danger">
+                                    <pre>{{errorOO | json}}</pre>
+                                </div>
+
+                            </div>
+
+                            <div ng-hide="submissionOO || errorOO">
                                 <div class="row">
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         Template
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <select ng-model="selectedTemplate" class="form-control"
                                                 placeholder="Select form"
                                                 ng-change="selectQ(selectedTemplate)"
@@ -203,14 +223,27 @@
                                         </select>
                                     </div>
                                     <div class="col-md-2">
+                                        <checkbox ng-show="selectedRequest && selectedReportQ"
+                                                  ng-model="input.final"></checkbox> Final report
+                                    </div>
+                                    <div class="col-md-2">
                                         <button class="btn btn-primary"
                                                 ng-show="selectedRequest && selectedReportQ"
-                                                ng-click="submitReport()">Submit report</button>
+                                                ng-click="submitReport()">{{submitLabel()}}</button>
                                     </div>
                                 </div>
 
                                 <div class="myScroll">
-                                    <renderform q="selectedReportQ" qr="QR"></renderform>
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <renderform q="selectedReportQ" qr="QR"></renderform>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <qrdisplay qr="createdQR" q="selectedReportQ"></qrdisplay>
+                                        </div>
+                                    </div>
+
+
                                 </div>
                             </div>
 
@@ -221,7 +254,7 @@
 
                     </div>
                 </uib-tab>
-                <uib-tab heading="Report Preview">
+                <uib-tab ng-show = 'false' heading="Report Preview">
                     <qrdisplay qr="createdQR" q="selectedReportQ"></qrdisplay>
                 </uib-tab>
                 <uib-tab heading="View report bundle">

@@ -39,19 +39,22 @@ angular.module('formsApp')
                                 try {
                                     $scope.qr.item.forEach(function (section) {
                                         section.item.forEach(function (child) {
-                                            child.answer.forEach(function (ans) {
-                                                if (ans.valueAttachment) {
-                                                    //so there should be a canvas element already created by the rendered with this linkId
+                                            if (child.answer) {
+                                                child.answer.forEach(function (ans) {
+                                                    if (ans.valueAttachment) {
+                                                        //so there should be a canvas element already created by the rendered with this linkId
 
-                                                    let canvas2 = document.getElementById(`drawing-${child.linkId}`);
-                                                    let context2 = canvas2.getContext('2d')
-                                                    let img = new Image()
-                                                    img.src = atob(ans.valueAttachment.data)
-                                                    img.onload = function(){
-                                                        context2.drawImage(img,0,0)
+                                                        let canvas2 = document.getElementById(`drawing-${child.linkId}`);
+                                                        let context2 = canvas2.getContext('2d')
+                                                        let img = new Image()
+                                                        img.src = atob(ans.valueAttachment.data)
+                                                        img.onload = function(){
+                                                            context2.drawImage(img,0,0)
+                                                        }
                                                     }
-                                                }
-                                            })
+                                                })
+                                            }
+
                                         })
                                     })
                                 } catch(ex) {
