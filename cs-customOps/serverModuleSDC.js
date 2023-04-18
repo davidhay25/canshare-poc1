@@ -118,7 +118,6 @@ function performResourceExtraction(Q,QR) {
     let hashQ = {}      //hash of items that have the Observation extract extension set
     let hashQR = {}     //hash of items in QR with an answer
     let hashQDefinition = {}    //hash of items that have the definition extraction set. {item: resourceType:}
-
     let hashQItem = {}          //hash or all items in the Q by linkId
 
 

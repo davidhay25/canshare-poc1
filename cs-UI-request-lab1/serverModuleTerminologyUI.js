@@ -4,7 +4,32 @@
 const axios = require("axios");
 //const commonModule = require("./serverModuleCommonUI");
 
+let library = require("./library.json")
+
+let servers = []
+
+servers.push({display:"CanShare",url:"http://localhost:9199/baseR4/"})
+servers.push({display:"Public hapi R4",url:"http://hapi.fhir.org/baseR4/"})
+servers.push({display:"Terminz",url:"https://terminz.azurewebsites.net/fhir/"})
+servers.push({display:"Ontoserver",url:"https://r4.ontoserver.csiro.au/fhir/"})
+
+
 function setup(app) {
+
+    app.get('/termServers', function(req,res) {
+        let ar = []
+        //only return the display and url
+        servers.forEach(function (svr) {
+            ar.push({display:svr.display,url:svr.url})
+        })
+        res.json(ar)
+    })
+
+    app.get('/searchLibrary', function(req,res) {
+
+        res.json(library)
+    })
+
     app.get('/termQuery',async function(req,res) {
 
         //the query was url encoded so it could be passed to the server. It is the full query (including server)

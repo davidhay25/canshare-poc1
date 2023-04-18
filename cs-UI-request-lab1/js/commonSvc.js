@@ -286,8 +286,6 @@ angular.module("pocApp")
 
                             }
 
-
-
                             //have we created the sectionitem yet?
                             if (! sectionRootItem) {
                                 //this is the first child entry that has data
@@ -325,13 +323,16 @@ angular.module("pocApp")
                 Q.item.forEach(function (sectionItem) {
                     let section = {text:sectionItem.text,questions:[]}
                     arSections.push(section)
-                    sectionItem.item.forEach(function (questionItem) {
-                        //let question = {text:questionItem.text,type:questionItem.type,linkId:questionItem.linkId}
+                    if (sectionItem.item) {
+                        sectionItem.item.forEach(function (questionItem) {
+                            //let question = {text:questionItem.text,type:questionItem.type,linkId:questionItem.linkId}
 
-                        section.questions.push(questionItem)
-                        //section.questions.push(question)
+                            section.questions.push(questionItem)
+                            //section.questions.push(question)
 
-                    })
+                        })
+                    }
+
                 })
                 return arSections
 

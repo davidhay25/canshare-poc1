@@ -8,6 +8,7 @@ let serverBase = process.env.SERVERBASE         //the location of the FHIR serve
 if (serverBase[serverBase.length-1] !== '/') {
     serverBase += '/'
 }
+
 let requestEndpoint = process.env.CUSTOMOPS + "$acceptRequest"  //where the request bundle is sent
 let testExtractEndpoint = process.env.CUSTOMOPS + "testExtraction"  //the EP that will extract the resources
 
@@ -26,13 +27,19 @@ function setup(app,inDb) {
         let type = resource.resourceType
 
         let qry = `${serverBase}${type}/$validate`
+        console.log("Validate: "+ qry)
         //let qry = serverBase + "/csValidate"
         try {
             let response = await axios.post(qry,resource)
             let bundle = response.data
             res.json(bundle)
         } catch (ex) {
-            res.json(ex.response.data)
+            console.log(ex.response)
+            if (ex.response) {
+                res.status(400).json(ex.response.data)
+            } else {
+                res.status(500).json(ex)
+            }
         }
     })
 
@@ -61,7 +68,7 @@ function setup(app,inDb) {
     //the request templates
     app.get('/requester/templates',async function(req,res){
 
-        let qry = serverBase + "/Questionnaire?context=request"
+        let qry = serverBase + "/Questionnaire?context=request&status=draft,active"
         try {
             let response = await axios.get(qry)
             let bundle = response.data

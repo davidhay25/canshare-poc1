@@ -411,8 +411,6 @@ angular.module("pocApp")
                 */
             }
 
-
-
             //call the validate endpoint on the local server (that serves this site)
             $scope.validateQR = function(resource) {
                 delete $scope.QRValidationResult
@@ -421,7 +419,9 @@ angular.module("pocApp")
                 $http.post(url,resource).then(
                     function(data){
                         $scope.QRValidationResult = data.data
-
+                    }, function(err) {
+                        //if it fails validation
+                        $scope.QRValidationResult = err.data
                     }
                 )
             }

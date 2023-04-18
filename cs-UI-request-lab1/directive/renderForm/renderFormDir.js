@@ -7,7 +7,7 @@ angular.module('formsApp')
                 //@ reads the attribute value, = provides two-way binding, & works with functions
                 q: '=',
                 qr : '=',
-                form : "="
+                form : "="          //todo I don't think this is being used & could be removed when I get back to the forms app
             },
 
             templateUrl: 'directive/renderForm/renderFormDir.html',
@@ -28,12 +28,7 @@ angular.module('formsApp')
                         })
                     }
 
-
-                    //$scope.form =
-
-
                     //not working...  renderFormsSvc.setControls($scope.input.formTemplate,$scope.input.form)
-
                   //  $scope.makeQR() - causes a stack overflow
                 })
 

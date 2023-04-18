@@ -290,7 +290,7 @@ function setup(app) {
     //the Q themselves are developed in the IG cs-datastandarddesigner
     app.get('/lab/templates',async function(req,res){
 
-        let qry = serverBase + "/Questionnaire?context=report"
+        let qry = serverBase + "/Questionnaire?context=report&status=draft,active"
         try {
             let response = await axios.get(qry)
             let bundle = response.data

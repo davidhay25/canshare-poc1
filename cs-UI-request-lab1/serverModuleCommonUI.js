@@ -28,6 +28,8 @@ async function multiQuery(lst) {
 
 }
 
+//execute a single query, following paging.
+//If the query does not begin with 'http', then execute agains the POC fhir server
 async function singleQuery(query) {
 
     let qry = query

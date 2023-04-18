@@ -75,6 +75,10 @@ angular.module('formsApp')
                     $scope.input.hiddenFields = {}
                     $scope.hashDrawings = {}
 
+                    if (!Q.item) {
+                        return
+                    }
+
                     Q.item.forEach(function (section) {
                         if (section.item) {
                             section.item.forEach(function (item) {

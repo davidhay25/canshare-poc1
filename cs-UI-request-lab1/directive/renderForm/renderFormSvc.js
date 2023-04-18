@@ -424,7 +424,7 @@ angular.module("formsApp")
                 let hashValues = {}
                 Object.keys(form).forEach(function (linkId) {
                     let dataItem = form[linkId]
-                    let canShow = that.checkConditional(dataItem,form)
+                    //let canShow = that.checkConditional(dataItem,form)
                     hashValues[linkId] = dataItem
                 })
 
@@ -457,7 +457,7 @@ angular.module("formsApp")
                                             sectionItem.item.push(groupItem)
                                         }
 
-                                        let leafItem = {linkId:gc.linkId,  answer:[]}
+                                        let leafItem = {linkId:gc.linkId,  answer:[], text:gc.text}
                                         groupItem.item.push(leafItem)
 
                                         let v = hashValues[gc.linkId]        //the value in the form
@@ -473,15 +473,16 @@ angular.module("formsApp")
 
                             } else {
                                 //this is a leaf directly off the section
-                                if (hashValues[child.linkId]) {
+                                if (hashValues[child.linkId] ) {
                                     //there is a value, so it should be added to the QR (as a child of he section.
-                                    //First, is there a seciton item?
+                                    //First, is there a section item?
                                     if (! sectionItem) {
                                         //no there isn't - add it to the top level of the QR
                                         sectionItem = {linkId : section.linkId,text:section.text,item: []}
                                         QR1.item.push(sectionItem)
                                     }
                                     //now craete an item that can be added to the section
+
                                     let leafItem = {linkId:child.linkId, text: child.text,answer:[]}
                                     sectionItem.item.push(leafItem)      //add the leaf item to the section
 
@@ -491,6 +492,7 @@ angular.module("formsApp")
                                         leafItem.answer = leafItem.answer ||[]
                                         leafItem.answer.push(result)
                                     }
+
                                 }
                             }
 
@@ -503,9 +505,11 @@ angular.module("formsApp")
 
                 return QR1
 
+
+
                         //---------------------
 
-
+/*
                 //todo - working on multiple values for a single linkId.
                 //the form var is a hash keyed by the linkId containing the value (if any).
                 // For now, make that an array = and only take the first value when processing. Later - allow more than one
@@ -554,11 +558,7 @@ angular.module("formsApp")
                             //let canShow = that.checkConditional(child,)
 
                             if (arValues !== undefined && arValues.length > 0) {        //is there a value for this item. Won't be if this is a group...
-                               /* if (! parentItem) {
-                                    parentItem = {linkId : section.linkId,text:section.text,item: []}
-                                    QR.item.push(parentItem)
-                                }
-*/
+
                                 arValues.forEach(function (value) {
                                     let result = getValue(child,value)
                                     if (result ) {
@@ -620,14 +620,7 @@ angular.module("formsApp")
                                         arValues.forEach(function (v) {
                                             let result = getValue(gcItem,v)
                                             if (result) {
-/*
-                                                if (! gcRootItem) {
-                                                    //the root hasn't been created
-                                                    gcRootItem = {linkId:child.linkId,text:child.text}
-                                                    parentItem.item = parentItem.item || []
-                                                    parentItem.item.push(gcRootItem)
-                                                }
-*/
+
 
                                                 gcItemToInsert.answer = gcItemToInsert.answer ||[]
                                                 gcItemToInsert.answer.push(result)
@@ -685,6 +678,8 @@ angular.module("formsApp")
                 })
 
                 return QR
+
+                */
 
                 function getValue(item,value) {
                     if (value == undefined) {       //can't just use 'if value' as booleans can be false

@@ -12,7 +12,6 @@
 
                     <div ng-hide="input.hiddenFields[child.linkId]">
 
-
                         <div ng-if="child.answer[0].valueAttachment">
                             <div class="col-md-12">
                                 <div style="text-align: center">
@@ -41,12 +40,8 @@
                             </div>
                         </div>
 
-
                     </div>
                 </div>
-
-
-
 
             </div>
             <div ng-show = "child.item">    <!-- this is a group - it has child items itself-->
@@ -57,8 +52,6 @@
                 <div ng-repeat = "gc in child.item">
                     <div class="row" ng-show="gc.answer.length > 0">
                         <div ng-hide="input.hiddenFields[gc.linkId]">
-
-
 
                         <div class="col-md-6" >
                             <div style="padding-left: 8px"  uib-popover="{{gc.linkId}}"

@@ -56,6 +56,7 @@ app.get('/config', async function(req,res){
 
 
 //send in an array of queries. Execute them and add all the results into a single bundle
+//If the query doesn't start with 'http' then execute against the POC server
 //todo - if we want to, could change to parallel execution...
 //https://javascript.plainenglish.io/running-multiple-requests-with-async-await-and-promise-all-e178ae318654
 app.post('/multiquery',async function(req,res){
@@ -105,6 +106,8 @@ app.post('/multiquery',async function(req,res){
 })
 
 
+//execute a single query, following paging.
+//If the query doesn't start with 'http' then execute against the POC server
 app.get('/proxy',async function(req,res){
 
     //the query was url encoded so it could be passed to the server

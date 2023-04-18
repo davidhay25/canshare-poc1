@@ -1,0 +1,48 @@
+{
+  "entry" : [
+    {
+      "display" :  "All resources for a patient",
+      "url" : "Patient/{patientid}/$everything",
+      "notes" : "This uses the patient compartment operation, which requires the patient id to be known",
+      "links" : [
+        {
+          "display" : "Compartments",
+          "url" : "compartmentdefinition.html"
+        }
+      ]
+    },
+    {
+      "display" :  "All CarePlans for a patient",
+      "url" : "CarePlan?subject.identifier={identifier}",
+      "notes" : "This returns CarePlans for a patient using a chained query (the patient identifier) to select it",
+      "links" : [
+        {
+          "display" : "Chained seearches",
+          "url" : "search.html#chaining"
+        }
+      ]
+    },
+
+    {
+      "display" :  "All ServiceRequests for a patient. Identifier search",
+      "url" : "ServiceRequest?subject.identifier={identifier}",
+      "notes" : "Return all ServiceRequests, using the patient identifier",
+      "links" : [
+
+      ]
+    },
+    {
+      "display" :  "All ServiceRequests for a patient. Id query",
+      "url" : "ServiceRequest?subject={patientid}",
+      "notes" : "Return all ServiceRequests using the patient id. The UI allows patient query.",
+      "links" : [
+
+      ]
+    }
+  ],
+  "systems" : [
+    {"display": "NHI",
+      "value": "https://standards.digital.health.nz/ns/nhi-id"
+    }
+  ]
+}

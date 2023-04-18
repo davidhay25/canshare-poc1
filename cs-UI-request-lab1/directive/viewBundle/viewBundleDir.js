@@ -30,9 +30,6 @@ angular.module('formsApp')
 
                 $scope.input = {showhide:{}};
 
-
-
-
                 let baseFhirUrl = "http://hl7.org/fhir/R4B/"     //hard code to R4B. may need to become a parameter...
 
                 //select an entry from the bundle

@@ -72,6 +72,7 @@
 
                     <button class="btn btn-primary" ng-click="input.command = commands[0]">{{commands[0].display}}</button>
                     <button class="btn btn-primary" ng-click="input.command = commands[1]">{{commands[1].display}}</button>
+                    <button class="btn btn-primary" ng-click="input.command = commands[2]">{{commands[2].display}}</button>
 
                 </div>
 
@@ -99,6 +100,11 @@
     </nav>
 
 
+
+    <div ng-show="input.command.key == 'formserver'">
+        ? deprecate forms on forms server - change status
+    </div>
+
     <div ng-show="input.command.key == 'forms'">
 
 
@@ -108,10 +114,14 @@
                 <checkbox ng-model="input.fsOnly" ng-change="checkBoxChange()">
                 </checkbox> Show already on Forms Server (<span class="badge">FS</span>)
                 <br/><br/>
-
+<!-- add later, select based on context
                 <select class="form-control" ng-model="input.context"
                         ng-options = "ctx for ctx in contexts"></select>
                 <br/>
+                -->
+
+                <input class="form-control" ng-model="filter" placeholder="Filter text"/>
+
                 <div class="myScroll">
                     <div class="list-group">
                         <div ng-class="{'list-group-item':true,listItemSelected:miniQ==selectedMiniQ}"
@@ -119,11 +129,12 @@
                              ng-show = "showInList(miniQ)"
                              style="cursor: pointer"
                              ng-repeat="miniQ in allMiniQ">
+                            <span class="pull-right">v{{miniQ.designResource.meta.versionId}}</span>
                             {{miniQ.name}}
                             <span class="pull-right badge" ng-show="miniQ.existsOnFormsServer">
                                 FS
                             </span>
-                            <div>{{miniQ.title}}</div>
+                            <div><em>{{miniQ.title}}</em></div>
                         </div>
                     </div>
                 </div>
@@ -133,68 +144,106 @@
             </div>
             <div class="col-md-9">
                 <uib-tabset ng-show="selectedMiniQ">
-                    <uib-tab heading="Tree">
-                        <showqtree q="selectedQfromDesigner"></showqtree>
-                    </uib-tab>
-                    <uib-tab heading="Form">
-                        <uib-tabset>
-                            <uib-tab heading="Edit form">
-                                <renderform q="selectedQfromDesigner" qr="createdQR" form="formData"></renderform>
-                            </uib-tab>
-                            <uib-tab heading="Display form">
 
-                                <qrdisplay q="selectedQfromDesigner" qr="createdQR"></qrdisplay>
-                            </uib-tab>
-                        </uib-tabset>
-                    </uib-tab>
-                    <uib-tab heading="Manage">
-                        <br/>
-                        <div>Url: {{selectedMiniQ.url}}</div>
-                        <br/><br/>
-                        <div ng-show = "selectedMiniQ.existsOnFormsServer">
-                            <div class="row">
+                        <uib-tab heading="Manage">
+                            <br/>
+                            <div class="banner">{{selectedMiniQ.url}}</div>
+                            <br/><br/>
+                            <div ng-show = "selectedMiniQ.existsOnFormsServer">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        This template already exists on the forms server.
+
+                                        <br/><br/>
+
+                                        <table class="table table-bordered">
+                                            <tr><th>Property</th><th>Designer</th><th>Forms Server</th></tr>
+                                            <tr>
+                                                <td>Resource Version</td>
+                                                <td>{{selectedMiniQ.designResource.meta.versionId}}</td>
+                                                <td>{{selectedMiniQ.fsResource.meta.versionId}}</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>Form Version</td>
+                                                <td>{{selectedMiniQ.designResource.version}}</td>
+                                                <td>{{selectedMiniQ.fsResource.version}}</td>
+                                            </tr>
+
+
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <br/><h4>Copy from Designer to Forms Server</h4>
+
                                 <div class="col-md-6">
-                                    This template already exists on the forms server.
+                                    This action will copy the selected template to the Forms Server,
+                                    making it available to applications in the Reference Implementation.
 
-                                    <br/><br/>
+                                    <div ng-show = "selectedQfromDesigner.useContext">
+                                        <br/>
+                                        This Q defines a {{contextString}} form.
+                                    </div>
 
-                                    <table class="table table-bordered">
-                                        <tr><th>Property</th><th>Designer</th><th>Forms Server</th></tr>
-                                        <tr>
-                                            <td>Version</td>
-                                            <td>{{selectedQfromDesigner.version}}</td>
-                                            <td>{{selectedQfromFS.version}}</td>
-                                        </tr>
-                                    </table>
+                                    <div ng-hide = "contextString">
+                                        <br/>
+                                        This Questionnaire has no context defined in the Designer (ie whether it is a request, report or general form. What should it be?
+                                        <br/><br/>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <select class="form-control" ng-model="input.QContext"
+                                                        ng-change="setContext(input.QContext)"
+                                                        ng-options="ctx for ctx in arQContext">
+
+                                                </select>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <br/>
+
+                                    <button class="btn btn-primary" ng-show="contextString"
+                                            ng-click="copyFormToFormsServer(selectedQfromDesigner)">Copy to Forms server</button>
+
+
                                 </div>
                                 <div class="col-md-6">
 
                                 </div>
-                            </div>
-                        </div>
-
-                        <div ng-hide = "selectedMiniQ.existsOnFormsServer">
-                            <div class="col-md-6">
-                                This action will copy the selected template to the Forms Server,
-                                making it available to applications in the Reference Implementation.
-
-
-                                <button class="btn btn-primary" ng-click="copyFormToFormsServer(selectedQfromDesigner)">Copy to Forms server</button>
-
-
-                            </div>
-                            <div class="col-md-6">
-
-                            </div>
-                        </div>
 
 
 
-                    </uib-tab>
-                    <uib-tab heading="Json">
-                        <pre>{{selectedQfromDesigner | json}}</pre>
-                    </uib-tab>
 
+                        </uib-tab>
+
+                        <uib-tab heading="Form on Designer">
+                            <uib-tabset>
+                                <uib-tab heading="Tree">
+                                    <showqtree q="selectedQfromDesigner"></showqtree>
+                                </uib-tab>
+                                <uib-tab heading="Form">
+                                    <uib-tabset>
+                                        <uib-tab heading="Edit form">
+                                            <renderform q="selectedQfromDesigner" qr="createdQR" form="formData"></renderform>
+                                        </uib-tab>
+                                        <uib-tab heading="Display form">
+
+                                            <qrdisplay q="selectedQfromDesigner" qr="createdQR"></qrdisplay>
+                                        </uib-tab>
+                                    </uib-tabset>
+                                </uib-tab>
+                                <uib-tab heading="Json">
+                                    <pre>{{selectedQfromDesigner | json}}</pre>
+                                </uib-tab>
+                            </uib-tabset>
+                        </uib-tab>
 
 
 

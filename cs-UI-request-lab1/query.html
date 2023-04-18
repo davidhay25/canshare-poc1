@@ -15,7 +15,7 @@
     <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
 
     <script>
-        angular.module("pocApp",['ui.bootstrap','ui.checkbox']).config(function($locationProvider) {
+        angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage']).config(function($locationProvider) {
             $locationProvider.html5Mode(true);
             $locationProvider.hashPrefix('!');
         });
@@ -25,13 +25,15 @@
         angular.module('topApp', ['pocApp', 'formsApp'])
 
     </script>
+    <script src="js/libs/ngStorage.min.js"></script>
 
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
 
-    <script src="js/questionnaireSvc.js"></script>
+
 
     <script src="js/queryCtrl.js"></script>
-
+    <script src="js/libs/vis.min.js"></script>
+    <script src="js/makeLibraryQuery.js"></script>
 
     <script src="directive/viewBundle/viewBundleDir.js"></script>
     <script src="directive/viewBundle/viewBundleSvc.js"></script>
@@ -56,9 +58,17 @@
 
             </div>
 
-            <div class="col-md-5 col-sm-5">
+            <div class="col-md-1 col-sm-1">
                 <div class="navbar-text">
+                    Server
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-4">
+                <div class="navbar-text">
+                    <select class="form-control" ng-model="svr" ng-change="selectServer(svr)"
+                            ng-options="svr.display for svr in allServers">
 
+                    </select>
 
 
                 </div>
@@ -87,7 +97,74 @@
     </nav>
 
     <uib-tabset>
-        <uib-tab heading="ValueSet finder">
+
+
+        <uib-tab heading="General queries">
+            <br/>
+            <div class="row">
+                <div class="col-md-1">
+                    Query
+                </div>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" ng-model="generalQuery"/>
+                </div>
+
+                <div class="col-md-2">
+                    <button class="btn btn-primary" ng-click="executeGeneralQuery(generalQuery)">Execute</button>
+                </div>
+            </div>
+            <hr/>
+            <div class="row">
+                <div class="col-md-4">
+
+                    <uib-tabset>
+                        <uib-tab heading="Library">
+                            <br/>
+                            <ul class="list-unstyled">
+                                <li ng-click="executeFromLibrary(item)"
+                                    class="clickable"
+                                    ng-repeat="item in library.entry track by $index">
+                                    {{item.display}}
+                                </li>
+                            </ul>
+                        </uib-tab>
+
+                        <uib-tab heading="History (last 20)">
+                            <br/>
+                            <ul class="list-unstyled">
+                                <li
+                                    class="clickable"
+
+                                    ng-repeat="item in localStorage.genHistory track by $index">
+
+                                    <span  ng-click="executeFromHistory(item)">{{trimDisplay(item,65)}}</span>
+
+                                    <span ng-click="removeHistory($index)"> <i class="glyphicon glyphicon-remove-sign pull-right"></i></span>
+                                </li>
+                            </ul>
+                        </uib-tab>
+                    </uib-tabset>
+
+
+
+
+                    <br/>
+
+
+
+                </div>
+                <div class="col-md-8">
+                    <pre ng-show="ooGeneral">{{ooGeneral | json}}</pre>
+                    <viewbundle bundle="generalBundle"></viewbundle>
+                </div>
+            </div>
+
+
+
+
+        </uib-tab>
+
+        <uib-tab heading="ValueSet explorer">
             <div class="row">
                 <div class="col-md-3">
                     <br/>
@@ -115,7 +192,25 @@
                     <input type="text" class="form-control" ng-model="vsCustom"/>
 
 
-                    <button class="btn-primary btn" ng-click="findVS(vsType,vsTumourType,vsCustom)">Find</button>
+
+
+
+                    <br/>
+                    <div>
+                        <button class="btn-primary btn pull-right" ng-click="findVS(vsType,vsTumourType,vsCustom)">Find</button>
+                    </div>
+
+                    <br/> <br/>
+                    <label>Saved queries</label>
+                    <br/> <br/>
+                    <ul class="list-unstyled">
+                        <li ng-repeat="qry in localStorage.vsQuery">
+                            <div class="clickable" ng-click="findVS(null,null,qry)">
+                                {{qry}}
+                            </div>
+
+                        </li>
+                    </ul>
 
                 </div>
                 <div class="col-md-9">
@@ -131,13 +226,17 @@
 
                     <div ng-hide="oo" class="row">
                         <div class="col-md-3">
-                            <div class="list-group">
-                                <div class="list-group-item" ng-click="selectVS(entry.resource)"
-                                     style="cursor: pointer"
-                                    ng-repeat="entry in vsBundle.entry">
+                            <div class="myScroll">
+                                <div class="list-group">
+                                    <div ng-class="{'list-group-item':true,listItemSelected:selectedVS.id == entry.resource.id}"
+                                         ng-click="selectVS(entry.resource)"
+                                         style="cursor: pointer"
+                                         ng-repeat="entry in vsBundle.entry">
                                         {{entry.resource.title || getLastPartOfUrl(entry.resource.url)}}
+                                    </div>
                                 </div>
                             </div>
+
 
                         </div>
                         <div class="col-md-9" ng-show="selectedVS">
@@ -158,7 +257,27 @@
                                     </div>
                                     <br/>
                                     <pre ng-show="ooExpand">{{ooExpand | json}}</pre>
-                                    <pre ng-show="vsExpanded">{{vsExpanded.expansion | json}}</pre>
+
+                                    <uib-tabset ng-show="vsExpanded">
+                                        <uib-tab heading="List">
+                                            <table class="table table-condensed">
+                                                <tr ng-repeat="concept in vsExpanded.expansion.contains">
+                                                    <td>{{concept.display}}</td>
+                                                    <td>{{concept.code}}</td>
+                                                    <td>{{concept.system}}
+                                                        <div>{{concept.version}}</div>
+                                                    </td>
+
+                                                </tr>
+                                            </table>
+                                        </uib-tab>
+                                        <uib-tab heading="Json">
+                                            <pre >{{vsExpanded.expansion | json}}</pre>
+                                        </uib-tab>
+                                    </uib-tabset>
+
+
+
 
                                 </uib-tab>
                             </uib-tabset>
@@ -173,6 +292,7 @@
                 </div>
             </div>
         </uib-tab>
+
     </uib-tabset>
 
 
