@@ -20,7 +20,7 @@ function setup(app) {
         let lstRequiredTypes = ['ServiceRequest','QuestionnaireResponse','Patient']
         let lstErrors = utilModule.level1Validate(bundle,lstRequiredTypes)
 
-        console.log(lstErrors)
+        //console.log(lstErrors)
 
         if (lstErrors.length > 0) {
             //There were validation errors. These cannot be ignored.
@@ -79,6 +79,9 @@ function setup(app) {
 
             //now perform profile validation. This is done after response extraction so that the extracted resources are included
             let profileValidationOO
+
+            profileValidationOO = await utilModule.profileValidation(bundle)
+            /*
             try {
                 profileValidationOO = await utilModule.profileValidation(bundle)
             } catch (ex) {
@@ -86,7 +89,7 @@ function setup(app) {
                 //console.log(ex)
                 profileValidationOO = ex
             }
-
+*/
             logObject.validation = profileValidationOO
 
             //save the log object

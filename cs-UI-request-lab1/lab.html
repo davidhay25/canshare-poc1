@@ -63,7 +63,7 @@
 
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="navbar-text">
 
                     <select style="margin-top: 8px" class="form-control" ng-model="input.request"
@@ -75,7 +75,7 @@
 
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="navbar-text">
                     {{commonSvc.getPatientName(selectedRequest.pat)}} {{selectedRequest.pat.gender}} {{selectedRequest.pat.birthDate}}
                 </div>
@@ -90,7 +90,8 @@
 
             <div class="col-md-1 col-sm-1">
                 <form class="navbar-form navbar-left">
-                    <button class="btn btn-primary" ng-click="getActiveRequests()">Refresh</button>
+
+                    <button class="btn btn-link" ng-click="toggleRequestDisplay()">Toggle request</button>
 
                 </form>
             </div>
@@ -109,29 +110,6 @@
         </div>
     </nav>
 
-<!--
-    <div style="background-color: #e9e9e9; height: 50px" class="row">
-        <div class="col-md-2">
-            <div style="margin-top: 12px">Currently active requests</div>
-        </div>
-        <div class="col-md-2">
-
-            <select style="margin-top: 8px" class="form-control" ng-model="input.request"
-                    ng-change = "selectRequest(input.request)"
-                    ng-options="commonSvc.getPatientName(request.pat) for request in activeRequests"></select>
-        </div>
-        <div class="col-md-4">
-            <div style="margin-top: 12px">
-                {{commonSvc.getPatientName(selectedRequest.Pat)}} {{selectedRequest.Pat.gender}} {{selectedRequest.Pat.birthDate}}
-            </div>
-
-        </div>
-        <div class="col-md-2">
-
-        </div>
-    </div>
-        -->
-
     <div class="row" style="margin-top: 8px">
         <div class="col-md-4">
             <div class="banner">Request</div>
@@ -144,7 +122,7 @@
 
     <div class="row">
 
-        <div class="col-md-4">
+        <div ng-class="input.leftPane">
             <br/>
             <div ng-hide="selectedRequest">
                 <br/><br/>
@@ -182,7 +160,7 @@
 
         </div>
 
-        <div ng-show="selectedRequest" class="col-md-8">
+        <div ng-show="selectedRequest" ng-class="input.rightPane">
             <br/>
             <uib-tabset>
                 <uib-tab heading="New report">
@@ -193,7 +171,7 @@
 
                             <div ng-show="selectedRequest.dr">
                                 <div class="alert alert-warning">
-                                    There was a previous report
+                                    There was a previous report.
                                 </div>
                             </div>
 
@@ -226,8 +204,8 @@
                                         <checkbox ng-show="selectedRequest && selectedReportQ"
                                                   ng-model="input.final"></checkbox> Final report
                                     </div>
-                                    <div class="col-md-2">
-                                        <button class="btn btn-primary"
+                                    <div class="col-md-4">
+                                        <button class="btn btn-primary pull-right"
                                                 ng-show="selectedRequest && selectedReportQ"
                                                 ng-click="submitReport()">{{submitLabel()}}</button>
                                     </div>
@@ -236,9 +214,13 @@
                                 <div class="myScroll">
                                     <div class="row">
                                         <div class="col-md-8">
-                                            <renderform q="selectedReportQ" qr="QR"></renderform>
+                                            <renderform q="selectedReportQ" qr="QR" form="prePopData"></renderform>
                                         </div>
                                         <div class="col-md-4">
+                                            <div ng-show="input.itemDetail">
+                                                <ng-include src ="'includes/itemDetail.html'"></ng-include>
+                                            </div>
+
                                             <qrdisplay qr="createdQR" q="selectedReportQ"></qrdisplay>
                                         </div>
                                     </div>
@@ -257,6 +239,17 @@
                 <uib-tab ng-show = 'false' heading="Report Preview">
                     <qrdisplay qr="createdQR" q="selectedReportQ"></qrdisplay>
                 </uib-tab>
+                <uib-tab heading="Report QR">
+                    <em>This resource is created by the form rendering directive as the user enters data, it is not saved on the server.</em>
+                    <pre>{{createdQR | json}}</pre>
+                </uib-tab>
+
+                <uib-tab heading="Report Q">
+                    <em>The Questionnaire that defines the selected pathology template</em>
+                    <pre>{{selectedReportQ | json}}</pre>
+                </uib-tab>
+
+
                 <uib-tab heading="View report bundle">
 
                     <viewbundle bundle="reportBundle"></viewbundle>
@@ -273,7 +266,7 @@
 
                 </uib-tab>
 
-                <uib-tab heading="Previous reports">
+                <uib-tab ng-show = "false" heading="Previous reports">
                     <div class="row">
                         <div class="col-md-4">
 

@@ -26,6 +26,13 @@ angular.module("pocApp")
             )
 
 
+            //emitted when a user clicks on the ? icon in the form render
+            $scope.$on("itemDetail",function(ev,vo){
+                $scope.input.itemDetail = vo
+                console.log(vo)
+                //{item: meta:
+            })
+
             //create the author resource. The identifier (HPI) is required
             $scope.author = {resourceType:"Practitioner", name:[{text:"Sally Surgeon"}]}
             $scope.author.id = commonSvc.createUUID()
@@ -216,6 +223,8 @@ angular.module("pocApp")
             //as soon as any change in the form is made (using ng-change) - so it gets called a lot!
 
             $scope.$on('qrCreated',function(event,vo1){
+
+                delete $scope.input.itemDetail        //delete the item display as soon as typing or clicking starts...
 
                 $scope.createdQR = vo1.QR
                 $scope.formData = vo1.formData
@@ -449,6 +458,9 @@ angular.module("pocApp")
                             }
                             sendBundle()
 
+                        },function(err) {
+                            console.log(err)
+                            alert(angular.toJson(err.data))
                         }
                     )
 
@@ -498,6 +510,7 @@ angular.module("pocApp")
                 if (!QR) {
                     alert ("You need to enter some data in the form")
                 }
+                QR.id = commonSvc.createUUID()
                 QR.subject = {reference : `urn:uuid:${$scope.selectedPatient.id}`}
                 //QR identifier is single
                 QR.identifier = {system:'http://canshare.co.nz/NamingSystem/pathIdentifier',value: new Date().toISOString()}

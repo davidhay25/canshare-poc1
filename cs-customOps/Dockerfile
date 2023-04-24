@@ -4,8 +4,13 @@ LABEL maintainer="david.hay25@gmail.com"
 COPY . /src
 WORKDIR /src
 
+# when in a container
+ENV SERVERBASE=http://localhost:8080/fhir/
+
 EXPOSE 9300
 ENTRYPOINT ["node", "/src/server.js"]
+
+RUN echo "SERVERBASE set to $SERVERBASE"
 
 # build
 # docker image build -t cs-ops:latest .

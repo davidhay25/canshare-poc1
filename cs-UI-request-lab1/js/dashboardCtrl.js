@@ -7,6 +7,7 @@ angular.module("pocApp")
             $scope.commands = []
             $scope.commands.push({display:'Update forms from Designer',key:'forms'})
             $scope.commands.push({display:'Manage Forms Server',key:'formserver'})
+            $scope.commands.push({display:'Service Requests',key:'sr'})
             $scope.commands.push({display:'Log',key:'log'})
 
             $scope.input.command = $scope.commands[0]
@@ -111,7 +112,9 @@ angular.module("pocApp")
                         //get the context of the Q.
                         $scope.contextString = getContext(Q)
                         //remove all the extensions used for hiso
-                        $scope.cleanQ = dashboardSvc.cleanQ(Q)
+                        let vo = dashboardSvc.cleanQ(Q)
+                        $scope.cleanQ = vo.Q  //dashboardSvc.cleanQ(Q)
+                        $scope.issuesWithQ = vo.issues
 
                     }, function (err) {
                         console.log(err)

@@ -1,4 +1,4 @@
-angular.module("pocApp").service('dashboardSvc', function($q,$http) {
+angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaireSvc) {
 
     //where the Q's are todo - might want to be able to select from different servers
     //let designerServer = "http://canshare.co.nz:9099/baseR4/"   //actually the public server ATM
@@ -9,36 +9,59 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http) {
 
         cleanQ : function (Q,context) {
             //remove all the extensions that are not needed for rendering - eg hiso ones
-
+/*
             let keeplist = {}      //a list of all the extension urls to keep
             keeplist["http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"] = true
             keeplist["http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"] = true
             keeplist["http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"] = true
             keeplist["http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"] = true
 
+*/
 
+
+
+            let issues = []
             if (!Q.item) {
                 return Q
             }
 
             Q.item.forEach(function (section) {
-                cleanItem(section)
+                //let sectionText = section.
+                cleanItem(section,section)
                 if (section.item) {
                     section.item.forEach(function (child) {
-                        cleanItem(child)
+                        cleanItem(child,section)
                         if (child.item) {
                             child.item.forEach(function (gc) {
-                                cleanItem(gc)
+                                cleanItem(gc,section)
                             })
                         }
                     })
                 }
             })
 
-            return Q
+            return {Q:Q,issues:issues}
 
 
-            function cleanItem(item) {
+            function cleanItem(item,section) {
+                let meta = questionnaireSvc.getMetaInfoForItem(item)        //so can do issue checking
+
+                console.log(item.type,meta.itemControl)
+
+                //check that a choice item set as checkbox has repeats set
+
+                if (meta.itemControl && meta.itemControl.coding && meta.itemControl.coding[0].code == 'check-box') {
+                    if (! item.repeats) {
+                        let iss = {display:"A choice item that renders as checkboxs must have the 'repeats' flag set"}
+                        iss.item = item
+                        iss.section = section
+
+                        issues.push(iss)
+                    }
+                }
+
+
+                //remove hiso extensions
                 if (item.extension) {
                     let extCopy = JSON.parse(JSON.stringify(item.extension))
                     delete item.extension

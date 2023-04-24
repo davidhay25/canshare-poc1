@@ -11,6 +11,12 @@ console.log(`custom ops from env is ${process.env.CUSTOMOPS}`)
 let serverBase = process.env.SERVERBASE
 
 
+
+
+
+
+
+
 //let fs = require('fs')
 let http = require('http');
 

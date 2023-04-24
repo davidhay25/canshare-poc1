@@ -58,9 +58,9 @@ angular.module('formsApp')
                     function() {return $scope.validationoo},
                     function() {
                         if ($scope.validationoo) {
-                            console.log($scope.validationoo)
+                            //console.log($scope.validationoo)
                             let vo1 = viewBundleSvc.summarizeValidation($scope.validationoo,$scope.bundle)
-                            console.log(vo1)
+                          //  console.log(vo1)
                             $scope.validationObject = vo1.resources
                             $scope.validationErrorCount = vo1.totalErrors
                             $scope.unknownIssues = vo1.unknownIssues
@@ -85,7 +85,7 @@ angular.module('formsApp')
 
                 //makes the selected resource the focus. Only resources it references and that reference it will be shwon in the graph
                 $scope.makeFocus = function(resource) {
-                    console.log(resource)
+                    //console.log(resource)
                     createGraph($scope.bundle,resource)
 
                 }
@@ -117,11 +117,11 @@ angular.module('formsApp')
                     })
                     let vo = viewBundleSvc.makeGraph({arResources: arResources,focusResource:focusResource})  //actually entries...
 
-                    console.log($scope.graphId)
+                   // console.log($scope.graphId)
 
                     let container = document.getElementById('graph');
                    // let container = document.getElementById($scope.graphId);
-                    console.log(container)
+                   // console.log(container)
                     if (container) {
 
 

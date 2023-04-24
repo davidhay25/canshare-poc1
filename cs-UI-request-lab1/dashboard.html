@@ -67,13 +67,13 @@
 
             </div>
 
-            <div class="col-md-5 col-sm-5">
+            <div class="col-md-7">
                 <div class="navbar-text">
 
                     <button class="btn btn-primary" ng-click="input.command = commands[0]">{{commands[0].display}}</button>
                     <button class="btn btn-primary" ng-click="input.command = commands[1]">{{commands[1].display}}</button>
                     <button class="btn btn-primary" ng-click="input.command = commands[2]">{{commands[2].display}}</button>
-
+                    <button class="btn btn-primary" ng-click="input.command = commands[3]">{{commands[3].display}}</button>
                 </div>
 
             </div>
@@ -85,9 +85,7 @@
                 </form>
             </div>
 
-            <div class="col-md-2">
 
-            </div>
 
             <div class="col-md-2">
                 <a href="https://teaho.govt.nz/" target="_blank">
@@ -100,6 +98,12 @@
     </nav>
 
 
+
+    <div ng-show="input.command.key == 'sr'">
+        query by SR
+        graph of resources related to SR
+        ST by status - especially active
+    </div>
 
     <div ng-show="input.command.key == 'formserver'">
         ? deprecate forms on forms server - change status
@@ -149,6 +153,23 @@
                             <br/>
                             <div class="banner">{{selectedMiniQ.url}}</div>
                             <br/><br/>
+
+                            <div ng-show="issuesWithQ.length > 0">
+                                <strong>There are some issues with this form that may prevent it working properly</strong>
+                                <table class="table table-condensed table-bordered">
+                                    <tr><th>Issue</th><th>Item</th><th>LinkId</th><th>Section</th></tr>
+                                    <tr ng-repeat="iss in issuesWithQ">
+
+                                        <td>{{iss.display}}</td>
+                                        <td>{{iss.item.text}}</td>
+                                        <td>{{iss.item.linkId}}</td>
+                                        <td>{{iss.section.text}}</td>
+                                    </tr>
+                                </table>
+
+                            </div>
+
+
                             <div ng-show = "selectedMiniQ.existsOnFormsServer">
                                 <div class="row">
                                     <div class="col-md-6">

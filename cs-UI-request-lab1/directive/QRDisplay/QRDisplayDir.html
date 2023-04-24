@@ -6,7 +6,7 @@
         <strong>{{section.text}}</strong>
 
         <div ng-repeat = "child in section.item">
-            <div ng-hide = "child.item.length > 0">    <!-- This is an item - it has no items itself-->
+            <div ng-hide = "child.item.length > 0"  >    <!-- This is an item - it has no items itself-->
 
                 <div class="row" ng-show="child.answer.length > 0">
 
@@ -21,7 +21,7 @@
 
                         </div>
 
-                        <div ng-if="! child.answer[0].valueAttachment">
+                        <div ng-if="! child.answer[0].valueAttachment" style="border-bottom: 1px solid lightgray">
                             <div class="col-md-6" >
                                 {{child.text}}
                             </div>

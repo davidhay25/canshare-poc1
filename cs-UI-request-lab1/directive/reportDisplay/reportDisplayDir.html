@@ -3,6 +3,10 @@
 
 
     <uib-tabset>
+        <uib-tab heading = "Table">
+            <p style="margin-left: 10px" ng-bind-html="to_trusted(presentedForm)"></p>
+        </uib-tab>
+
         <uib-tab heading = "Report">
             <!-- The report  -->
             <h4>Report header</h4>
@@ -35,8 +39,14 @@
 
                     <td><div ng-repeat = "identifier in obs.identifier">{{identifier}}</div></td>
                     -->
-                    <td><strong>{{obs.code.coding[0].display}} <span ng-hide="obs.code.coding[0].display">{{obs.code.coding[0].code}}</span></strong>: </td>
-                    <td>{{obs.valueString}} {{obs.valueCoding.display}}
+                    <td><strong>{{obs.code.coding[0].display}}
+                        <span ng-hide="obs.code.coding[0].display">{{obs.code.coding[0].code}}</span></strong>
+                        <span ng-hide="obs.code.coding">{{obs.code.text}}</span>
+                        : </td>
+                    <td>
+                        {{obs.valueString}}
+                        {{obs.valueCodeableConcept.coding[0].display}}
+                        (Code: {{obs.valueCodeableConcept.coding[0].code}})
 
                     </td>
                 </tr>
@@ -44,6 +54,7 @@
 
 
         </uib-tab>
+
         <uib-tab heading = "Json">
             <em>This is a custom object containing the key resources</em>
             <pre>{{reportobject | json}}</pre>

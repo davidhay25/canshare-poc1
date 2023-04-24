@@ -291,6 +291,10 @@
                                 </div>
 
                                 <div class="col-md-4">
+                                    <div ng-show="input.itemDetail">
+                                        <ng-include src ="'includes/itemDetail.html'"></ng-include>
+                                    </div>
+
                                     <div class="rounded-box">
                                         <div class="myScroll">
                                             <qrdisplay qr="QR" q="selectedTemplate.Q"></qrdisplay>

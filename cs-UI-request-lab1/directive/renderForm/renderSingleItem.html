@@ -20,15 +20,27 @@
     <div  style="margin-bottom: 15px" ng-show="showConditional(cell,input.form)">
 
         <div ng-hide="cell.item.type == 'display'">
+
             <span ng-show="cell.item.type == 'reference'">
                 <i class="btn btn-link glyphicon glyphicon-search clickable pull-right"
                    ng-click="selectResourceFromService(cell.item)"></i>
             </span>
 
             <div ng-hide = "cell.item.type == 'boolean'">
-                <span ng-class="{bold:false,required:cell.required}">{{cell.item.text}}</span>
+                <span ng-class="{bold:false,required:cell.required}"
+                      style="cursor: pointer"
+                      ng-click="showItemDetails(cell.item,cell.meta)">{{cell.item.text}}</span>
+
+                <!--
+                <span> <i class="glyphicon glyphicon-question-sign clickable"
+                    ng-click="showItemDetails(cell.item,cell.meta)"
+                ></i></span>
+                -->
+
                 <span ng-show = "cell.item.required"> * </span>
                 <span ng-show = "cell.item.repeats"> <span style="color:purple">(Multiple are allowed)</span>  </span>
+
+
 
                 <span ng-show = "cell.meta.description">
                     <i class="glyphicon glyphicon-info-sign"
@@ -107,7 +119,8 @@
             </div>
 
             <div ng-switch-when="boolean">
-                <checkbox ng-model="input.form[cell.item.linkId]"  ng-change="makeQR(cell.item.linkId)"></checkbox> {{cell.item.text}}
+                <checkbox ng-model="input.form[cell.item.linkId]"  ng-change="makeQR(cell.item.linkId)"></checkbox>
+                <span style="cursor: pointer" ng-click="showItemDetails(cell.item,cell.meta)">{{cell.item.text}}</span>
             </div>
 
 

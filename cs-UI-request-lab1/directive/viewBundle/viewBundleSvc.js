@@ -145,7 +145,7 @@ angular.module("formsApp")
                         arNodes.push(node);
 
                         var refs = [];
-                        findReferences(refs,resource,resource.resourceType);
+                        findReferences(refs,resource,resource.resourceType);    //locate all the outbound references for this element
                         let cRefs = []
 
                         refs.forEach(function(ref){
@@ -153,9 +153,6 @@ angular.module("formsApp")
 
                         })
                     }
-
-
-
 
                 });
 
@@ -206,7 +203,7 @@ angular.module("formsApp")
 
                     } else {
 
-                        console.log('>>>>>>> error Node Id '+ref.targ + ' is not present')
+                        console.log('>>>>>>> error Node Id '+ref.targ + ' is not present. (From '+ ref.src.id)
                     }
                 });
 
@@ -252,22 +249,35 @@ angular.module("formsApp")
 
                         //if it's an object, does it have a child called 'reference'?
 
+                       // if (angular.isArray(node.id,value)) {
                         if (angular.isArray(value)) {
+                            //console.log(value)
                             value.forEach(function(obj,inx) {
                                 //examine each element in the array
                                 if (obj) {  //somehow null's are getting into the array...
                                     var lpath = nodePath + '.' + key;
-                                    if (obj.reference) {
+                                    if (obj.reference || obj.valueReference) {
                                         //this is a reference!
 //console.log(obj)
-                                        //there are also circumstances where this is an element name
-                                        //mar 15 - 2022
 
-                                        let thing = obj.reference;
-                                        if (thing.reference) {
-                                            thing = thing.reference
+
+                                        //This is a 'normal' reference - from a defined element
+                                        if (obj.reference) {
+                                            let thing = obj.reference;
+                                            //there are also circumstances where this is an element name
+                                            //mar 15 - 2022
+
+                                            if (thing.reference) {
+                                                thing = thing.reference
+                                            }
+                                            refs.push({path: lpath, reference: obj.reference})
                                         }
-                                        refs.push({path: lpath, reference: obj.reference})
+
+
+                                        //for extensions, the element name is 'valueReference'
+                                        if (obj.valueReference) {
+                                            refs.push({path: lpath, reference: obj.valueReference.reference})
+                                        }
 
                                     } else {
                                         //if it's not a reference, then does it have any children?

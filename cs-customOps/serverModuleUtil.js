@@ -1,14 +1,46 @@
+
+
+
+
+
+
+
+
 let MongoClient = require('mongodb').MongoClient;
 const { default: axios } = require("axios")
 
 //set up the logging database
+
+
+
 let dbAddress = process.env.LOGDB || "localhost"
 console.log(`Logger database name is ${dbAddress}`)
-const uri = `mongodb://${dbAddress}:27017`
-const client = new MongoClient(uri)
+//const uri = `mongodb://${dbAddress}:27017`
+const uri = "mongodb://127.0.0.1:27017"
+console.log(`Connection string: ${uri}`)
+//const client = new MongoClient(uri)
 let database
 
-client.connect().then(
+
+MongoClient.connect(uri,{
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    },
+    (err, client) => {
+        if (err) {
+            console.log(err)
+            return console.log(err)
+        }
+
+        // Specify the database you want to access
+        const db = client.db('school')
+
+        console.log(`MongoDB Connected: ${url}`)
+    }
+)
+
+/*
+client.connect(uri).then(
     function () {
         console.log('connected to Mongo database')
         database = client.db("logger")
@@ -17,7 +49,7 @@ client.connect().then(
     }
 )
 
-
+*/
 //const database = client.db("logger")    //all logs are in the same database
 
 
@@ -133,7 +165,6 @@ function level1Validate(bundle,lstRequiredTypes) {
 
     })
 
-
     return lstErrors
 }
 
@@ -147,7 +178,8 @@ async function profileValidation(bundle) {
     } catch (err) {
         //console.log("exception from validate")
         if (err.response) {
-            throw(err.response.data)
+            //throw(err.response.data)
+            return err.response.data
             //return {ok:true,oo:err.response.data}
 
         } else {

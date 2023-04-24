@@ -1,0 +1,11 @@
+<div class="rounded-box">
+    <strong>Item details</strong>
+    <div class="pull-right" ng-click="input.itemDetail=null" style="cursor: pointer">X</div>
+
+    <div>{{input.itemDetail.item.text}}</div>
+    <div ng-show = "input.itemDetail.item.repeats">
+        Item can repeat
+    </div>
+    <div>{{input.itemDetail.meta.description}}</div>
+
+</div>
