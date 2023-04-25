@@ -7,6 +7,58 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
 
     return {
 
+        getActiveSR : function () {
+            let deferred = $q.defer()
+            let qry = `ServiceRequest?status=active&_include=ServiceRequest:subject&_include=ServiceRequest:supportingInfo`
+            let encodedQry = encodeURIComponent(qry)
+            //the proxy endpoint will follow the paging to return all matching resources...
+            let hash = {}
+            let activeSR = []
+            $http.get(`proxy?qry=${encodedQry}`).then(
+                function (data) {
+//console.log(data.data)
+                    //create a summary object for display
+                    if (data.data && data.data.entry) {
+                        //create a hash of Patient
+                        let hashPatient = {}, hashQR = {}
+                        data.data.entry.forEach(function (entry) {
+                            switch (entry.resource.resourceType) {
+                                case 'Patient' :
+                                    hashPatient[`Patient/${entry.resource.id}`] = entry.resource
+                                    break
+                                case 'QuestionnaireResponse' :
+                                    hashQR[`QuestionnaireResponse/${entry.resource.id}`] = entry.resource
+                                    break
+                            }
+
+                        })
+                        //create the list of active SR
+                        data.data.entry.forEach(function (entry) {
+                            if (entry.resource.resourceType == 'ServiceRequest') {
+                                let sr = entry.resource
+                                let vo = {sr:sr}
+                                vo.patient = hashPatient[sr.subject.reference]
+                               // vo.qr =
+                                let siLink = sr.supportingInfo[0].reference
+                                vo.qr = hashQR[siLink]
+                                activeSR.push(vo)
+                            }
+                        })
+
+                        //console.log(activeSR)
+                        deferred.resolve(activeSR)
+                    }
+
+
+
+                    //console.log(qry, data)
+                },function (err) {
+                    console.log(err)
+                }
+            )
+            return deferred.promise
+        },
+
         cleanQ : function (Q,context) {
             //remove all the extensions that are not needed for rendering - eg hiso ones
 /*
@@ -21,6 +73,7 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
 
 
             let issues = []
+            let summary = []
             if (!Q.item) {
                 return Q
             }
@@ -40,18 +93,48 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
                 }
             })
 
-            return {Q:Q,issues:issues}
+            return {Q:Q,issues:issues,summary:summary}
 
 
             function cleanItem(item,section) {
                 let meta = questionnaireSvc.getMetaInfoForItem(item)        //so can do issue checking
 
-                console.log(item.type,meta.itemControl)
+                //console.log(item.type,meta.itemControl)
+
+                //generate the summary for this item
+                let sumry = {item:item,section:section,issues:[]}
+                if (item.code) {
+                    sumry.code = item.code[0].code
+                    sumry.status = 'ok'
+                } else {
+                    //sumry.obs = "Text only"
+                    sumry.status = 'warning'
+                }
+
+                //resource extraction
+                if (meta.extraction || item.definition) {
+                    if (meta.extraction.extractObservation) {
+                        sumry.extract = "Observation"
+                    } else {
+                        if (item.definition) {
+                            let def = item.definition
+                            sumry.extract = def
+                        }
+                    }
+
+                }
+
+                //let extract = meta.extraction || {}
+
+
+                summary.push(sumry)
+
 
                 //check that a choice item set as checkbox has repeats set
-
                 if (meta.itemControl && meta.itemControl.coding && meta.itemControl.coding[0].code == 'check-box') {
                     if (! item.repeats) {
+                        sumry.issues.push("repeats flag should be set as it's a checkbox")
+                        sumry.status = 'error'
                         let iss = {display:"A choice item that renders as checkboxs must have the 'repeats' flag set"}
                         iss.item = item
                         iss.section = section

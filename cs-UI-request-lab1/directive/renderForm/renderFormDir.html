@@ -64,6 +64,7 @@
 
             <div ng-if = "row.meta.columnCount == 1 ">
               <div class="col-md-12">
+
                 <div ng-repeat="cell in row.col1 track by $index">
                   <div style="margin-bottom: 8px">
                     <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
@@ -73,8 +74,9 @@
               </div>
             </div>
 
-            <!-- 2 columns  - the default - was 2 cols of 6 - cganges temporarily to get drawing working-->
+            <!-- 2 columns  - was the default 24-Apr- was 2 cols of 6 - cganges temporarily to get drawing working-->
             <div ng-if = "row.meta.columnCount == 2 || ! row.meta.columnCount">
+
               <div class="col-md-6">
                 <div ng-repeat="cell in row.col1 track by $index">
                   <div style="margin-bottom: 8px">

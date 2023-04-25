@@ -77,7 +77,9 @@
 
             <div class="col-md-4">
                 <div class="navbar-text">
-                    {{commonSvc.getPatientName(selectedRequest.pat)}} {{selectedRequest.pat.gender}} {{selectedRequest.pat.birthDate}}
+                    <a target="_blank" ng-href={{pathToClinicalViewer}}>{{commonSvc.getPatientName(selectedRequest.pat)}}</a>
+
+                     {{selectedRequest.pat.gender}} {{selectedRequest.pat.birthDate}}
                 </div>
             </div>
 
@@ -110,7 +112,8 @@
         </div>
     </nav>
 
-    <div class="row" style="margin-top: 8px">
+        <!--
+    <div  class="row" style="margin-top: 8px">
         <div class="col-md-4">
             <div class="banner">Request</div>
         </div>
@@ -119,11 +122,14 @@
         </div>
 
     </div>
+        -->
 
     <div class="row">
 
         <div ng-class="input.leftPane">
             <br/>
+            <div ng-show="selectedRequest" class="banner">Request</div>
+
             <div ng-hide="selectedRequest">
                 <br/><br/>
                 Select one of the current requests from dropdown above to show the details of the request.
@@ -147,14 +153,11 @@
                     </div>
                 </uib-tab>
 
-
                 <uib-tab heading = "QR">
                     <div class="myScroll">
                         <pre>{{selectedRequest.qr | json}}</pre>
                     </div>
                 </uib-tab>
-
-
 
             </uib-tabset>
 
@@ -162,6 +165,7 @@
 
         <div ng-show="selectedRequest" ng-class="input.rightPane">
             <br/>
+            <div class="banner">Report</div>
             <uib-tabset>
                 <uib-tab heading="New report">
                     <br/>
@@ -211,11 +215,17 @@
                                     </div>
                                 </div>
 
-                                <div class="myScroll">
+
                                     <div class="row">
+
+
                                         <div class="col-md-8">
-                                            <renderform q="selectedReportQ" qr="QR" form="prePopData"></renderform>
+                                            <div class="myScroll">
+                                                <renderform q="selectedReportQ" qr="QR" form="prePopData"></renderform>
+                                            </div>
                                         </div>
+
+
                                         <div class="col-md-4">
                                             <div ng-show="input.itemDetail">
                                                 <ng-include src ="'includes/itemDetail.html'"></ng-include>
@@ -226,7 +236,7 @@
                                     </div>
 
 
-                                </div>
+
                             </div>
 
 

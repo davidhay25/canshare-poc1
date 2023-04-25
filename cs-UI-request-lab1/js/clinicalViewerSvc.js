@@ -18,6 +18,35 @@ angular.module("pocApp").service('clinicalViewerSvc', function($q,$http,commonSv
 
     return {
 
+        findPatientByIdentifier: function (identifier) {
+            let deferred = $q.defer()
+            let qry = `Patient?identifier=${identifier}`
+            let encodedQry = encodeURIComponent(qry)
+            //the proxy endpoint will follow the paging to return all matching resources...
+           
+            $http.get(`proxy?qry=${encodedQry}`).then(
+                function (data) {
+                    if (data.data && data.data.entry) {
+                        switch (data.data.entry.length) {
+                            case 0 :
+                                deferred.reject("There were no matching identifiers")
+                                break
+                            case 1 :
+                                deferred.resolve(data.data.entry[0].resource)
+                                break
+                            default :
+                                deferred.reject("There were no matching identifiers")
+                                break
+                        }
+                    }
+                }, function (err) {
+                    
+                }
+                
+            )
+            return deferred.promise
+        },
+
         makeSubmissionBundle : function (vo) {
             //make a submission bundle with the patient, QR and a DocRef
             //used by document creator

@@ -310,7 +310,10 @@ angular.module("pocApp")
                 if (patient && patient.name) {
                     //todo look for firstName, lastName etc.
                     name = patient.name[0].text
+
+
                 }
+                console.log(patient,name)
                 return name
             },
             parseQ : function(Q) {

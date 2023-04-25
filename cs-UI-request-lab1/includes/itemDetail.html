@@ -7,5 +7,11 @@
         Item can repeat
     </div>
     <div>{{input.itemDetail.meta.description}}</div>
+    <div ng-show="input.itemDetail.item.code">
+        Code: {{input.itemDetail.item.code[0].code}}
+    </div>
+    <div ng-hide="input.itemDetail.item.code">
+        No code in the Q. No Observation will be generated.
+    </div>
 
 </div>

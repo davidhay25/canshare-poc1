@@ -51,6 +51,15 @@
     <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
     <script src="js/libs/jstree.min.js"></script>
 
+    <style>
+        .err {
+            background-color: #ebcccc;
+        }
+        .ok {
+            background-color: palegreen;
+        }
+    </style>
+
 </head>
 <body style="padding: 8px;padding-top: 80px">
 <div ng-app="topApp" ng-controller="dashboardCtrl" class="container-fluid">
@@ -69,11 +78,12 @@
 
             <div class="col-md-7">
                 <div class="navbar-text">
-
+<!--
                     <button class="btn btn-primary" ng-click="input.command = commands[0]">{{commands[0].display}}</button>
                     <button class="btn btn-primary" ng-click="input.command = commands[1]">{{commands[1].display}}</button>
                     <button class="btn btn-primary" ng-click="input.command = commands[2]">{{commands[2].display}}</button>
                     <button class="btn btn-primary" ng-click="input.command = commands[3]">{{commands[3].display}}</button>
+                    -->
                 </div>
 
             </div>
@@ -99,232 +109,327 @@
 
 
 
-    <div ng-show="input.command.key == 'sr'">
-        query by SR
-        graph of resources related to SR
-        ST by status - especially active
-    </div>
+    <uib-tabset>
+        <uib-tab heading = "Update forms from Designer">
+            <br/>
+            <div>
 
-    <div ng-show="input.command.key == 'formserver'">
-        ? deprecate forms on forms server - change status
-    </div>
-
-    <div ng-show="input.command.key == 'forms'">
-
-
-        <div class="row">
-            <div class="col-md-3">
-
-                <checkbox ng-model="input.fsOnly" ng-change="checkBoxChange()">
-                </checkbox> Show already on Forms Server (<span class="badge">FS</span>)
-                <br/><br/>
-<!-- add later, select based on context
-                <select class="form-control" ng-model="input.context"
-                        ng-options = "ctx for ctx in contexts"></select>
-                <br/>
-                -->
-
-                <input class="form-control" ng-model="filter" placeholder="Filter text"/>
-
-                <div class="myScroll">
-                    <div class="list-group">
-                        <div ng-class="{'list-group-item':true,listItemSelected:miniQ==selectedMiniQ}"
-                             ng-click = "selectMiniQ(miniQ)"
-                             ng-show = "showInList(miniQ)"
-                             style="cursor: pointer"
-                             ng-repeat="miniQ in allMiniQ">
-                            <span class="pull-right">v{{miniQ.designResource.meta.versionId}}</span>
-                            {{miniQ.name}}
-                            <span class="pull-right badge" ng-show="miniQ.existsOnFormsServer">
-                                FS
-                            </span>
-                            <div><em>{{miniQ.title}}</em></div>
-                        </div>
-                    </div>
+                <div ng-hide="allMiniQ">
+                    Loading templates, please wait...
                 </div>
 
+                <div class="row" ng-show="allMiniQ">
+                    <div class="col-md-3">
 
+                        <checkbox ng-model="input.fsOnly" ng-change="checkBoxChange()">
 
-            </div>
-            <div class="col-md-9">
-                <uib-tabset ng-show="selectedMiniQ">
+                        </checkbox> Show already on Forms Server (<span class="badge">FS</span>)
+                        <br/><br/>
+                        <!-- add later, select based on context
+                                        <select class="form-control" ng-model="input.context"
+                                                ng-options = "ctx for ctx in contexts"></select>
+                                        <br/>
+                                        -->
 
-                        <uib-tab heading="Manage">
-                            <br/>
-                            <div class="banner">{{selectedMiniQ.url}}</div>
-                            <br/><br/>
+                        <input class="form-control" ng-model="input.filter" placeholder="Filter text"/>
 
-                            <div ng-show="issuesWithQ.length > 0">
-                                <strong>There are some issues with this form that may prevent it working properly</strong>
-                                <table class="table table-condensed table-bordered">
-                                    <tr><th>Issue</th><th>Item</th><th>LinkId</th><th>Section</th></tr>
-                                    <tr ng-repeat="iss in issuesWithQ">
-
-                                        <td>{{iss.display}}</td>
-                                        <td>{{iss.item.text}}</td>
-                                        <td>{{iss.item.linkId}}</td>
-                                        <td>{{iss.section.text}}</td>
-                                    </tr>
-                                </table>
-
-                            </div>
-
-
-                            <div ng-show = "selectedMiniQ.existsOnFormsServer">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        This template already exists on the forms server.
-
-                                        <br/><br/>
-
-                                        <table class="table table-bordered">
-                                            <tr><th>Property</th><th>Designer</th><th>Forms Server</th></tr>
-                                            <tr>
-                                                <td>Resource Version</td>
-                                                <td>{{selectedMiniQ.designResource.meta.versionId}}</td>
-                                                <td>{{selectedMiniQ.fsResource.meta.versionId}}</td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>Form Version</td>
-                                                <td>{{selectedMiniQ.designResource.version}}</td>
-                                                <td>{{selectedMiniQ.fsResource.version}}</td>
-                                            </tr>
-
-
-                                        </table>
-                                    </div>
-                                    <div class="col-md-6">
-
-                                    </div>
+                        <div class="myScroll">
+                            <div class="list-group">
+                                <div ng-class="{'list-group-item':true,listItemSelected:miniQ==selectedMiniQ}"
+                                     ng-click = "selectMiniQ(miniQ)"
+                                     ng-show = "showInList(miniQ)"
+                                     style="cursor: pointer"
+                                     ng-repeat="miniQ in allMiniQ">
+                                    <span class="pull-right">v{{miniQ.designResource.meta.versionId}}</span>
+                                    {{miniQ.name}}
+                                    <span class="pull-right badge" ng-show="miniQ.existsOnFormsServer">
+                                FS
+                            </span>
+                                    <div><em>{{miniQ.title}}</em></div>
                                 </div>
                             </div>
+                        </div>
 
 
-                            <br/><h4>Copy from Designer to Forms Server</h4>
 
-                                <div class="col-md-6">
-                                    This action will copy the selected template to the Forms Server,
-                                    making it available to applications in the Reference Implementation.
+                    </div>
+                    <div class="col-md-9">
+                        <div ng-show="selectedMiniQ.url">
+                            <div class="banner">{{selectedMiniQ.url}}</div>
 
-                                    <div ng-show = "selectedQfromDesigner.useContext">
-                                        <br/>
-                                        This Q defines a {{contextString}} form.
-                                    </div>
+                            <uib-tabset>
 
-                                    <div ng-hide = "contextString">
-                                        <br/>
-                                        This Questionnaire has no context defined in the Designer (ie whether it is a request, report or general form. What should it be?
-                                        <br/><br/>
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <select class="form-control" ng-model="input.QContext"
-                                                        ng-change="setContext(input.QContext)"
-                                                        ng-options="ctx for ctx in arQContext">
+                                <uib-tab heading="Import">
+                                    <div class="row">
 
-                                                </select>
+
+                                        <div class="col-md-6">
+                                            <h4>Copy from Designer to Forms Server</h4>
+                                            This action will copy the selected template to the Forms Server,
+                                            making it available to applications in the Reference Implementation.
+
+                                            <div ng-show = "selectedQfromDesigner.useContext">
+                                                <br/>
+                                                This Q defines a {{contextString}} form.
                                             </div>
+
+                                            <div ng-hide = "contextString">
+                                                <br/>
+                                                This Questionnaire has no context defined in the Designer (ie whether it is a request, report or general form. What should it be?
+                                                <br/><br/>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <select class="form-control" ng-model="input.QContext"
+                                                                ng-change="setContext(input.QContext)"
+                                                                ng-options="ctx for ctx in arQContext">
+
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                            <br/>
+
+                                            <button class="btn btn-primary" ng-show="contextString"
+                                                    ng-click="copyFormToFormsServer(selectedQfromDesigner)">Copy to Forms server</button>
+
+
+                                        </div>
+                                        <div class="col-md-6">
+
+
+                                            <div ng-show = "selectedMiniQ.existsOnFormsServer">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        This template already exists on the forms server.
+
+                                                        <br/><br/>
+
+                                                        <table class="table table-bordered">
+                                                            <tr><th>Property</th><th>Designer</th><th>Forms Server</th></tr>
+                                                            <tr>
+                                                                <td>Resource Version</td>
+                                                                <td>{{selectedMiniQ.designResource.meta.versionId}}</td>
+                                                                <td>{{selectedMiniQ.fsResource.meta.versionId}}</td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>Form Version</td>
+                                                                <td>{{selectedMiniQ.designResource.version}}</td>
+                                                                <td>{{selectedMiniQ.fsResource.version}}</td>
+                                                            </tr>
+
+
+                                                        </table>
+                                                    </div>
+                                                    <div class="col-md-6">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
                                         </div>
 
-
                                     </div>
-                                    <br/>
-
-                                    <button class="btn btn-primary" ng-show="contextString"
-                                            ng-click="copyFormToFormsServer(selectedQfromDesigner)">Copy to Forms server</button>
-
-
-                                </div>
-                                <div class="col-md-6">
-
-                                </div>
-
-
-
-
-                        </uib-tab>
-
-                        <uib-tab heading="Form on Designer">
-                            <uib-tabset>
-                                <uib-tab heading="Tree">
-                                    <showqtree q="selectedQfromDesigner"></showqtree>
                                 </uib-tab>
-                                <uib-tab heading="Form">
-                                    <uib-tabset>
-                                        <uib-tab heading="Edit form">
-                                            <renderform q="selectedQfromDesigner" qr="createdQR" form="formData"></renderform>
-                                        </uib-tab>
-                                        <uib-tab heading="Display form">
+                                <uib-tab>
+                                    <uib-tab-heading>Summary <span class="badge">{{summary.length}}</span></uib-tab-heading>
+                                    <table class="table table-condensed table-bordered">
+                                        <tr><th>Section</th><th>Item</th><th>linkID</th><th>Item code</th><th>Extraction</th><th>Issues</th></tr>
+                                        <tr ng-repeat="sumry in summary"
 
-                                            <qrdisplay q="selectedQfromDesigner" qr="createdQR"></qrdisplay>
+                                            ng-class="{err:sumry.status == 'error',ok:sumry.status=='ok'}">
+                                            <td>{{sumry.section.text}}</td>
+                                            <td>{{sumry.item.text}}</td>
+                                            <td>{{sumry.item.linkId}}</td>
+
+                                            <td>{{sumry.code}}</td>
+                                            <td>{{sumry.extract}}</td>
+                                            <td>
+                                                <div ng-repeat = "iss in sumry.issues">
+                                                    {{iss}}
+                                                </div>
+
+                                            </td>
+
+
+
+                                        </tr>
+                                    </table>
+                                </uib-tab>
+                                <uib-tab>
+                                    <uib-tab-heading>Issues <span class="badge">{{issuesWithQ.length}}</span></uib-tab-heading>
+
+                                    <strong>There are some issues with this form that may prevent it working properly</strong>
+                                    <table class="table table-condensed table-bordered">
+                                        <tr><th>Issue</th><th>Item</th><th>LinkId</th><th>Section</th></tr>
+                                        <tr ng-repeat="iss in issuesWithQ">
+
+                                            <td>{{iss.display}}</td>
+                                            <td>{{iss.item.text}}</td>
+                                            <td>{{iss.item.linkId}}</td>
+                                            <td>{{iss.section.text}}</td>
+                                        </tr>
+                                    </table>
+
+
+                                </uib-tab>
+                                <uib-tab heading="Form on Designer">
+                                    <uib-tabset>
+                                        <uib-tab heading="Tree">
+                                            <showqtree q="selectedQfromDesigner"></showqtree>
+                                        </uib-tab>
+                                        <uib-tab heading="Form">
+                                            <uib-tabset>
+                                                <uib-tab heading="Edit form">
+                                                    <renderform q="selectedQfromDesigner" qr="createdQR" form="formData"></renderform>
+                                                </uib-tab>
+                                                <uib-tab heading="Display form">
+
+                                                    <qrdisplay q="selectedQfromDesigner" qr="createdQR"></qrdisplay>
+                                                </uib-tab>
+                                            </uib-tabset>
+                                        </uib-tab>
+                                        <uib-tab heading="Json">
+                                            <pre>{{selectedQfromDesigner | json}}</pre>
                                         </uib-tab>
                                     </uib-tabset>
                                 </uib-tab>
-                                <uib-tab heading="Json">
-                                    <pre>{{selectedQfromDesigner | json}}</pre>
-                                </uib-tab>
+
+
+
                             </uib-tabset>
-                        </uib-tab>
 
 
+                        </div>
 
-                </uib-tabset>
 
+                    </div>
 
+                </div>
             </div>
 
-        </div>
-    </div>
+
+        </uib-tab>
+        <uib-tab heading = "Manage Forms Server">
+
+        </uib-tab>
+        <uib-tab heading = "Active Service Requests">
+            <uib-tab-heading>Active Service Requests <span class="badge">{{activeSR.length}}</span> </uib-tab-heading>
+            <br/>
+            <div>
+
+                <div class="row">
+                    <div class="col-md-8">
+
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn-link btn pull-right" ng-click="refreshSR()">Refresh</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <strong ng-show="activeSR">Active ServiceRequests</strong>
+                        <div class="list-group">
+                            <div class="list-group-item" ng-repeat="vo in activeSR"
+                                 ng-click = "selectVoSR(vo)" style="cursor: pointer">
+                                <div class="pull-right">{{vo.sr.id}}</div>
+                                {{vo.sr.authoredOn | date}}
+                                <div>{{vo.patient.id}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+
+                        <div class="row" ng-show="selectedSRPatient">
+                            <div class="col-md-9">
+                                <strong>Patient</strong>
+                                <div><a target="_blank" ng-href={{pathToClinicalViewer}}>{{selectedSRPatient.name[0].text}}</a></div>
+                                <br/>
+                            </div>
+
+                            <div class="col-md-3">
+                                <!--
+                                <button class="btn btn-link">Load Clinical Viewer (todo) </button>
+                                -->
+                            </div>
+                        </div>
 
 
-    <div ng-show="input.command.key == 'log'">
+                        <qrdisplay qr="selectedQR"></qrdisplay>
 
-        <div class="row">
-            <div class="col-md-2">
-                <strong>Log Entries</strong>
-                <div class="list-group">
-                    <div ng-class="{'list-group-item':true,listItemSelected:log==input.selectedLog}" ng-repeat="log in logs"
-                        style="cursor: pointer"
-                        ng-click="input.selectedLog = log">
-                        {{log.date | date}}
+
+
                     </div>
                 </div>
 
             </div>
-            <div class="col-md-10">
-                <uib-tabset ng-show="input.selectedLog">
-                   <br/>
-                    <uib-tab heading="Bundle">
-                        <br/>
-                        <viewbundle bundle="input.selectedLog.bundle"
-                                    validationoo="input.selectedLog.validation">
+        </uib-tab>
+        <uib-tab heading = "Log">
+            <br/>
 
-                        </viewbundle>
-                    </uib-tab>
+            <div>
 
-                    <uib-tab heading="L1 validation errors">
-                        <pre>{{input.selectedLog.l1errors | json}}</pre>
-                    </uib-tab>
+                <div class="row">
+                    <div class="col-md-2">
+                        <strong>Log Entries</strong>
+                        <div class="list-group">
+                            <div ng-class="{'list-group-item':true,listItemSelected:log==input.selectedLog}" ng-repeat="log in logs"
+                                 style="cursor: pointer"
+                                 ng-click="input.selectedLog = log">
+                                {{log.date | date}}
+                            </div>
+                        </div>
 
-                    <uib-tab ng-show="false" heading="Json">
-                        <pre>{{input.selectedLog | json}}</pre>
-                    </uib-tab>
+                    </div>
+                    <div class="col-md-10">
+                        <uib-tabset ng-show="input.selectedLog">
+                            <br/>
+                            <uib-tab heading="Bundle">
+                                <br/>
+                                <viewbundle bundle="input.selectedLog.bundle"
+                                            validationoo="input.selectedLog.validation">
 
-                </uib-tabset>
+                                </viewbundle>
+                            </uib-tab>
+
+                            <uib-tab heading="L1 validation errors">
+                                <pre>{{input.selectedLog.l1errors | json}}</pre>
+                            </uib-tab>
+
+                            <uib-tab ng-show="false" heading="Json">
+                                <pre>{{input.selectedLog | json}}</pre>
+                            </uib-tab>
+
+                        </uib-tabset>
+
+                    </div>
+                </div>
+
+                <!--
+                        display from log (mongo)
+
+                        each CS submission has
+                            bundle submitted (use viewBundle dir.)
+                            bundle generated
+                            processing outcome
+                            validation reslult
+                -->
 
             </div>
-        </div>
 
-<!--
-        display from log (mongo)
 
-        each CS submission has
-            bundle submitted (use viewBundle dir.)
-            bundle generated
-            processing outcome
-            validation reslult
--->
+        </uib-tab>
+    </uib-tabset>
 
+
+
+
+    <div ng-show="input.command.key == 'formserver'">
+        ? deprecate forms on forms server - change status
     </div>
 
 

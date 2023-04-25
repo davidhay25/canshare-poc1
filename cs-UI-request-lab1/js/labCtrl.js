@@ -1,13 +1,23 @@
 angular.module("pocApp")
     .controller('labCtrl',
-        function ($scope,$http,commonSvc,labSvc) {
+        function ($scope,$http,commonSvc,labSvc,$location) {
+
+            let protocol = $location.protocol();
+            let port = $location.port();
+
+            $scope.host = protocol + "://" + $location.host()
+            if (port != 80) {
+                $scope.host += ":" + port
+            }
+
 
             $scope.input = {};
             $scope.answer = {};     //the answers. keyed by linkId.
             $scope.commonSvc = commonSvc
 
-$scope.prePopData = {"test":"test"}      //trial...
+            //$scope.prePopData = {"test":"test"}      //trial...
 
+            //    $scope.bvUrl = $location.protocol() + "://" + $location.host() + ":" + $location.port() +  "/bundleVisualizer.html"
 
             commonSvc.init().then(
                 function(data){
@@ -161,6 +171,9 @@ $scope.prePopData = {"test":"test"}      //trial...
                             console.log(data.data)
                             let vo = data.data
                             $scope.selectedRequest = vo
+
+                            //A link to display the clincial viewer for the patient
+                            $scope.pathToClinicalViewer = $scope.host + "/ClinicalViewer.html?nhi=" + vo.pat.identifier[0].value
 
                             //an object containing an array of all the answers is saved in the second attachment and the url of the form
                             try {

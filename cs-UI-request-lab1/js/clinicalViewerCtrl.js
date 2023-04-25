@@ -1,9 +1,10 @@
 angular.module("pocApp")
     .controller('clinicalViewerCtrl',
-        function ($scope,$http,commonSvc,clinicalViewerSvc) {
+        function ($scope,$http,commonSvc,clinicalViewerSvc,$window) {
 
             $scope.input = {};
             $scope.input.anClinicalSummary = {}
+            $scope.commonSvc = commonSvc
 
             //load the config. We need this for the fullUrl in the request bundle and server interactions
             commonSvc.init().then(
@@ -16,8 +17,39 @@ angular.module("pocApp")
                     )
                 })
 
-            $scope.$on('qrCreated',function(event,vo1) {
+            let search = $window.location.search;
 
+            if (search) {
+                search = search.substring(1)
+                search = decodeURIComponent(search)
+                let ar = search.split("&")
+                for (q of ar) {
+                    console.log((q))
+                    let ar1 = q.split('=')
+                    if (ar1[0] == 'nhi') {
+                        console.log('NHI = ' + ar1[1])
+                        //If there is an identifier, then find the patient with that identifier & display their data
+                        nhi = ar1[1]
+                        if (nhi) {
+                            clinicalViewerSvc.findPatientByIdentifier(nhi).then(
+                                function (patient) {
+                                    $scope.patientExternallySpecified = true
+                                    $scope.selectPatient({patient:patient})
+                                }, function (err) {
+                                    console.log(err)
+                                }
+                            )
+                        }
+                    }
+                }
+                //console.log(search)
+            }
+
+
+
+
+            //when a QR is created by the renderform directive
+            $scope.$on('qrCreated',function(event,vo1) {
                 $scope.createdQR = vo1.QR
             })
 
@@ -31,10 +63,6 @@ angular.module("pocApp")
 
             $scope.selectTemplate = function (Q) {
                 $scope.selectedQ = Q
-
-               // let formTemplate = commonSvc.parseQ(Q)     //the actual data source for the rendered form
-              //  console.log(formTemplate)
-              //  $scope.selectedForm = formTemplate
             }
 
             //send the document via the UI local server to the custom op
@@ -238,6 +266,15 @@ angular.module("pocApp")
 
             }
 
+            $scope.findPatientByIdentifierDEP = function(identifier) {
+                clinicalViewerSvc.findPatientByIdentifier(identifier).then(
+                    function (patient) {
+                        $scope.selectPatient({patient:patient})
+                    }, function (err) {
+                        console.log(err)
+                    }
+                )
+            }
 
             $scope.selectPatient = function (vo) {
                 //console.log(vo.patient)
@@ -258,8 +295,6 @@ angular.module("pocApp")
                 //todo ?add a date filter
                 getMedications(patient)
 
-                //get the regiments
-               // getRegimens(patient)
                 //get all the SR for this patient
                 commonSvc.getSRForPatient(patient.id).then(
                     function (bundle) {

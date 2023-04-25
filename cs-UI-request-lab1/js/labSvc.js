@@ -194,18 +194,21 @@ angular.module("pocApp")
 
                         hashAnswers[item.linkId].forEach(function (answer) {
                             //The 'code' element in the Observation is a CodepableConcept, whereal in the Q it is a Coding...
-                            let code = {text:"Unknown code"}
+
                             if (item.code) {
                                 code = {coding:[item.code[0]]}        //only use the first code in the Q
+                                let obs = makeObservation(item.linkId,code,answer)
+
+                                bundle.entry.push(commonSvc.makePOSTEntry(obs))
+                                DR.result.push({reference:"urn:uuid:"+ obs.id})
+
                             }
 
-                            let obs = makeObservation(item.linkId,code,answer)
-                            bundle.entry.push(commonSvc.makePOSTEntry(obs))
-                            DR.result.push({reference:"urn:uuid:"+ obs.id})
                             arAllAnswers.push({linkId:item.linkId,text:item.text,answer:answer})
 
                         })
                     }
+
                     if (item.item) {
                         item.item.forEach(function (child) {
                             getAnswersForSection(child)
@@ -363,12 +366,9 @@ angular.module("pocApp")
                 //todo - should this be a conditional update
                 addToBundleAsPUT(bundle,SR)
 
-
                 //add the patient
                 addToBundleAsPUT(bundle,patient)
 
-
-               // console.log(bundle)
                 return bundle
 
                 //generate the 'textual' report. We'll make it a simple html file for now - can enhance later
@@ -403,6 +403,8 @@ angular.module("pocApp")
                 }
 
                 function makeObservation(linkId,code,answer) {
+
+
                     let obs = {"resourceType":"Observation",id:commonSvc.createUUID(),status:status}
                     obs.identifier = [commonSvc.createUUIDIdentifier()]
                     obs.subject = {reference:'Patient/' + patient.id}

@@ -1,9 +1,20 @@
 angular.module("pocApp")
     .controller('dashboardCtrl',
-        function ($scope,$http,dashboardSvc) {
+        function ($scope,$http,dashboardSvc,$location) {
 
+
+            let protocol = $location.protocol();
+            let port = $location.port();
+
+            $scope.host = protocol + "://" + $location.host()
+            if (port != 80) {
+                $scope.host += ":" + port
+            }
+
+            console.log($scope.host)
 
             $scope.input = {}
+            /*
             $scope.commands = []
             $scope.commands.push({display:'Update forms from Designer',key:'forms'})
             $scope.commands.push({display:'Manage Forms Server',key:'formserver'})
@@ -11,7 +22,7 @@ angular.module("pocApp")
             $scope.commands.push({display:'Log',key:'log'})
 
             $scope.input.command = $scope.commands[0]
-
+*/
             $scope.formData = {}
 
             $scope.arQContext = ['report','request','general']
@@ -43,11 +54,41 @@ angular.module("pocApp")
             }
 
 
-
+/*
             //when the form is updated. Used by the display form tab
             $scope.$on('qrCreated',function(event,vo1) {
                 $scope.createdQR = vo1.QR
             })
+            */
+
+            //get all SR in the 'active' status
+            $scope.refreshSR = function () {
+                dashboardSvc.getActiveSR().then(
+                    function (data) {
+                        $scope.activeSR = data
+                    }
+                )
+            }
+            $scope.refreshSR()
+
+            //select a single SR vo = {sr: patient: qr:
+            $scope.selectVoSR = function(vo) {
+                $scope.selectedSR = vo.sr
+                $scope.selectedQR = vo.qr
+                $scope.selectedSRPatient = vo.patient
+
+                if (vo.patient.identifier) {
+                    //really should be at least one...
+                    //for now just return the first one - todo check for nhi
+
+                    $scope.pathToClinicalViewer = $scope.host + "/ClinicalViewer.html?nhi=" + vo.patient.identifier[0].value
+
+                  //  ${host}/clinicalViewer.html?nhi=${selectedSRPatientIdentifier}`
+
+                   // $scope.selectedSRPatientIdentifier = vo.patient.identifier[0].value
+                }
+
+            }
 
             $scope.copyFormToFormsServer = function (Q) {
 
@@ -60,12 +101,12 @@ angular.module("pocApp")
                     }
                 )
 
-
             }
 
 
             $scope.contexts = ["All","Request","Report","General"]
 
+            //selecting whether to show only forms already on the forms server
             $scope.checkBoxChange = function () {
                 delete $scope.selectedQfromDesigner
                 delete $scope.createdQR
@@ -75,8 +116,8 @@ angular.module("pocApp")
             $scope.showInList = function (miniQ) {
                 let canShow = true
                 //if there's a filter and the name doesn't match then don't show, regardless
-                if ($scope.filter) {
-                    if (miniQ.name.toLowerCase().indexOf($scope.filter.toLowerCase()) == -1) {
+                if ($scope.input.filter) {
+                    if (miniQ.name.toLowerCase().indexOf($scope.input.filter.toLowerCase()) == -1) {
                         return false
                     }
                 }
@@ -115,6 +156,7 @@ angular.module("pocApp")
                         let vo = dashboardSvc.cleanQ(Q)
                         $scope.cleanQ = vo.Q  //dashboardSvc.cleanQ(Q)
                         $scope.issuesWithQ = vo.issues
+                        $scope.summary = vo.summary
 
                     }, function (err) {
                         console.log(err)

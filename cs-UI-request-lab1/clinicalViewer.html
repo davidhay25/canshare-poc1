@@ -70,7 +70,7 @@
             </div>
             <div class="col-md-2">
                 <div class="navbar-text">
-                <select ng-model="input.pat" class="form-control"
+                <select ng-hide="patientExternallySpecified" ng-model="input.pat" class="form-control"
                         ng-change="selectPatient(input.pat)"
                         ng-options="item.display for item in allPatients">
 
@@ -78,10 +78,12 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-5">
                 <div class="navbar-text">
 
+                    <span ng-show="patientExternallySpecified">{{commonSvc.getPatientName(selectedPatient)}}</span>
                     NHI: {{selectedPatient.identifier[0].value}}
+
                     <span ng-show="selectedPatient.gender">Gender: {{selectedPatient.gender}}</span>
                     <span ng-show="selectedPatient.birthDate">BirthDate: {{selectedPatient.birthDate}}</span>
 
@@ -96,9 +98,6 @@
                 </form>
             </div>
 
-            <div class="col-md-1">
-
-            </div>
 
             <div class="col-md-2">
                 <a href="https://teaho.govt.nz/" target="_blank">
@@ -130,7 +129,7 @@
                                             <div ng-repeat="cat in entry.resource.category">{{cat.text}}</div>
 
                                         <div class="pull-right">{{entry.resource.id}}</div>
-                                        {{entry.resource.authoredOn | date}}
+                                        ({{entry.resource.status}})  {{entry.resource.authoredOn | date}}
 
                                     </div>
                                 </div>
