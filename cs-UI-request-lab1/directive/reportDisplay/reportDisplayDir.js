@@ -25,7 +25,6 @@ angular.module('formsApp')
                             $scope.presentedForm = atob($scope.reportobject.DR.presentedForm[0].data)
                             console.log(atob($scope.reportobject.DR.presentedForm[0].data))
 
-
                         }
 
                     }

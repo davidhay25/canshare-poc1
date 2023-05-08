@@ -39,6 +39,9 @@
 
     <script src="directive/renderForm/renderFormDir.js"></script>
     <script src="directive/renderForm/renderFormSvc.js"></script>
+
+    <script src="directive/renderForm/renderFormAsTreeDir.js"></script>
+
 <!--
     <script src="directive/showQTree/showQTreeDir.html"></script>
     -->
@@ -282,6 +285,16 @@
                                             <showqtree q="selectedQfromDesigner"></showqtree>
                                         </uib-tab>
                                         <uib-tab heading="Form">
+
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    <renderform q="selectedQfromDesigner" qr="createdQR" form="formData"></renderform>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <qrdisplay q="selectedQfromDesigner" qr="createdQR"></qrdisplay>
+                                                </div>
+                                            </div>
+                                            <!--
                                             <uib-tabset>
                                                 <uib-tab heading="Edit form">
                                                     <renderform q="selectedQfromDesigner" qr="createdQR" form="formData"></renderform>
@@ -290,8 +303,21 @@
 
                                                     <qrdisplay q="selectedQfromDesigner" qr="createdQR"></qrdisplay>
                                                 </uib-tab>
+
+
                                             </uib-tabset>
+                                            -->
                                         </uib-tab>
+
+                                        <uib-tab heading="Review tree">
+                                            <renderformastree q="selectedQfromDesignerTree" qr="treeReviewQR" form="input.formData">
+
+                                            </renderformastree>
+                                        </uib-tab>
+
+
+
+
                                         <uib-tab heading="Json">
                                             <pre>{{selectedQfromDesigner | json}}</pre>
                                         </uib-tab>
@@ -320,7 +346,7 @@
             <uib-tab-heading>Active Service Requests <span class="badge">{{activeSR.length}}</span> </uib-tab-heading>
             <br/>
             <div>
-
+<!--
                 <div class="row">
                     <div class="col-md-8">
 
@@ -329,12 +355,13 @@
                         <button class="btn-link btn pull-right" ng-click="refreshSR()">Refresh</button>
                     </div>
                 </div>
+                -->
 
                 <div class="row">
                     <div class="col-md-3">
                         <strong ng-show="activeSR">Active ServiceRequests</strong>
                         <div class="list-group">
-                            <div class="list-group-item" ng-repeat="vo in activeSR"
+                            <div ng-class="{'list-group-item':true,listItemSelected:vo.sr.id==selectedSR.id}" ng-repeat="vo in activeSR"
                                  ng-click = "selectVoSR(vo)" style="cursor: pointer">
                                 <div class="pull-right">{{vo.sr.id}}</div>
                                 {{vo.sr.authoredOn | date}}

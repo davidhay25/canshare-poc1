@@ -8,6 +8,8 @@ const {logger} = require("./serverModuleUtil");
 
 function setup(app) {
 
+
+
     //test the observation extraction. Returns an array of all resources including those in the bundle
     app.post("/testExtraction", async function (req,res) {
 
@@ -56,6 +58,7 @@ function setup(app) {
                 console.log ("Q passed in bundle")
             }
 
+            //retrieve all the extractable resoruces - eg Observations & Procedures
             let ar
             try {
                 ar = await sdcModule.extractResources(QR,SR, Q)     //throw an exception if there was an error, or an array of extracted resources if not
@@ -165,7 +168,20 @@ function setup(app) {
         try {
             //If any resources are extracted, then a specific provenance and device will be added and included in the list.
             arExtractedResources = await sdcModule.extractResources(QR,SR)     //throw an exception if there was an error, or an array of extracted resources if not
+
             utilModule.addResourcesToBundle(bundle,arExtractedResources)
+
+            //extracted observations & [rcedures have a reference from the SR to them as supportingInfo (as does the S QR)
+            SR.supportingInfo = SR.supportingInfo || []     //a bit redundant, but doesn't hurt
+            arExtractedResources.forEach(function (resource) {
+                if (['Observation','Procedure'].indexOf(resource.resourceType) > -1 ) {
+                    SR.supportingInfo.push({reference:`urn:uuid:${resource.id}`})
+                }
+
+
+
+            })
+
 
         } catch(ex) {
             console.log(ex)

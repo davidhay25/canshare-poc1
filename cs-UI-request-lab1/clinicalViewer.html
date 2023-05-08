@@ -81,7 +81,9 @@
             <div class="col-md-5">
                 <div class="navbar-text">
 
-                    <span ng-show="patientExternallySpecified">{{commonSvc.getPatientName(selectedPatient)}}</span>
+                    <span ng-show="patientExternallySpecified">
+                        <strong>{{commonSvc.getPatientName(selectedPatient)}}</strong>
+                    </span>
                     NHI: {{selectedPatient.identifier[0].value}}
 
                     <span ng-show="selectedPatient.gender">Gender: {{selectedPatient.gender}}</span>

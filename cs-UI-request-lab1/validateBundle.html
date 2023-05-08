@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>Bundle validator</title>
+
+    <script src="js/libs/jquery-1.9.0.min.js"></script>
+    <script src="js/libs/angular.min1-5.js"></script>
+    <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+    <script src="js/libs/moment.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+
+    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+
+    <script>
+        angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage']).config(function($locationProvider) {
+            $locationProvider.html5Mode(true);
+            $locationProvider.hashPrefix('!');
+        });
+
+        angular.module("formsApp",[])
+        angular.module('topApp', ['pocApp', 'formsApp'])
+
+    </script>
+
+    <style>
+        .error {
+            background-color: red;
+        }
+
+        .warning {
+            background-color: orange;
+        }
+
+        .hint {
+            color: lightskyblue;
+            font-size : 18px
+        }
+
+    </style>
+
+    <script src="js/libs/ngStorage.min.js"></script>
+
+    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
+    <script src="js/validateBundle.js"></script>
+    <script src="js/libs/vis.min.js"></script>
+    <script src="directive/viewBundle/viewBundleDir.js"></script>
+    <script src="directive/viewBundle/viewBundleSvc.js"></script>
+</head>
+<body style="padding: 8px;padding-top: 80px">
+    <div ng-app="topApp" ng-controller="validateBundleCtrl" class="container-fluid">
+
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+            <div class="container-fluid">
+                <div class="col-md-2 col-sm-2">
+                        <span>
+                            <a class="navbar-brand" href="#">
+                                Validate Bundle
+                            </a>
+                        </span>
+
+                </div>
+
+                <div class="col-md-1 col-sm-1">
+
+                </div>
+                <div class="col-md-2">
+
+                </div>
+
+                <div class="col-md-4">
+
+                </div>
+
+                <div class="col-md-1 col-sm-1">
+                    <form class="navbar-form navbar-left">
+                        <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+
+                    </form>
+                </div>
+
+
+
+                <div class="col-md-2">
+                    <a href="https://teaho.govt.nz/" target="_blank">
+                        <img width="150" height="auto" class="pull-right"
+                             style="padding: 3px"
+                             src="images/TAK-logo-midgreen.png"/>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="row">
+
+            <div class="col-md-12">
+                <uib-tabset active="input.mainTabActive">
+
+                    <uib-tab heading = "Bundle">
+                        <button ng-hide="input.bundle" class="btn btn-link pull-right" ng-click="loadSample()">Load sample</button>
+                        <button ng-show="input.bundle" class="btn btn-link pull-right" ng-click="validate('an')">Validate ACT-NOW</button>
+
+                        <textarea ng-model = "input.bundle" placeholder="Paste Bundle here" class="form-control" rows="25">
+
+                        </textarea>
+                    </uib-tab>
+
+                    <uib-tab heading="Issues ">
+                        <uib-tab-heading>List <span class="badge">{{arIssues.length}}</span> </uib-tab-heading>
+                        <h4>Issues fron validator</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="myScroll">
+                                    <div class="list-group">
+                                        <div ng-class="{'list-group-item':true,listItemSelected: issue == input.selectedIssue}"
+                                             style="cursor: pointer;padding: 8px"
+                                             ng-click = "selectIssue(issue)"
+                                             ng-repeat="issue in arIssues">
+                                            <div uib-popover="{{issue.hint.comment}}"
+                                                    popover-placement="left"
+                                                    popover-trigger="'mouseenter'"
+                                                    ng-class="{'pull-right':true, badge:true ,error:issue.issue.severity == 'error',warning:issue.issue.severity == 'warning'}">
+                                                {{issue.issue.severity.substring(0,1)}}
+                                            </div>
+
+                                            {{issue.issue.diagnostics}}
+<!--
+                                            <div class="pull-right" ng-show="issue.hint">
+                                                <i class=" glyphicon glyphicon-info-sign hint"
+                                                   uib-popover="{{issue.hint.comment}}"
+                                                   popover-placement="left"
+                                                   popover-trigger="'mouseenter'"></i>
+
+                                            </div>
+                                            -->
+                                            <div><em>{{issue.issue.location[0]}}</em></div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Entry</strong>
+                                <pre>{{input.selectedIssue.entry | json}}</pre>
+                                <strong>Full issue</strong>
+                                <pre>{{input.selectedIssue.issue | json}}</pre>
+
+                            </div>
+                        </div>
+
+<!--
+                        <pre>{{arIssues | json}}</pre>
+-->
+                    </uib-tab>
+
+                    <uib-tab heading="Graph of resources">
+                        <viewbundle bundle="inputtedBundle" validationoo = "oo"></viewbundle>
+                    </uib-tab>
+
+                    <uib-tab heading="OO Json">
+                        <pre>{{oo | json}}</pre>
+                    </uib-tab>
+                </uib-tabset>
+
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+
+</body>
+</html>

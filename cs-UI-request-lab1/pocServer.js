@@ -24,8 +24,9 @@ const terminologyModule = require("./serverModuleTerminologyUI")
 //let config = require("./config.json")
 
 let express = require('express');
+const fle = require("./samples/valenciaMay.json");
 let app = express();
-app.use(bodyParser.json({limit:'50mb',type:['application/fhir+json','application/json']}))
+app.use(bodyParser.json({limit:'50mb',type:['application/json+fhir','application/fhir+json','application/json']}))
 /*
 //disable any cache - https://stackoverflow.com/questions/22632593/how-to-disable-webpage-caching-in-expressjs-nodejs
 app.use((req, res, next) => {
@@ -41,8 +42,44 @@ dashBoardModule.setup(app)
 clinicalViewerModule.setup(app)
 terminologyModule.setup(app)
 
-
 //common calls (not specifically related to requester or lab. ?move to separate module
+
+
+
+app.get('/sampleAN',function (req,res) {
+    let fle = require("./samples/valenciaMay.json")
+    res.json(fle)
+})
+
+app.get('/validatorHints',function (req,res) {
+    let fle = require("./validatorHints.json")
+    res.json(fle)
+})
+
+//validation.
+app.post('/validateBundle', async function (req,res) {
+    let bundle = req.body
+//console.log(req.params.type)
+    if (! bundle || ! bundle.entry) {
+        res.status(400).json({msg:"Must contain a bundle. Is the content-type header set to 'application/json' "})
+    } else {
+        let validationEP = "http://localhost:9300/validateActNow"
+        try {
+            let response = await axios.post(validationEP,bundle)
+            res.json(response.data)
+        } catch (ex) {
+            res.status(500).json(ex)
+        }
+
+    }
+
+
+
+
+})
+
+
+
 app.get('/config', async function(req,res){
 
     let config = {

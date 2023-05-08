@@ -6,28 +6,75 @@ angular.module("pocApp")
         let extDRtoQR = "http://canshare.co.nz/fhir/StructureDefinition/diagnosticreport-qr"
 
         return {
-            setInitialQValues : function (Q,hashData) {
-                //update the .initial values in the Q. This will 'pre-populate' the values when the template isbeing built in the renderForm directive
 
+            setInitialQValuesFromQR : function (Q,QR) {
+
+            },
+
+            setInitialQValuesFromObs : function (Q,arObs) {
+                //create a hash of prepop data keyed on linkId from inputs (obs) that are identifier by code (not linkId).
+                //for each item in the Q, if it has a .code and if there is an observation that has that code, then add the obs.value[x] to
+                //to hash using the item.linkId as the key. Then the hash can be use by 'setInitialQValues'
+
+                //first create a hash of observation values keyed by code
+                let hashData = {}
+                arObs.forEach(function (obs) {
+                    if (obs.code) {   //a codeableconcept. look at the first coding only
+                        let key = `${obs.code.coding[0].system}|${obs.code.coding[0].code}`
+                        let ans
+                        //get the answer, todo Is there a more efficient way to do this?
+                        if (obs.valueString) {
+                            ans = {valueString:obs.valueString}
+                        } else if (obs.valueCodeableConcept) {
+                            ans = obs.valueCodeableConcept.coding[0]        //A CC in the obs is a coding in the Q
+                        }
+                        if (ans) {
+                            hashData[key] = ans
+                        }
+                    }
+                })
+
+                //now we can set the initial values
+                //need to recursively check each section
+                if (Q.item) {
+                    Q.item.forEach(function (section) {
+                        checkItem(section)
+
+                    })
+                }
+
+                function checkItem(item) {
+                    //if the item has a code, and there is data in the hash then set the initial value
+                    if (item.code) { //this is a coding
+                        let key = `${item.code[0].system}|${item.code[0].code}`
+                        if (hashData[key]) {
+                            item.initial = []       //only 1 initial is supported
+                            item.initial.push(hashData[key])
+                            console.log("Setting " + key + " to ",hashData[key])
+                        }
+                    }
+                    if (item.item) {
+                        item.item.forEach(function (child) {
+                            checkItem(child)
+                        })
+                    }
+
+                }
+
+
+
+
+            },
+
+
+            setInitialQValuesFromHash : function (Q,hashData) {
+                //update the .initial values in the Q. This will 'pre-populate' the values when the template isbeing built in the renderForm directive
+                // hashData is keyed by linkId, so is specific to this template
 
                 //need to recursively check each section
                 if (Q.item) {
                     Q.item.forEach(function (section) {
                         checkItem(section)
-                        /*
-                        if (section.item) {
-                            section.item.forEach(function (child) {
-                                if (child.item) {
-                                    child.item.forEach(function (gc) {
-                                        setInitial(gc,hashData)
-                                    })
-                                } else {
-                                    setInitial(child,hashData)
-                                }
-                            })
-                        }
-                        */
-
 
                     })
                 }
@@ -46,25 +93,11 @@ angular.module("pocApp")
                 //set the initial value - for specific datatypes only
                 function setInitial(item,hashValues) {
                     if (hashValues[item.linkId]) {
-                        console.log(item.linkId,hashValues[item.linkId])
+                        //console.log(item.linkId,hashValues[item.linkId])
 
                         item.initial = []       //only 1 initial is supported
                         item.initial.push(hashValues[item.linkId])
 
-
-                        /* - is a switch needed here?
-                        switch (item.type) {
-                            case "choice" :
-                                item.initial = []       //only 1 initial is supported
-                                item.initial.push(hashValues[item.linkId])
-                                break
-                            case "string" :
-                            case "text" :
-                                item.initial = []       //only 1 initial is supported
-                                item.initial.push(hashValues[item.linkId])
-                                break
-                        }
-                        */
                     }
                 }
 
@@ -88,18 +121,6 @@ angular.module("pocApp")
                         addToBundleAsPUT(bundle,obs)
                     })
                 }
-
-                /*  No  - nnot any more
-                if (request.dr) {
-                    //invalidate the dr and add to the bundle as an update
-                    request.dr.status = "cancelled"
-                    let entry = {resource:request.dr}
-                    entry.fullUrl = fhirServerUrl + "/DiagnosticReport/"+ request.dr.id
-                    entry.request = {method:"PUT",url:"DiagnosticReport/"+request.dr.id}
-                    bundle.entry.push(entry)
-                }
-                * */
-
 
 
                 //objects used by functions below
@@ -220,54 +241,8 @@ angular.module("pocApp")
                 reportQ.item.forEach(function (section) {
                     getAnswersForSection(section)
                 })
-                /*
-
-                reportQ.item.forEach(function (section) {
-                    let compSection = null              //the section will be created if there are items below it
-                    if (section.item) {
-                        section.item.forEach(function (child) {
-                            if (child.item) {
-                                //this is a group - todo, finish this...
 
 
-
-                            } else {
-                                //this is a leaf off the section
-                                if (hashAnswers[child.linkId] && hashAnswers[child.linkId].length > 0) {
-                                    //so there is an answer for this linkId
-                                    //create a composition section, if needed and add it to the composition
-                                    if (!compSection) {
-                                        compSection = {entry:[]}        //also need title
-                                        composition.section.push(compSection)
-                                    }
-                                    hashAnswers[child.linkId].forEach(function (answer) {
-                                        //The 'code' element in the Observation is a CodepableConcept, whereal in the Q it is a Coding...
-                                        let code = {text:"Unknown code"}
-                                        if (child.code) {
-                                            code = {coding:[child.code[0]]}        //only use the first code in the Q
-                                        }
-
-                                        let obs = makeObservation(child.linkId,code,answer)
-                                        bundle.entry.push(commonSvc.makePOSTEntry(obs))
-                                        DR.result.push({reference:"urn:uuid:"+ obs.id})
-                                        compSection.entry.push({reference:"urn:uuid:"+ obs.id})
-
-                                        arAllAnswers.push({linkId:child.linkId,text:child.text,answer:answer})
-                                    })
-
-
-                                }
-                            }
-
-                        })
-                    }
-
-                })
-
-
-                */
-                //console.log(arAllAnswers)
-                
                 //construct the textual report and add to the DR
                 makeTextualReport(arAllAnswers,DR)
 
@@ -289,70 +264,10 @@ angular.module("pocApp")
                 let strVo = angular.toJson(vo)          //all the form data as a hash
 
 
-                let att = {'contentType':'application/json',data:btoa(strVo)}
+                let att = {'contentType':'application/json',data:btoa(strVo),title:"Raw form data"}
                 DR.presentedForm.push(att)
                 
 
-                /*
-                //so now we have all the answers. Create an observation for each one
-                Object.keys(hashAnswers).forEach(function (linkId) {
-                    let arAnswers = hashAnswers[linkId]    //array of answers
-
-                    if (arAnswers && arAnswers.length > 0) {
-                        let answer = arAnswers[0]
-                        let issuedDate = new Date().toISOString()
-
-                        let obs = {"resourceType":"Observation",id:commonSvc.createUUID(),status:status}
-                        obs.identifier = [commonSvc.createUUIDIdentifier()]
-                        obs.subject = {reference:'Patient/' + patient.id}
-                        obs.performer = [{display:"Pertinent Pathology"}]
-                        obs.basedOn = [{reference:'ServiceRequest/'+ SR.id}]
-
-                        //the code is defined in the Q item (along with the linkId which is the key)
-                        //todo - do we need to check that there is a code?
-                        //obs.code =  {coding:[hashLinkIdCodes[linkId]]}
-                        obs.code =  hashLinkIdCodes[linkId]         //this is a CC
-
-
-                        obs.effectiveDateTime = issuedDate
-                        obs.issued = issuedDate
-
-                        //obs.valueString = value
-                        let newObs = {...obs, ...answer}
-
-                        console.log(newObs)
-                        DR.result.push({reference:"urn:uuid:"+ obs.id})
-
-                        bundle.entry.push(commonSvc.makePOSTEntry(newObs))
-
-                    }
-
-                })
-
-                */
-
-              /*
-                //iterate through the QR. For all those with an answer, create an observation
-                QR.item.forEach(function (section) {
-                    if (section.item) {
-                        section.item.forEach(function (child) {
-                            if (child.item) {
-                                //group
-                            } else {
-                                //leaf
-                                makeObservation(child)
-                            }
-
-                        })
-                    }
-                })
-
-
-                Object.keys($scope.answer).forEach(function (key) {
-
-                })
-
-               */
 
                 //If the status us 'final', also need to update and add the SR to the bundle.
                 //it should be safe to use the one we retrieved first time as no one else should have updated it in the interim
@@ -397,7 +312,7 @@ angular.module("pocApp")
                     let html = ar.join("\n")
 
                     //console.log(html)
-                    let att = {'contentType':'text/html',data:btoa(html)}
+                    let att = {'contentType':'text/html',data:btoa(html),title:"The generated report"}
                     DR.presentedForm = [att]
 
                 }

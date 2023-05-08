@@ -25,6 +25,9 @@ angular.module('formsApp')
                     console.log(item,meta)
                 }
 
+                $scope.$on('prepop',function (ev,vo) {
+                    
+                })
 
 
                 $scope.$on("externalQRUpdate",function(ev,vo){
@@ -44,6 +47,7 @@ angular.module('formsApp')
                   //  $scope.makeQR() - causes a stack overflow
                 })
 
+                
 
                 //for some reason when the q changes, the change doesn't ripple through to the directive, so $scope.$broadcast is needed
                 //this is used by the designer...

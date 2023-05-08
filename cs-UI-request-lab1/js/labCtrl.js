@@ -39,9 +39,6 @@ angular.module("pocApp")
             }
             $scope.toggleRequestDisplay()
 
-
-
-
             $scope.submitLabel = function() {
                 if ($scope.input.final) {
 
@@ -54,7 +51,7 @@ angular.module("pocApp")
             //emitted when a user clicks on the ? icon in the form render
             $scope.$on("itemDetail",function(ev,vo){
                 $scope.input.itemDetail = vo
-                console.log(vo)
+                //console.log(vo)
                 //{item: meta:
             })
 
@@ -136,6 +133,15 @@ angular.module("pocApp")
                 $scope.hashLinkIdCodes = labSvc.getCodingForLinkId($scope.selectedReportQ)  //note these are CC
 
 
+                //This is an array of observations created by the requester. Use the data in these obs
+                //to set the initial values on the Q. This only works where the Q.item.code is set as that is the link to obs.code
+                if ($scope.selectedRequest.qrobs) {
+                    labSvc.setInitialQValuesFromObs(template.Q,$scope.selectedRequest.qrobs)
+                }
+
+
+                commonSvc.populate(template.Q,$scope.selectedRequest.pat,$scope.selectedRequest.qr)
+
 
                 //console.log($scope.hashLinkIdCodes)
 
@@ -158,11 +164,11 @@ angular.module("pocApp")
             }
 
             //a single request object {pat:, sr:} is selected.
-            //retrieve the details for that sr
+            //retrieve the details for that sr from a lab specific call - ie to the lab server which then queries cansahre thru fhir
             $scope.selectRequest = function(request) {
                 if (request && request.sr && request.sr.identifier) {
                     let srIdentifier = request.sr.identifier[0].value
-                    //returns an object {pat:, sr:, qr:, dr: obs:}
+                    //returns an object {pat:, sr:, qr:, dr:, qrobs, obs:}
                     //dr (DiagnosticReport) and obs will be populated if there was an interim report that is being updated.
 
                     let qry = `/lab/SRDetails?identifier=${srIdentifier}`
@@ -171,6 +177,11 @@ angular.module("pocApp")
                             console.log(data.data)
                             let vo = data.data
                             $scope.selectedRequest = vo
+
+
+
+                            $scope.hashAllData = commonSvc.allQRData(vo.qr)
+                            console.log($scope.hashAllData)
 
                             //A link to display the clincial viewer for the patient
                             $scope.pathToClinicalViewer = $scope.host + "/ClinicalViewer.html?nhi=" + vo.pat.identifier[0].value
@@ -181,7 +192,7 @@ angular.module("pocApp")
 
                                     let vo1 = angular.fromJson(atob(vo.dr.presentedForm[1].data))
 
-                                    $scope.prePopData = vo1.data
+                                    $scope.prePopData = vo1.data  //todo - don't think this is being used
 
                                     //now locate the template in $scope.templates
                                     for (const template of $scope.templates) {
@@ -190,7 +201,15 @@ angular.module("pocApp")
 
                                             //so we've found the template. If we update the .initial values, then the values
                                             //will be displayed in the form
-                                            labSvc.setInitialQValues(template.Q,vo1.data)
+
+
+                                            //vo1.data is a hash of data by linkid from data previously entered and saved in the DR
+                                            //ie it will only be populated when a form is being updated
+                                            //this approach is really only suitable in this implementation - other will likely store this data separately
+                                            if (vo1.data) {
+                                                labSvc.setInitialQValuesFromHash(template.Q,vo1.data)
+                                            }
+
 
                                             $scope.selectedTemplate = template   //set the selected template.
                                             $scope.selectQ(template)        //select the template
@@ -262,7 +281,11 @@ angular.module("pocApp")
                     function(data){
                         //alert("Report has been submitted")
 
+
                         $scope.submissionOO = data.data
+
+
+
                         $scope.getActiveRequests()
                         console.log(data)
 

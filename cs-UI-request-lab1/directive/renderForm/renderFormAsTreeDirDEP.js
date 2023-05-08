@@ -11,20 +11,16 @@ angular.module('formsApp')
             },
 
             templateUrl: 'directive/renderForm/renderFormAsTreeDir.html',
-            controller: function($scope,renderFormsSvc,$timeout){
-
-                // #changed
-
+            controller: function($scope,renderFormsSvc,$timeout,renderFormsSvc){
 
 
                 $scope.form = {}        //a hash containing form data entered by the user
                 $scope.input = {};
 
-                $scope.input.comments = {}      //comments entered against an individual item
-
                 $scope.datePopup = {}
                 $scope.openDate = function(linkId) {
                     $scope.datePopup[linkId] = {opened:true}
+                    // $scope.datePopup.opened = true
                 }
 
                 //a hash of items that failed the most current dependency check
@@ -75,7 +71,6 @@ angular.module('formsApp')
                                 }
                             })
 
-                            $scope.treeData = vo.treeData
                             drawTree(vo.treeData)       //for drawing the tree
 
 
@@ -85,20 +80,13 @@ angular.module('formsApp')
                 );
 
 
-                $scope.addNewCommentDEP = function(txt,item,groupComment) {
-//console.log(txt,item,groupComment)
-
-                    // #changed
-
-                    //$scope.selectedNode.data.meta.comment = $scope.input.newComment
-
+                $scope.addNewComment = function(txt,item,groupComment) {
+console.log(txt,item,groupComment)
 
                     $scope.form[groupComment.linkId] = $scope.form[groupComment.linkId] || ""
                     $scope.form[groupComment.linkId] += item.text + ": " + txt + "\n"
 
-                    //delete $scope.input.newComment
-
-
+                    delete $scope.input.newComment
 
                     $scope.makeQR()
                 }
@@ -120,13 +108,7 @@ angular.module('formsApp')
                             delete $scope.selectedGroup
                             delete $scope.input.newComment
                             $scope.selectedNode = data.node;
-
-                            // #changed
-                            $scope.input.newComment = $scope.selectedNode.data.meta.comment || ""
                             //console.log(data.node)
-
-
-                            //
 
                             //this will update the item display in the right pane
                             //todo - may no longer be needed if we don't allow data entry via the tree
@@ -146,20 +128,8 @@ angular.module('formsApp')
                 //note that this is called every time there is a change (eg keypress) in the forms component
                 //this is to ensure that the QR is always up to date. onBlur could miss the most recently updated firld...
                 $scope.makeQR = function() {
-console.log('makeQR')
-                    //need to add the individual comments against items (in $scope.input.comments) to the form data (in $scope.form)
-
-                    let model = angular.copy($scope.form)   //a copy of the form data. We don't want to update the one that the tree is using
-
-                    //updates the items marked as comments (using the code.system)
-                    //If I was doing this again I'd use an extension, but that will require updating the disposer. Perhaps another time...
-                    renderFormsSvc.addCommentsToModel($scope.q,$scope.input.comments,model,$scope.hashItem)
-
-
-                    $scope.qr = renderFormsSvc.makeQR($scope.q, model,$scope.hashItem)
-                    //$scope.qr = renderFormsSvc.makeQR($scope.q, $scope.form,$scope.hashItem)
-
-
+//console.log('makeQR')
+                    $scope.qr = renderFormsSvc.makeQR($scope.q, $scope.form,$scope.hashItem)
                     //emit the QR so it can be captured by the containing hierarchy. Otherwise the scopes get complicated...
                     $scope.$emit('qrCreated',{QR:$scope.qr,formData:$scope.form,hashItem:$scope.hashItem,source:'tree'})
 

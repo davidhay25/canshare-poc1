@@ -115,6 +115,9 @@ angular.module('formsApp')
                     bundle.entry.forEach(function (entry) {
                         arResources.push(entry.resource)
                     })
+                    console.log("Creating graph in viewBundle..")
+                    //return
+
                     let vo = viewBundleSvc.makeGraph({arResources: arResources,focusResource:focusResource})  //actually entries...
 
                    // console.log($scope.graphId)

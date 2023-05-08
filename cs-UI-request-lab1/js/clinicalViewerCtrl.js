@@ -122,34 +122,41 @@ angular.module("pocApp")
             // a specific version of a DR
             $scope.selectDRVersion = function(DR) {
                 $scope.selectedDRVersion = DR
+                $scope.reportObject = {DR:DR,observations:[]}
 
-                //create the query that will return the Observations references by this version of the DR.
+
+                //create the query that will return the Observations references by this version of the DR (If any).
+                //this will have all the observation id's
                 //we can't use _include as it's not version aware
-                let qry = "Observation?_id="
-                if (DR.result) {
+
+                if (DR.result && DR.result.length > 0) {  //shouldn't ever be an empty array...
+                    let qry = "Observation?_id="
                     DR.result.forEach(function (ref) {
                         let ar = ref.reference.split('/')
                         qry += ar[ar.length-1] + ","
                     })
+
+                    let encodedQry = encodeURIComponent(qry)
+                    $http.get(`/proxy?qry=${encodedQry}`).then(
+                        function (data) {
+                            console.log(data.data)
+                            //$scope.DRhistory = data.data    //a bundle containing all the DR versions
+                            //generate the report object needed by the reportdisplay directive
+
+                            data.data.entry.forEach(function (entry) {
+                                $scope.reportObject.observations.push(entry.resource)
+                            })
+
+                        }, function(err) {
+
+                        })
+
                 }
 
 
 
 
-                let encodedQry = encodeURIComponent(qry)
-                $http.get(`/proxy?qry=${encodedQry}`).then(
-                    function (data) {
-                        console.log(data.data)
-                        //$scope.DRhistory = data.data    //a bundle containing all the DR versions
-                        //generate the report object needed by the reportdisplay directive
-                        $scope.reportObject = {DR:DR,observations:[]}
-                        data.data.entry.forEach(function (entry) {
-                            $scope.reportObject.observations.push(entry.resource)
-                        })
 
-                    }, function(err) {
-
-                    })
 
             }
 
@@ -277,7 +284,6 @@ angular.module("pocApp")
             }
 
             $scope.selectPatient = function (vo) {
-                //console.log(vo.patient)
                 let patient = vo.patient
                 $scope.selectedPatient = vo.patient
 
@@ -290,10 +296,12 @@ angular.module("pocApp")
                     }
                 )
 
-
                 // get all the medications data for the patient.
                 //todo ?add a date filter
                 getMedications(patient)
+
+                //get all the Episodes of care
+                getEOC(patient)
 
                 //get all the SR for this patient
                 commonSvc.getSRForPatient(patient.id).then(
@@ -356,6 +364,24 @@ angular.module("pocApp")
                     }
                 )
 
+
+            }
+
+            function getEOC(patient) {
+                //get the episodes of care for a patient
+                delete $scope.eoc
+                let ar = []
+
+                ar.push(`EpisodeOfCare?patient=${$scope.selectedPatient.id}`)
+                $http.post('multiquery',ar).then(
+                    function (data) {
+                        console.log(data.data)
+                        $scope.eoc = data.data
+                        console.log($scope.allMeds)
+                    }, function (err) {
+                        console.log(err.data)
+                    }
+                )
 
             }
 

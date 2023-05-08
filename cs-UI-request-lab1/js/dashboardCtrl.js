@@ -13,6 +13,8 @@ angular.module("pocApp")
 
             console.log($scope.host)
 
+            $scope.treeReviewQR = {}
+
             $scope.input = {}
             /*
             $scope.commands = []
@@ -33,6 +35,8 @@ angular.module("pocApp")
                 if (Q.useContext) {
                     Q.useContext.forEach(function (uc) {
                         if (uc.code) {
+
+
                             if (uc.code.system == 'http://terminology.hl7.org/CodeSystem/usage-context-type' && uc.code.code == "focus") {
                                 context = uc
                             }
@@ -149,6 +153,10 @@ angular.module("pocApp")
                 dashboardSvc.getSingleQFromDesigner(miniQ).then(
                     function (Q) {
                         $scope.selectedQfromDesigner = Q
+
+                        $scope.selectedQfromDesignerTree = angular.copy(Q)
+
+                        //selectedQfromDesigner
 
                         //get the context of the Q.
                         $scope.contextString = getContext(Q)

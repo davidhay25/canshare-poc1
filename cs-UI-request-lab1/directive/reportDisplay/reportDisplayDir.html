@@ -32,6 +32,11 @@
             </table>
 
             <h4>Observations</h4>
+
+            <div ng-hide="reportobject.observations.length > 0">
+                There were no Observation created in this report
+            </div>
+
             <table class="table ">
                 <tr ng-repeat = "obs in reportobject.observations">
                     <!--

@@ -1,15 +1,227 @@
 angular.module("pocApp")
     .controller('queryCtrl',
-        function ($scope,$http,$localStorage,$uibModal,$q) {
-
-
-
-
-            //$scope.serverUrl = "http://hapi.fhir.org/baseR4/"
+        function ($scope,$http,$localStorage,$uibModal,$q,$timeout) {
 
             $scope.localStorage = $localStorage
 
+            $scope.input = {}
 
+
+            // =============================================== functions to support ConceptMap work =================
+
+            //load the tsv file extracted from the spreadsheet that defines the conceptmaps
+
+
+
+
+            $scope.input.id = "cs-test1"
+
+            $scope.examples = []            //an array of possible values
+            let example1 = {display:"Line 16",id:"cs-test16",target:"399687005",dep1:"394803006",prop1:'http://what-is-this'}
+            $scope.examples.push(example1)
+
+            let example2 = {display:"Line 18",id:"cs-test16",target:"399687005",dep1:"394803006",prop1:'http://what-is-this',dep2:'372137005',prop2:'http://what-is-this'}
+            $scope.examples.push(example2)
+
+
+            let example3 = {display:"Line 22",id:"cs-test16",target:"253211000210102",source:"512001000004108",dep1:"394803006",prop1:"cancer-service"}
+            $scope.examples.push(example3)
+
+            $scope.setExample = function(example) {
+                $scope.input.id = example.id
+                $scope.input.target = example.target
+                $scope.input.source = example.source
+                $scope.input.prop1 = example.prop1
+                $scope.input.dep1 = example.dep1
+
+                $scope.input.prop2 = example.prop2
+                $scope.input.dep2 = example.dep2
+
+                $scope.generateMapAndTranslate()
+
+            }
+
+            $scope.lookup = function (code) {
+                let url = `${termServer}CodeSystem/$lookup?system=${snomed}&code=${code}`
+                $http.get(url).then(
+                    function (data) {
+                        console.log(data.data)
+                        //alert(data.data)
+
+                        $uibModal.open({
+                            templateUrl: 'modalTemplates/showParameters.html',
+                            backdrop: 'static',
+                            //size : 'lg',
+                            controller: function($scope,parameters){
+                                $scope.parameters = parameters
+                            },
+                            resolve: {
+                                parameters: function () {
+                                    return data.data
+                                }
+                            }
+
+                        }).result.then(
+                            function (vo) {
+
+
+                            }
+                        )
+
+
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+            }
+
+
+
+            let termServer = "https://r4.ontoserver.csiro.au/fhir/"
+            let snomed = "http://snomed.info/sct"
+
+
+            //$scope.input.prop1 = "http://what-is-this"
+            //$scope.input.prop2 = "http://what-is-this"
+
+            //download the map indicated by the current id
+            $scope.downloadMap = function () {
+                let url = `${termServer}/ConceptMap/${$scope.input.id}`
+                $http.get(url).then(
+                    function (data) {
+                        $scope.cm = data.data
+                        $timeout(function(){
+                            alert("ConceptMap downloaded")
+                        },100)
+
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+
+            }
+
+
+            $scope.uploadMap = function () {
+                let url = `${termServer}/ConceptMap/${$scope.cm.id}`
+                $http.put(url,$scope.cm).then(
+                    function (data) {
+                        alert("ConceptMap updated")
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+
+            }
+
+            $scope.generateMapAndTranslate = function(){
+                $scope.generateMap()
+                //========  now the translate call
+                $scope.generateTranslate()
+            }
+
+            //Generate the ConceptMap
+            $scope.generateMap = function() {
+
+                //======== first the concept map
+                $scope.cm = {resourceType:"ConceptMap",status:"draft"}
+                $scope.cm.id = $scope.input.id
+                $scope.cm.url = `http://canshare.co.nz/fhir/ConceptMap/${$scope.input.id}`
+
+                $scope.cm.group = []
+
+                let group = {}
+                group.source = snomed
+                group.target = snomed
+                group.element = []
+
+                $scope.cm.group.push(group)
+                let element = {}
+                element.code = $scope.input.source
+                group.element.push(element)
+                element.target = []
+
+                let target = {}
+                target.code = $scope.input.target
+                target.equivalence = "relatedto"
+                target.dependsOn = []
+                element.target.push(target)
+
+                let do1 = {}        //first dependency
+                if ($scope.input.dep1) {
+                    do1.property = $scope.input.prop1
+                    do1.system =  snomed
+                    do1.value = $scope.input.dep1
+
+                    target.dependsOn.push(do1)
+                }
+
+                let do2 = {}        //second dependency
+                if ($scope.input.dep2) {
+                    do2.property = $scope.input.prop2
+                    do2.system =  snomed
+                    do2.value = $scope.input.dep2
+
+                    target.dependsOn.push(do2)
+                }
+
+
+            }
+
+
+            //Generate the example translate parameters
+            $scope.generateTranslate = function() {
+                $scope.parameters = {resourceType:"Parameters", parameter:[]}
+
+                //the conceptmap url
+                $scope.parameters.parameter.push({name:"url",valueUri:`http://canshare.co.nz/fhir/ConceptMap/${$scope.input.id}`})
+
+                //? no code to be translated is needed
+
+                //add the target - what we are looking for. This is in the group.elements.target.code
+                let thingWeWant = {system:"http://snomed.info/sct",code:$scope.input.source}
+                $scope.parameters.parameter.push({name:"coding",valueCoding:thingWeWant})
+
+                //the dependency
+                if ( $scope.input.dep1) {
+                    let depParam1 = {name:"dependency",part :[]}
+                    $scope.parameters.parameter.push(depParam1)
+                    let part1 = {"name":"element","valueUri":$scope.input.prop1}
+                    depParam1.part.push(part1)
+                    let ccValue = {coding:[{system:snomed,code:$scope.input.dep1}]}
+                    let part2 = {"name":"concept","valueCodeableConcept":ccValue}
+                    depParam1.part.push(part2)
+                }
+
+                if ( $scope.input.dep2) {
+                    let depParam2 = {name:"dependency",part :[]}
+                    $scope.parameters.parameter.push(depParam2)
+                    let part1 = {"name":"element","valueUri":$scope.input.prop2}
+                    depParam2.part.push(part1)
+                    let ccValue = {coding:[{system:snomed,code:$scope.input.dep2}]}
+                    let part2 = {"name":"concept","valueCodeableConcept":ccValue}
+                    depParam2.part.push(part2)
+                }
+
+
+            }
+
+            $scope.executeTranslate = function () {
+                let url = `${termServer}ConceptMap/$translate`
+                console.log($scope.parameters)
+                $http.post(url,$scope.parameters).then(
+                    function (data) {
+                        alert(angular.toJson(data.data))
+                        $scope.response = data.data
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                        $scope.response = err.data
+                    }
+                )
+
+            }
+
+            // ========================== end of conceptmap functions ====================
 
             function setServer() {
                 if ($localStorage.currentServer) {
@@ -152,7 +364,8 @@ angular.module("pocApp")
 
             $scope.selectServer = function (svr) {
                // $scope.selectedServer = svr
-                $localStorage.currentServer = $scope.selectedServer
+                $localStorage.currentServer = svr //$scope.selectedServer
+                setServer()
             }
             
             $scope.vsTypes = []

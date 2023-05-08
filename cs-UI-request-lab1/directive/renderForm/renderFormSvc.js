@@ -57,6 +57,46 @@ angular.module("formsApp")
 
         return {
 
+            //
+            addCommentsToModel : function(Q,hashComments,hashModel,hashItem){
+                //hashCommnents are comments, hashModel is the data model (keyed bu linkId), hashItem are the item definitions from the Q (keyed bu linkId)
+                //strategy is to work through the tree 'top down' (by section). Keep a running total of the comments.
+                //when we come across a marked comment item (code.system = 'http://clinfhir.com/fhir/CodeSystem/review-comment') then add the running total to any existing comment there and clear the running total
+                //the last item in the tree should be a comment item!
+
+                let runningComments = ""
+                let reviewerCommentSystem = "http://clinfhir.com/fhir/CodeSystem/review-comment"
+
+                function checkItem(item) {
+                    if (hashComments[item.linkId]) {
+                        runningComments += item.text +': ' + hashComments[item.linkId] + "\n"
+                    }
+
+                    if (item.code && item.code.system == '') {
+                        //this is a comment item
+                        hashModel[item.linkId] = runningComments
+                        runningComments = ""
+                    }
+
+                    if (item.item) {
+                        item.item.forEach(function (child) {
+                            checkItem(child)
+                        })
+                    }
+
+                }
+
+                if (Q.item) {
+                    Q.item.forEach(function (section) {
+                        checkItem(section)
+                    })
+                }
+
+
+
+
+            },
+
             setControls : function (template,data) {
                 //set the values for dropdowns
 
@@ -111,7 +151,7 @@ angular.module("formsApp")
 
                     //check to see if this item is a review item. If so, add it to the list of all review items this section
                     if (item.code) {
-                        console.log(item.code)
+                        //console.log(item.code)
                         item.code.forEach(function (code) {
                             if (code.system == 'http://clinfhir.com/fhir/CodeSystem/review-comment') {
                                 sectionItem.reviewItem.push(item)
@@ -131,7 +171,7 @@ angular.module("formsApp")
 
                     let iconFile = "icons/icon-q-" + item.type + ".png"
                     node.icon = iconFile
-
+/*
                     //if this is a review item text box then don't add to the tree
                     let canAdd = true
                     if (item.code) {
@@ -146,8 +186,9 @@ angular.module("formsApp")
                     if (canAdd) {
                         treeData.push(node)
                     }
+                    */
 
-
+                    treeData.push(node)
 
                     //now look at any sub children
                     if (item.item) {

@@ -112,17 +112,6 @@
         </div>
     </nav>
 
-        <!--
-    <div  class="row" style="margin-top: 8px">
-        <div class="col-md-4">
-            <div class="banner">Request</div>
-        </div>
-        <div class="col-md-8">
-            <div class="banner">Report</div>
-        </div>
-
-    </div>
-        -->
 
     <div class="row">
 
@@ -138,6 +127,12 @@
 
             </div>
 
+
+            <div class="myScroll">
+                <qrdisplay qr="selectedRequest.qr"></qrdisplay>
+            </div>
+
+<!--
             <uib-tabset ng-show="selectedRequest">
 
                 <uib-tab heading="Request text">
@@ -160,12 +155,14 @@
                 </uib-tab>
 
             </uib-tabset>
+            -->
 
         </div>
 
         <div ng-show="selectedRequest" ng-class="input.rightPane">
             <br/>
             <div class="banner">Report</div>
+
             <uib-tabset>
                 <uib-tab heading="New report">
                     <br/>
@@ -175,20 +172,50 @@
 
                             <div ng-show="selectedRequest.dr">
                                 <div class="alert alert-warning">
-                                    There was a previous report.
+                                    You are updating a report.
                                 </div>
                             </div>
 
                             <div ng-show = "submissionOO">
+
+                                <uib-tabset>
+                                    <uib-tab heading="Outcome">
+                                        <div class="alert alert-success">
+                                            The report has been successfully saved on the CanShare server.
+                                            Details of the resources created are show in the details tab.
+                                        </div>
+
+                                    </uib-tab>
+                                    <uib-tab heading="Details">
+                                        <pre class="alert-success" ng-show="submissionOO">{{submissionOO | json}}</pre>
+                                    </uib-tab>
+                                </uib-tabset>
+
+                                <!--
                                 <div class="alert alert-success">
                                     <pre>{{submissionOO | json}}</pre>
                                 </div>
+                                -->
                             </div>
 
                             <div ng-show = "errorOO">
+                                <uib-tabset>
+                                    <uib-tab heading="Outcome">
+                                        <div class="alert alert-danger">
+                                            There was an error saving the report, and it has not been saved.
+                                            Details of the error are available in the details tab.
+                                        </div>
+                                    </uib-tab>
+                                    <uib-tab heading="Details">
+                                        <pre class="alert-danger" ng-show="errorOO">{{errorOO | json}}</pre>
+                                    </uib-tab>
+                                </uib-tabset>
+
+                                <!--
                                 <div class="alert alert-danger">
                                     <pre>{{errorOO | json}}</pre>
                                 </div>
+                                -->
 
                             </div>
 
@@ -210,7 +237,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <button class="btn btn-primary pull-right"
-                                                ng-show="selectedRequest && selectedReportQ"
+                                                ng-show="selectedRequest && selectedReportQ && createdQR"
                                                 ng-click="submitReport()">{{submitLabel()}}</button>
                                     </div>
                                 </div>
@@ -246,74 +273,60 @@
 
                     </div>
                 </uib-tab>
-                <uib-tab ng-show = 'false' heading="Report Preview">
-                    <qrdisplay qr="createdQR" q="selectedReportQ"></qrdisplay>
-                </uib-tab>
-                <uib-tab heading="Report QR">
-                    <em>This resource is created by the form rendering directive as the user enters data, it is not saved on the server.</em>
-                    <pre>{{createdQR | json}}</pre>
-                </uib-tab>
 
-                <uib-tab heading="Report Q">
-                    <em>The Questionnaire that defines the selected pathology template</em>
-                    <pre>{{selectedReportQ | json}}</pre>
-                </uib-tab>
-
-
-                <uib-tab heading="View report bundle">
-
-                    <viewbundle bundle="reportBundle"></viewbundle>
-                </uib-tab>
-                <uib-tab heading="Validate report bundle">
-
-
+                <uib-tab heading="Technical views">
                     <br/>
-                    <div>
-                        <button class="btn btn-link pull-right" ng-click="validate()">Perform validation</button>
-                    </div>
-                    <viewvalidation validationobject="labValidationObject"
-                                    unknownissues="labValidationUnknownIssues"></viewvalidation>
+                    <uib-tabset>
 
-                </uib-tab>
+                        <uib-tab heading="View report bundle">
 
-                <uib-tab ng-show = "false" heading="Previous reports">
-                    <div class="row">
-                        <div class="col-md-4">
+                            <viewbundle bundle="reportBundle"></viewbundle>
+                        </uib-tab>
 
-                            <ul class="list-group">
-                                <li ng-class="{'list-group-item':true}"
-                                    ng-click="selectPreviousReport(report)"
-                                    ng-repeat = "report in previousReports">
-                                    {{report.DR.code.text}}
-                                    <div><em>{{report.DR.issued | date}}</em></div>
-                                </li>
-                            </ul>
-
-                        </div>
-
-                        <div class="col-md-8">
-                            <div ng-show="selectedReportObject">
-                                <uib-tabset>
-                                    <uib-tab heading="Report">
-
-                                        <reportdisplay reportobject="selectedReportObject"></reportdisplay>
-
-                                        <!--
-                                        <ng-include src="'/includes/ReportDisplay.html'"></ng-include>
--->
-                                    </uib-tab>
-                                    <uib-tab heading="Json">
-                                        <pre>{{selectedReportObject | json}}</pre>
-                                    </uib-tab>
-                                </uib-tabset>
-
-
+                        <uib-tab heading = "SR">
+                            <div class="myScroll">
+                                <pre>{{selectedRequest.sr | json}}</pre>
                             </div>
+                        </uib-tab>
 
-                        </div>
-                    </div>
+                        <uib-tab heading = "QR">
+                            <div class="myScroll">
+                                <pre>{{selectedRequest.qr | json}}</pre>
+                            </div>
+                        </uib-tab>
+                        <uib-tab heading="Report QR">
+                            <em>This resource is created by the form rendering directive as the user enters data, it is not saved on the server.</em>
+                            <pre>{{createdQR | json}}</pre>
+                        </uib-tab>
+
+                        <uib-tab heading="Report Q">
+                            <em>The Questionnaire that defines the selected pathology template</em>
+                            <pre>{{selectedReportQ | json}}</pre>
+                        </uib-tab>
+
+
+
+
+                        <uib-tab heading="Validate report bundle">
+
+
+                            <br/>
+                            <div>
+                                <button class="btn btn-link pull-right" ng-click="validate()">Perform validation</button>
+                            </div>
+                            <viewvalidation validationobject="labValidationObject"
+                                            unknownissues="labValidationUnknownIssues"></viewvalidation>
+
+                        </uib-tab>
+                    </uib-tabset>
 
                 </uib-tab>
+
+
+
+
+
+
             </uib-tabset>
 
 

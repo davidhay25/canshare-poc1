@@ -7,7 +7,6 @@
       <div id="reviewTree"></div>
     </div>
 
-
     <div class="col-md-6" ng-show="selectedNode">
 
 
@@ -36,22 +35,18 @@
 
             <div style="padding:8px; background-color: #eeeeee">
 
-
-
             <div class="row" ng-show="selectedNode.data.section.reviewItem.length > 0">
                 <div class = 'col-md-3'>
-                    <em>Add a comment about this item</em>
+                    <em>Comment for this item</em>
                 </div>
-
-                <div class = 'col-md-9'>
-                    <textarea class="form-control" ng-model="input.comments[selectedNode.id]"></textarea>
+                <div class = 'col-md-7'>
+                    <textarea class="form-control" ng-model="input.newComment"></textarea>
                 </div>
-                <!--
                 <div class = 'col-md-2'>
                     <button class="btn btn-primary"
                             ng-click="addNewComment(input.newComment,selectedNode.data.item,selectedNode.data.section.reviewItem[0])">
-                        Update</button>
-                </div-->
+                        Add</button>
+                </div>
             </div>
 
                 <!--
@@ -68,20 +63,7 @@
                 -->
 
             </div>
-
-
-            <h3>All comments</h3>
-            <table class="table table-bordered table-condensed">
-                <tr ng-repeat="(k,v) in input.comments">
-                    <td>{{k}}</td>
-                    <td>{{v}}</td>
-                </tr>
-            </table>
-
-
-
-
-          <div ng-show="false && selectedNode.data.section.reviewItem.length > 0">
+          <div ng-show="selectedNode.data.section.reviewItem.length > 0">
             <h5>Section comments</h5>
               <div style="padding:8px; background-color: #eeeeee">
             <div ng-repeat = "item in selectedNode.data.section.reviewItem">

@@ -107,6 +107,7 @@
             </div>
             <div class="col-md-3">
                 <div class="navbar-text">
+                    <a target="_blank" ng-href={{pathToClinicalViewer}}>{{commonSvc.getPatientName(selectedPatient)}}</a>
                 NHI: {{selectedPatient.identifier[0].value}}
                 <span ng-show="selectedPatient.gender">Gender: {{selectedPatient.gender}}</span>
                 <span ng-show="selectedPatient.birthDate">BirthDate: {{selectedPatient.birthDate}}</span>
@@ -167,37 +168,28 @@
         <div></div>
 
 
-        <!--
-                <canvas id="canvas1" width="200" height="200" style="border: #c9302c" ></canvas>
-
-                <hr/>
-
-                <button ng-click="reset()">reset</button>
-                <button ng-click="save()">save</button>
-
-                <canvas id="canvas2" width="200" height="200" style="border: #c9302c" ></canvas>
-
-                <img id = "myDrawing" ng-src="{{imageUrl}}" />
-                <canvas id="canvas" width="{{canvasWidth}}" height="{{canvasHeight}}"></canvas>
-
-        -->
-
 
     </div>
 
     <div class="row">
 
+
+        <div class="alert alert-info" ng-show="input.showHelp && !selectedPatient">
+            <p>Select the patient from the dropdown above. After that, a new request can be created.</p>
+
+        </div>
+
+
         <div class="col-md-12" ng-show="selectedPatient">
-
-
-
-
-
-
                     <uib-tabset>
                         <uib-tab heading="Create new request">
                             <br/>
                             <div class="row">
+
+                                <div class="alert alert-info" ng-show="input.showHelp">
+                                    <p>Select the template from the dropdown below, enter the data then Send the request</p>
+                                    <p>The Technical functions are intended for informaticians & implementers.</p>
+                                </div>
 
                                 <div class="col-md-8" >
                                     <div class="row">
@@ -211,20 +203,40 @@
                                         <div class="col-md-2">
                                             <button class="btn btn-primary" ng-click="submitRequest()">Send request</button>
                                         </div>
-                                        <!--
-                                        <div ng-show = "false" class="col-md-2">
-                                            <button class="btn btn-primary" ng-click="validateBundle()">Validate</button>
-                                        </div>
-                                        -->
+
                                     </div>
 
                                     <div class="alert" ng-show="oo">
                                         <br/>
                                         <div ng-show = "submitStatus == 'pass'">
-                                            <pre class="alert-success" ng-show="oo">{{oo | json}}</pre>
+                                            <uib-tabset>
+                                                <uib-tab heading="Outcome">
+                                                    <div class="alert alert-success">
+                                                        The request has been successfully saved on the CanShare server.
+                                                        Details of the resources created are show in the details tab.
+                                                    </div>
+
+                                                </uib-tab>
+                                                <uib-tab heading="Details">
+                                                    <pre class="alert-success" ng-show="oo">{{oo | json}}</pre>
+                                                </uib-tab>
+                                            </uib-tabset>
+
+
                                         </div>
                                         <div ng-show = "submitStatus == 'fail'" >
-                                            <pre class="alert-danger" ng-show="oo">{{oo | json}}</pre>
+                                            <uib-tabset>
+                                                <uib-tab heading="Outcome">
+                                                    <div class="alert alert-danger">
+                                                    There was an error sending the request, and it has not been saved.
+                                                    Details of the error are available in the details tab.
+                                                    </div>
+                                                </uib-tab>
+                                                <uib-tab heading="Details">
+                                                    <pre class="alert-danger" ng-show="oo">{{oo | json}}</pre>
+                                                </uib-tab>
+                                            </uib-tabset>
+
                                         </div>
                                     </div>
 

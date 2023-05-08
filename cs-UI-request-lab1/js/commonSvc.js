@@ -12,25 +12,97 @@ angular.module("pocApp")
 
         return {
 
+            populate : function(Q,patient,QR) {
+                //create a QR based on the input. This is intended to be similar to the SDC populate operation,
+                //and it may be that this function is moved to the sever to more properly support this.
+                //the QR would be a 'context' in the SDC operation
+                //the mapping is based on the item.code element
 
-            summarizeValidation : function(OO,bundle) {
+                //first, get the Q that corr
+
+                //next, create a hash of all the data in the incomming QR (based on item.code)
+                let hashInput = {}      //the hash of input data, keyed on code
+                function getInput(item) {
+                    if (item.code && item.code.length > 0) {
+                        //we only use the first code
+                        let key = `${item.code[0].system}|${item.code[0].code}`
+
+                        hashInput[key] = item.answer
+                    }
+                    if (item.item) {
+                        item.item.forEach(function (child) {
+                            getInput(child)
+                        })
+                    }
+                }
+
+                if (QR.item) {
+                    QR.item.forEach(function (section) {
+                        getInput(section)
+                    })
+                }
+
+                console.log(hashInput)
+
+                //now, create the 'output' QR based on the Q and the data in the input QR
+                //we assume that the datatype of any items with the same code are the same.
+
+
+
+
+            },
+
+            allQRData : function(qr){
+                //add all the data from the QR into a hash by linkId. For the lab report (and other reports)
+                let hash = {}
+
+                function addAnswer(item) {
+                    if (item.answer) {
+                        hash[item.linkId] = item.answer
+                    }
+                    if (item.item) {
+                        item.item.forEach(function (child) {
+                            addAnswer(child)
+                        })
+                    }
+                }
+
+                if (qr.item) {
+                    qr.item.forEach(function (item) {
+                        addAnswer(item)
+                    })
+                    return hash
+                }
+
+
+            },
+
+            summarizeValidation : function(OO,bundle,Q) {
                 //present the validation issues in the OO with the bundle entry
 
                 //create an index of resources in the bundle
                 let totalErrors = 0
                 let lstResources = []
                 let unknownIssues = []      //issues that can't be associated with a specific resource
-                if (! bundle.entry) {
-                    return {}
+                let enhancedErrors = []     //errors with improved notification
+                let hashQItem = makeQHash(Q)              //a has of Q items used for the improved errors
+
+                //if (! bundle.entry) {
+                //    return {}
+               // }
+
+
+                if (bundle && bundle.entry) {
+                    bundle.entry.forEach(function (entry,inx) {
+                        lstResources.push({resource:entry.resource,pos:inx,issues:[]})
+                    })
                 }
-                bundle.entry.forEach(function (entry,inx) {
-                    lstResources.push({resource:entry.resource,pos:inx,issues:[]})
-                })
+
 
                 //add all the issues in the OO to the list
                 OO.issue.forEach(function (iss) {
                     if (iss.location) {
-                        let loc = iss.location[0]  //Bundle.entry[2].resource
+                        let loc = iss.location[0]
                         let ar = loc.split('[')
                         if (ar.length > 1) {
                             let l = ar[1]   // 2].resource
@@ -38,12 +110,19 @@ angular.module("pocApp")
                             let pos = l.slice(0,g)
                             //console.log(pos,loc)
 
-                            let resourceAtIndex = lstResources[pos]
                             let item = {severity:iss.severity,location:loc,pos:pos,diagnostics:iss.diagnostics}
                             if (iss.severity == 'error') {
                                 totalErrors++
+                                enhancedErrors.push(makeEnhancedError(iss.diagnostics,hashQItem))
                             }
-                            resourceAtIndex.issues.push(item)
+
+                            let resourceAtIndex = lstResources[pos]
+                            if (resourceAtIndex) {
+                                resourceAtIndex.issues.push(item)
+                            }
+
+
+
                         } else {
                             unknownIssues.push(iss)
                         }
@@ -56,7 +135,52 @@ angular.module("pocApp")
 
                 })
 
-                return {resources:lstResources,totalErrors:totalErrors,unknownIssues:unknownIssues}
+                return {resources:lstResources,totalErrors:totalErrors,unknownIssues:unknownIssues,enhancedErrors:enhancedErrors}
+
+                //make a more understandable version of an error
+                function makeEnhancedError(diagnostics,hash) {
+                    let err = {}    //this will be the enhances answer
+                    if (diagnostics.indexOf("No response answer found for required item") > -1) {
+                        //error like: No response answer found for required item 'indication'
+                        let ar = diagnostics.split("'")
+                        let linkId = ar[1]
+                        let extra = hash[linkId]
+                        let display = `The required item '${extra.itemText}' in section '${extra.sectionText}' is missing.`
+                        err = {display:display,err:diagnostics,linkId:linkId,extra:extra}
+                    }
+                    return err
+                }
+
+                //make a hash of the Q items used in the enhanced errors
+                function makeQHash(Q) {
+                    let hash = {}
+                    if (Q && Q.item) {
+                        Q.item.forEach(function (section) {
+                            if (section.item) {
+                                section.item.forEach(function (child) {
+                                    if (child.item) {
+                                        //group
+                                        child.item.forEach(function (gc) {
+                                            addToHash(gc,section,hash)
+                                        })
+                                    } else {
+                                        //leaf
+                                        addToHash(child,section,hash)
+                                    }
+
+                                })
+                            }
+
+                        })
+                    }
+                    return hash
+
+                }
+
+                function addToHash(item,section,hash) {
+                    let row = {sectionText:section.text,itemText:item.text}
+                    hash[item.linkId] = {sectionText:section.text,itemText:item.text}
+                }
 
             },
 
@@ -313,7 +437,7 @@ angular.module("pocApp")
 
 
                 }
-                console.log(patient,name)
+               // console.log(patient,name)
                 return name
             },
             parseQ : function(Q) {

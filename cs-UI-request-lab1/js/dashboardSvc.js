@@ -112,7 +112,16 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
                 }
 
                 //resource extraction
-                if (meta.extraction || item.definition) {
+                if (meta.extraction && meta.extraction.extractObservation) {
+                    sumry.extract = "Observation"
+                }
+                if (item.definition) {
+                    let def = item.definition
+                    sumry.extract = def
+                }
+
+/*
+                    if (meta.extraction || item.definition) {
                     if (meta.extraction.extractObservation) {
                         sumry.extract = "Observation"
                     } else {
@@ -122,8 +131,9 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
                         }
                     }
 
-                }
 
+                }
+ */
                 //let extract = meta.extraction || {}
 
 
@@ -140,6 +150,8 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
                         iss.section = section
 
                         issues.push(iss)
+                        //correct on the imported copy so the requester works
+                        item.repeats = true
                     }
                 }
 

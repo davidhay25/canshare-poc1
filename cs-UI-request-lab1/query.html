@@ -63,7 +63,7 @@
                     Server
                 </div>
             </div>
-            <div class="col-md-4 col-sm-4">
+            <div class="col-md-2">
                 <div class="navbar-text">
                     <select class="form-control" ng-model="svr" ng-change="selectServer(svr)"
                             ng-options="svr.display for svr in allServers">
@@ -72,7 +72,12 @@
 
 
                 </div>
+            </div>
 
+            <div class="col-md-4">
+                <div class="navbar-text">
+                    {{selectedServer.url}}
+                </div>
             </div>
 
             <div class="col-md-1 col-sm-1">
@@ -82,9 +87,7 @@
                 </form>
             </div>
 
-            <div class="col-md-2">
 
-            </div>
 
             <div class="col-md-2">
                 <a href="https://teaho.govt.nz/" target="_blank">
@@ -96,7 +99,210 @@
         </div>
     </nav>
 
+    <div>
+        <a href="http://hl7.org/fhir/R4B/conceptmap.html" target="_blank" class="btn-link btn pull-right">ConceptMap in spec</a>
+        <a href="http://hl7.org/fhir/R4B/conceptmap-operation-translate.html" target="_blank" class="btn-link btn pull-right">Translate in spec</a>
+        <a href="https://terminology.hl7.org/SNOMEDCT.html" target="_blank" class="btn-link btn pull-right">SNOMED & FHIR in spec</a>
+        <a href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/view#gid=245875863" target="_blank" class="btn-link btn pull-right">Linda's spreadsheet</a>
+
+
+
+    </div>
+
     <uib-tabset>
+
+        <uib-tab heading="ConceptMap">
+            <br/>
+
+            <div class="row">
+                <div class="col-md-4">
+
+                    <div class="row">
+                        <div class="col-md-2">
+                            Examples
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-control" ng-model="selectedExample"
+                                    ng-change="setExample(selectedExample)"
+                                    ng-options = "opt.display for opt in examples">
+
+                            </select>
+                        </div>
+                    </div>
+                    <hr/>
+
+                    <div class="row">
+                        <div class="col-md-2">
+                            Id
+                        </div>
+                        <div class="col-md-4">
+                            <input class="form-control" type="text" ng-model="input.id"/>
+                        </div>
+                        <div class="col-md-6">
+                            The Id of the map
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="row">
+                        <div class="col-md-2">
+                            source
+                        </div>
+                        <div class="col-md-4">
+                            <input class="form-control" type="text" ng-model="input.source"/>
+                        </div>
+                        <div class="col-md-1">
+                            <i class="glyphicon glyphicon-info-sign clickable" ng-click="lookup(input.target)"></i>
+                        </div>
+                        <div class="col-md-5">
+                            The thing to be returned (eg VS)
+                        </div>
+                    </div>
+
+                    <hr/>
+                    <div class="row">
+                        <div class="col-md-2">
+                            Target
+                        </div>
+                        <div class="col-md-4">
+                            <input class="form-control" type="text" ng-model="input.target"/>
+                        </div>
+                        <div class="col-md-1">
+                            <i class="glyphicon glyphicon-info-sign clickable" ng-click="lookup(input.target)"></i>
+                        </div>
+                        <div class="col-md-5">
+                            The thing to be returned (eg VS)
+                        </div>
+                    </div>
+
+                    <hr/>
+                    <div class="row">
+                        <div class="col-md-2">
+                            First dependency
+                        </div>
+                        <div class="col-md-4">
+                            <input class="form-control" type="text" ng-model="input.dep1"/>
+                        </div>
+                        <div class="col-md-1">
+                            <i class="glyphicon glyphicon-info-sign clickable" ng-click="lookup(input.dep1)"></i>
+                        </div>
+                        <div class="col-md-5">
+                            The first dependency eg service
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="row">
+                        <div class="col-md-2">
+                            First property
+                        </div>
+                        <div class="col-md-9">
+                            <input class="form-control" type="text" ng-model="input.prop1"/>
+                            <div>The first dependency property</div>
+                        </div>
+                        <div class="col-md-1">
+                            <i class="glyphicon glyphicon-info-sign clickable" ng-click="lookup(input.prop1)"></i>
+                        </div>
+
+                    </div>
+
+                    <hr/>
+                    <div class="row">
+                        <div class="col-md-2">
+                            Second dependency
+                        </div>
+                        <div class="col-md-4">
+                            <input class="form-control" type="text" ng-model="input.dep2"/>
+
+                        </div>
+                        <div class="col-md-6">
+                            The second dependency eg tumour type
+                        </div>
+                    </div>
+
+                    <br/>
+                    <div class="row">
+                        <div class="col-md-2">
+                            second dep.  property
+                        </div>
+                        <div class="col-md-10">
+                            <input class="form-control" type="text" ng-model="input.prop2"/>
+                            <div>The second dependency property</div>
+                        </div>
+
+                    </div>
+                    <br/>
+
+                    <button class="btn btn-link" ng-click="generateMapAndTranslate()">Generate ConceptMap & example translate call</button>
+                    <div>
+                        <button class="btn btn-link" ng-click="generateMap()">Generate ConceptMap only</button>
+                    </div>
+
+                    <div>
+                        <button class="btn btn-link" ng-click="generateTranslate()">Generate translate call only</button>
+                    </div>
+
+
+
+                </div>
+                <div class="col-md-8">
+
+
+
+                    <div class="row">
+                        <div class="col-md-6">
+
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button class="btn btn-link" ng-click="downloadMap()">Get current map</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button ng-show="cm" class="btn btn-link pull-right" ng-click="uploadMap()">Upload</button>
+                                </div>
+                            </div>
+
+
+
+                            <pre ng-show="cm">{{cm | json}}</pre>
+                        </div>
+                        <div class="col-md-6">
+
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                </div>
+                                <div class="col-md-6">
+
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <button class="btn btn-link pull-right" ng-click="executeTranslate()">Execute translate</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <uib-tabset>
+                                <uib-tab heading="Query">
+                                    <pre ng-show="parameters">{{parameters | json}}</pre>
+                                </uib-tab>
+                                <uib-tab heading="Result">
+                                    <pre>{{response | json}}</pre>
+                                </uib-tab>
+                            </uib-tabset>
+
+
+
+
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+
+        </uib-tab>
 
 
         <uib-tab heading="General queries">

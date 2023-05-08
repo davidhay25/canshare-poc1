@@ -5,6 +5,28 @@ const utilModule = require("./serverModuleUtil.js")
 
 
 function setup(app,serverBase) {
+
+
+    app.post("/validateActNow",async function(req,res) {
+        //validate an act-now bundle
+        console.log('headers:', req.headers)
+        let bundle = req.body
+        console.log('bundle:',bundle)
+        //if lstIssues length is 0 then no issues were found otherwise there were validation issues. These cannot be ignored.
+        let lstIssues = utilModule.level1Validate(bundle)
+        if (lstIssues.length > 0) {
+
+            let oo = utilModule.makeOO(lstIssues)
+            utilModule.logger("actnow",{content:bundle,outcome:oo,headers:req.headers,status:400,metrics:metrics})
+            res.status("400").json(oo)
+            return
+        }
+
+        let profileValidationOO = await utilModule.profileValidation(bundle)
+        res.json(profileValidationOO)
+
+    })
+
     
     app.post("/([$])acceptActNow",async function(req,res){
 

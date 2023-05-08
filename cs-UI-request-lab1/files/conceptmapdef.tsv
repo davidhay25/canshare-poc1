@@ -1,0 +1,74 @@
+Value Set Workflow																										
+Domain  (observable entity/attribute)		Cancer Service (qualifier value)			Primary cancer type (disorder)			Cancer stream (disorder)			Cancer substream (disorder)			Cancer type (disorder)			Primary Location (body structure)			Histology (morphologic abnormality)			Value/  Value set	SCTID	SCT Description	Value Set Name
+-	Basis of diagnosis																						Value set	253131000210102	NZ SACT basis of diagnosis	sact-basis-of-cancer-diagnosis-vs
+-	Cancer service																						Value set	-	NZ cancer service reference set	cs-cancer-service-vs
+-	Cancer stream																						Value set	-	NZ cancer stream reference set	cs-cancer-stream-vs
+-	Cancer stream	= (value)	Haematology	394803006																			Value set	-	NZ cancer haematology stream reference set	cs-cancer-haematology-stream-vs
+-	Cancer stream	= (value)	Medical oncology	394593009																			Value set	-	NZ cancer medical oncology stream reference set	cs-cancer-medical-oncology-stream-vs
+-	Cancer stream	= (value)	Paediatric oncology	418002000																			Value set	-	NZ cancer paediatric stream reference set	cs-cancer-paediatric-stream-vs
+-	Cancer substream																						Value set	-	NZ cancer substream reference set	cs-cancer-substream-vs
+-	Cancer substream				= (value)	Breast primary	372137005																Value	372137005	Breast primary	
+																										
+-	Cancer type																						Value set	-	NZ cancer type reference set	cs-cancer-type-vs
+-	Cancer type				= (value)	Breast primary	372137005																Value	372137005	Breast primary	
+																										
+399687005	Anatomic location of primary malignant neoplasm																						Value set	253141000210105	NZ cancer topography reference set	cs-topography-vs
+399687005	Anatomic location of primary malignant neoplasm	= (value)	Haematology	394803006																			N/A			
+399687005	Anatomic location of primary malignant neoplasm	= (value)	Medical oncology	394593009				= (value)	Breast primary	#VALUE!													Value set	253141000210105	NZ cancer topography	cs-topography-vs
+399687005	Anatomic location of primary malignant neoplasm	= (value)	Medical oncology	394593009	= (value)	Breast primary	372137005	= (value)	Breast primary	#VALUE!													Value set	253151000210108	NZ cancer breast topography	cs-breast-topography-vs
+399687005	Anatomic location of primary malignant neoplasm	= (value)	Medical oncology	394593009	= (value)	Skin primary	94047004	= (value)	Skin primary	#VALUE!													Value set	-	NZ cancer skin topography	cs-skin-topography-vs
+																										
+272741003	Laterality (attribute)																^ (refset)	Lateralizable body structure reference set	723264001					253241000210101	NZ cancer laterality reference set	cs-laterality-vs
+512001000004108	Histologic type of primary malignant neoplasm	= (value)	Haematology	394803006																				253211000210102	NZ WHO histology reference set	cs-histology-vs
+																										
+																										
+-	Histologic grading system of primary malignant neoplasm																						Value set	253281000210108	NZ cancer grading system	cs-histologic-grading-system-vs
+-	Histologic grading system of primary malignant neoplasm				= (value)	Breast primary	372137005													^ (refset)	NZ cancer in situ breast tumour morphology reference set	-	Value	449205006	Nottingham histologic grading system	
+					= (value)	Breast primary	372137005													^ (refset)	NZ cancer invasive breast tumour morphology reference set	-	Value	-	Nuclear histological grading system	
+1850001000004102	Histologic grade of primary malingnant neoplasm																									
+372276001	Nottingham combined grade of primary malignant neoplasm of breast				= (value)	Breast primary														^ (refset)	cs-breast-invasive-histology-vs	-		-	NZ Nottingham Combined histologic grade reference set	cs-nottingham-grade-vs
+372276001	Nottingham combined grade of primary malignant neoplasm of breast																^ (refset)	cs-breast-topography-vs	253151000210108	^ (refset)	cs-breast-invasive-histology-vs	-		-	NZ Nottingham Combined histologic grade reference set	cs-nottingham-grade-vs
+																									NZ ductal carcinoma in situ nuclear histologic grade reference set	
+																										
+																										
+	Recurrence type																									
+423740007	ECOG performance status																									
+399504009	cT category																									
+																										
+384625004	pT category																									
+																										
+399534004	cN category																									
+																										
+371494008	pN category																									
+																										
+399387003	cM category																									
+																										
+371497001	pM category																									
+																										
+	TNM edition																									
+399537006	cTNM stage grouping																									
+																										
+399588009	pTNM stage grouping																									
+																										
+	Staging																									
+																										
+	Staging system																									
+																										
+445028008	ER tumour status																									
+445029000	PR tumour status																									
+261811000210109	HER2 tumour status																									
+	Prognostic score																									
+																										
+	Prognostic scoring system																									
+																										
+	Treatment intent																									
+																										
+																										
+	Discontinue reason																									
+	Discontinue reason (patient factors)																									
+	Discontinue reason (toxicity)																									
+	Disease response																									
+																										
+	Dosed adjustment reason																									
+	Dose unit																									
+	Route of administration																									

@@ -36,12 +36,12 @@
     </style>
 
 
-    <script src="js/frontCtrl.js"></script>
+    <script src="js/pocCtrl.js"></script>
 
 
 </head>
 <body style="padding: 8px;padding-top: 80px">
-<div ng-app="pocApp" ng-controller="frontCtrl" class="container-fluid">
+<div ng-app="pocApp" ng-controller="pocCtrl" class="container-fluid">
 
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
@@ -153,28 +153,46 @@
 
 
             <div class="alert-warning alert">
-                The purpose of the RI is to show how it could work.
+
+                <p>This application is intended to validate and improve the CanShare FHIR design and act as a development and testing
+                    environment for implementers. It also provides a simulated environment for clinicians to evaluate process and forms design - both
+                    for requests and reports. </p>
                 <br/>
-
-                <em>This application is intended to validate the CanShare FHIR design and act as a development and testing
-                    environment for implementers. It is not a production application, and MUST NOT contain real clinical information.</em>
+                <em><strong>It is NOT a production application, and MUST NOT contain real clinical information.</strong></em>
 
             </div>
 
-            <div class="text-center">
-                <a href="dashboard.html" target="_blank" class="btn btn-primary">Dashboard</a>
-
-
-            </div>
-
-            <br/>
-
-            <img src="images/canshare-1.png"/>
-            <br/>   <br/> <br/>
             <div class="text-center">
                 <a href="clinicalViewer.html" target="_blank" class="btn btn-primary">Clinical Viewer</a>
 
+
+
+            </div>
+
+
+
+            <div>
+                <button class="btn-link btn pull-right" ng-click="setImageUrl('images/clinicalPOC.png')">Clinical</button>
+                <button class="btn-link btn pull-right" ng-click="setImageUrl('images/canshare-1.png')">Technical</button>
+            </div>
+
+
+
+                <img ng-src="{{slideUrl}}"/>
+
+
+
+
+            <br/>   <br/> <br/>
+            <div class="text-center">
+
+                <a href="dashboard.html" target="_blank" class="btn btn-primary">Dashboard</a>
+
+
                 <a style="margin-left: 20px" href="query.html" target="_blank" class="btn btn-primary">API Query</a>
+
+                <a style="margin-left: 20px" href="validateBundle.html" target="_blank" class="btn btn-primary">Bundle validator</a>
+
             </div>
 
         </div>

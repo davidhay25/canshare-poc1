@@ -101,8 +101,17 @@ function setup(app) {
                         vo.dr = resource
                         break
                     case "Observation" :
-                        vo.obs = vo.obs || []
-                        vo.obs.push(resource)
+                        if (resource.derivedFrom) {
+                            //if the Observation has got a derivedFrom set then it must be an observation
+                            //then was created by the requester
+                            //todo - should check this, and maybe check that the derived from is to the QR
+                            vo.qrobs = vo.qrobs || []
+                            vo.qrobs.push(resource)
+                        } else {
+                            vo.obs = vo.obs || []
+                            vo.obs.push(resource)
+                        }
+
                         break
                     default :
                         //shouldn't be any others, but you never know...

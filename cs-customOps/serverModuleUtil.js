@@ -141,7 +141,6 @@ function level1Validate(bundle,lstRequiredTypes) {
         lstErrors.push("The bundle must be of type 'transaction'")
     }
 
-
     bundle.entry.forEach(function (entry,inx) {
         let resource = entry.resource
         let resourceType = resource.resourceType
@@ -153,17 +152,37 @@ function level1Validate(bundle,lstRequiredTypes) {
             lstErrors.push(`Entry #${inx} ${resource.resourceType} resource with the id ${resource.id} has no identifier`)
         }
 
-
-
-    })
-
-    //now check for the required types
-    lstRequiredTypes.forEach(function (type) {
-        if (! hashTypes[type]) {
-            lstErrors.push(`No resource with the type ${type} was found in the bundle, and it is required.`)
+        /* hold off on this validation until the lab is sorted...
+        //Must be a conditional update on identifier
+        if (entry.request) {
+            if (entry.request.method !== 'PUT') {
+                lstErrors.push(`Entry #${inx} must have a PUT method`)
+            } else {
+                if (entry.request.url) {
+                    if (entry.request.url.indexOf("?identifier") == -1) {
+                        lstErrors.push(`Entry #${inx} must be a conditional update on identifier`)
+                    }
+                } else {
+                    lstErrors.push(`Entry #${inx} is missing the url`)
+                }
+            }
+        } else {
+            lstErrors.push(`Entry #${inx} ${resource.resourceType} resource with the id ${resource.id} is missing the entry.request element`)
         }
 
+        */
     })
+
+    //now check for the required types - if any
+    if (lstRequiredTypes) {
+        lstRequiredTypes.forEach(function (type) {
+            if (! hashTypes[type]) {
+                lstErrors.push(`No resource with the type ${type} was found in the bundle, and it is required.`)
+            }
+
+        })
+
+    }
 
     return lstErrors
 }
@@ -173,8 +192,10 @@ async function profileValidation(bundle) {
     let url = checkUrlSlash(serverBase) + "Bundle/$validate"
 
     try {
-        response = await axios.post(url,bundle)
-        return response.data    //this will be a OO - potentially with informational issues
+
+        let config = {headers:{'cache-control':'no-cache'}}     //otherwise the hapi server will cache for a minute
+        response = await axios.post(url,bundle,config)
+        return response.data    //this will be an OO - potentially with informational issues
     } catch (err) {
         //console.log("exception from validate")
         if (err.response) {
