@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('dashboardCtrl',
-        function ($scope,$http,dashboardSvc,$location) {
+        function ($scope,$http,dashboardSvc,$location,$uibModal) {
 
 
             let protocol = $location.protocol();
@@ -16,15 +16,7 @@ angular.module("pocApp")
             $scope.treeReviewQR = {}
 
             $scope.input = {}
-            /*
-            $scope.commands = []
-            $scope.commands.push({display:'Update forms from Designer',key:'forms'})
-            $scope.commands.push({display:'Manage Forms Server',key:'formserver'})
-            $scope.commands.push({display:'Service Requests',key:'sr'})
-            $scope.commands.push({display:'Log',key:'log'})
 
-            $scope.input.command = $scope.commands[0]
-*/
             $scope.formData = {}
 
             $scope.arQContext = ['report','request','general']
@@ -58,12 +50,7 @@ angular.module("pocApp")
             }
 
 
-/*
-            //when the form is updated. Used by the display form tab
-            $scope.$on('qrCreated',function(event,vo1) {
-                $scope.createdQR = vo1.QR
-            })
-            */
+
 
             //get all SR in the 'active' status
             $scope.refreshSR = function () {
@@ -176,19 +163,155 @@ angular.module("pocApp")
             //retrieve a mini version of all Q on the Designer
             //first, get a hash containing key data from the forms server, then get a mini version from the designer
             //idea is that we can say which Q are on both (based on the url)
-            $scope.showWaiting = true
-            dashboardSvc.getQfromFormsServer().then(
-                function (hash){
-                    //returns a hash of urls that are currently on the forms server. Now get the Q from the
-                    //designer. Pass in the hash so we can mark which are on the forms server
-                    console.log(hash)
-                    dashboardSvc.getQFromDesigner(hash).then(
-                        function (lst) {
-                            $scope.allMiniQ = lst
-                            $scope.showWaiting = false
+
+            //maybe - temp function - just while developing fs manager to avoid needing to
+            function loadAllMiniQFromFS() {
+                dashboardSvc.getQfromFormsServer().then(
+                    function (hash) {
+                        //returns a hash of urls that are currently on the forms server.
+                        //Now create a list that we can sort
+                        $scope.lstFsMiniQ = []
+                        Object.keys(hash).forEach(function (key) {
+                            let mq = hash[key]
+                            let context = $scope.getContext(mq)
+                            let item = {miniQ:mq,context:context,title:mq.title || mq.name}
+                            $scope.lstFsMiniQ.push(item)
+
+                        })
+
+                        $scope.lstFsMiniQ.sort(function (a,b) {
+                            if (a.title > b.title ) {
+                                return 1
+                            } else { return -1}
+                        })
+                        $scope.showWaiting = false
+                        $scope.formsServerMiniQ = hash
+                    })
+
+            }
+            loadAllMiniQFromFS()
+
+            $scope.getContext = function (miniQ) {
+                //get the context string from a miniQ - used for FormsServer components
+                let context = ""
+                //retien the use context. assume only 1 with focus
+                if (miniQ.useContext) {
+                    miniQ.useContext.forEach(function (ctx) {
+                        if (ctx.code.code == 'focus') {
+                            if (ctx.valueCodeableConcept && ctx.valueCodeableConcept.coding &&  ctx.valueCodeableConcept.coding.length > 0) {
+                                context = ctx.valueCodeableConcept.coding[0].code
+                            }
+
                         }
-                    )
+
+                    })
+                }
+                return context
+
+            }
+
+            $scope.setQStatus = function (miniQ) {
+                //set the status of a miniQ on the forms server
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/getOption.html',
+                    backdrop: 'static',
+                    //size : 'lg',
+                    controller: function($scope,title,options,current,description){
+                        $scope.input = {}
+                        $scope.input.selected = current
+                        $scope.title = title
+                        $scope.description = description
+                        $scope.options = options
+                        $scope.select = function () {
+                            $scope.$close($scope.input.selected)
+                        }
+                    },
+                    resolve: {
+                        title: function () {
+                            return "Select status"
+                        },
+                        description: function () {
+                            return "Select the new status. A value of 'Retired' means the form will no longer displayed in the requester, lab or general functions."
+                        },
+                        current : function () {
+                            return miniQ.status
+                        },
+                        options: function () {
+                            let ar = []
+                            ar.push({display:'Draft',value:'draft'})
+                            ar.push({display:'Active',value:'active'})
+                            ar.push({display:'Retired',value:'retired'})
+
+
+                            return ar
+                        }
+                    }
+
+                }).result.then(
+                    function (newStatus) {
+
+                        console.log(newStatus)
+
+                        if (newStatus !== miniQ.status) {
+                            miniQ.status = newStatus
+                            dashboardSvc.updateQStatusInFormsServer(miniQ).then(
+                                function () {
+                                    //the Q has been updated - re-load the list of miniQ
+                                    loadAllMiniQFromFS()
+                                }, function (err) {
+                                    alert(angular.toJson(err))
+                                }
+                            )
+                        }
+
+                    }
+                )
+            }
+            
+            $scope.selectQfromFS = async function (miniQ) {
+                //get the full Q from the
+                // FS
+
+                $scope.fsFormData = {}
+                $scope.fsQR = {}
+
+                dashboardSvc.getSingleQFromFormsServer(miniQ).then(function (Q) {
+                    $scope.selectedQfromFS = Q
                 })
+
+               // let temp = await dashboardSvc.getSingleQFromForsmServer(miniQ)
+              //  $scope.selectedQfromFS = temp
+                console.log($scope.selectedQfromFS)
+            }
+
+            $scope.refreshDesigner = function() {
+                $scope.showWaiting = true
+                $scope.showLoading = true
+                dashboardSvc.getQfromFormsServer().then(        //todo not needed....
+                    function (hash){
+                        //returns a hash of urls that are currently on the forms server. Now get the Q from the
+                        //designer. Pass in the hash so we can mark which are on the forms server
+                        console.log(hash)
+                        $scope.showWaiting = false
+
+                        $scope.formsServerMiniQ = hash
+                        dashboardSvc.getQFromDesigner(hash).then(
+                            function (lst) {
+                                $scope.allMiniQ = lst
+                                $scope.showWaiting = false
+                            }
+                        ).finally(function () {
+                            $scope.showWaiting = false
+                            $scope.showLoading = false
+                        })
+
+
+
+                    })
+
+            }
+
 
 
             function getLogs() {

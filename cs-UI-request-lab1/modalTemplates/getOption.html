@@ -1,0 +1,43 @@
+
+<div>
+    <!--<div ng-controller="newResourceCtrl">-->
+    <style>
+        .model-vlg {
+
+        }
+    </style>
+    <div class="modal-header">
+
+        <div class="row">
+            <div class="col-md-8 col-sm-8">
+                <h3 class="modal-title">{{title}}</h3>
+            </div>
+
+
+            <div class="col-md-4 col-sm-4">
+
+
+                <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
+
+                <button class="btn btn-primary pull-right" ng-click="select()">Select</button>
+
+            </div>
+
+
+        </div>
+
+    </div>
+    <div class="modal-body">
+
+        <div ng-repeat="option in options">
+            <input type="radio" name="option" ng-model="input.selected" value="{{option.value}}"/> {{option.display}}
+        </div>
+
+    </div>
+
+
+    <div class="modal-header">
+
+        {{description}}
+    </div>
+</div>

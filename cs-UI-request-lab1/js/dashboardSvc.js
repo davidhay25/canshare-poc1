@@ -193,13 +193,63 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
             return deferred.promise
         },
 
+        updateQStatusInFormsServer : function (miniQ) {
+            //update a single Q. Read the current then put it back (we can't rely on it being loaded first)
+            let deferred = $q.defer()
+            let qry = `Questionnaire/${miniQ.id}`
+            let encodedQry = encodeURIComponent(qry)
+
+            //get the full Q from the FS
+            $http.get(`proxy?qry=${encodedQry}`).then(
+                function (data) {
+                    let Q = data.data
+                    Q.status = miniQ.status
+                    $http.put("/dashboard/Questionnaire",Q).then(
+                        function (data) {
+                            deferred.resolve()
+
+                        }, function (err) {
+                            console.log(err)
+                            deferred.reject(err.data)
+                        }
+                    )
+                    //deferred.resolve(data.data)
+                }, function(err){
+                    console.log(err)
+                    deferred.reject(err.data)
+                }
+            )
+            return deferred.promise
+
+
+        },
+
+        getSingleQFromFormsServer : function(miniQ) {
+            let deferred = $q.defer()
+            let qry = `Questionnaire/${miniQ.id}`
+            let encodedQry = encodeURIComponent(qry)
+
+            //the proxy endpoint will follow the paging to return all matching resources...
+            let hash = {}
+            $http.get(`proxy?qry=${encodedQry}`).then(
+                function (data) {
+                    deferred.resolve(data.data)
+                }, function(err){
+                    console.log(err)
+                    deferred.reject(err)
+                }
+            )
+            return deferred.promise
+
+        },
+
         getQfromFormsServer : function() {
             //retrieve a description of the Q on the forms  server. return a simple list of custom objects
             let deferred = $q.defer()
 
             //let qry = `${formsServer}Questionnaire?_elements=url`
             //don't include the server base - the proxy endpoint will automatically query against the POC fhir server
-            let qry = `Questionnaire?_elements=url,version`
+            let qry = `Questionnaire?_elements=id,url,version,name,title,status,useContext,description`
             let encodedQry = encodeURIComponent(qry)
 
             //the proxy endpoint will follow the paging to return all matching resources...

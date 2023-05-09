@@ -25,7 +25,8 @@ function setup(app) {
         let qry = `${serverBase}Questionnaire/${Q.id}`
 
         try {
-            let response = await axios.put(qry,Q)
+            let config = {headers:{'cache-control':'no-cache'}}
+            let response = await axios.put(qry,Q,config)
             res.json(response.data)
         } catch (ex) {
             if (ex.response) {

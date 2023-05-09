@@ -113,12 +113,50 @@
 
 
     <uib-tabset>
+
+        <uib-tab heading = "Manage Forms Server">
+            <br/>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table-condensed table">
+                        <tr><th>Title</th><th>Description</th><th>Status</th><th>Context</th></tr>
+                        <tr ng-repeat="item in lstFsMiniQ">
+                            <td><div class="clickable" ng-click="selectQfromFS(item.miniQ)">{{item.miniQ.title }}</div> </td>
+                            <td>{{item.miniQ.description}}</td>
+                            <td><div class="clickable" ng-click="setQStatus(item.miniQ)">{{item.miniQ.status}}</div> </td>
+                            <td>{{item.context}}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <renderform q="selectedQfromFS" qr="fsQR" form="fsFormData"></renderform>
+                </div>
+            </div>
+
+
+            <!--
+            <pre>{{formsServerMiniQ | json}}</pre>
+            -->
+
+        </uib-tab>
+
         <uib-tab heading = "Update forms from Designer">
             <br/>
             <div>
 
                 <div ng-hide="allMiniQ">
-                    Loading templates, please wait...
+
+                    <button ng-hide="showLoading" class="btn btn-link " ng-click="refreshDesigner()">Load designer list</button>
+
+
+                    <div ng-show="showLoading">
+                        Loading templates, please wait...
+                    </div>
+
+
+
+
                 </div>
 
                 <div class="row" ng-show="allMiniQ">
@@ -339,9 +377,7 @@
 
 
         </uib-tab>
-        <uib-tab heading = "Manage Forms Server">
 
-        </uib-tab>
         <uib-tab heading = "Active Service Requests">
             <uib-tab-heading>Active Service Requests <span class="badge">{{activeSR.length}}</span> </uib-tab-heading>
             <br/>
