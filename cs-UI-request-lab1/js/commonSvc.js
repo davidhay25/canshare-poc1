@@ -100,40 +100,43 @@ angular.module("pocApp")
 
 
                 //add all the issues in the OO to the list
-                OO.issue.forEach(function (iss) {
-                    if (iss.location) {
-                        let loc = iss.location[0]
-                        let ar = loc.split('[')
-                        if (ar.length > 1) {
-                            let l = ar[1]   // 2].resource
-                            let g = l.indexOf(']')
-                            let pos = l.slice(0,g)
-                            //console.log(pos,loc)
+                if (OO && OO.issue) {
+                    OO.issue.forEach(function (iss) {
+                        if (iss.location) {
+                            let loc = iss.location[0]
+                            let ar = loc.split('[')
+                            if (ar.length > 1) {
+                                let l = ar[1]   // 2].resource
+                                let g = l.indexOf(']')
+                                let pos = l.slice(0,g)
+                                //console.log(pos,loc)
 
-                            let item = {severity:iss.severity,location:loc,pos:pos,diagnostics:iss.diagnostics}
-                            if (iss.severity == 'error') {
-                                totalErrors++
-                                enhancedErrors.push(makeEnhancedError(iss.diagnostics,hashQItem))
+                                let item = {severity:iss.severity,location:loc,pos:pos,diagnostics:iss.diagnostics}
+                                if (iss.severity == 'error') {
+                                    totalErrors++
+                                    enhancedErrors.push(makeEnhancedError(iss.diagnostics,hashQItem))
+                                }
+
+                                let resourceAtIndex = lstResources[pos]
+                                if (resourceAtIndex) {
+                                    resourceAtIndex.issues.push(item)
+                                }
+
+
+
+                            } else {
+                                unknownIssues.push(iss)
                             }
-
-                            let resourceAtIndex = lstResources[pos]
-                            if (resourceAtIndex) {
-                                resourceAtIndex.issues.push(item)
-                            }
-
 
 
                         } else {
+                            //this is an OO with no location. I didn't think this should happen & we don't know which resource caused it...
                             unknownIssues.push(iss)
                         }
 
+                    })
+                }
 
-                    } else {
-                        //this is an OO with no location. I didn't think this should happen & we don't know which resource caused it...
-                        unknownIssues.push(iss)
-                    }
-
-                })
 
                 return {resources:lstResources,totalErrors:totalErrors,unknownIssues:unknownIssues,enhancedErrors:enhancedErrors}
 

@@ -36,7 +36,7 @@ angular.module("pocApp")
             //emitted when a user clicks on the ? icon in the form render
             $scope.$on("itemDetail",function(ev,vo){
                 $scope.input.itemDetail = vo
-                console.log(vo)
+                //console.log(vo)
                 //{item: meta:
             })
 
@@ -139,8 +139,11 @@ angular.module("pocApp")
                         $scope.templates.push({display:entry.resource.title,Q:entry.resource})
                     })
 
-                    $scope.selectedTemplate = $scope.templates[0]
-                    $scope.selectQ($scope.selectedTemplate)
+                    //this means that the forst termplate is already selected after the patient is. Do we want that?
+                   // $scope.selectedTemplate = $scope.templates[0]
+                   // $scope.selectQ($scope.selectedTemplate)
+
+
                 }, function(err) {
                     console.log(err)
                 }
@@ -193,18 +196,6 @@ angular.module("pocApp")
                 $scope.selectedPatient.id = commonSvc.createUUID()
 
                 let identifierQuery = `${patient.identifier[0].system}|${patient.identifier[0].value}`
-
-                /* - not loading previous stuff
-                //load ServiceRequests via the server proxy
-                let qry = encodeURIComponent(`ServiceRequest?subject.identifier=${identifierQuery}`)
-                $http.get(`/proxy?qry=${qry}`).then(
-                    function (data) {
-                        $scope.allSRonePatient = data.data
-                        console.log($scope.allSRonePatient)
-                    }
-                )
-
-                */
 
 
 
@@ -516,6 +507,7 @@ angular.module("pocApp")
                 })
 
             }
+
             //draw the Q tree
             let drawTree = function(treeData){
                 //console.log(treeData)
