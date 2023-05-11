@@ -44,10 +44,8 @@ terminologyModule.setup(app)
 
 //common calls (not specifically related to requester or lab. ?move to separate module
 
-
-
 app.get('/sampleAN',function (req,res) {
-    let fle = require("./samples/valenciaMay.json")
+    let fle = require("./samples/valenciaMay11.json")
     res.json(fle)
 })
 

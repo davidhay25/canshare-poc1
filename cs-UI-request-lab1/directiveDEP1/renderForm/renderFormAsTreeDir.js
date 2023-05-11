@@ -11,7 +11,7 @@ angular.module('formsApp')
             },
 
             templateUrl: 'directive/renderForm/renderFormAsTreeDir.html',
-            controller: function($scope,renderFormsSvc,$timeout,$rootScope){
+            controller: function($scope,renderFormsSvc,$timeout){
 
                 // #changed
 
@@ -143,21 +143,17 @@ angular.module('formsApp')
                 }
 
 
-                //The tree view doesn't allow data entry, so it cannot create a QR. Instead it
-                //uses $emit to send the hash of comments to the parent app.
-
-                $scope.updateComments = function () {
-                    $rootScope.$broadcast('commentsUpdated',{hashComments:$scope.input.comments})
-
-                }
-
-
-                $scope.makeQRDEP = function() {
+                //note that this is called every time there is a change (eg keypress) in the forms component
+                //this is to ensure that the QR is always up to date. onBlur could miss the most recently updated firld...
+                $scope.makeQR = function() {
 console.log('makeQR')
                     //need to add the individual comments against items (in $scope.input.comments) to the form data (in $scope.form)
 
+                    let model = angular.copy($scope.form)   //a copy of the form data. We don't want to update the one that the tree is using
 
-
+                    //updates the items marked as comments (using the code.system)
+                    //If I was doing this again I'd use an extension, but that will require updating the disposer. Perhaps another time...
+                    renderFormsSvc.addCommentsToModel($scope.q,$scope.input.comments,model,$scope.hashItem)
 
 
                     $scope.qr = renderFormsSvc.makeQR($scope.q, model,$scope.hashItem)

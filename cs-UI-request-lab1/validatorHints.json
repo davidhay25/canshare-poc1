@@ -1,15 +1,19 @@
 [
   {
     "match":"does not match any known slice",
-    "comment":"This simply means that there additional elements in a sliced element (eg catagory) and can be ignored."
+    "comment":"This simply means that there additional elements in a sliced element (eg category) and can generally be ignored."
   },
   {
     "match" : "minimum required = 1, but only found 0",
-    "comment" : "A required element or slice is missing. This is a fatal error."
+    "comment" : "A required element or slice is missing. If a slice, check that both system and code match the profile."
   },
   {
     "match" : "not found by validator",
     "comment" : "A resource (like a ValueSet) is not on the server, so the contents can't be checked. Usually OK to ignore."
+  },
+  {
+    "match" : "codings provided are in the value",
+    "comment" : "The value for this element is not in the ValueSet. If the binding is required, then this an error - otherwise a warning."
   }
 
 ]

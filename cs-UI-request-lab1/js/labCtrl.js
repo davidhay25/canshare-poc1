@@ -184,7 +184,7 @@ angular.module("pocApp")
                             console.log($scope.hashAllData)
 
                             //A link to display the clincial viewer for the patient
-                            $scope.pathToClinicalViewer = $scope.host + "/ClinicalViewer.html?nhi=" + vo.pat.identifier[0].value
+                            $scope.pathToClinicalViewer = $scope.host + "/clinicalViewer.html?nhi=" + vo.pat.identifier[0].value
 
                             //an object containing an array of all the answers is saved in the second attachment and the url of the form
                             try {

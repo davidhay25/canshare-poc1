@@ -20,7 +20,7 @@ function setup(app) {
         //Level 1 validation - errors that cannot be ignored like missing identifiers or required resources
         //if lstErrors length is 0 then no errors were found. Any errors will cause the bundle to be rejected
         let lstRequiredTypes = ['ServiceRequest','QuestionnaireResponse','Patient']
-        let lstErrors = utilModule.level1Validate(bundle,lstRequiredTypes)
+        let lstErrors = utilModule.level1Validate(bundle,{lstRequiredTypes:lstRequiredTypes})
 
         //console.log(lstErrors)
 
@@ -123,7 +123,7 @@ function setup(app) {
 
         //if lstErrors length is 0 then no errors were found. Any errors will cause the bundle to be rejected
         let lstRequiredTypes = ['ServiceRequest','QuestionnaireResponse']
-        let lstErrors = utilModule.level1Validate(bundle,lstRequiredTypes)
+        let lstErrors = utilModule.level1Validate(bundle,{lstRequiredTypes:lstRequiredTypes})
         if (lstErrors.length > 0) {
             //There were validation errors. These cannot be ignored.
             let oo = utilModule.makeOO(lstErrors)

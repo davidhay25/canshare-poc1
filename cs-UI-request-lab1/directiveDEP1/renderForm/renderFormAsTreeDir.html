@@ -38,15 +38,13 @@
 
 
 
-            <div class="row" ng-show="selectedNode.data">
+            <div class="row" ng-show="selectedNode.data.section.reviewItem.length > 0">
                 <div class = 'col-md-3'>
                     <em>Add a comment about this item</em>
                 </div>
 
                 <div class = 'col-md-9'>
-                    <textarea class="form-control"
-                              ng-blur = "updateComments()"
-                              ng-model="input.comments[selectedNode.id]"></textarea>
+                    <textarea class="form-control" ng-model="input.comments[selectedNode.id]"></textarea>
                 </div>
                 <!--
                 <div class = 'col-md-2'>
@@ -71,23 +69,14 @@
 
             </div>
 
-            {{Object.keys(input.comments)}}
 
-
-                <h3>All comments</h3>
-                <table class="table table-bordered table-condensed">
-                    <tr><td>Item</td><td>Comment</td></tr>
-                    <tr ng-repeat="(k,v) in input.comments">
-
-                        <td>{{hashAllItems[k].text}}</td>
-
-
-
-                        <td>{{v}}</td>
-                    </tr>
-                </table>
-
-
+            <h3>All comments</h3>
+            <table class="table table-bordered table-condensed">
+                <tr ng-repeat="(k,v) in input.comments">
+                    <td>{{k}}</td>
+                    <td>{{v}}</td>
+                </tr>
+            </table>
 
 
 

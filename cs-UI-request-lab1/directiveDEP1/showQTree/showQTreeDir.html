@@ -1,0 +1,29 @@
+<div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div id="designTree"></div>
+    </div>
+    <div class="col-md-6">
+
+        <div ng-show="selectedNode">
+            <uib-tabset>
+                <uib-tab heading="Details">
+                    <ng-include src = "'directive/showQTree/itemDetails.html'"></ng-include>
+                </uib-tab>
+                <uib-tab heading="Json">
+                    <pre>{{selectedNode.data.item | json}}</pre>
+                    <pre>{{selectedNode.data.meta | json}}</pre>
+                </uib-tab>
+            </uib-tabset>
+        </div>
+
+
+
+
+    </div>
+</div>
+
+
+
+</div>

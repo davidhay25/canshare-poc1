@@ -13,7 +13,8 @@ function setup(app,serverBase) {
         let bundle = req.body
         console.log('bundle:',bundle)
         //if lstIssues length is 0 then no issues were found otherwise there were validation issues. These cannot be ignored.
-        let lstIssues = utilModule.level1Validate(bundle)
+        let options = {mustBeConditional : true}
+        let lstIssues = utilModule.level1Validate(bundle,options)
         if (lstIssues.length > 0) {
 
             let oo = utilModule.makeOO(lstIssues)
@@ -36,7 +37,8 @@ function setup(app,serverBase) {
         metrics.start = new Date()
 
         //if lstIssues length is 0 then no issues were found otherwise there were validation issues. These cannot be ignored.
-        let lstIssues = utilModule.level1Validate(bundle)
+        let options = {mustBeConditional : true}
+        let lstIssues = utilModule.level1Validate(bundle,options)
         if (lstIssues.length > 0) {
             
             let oo = utilModule.makeOO(lstIssues)

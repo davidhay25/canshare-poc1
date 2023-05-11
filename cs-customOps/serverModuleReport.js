@@ -18,7 +18,7 @@ function setup(app) {
 
         //if lstErrors length is 0 then no errors were found. Any errors will cause the bundle to be rejected
         let lstRequiredTypes = ['DiagnosticReport','ServiceRequest','Patient']
-        let lstErrors = utilModule.level1Validate(bundle,lstRequiredTypes)
+        let lstErrors = utilModule.level1Validate(bundle,{lstRequiredTypes:lstRequiredTypes})
         if (lstErrors.length > 0) {
             //There were validation errors. These cannot be ignored.
             let oo = utilModule.makeOO(lstErrors)

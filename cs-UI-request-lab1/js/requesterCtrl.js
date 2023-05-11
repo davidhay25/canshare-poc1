@@ -178,8 +178,6 @@ angular.module("pocApp")
 
             }
 
-
-
             //When a patient is selected, get the previous SR's
             $scope.selectPatient = function (vo) {
                 let patient = vo.patient
@@ -188,7 +186,7 @@ angular.module("pocApp")
                     patient.identifier = [{system:"http://canshare.co.nz/identifier/bundle",value:new Date().toISOString()}]
                 }
 
-                $scope.pathToClinicalViewer = $scope.host + "/ClinicalViewer.html?nhi=" + patient.identifier[0].value
+                $scope.pathToClinicalViewer = $scope.host + "/clinicalViewer.html?nhi=" + patient.identifier[0].value
 
                 $scope.selectedPatient = patient
 

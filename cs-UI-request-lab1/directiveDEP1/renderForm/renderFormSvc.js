@@ -58,15 +58,11 @@ angular.module("formsApp")
         return {
 
             //
-            addCommentsToModel : function(Q,hashComments,hashModel){
-                //hashCommnents are comments, hashModel is the data model (keyed bu linkId),
+            addCommentsToModel : function(Q,hashComments,hashModel,hashItem){
+                //hashCommnents are comments, hashModel is the data model (keyed bu linkId), hashItem are the item definitions from the Q (keyed bu linkId)
                 //strategy is to work through the tree 'top down' (by section). Keep a running total of the comments.
                 //when we come across a marked comment item (code.system = 'http://clinfhir.com/fhir/CodeSystem/review-comment') then add the running total to any existing comment there and clear the running total
                 //the last item in the tree should be a comment item!
-
-                if (! hashComments) {
-                    return
-                }
 
                 let runningComments = ""
                 let reviewerCommentSystem = "http://clinfhir.com/fhir/CodeSystem/review-comment"
@@ -76,13 +72,8 @@ angular.module("formsApp")
                         runningComments += item.text +': ' + hashComments[item.linkId] + "\n"
                     }
 
-                    if (runningComments && item.code && item.code.length > 0 && item.code[0].system == reviewerCommentSystem) {
-                        //this is a comment item, and there are comments to add
-
-                        if (hashModel[item.linkId]) {
-                            runningComments = hashModel[item.linkId] + "\n" + runningComments
-                        }
-
+                    if (item.code && item.code.system == '') {
+                        //this is a comment item
                         hashModel[item.linkId] = runningComments
                         runningComments = ""
                     }
@@ -95,12 +86,10 @@ angular.module("formsApp")
 
                 }
 
-                if (Q && Q.item) {
+                if (Q.item) {
                     Q.item.forEach(function (section) {
                         checkItem(section)
                     })
-
-                  //  console.log(runningComments)
                 }
 
 
@@ -108,15 +97,13 @@ angular.module("formsApp")
 
             },
 
-
-
             setControls : function (template,data) {
                 //set the values for dropdowns
 
 
                 function setOneControl(item) {
                     if (item.type == 'choice' && item.answerOption && data[item.linkId]) {
-                       // console.log(item.linkId,data[item.linkId])
+                        console.log(item.linkId,data[item.linkId])
                         item.answerOption.forEach(function (ao) {
                             if (data[item.linkId] && data[item.linkId].valueCoding) {
                                 if (ao.valueCoding.code == data[item.linkId].valueCoding.code) {
@@ -129,7 +116,7 @@ angular.module("formsApp")
                     }
 
                     if (item.item) {
-                       // console.log(item.item)
+                        console.log(item.item)
                         item.item.forEach(function (child) {
                             setOneControl(child)
                         })
@@ -162,7 +149,6 @@ angular.module("formsApp")
                     let thisItem = angular.copy(item)
                     delete thisItem.item
 
-                    /* - not doing this now...
                     //check to see if this item is a review item. If so, add it to the list of all review items this section
                     if (item.code) {
                         //console.log(item.code)
@@ -172,8 +158,6 @@ angular.module("formsApp")
                             }
                         })
                     }
-
-                   */
 
                     let text = item.text
                     if (text.length > 50) {
@@ -227,7 +211,7 @@ angular.module("formsApp")
                     Q.item.forEach(function (item) {
                         let section = angular.copy(item)
                         delete section.item
-                        //section.reviewItem = []
+                        section.reviewItem = []
                         addItemToTree(qParentId,item,'section',section)
                     })
                 }
@@ -1219,12 +1203,12 @@ angular.module("formsApp")
                             //let vs = cell.item.answerValueSet
                             //maximum number to return is 50
 
-                            //console.log('fillFromVS',cell,vsUrl)
+                            console.log('fillFromVS',cell,vsUrl)
 
                             if (arExpandedVsCache[vsUrl]) {
                                 //present in the cache
                                 cell.meta.expandedVSOptions = arExpandedVsCache[vsUrl]
-                               // console.log('cache hit')
+                                console.log('cache hit')
                             } else {
                                 let qry =  termServer + "ValueSet/$expand?url=" + vsUrl + "&count=50"
 

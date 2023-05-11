@@ -101,14 +101,7 @@ angular.module("formsApp")
                 let missingReferences = {}      //where a resource references a missing entry...
                 let focusResourceRef
                 if (options.focusResource) {    //this is an actual resource instance
-
-                    focusResourceRef = `${options.focusResource.resourceType}/${options.focusResource.id}` //default to type/id
-
-                    if (options.focusResource.id.indexOf('-') > -1) {    //this is a UUID
-                        focusResourceRef = `urn:uuid:${options.focusResource.id}`
-                    }
-
-
+                    focusResourceRef = `${options.focusResource.resourceType}/${options.focusResource.id}`
                 }
 
 

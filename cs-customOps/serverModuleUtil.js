@@ -132,8 +132,8 @@ async function postBundleToServer(bundle,metrics,res,collectionName,req) {
 // That all resources have an identifier
 // That the specified resources (at least 1) exists in the bindle
 //todo check for conditional update or create
-
-function level1Validate(bundle,lstRequiredTypes) {
+// function level1Validate(bundle,lstRequiredTypes,options) {
+function level1Validate(bundle,options) {
     let lstErrors = []
     let hashTypes = {}
 
@@ -150,6 +150,25 @@ function level1Validate(bundle,lstRequiredTypes) {
 
         if (! resource.identifier) {
             lstErrors.push(`Entry #${inx} ${resource.resourceType} resource with the id ${resource.id} has no identifier`)
+        }
+
+        if (options && options.mustBeConditional) {
+            //Must be a conditional update on identifier
+            if (entry.request) {
+                if (entry.request.method !== 'PUT') {
+                    lstErrors.push(`Entry #${inx} must have a PUT method`)
+                } else {
+                    if (entry.request.url) {
+                        if (entry.request.url.indexOf("?identifier") == -1) {
+                            lstErrors.push(`Entry #${inx} must be a conditional update on identifier`)
+                        }
+                    } else {
+                        lstErrors.push(`Entry #${inx} is missing the url`)
+                    }
+                }
+            } else {
+                lstErrors.push(`Entry #${inx} ${resource.resourceType} resource with the id ${resource.id} is missing the entry.request element`)
+            }
         }
 
         /* hold off on this validation until the lab is sorted...
@@ -174,8 +193,8 @@ function level1Validate(bundle,lstRequiredTypes) {
     })
 
     //now check for the required types - if any
-    if (lstRequiredTypes) {
-        lstRequiredTypes.forEach(function (type) {
+    if (options && options.lstRequiredTypes) {
+        options.lstRequiredTypes.forEach(function (type) {
             if (! hashTypes[type]) {
                 lstErrors.push(`No resource with the type ${type} was found in the bundle, and it is required.`)
             }
@@ -194,7 +213,7 @@ async function profileValidation(bundle) {
     try {
 
         let config = {headers:{'cache-control':'no-cache'}}     //otherwise the hapi server will cache for a minute
-        response = await axios.post(url,bundle,config)
+        let response = await axios.post(url,bundle,config)
         return response.data    //this will be an OO - potentially with informational issues
     } catch (err) {
         //console.log("exception from validate")

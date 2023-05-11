@@ -15,7 +15,7 @@ function setup(app) {
         utilModule.logger("form", {content: bundle})
 
         let lstRequiredTypes = ['DocumentReference','QuestionnaireResponse']
-        let lstErrors = utilModule.level1Validate(bundle,lstRequiredTypes)
+        let lstErrors = utilModule.level1Validate(bundle,{lstRequiredTypes:lstRequiredTypes})
         if (lstErrors.length > 0) {
             //There were validation errors. These cannot be ignored.
             let oo = utilModule.makeOO(lstErrors)
