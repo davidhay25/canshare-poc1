@@ -5,7 +5,16 @@ const axios = require("axios");
 const fs = require("fs")
 //const commonModule = require("./serverModuleCommonUI");
 
+let jwt_decode = require( "jwt-decode")
+console.log(jwt_decode)
 let library = require("./library.json")
+
+
+//load the config file for accessing NZHTS (the file is excluded from git)
+const nzhtsconfig = JSON.parse(fs.readFileSync("./nzhtsconfig.config").toString())
+//console.log(nzhtsconfig)
+
+//let nztsBase = "https://authoring.nzhts.digital.health.nz/fhir/" //? mpve to config
 
 let servers = []
 
@@ -15,6 +24,7 @@ servers.push({display:"Public hapi R4",url:"http://hapi.fhir.org/baseR4/"})
 servers.push({display:"Terminz",url:"https://terminz.azurewebsites.net/fhir/"})
 servers.push({display:"Ontoserver",url:"https://r4.ontoserver.csiro.au/fhir/"})
 
+/*
 //load the codesystem def files
 let cmDefinitions = fs.readFileSync("./files/conceptmapdef.tsv").toString()
 let arLines = cmDefinitions.split('\n')
@@ -85,11 +95,88 @@ arLines.forEach(function (line,inx) {
 
 
 
+*/
+
+async function getNZHTSAccessToken() {
+    url = "https://authenticate.nzhts.digital.health.nz/auth/realms/nzhts/protocol/openid-connect/token"
+    let body =`grant_type=client_credentials&client_id=${nzhtsconfig.clientId}&client_secret=${nzhtsconfig.clientSecret}`
+    try {
+        let result = await axios.post(url,body)
+        //console.log(result.data['access_token'])
+        return result.data['access_token']
+    } catch (ex) {
+        console.log(ex)
+        return null
+    }
+}
 
 
 
 function setup(app) {
 
+
+    //perform a query against the NZHTS.
+    //right now, we get a new access token for each call - todo make more efficient
+
+    app.get('/nzhts',async function(req,res){
+        console.log(req.query.qry)
+
+        //let qry = req.query.query || `https://authoring.nzhts.digital.health.nz/fhir/ValueSet/$expand?url=https://nzhts.digital.health.nz/fhir/ValueSet/canshare-data-absent-reason`
+        if (req.query.qry) {
+            let qry = nzhtsconfig.serverBase +  decodeURIComponent(req.query.qry)
+
+            //need to re-urlencode the |
+            qry = qry.split('|').join("%7c")
+
+
+            //todo - check expiry and refresh if needed
+            console.log(qry)
+
+            let token = await getNZHTSAccessToken()
+            if (token) {
+
+                var decoded = jwt_decode(token);
+                // let expiry =
+                let timeToExpire = decoded.exp * 1000 - Date.now()       //exp is in seconds
+                // console.log(Date(decoded.exp).toString())
+
+                console.log(timeToExpire / (1000 * 60 *60 ));
+
+                let config = {headers:{authorization:'Bearer ' + token}}
+                config['content-type'] = "application/fhir+json"
+console.log(config)
+                axios.get(qry,config).then(function(data) {
+                    //console.log(data.data)
+                    //console.log(JSON.stringify(data.data))
+                    res.json(data.data)
+                }).catch(function(ex) {
+                    //console.log(ex.code)
+                    //console.log(ex.response.status)
+                    //console.log(ex.response.data)
+                    if (ex.response) {
+                        res.status(ex.response.status).json(ex.response.data)
+                    } else {
+                        res.status(500).json(ex)
+                    }
+
+                })
+            } else {
+                res.status(ex.response.status).json({msg:"Unable to get Access Token."})
+            }
+
+
+        } else {
+            res.status(400).json({msg:"Must have urlencoded qry query"})
+
+        }
+
+
+
+
+
+        //res.send(token)
+
+    })
 
     app.get('/conceptMap/all', function(req,res) {
         res.json(allConceptMaps)
@@ -108,6 +195,8 @@ function setup(app) {
 
         res.json(library)
     })
+
+
 
     app.get('/termQuery',async function(req,res) {
 

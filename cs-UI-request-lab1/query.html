@@ -32,6 +32,7 @@
 
 
     <script src="js/queryCtrl.js"></script>
+    <script src="js/querySvc.js"></script>
     <script src="js/libs/vis.min.js"></script>
     <script src="js/makeLibraryQuery.js"></script>
 
@@ -99,20 +100,95 @@
         </div>
     </nav>
 
-    <div>
-        <a href="http://hl7.org/fhir/R4B/conceptmap.html" target="_blank" class="btn-link btn pull-right">ConceptMap in spec</a>
-        <a href="http://hl7.org/fhir/R4B/conceptmap-operation-translate.html" target="_blank" class="btn-link btn pull-right">Translate in spec</a>
-        <a href="https://terminology.hl7.org/SNOMEDCT.html" target="_blank" class="btn-link btn pull-right">SNOMED & FHIR in spec</a>
-        <a href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/view#gid=245875863" target="_blank" class="btn-link btn pull-right">Linda's spreadsheet</a>
 
-
-
-    </div>
 
     <uib-tabset>
 
-        <uib-tab heading="ConceptMap">
+
+        <uib-tab heading="NZHTS query">
             <br/>
+            <em>This tab will make queries against the New Zealand National Terminology server</em>
+            <br/>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="list-group">
+                        <div class="list-group-item" style="cursor: pointer" ng-repeat="item in allVSItem" ng-click="selectVSItem(item)">
+                            {{item.display}}
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-9" ng-show="selectedVS">
+                    <br/>
+                        Query: {{termServerQuery}}
+                    <br/>  <br/>
+                    <uib-tabset>
+                        <uib-tab heading="Json">
+                            <pre>{{selectedVS | json}}</pre>
+                        </uib-tab>
+                        <uib-tab heading="Expand">
+                            <br/>
+                            <div class="row">
+                                <div class="col-md-1">
+                                    Language
+                                </div>
+                                <div class="col-md-3">
+                                    <select ng-model="input.selectedLanguage" class="form-control"
+                                            ng-options = "item.display for item in languages"></select>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" ng-model="input.filter" placeholder="Filter text"/>
+                                </div>
+                                <div class="col-md-5">
+                                    <button class="btn btn-primary pull-right" ng-click="expandVSInTS(selectedVS)">Expand</button>
+                                </div>
+                            </div>
+                            <br/>
+                            <div ng-show="expandQry">Query: {{expandQry}}</div>
+                            <br/>
+
+
+
+                            <uib-tabset>
+                                <uib-tab heading="Concepts">
+                                    <table class="table table-bordered table-condensed">
+                                        <tr ng-repeat="concept in expandedVS.expansion.contains">
+                                            <td>{{concept.display}}</td>
+                                            <td>{{concept.code}}</td>
+                                            <td>{{concept.system}}</td>
+                                        </tr>
+                                    </table>
+                                </uib-tab>
+                                <uib-tab heading="Json">
+                                    <pre>{{expandedVS | json}}</pre>
+                                </uib-tab>
+                            </uib-tabset>
+
+
+
+
+
+
+                        </uib-tab>
+                    </uib-tabset>
+
+                </div>
+            </div>
+
+
+        </uib-tab>
+
+        <uib-tab ng-show="false" heading="ConceptMap">
+            <br/>
+            <div>
+                <a href="http://hl7.org/fhir/R4B/conceptmap.html" target="_blank" class="btn-link btn pull-right">ConceptMap in spec</a>
+                <a href="http://hl7.org/fhir/R4B/conceptmap-operation-translate.html" target="_blank" class="btn-link btn pull-right">Translate in spec</a>
+                <a href="https://terminology.hl7.org/SNOMEDCT.html" target="_blank" class="btn-link btn pull-right">SNOMED & FHIR in spec</a>
+                <a href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/view#gid=245875863" target="_blank" class="btn-link btn pull-right">Linda's spreadsheet</a>
+
+
+
+            </div>
 
             <div class="row">
                 <div class="col-md-4">
@@ -307,6 +383,7 @@
 
         <uib-tab heading="General queries">
             <br/>
+            <em>These are queries against the CanShare FHIR server</em>
             <div class="row">
                 <div class="col-md-1">
                     Query
@@ -370,7 +447,7 @@
 
         </uib-tab>
 
-        <uib-tab heading="ValueSet explorer">
+        <uib-tab ng-show="false" heading="ValueSet explorer">
             <div class="row">
                 <div class="col-md-3">
                     <br/>

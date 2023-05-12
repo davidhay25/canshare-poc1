@@ -1,11 +1,14 @@
 angular.module("pocApp")
     .controller('queryCtrl',
-        function ($scope,$http,$localStorage,$uibModal,$q,$timeout) {
+        function ($scope,$http,$localStorage,$uibModal,$q,$timeout,querySvc) {
 
             $scope.localStorage = $localStorage
 
             $scope.input = {}
 
+            $scope.languages = []       //languages that can be used for the expansion
+            $scope.languages.push({display:"Default",code:""})      //todo find nz expansion
+            $scope.languages.push({display:"CanShare",code:"en-x-sctlang-23162100-0210105"})
 
             // =============================================== functions to support ConceptMap work =================
 
@@ -223,6 +226,88 @@ angular.module("pocApp")
 
             // ========================== end of conceptmap functions ====================
 
+            //$scope.allVSItem = []      //this will be list of Valuesets. todo ?retrieve from server
+            //$scope.allVSItem.push({display:"Data Absent Reasons",url:"https://nzhts.digital.health.nz/fhir/ValueSet/canshare-data-absent-reason"})
+
+
+            //get the canshare valuesets from the TS
+            querySvc.getValueSets().then(
+                function (ar) {
+                    $scope.allVSItem = ar
+                    console.log(ar)
+                }
+            )
+
+            $scope.expandVSInTS = function (vs) {
+                delete $scope.expandedVS
+                let qry = `ValueSet/$expand?url=${vs.url}&_summary=false`
+
+                if ($scope.input.selectedLanguage && $scope.input.selectedLanguage.code) {
+                    qry += `&displayLanguage=${$scope.input.selectedLanguage.code} `
+                }
+                if ($scope.input.filter) {
+                    qry += `&filter=${$scope.input.filter}`
+                }
+
+                $scope.expandQry = qry
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        $scope.expandedVS = data.data
+                    }, function (err) {
+
+                    }
+                ).finally(
+                    function () {
+                        $scope.showWaiting = false
+                    }
+                )
+
+            }
+
+            $scope.selectVSItem = function (item) {
+                //retrieve the complete VS. we know the id, but we'll still search by url as that's the recommended
+                // way to do it, and we want to show the url to the user...
+
+                //let qry = `ValueSet.item.vs.id`
+                let qry = `ValueSet?url=${item.vs.url}&_summary=false`
+               // qry += "&_summary=false"
+
+                //let qry = `ValueSet/$expand?url=${item.url}&_summary=false`
+
+
+                console.log(qry)
+                $scope.termServerQuery = qry
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                       // $scope.selectedVS = data.data
+
+                        //it's a query so a bundle is expected
+                        if (data.data && data.data.entry) {
+                            if (data.data.entry.length !== 1) {
+                                alert("There were ${} matching ValueSets. This is very likely an issue with duplicated resrces on the terminology server")
+                            } else {
+                                $scope.selectedVS = data.data.entry[0].resource
+                            }
+                        } else {
+                            alert("The ValueSet was not found")
+                        }
+
+
+                    }, function (err) {
+                        console.log(err)
+                    }
+                ).finally(
+                    function () {
+                        $scope.showWaiting = false
+                    }
+                )
+
+            }
+
             function setServer() {
                 if ($localStorage.currentServer) {
                     $scope.selectedServer = $localStorage.currentServer
@@ -317,12 +402,15 @@ angular.module("pocApp")
             }
 
             $scope.trimDisplay = function(str,length) {
-                if (str.length <= length) {
-                    return str
-                } else {
-                    str = str.substring(0,length-3) + "..."
-                    return str
+                if (str) {
+                    if (str.length <= length) {
+                        return str
+                    } else {
+                        str = str.substring(0,length-3) + "..."
+                        return str
+                    }
                 }
+
             }
 
             $scope.executeGeneralQuery = function (qry) {
