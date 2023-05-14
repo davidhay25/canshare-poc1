@@ -22,6 +22,10 @@ if (serverBase[serverBase.length-1] !== '/') {
 
 let serverBase = utilModule.checkUrlSlash(process.env.SERVERBASE)
 
+//a cache of Questionnaire resources. todo - make version aware
+//used by makeVoFromQR
+let QCache = {}
+
 
 //todo ? copy from pocServer
 async function multiQuery(lst) {
@@ -114,8 +118,91 @@ function getNextPageUrl(bundle) {
 
 }
 
+async function  makeVoFromQR(QR) {
+    //construct a value object from the coded answers in the QR
+    //right now it's a simple name/value combo - later maybe we can maintainn the structure
+    //let clone = angular.copy(QR)    //we'll add the code to this QR
+    let questionnaireUrl = QR.questionnaire
+    if (!questionnaireUrl ){
+        return {success:false,msg:"Missing questionnaire element in QR"}
+    }
+    //now get the Q
+    let Q = QCache[questionnaireUrl]
+    if (! Q) {
+        //retrieve the Q from the forms server and place in cache
+        let qry = `Questionnaire?url=${questionnaireUrl}`
+        let bundle = await singleQuery(qry)
+        if (bundle.entry.length > 0) {
+            Q = bundle.entry[0].resource
+            QCache[questionnaireUrl] = Q
+        } else {
+            return {success:false,msg:`A questionnaire with the url ${questionnaireUrl} was not found`}
+        }
+
+    }
+
+    //now we have a Q, construct a hash of codes by linkId. Contains the Coding for that linkId
+    let hashCodes = {}
+    Q.item.forEach(function (section) {
+        getCodedItem(section)
+    })
+
+    //Finally, we can iterate through the QR.
+    let hashAnswers = {}  //keyed on system|code
+    QR.item.forEach(function (section) {
+        processQRItem(section,section)
+    })
+
+    return {answers : hashAnswers}
+
+
+    //process an item from the QR. If it has an answer (and there should be), and there is a matching code in the hash (from the Q) then add to hashAnswers
+    function processQRItem(item,section) {
+        let codes = hashCodes[item.linkId]
+
+        //console.log('a',item.linkId,codes)
+
+        if (codes) {
+            //there is a matching code (array of Coding) for this linkId
+            //add all the codings to the vo. Generally there will only be 1...
+            codes.forEach(function (coding) {
+                let key = `${coding.system}|${coding.code}`
+                item.answer.forEach(function (ans) {
+                    //console.log(ans)
+                    hashAnswers[key] = hashAnswers[key] || {answers:[]}
+                    hashAnswers[key].answers.push({answer:ans,linkId:item.linkId,text:item.text,section:section.text})       //will be something like valueCoding
+                })
+            })
+
+        }
+
+        if (item.item) {
+            item.item.forEach(function (child) {
+                processQRItem(child,section)
+            })
+        }
+
+
+
+
+    }
+
+    //gets a coded item from the Q
+    function getCodedItem(item) {
+        if (item.code) {
+            hashCodes[item.linkId] = item.code       //an array of codings
+        }
+        if (item.item) {
+            item.item.forEach(function (child) {
+                getCodedItem(child)
+            })
+        }
+    }
+
+}
 
 module.exports = {
     multiQuery : multiQuery,
-    singleQuery : singleQuery
+    singleQuery : singleQuery,
+    makeVoFromQR : makeVoFromQR
 };

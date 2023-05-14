@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('labCtrl',
-        function ($scope,$http,commonSvc,labSvc,$location) {
+        function ($scope,$http,commonSvc,labSvc,$location,$timeout) {
 
             let protocol = $location.protocol();
             let port = $location.port();
@@ -9,7 +9,7 @@ angular.module("pocApp")
             if (port != 80) {
                 $scope.host += ":" + port
             }
-
+            $scope.pathToHome = $scope.host + "/poc.html"
 
             $scope.input = {};
             $scope.answer = {};     //the answers. keyed by linkId.
@@ -121,17 +121,17 @@ angular.module("pocApp")
             //Note that unlike the requester, a QR is not submitted to the server - it's a DR / Observations combo. Of course
             //if a commercial Q based forms app were to be used, then a QR would be generated. The lab would then need
             //to create the DR/Obs from the QR.
-            $scope.selectQ = function(template) {
-                $scope.selectedReportQ = template.Q                     //this is the bound variable for the <renderform> directive
-                //let formTemplate = commonSvc.parseQ(template.Q)     //the actual data source for the rendered form
-                //console.log(formTemplate)
-                //$scope.selectedForm = formTemplate
+            $scope.selectQ = function(template,prepopFromQR) {
+                //tme$scope.selectedReportQ = template.Q                     //this is the bound variable for the <renderform> directive
 
                 //now create the relationship between the item.code and linkId in the Q. This is needed
                 //as the Observations that will be generated will use the code from the item...
 
-                $scope.hashLinkIdCodes = labSvc.getCodingForLinkId($scope.selectedReportQ)  //note these are CC
+                //tmp$scope.hashLinkIdCodes = labSvc.getCodingForLinkId($scope.selectedReportQ)  //note these are CC
 
+
+                /*
+                This was the pre=pop based on Observations. Changing to use the QR directly instead
 
                 //This is an array of observations created by the requester. Use the data in these obs
                 //to set the initial values on the Q. This only works where the Q.item.code is set as that is the link to obs.code
@@ -139,8 +139,70 @@ angular.module("pocApp")
                     labSvc.setInitialQValuesFromObs(template.Q,$scope.selectedRequest.qrobs)
                 }
 
+                */
 
-                commonSvc.populate(template.Q,$scope.selectedRequest.pat,$scope.selectedRequest.qr)
+                if (prepopFromQR) {
+                    let hash = {}
+                    Object.keys($scope.qrCodedData.answers).forEach(function (key) {
+                        let Answers = $scope.qrCodedData.answers[key]     //the key is system|code
+                        let ans = Answers.answers[0]      //the first value only. todo need to think about multiple values
+                        hash[ans.linkId] = ans.answer
+                    })
+
+                    //  $timeout(function(){
+                    labSvc.setInitialQValuesFromHash(template.Q, hash)
+                    $scope.selectedReportQ = template.Q
+                    $scope.hashLinkIdCodes = labSvc.getCodingForLinkId($scope.selectedReportQ)  //note these are CC
+
+                } else {
+                    $scope.selectedReportQ = template.Q
+                    $scope.hashLinkIdCodes = labSvc.getCodingForLinkId($scope.selectedReportQ)  //note these are CC
+                }
+
+                return
+
+
+                //get the coded answers from the QR
+                $http.post("/requester/testQRAnalyse",$scope.selectedRequest.qr).then(
+                    function (data) {
+                        console.log(data.data)
+                        $scope.qrCodedData = data.data      //for the displa
+
+                        //only pre-pop when a new template is chosen, not if editing a previous version
+                        if (prepopFromQR) {
+                            let hash = {}
+                            Object.keys($scope.qrCodedData.answers).forEach(function (key) {
+                                let Answers = $scope.qrCodedData.answers[key]     //the key is system|code
+                                let ans = Answers.answers[0]      //the first value only. todo need to think about multiple values
+                                hash[ans.linkId] = ans.answer
+                            })
+
+                            //  $timeout(function(){
+                            labSvc.setInitialQValuesFromHash(template.Q, hash)
+                            $scope.selectedReportQ = template.Q
+                            $scope.hashLinkIdCodes = labSvc.getCodingForLinkId($scope.selectedReportQ)  //note these are CC
+
+                        }
+
+
+
+                    //    },500)
+
+
+
+                        //templabSvc.setInitialQValuesFromHash($scope.selectedReportQ,$scope.prePopData)
+
+
+                    }
+                )
+
+
+                        //$scope.prePopData was created when the SR was selected. Here we use it to pre-pop the QR
+                //labSvc.setInitialQValuesFromHash(template.Q,$scope.prePopData)
+
+
+                //not sure what this function achieves - ?is it an incomplete fn????
+                //commonSvc.populate(template.Q,$scope.selectedRequest.pat,$scope.selectedRequest.qr)
 
 
                 //console.log($scope.hashLinkIdCodes)
@@ -178,31 +240,138 @@ angular.module("pocApp")
                             let vo = data.data
                             $scope.selectedRequest = vo
 
-
-
-                            $scope.hashAllData = commonSvc.allQRData(vo.qr)
-                            console.log($scope.hashAllData)
-
-                            //A link to display the clincial viewer for the patient
+                            //A link to display the clinical viewer for the patient
                             $scope.pathToClinicalViewer = $scope.host + "/clinicalViewer.html?nhi=" + vo.pat.identifier[0].value
+
+                            //if there is a previous DR, then pre-populate the template...
+                            if (vo.dr && vo.dr.presentedForm && vo.dr.presentedForm.length >= 2) {
+                                //yes there is. Note that the hash is keyed on linkId and, right now, has a single value only
+                                let vo1 = angular.fromJson(atob(vo.dr.presentedForm[1].data))
+
+                                for (const template of $scope.templates) {
+                                    if (template.Q.url == vo1.url) {
+                                        if (vo1.data) {
+                                            labSvc.setInitialQValuesFromHash(template.Q, vo1.data)
+                                        }
+
+                                        $scope.selectedTemplate = template   //set the selected template.
+                                        $scope.selectQ(template)        //select the template
+
+
+                                        break
+                                    }
+                                }
+                            }
+
+                            //if there is
+
+
+
+
+                            //call the server function that will pull the coded answers out of the QR
+                            $http.post("/requester/testQRAnalyse",vo.qr).then(
+                                function (data) {
+                                    console.log(data.data)
+                                    $scope.qrCodedData = data.data      //for the display
+
+                                    //create a simplified hash keyed on linkId with a single value for each code.
+                                    //If this is the first
+
+                                    //labSvc.setInitialQValuesFromHash(template.Q,vo1.data)
+
+                                    //now that we have the coded data with answers from the QR, we can check the DR for updated answers
+                                    //an object containing an array of all the answers is saved in the second attachment and the url of the form
+                                    //if there is data in the DR, then it becomes the data that sets the .initial value in the Q
+
+                                    //now find the template
+
+
+
+
+/*
+                                    for (const template of $scope.templates) {
+
+                                        if (template.Q.url == vo1.url) {
+                                            //OK. we have the template. Is there an existing DR with data in it?
+                                           else {
+                                                //no there isn't. Use the data from the QR instead.
+                                                let hash = {}
+                                                Object.keys($scope.qrCodedData.answers).forEach(function (key) {
+                                                    let anAnswers = $scope.qrCodedData.answers[key]     //the key is system|code
+                                                    let ans = anAnswers[0]      //the first value only. todo need to think about multiple values
+                                                    hash[ans.linkId] = ans.answer
+                                                })
+
+                                                labSvc.setInitialQValuesFromHash(template.Q, hash)
+
+                                            }
+
+                                            break
+                                        }
+                                    }
+
+
+*/
+
+/*
+
+
+                                    try {
+                                        if (vo.dr && vo.dr.presentedForm && vo.dr.presentedForm.length >= 2) {
+                                            let vo1 = angular.fromJson(atob(vo.dr.presentedForm[1].data))
+
+                                            $scope.prePopData = vo1.data  //data from the previous DR to pre-populate the form. It will replace the object created from the QR above
+
+                                            //now locate the template in $scope.templates
+                                            for (const template of $scope.templates) {
+                                                if (template.Q.url == vo1.url) {
+
+                                                    //so we've found the template. If we update the .initial values, then the values
+                                                    //will be displayed in the form
+                                                    //vo1.data is a hash of data by linkid from data previously entered and saved in the DR
+                                                    //ie it will only be populated when a form is being updated
+                                                    //this approach is really only suitable in this implementation - other will likely store this data separately
+                                                    if (vo1.data) {
+                                                        labSvc.setInitialQValuesFromHash(template.Q,vo1.data)
+                                                    }
+
+                                                    $scope.selectedTemplate = template   //set the selected template.
+                                                    $scope.selectQ(template)        //select the template
+
+                                                    break
+                                                }
+                                            }
+
+                                        }
+                                    } catch(ex) {
+                                        console.log("Error getting previous values",ex)
+                                    }
+
+
+
+                                }, function (err) {
+                                    console.log(err)
+                                }
+
+                                */
+                          //  )
+
+
+/*
 
                             //an object containing an array of all the answers is saved in the second attachment and the url of the form
                             try {
                                 if (vo.dr && vo.dr.presentedForm && vo.dr.presentedForm.length >= 2) {
-
                                     let vo1 = angular.fromJson(atob(vo.dr.presentedForm[1].data))
 
-                                    $scope.prePopData = vo1.data  //todo - don't think this is being used
+                                    $scope.prePopData = vo1.data  //data from the previous DR to pre-populate the form. It will replace the object created from the QR above
 
                                     //now locate the template in $scope.templates
                                     for (const template of $scope.templates) {
-                                   // $scope.templates.forEach(function (template) {
                                         if (template.Q.url == vo1.url) {
 
                                             //so we've found the template. If we update the .initial values, then the values
                                             //will be displayed in the form
-
-
                                             //vo1.data is a hash of data by linkid from data previously entered and saved in the DR
                                             //ie it will only be populated when a form is being updated
                                             //this approach is really only suitable in this implementation - other will likely store this data separately
@@ -216,17 +385,14 @@ angular.module("pocApp")
 
                                             break
                                         }
-
                                     }
 
-
-                                 //   console.log($scope.prePopData)
                                 }
                             } catch(ex) {
                                 console.log("Error getting previous values",ex)
                             }
 
-
+*/
 
 /*
                             //create a pre-pop object from the Observations. Limited for now, just to show how it might work...
@@ -242,13 +408,13 @@ angular.module("pocApp")
                             //$scope.prePopData = {"updated":"updated"}
 
                             //todo - if observations were returned, we can pre-populate the form...
-                        },
-                        function(err) {
-                            console.log(err.data)
                         }
-                    )
-                }
 
+
+                    )
+                })
+
+            }
             }
 
             //generate the report bundle from the QR and the currrent reques object ({pat:, sr:, qr:, comp:}

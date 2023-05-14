@@ -120,10 +120,13 @@
                 </div>
                 <div class="col-md-9" ng-show="selectedVS">
                     <br/>
-                        Query: {{termServerQuery}}
-                    <br/>  <br/>
+
                     <uib-tabset>
                         <uib-tab heading="Json">
+                            <br/>
+                            Query: {{termServerQuery}}
+                            <br/>  <br/>
+
                             <pre>{{selectedVS | json}}</pre>
                         </uib-tab>
                         <uib-tab heading="Expand">
@@ -149,9 +152,10 @@
 
 
 
-                            <uib-tabset>
+                            <uib-tabset ng-show="expandedVS">
                                 <uib-tab heading="Concepts">
                                     <table class="table table-bordered table-condensed">
+                                        <tr><th>Display</th><th>Code</th><th>System</th></tr>
                                         <tr ng-repeat="concept in expandedVS.expansion.contains">
                                             <td>{{concept.display}}</td>
                                             <td>{{concept.code}}</td>

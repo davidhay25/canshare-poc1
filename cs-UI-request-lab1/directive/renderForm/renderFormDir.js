@@ -153,6 +153,14 @@ angular.module('formsApp')
                     }
                 }
 
+
+                //called when the element receives focus. Emits an event so the host can display stuff
+                $scope.onFocus = function (cell) {
+                    console.log(cell)
+                    $scope.$emit('elementSelected',{cell:cell})
+
+                }
+
                 //note that this is called every time there is a change (eg keypress) in the forms component
                 //this is to ensure that the QR is always up to date. onBlur could miss the most recently updated firld...
                 $scope.makeQR = function() {
@@ -188,9 +196,9 @@ angular.module('formsApp')
                         $scope.formPane = "col-md-6"
                         $scope.drawingPane = "col-md-3"
                     } else {
-
                         $scope.formPane = "col-md-9"
                         $scope.drawingPane = "col-md-0"
+                        clearDrawing()
                     }
                 }
 
@@ -200,6 +208,12 @@ angular.module('formsApp')
                     $timeout(function(){
                         $scope.makeQR()
                     },100)
+                }
+
+                clearDrawing = function() {
+                    let canvas = document.getElementById('drawingCanvas')
+                    let context = canvas.getContext('2d')
+                    context.clearRect(0, 0, canvas.width, canvas.height);
                 }
 
                 setDrawing = function (imageName) {
@@ -219,8 +233,6 @@ angular.module('formsApp')
                         context.beginPath();
                         context.arc(startX, startY, 7, 0, 2 * Math.PI);
                         context.stroke();
-
-
 
                         $scope.input.form[$scope.selectedSection.imageDetails.linkId] = canvas.toDataURL()
                         $timeout(function(){

@@ -105,6 +105,7 @@
                 </select>
                 </div>
             </div>
+
             <div class="col-md-3">
                 <div class="navbar-text">
                     <a target="_blank" ng-href={{pathToClinicalViewer}}>{{commonSvc.getPatientName(selectedPatient)}}</a>
@@ -114,23 +115,30 @@
                 </div>
             </div>
 
-
-
-
-
             <div class="col-md-1 col-sm-1">
-                <form class="navbar-form navbar-left">
+                <form class="navbar-form navbar-right">
 
                     <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
 
                 </form>
             </div>
 
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <div class="navbar-text">
-                    <checkbox ng-model="input.showHelp"></checkbox> Show help
+                    <checkbox ng-model="input.showHelp"></checkbox> Help
                 </div>
             </div>
+
+
+            <div class="col-md-1">
+                <div class="navbar-text">
+                    <a target="_blank" ng-href={{pathToHome}}>
+                        <i class="glyphicon glyphicon-home"></i>
+                    </a>
+                </div>
+            </div>
+
+
 
             <div class="col-md-2">
                 <a href="https://teaho.govt.nz/" target="_blank">
@@ -502,6 +510,48 @@
                                                 </table>
                                             </uib-tab>
 
+                                            <uib-tab heading="Coded data">
+                                                <em>Items that have a .code and an answer. Able to be pre-pop sources for the lab forms</em>
+                                                <!--{{qrCodedData.answers}}-->
+                                                <br/> <br/>
+                                                <table class="table-condensed table table-bordered">
+                                                    <tr><th>System|Code</th><th>Section, Text & Value</th></tr>
+                                                    <tr  ng-repeat ="(k,v) in qrCodedData.answers">
+                                                        <td style="width: 30%" >
+                                                            {{k}}
+                                                        </td>
+                                                        <td>
+                                                            <div class = 'row' ng-repeat="ans in v.answers">
+
+                                                                <div class="col-md-3">
+                                                                    {{ans.section}}
+                                                                </div>
+
+                                                                <div class="col-md-3">
+                                                                    {{ans.text}}
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    {{ans.answer}}
+                                                                </div>
+                                                            </div>
+
+<!--
+                                                            <table class="table">
+                                                                <tr ng-repeat="ans in v.answers">
+                                                                    <td width="25%">{{ans.linkId}}</td>
+                                                                    <td>{{ans.answer}}</td>
+                                                                </tr>
+                                                            </table>
+                                                            -->
+                                                        </td>
+
+                                                    </tr>
+                                                </table>
+
+
+
+                                            </uib-tab>
+
                                         </uib-tabset>
 
                                     </div>
@@ -624,37 +674,7 @@
                                 </div>
                             </div>
 
-                            <!--
-                            <uib-tabset vertical="true">
-                                <uib-tab heading="Request text">
-                                    <qrdisplay qr="QR"></qrdisplay>
-                                </uib-tab>
-                                <uib-tab heading="Q">
-                                    <pre>{{selectedTemplate | json}}</pre>
-                                </uib-tab>
-                                <uib-tab heading="Patient">
-                                    <pre>{{selectedPatient | json}}</pre>
-                                </uib-tab>
-                                <uib-tab heading="QR">
-                                    <pre>{{QR | json}}</pre>
-                                </uib-tab>
-                                <uib-tab heading="SR">
-                                    <pre>{{createdSR | json}}</pre>
-                                </uib-tab>
-                                <uib-tab heading="Extract">
-                                    <button class="btn btn-link" ng-click="testExtraction(QR)">Extract
 
-                                    </button>
-
-
-                                    <pre>{{testExtractionResult | json}}</pre>
-                                </uib-tab>
-                                <uib-tab heading="Bundle">
-                                    <pre>{{bundle | json}}</pre>
-                                </uib-tab>
-                            </uib-tabset>
-
-                            -->
 
                         </uib-tab>
 

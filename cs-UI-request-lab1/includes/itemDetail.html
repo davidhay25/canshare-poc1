@@ -1,4 +1,4 @@
-<div class="rounded-box">
+<div class="rounded-box-filled">
     <strong>Item details</strong>
     <div class="pull-right" ng-click="input.itemDetail=null" style="cursor: pointer">X</div>
 
@@ -11,7 +11,11 @@
         Code: {{input.itemDetail.item.code[0].code}}
     </div>
     <div ng-hide="input.itemDetail.item.code">
-        No code in the Q. No Observation will be generated.
+        No code in the Q. Won't pre-pop the lab report (unless demographics).
+    </div>
+
+    <div ng-show = "input.itemDetail.meta.extraction.extractObservation">
+        An Observation will be generated.
     </div>
 
 </div>

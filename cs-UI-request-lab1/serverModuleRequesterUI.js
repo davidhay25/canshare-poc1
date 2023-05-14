@@ -1,6 +1,7 @@
 //endpoints used by the requester UI component
 
 const axios = require("axios");
+const commonModule = require("./serverModuleCommonUI");
 const showLog = true
 
 let serverBase = process.env.SERVERBASE         //the location of the FHIR server
@@ -20,6 +21,20 @@ function setup(app,inDb) {
     db = inDb
 
 
+    app.post('/requester/testQRAnalyse',async function(req,res) {
+        let body = req.body
+        console.log("test analyse",body )
+        commonModule.makeVoFromQR(body).then(
+            function (vo) {
+                console.log('codes=',vo)
+                res.json(vo)
+            },function (ex) {
+                res.status(500).json(ex)
+            }
+        )
+
+
+    })
 
     //validate endpoint. will call the $validate operation on the server
     app.post('/requester/validate',async function(req,res){

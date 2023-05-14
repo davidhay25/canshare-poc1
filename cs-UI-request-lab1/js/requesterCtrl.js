@@ -14,6 +14,8 @@ angular.module("pocApp")
                 $scope.host += ":" + port
             }
 
+            $scope.pathToHome = $scope.host + "/poc.html"
+
             //load the config. We need this for the fullUrl in the request bundle and server interactions
             commonSvc.init().then(
                 function(data){
@@ -33,12 +35,24 @@ angular.module("pocApp")
             )
 
 
+            /* has been replaced by elementSelected event
             //emitted when a user clicks on the ? icon in the form render
             $scope.$on("itemDetail",function(ev,vo){
                 $scope.input.itemDetail = vo
-                //console.log(vo)
+
+            })
+            */
+
+            //when the user enters (focus) an element. emitted by the renderform directive
+            $scope.$on("elementSelected",function(ev,vo){
+                $scope.input.itemDetail = vo.cell
+                console.log(vo)
                 //{item: meta:
             })
+
+
+
+
 
             //create the author resource. The identifier (HPI) is required
             $scope.author = {resourceType:"Practitioner", name:[{text:"Sally Surgeon"}]}
@@ -70,7 +84,7 @@ angular.module("pocApp")
 
             $scope.$on('qrCreated',function(event,vo1){
 
-                delete $scope.input.itemDetail        //delete the item display as soon as typing or clicking starts...
+                //delete $scope.input.itemDetail        //delete the item display as soon as typing or clicking starts...
 
                 $scope.createdQR = vo1.QR
                 $scope.formData = vo1.formData
@@ -104,6 +118,21 @@ angular.module("pocApp")
             //call the 'test extraction' endpoint to return the extracted resources
             $scope.testExtraction = function () {
                 let bundle = makeBundle()
+
+                //perfrom a test QR analysis
+                // $scope.createdSR
+
+
+                $http.post("/requester/testQRAnalyse",$scope.createdQR).then(
+                    function (data) {
+                        console.log(data.data)
+                        $scope.qrCodedData = data.data
+                    }, function (err) {
+                        console.log(err)
+                    }
+                )
+
+
                 delete $scope.testExtractionResult
                 $http.post("/requester/extract",bundle).then(
                     function (data) {
@@ -187,6 +216,11 @@ angular.module("pocApp")
                 }
 
                 $scope.pathToClinicalViewer = $scope.host + "/clinicalViewer.html?nhi=" + patient.identifier[0].value
+
+
+
+
+
 
                 $scope.selectedPatient = patient
 

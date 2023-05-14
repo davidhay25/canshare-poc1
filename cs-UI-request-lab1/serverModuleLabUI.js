@@ -9,6 +9,8 @@ let db
 //the utils module is stored in the cs-customops folder. todo ?should we move it to a separate 'common' folder?
 const utilModule = require("../cs-customOps/serverModuleUtil.js")
 
+const commonModule = require("./serverModuleCommonUI.js")
+
 //The lab system can make queries to the FHIR server. In this implementation it os assumed
 //that the lab system is dorectly interacting with the FHIR sever (via this module) - ie it doesn't have it's own data storage
 //In a real application, the lab system will likely store stuff locally as well as sending it to the fhir server
@@ -93,6 +95,15 @@ function setup(app) {
                         break
                     case "QuestionnaireResponse" :
                         vo.qr = resource
+
+                        //just for testing
+                        commonModule.makeVoFromQR(vo.qr).then(
+                            function (vo) {
+                                console.log('codes=',vo)
+                            }
+                        )
+
+
                         break
                     case "Patient" :
                         vo.pat = resource

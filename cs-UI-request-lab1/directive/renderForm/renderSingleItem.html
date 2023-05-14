@@ -76,6 +76,7 @@
 
                     <input type="text" class="form-control" uib-datepicker-popup="dd-MMMM-yyyy"
                            ng-model="input.form[cell.item.linkId]" is-open="datePopup[cell.item.linkId].opened"
+                           ng-focus="onFocus(cell)"
                            ng-change="makeQR(cell.item.linkId)"/>
 
                     <span class="input-group-btn">
@@ -112,6 +113,7 @@
                     <textarea ng-class="{'form-control':true,userComment:cell.item.code[0].system=='http://clinfhir.com/fhir/CodeSystem/review-comment' }"
                               ng-model="input.form[cell.item.linkId]" class="form-control"
                               placeholder="{{cell.meta.placeholder}}"
+                              ng-focus="onFocus(cell)"
                               ng-change="makeQR(cell.item.linkId)"></textarea>
                 </div>
 
@@ -119,7 +121,11 @@
             </div>
 
             <div ng-switch-when="boolean">
-                <checkbox ng-model="input.form[cell.item.linkId]"  ng-change="makeQR(cell.item.linkId)"></checkbox>
+                <checkbox ng-model="input.form[cell.item.linkId]"
+                          ng-focus="onFocus(cell)"
+                          ng-change="makeQR(cell.item.linkId)">
+
+                </checkbox>
                 <span style="cursor: pointer" ng-click="showItemDetails(cell.item,cell.meta)">{{cell.item.text}}</span>
             </div>
 
@@ -134,6 +140,7 @@
 
                             <input type="radio" value="{{option}}"
                                    ng-change="makeQR(cell.item.linkId)"
+                                   ng-focus="onFocus(cell)"
                                    ng-model="input.form[cell.item.linkId]"/>
 
                             {{option.valueCoding.display}}
@@ -154,6 +161,7 @@
                             <checkbox
                                     ng-true-value = {{option}}
                                     ng-false-value = ""
+                                    ng-focus="onFocus(cell)"
                                     ng-change = makeQR()
                                     ng-model="input.form[cell.item.linkId + '--' + $index]">
 
@@ -190,6 +198,7 @@
                             <div class="col-md-11 col-sm-11">
                                 <select class="form-control" ng-model="input.form[cell.item.linkId]"
                                         ng-change="makeQR(cell.item.linkId)"
+                                        ng-focus="onFocus(cell)"
                                         ng-options = "concept.valueCoding.display for concept in cell.item.answerOption">
 
                                     <option value="" disabled selected>{{cell.meta.placeholder}}</option>
@@ -224,6 +233,7 @@
                             <span ng-repeat="option in cell.meta.expandedVSOptions">
                                 <input type="radio" value="{{option}}"
                                        ng-change="makeQR(cell.item.linkId)"
+                                       ng-focus="onFocus(cell)"
                                        ng-model="input.form[cell.item.linkId]"/>
 
                                 {{option.display}}
@@ -241,6 +251,7 @@
 
                         <div ng-hide="cell.meta.renderVS == 'radio' || cell.meta.renderVS == 'lookup'">
                             <select class="form-control" ng-model="input.form[cell.item.linkId]"
+                                    ng-focus="onFocus(cell)"
                                     ng-change="makeQR(cell.item.linkId)"
 
                                     ng-options = "concept.display for concept in cell.item.answerOption">
@@ -297,6 +308,7 @@
                     <div ng-hide="cell.displayHint == 'radio-button' || cell.displayHint == 'radio'">
                         <select class="form-control" ng-model="input.form[cell.item.linkId]"
                             ng-change="makeQR(cell.item.linkId)"
+                                ng-focus="onFocus(cell)"
                             ng-options = "value.valueInteger for value in cell.item.answerOption"/>
                     </div>
 
@@ -306,6 +318,7 @@
 
                             <input type="radio" value="{{option}}"
                                    ng-change="makeQR(cell.item.linkId)"
+                                   ng-focus="onFocus(cell)"
                                    ng-model="input.form[cell.item.linkId]"/>
 
                             {{option.valueInteger}}
@@ -317,6 +330,7 @@
 
                 <div ng-hide = "cell.item.answerOption.length > 0">
                     <input type="number"  ng-change="makeQR(cell.item.linkId)"
+                           ng-focus="onFocus(cell)"
                            placeholder="{{cell.meta.placeholder}}"
                            ng-model="input.form[cell.item.linkId]" class="form-control"/>
                 </div>
@@ -326,6 +340,7 @@
 
             <div ng-switch-when = "decimal" >
                 <input type="number"  ng-change="makeQR(cell.item.linkId)"
+                       ng-focus="onFocus(cell)"
                        placeholder="{{cell.meta.placeholder}}"
                        ng-model="input.form[cell.item.linkId]" class="form-control"/>
 
@@ -337,7 +352,7 @@
 
                     <div ng-hide="cell.displayHint == 'radio-button' || cell.displayHint == 'radio'">
                         <select class="form-control" ng-model="input.form[cell.item.linkId]"
-
+                                ng-focus="onFocus(cell)"
                             ng-change="makeQR(cell.item.linkId)"
                             ng-options = "value.valueString for value in cell.item.answerOption"/>
                     </div>
@@ -349,6 +364,7 @@
                             <input type="radio" value="{{option}}"
 
                                    ng-change="makeQR(cell.item.linkId)"
+                                   ng-focus="onFocus(cell)"
                                    ng-model="input.form[cell.item.linkId]"/>
 
                             {{option.valueString}}
@@ -361,6 +377,7 @@
                 </div>
                 <div ng-hide = "cell.item.answerOption.length > 0">
                     <input type="text"  ng-change="makeQR(cell.item.linkId)"
+                           ng-focus="onFocus(cell)"
                            placeholder="{{cell.meta.placeholder}}"
                            ng-class="{'form-control':true,userComment:cell.item.code[0].system=='http://clinfhir.com/fhir/CodeSystem/review-comment' }"
                            ng-model="input.form[cell.item.linkId]" />
@@ -371,6 +388,7 @@
 
             <div ng-switch-default>
                 <input type="text"  ng-change="makeQR(cell.item.linkId)"
+                       ng-focus="onFocus(cell)"
                        placeholder="{{cell.meta.placeholder}}"
                        ng-model="input.form[cell.item.linkId]" class="form-control"/>
             </div>

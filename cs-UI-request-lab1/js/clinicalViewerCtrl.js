@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('clinicalViewerCtrl',
-        function ($scope,$http,commonSvc,clinicalViewerSvc,$window) {
+        function ($scope,$http,commonSvc,clinicalViewerSvc,$window,$location) {
 
             $scope.input = {};
             $scope.input.anClinicalSummary = {}
@@ -18,6 +18,15 @@ angular.module("pocApp")
                 })
 
             let search = $window.location.search;
+
+            let protocol = $location.protocol();
+            let port = $location.port();
+            $scope.host = protocol + "://" + $location.host()
+            if (port != 80) {
+                $scope.host += ":" + port
+            }
+            $scope.pathToHome = $scope.host + "/poc.html"
+
 
             if (search) {
                 search = search.substring(1)

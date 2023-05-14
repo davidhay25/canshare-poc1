@@ -10,7 +10,9 @@ angular.module("pocApp")
         let config= {}
 
 
+
         return {
+
 
             populate : function(Q,patient,QR) {
                 //create a QR based on the input. This is intended to be similar to the SDC populate operation,
