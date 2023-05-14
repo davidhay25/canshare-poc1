@@ -33,9 +33,7 @@ angular.module('formsApp')
 
                 })
 
-                $scope.$on('prepop',function (ev,vo) {
-                    
-                })
+
 
                 /* - I don't believe this is now used
 
@@ -109,7 +107,7 @@ angular.module('formsApp')
                 $scope.notShown = {}
 
                 //if the form variable is set from the outside, it is assumed to contain data in the same format as input.form - a hash of values by linkId
-                $scope.$watch(
+          /* not sure if this is used      $scope.$watch(
                     function() {return $scope.form},
                     function() {
                         //don't do this here ATM. Right now this is being done for labs in labSvc - if needed elsewhere then refactor
@@ -118,26 +116,13 @@ angular.module('formsApp')
 
                     }
                 )
-
+*/
                 $scope.$watch(
                     function() {return $scope.q},
                     function() {
                       // console.log('Q updated')
                         setupQ()
-                        /*
-                        delete $scope.selectedSection       //c;ears the current section display
-                        if ($scope.q) {
-                            let vo = renderFormsSvc.makeFormTemplate($scope.q,$scope.input.form)
-                            if (vo) {
-                                $scope.input.formTemplate = vo.template     //an array of sections
-                                $scope.hashItem = vo.hashItem
-
-                                $scope.selectSection($scope.input.formTemplate[0])  //select the first tab
-                            }
-                        }
-                        */
-
-                    }
+                                           }
                 );
 
                 function setupQ () {
@@ -147,8 +132,8 @@ angular.module('formsApp')
                         if (vo) {
                             $scope.input.formTemplate = vo.template     //an array of sections
                             $scope.hashItem = vo.hashItem
-
                             $scope.selectSection($scope.input.formTemplate[0])  //select the first tab
+                            $scope.makeQR()     //will include any .initial values
                         }
                     }
                 }

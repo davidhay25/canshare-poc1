@@ -7,7 +7,57 @@ angular.module("pocApp")
 
         return {
 
-            setInitialQValuesFromQR : function (Q,QR) {
+            setInitialQValuesFromQR : function (Q,hashByCode) {
+                //update the .initial values in the Q. This will 'pre-populate' the values when the template isbeing built in the renderForm directive
+                // hashByCode is keyed by system|code as a different template
+
+                //need to recursively check each section
+                if (Q.item) {
+                    Q.item.forEach(function (section) {
+                        checkItem(section)
+
+                    })
+                }
+
+                //check an item and all the descendants recursively
+                function checkItem(item) {
+                    setInitial(item,hashByCode)
+                    if (item.item) {
+                        item.item.forEach(function (child) {
+                            checkItem(child)
+                        })
+                    }
+                }
+
+
+                //set the initial value - for specific datatypes only
+                //todo - do we need to think about datatype? currently assimung they are the same dt in different templates with the same code
+                function setInitial(item,hashValues) {
+                    if (item.code) {
+                        //can only pre-pop based on code
+                        let key = `${item.code[0].system}|${item.code[0].code}`
+                        if (hashValues[key]) {
+                            //console.log(item.linkId,hashValues[item.linkId])
+
+                            item.initial = []       //only 1 initial is supported
+
+                            let ans = hashValues[key].answers[0].answer  //todo currently only 1 answer
+
+                            item.initial.push(ans)
+
+                        }
+                    }
+
+                    /*
+                    if (hashValues[item.linkId]) {
+                        //console.log(item.linkId,hashValues[item.linkId])
+
+                        item.initial = []       //only 1 initial is supported
+                        item.initial.push(hashValues[item.linkId])
+
+                    }
+                    */
+                }
 
             },
 
