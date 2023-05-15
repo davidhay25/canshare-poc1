@@ -50,6 +50,13 @@ angular.module("pocApp")
             }
 
 
+            $scope.mqByTypeDEP = function (type) {
+                let ar = []
+                $scope.lstFsMiniQ.forEach(function (mq) {
+                    ar.push(mq.title)
+                })
+                return ar
+            }
 
 
             //get all SR in the 'active' status
@@ -72,11 +79,7 @@ angular.module("pocApp")
                     //really should be at least one...
                     //for now just return the first one - todo check for nhi
 
-                    $scope.pathToClinicalViewer = $scope.host + "/ClinicalViewer.html?nhi=" + vo.patient.identifier[0].value
-
-                  //  ${host}/clinicalViewer.html?nhi=${selectedSRPatientIdentifier}`
-
-                   // $scope.selectedSRPatientIdentifier = vo.patient.identifier[0].value
+                    $scope.pathToClinicalViewer = $scope.host + "/clinicalViewer.html?nhi=" + vo.patient.identifier[0].value
                 }
 
             }
@@ -129,6 +132,20 @@ angular.module("pocApp")
 
             }
 
+            $scope.analyseRequestReport = function () {
+                //generate the table comparing coded items between specific request & report forms
+                //todo - could add ViewVS fom here
+
+                dashboardSvc.analyseRequestReport($scope.input.requests,$scope.input.reports).then(
+                    function (data) {
+                        $scope.codedAnalysis = data
+                        $scope.$digest()    //unclear why this is needed
+                    }
+                )
+
+
+            }
+
             $scope.selectMiniQ = function (miniQ) {
                 $scope.selectedMiniQ = miniQ
                 delete $scope.selectedQfromDesigner
@@ -171,11 +188,19 @@ angular.module("pocApp")
                         //returns a hash of urls that are currently on the forms server.
                         //Now create a list that we can sort
                         $scope.lstFsMiniQ = []
+
+                        $scope.allRequests = []      //all requests
+                        $scope.hashMQByType = {}
+
                         Object.keys(hash).forEach(function (key) {
                             let mq = hash[key]
                             let context = $scope.getContext(mq)
                             let item = {miniQ:mq,context:context,title:mq.title || mq.name}
                             $scope.lstFsMiniQ.push(item)
+
+                            $scope.hashMQByType[context] = $scope.hashMQByType[context] || []
+                            $scope.hashMQByType[context].push(item)
+                            $scope.allRequests.push(item)
 
                         })
 
@@ -273,11 +298,13 @@ angular.module("pocApp")
                 //get the full Q from the
                 // FS
 
+                $scope.selectedMiniQ = miniQ
                 $scope.fsFormData = {}
                 $scope.fsQR = {}
 
                 dashboardSvc.getSingleQFromFormsServer(miniQ).then(function (Q) {
                     $scope.selectedQfromFS = Q
+                    $scope.codedElementsInSingleQ = dashboardSvc.getAllCodedElements(Q)
                 })
 
                // let temp = await dashboardSvc.getSingleQFromForsmServer(miniQ)

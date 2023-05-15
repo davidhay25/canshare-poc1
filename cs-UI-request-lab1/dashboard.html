@@ -121,7 +121,7 @@
                 <div class="col-md-6">
                     <table class="table-condensed table">
                         <tr><th>Title</th><th>Description</th><th>Status</th><th>Context</th></tr>
-                        <tr ng-repeat="item in lstFsMiniQ">
+                        <tr ng-repeat="item in lstFsMiniQ" ng-class="{'listItemSelected' : selectedMiniQ.id == item.miniQ.id}">
                             <td><div class="clickable" ng-click="selectQfromFS(item.miniQ)">{{item.miniQ.title }}</div> </td>
                             <td>{{item.miniQ.description}}</td>
                             <td><div class="clickable" ng-click="setQStatus(item.miniQ)">{{item.miniQ.status}}</div> </td>
@@ -129,9 +129,36 @@
                         </tr>
                     </table>
                 </div>
+
                 <div class="col-md-6">
-                    <renderform q="selectedQfromFS" qr="fsQR" form="fsFormData"></renderform>
+                    <uib-tabset ng-show="selectedQfromFS">
+                        <uib-tab heading="Form">
+                            <renderform q="selectedQfromFS" qr="fsQR" form="fsFormData"></renderform>
+                        </uib-tab>
+                        <uib-tab heading="Coded elements">
+                            <table class="table-bordered table">
+                                <tr><th>System|code</th><th>Section</th><th>Text</th></tr>
+                                <tr ng-repeat="(k,v) in codedElementsInSingleQ">
+                                    <td>{{k}}</td>
+                                    <td>
+                                        {{v.section.text}}
+                                    </td>
+                                    <td>
+                                        {{v.item.text}}
+                                    </td>
+
+                                </tr>
+                            </table>
+
+
+                        </uib-tab>
+                        <uib-tab heading="Json">
+                            <pre>{{selectedQfromFS | json}}</pre>
+                        </uib-tab>
+                    </uib-tabset>
+
                 </div>
+
             </div>
 
 
@@ -374,6 +401,53 @@
 
                 </div>
             </div>
+
+
+        </uib-tab>
+
+        <uib-tab heading = "Request/Report coded matching">
+            <br/>
+            <div class="row">
+
+                <div class="col-md-1">
+                    Request
+                </div>
+                <div class="col-md-2">
+                    <select ng-model="input.requests" class="form-control"
+                            ng-options = "mq.title for mq in hashMQByType['request']"></select>
+                </div>
+                <div class="col-md-4">
+                    <select ng-model="input.reports" class="form-control"
+                            ng-options = "mq.title for mq in hashMQByType['report']"></select>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-link" ng-click="analyseRequestReport()">Generate analysis</button>
+                </div>
+            </div>
+
+            <br/>
+            <table class="table table-bordered" ng-show="codedAnalysis">
+                <tr><th style="width: 50%">system|code</th><th>Request</th><th>Report</th></tr>
+                <tr ng-repeat = "(k,v) in codedAnalysis">
+                    <td>{{k}}</td>
+                    <td>
+                        <div ng-repeat="vv in v.request ">
+                            {{vv.item.text}} ({{vv.section.text}})
+                        </div>
+                    </td>
+                    <td>
+                        <div ng-repeat="vv in v.report ">
+                            {{vv.item.text}} ({{vv.section.text}})
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+
+
+
+
+
 
 
         </uib-tab>

@@ -7,6 +7,123 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
 
     return {
 
+        analyseRequestReport : async function(mqRequest,mqReport) {
+            let deferred = $q.defer()
+            //generate a comparison report between 2 miniQ
+            let that = this
+            //let requestQ
+            //let reportQ
+            this.getSingleQFromFormsServer(mqRequest.miniQ).then(
+
+                function (data) {
+                    let requestQ = data //data.entry[0].resource       //returns a bundle
+                    that.getSingleQFromFormsServer(mqReport.miniQ).then(
+                        function (data) {
+                            let reportQ = data //data.entry[0].resource       //returns a bundle
+                            let analysis = performAnalysis(requestQ,reportQ)
+                            deferred.resolve(analysis)
+                        })
+                }
+            )
+
+
+
+
+            return deferred.promise
+
+            function performAnalysis(requestQ,reportQ) {
+                //return {msg:"ok"}
+                //get the request
+                let analysis = {}
+                let requestCodes = that.getAllCodedElements(requestQ)
+
+                //copy into the analysis object
+                Object.keys(requestCodes).forEach(function (key) {
+                    // code = requestCodes[key]    // system|code
+                    let v = requestCodes[key]
+                    analysis[key] = {request:[v]}
+
+                })
+
+                let reportCodes = that.getAllCodedElements(reportQ)
+
+                Object.keys(reportCodes).forEach(function (key) {
+                   // let code = requestCodes[key]    // system|code
+                    let v = reportCodes[key]
+                     if (analysis[key]) {
+                         let t = analysis[key]
+                         t.report = [v]
+
+                     } else {
+                         analysis[key] = {report:[v]}
+                     }
+
+                })
+
+                return analysis
+
+            }
+
+            function getAllCodedElementsDEP(Q) {
+                let hashByCode = {}     //keyed on system|code
+
+                function processElement(item) {
+                    if (item.code) {
+                        let key = `${item.code[0].system}|${item.code[0].code}`
+                        let miniItem = angular.copy(item)
+                        delete miniItem.item
+                        hashByCode[key] = miniItem      //assume that any specific code will only appear once in a Q
+                    }
+
+                    if (item.item) {
+                        item.item.forEach(function (child) {
+                            processElement(child)
+                        })
+                    }
+                }
+
+                if (Q.item) {
+                    Q.item.forEach(function (section) {
+                        processElement(section)
+                    })
+                }
+
+                return hashByCode
+
+
+            }
+
+        },
+
+        getAllCodedElements : function(Q) {
+            let hashByCode = {}     //keyed on system|code
+
+            function processElement(item,miniSection) {
+                if (item.code) {
+                    let key = `${item.code[0].system}|${item.code[0].code}`
+                    let miniItem = angular.copy(item)
+                    delete miniItem.item
+                    hashByCode[key] = {item:miniItem,section:miniSection}      //assume that any specific code will only appear once in a Q
+                }
+
+                if (item.item) {
+                    item.item.forEach(function (child) {
+                        processElement(child,miniSection)
+                    })
+                }
+            }
+
+            if (Q.item) {
+                Q.item.forEach(function (section) {
+                    let miniSection = angular.copy(section)
+                    delete miniSection.item
+                    processElement(section,miniSection)
+                })
+            }
+
+            return hashByCode
+        },
+
         getActiveSR : function () {
             let deferred = $q.defer()
             let qry = `ServiceRequest?status=active&_include=ServiceRequest:subject&_include=ServiceRequest:supportingInfo`
@@ -260,6 +377,10 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
                     if (data.data.entry) {
                         data.data.entry.forEach(function (entry) {
                             let resource = entry.resource
+
+
+
+
                             hash[resource.url] = resource
 
                         })

@@ -150,7 +150,7 @@ app.get('/proxy',async function(req,res){
 console.log(query)
     try {
         let bundle = await commonModule.singleQuery(query)
-        //console.log(bundle)
+        console.log(bundle)
         res.json(bundle)
     } catch (ex) {
 
