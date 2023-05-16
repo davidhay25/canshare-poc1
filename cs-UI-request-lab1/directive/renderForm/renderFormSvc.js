@@ -512,12 +512,13 @@ angular.module("formsApp")
                 QR1.questionnaire = Q.url
 
                 //the top level items - sections - directly off the Q root...
+                //the checkConditional means that comments from the tree don't work...
                 Q.item.forEach(function (section) {
                     let sectionItem = null
-                    if (section.item && that.checkConditional(section,form) ) {  //check that the section is enabled (otherwise we get validation issues)
+                    if (section.item) {// && that.checkConditional(section,form) ) {  //check that the section is enabled (otherwise we get validation issues)
                         section.item.forEach(function (child) {
                             //a child can be a group or a leaf element
-                            if (child.item && that.checkConditional(child,form) ) {  //check that the group is enabled (otherwise we get validation issues)
+                            if (child.item) { // && that.checkConditional(child,form) ) {  //check that the group is enabled (otherwise we get validation issues)
                                 //this is a group. it won't have a value (though can have other attributes like a code)
                                 let groupItem = null
                                 child.item.forEach(function (gc) {
@@ -1291,6 +1292,7 @@ angular.module("formsApp")
             },
 //determine whether the condition on an item is true...
             checkConditional : function(item,formData) {
+
 
                 //operates like an OR - return true if any of the conditionals match
 

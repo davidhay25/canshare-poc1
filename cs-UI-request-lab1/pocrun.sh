@@ -6,4 +6,6 @@ export LOGDB=localhost
 export SERVERBASE=http://poc.canshare.co.nz:8080/fhir/  # when in a container
 export CUSTOMOPS=http://poc.canshare.co.nz:9300/
 
+export POCSERVERBASE=80
+
 node ./pocServer.js

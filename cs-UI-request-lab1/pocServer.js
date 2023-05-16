@@ -5,7 +5,9 @@ let fs = require('fs')
 let http = require('http');
 const axios = require("axios");
 
-let port = 9500
+console.log('port',process.env.POCSERVERBASE)
+
+let port = process.env.POCSERVERBASE || 9500
 
 const bodyParser = require('body-parser')
 
@@ -24,7 +26,7 @@ const terminologyModule = require("./serverModuleTerminologyUI")
 //let config = require("./config.json")
 
 let express = require('express');
-const fle = require("./samples/valenciaMay.json");
+//const fle = require("./samples/valenciaMay.json");
 let app = express();
 app.use(bodyParser.json({limit:'50mb',type:['application/json+fhir','application/fhir+json','application/json']}))
 /*
