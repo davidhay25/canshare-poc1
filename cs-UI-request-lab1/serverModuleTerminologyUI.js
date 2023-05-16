@@ -144,7 +144,7 @@ function setup(app) {
 
                 let config = {headers:{authorization:'Bearer ' + token}}
                 config['content-type'] = "application/fhir+json"
-console.log(config)
+
                 axios.get(qry,config).then(function(data) {
                     //console.log(data.data)
                     //console.log(JSON.stringify(data.data))

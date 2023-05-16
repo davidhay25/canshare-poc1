@@ -270,6 +270,10 @@ angular.module("pocApp")
                 //retrieve the complete VS. we know the id, but we'll still search by url as that's the recommended
                 // way to do it, and we want to show the url to the user...
 
+                delete $scope.expandedVS
+                delete $scope.selectedVS
+                delete $scope.expandQry
+
                 //let qry = `ValueSet.item.vs.id`
                 let qry = `ValueSet?url=${item.vs.url}&_summary=false`
                // qry += "&_summary=false"
