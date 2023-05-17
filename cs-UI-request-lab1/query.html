@@ -108,15 +108,19 @@
         <uib-tab heading="NZHTS query">
             <br/>
             <em>This tab will make queries against the New Zealand National Terminology server</em>
+            <div ng-show="showLoadingMessage">Loading ValueSets, please wait...</div>
             <br/>
             <div class="row">
                 <div class="col-md-3">
-                    <div class="list-group">
-                        <div class="list-group-item" style="cursor: pointer" ng-repeat="item in allVSItem" ng-click="selectVSItem(item)">
-                            {{item.display}}
+                    <div class="myScroll">
+                        <div class="list-group">
+                            <div class="list-group-item" style="cursor: pointer" ng-repeat="item in allVSItem" ng-click="selectVSItem(item)">
+                                {{item.display}}
 
+                            </div>
                         </div>
                     </div>
+
                 </div>
                 <div class="col-md-9" ng-show="selectedVS">
                     <br/>

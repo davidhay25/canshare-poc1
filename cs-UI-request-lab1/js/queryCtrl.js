@@ -231,10 +231,12 @@ angular.module("pocApp")
 
 
             //get the canshare valuesets from the TS
+            $scope.showLoadingMessage = true
             querySvc.getValueSets().then(
                 function (ar) {
                     $scope.allVSItem = ar
                     console.log(ar)
+                    delete $scope.showLoadingMessage
                 }
             )
 
