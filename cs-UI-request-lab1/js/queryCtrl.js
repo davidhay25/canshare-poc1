@@ -271,7 +271,7 @@ angular.module("pocApp")
             $scope.selectVSItem = function (item) {
                 //retrieve the complete VS. we know the id, but we'll still search by url as that's the recommended
                 // way to do it, and we want to show the url to the user...
-
+                $scope.selectedItem = item
                 delete $scope.expandedVS
                 delete $scope.selectedVS
                 delete $scope.expandQry

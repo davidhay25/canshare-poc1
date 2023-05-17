@@ -114,7 +114,8 @@
                 <div class="col-md-3">
                     <div class="myScroll">
                         <div class="list-group">
-                            <div class="list-group-item" style="cursor: pointer" ng-repeat="item in allVSItem" ng-click="selectVSItem(item)">
+                            <div ng-class="{'list-group-item':true,listItemSelected:selectedItem==item}"
+                                 style="cursor: pointer" ng-repeat="item in allVSItem" ng-click="selectVSItem(item)">
                                 {{item.display}}
 
                             </div>
