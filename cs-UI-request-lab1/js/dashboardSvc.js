@@ -296,11 +296,25 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
         getSingleQFromDesigner : function(miniQ){
             //get the complete Q
             let deferred = $q.defer()
-            let url = `${designerServer}Questionnaire/${miniQ.id}`
+
+
+
+
+            let qry = `${designerServer}Questionnaire/${miniQ.id}`
+
+
 
 
             let lst = []
-            $http.get(url).then(
+
+
+            let encodedQry = encodeURIComponent(qry)
+
+            //get the full Q from the FS
+            $http.get(`proxy?qry=${encodedQry}`).then(
+
+
+           // $http.get(qry).then(
                 function (data) {
                     deferred.resolve(data.data)     //returns the actual Q
                 }, function (err) {
