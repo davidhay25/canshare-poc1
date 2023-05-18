@@ -5,6 +5,8 @@ const axios = require("axios");
 const fs = require("fs")
 //const commonModule = require("./serverModuleCommonUI");
 
+const commonModule = require("./serverModuleCommonUI.js")
+
 let jwt_decode = require( "jwt-decode")
 console.log(jwt_decode)
 let library = require("./library.json")
@@ -175,6 +177,17 @@ function setup(app) {
 
 
         //res.send(token)
+
+    })
+
+    //return a list of Q where a particular ValueSet is used
+    //todo - this might be useful in the designer
+    app.get('/term/findQusingVS',async function (req,res) {
+        let vsUrl = req.query.url
+
+        let hash = await commonModule.findQusingVS(vsUrl)
+        console.log('hash',hash)
+        res.json(hash)
 
     })
 

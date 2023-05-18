@@ -44,18 +44,63 @@ angular.module("pocApp")
 
             }
 
-            $scope.lookup = function (code) {
-                let url = `${termServer}CodeSystem/$lookup?system=${snomed}&code=${code}`
-                $http.get(url).then(
-                    function (data) {
-                        console.log(data.data)
-                        //alert(data.data)
+            $scope.selectQfromVSList = function(Q) {
+                $scope.selectedQ = Q
+                $scope.dummyQR = {}
+                $scope.dummyFormData = {}
+            }
 
+            //refresh the list of Q that use a specific VS
+            $scope.refreshVsQList = function(url) {
+                let qry = `/term/findQusingVS?url=${url}`
+                $scope.showWaiting = true
+                $http.get(qry).then(function (data) {
+                    $scope.showWaiting = false
+                    $scope.qUsingVS = data.data
+                    if (Object.keys($scope.qUsingVS).length == 0) {
+                        alert("There currently are no forms using this ValueSet")
+                    }
+                    //console.log(data.data)
+                })
+            }
+
+
+            //whether to show a particular VS
+            $scope.showVS = function (item) {
+                let filter = $scope.input.filterlist
+                if (filter) {
+                    if (item.display.toLowerCase().indexOf(filter.toLowerCase()) > -1) {
+                        return true
+                    } else {
+                        return false
+                    }
+                } else {
+                    return true
+                }
+
+            }
+
+            $scope.lookup = function (code) {
+
+
+                let qry = `CodeSystem/$lookup?system=${snomed}&code=${code}`
+
+
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+
+                //$http.get(url).then(
+                    function (data) {
+                        //console.log(data.data)
+                        //alert(data.data)
+                        $scope.showWaiting = false
                         $uibModal.open({
                             templateUrl: 'modalTemplates/showParameters.html',
-                            backdrop: 'static',
+                            //backdrop: 'static',
                             //size : 'lg',
-                            controller: function($scope,parameters){
+                            controller : "showParametersCtrl",
+                            controllerDEP: function($scope,parameters){
                                 $scope.parameters = parameters
                             },
                             resolve: {
@@ -64,12 +109,7 @@ angular.module("pocApp")
                                 }
                             }
 
-                        }).result.then(
-                            function (vo) {
-
-
-                            }
-                        )
+                        })
 
 
                     }, function (err) {
@@ -275,6 +315,8 @@ angular.module("pocApp")
                 delete $scope.expandedVS
                 delete $scope.selectedVS
                 delete $scope.expandQry
+                delete $scope.qUsingVS
+                delete $scope.dummyQR
 
                 //let qry = `ValueSet.item.vs.id`
                 let qry = `ValueSet?url=${item.vs.url}&_summary=false`

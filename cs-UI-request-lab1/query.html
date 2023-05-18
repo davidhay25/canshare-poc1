@@ -35,9 +35,13 @@
     <script src="js/querySvc.js"></script>
     <script src="js/libs/vis.min.js"></script>
     <script src="js/makeLibraryQuery.js"></script>
+    <script src="js/showParameters.js"></script>
 
     <script src="directive/viewBundle/viewBundleDir.js"></script>
     <script src="directive/viewBundle/viewBundleSvc.js"></script>
+
+    <script src="directive/renderForm/renderFormDir.js"></script>
+    <script src="directive/renderForm/renderFormSvc.js"></script>
 
     <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
 
@@ -114,9 +118,12 @@
             <br/>
             <div class="row">
                 <div class="col-md-3">
+                    <input placeholder="Filter" type="text" class="form-control" ng-model="input.filterlist"/>
+                    <br/>
                     <div class="myScroll">
                         <div class="list-group">
                             <div ng-class="{'list-group-item':true,listItemSelected:selectedItem==item}"
+                                 ng-show="showVS(item)"
                                  style="cursor: pointer" ng-repeat="item in allVSItem" ng-click="selectVSItem(item)">
                                 {{item.display}}
 
@@ -128,6 +135,8 @@
                 <div class="col-md-9" ng-show="selectedVS">
                     <br/>
 
+                    <div class="banner"> {{selectedVS.description}}</div>
+                    <br/>
                     <uib-tabset>
                         <uib-tab heading="Json">
                             <br/>
@@ -165,7 +174,8 @@
                                         <tr><th>Display</th><th>Code</th><th>System</th></tr>
                                         <tr ng-repeat="concept in expandedVS.expansion.contains">
                                             <td>{{concept.display}}</td>
-                                            <td>{{concept.code}}</td>
+                                            <td>
+                                                <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
                                             <td>{{concept.system}}</td>
                                         </tr>
                                     </table>
@@ -178,6 +188,39 @@
 
 
 
+
+
+                        </uib-tab>
+                        <uib-tab heading="Forms where used">
+                            <br/>
+
+
+                            <button class="btn btn-link pull-right" ng-click="refreshVsQList(selectedVS.url)">Refresh</button>
+
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="list-group">
+                                        <div class="list-group-item"
+                                             ng-click="selectQfromVSList(v.Q)"
+                                             style="cursor: pointer"
+                                             ng-repeat="(k,v) in qUsingVS">
+                                            {{v.Q.title || v.Q.name}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <uib-tabset ng-show="selectedQ">
+                                        <uib-tab heading="Form">
+                                            <renderform  q="selectedQ" qr="dummyQR" form="dummyFormData"></renderform>
+                                        </uib-tab>
+                                        <uib-tab heading="Json">
+                                            <pre>{{selectedQ | json}}</pre>
+                                        </uib-tab>
+                                    </uib-tabset>
+
+                                </div>
+                            </div>
 
 
                         </uib-tab>

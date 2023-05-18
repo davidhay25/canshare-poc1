@@ -201,8 +201,49 @@ async function  makeVoFromQR(QR) {
 
 }
 
+//find all Q using a given valueset. todo: cache in some way as computationally expensive
+async function findQusingVS(vsUrl) {
+    console.log('vs url',vsUrl)
+    let qry = "Questionnaire"
+    let currentQUrl     //
+    let bundle = await this.singleQuery(qry)
+    let hashQ = {}   //the hash of Q where the VS is used - key url,  {url: item:[{linkId: text:]}
+
+    bundle.entry.forEach(function (entry) {
+
+        let Q = entry.resource
+        currentQ = Q     //set the url of the Q being examined
+        Q.item.forEach(function (section) {
+            processItem(section)
+        })
+    })
+
+    return hashQ
+
+    function processItem(item) {
+        if (item.answerValueSet){
+            console.log(item.answerValueSet,vsUrl)
+        }
+
+
+        if (item.answerValueSet && item.answerValueSet == vsUrl) {
+            console.log('hit')
+            hashQ[currentQ.url] = hashQ[currentQ.ur] || {Q:currentQ,items:[]}
+            hashQ[currentQ.url].items.push({linkId:item.linkId, text:item.text})
+        }
+
+        if (item.item) {
+            item.item.forEach(function (child) {
+                processItem(child)
+            })
+        }
+    }
+
+}
+
 module.exports = {
     multiQuery : multiQuery,
     singleQuery : singleQuery,
-    makeVoFromQR : makeVoFromQR
+    makeVoFromQR : makeVoFromQR,
+    findQusingVS : findQusingVS
 };

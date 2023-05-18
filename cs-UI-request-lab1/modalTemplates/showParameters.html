@@ -28,7 +28,30 @@
 
     </div>
     <div class="modal-body">
-        <pre>{{parameters | json}}</pre>
+        <uib-tabset>
+            <uib-tab heading="Json">
+                <pre>{{parameters | json}}</pre>
+            </uib-tab>
+            <uib-tab heading="Display">
+                <div class="row">
+                    <div class="col-sm-4 col-md-4">
+                        <div class="list-group">
+                            <div class="list-group-item"
+                                 ng-click="selectParameter(param)"
+                                 style="cursor: pointer" ng-repeat="param in parameters.parameter">
+                                {{param.name}}
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-8 col-md-8">
+                        <pre ng-show="selectedParameter">{{selectedParameter | json}}</pre>
+                    </div>
+                </div>
+
+            </uib-tab>
+        </uib-tabset>
+
     </div>
 
 
