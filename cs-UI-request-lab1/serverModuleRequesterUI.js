@@ -83,10 +83,16 @@ function setup(app,inDb) {
     //the request templates
     app.get('/requester/templates',async function(req,res){
 
+
         let qry = serverBase + "/Questionnaire?context=request&status=draft,active"
+
+
+
+
         try {
-            let response = await axios.get(qry)
-            let bundle = response.data
+            let bundle = await commonModule.singleQuery(qry)
+            //let response = await axios.get(qry)
+            //et bundle = response.data
             res.json(bundle)
         } catch (ex) {
             res.status(500).json(ex)

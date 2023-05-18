@@ -132,6 +132,7 @@
 
             <div ng-switch-when="choice">
 
+
                 <div ng-show = "cell.item.answerOption">
 
                     <div ng-show="cell.displayHint == 'radio-button' || cell.displayHint == 'radio'">
@@ -147,6 +148,13 @@
                         </span>
 
                     </div>
+
+                    <!--
+                    <div ng-show="cell.displayHint == 'lookup' ">
+
+
+                    </div>
+                    -->
 
                     <!-- Choice as checkboxes - https://www.npmjs.com/package/angular-bootstrap-checkbox -->
 
@@ -170,29 +178,10 @@
                         </div>
                         </div>
 
-
-
-
-
-                        <!--
-                         <span ng-repeat="option in cell.item.answerOption">
-                            <checkbox
-                                    ng-true-value = {{option}}
-                                    ng-false-value = ""
-                                    ng-change = makeQR()
-                                    ng-model="input.form[cell.item.linkId + '--' + $index]">
-
-                            </checkbox>
-                            {{option.valueCoding.display}}
-                        </span>
-                        -->
-
-
-
                     </div>
 
 
-                    <div ng-hide="cell.displayHint == 'radio-button' || cell.displayHint == 'radio' || cell.displayHint == 'check-box'">
+                    <div ng-hide="cell.displayHint == 'radio-button' || cell.displayHint == 'radio' || cell.displayHint == 'check-box' ">
 
                         <div class="row">
                             <div class="col-md-11 col-sm-11">
@@ -219,10 +208,12 @@
                     </div>
 
 
+
                 </div>
 
 
-            <div ng-show = "cell.item.answerValueSet">
+                <!-- currently if there is an answerValueSet, the answerOptions is populated...-->
+            <div ng-show = "false && cell.item.answerValueSet">
 
                 <div class="row">
                     <div class="col-md-10">
@@ -230,6 +221,7 @@
                         {{cell.meta.renderVS}}
 -->
                         <div ng-show = "cell.meta.renderVS == 'radio'">
+                            R
                             <span ng-repeat="option in cell.meta.expandedVSOptions">
                                 <input type="radio" value="{{option}}"
                                        ng-change="makeQR(cell.item.linkId)"
@@ -241,6 +233,7 @@
                         </div>
 
                         <div ng-show = "cell.meta.renderVS == 'lookup'">
+                            L
                             <input type="text" class = "form-control" ng-model="input.form[cell.item.linkId]"
                                    placeholder="Auto lookup after 3 characters"
                                    typeahead-min-length="3"
@@ -250,6 +243,7 @@
                         </div>
 
                         <div ng-hide="cell.meta.renderVS == 'radio' || cell.meta.renderVS == 'lookup'">
+                            O
                             <select class="form-control" ng-model="input.form[cell.item.linkId]"
                                     ng-focus="onFocus(cell)"
                                     ng-change="makeQR(cell.item.linkId)"

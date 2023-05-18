@@ -1168,8 +1168,48 @@ angular.module("formsApp")
                 // this function will populate cell.meta.expandedVSOptions
 
 
+                function fillFromValueSet(cell) {
+                    //ATM there could be both an answerValueSet and answerOptions - not strictly correct
+                    //If there is a ValueSet, then remove all the answerOptions in the active copy of the ve
 
-                function fillFromValueSet(cell,termServer) {
+
+                    if (cell.item.answerValueSet) {
+                        //todo: if there is a VS, then check the displayhint. If it's a lookup, then do nothing here - when
+                        //todo the control renders it will have the typeahead
+
+
+                        //if there's a vakueset then replace the item.answerOption with the expanded vs. todo - this is just a forst step...
+
+                        console.log(cell.item.answerValueSet)
+
+                        let qry = `ValueSet/$expand?url=${cell.item.answerValueSet}&displayLanguage=en-x-sctlang-23162100-0210105`
+                        console.log(qry)
+                        let encodedQry = encodeURIComponent(qry)
+
+                        $http.get(`nzhts?qry=${encodedQry}`).then(
+                            function (data) {
+                                let expandedVS = data.data
+                                if (expandedVS && expandedVS.expansion && expandedVS.expansion.contains) {
+                                    cell.item.answerOption = []
+
+                                    expandedVS.expansion.contains.forEach(function (concept) {
+                                        cell.item.answerOption.push({valueCoding:concept})
+                                    })
+                                }
+                                console.log(data.data)
+                            }, function (err) {
+
+                            }
+                        )
+
+
+
+                    }
+
+                }
+
+                //this is the original funciotn. superceeded.
+                function fillFromValueSetOriginal(cell,termServer) {
                     // console.log('fillFromVS',cell)
                     if (cell.item.answerOption) {
                         //ATM there can be both answerOption and answerValueSet as an artifact of authoring (strictly incorrect).

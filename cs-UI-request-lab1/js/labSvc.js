@@ -260,28 +260,43 @@ angular.module("pocApp")
                 let arAllAnswers = []
 
 
-                function getAnswersForSection(item) {
+                function getAnswersForSection(item,parentObservation) {
                     if (hashAnswers[item.linkId] && hashAnswers[item.linkId].length > 0) {
 
                         hashAnswers[item.linkId].forEach(function (answer) {
-                            //The 'code' element in the Observation is a CodepableConcept, whereal in the Q it is a Coding...
 
+
+                            //The 'code' element in the Observation is a CodeableConcept, whereal in the Q it is a Coding...
                             if (item.code) {
-                                code = {coding:[item.code[0]]}        //only use the first code in the Q
+
+                                //is this marked as an Observation extraction
+                                //if yes,
+
+
+                                let code = {coding:[item.code[0]]}        //only use the first code in the Q
                                 let obs = makeObservation(item.linkId,code,answer)
+
+                                //if there's a parent observation passed in, then create a hasMember reference from the parent to the new obs
+                                if (parentObservation) {
+                                    parentObservation.hasMember = parentObservation.hasMember || []
+                                    parentObservation.hasMember.push({reference:`urn:uuid:${obs.id}`})
+
+                                }
 
                                 bundle.entry.push(commonSvc.makePOSTEntry(obs))
                                 DR.result.push({reference:"urn:uuid:"+ obs.id})
 
                             }
 
+
                             arAllAnswers.push({linkId:item.linkId,text:item.text,answer:answer})
 
                         })
                     }
 
+                    //if there is a child item, then this is a group.
                     if (item.item) {
-                        item.item.forEach(function (child) {
+                        item.item.forEach(function (child,obs) {
                             getAnswersForSection(child)
                         })
                     }

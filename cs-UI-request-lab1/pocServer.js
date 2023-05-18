@@ -29,6 +29,8 @@ let express = require('express');
 //const fle = require("./samples/valenciaMay.json");
 let app = express();
 app.use(bodyParser.json({limit:'50mb',type:['application/json+fhir','application/fhir+json','application/json']}))
+app.use('/', express.static(__dirname,{index:'/poc.html'}));
+
 /*
 //disable any cache - https://stackoverflow.com/questions/22632593/how-to-disable-webpage-caching-in-expressjs-nodejs
 app.use((req, res, next) => {
