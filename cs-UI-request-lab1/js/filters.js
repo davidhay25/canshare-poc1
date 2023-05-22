@@ -1,5 +1,19 @@
 angular.module("pocApp")
 
+    .filter('lastInUrl',function(){
+        //return the last element in a url
+        //todo - there must be a more elegant way than this...
+        return function(url) {
+
+            if (url) {
+                let ar = url.split('/')
+                return ar[ar.length-1]
+            }
+
+
+        }
+    })
+
     .filter('cleanTextDiv',function(){
         //remove the <div  xmlns='http://www.w3.org/1999/xhtml'>{texthere}</div> tgs...
         //todo - there must be a more elegant way than this...

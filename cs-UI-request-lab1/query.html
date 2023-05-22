@@ -36,6 +36,7 @@
     <script src="js/libs/vis.min.js"></script>
     <script src="js/makeLibraryQuery.js"></script>
     <script src="js/showParameters.js"></script>
+    <script src="js/filters.js"></script>
 
     <script src="directive/viewBundle/viewBundleDir.js"></script>
     <script src="directive/viewBundle/viewBundleSvc.js"></script>
@@ -83,7 +84,9 @@
 
             <div class="col-md-4">
                 <div class="navbar-text">
+                    <!--
                     {{selectedServer.url}}
+                    -->
                 </div>
             </div>
 
@@ -111,7 +114,8 @@
     <uib-tabset>
 
 
-        <uib-tab heading="NZHTS query">
+        <uib-tab >
+            <uib-tab-heading>NZHTS ValueSets <span class="badge">{{allVSItem.length}}</span> </uib-tab-heading>
             <br/>
             <em>This tab will make queries against the New Zealand National Terminology server</em>
             <div ng-show="showLoadingMessage">Loading ValueSets, please wait...</div>
@@ -231,6 +235,133 @@
 
 
         </uib-tab>
+
+
+        <uib-tab heading="NZHTS analysis">
+            <br/>
+
+            <button ng-hide="rawAnalysis" class="btn btn-primary pull-right" ng-click="vsAnalysis()">Perform analysis</button>
+
+            <div ng-hide="rawAnalysis">
+                <p>Performs basic analytics on the CanShare ValueSets on the NZHTS server. Click the link to the right to
+                perform the analysis. Note that this can sometimes take 5-10 seconds to perform</p>
+
+                <p>Reports available:</p>
+                <ul>
+                    <li>A list of ValueSets with a count of the number of concepts in each. The ValueSet contents can be displayed.</li>
+                    <li>A list of concept showing the ValueSet/s they appear in. The ValueSet contents can be displayed.</li>
+                </ul>
+                <p>The reports can be quite long, so to look for a specific code or ValueSet, use the browser search
+                function - Control S or Command S - when the report is displayed.</p>
+
+            </div>
+
+            <uib-tabset ng-show="rawAnalysis">
+                <uib-tab heading="Count of concepts in each ValueSet">
+
+                    <br/>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div ng-show="rawAnalysis.vsLength">{{rawAnalysis.vsLength.length}} ValueSets</div>
+                            <br/>
+                            <div class="myScroll">
+                                <table class="table table-bordered table-condensed">
+                                    <tr ng-repeat="item in rawAnalysis.vsLength">
+                                        <td>
+                                            <div class="clickable" ng-click="expandFromAnalysis(item.url)">
+                                                {{item.url | lastInUrl}}
+                                            </div>
+                                        </td>
+                                        <td>{{item.title}}</td>
+                                        <td>{{item.expandedCount}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+
+                        </div>
+                        <div class="col-md-6" ng-show="expandedVSFromAnalysis">
+                            <div class="banner">{{expandedVSFromAnalysis.url}}</div>
+                            <uib-tabset>
+                                <uib-tab heading="Concepts">
+
+                                    <table class="table table-bordered table-condensed">
+                                        <tr><th>Display</th><th>Code</th><th>System</th></tr>
+                                        <tr ng-repeat="concept in expandedVSFromAnalysis.expansion.contains">
+                                            <td>{{concept.display}}</td>
+                                            <td>
+                                                <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
+                                            <td>{{concept.system}}</td>
+                                        </tr>
+                                    </table>
+                                </uib-tab>
+                                <uib-tab heading="Json">
+                                    <pre>{{expandedVSFromAnalysis | json}}</pre>
+                                </uib-tab>
+                            </uib-tabset>
+
+
+
+                        </div>
+                    </div>
+
+                </uib-tab>
+
+                <uib-tab heading="Concepts by ValueSet">
+                    <br/>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div ng-show="rawAnalysis.conceptVS">{{rawAnalysis.conceptCount}} Concepts</div>
+                            <br/>
+                            <div class="myScroll">
+                                <table class="table-condensed table table-bordered">
+                                    <tr><th>Code</th><th>Display</th><th>ValueSet</th></tr>
+                                    <tr ng-repeat="(k,v) in rawAnalysis.conceptVS">
+                                        <td>
+                                            <div  class="clickable" ng-click="lookup(v.concept.code)">{{v.concept.code}}</div></td>
+
+
+
+
+                                        </td>
+
+                                        <td>{{v.concept.display}}</td>
+                                        <td style="width: 50%">
+                                            <div ng-repeat = "vs in v.vs"  >
+                                                <div class="clickable" ng-click="expandFromAnalysisVS(vs)">{{vs | lastInUrl}}</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6" ng-show="expandedVSFromAnalysisVS">
+                            <div class="banner">{{expandedVSFromAnalysisVS.url}}</div>
+                            <table class="table table-bordered table-condensed">
+                                <tr><th>Display</th><th>Code</th><th>System</th></tr>
+                                <tr ng-repeat="concept in expandedVSFromAnalysisVS.expansion.contains">
+                                    <td>{{concept.display}}</td>
+                                    <td>
+                                        <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
+                                    <td>{{concept.system}}</td>
+                                </tr>
+                            </table>
+
+                        </div>
+                    </div>
+
+                </uib-tab>
+
+                <uib-tab heading="Json">
+                    <pre>{{rawAnalysis | json}}</pre>
+                </uib-tab>
+            </uib-tabset>
+
+
+
+        </uib-tab>
+
 
         <uib-tab ng-show="false" heading="ConceptMap">
             <br/>

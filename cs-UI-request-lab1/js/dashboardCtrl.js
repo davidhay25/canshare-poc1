@@ -146,6 +146,37 @@ angular.module("pocApp")
 
             }
 
+            $scope.validateSD = function (Q) {
+                $scope.SD = dashboardSvc.makeSD(Q)
+
+                $http.post('/validateSD',$scope.SD).then(
+                    function (data) {
+                        console.log(data)
+                        $scope.SDOutcome = data.data
+                    },function (err) {
+                        $scope.SDOutcome = err.data
+                        console.log(err)
+                    }
+                )
+            }
+
+            $scope.saveSD = function (Q) {
+                $scope.SD = dashboardSvc.makeSD(Q)
+                let qry = `http://hapi.fhir.org/baseR4/StructureDefinition/${$scope.SD.id}`
+                $http.put(qry,$scope.SD).then(
+                    function (data) {
+                        alert('saved to '+qry)
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+            }
+
+
+            $scope.makeSD = function (Q) {
+                $scope.SD = dashboardSvc.makeSD(Q)
+            }
+
             $scope.selectMiniQ = function (miniQ) {
                 $scope.selectedMiniQ = miniQ
                 delete $scope.selectedQfromDesigner

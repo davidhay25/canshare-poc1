@@ -7,7 +7,7 @@ angular.module("pocApp")
             $scope.setImageUrl = function (url) {
                 $scope.slideUrl = url
             }
-            $scope.slideUrl = 'images/canshare-1.png'
+            $scope.slideUrl = 'images/canshare-2.png'
 
         }
     )

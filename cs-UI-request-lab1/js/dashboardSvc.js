@@ -7,6 +7,107 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
 
     return {
 
+        makeSD : function (Q) {
+            //https://build.fhir.org/logical.html
+
+            let ctr = 0
+
+            let typeName = Q.name
+            typeName = typeName.replace(/-/g, "");
+
+
+            let urlBase = "http://canshare.co.nz/"
+
+            let SD = {resourceType:"StructureDefinition"}
+            SD.id = "canshare-" + typeName
+            let text = "Generated SD from Questionnaire"
+            SD.text = {status:"generated"}
+            SD.text.div = `<div xmlns="http://www.w3.org/1999/xhtml">${text}</div>`
+
+
+            SD.name = typeName
+            SD.fhirVersion = "4.0.1"
+            SD.version = "0.1"
+
+            SD.url =  `${urlBase}StructureDefinition/${typeName}`
+
+            SD.type= `${urlBase}StructureDefinition/${typeName}`  //`http://example.org/StructureDefinition/${typeName}` //type is required, otherwise we get a weird null access pointer
+
+         //   SD.title = "SD"
+          //  SD.purpose = "SD"
+
+            SD.status = "draft"
+            SD.kind = "logical"
+            SD.abstract = false
+            SD.description = "test"
+            SD.baseDefinition = "http://hl7.org/fhir/StructureDefinition/Element"  //was element
+            SD.derivation = "specialization"
+
+
+
+            SD.snapshot = {element:[]}
+
+            let rootED = {path:typeName,short:Q.name,id:typeName,min:1,max:"1"}
+            rootED.definition="def"
+
+            //rootED.type = [{code:'string'}]
+
+
+            SD.snapshot.element.push(rootED)
+
+            Q.item.forEach(function (section) {
+                processItem(section,typeName)
+
+            })
+
+
+            return SD
+
+            function processItem(item,path) {
+                let id = item.linkId.replace(/-/g, "");
+                id = id.replace(/\./g, "");
+                id = id.replace(/\(/g, "");
+                id = id.replace(/\)/g, "");
+                id = id.replace(/\'/g, "");
+                id = id.replace(/\’/g, "");
+
+
+                id = id.toLowerCase()
+
+                console.log(ctr++,id)
+
+                let pathOfThisElement = `${path}.${id}`
+                let ED = {path:pathOfThisElement}
+                ED.short = item.text
+                ED.type = [{code:'string'}]
+
+
+
+                ED.id = id
+                ED.definition = "Definition here"
+                ED.min=0
+
+                if (item.required) {
+                    ED.min = 1
+                }
+
+                ED.max = "1"
+                if (item.repeats) {
+                    ED.max = "*"
+                }
+
+                SD.snapshot.element.push(ED)
+                if (item.item) {
+                    item.item.forEach(function (child) {
+                        processItem(child,pathOfThisElement)
+                    })
+                }
+
+            }
+
+
+        },
+
         analyseRequestReport : async function(mqRequest,mqReport) {
             let deferred = $q.defer()
             //generate a comparison report between 2 miniQ

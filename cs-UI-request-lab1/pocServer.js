@@ -61,7 +61,6 @@ app.get('/validatorHints',function (req,res) {
 //validation.
 app.post('/validateBundle', async function (req,res) {
     let bundle = req.body
-//console.log(req.params.type)
     if (! bundle || ! bundle.entry) {
         res.status(400).json({msg:"Must contain a bundle. Is the content-type header set to 'application/json' "})
     } else {
@@ -72,14 +71,24 @@ app.post('/validateBundle', async function (req,res) {
         } catch (ex) {
             res.status(500).json(ex)
         }
-
     }
-
-
-
-
 })
 
+//validate a StructureDefiniton
+app.post('/validateSD', async function (req,res) {
+    let SD = req.body
+
+    let validationEP = `${serverBase}StructureDefinition/$validate`
+    console.log(validationEP)
+    try {
+        let response = await axios.post(validationEP,SD)
+        res.json(response.data)
+    } catch (ex) {
+        //console.log(ex.response.data)
+        res.status(400).json(ex.response.data)
+    }
+
+})
 
 
 app.get('/config', async function(req,res){
@@ -154,7 +163,7 @@ app.get('/proxy',async function(req,res){
 console.log(query)
     try {
         let bundle = await commonModule.singleQuery(query)
-        console.log(bundle)
+        //console.log(bundle)
         res.json(bundle)
     } catch (ex) {
 

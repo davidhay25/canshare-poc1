@@ -120,6 +120,70 @@ function setup(app) {
     //perform a query against the NZHTS.
     //right now, we get a new access token for each call - todo make more efficient
 
+    let cachedAnalysis;         //cache the analysis. Just for dev as I'm impatient
+
+    app.get('/analyseVS',async function(req,res){
+        if (cachedAnalysis) {
+            res.json(cachedAnalysis)
+        } else {
+            let token = await getNZHTSAccessToken()
+            if (token) {
+                let config = {headers:{authorization:'Bearer ' + token}}
+                config['content-type'] = "application/fhir+json"
+
+                let analysis = {vsLength:[],conceptVS:{}}
+
+                let qry = "https://authoring.nzhts.digital.health.nz/fhir/ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c"
+
+                axios.get(qry,config).then(async function(data) {
+                    let bundle = data.data      //all canshare vs
+                    for (const entry of bundle.entry) {
+                        let vs = entry.resource
+                        let qryVs = `https://authoring.nzhts.digital.health.nz/fhir/ValueSet/$expand?url=${vs.url}&displayLanguage=en-x-sctlang-23162100-0210105`
+                        let response = await axios.get(qryVs,config)
+                        let expandedVS = response.data
+
+                        if (expandedVS.expansion && expandedVS.expansion.contains) {
+                            analysis.vsLength.push({url:expandedVS.url,title:vs.title,expandedCount:expandedVS.expansion.contains.length})
+                            console.log(qryVs,expandedVS.url,expandedVS.expansion.contains.length)
+                            for (const concept of expandedVS.expansion.contains) {
+                                let key = `${concept.system}|${concept.code}|`
+                                analysis.conceptVS[key] = analysis.conceptVS[key] || {concept:concept,vs:[]}
+                                analysis.conceptVS[key].vs.push(expandedVS.url)
+                            }
+
+                            //now create the has of concept vs valueset
+
+                        } else {
+                            analysis.vsLength.push({url:expandedVS.url,expandedCount:0})
+                        }
+
+
+
+
+                    }
+                    cachedAnalysis = analysis
+                    res.json(analysis)
+
+
+                }).catch(function(ex) {
+                    console.log(ex)
+                    if (ex.response) {
+                        res.status(ex.response.status).json(ex.response.data)
+                    } else {
+                        res.status(500).json(ex)
+                    }
+
+                })
+
+
+            }
+
+        }
+
+
+    })
+
     app.get('/nzhts',async function(req,res){
         console.log(req.query.qry)
 

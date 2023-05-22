@@ -106,6 +106,9 @@ angular.module("pocApp")
                             resolve: {
                                 parameters: function () {
                                     return data.data
+                                },
+                                title : function () {
+                                    return `Concept lookup (${code})`
                                 }
                             }
 
@@ -270,6 +273,60 @@ angular.module("pocApp")
             //$scope.allVSItem.push({display:"Data Absent Reasons",url:"https://nzhts.digital.health.nz/fhir/ValueSet/canshare-data-absent-reason"})
 
 
+            $scope.vsAnalysis = function () {
+                let url = "/analyseVS"
+                $http.get(url).then(
+                    function (data) {
+                        $scope.rawAnalysis = data.data
+                        $scope.rawAnalysis.conceptCount = Object.keys($scope.rawAnalysis.conceptVS).length
+                    }
+                )
+            }
+
+
+
+
+            $scope.expandFromAnalysisVS = function (url) {
+                delete $scope.expandedVSFromAnalysisVS
+                let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=en-x-sctlang-23162100-0210105`
+
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        $scope.expandedVSFromAnalysisVS = data.data
+
+                    }, function (err) {
+
+                    }
+                ).finally(
+                    function () {
+                        $scope.showWaiting = false
+                    }
+                )
+            }
+
+            $scope.expandFromAnalysis = function (url) {
+
+                delete $scope.expandedVS
+                let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=en-x-sctlang-23162100-0210105`
+
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        $scope.expandedVSFromAnalysis = data.data
+                    }, function (err) {
+
+                    }
+                ).finally(
+                    function () {
+                        $scope.showWaiting = false
+                    }
+                )
+                
+            }
+
             //get the canshare valuesets from the TS
             $scope.showLoadingMessage = true
             querySvc.getValueSets().then(
@@ -279,6 +336,9 @@ angular.module("pocApp")
                     delete $scope.showLoadingMessage
                 }
             )
+
+
+
 
             $scope.expandVSInTS = function (vs) {
                 delete $scope.expandedVS

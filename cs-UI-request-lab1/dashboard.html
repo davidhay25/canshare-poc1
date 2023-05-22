@@ -155,6 +155,27 @@
                         <uib-tab heading="Json">
                             <pre>{{selectedQfromFS | json}}</pre>
                         </uib-tab>
+                        <uib-tab heading="As StructureDefinition">
+
+                            <uib-tabset>
+                                <uib-tab heading="Validate">
+                                    <button class="btn-link btn pull-right" ng-click="validateSD(selectedQfromFS)">Make SD & Validate</button>
+                                    <div class="clearfix"></div>
+                                    <pre>{{SDOutcome | json}}</pre>
+                                </uib-tab>
+
+                                <uib-tab heading="Json">
+                                    <button ng-show="SD" class="btn-link btn" ng-click="saveSD(selectedQfromFS)">Save SD</button>
+                                    <button class="btn-link btn pull-right" ng-click="makeSD(selectedQfromFS)">Make StructureDefinition</button>
+                                    <div class="clearfix"></div>
+                                    <pre>{{SD | json}}</pre>
+                                </uib-tab>
+                            </uib-tabset>
+
+
+
+
+                        </uib-tab>
                     </uib-tabset>
 
                 </div>
