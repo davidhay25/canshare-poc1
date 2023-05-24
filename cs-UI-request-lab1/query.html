@@ -162,7 +162,11 @@
                                 <div class="col-md-3">
                                     <input type="text" class="form-control" ng-model="input.filter" placeholder="Filter text"/>
                                 </div>
-                                <div class="col-md-5">
+                                <div class="col-md-3">
+                                    <div ng-show="expandedVS.expansion.contains">{{expandedVS.expansion.contains.length}} concepts</div>
+                                </div>
+
+                                <div class="col-md-2">
                                     <button class="btn btn-primary pull-right" ng-click="expandVSInTS(selectedVS)">Expand</button>
                                 </div>
                             </div>

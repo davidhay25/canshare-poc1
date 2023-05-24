@@ -162,14 +162,17 @@ angular.module("pocApp")
 
             $scope.saveSD = function (Q) {
                 $scope.SD = dashboardSvc.makeSD(Q)
-                let qry = `http://hapi.fhir.org/baseR4/StructureDefinition/${$scope.SD.id}`
-                $http.put(qry,$scope.SD).then(
-                    function (data) {
-                        alert('saved to '+qry)
-                    }, function (err) {
-                        alert(angular.toJson(err.data))
-                    }
-                )
+                if ($scope.SD) {
+                    let qry = `http://hapi.fhir.org/baseR4/StructureDefinition/${$scope.SD.id}`
+                    $http.put(qry,$scope.SD).then(
+                        function (data) {
+                            alert('saved to '+qry)
+                        }, function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+                }
+
             }
 
 

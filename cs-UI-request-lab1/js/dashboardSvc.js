@@ -12,9 +12,17 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
 
             let ctr = 0
 
-            let typeName = Q.name
-            typeName = typeName.replace(/-/g, "");
+            let typeName = Q.name || Q.title
+            typeName = makeSafeString(typeName)
+/*
+            if (! Q.name) {
+                alert("The 'name' field is missing in the Questionnaire. This is required.")
+                return
+            }
+*/
+            //typeName = typeName.replace(/-/g, "");
 
+            let hashId = {}   //a hash of paths that have been created. Used for de-duplicating
 
             let urlBase = "http://canshare.co.nz/"
 
@@ -23,9 +31,9 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
             let text = "Generated SD from Questionnaire"
             SD.text = {status:"generated"}
             SD.text.div = `<div xmlns="http://www.w3.org/1999/xhtml">${text}</div>`
+            SD.identifier = [{system:"http://canshare.co.nz/fhir/NamingSystem/logical-models",value:typeName}]
 
-
-            SD.name = typeName
+            SD.name = 'Cs_' + typeName
             SD.fhirVersion = "4.0.1"
             SD.version = "0.1"
 
@@ -52,7 +60,7 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
 
             //rootED.type = [{code:'string'}]
 
-
+            rootED.base = {path:rootED.path,min:rootED.min,max:rootED.max}
             SD.snapshot.element.push(rootED)
 
             Q.item.forEach(function (section) {
@@ -64,27 +72,51 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
             return SD
 
             function processItem(item,path) {
-                let id = item.linkId.replace(/-/g, "");
-                id = id.replace(/\./g, "");
-                id = id.replace(/\(/g, "");
-                id = id.replace(/\)/g, "");
-                id = id.replace(/\'/g, "");
-                id = id.replace(/\’/g, "");
+                //let id = makeSafeString(item.linkId)
+                let id = makeSafeString(item.text)
+                id = id.substring(0,64)
+
 
 
                 id = id.toLowerCase()
 
-                console.log(ctr++,id)
+                //check for uniqueness. If the id already exists then add a suffix
+                if (hashId[id]) {
+                    //this id has already been used (in the original it may have had special characters that have been removed
+                    let v = hashId[id]
+                    id = id  + "Cc" + v         //Cc are just strings that should be unused
+                    hashId[id] = v + 1
+                    console.log('dup')
+
+                } else {
+                    hashId[id] = 1
+                }
+
+
 
                 let pathOfThisElement = `${path}.${id}`
                 let ED = {path:pathOfThisElement}
                 ED.short = item.text
+
+
+
+
                 ED.type = [{code:'string'}]
 
+                switch (item.type) {
+                    case 'choice' :
+                        ED.type[0].code = "CodeableConcept"
+                        break;
+                    case 'boolean' :
+                        ED.type[0].code = "boolean"
+                        break;
+
+                }
+                console.log(ctr++,id,hashId[id],item.type)
 
 
                 ED.id = id
-                ED.definition = "Definition here"
+                ED.definition = item.text   //todo - maybe look in description?
                 ED.min=0
 
                 if (item.required) {
@@ -96,6 +128,8 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
                     ED.max = "*"
                 }
 
+                ED.base = {path:ED.path,min:ED.min,max:ED.max}
+
                 SD.snapshot.element.push(ED)
                 if (item.item) {
                     item.item.forEach(function (child) {
@@ -103,6 +137,33 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
                     })
                 }
 
+            }
+            
+            function makeSafeString(s) {
+                if (s) {
+                    s = s.replace(/-/g, "");
+                    s = s.replace(/\./g, "");
+                    s = s.replace(/\,/g, "");
+                    s = s.replace(/\(/g, "");
+                    s = s.replace(/\)/g, "");
+                    s = s.replace(/\'/g, "");
+                    s = s.replace(/\’/g, "");
+                    s = s.replace(/\?/g, "");
+
+                    s = s.replace(/ /g, "");
+                    s = s.replace(/\//g, "");
+                    s = s.replace(/\:/g, "");
+                    s = s.replace(/\%/g, "");
+                    s = s.replace(/\_/g, "");
+                    s = s.replace(/\#/g, "");
+                    s = s.replace(/\–/g, "");
+                    s = s.replace(/\;/g, "");
+
+                    return s
+                } else {
+                    return ""
+                }
+                
             }
 
 
