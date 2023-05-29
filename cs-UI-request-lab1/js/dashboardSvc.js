@@ -4,8 +4,8 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
     //let designerServer = "http://canshare.co.nz:9099/baseR4/"   //actually the public server ATM
     let designerServer = "http://test.canshare.co.nz:9099/baseR4/"   //actually the public server ATM
 
-
     return {
+
 
         makeSD : function (Q) {
             //https://build.fhir.org/logical.html

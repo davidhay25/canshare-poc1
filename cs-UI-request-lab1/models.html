@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>Logical Model</title>
+
+    <style>
+        #graph {
+            width: 100%;
+            height: 400px;
+            border: 1px solid lightgray;
+        }
+    </style>
+
+    <script src="js/libs/jquery-1.9.0.min.js"></script>
+    <script src="js/libs/angular.min1-5.js"></script>
+    <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+    <script src="js/libs/moment.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+
+    <script>
+        angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage']).config(function($locationProvider) {
+            $locationProvider.html5Mode(true);
+            $locationProvider.hashPrefix('!');
+        });
+        angular.module("pocApp").constant("moment", moment);
+
+        angular.module("formsApp",[])
+        angular.module('topApp', ['pocApp', 'formsApp'])
+
+    </script>
+
+
+
+    <script src="js/libs/ngStorage.min.js"></script>
+
+    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
+    <script src="js/libs/jstree.min.js"></script>
+
+    <script src="js/modelsCtrl.js"></script>
+    <script src="js/modelsSvc.js"></script>
+
+    <script src="js/libs/vis.min.js"></script>
+
+    <script src="js/filters.js"></script>
+<!--
+
+   <script src="js/querySvc.js"></script>
+
+  <script src="js/makeLibraryQuery.js"></script>
+    <script src="js/showParameters.js"></script>
+
+    <script src="directive/viewBundle/viewBundleDir.js"></script>
+    <script src="directive/viewBundle/viewBundleSvc.js"></script>
+
+    <script src="directive/renderForm/renderFormDir.js"></script>
+    <script src="directive/renderForm/renderFormSvc.js"></script>
+
+    -->
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+
+
+
+</head>
+<body style="padding: 8px;padding-top: 80px">
+<div ng-app="topApp" ng-controller="modelsCtrl" class="container-fluid">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+        <div class="container-fluid">
+            <div class="col-md-2 col-sm-2">
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            Logical models
+                        </a>
+                    </span>
+
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <div class="navbar-text">
+
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="navbar-text">
+                    <!--
+                    <select class="form-control" ng-model="svr" ng-change="selectServer(svr)"
+                            ng-options="svr.display for svr in allServers">
+
+                    </select>
+                    -->
+
+
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="navbar-text">
+                    <!--
+                    {{selectedServer.url}}
+                    -->
+                </div>
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <form class="navbar-form navbar-left">
+                    <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+
+                </form>
+            </div>
+
+
+
+            <div class="col-md-2">
+                <a href="https://teaho.govt.nz/" target="_blank">
+                    <img width="150" height="auto" class="pull-right"
+                         style="padding: 3px"
+                         src="images/TAK-logo-midgreen.png"/>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div>
+        <button class="pull-right btn-link btn" ng-click="resetWorld()">Reset</button>
+
+        <a class="btn pull-right" target="_blank" href="https://docs.google.com/spreadsheets/d/1XU7Jc0BbC5nXgmTu-qVLS-WwJjKO9GLXgjVHVk2WRL0/edit#gid=0">Spreadsheet</a>
+
+
+
+
+
+    </div>
+
+    <uib-tabset>
+
+
+        <uib-tab heading="Compositions and datagroups">
+
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="myScroll">
+                        <uib-accordion close-others="true" >
+
+                            <div uib-accordion-group class="panel-default" is-open="true">
+                                <uib-accordion-heading>
+                                    <span ng-click="accordianOpened('composition')">Compositions</span>
+
+                                </uib-accordion-heading>
+
+                                <div class="list-group">
+                                    <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
+                                         ng-click="selectModel(v)"
+                                         ng-repeat="(k,v) in world.compositions">
+                                        {{v.title}}
+
+                                        <div ng-show="v.parent" class="pull-right">
+                                            ({{v.parent}})
+                                        </div>
+                                        <div><em>{{k}}</em></div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div uib-accordion-group class="panel-default">
+                                <uib-accordion-heading>
+                                    <span ng-click="accordianOpened('datagroup')">DataGroups</span>
+                                </uib-accordion-heading>
+
+                                <div class="list-group">
+                                    <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
+                                         ng-click="selectModel(v)"
+                                         ng-repeat="(k,v) in world.dataGroups">
+                                        {{v.title}}
+                                        <div><em>{{k}}</em></div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div uib-accordion-group class="panel-default">
+                                <uib-accordion-heading>
+                                    <span ng-click="accordianOpened('valueset')">ValueSets</span>
+                                </uib-accordion-heading>
+
+                                <div class="list-group">
+                                    <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
+                                         ng-click="selectModel(v)"
+                                         ng-repeat="(k,v) in world.valueSets">
+                                        {{v.title}}
+                                        <div><em>{{k}}</em></div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </uib-accordion>
+                    </div>
+
+
+
+                </div>
+                <!--
+                <div class="col-md-3">
+
+                    <div ng-show="selectedModel">
+                        <div class="banner">{{selectedModel.name}} </div>
+                        <pre>{{selectedModel | json}}</pre>
+                    </div>
+
+
+
+
+                </div>
+                -->
+
+                <div class="col-md-9" ng-show="selectedModel.kind == 'vs'">
+                    <br/>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <pre>{{selectedModel | json}}</pre>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-bordered">
+                                <tr><th>Display</th><th>Code</th></tr>
+                                <tr ng-repeat="concept in selectedModel.concepts">
+                                    <td>{{concept.display}}</td>
+                                    <td>{{concept.code}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-9" ng-show="selectedModel.kind == 'comp' || selectedModel.kind == 'dg'">
+                    <br/>
+                    <div class="pull-right">
+                        <checkbox ng-model="input.showFullModel" ng-click="updateFullModelShow()"></checkbox> Show expanded model
+                    </div>
+                    <uib-tabset>
+                        <uib-tab heading="Table">
+                            <em class="pull-right">The model as a table. Expanded if the checkbox is selected</em>
+
+                            <div ng-show = "selectedModel.parent">
+                                <strong class="pull-left">Profiles: {{selectedModel.parent}}</strong>
+                            </div>
+
+                            <table class="table-bordered table">
+                                <tr><th>Path</th><th>Title</th><th>Type</th><th>Mult.</th><th>Code</th></tr>
+                                <tr ng-repeat="element in fullElementList">
+
+                                    <td>{{element.path}}</td>
+                                    <td>{{element.title}}</td>
+                                    <td>
+                                        <div ng-repeat="type in element.type">
+                                            {{type}}
+                                        </div>
+                                        <div><em class="clickable" ng-click="showVS(element.valueSet)">{{element.valueSet}}</em></div>
+                                    </td>
+                                    <td>{{element.mult}}</td>
+                                    <td>
+                                        <div ng-repeat="code in element.code">
+                                            {{code.code}}
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            </table>
+                        </uib-tab>
+                        <uib-tab heading="Json">
+                            <em>The definition for this model (not expanded)</em>
+                            <pre>{{selectedModel | json}}</pre>
+                        </uib-tab>
+
+                        <uib-tab heading="Tree">
+                            <em>The model as a tree. Expanded if the checkbox is selected</em>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div id="compositionTree"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <pre>{{selectedNode.data.ed | json}}</pre>
+
+                                    <div ng-hide="input.showFullModel" && selectedNode.data>
+                                        Add new element
+
+                                        <div>
+                                            <input type="text" class="form-control" ng-model="input.newName" placeholder="Name of element">
+                                        </div>
+
+                                        <div>
+                                        <select class="form-control" ng-model="input.newType"
+                                                ng-options="k for k in input.arTypes"></select>
+                                        </div>
+                                        <div ng-show="input.newType && input.newName">
+                                            <button class="btn btn-link pull-right"
+                                                    ng-click="addElement(input.newName,input.newType)">Add item</button>
+                                        </div>
+
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+
+                        </uib-tab>
+
+
+                        <uib-tab heading="Graph" select="fitGraph()">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div id="graph"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <pre>{{selectedModelFromGraph | json}}</pre>
+                                </div>
+                            </div>
+
+
+                        </uib-tab>
+
+                        <uib-tab ng-show="false" heading="Json">
+                            <em>All the elements in a 'flattened' list (like a StructureDefinition).</em>
+                            <pre>{{fullElementList | json}}</pre>
+                        </uib-tab>
+
+
+
+                    </uib-tabset>
+
+
+                </div>
+            </div>
+
+<!--
+            <div class="row">
+                <div class="col-md-6">
+                    <pre>{{compositions | json}}</pre>
+                </div>
+                <div class="col-md-6">
+                    <pre>{{dataGroups | json}}</pre>
+                </div>
+            </div>
+            -->
+        </uib-tab>
+
+        <uib-tab>
+            <uib-tab-heading>
+                Errors <span class="badge">{{errors.length}}</span>
+            </uib-tab-heading>
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-bordered">
+                        <tr ng-repeat="row in errors">
+                            <td>
+                                <div style="cursor: pointer" ng-click="input.errorModel = row.model">{{row.msg}}</div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <pre>{{input.errorModel | json}}</pre>
+                </div>
+            </div>
+
+
+            <pre>{{errors | json}}</pre>
+        </uib-tab>
+
+        <uib-tab heading="The world">
+            <uib-tabset>
+                <br/>
+                <uib-tab heading="Type usage summary">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="myScroll">
+                                <table class="table-bordered table">
+                                    <tr><th>Type</th>
+                                        <th>
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    Source type
+                                                </div>
+                                                <div class="col-md-9">
+                                                    Path in source
+                                                </div>
+                                            </div>
+                                        </th></tr>
+                                    <tr ng-repeat="(k,v) in analysis">
+                                        <td>{{k}}</td>
+                                        <td>
+                                            <div ng-repeat="item in v">
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <div class="clickable"
+                                                             ng-click="selectModelFromTypeUsage(item.model)">{{item.model.name}}</div>
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        {{item.path}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <pre>{{selectedModelFromTypeUsage | json}}</pre>
+                        </div>
+                    </div>
+
+
+
+
+                </uib-tab>
+                <uib-tab heading="Json">
+                    <pre>{{world | json}}</pre>
+                </uib-tab>
+            </uib-tabset>
+
+        </uib-tab>
+
+    </uib-tabset>
+
+
+
+
+
+
+
+
+</div>
+</body>
