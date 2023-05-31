@@ -27,7 +27,7 @@
             </span>
 
             <div ng-hide = "cell.item.type == 'boolean'">
-                {{cell.item.prefix}}. <span ng-class="{bold:false,required:cell.required}"
+                {{cell.item.prefix}}<span ng-show="cell.item.prefix">.</span> <span ng-class="{bold:false,required:cell.required}"
                       style="cursor: pointer"
                       ng-click="showItemDetails(cell.item,cell.meta)">{{cell.item.text}}</span>
 

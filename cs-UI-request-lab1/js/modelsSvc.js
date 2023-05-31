@@ -7,6 +7,78 @@ angular.module("pocApp")
 
            // findUsageOf
 
+            makeQfromModel : function(model, types) {
+                //make a Q that represents a model
+                //all the top level elements on the model are a section
+                //if an element below that has childre it is a group
+                //todo - doesn't follow parent chain...
+
+                let Q = {title:model.title,name:model.name,status:'draft',item:[]}         //an object that will become a Q
+
+                //process an ed
+                function processSection(item,DG,pathRoot) {
+                    //add all the children of the DG to the item. If a child has children, call recursively
+                    if (DG.diff) {
+                        DG.diff.forEach(function (ed) {
+                            //find the ed in the set of types
+                            if (ed.type) {
+                                let type = ed.type[0]
+                                let m = types[type]
+                                if (m) {
+                                    if (m.diff) {
+                                        //there are child elements
+                                        let nextPathRoot = `${pathRoot}.${ed.path}`
+                                        let groupItem = {linkId:nextPathRoot,text:ed.title,type:'group'}
+                                        item.item = item.item || []
+                                        item.item.push(groupItem)
+                                        processSection(groupItem,m,nextPathRoot)
+
+
+                                    } else {
+                                        //add the item
+                                        let itemToAdd = {linkId:`${pathRoot}.${ed.path}` ,text:ed.title}
+                                        itemToAdd.type = 'string'
+                                        item.item = item.item || []
+                                        item.item.push(itemToAdd)
+                                    }
+                                }
+
+                            } else {
+                                console.log(`Type ${type} not found`)
+                            }
+
+                        })
+                    }
+                }
+
+                //iterate through the top level. These will be sections in the Q
+                //for now, assume that all of the top level entries in a model are
+                //references to DG / compositions. Perhaps any 'non types' could be in an 'other' section
+                if (model.diff) {
+                    model.diff.forEach(function (ed) {
+                        let section = {linkId:`section-${ed.path}`,text:ed.title}
+                        Q.item.push(section)
+                        let type = ed.type[0]
+                        let childModel = types[type]
+                        if (childModel) {
+                            processSection(section,childModel,ed.path)
+                        } else {
+                            console.log(`Type ${type} not found`)
+                        }
+
+                    })
+                }
+
+
+
+                return Q
+
+
+
+
+
+            },
+
             analyseWorld : function(world,types) {
                 //find references between structures
                 let that = this
@@ -82,7 +154,7 @@ angular.module("pocApp")
                 })
                 //{compositions:hashCompositions,dataGroups:hashDataGroups,valueSets:hashVS}
 
-                console.log(hashTarget)
+               // console.log(hashTarget)
 
             },
 
@@ -106,7 +178,7 @@ angular.module("pocApp")
                     treeData.push(node)
                 }
 
-                console.log(treeData)
+                //console.log(treeData)
                 return treeData
 
 
@@ -121,6 +193,8 @@ angular.module("pocApp")
 
                 let arNodes = []      //for the graph
                 let arEdges = []      //for the graph
+
+               // let q = {item:[]}
 
                 //first follow the parental hierarchy to populate the initial list
                 //updates allElements as it extracts
@@ -182,8 +256,6 @@ angular.module("pocApp")
                     } else {
                         arNodes.push(node);
                     }
-
-
                 }
 
 
@@ -205,9 +277,9 @@ angular.module("pocApp")
 
                     //do parents first.
                     if (model.parent && followReferences) {
-                        console.log('expanding ' + model.parent)
+                      //  console.log('expanding ' + model.parent)
                         if (types[model.parent]) {
-                            console.log(types[model.parent])
+                         //   console.log(types[model.parent])
 
                             //create the 'parent' link
                             let edge = {id: 'e' + arEdges.length +1,
@@ -228,15 +300,15 @@ angular.module("pocApp")
 
                     if (model.diff) {
                         model.diff.forEach(function (ed) {
-                            console.log(ed.path)
+                            //console.log(ed.path)
                             if (ed.type && ed.type.length > 0) {
                                 let type = ed.type[0]   //only look at the first code
-                                console.log(type)
+                                //console.log(type)
                                 if (types[type]) {
                                     //this is a known type. Is there a definition for this type (ie do we need to expand it)
                                     let childDefinition = types[type]
 
-                                    console.log(childDefinition)
+                                    //console.log(childDefinition)
 
                                     if (childDefinition.diff && followReferences) {
                                         //if there is a diff element in the type, then it can be expanded
@@ -251,7 +323,7 @@ angular.module("pocApp")
                                             label: ed.path,arrows : {to:true}}
                                         arEdges.push(edge)
 
-                                        console.log('expanding child: ' + childDefinition.name)
+                                        //console.log('expanding child: ' + childDefinition.name)
                                         let clone = angular.copy(ed)
                                         clone.path = pathRoot + "." + ed.path
                                         addToList(clone)
@@ -310,7 +382,7 @@ angular.module("pocApp")
                 addToHash(vo.compositions)
                 addToHash(vo.valueSets)     //treat vs as a type for the purposes of validation
 
-                console.log(types)
+               // console.log(types)
 
                 //now check all the models individually
                 Object.keys(hash).forEach(function (key) {
@@ -454,6 +526,7 @@ angular.module("pocApp")
                 //DG familymember hostory
                 let dgFMH = {kind:"dg",name:'fmh',title:"Family member history",diff:[]}
                 dgFMH.diff.push({path:'code',title:'Condition code',type:['CodeableConcept'],mult:'1..1'})
+                dgFMH.diff.push({path:'relation',title:'Relationship',type:['CodeableConcept'],mult:'1..1'})
                 hashDataGroups[dgFMH.name] = dgFMH
 
                 //DG assessment
@@ -520,14 +593,12 @@ angular.module("pocApp")
 
                 //--------  Composition for Breast biopsy - 'is-a' Path request
                 let compBreastBiopsy = {kind:"comp",name:'breast-biopsy',parent:"path-request",title: "Breast biopsy",diff:[]}
-                compBreastBiopsy.diff.push({path:'structure',type:['CodeableConcept'],valueSet:"http://bodysite/breastBiopsyRequestStructure"})
+                //compBreastBiopsy.diff.push({path:'structure',type:['CodeableConcept'],valueSet:"http://bodysite/breastBiopsyRequestStructure"})
 
 
                 compBreastBiopsy.diff.push({path:'specimen.bodysite.structure',type:["CodeableConcept"], valueSet:"breast-biopsy-bodysite"})
 
-
-
-                compBreastBiopsy.diff.push({path:'dummyBiopsy',type:["string"]})
+                compBreastBiopsy.diff.push({path:'added-element',type:["string"]})
                 hashCompositions[compBreastBiopsy.name] = compBreastBiopsy
 
                 //--------------Composition for Breast frozen section - 'is-a' Path request

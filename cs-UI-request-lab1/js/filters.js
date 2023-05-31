@@ -14,6 +14,25 @@ angular.module("pocApp")
         }
     })
 
+    .filter('dropFirstInPath',function(){
+        return function (path) {
+            if (path) {
+                let ar = path.split('.')
+                ar.splice(0, 1)
+                return ar.join('.')
+            }
+        }
+    })
+
+    .filter('pathindent', function() {
+        return function(path) {
+            if (path) {
+                var ar = path.split('.');
+                return 10 * (ar.length -1 );
+            }
+        }
+    })
+
     .filter('cleanTextDiv',function(){
         //remove the <div  xmlns='http://www.w3.org/1999/xhtml'>{texthere}</div> tgs...
         //todo - there must be a more elegant way than this...

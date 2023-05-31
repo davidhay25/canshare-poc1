@@ -51,6 +51,10 @@
     <script src="js/libs/vis.min.js"></script>
 
     <script src="js/filters.js"></script>
+    <script src="js/editModelCtrl.js"></script>
+
+    <script src="directive/renderForm/renderFormSvc.js"></script>
+    <script src="directive/renderForm/renderFormDir.js"></script>
 <!--
 
    <script src="js/querySvc.js"></script>
@@ -162,16 +166,20 @@
                                     <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
                                          ng-click="selectModel(v)"
                                          ng-repeat="(k,v) in world.compositions">
-                                        {{v.title}}
+
+
+                                        <i class="glyphicon glyphicon-edit pull-right clickable"
+                                           ng-click="editModel(v)"></i>
+                                        <div>{{v.title}}</div>
+                                        <em>{{k}}</em>
 
                                         <div ng-show="v.parent" class="pull-right">
                                             ({{v.parent}})
                                         </div>
-                                        <div><em>{{k}}</em></div>
 
                                     </div>
                                 </div>
-
+                                <div><button class="btn btn-link" ng-click="newModel('comp')">New Composition</button> </div>
                             </div>
 
                             <div uib-accordion-group class="panel-default">
@@ -183,9 +191,16 @@
                                     <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
                                          ng-click="selectModel(v)"
                                          ng-repeat="(k,v) in world.dataGroups">
-                                        {{v.title}}
-                                        <div><em>{{k}}</em></div>
 
+                                        <i class="glyphicon glyphicon-edit pull-right clickable"
+                                           ng-click="editModel(v)"></i>
+
+                                        {{v.title}}
+
+                                        <div><em>{{k}}</em></div>
+<!--
+                                        <div class="clickable" ng-click="editModel(v)"><em>{{k}}</em></div>
+-->
                                     </div>
                                 </div>
 
@@ -213,19 +228,7 @@
 
 
                 </div>
-                <!--
-                <div class="col-md-3">
 
-                    <div ng-show="selectedModel">
-                        <div class="banner">{{selectedModel.name}} </div>
-                        <pre>{{selectedModel | json}}</pre>
-                    </div>
-
-
-
-
-                </div>
-                -->
 
                 <div class="col-md-9" ng-show="selectedModel.kind == 'vs'">
                     <br/>
@@ -261,9 +264,18 @@
 
                             <table class="table-bordered table">
                                 <tr><th>Path</th><th>Title</th><th>Type</th><th>Mult.</th><th>Code</th></tr>
-                                <tr ng-repeat="element in fullElementList">
+                                <tr ng-repeat="element in fullElementList" ng-hide="$index==0">
 
-                                    <td>{{element.path}}</td>
+                                    <td>
+                                        <div  ng-style="{ 'padding-left': (element.path | pathindent) }">
+                                            {{element.path | dropFirstInPath}}
+
+
+
+                                        </div>
+
+
+                                    </td>
                                     <td>{{element.title}}</td>
                                     <td>
                                         <div ng-repeat="type in element.type">
@@ -337,6 +349,22 @@
 
                         </uib-tab>
 
+                        <uib-tab heading="Questionnaire">
+                            <uib-tabset>
+                                <uib-tab heading="Form">
+                                    <renderform q="Qobject" qr="QR"></renderform>
+                                </uib-tab>
+                                <uib-tab heading="Json">
+                                    <pre>{{Qobject | json}}</pre>
+                                </uib-tab>
+                            </uib-tabset>
+
+
+
+
+
+                        </uib-tab>
+
                         <uib-tab ng-show="false" heading="Json">
                             <em>All the elements in a 'flattened' list (like a StructureDefinition).</em>
                             <pre>{{fullElementList | json}}</pre>
@@ -391,7 +419,7 @@
                 <uib-tab heading="Type usage summary">
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-8">
                             <div class="myScroll">
                                 <table class="table-bordered table">
                                     <tr><th>Type</th>
@@ -425,7 +453,7 @@
                             </div>
 
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <pre>{{selectedModelFromTypeUsage | json}}</pre>
                         </div>
                     </div>

@@ -1,10 +1,11 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
-        function ($scope,$http,$localStorage,modelsSvc,$timeout) {
+        function ($scope,$http,$localStorage,modelsSvc,$timeout,$uibModal) {
 
             //$scope.localStorage = $localStorage
 
             $scope.input = {}
+            $scope.input.showFullModel = true
 
             $localStorage.world = modelsSvc.getDemo()
                 /*
@@ -25,9 +26,65 @@ angular.module("pocApp")
             $scope.world = $localStorage.world      //so world can be accessed from html page
 
 
+            //create a new model
+            $scope.newModel = function(kind) {
+                let newModel = {kind:kind}
+                $scope.editModel(newModel,true)
+            }
 
-           // $scope.compositions = world.compositions
-          //  $scope.dataGroups = world.dataGroups
+            //edit an existing model
+            $scope.editModel = function (model,isNew) {
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/editModel.html',
+                    backdrop: 'static',
+                    size : 'lg',
+                    controller : "editModelCtrl",
+
+                    resolve: {
+                        model: function () {
+                            return model
+                        },
+                        hashTypes: function () {
+                            return $scope.input.types
+                        },
+                        hashValueSets : function() {
+                            return $scope.world.valueSets
+                        },
+                        isNew: function () {
+                            return isNew
+                        }
+                    }
+
+                }).result.then(function (newModel) {
+                    if (newModel) {
+                        //if a model is returned, then it is a new one and needs to be added to the world
+
+
+                        if (newModel.kind == 'comp') {
+                            $scope.world.compositions[newModel.name] = newModel
+                        } else {
+                            $scope.world.dataGroups[newModel.name] = newModel
+                        }
+
+                        let vo1 = modelsSvc.validateModel($localStorage.world)
+                        $scope.errors = vo1.errors
+                        $scope.input.types = vo1.types      //a hash keyed by name
+
+                        //a hash by type of all elements that reference it
+                        $scope.analysis = modelsSvc.analyseWorld($scope.world,$scope.input.types)
+
+                        $scope.selectModel(newModel)
+
+                    } else {
+                        //the model may have been updated - select it to refresh the various tabs
+                        //note this is the model passed in for editing
+                        $scope.selectModel(model)
+                    }
+
+                })
+
+            }
 
             // validate the model. This retruns a hash of all types defined in the model as well as errors
             let vo1 = modelsSvc.validateModel($localStorage.world)
@@ -36,8 +93,27 @@ angular.module("pocApp")
 
             //a hash by type of all elements that reference it
             $scope.analysis = modelsSvc.analyseWorld($scope.world,$scope.input.types)
+
+
             $scope.selectModelFromTypeUsage = function (model) {
                 $scope.selectedModelFromTypeUsage = model
+            }
+
+            //drop the first element in the path - used by the table display
+            $scope.condensedPathDEP = function (path) {
+                if (path) {
+                    let ar = path.split('.')
+                    ar.splice(0,1)
+                    return  ar.join('.')
+                    /*
+                    let padding = ""
+                    for (var i = 0; i < ar.length; i++) {
+                        padding += "&nbsp;&nbsp;"
+                    }
+
+                    return  padding + ar.join('.')
+                    */
+                }
             }
 
             //$scope.input.arTypes = []
@@ -51,7 +127,8 @@ angular.module("pocApp")
 
             }
 
-            $scope.input.showFullModel = true
+
+
             $scope.updateFullModelShow = function () {
                 //when the 'show full model' checkbox is checked
                 delete $scope.selectedNode
@@ -85,6 +162,9 @@ angular.module("pocApp")
                 clearB4Select()
                 $scope.selectedModel = comp
 
+                $scope.Qobject = modelsSvc.makeQfromModel(comp,$scope.input.types)
+                $scope.QR = {}
+
                 let vo = modelsSvc.getFullListOfElements(comp,$scope.input.types,$scope.input.showFullModel)
 
                 //modelsSvc.getFullListOfElements(comp,$scope.input.types,$scope.input.showFullModel)
@@ -97,6 +177,8 @@ angular.module("pocApp")
 
                 let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
                 makeTree(treeData)
+
+
             }
 
            // $scope.selectDataGroup = function (comp) {
