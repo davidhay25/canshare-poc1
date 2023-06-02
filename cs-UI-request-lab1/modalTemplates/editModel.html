@@ -5,6 +5,13 @@
         .model-vlg {
 
         }
+        .overridden {
+            font-weight: bold;
+        }
+
+        .required {
+            color:red
+        }
     </style>
     <div class="modal-header">
         <div class="row">
@@ -96,95 +103,203 @@
             </uib-tab>
 
             <uib-tab heading="Base model content">
-                <em>Content directly defined by this model</em>
+                <em class="pull-right">Content directly defined by this model</em>
 
-                <table class="table table-bordered">
-                    <tr><th>Path</th><th>Title</th><th>Type</th><th>Code</th><th>Card.</th><th>Move</th><th>Edit</th></tr>
-                    <tr ng-repeat="element in model.diff">
-                        <td>{{element.path}}</td>
-                        <td>{{element.title}}</td>
-                        <td>
-                            <div ng-repeat="type in element.type">
-                                {{type}}
+                <uib-tabset>
+                    <uib-tab heading="Table">
+                        <table class="table table-bordered">
+                            <tr><th>Path</th><th>Title</th><th>Type</th><th>Code</th><th>Card.</th><th>Move</th><th>Delete</th></tr>
+                            <tr ng-repeat="element in model.diff">
+                                <td>{{element.path}}</td>
+                                <td>{{element.title}}</td>
+                                <td>
+                                    <div ng-repeat="type in element.type">
+                                        {{type}}
 
-                            </div>
+                                    </div>
 
-                            <div ng-show="element.valueSet">
-                                {{element.valueSet}}
-                            </div>
+                                    <div ng-show="element.valueSet">
+                                        {{element.valueSet}}
+                                    </div>
 
-                        </td>
-                        <td>
-                            <div ng-repeat="code in element.code">
-                                {{code.code}}
-                            </div>
-                        </td>
-                        <td>{{element.mult}}</td>
-                        <td>
+                                </td>
+                                <td>
+
+                                    <div ng-repeat="code in element.code">
+                                        {{code.code}}
+                                    </div>
+
+                                </td>
+                                <td>{{element.mult}}</td>
+                                <td>
                             <span ng-show="$index > 0">
                                 <i class="glyphicon glyphicon-arrow-up pull-right clickable"
                                    ng-click="moveUp($index)"></i>
                             </span>
-                            <span ng-show="$index < model.diff.length -1">
+                                    <span ng-show="$index < model.diff.length -1">
                                 <i class="glyphicon glyphicon-arrow-down clickable"
                                    ng-click="moveDn($index)"></i>
                             </span>
-                        </td>
-                        <td>
-                            <i style="color: red" class="glyphicon glyphicon-remove clickable"
-                               ng-click="remove($index)"></i>
+                                </td>
+                                <td>
+                                    <i style="color: red" class="glyphicon glyphicon-remove clickable"
+                                       ng-click="remove($index)"></i>
 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input class="form-control" type="text" ng-model="input.path"/></td>
-                        <td><input class="form-control" type="text" ng-model="input.title"/></td>
-                        <td>
-                            <select class="form-control" ng-model="input.type"
-                                ng-options = "type for type in input.types">
-                            </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input class="form-control" type="text" ng-model="input.path"/></td>
+                                <td><input class="form-control" type="text" ng-model="input.title"/></td>
+                                <td>
+                                    <select class="form-control" ng-model="input.type"
+                                            ng-options = "type for type in input.types">
+                                    </select>
 
-                            <div ng-show ="input.type == 'CodeableConcept'">
-                                <select class="form-control" ng-model="input.valueSet"
-                                        ng-options = "type for type in input.valueSets">
-                                </select>
+                                    <div ng-show ="input.type == 'CodeableConcept'">
+                                        <select class="form-control" ng-model="input.valueSet"
+                                                ng-options = "type for type in input.valueSets">
+                                        </select>
+                                    </div>
+
+                                </td>
+                                <td><input class="form-control" type="text" ng-model="input.code"/></td>
+                                <td><select class="form-control" ng-model="input.card"
+                                            ng-options = "card for card in input.cards"></select></td>
+                                <td></td>
+                                <td>
+                                    <i style="color: green" class="glyphicon glyphicon-ok clickable"
+                                       ng-show="input.path && input.title && input.type"
+                                       ng-click="add()"></i>
+                                </td>
+
+                            </tr>
+
+
+                        </table>
+                    </uib-tab>
+                    <uib-tab heading="List">
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="list-group">
+                                    <div class="list-group-item" ng-repeat="element in model.diff">
+                                        {{element.path}}
+                                    </div>
+                                </div>
                             </div>
+                        </div>
 
-                        </td>
-                        <td><input class="form-control" type="text" ng-model="input.code"/></td>
-                        <td><select class="form-control" ng-model="input.card"
-                                    ng-options = "card for card in input.cards"></select></td>
-                        <td></td>
-                        <td>
-                            <i style="color: green" class="glyphicon glyphicon-ok clickable"
-                               ng-show="input.path && input.title && input.type"
-                               ng-click="add()"></i>
-                        </td>
-
-                    </tr>
+                    </uib-tab>
+                </uib-tabset>
 
 
-                </table>
 
             </uib-tab>
             <uib-tab heading="Expanded model">
-                <br/>
+                <em class="pull-right">Expanded from parent/s</em>
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <ul class="list-unstyled">
-                            <li ng-style="{ 'padding-left': (element.path | pathindent) }"
 
-                                ng-repeat="element in allElements">
-                                <div ng-click="selectElement(element)" class="clickable" style="cursor: pointer">
-                                    {{element.path | dropFirstInPath}}</div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-md-6">
-                        <pre>{{selectedElement | json}}</pre>
-                    </div>
-                </div>
+                <uib-tabset>
+                    <uib-tab heading="Table">
+                        <table class="table table-bordered">
+                            <tr><th>Path</th><th>Title</th><th>Type</th><th>Code</th><th>Card.</th></tr>
+                            <tr ng-repeat="element in allElements" ng-class = "{required:isRequired(element),overridden: hasBeenOverridden(element)}">
+                                <td>
+                                    {{element.path | dropFirstInPath}}
+                                </td>
+                                <td>{{element.title}}</td>
+                                <td>
+                                    <div ng-repeat="type in element.type">
+                                        {{type}}
+
+                                    </div>
+
+                                    <div ng-show="element.valueSet">
+                                        {{element.valueSet}}
+                                    </div>
+
+                                </td>
+                                <td>
+
+                                    <div ng-repeat="code in element.code">
+                                        {{code.code}}
+                                    </div>
+
+                                </td>
+                                <td>{{element.mult}}</td>
+
+                            </tr>
+                        </table>
+
+                    </uib-tab>
+                    <uib-tab heading="List">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li ng-style="{ 'padding-left': (element.path | pathindent) }"
+
+                                        ng-repeat="element in allElements">
+                                        <div ng-click="selectElement(element)" class="clickable" style="cursor: pointer">
+
+                                    <span ng-class = "{required:isRequired(element),overridden: hasBeenOverridden(element)}">
+                                        {{element.path | dropFirstInPath}}
+
+                                    </span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <pre>{{selectedElement | json}}</pre>
+                                <br/>
+                                <div ng-show="selectedElementOverridden">
+                                    <div class="alert alert-info">
+                                        This element has been defined in this model,
+                                        replacing the original definition. Click the button below to remove that override
+                                        and replace the element with the original
+                                        <br/> <br/>
+                                        <button class="btn btn-danger pull-right" ng-click="removeOverride(selectedElement)">Remove Override</button>
+                                        <div class="clearfix"/>
+                                    </div>
+
+
+                                </div>
+                                <div ng-show="selectedElement && ! selectedElementOverridden && (selectedElement.type[0] == 'CodeableConcept')">
+                                    <div><strong>Override the ValueSet for this element</strong></div>
+                                    <br/>
+                                    <input type="text" class="form-control" placeholder="VS Url or name" ng-model="input.newVS"/>
+
+                                    <!--
+                                                                <div class="row">
+                                                                    <div class="col-md-3">
+                                                                        Change ValueSet
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <input type="text" class="form-control" placeholder="VS Url or name" ng-model="input.newVS"/>
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        todo: dropdown with named vs
+                                                                    </div>
+                                                                </div>
+                                                                -->
+                                    <br/>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <button class="btn btn-primary pull-right" ng-click = "applyOverride(selectedElement,input.newVS)">Apply override</button>
+
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+
+
+                            </div>
+                        </div>
+                    </uib-tab>
+                </uib-tabset>
+
 
             </uib-tab>
             <uib-tab heading="Json">

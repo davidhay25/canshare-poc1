@@ -47,8 +47,90 @@ angular.module("pocApp")
                 $scope.isUnique = (ar.length == 0) //temp
             }
 
+            $scope.isRequired = function (element) {
+                if (element.mult && element.mult.substring(0,1) == 1) {
+                    return true
+                }
+
+            }
+
+            //return true if there is an override element in the model for this path..
+            $scope.hasBeenOverridden = function(element) {
+                //the path in the model.diff won't have the first field
+                let ar = element.path.split('.')
+
+                if (ar.length == 2){
+                    return false // defined in the model
+                }
+                ar.splice(0,1)
+                let pathToCompare = ar.join('.')
+                let result = false
+                $scope.model.diff.forEach(function (e) {
+                    if (e.path == pathToCompare) {
+                        result = true
+                    }
+                })
+                return result
+            }
+
+
+            //select an element from the expanded elements list
             $scope.selectElement = function (element) {
-                $scope.selectedElement = element
+                //delete $scope.selectedOverrideElement
+                //locate the element in the allElements array. This is that setting/removing override can update the contents
+
+                for (const el of $scope.allElements) {
+                    if (el.path == element.path) {
+                        $scope.selectedElementOverridden = $scope.hasBeenOverridden(el)
+                        $scope.selectedElement = el
+                        break
+                    }
+                }
+            }
+
+
+            $scope.applyOverride = function (element,vsUrl) {
+                let newElement = angular.copy(element)
+                let ar = element.path.split('.')
+                ar.splice(0,1)
+                newElement.path = ar.join('.')
+                newElement.valueSet = vsUrl
+                $scope.model.diff.push(newElement)
+                //rebuild the all elements
+                let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
+                console.log(vo)
+                $scope.allElements = vo.allElements
+
+                $scope.selectElement(element)
+
+            }
+
+            $scope.removeOverride = function (element) {
+                if (confirm("Are you sure you wish to remove this Override, returning the definition to the original")) {
+                    let ar = element.path.split('.')
+                    ar.splice(0,1)
+                    let pathToCompare = ar.join('.')
+                    let pos = -1
+                    $scope.model.diff.forEach(function (e,inx) {
+                        if (e.path == pathToCompare) {
+                            pos=inx
+                        }
+                    })
+                    if (pos > -1) {
+                        $scope.model.diff.splice(pos,1)
+                        delete $scope.selectedElementOverridden
+
+                        //rebuild the all elements
+                        let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
+                        console.log(vo)
+                        $scope.allElements = vo.allElements
+
+                        $scope.selectElement(element)
+
+                    }
+                }
+
+
             }
 
             //add a new item

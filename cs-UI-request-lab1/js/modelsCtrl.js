@@ -8,13 +8,13 @@ angular.module("pocApp")
             $scope.input.showFullModel = true
 
             $localStorage.world = modelsSvc.getDemo()
-                /*
+
             if (! $localStorage.world) {
                 $localStorage.world = modelsSvc.getDemo()
             } else {
                 //$scope.world = modelsSvc.getDemo()
             }
-*/
+
             $scope.resetWorld = function () {
                 //not working
                 if (confirm("Are you wish to restore to the default demo state")) {
