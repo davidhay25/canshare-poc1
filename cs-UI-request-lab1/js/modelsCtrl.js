@@ -29,7 +29,6 @@ angular.module("pocApp")
 
             }
 
-           // $localStorage.world = $localStorage.world      //so world can be accessed from html page
 
             //Generate a bundle of SD's to save on a FHIR server
             //each model (comp or dg) will be an SD
@@ -40,14 +39,21 @@ angular.module("pocApp")
             $scope.validateBundle = function (bundle) {
 
 
+                delete $scope.lmValidate
                 let qry = "http://hapi.fhir.org/baseR4/Bundle/$validate"
                 $http.post(qry,bundle).then(
                     function (data) {
                         $scope.lmValidate = data.data
+                        $scope.lmValidateSummary = modelsSvc.summarizeValidation(data.data,bundle)
+
                     }, function (err) {
                         $scope.lmValidate = err.data
+                        $scope.lmValidateSummary = modelsSvc.summarizeValidation(data.data,bundle)
                     }
                 )
+
+
+
                 /*
                 return
 

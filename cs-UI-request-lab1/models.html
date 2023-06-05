@@ -543,20 +543,72 @@
         </uib-tab>
 
         <uib-tab heading="LM StructureDefinitions">
+            <button class="btn-link btn pull-right" ng-click="makeBundle()">Make Bundle</button>
+            <button ng-show="lmBundle" class="btn-link btn pull-right" ng-click="validateBundle(lmBundle)">Validate</button>
 
+            <div class="clearfix"></div>
 
+            <uib-tabset>
+                <uib-tab heading="Bundle">
+                    <pre>{{lmBundle | json}}</pre>
+                </uib-tab>
 
+                <uib-tab heading="Validation" ng-show="lmValidateSummary">
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="list-group">
+                            <div class="list-group-item"
+                                 ng-click="input.selectedValidationResource = resource"
+                                 ng-repeat="resource in lmValidateSummary.resources">
+                                <div class="pull-right badge"> {{resource.issues.length}}</div>
+                                {{resource.resource.name}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <pre>{{input.selectedValidationResource.issues | json}}</pre>
+                        <pre>{{input.selectedValidationResource.resource | json}}</pre>
+                    </div>
+                </div>
+                </uib-tab>
+
+            </uib-tabset>
+
+<!--
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <button class="btn-link btn pull-right" ng-click="makeBundle()">Make Bundle</button>
                     <div class="clearfix"></div>
                     <pre>{{lmBundle | json}}</pre>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-7">
                     <div ng-show="lmBundle">
                         <button class="btn-link btn pull-right" ng-click="validateBundle(lmBundle)">Validate</button>
                         <div class="clearfix"></div>
-                        {{lmValidateStatus}}
+
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="list-group">
+                                    <div class="list-group-item"
+                                         ng-click="input.selectedIssues = resource.issues"
+                                         ng-repeat="resource in lmValidateSummary.resources">
+                                        <div class="pull-right badge"> {{resource.issues.length}}</div>
+                                        {{resource.resource.name}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <pre>{{input.selectedIssues | json}}</pre>
+
+                            </div>
+                        </div>
+
+
+
+
+<hr/>
+                        {{lmValidateSummary}}
                         <pre>{{lmValidate | json}}</pre>
                     </div>
 
@@ -564,7 +616,7 @@
                 </div>
             </div>
 
-
+-->
 
 
         </uib-tab>

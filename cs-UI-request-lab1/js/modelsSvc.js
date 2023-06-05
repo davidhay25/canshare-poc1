@@ -7,6 +7,75 @@ angular.module("pocApp")
 
         return {
 
+            summarizeValidation : function(OO,bundle) {
+                //todo - do we need this???
+                //present the validation issues in the OO with the bundle entry
+                //copied from commonSvc, removing the Q specific stuff
+
+                //let cloneBundle = angular.copy()    //we're going to add issues directly to the resource...
+
+                //create an index of resources in the bundle
+                let totalErrors = 0
+                let lstResources = []
+                let unknownIssues = []      //issues that can't be associated with a specific resource
+                let enhancedErrors = []     //errors with improved notification
+
+                //let hashResources = {}
+
+
+                if (bundle && bundle.entry) {
+                    bundle.entry.forEach(function (entry,inx) {
+                        lstResources.push({resource:entry.resource,pos:inx,issues:[]})
+                    })
+                }
+
+
+                //add all the issues in the OO to the list
+                if (OO && OO.issue) {
+                    OO.issue.forEach(function (iss) {
+                        if (iss.location) {
+                            let loc = iss.location[0]
+                            let ar = loc.split('[')
+                            if (ar.length > 1) {
+                                let l = ar[1]   // 2].resource
+                                let g = l.indexOf(']')
+                                let pos = l.slice(0,g)
+                                //console.log(pos,loc)
+
+                                let item = {severity:iss.severity,location:loc,pos:pos,diagnostics:iss.diagnostics}
+
+                                if (iss.severity == 'error') {
+                                    totalErrors++
+                                }
+
+                                let resourceAtIndex = lstResources[pos]
+                                if (resourceAtIndex) {
+                                    resourceAtIndex.issues.push(item)
+                                }
+
+
+
+                            } else {
+                                unknownIssues.push(iss)
+                            }
+
+
+                        } else {
+                            //this is an OO with no location. I didn't think this should happen & we don't know which resource caused it...
+                            unknownIssues.push(iss)
+                        }
+
+                    })
+                }
+
+
+                return {resources:lstResources,totalErrors:totalErrors,unknownIssues:unknownIssues,enhancedErrors:enhancedErrors}
+
+
+
+            },
+
+
             fhirDataTypes : function(){
                 return ['string','CodeableConcept','CodeableConcept','Quantity','HumanName','dateTime','Identifier']
             },
@@ -16,11 +85,15 @@ angular.module("pocApp")
             createLMBundle : function (world) {
                 let fhirDataTypes = this.fhirDataTypes()
                 let urlBase = "http://canshare.co.nz/fhir/StructureDefinition"
-                let bundle = {resourceType:"Bundle",type:"collection",entry:[]}
+                let bundle = {resourceType:"Bundle",type:"transaction",entry:[]}
                 let merged = angular.copy({...world.compositions, ...world.dataGroups})     //all EDs
                 Object.keys(merged).forEach(function (key) {
                     let model = merged[key]
                     let SD = {resourceType:"StructureDefinition"}
+
+                    SD.text = {status:'generated'}
+                    SD.text.div = `<div xmlns="http://www.w3.org/1999/xhtml">Logical model for ${model.title}</div>`
+
                     SD.id = `canshare-${model.name}`
                     SD.url = `${urlBase}/${model.name}`
                     SD.kind = "logical"
@@ -538,50 +611,50 @@ angular.module("pocApp")
 
                 //---------- DataGroups
                 //DataGroup for patient
-                let dgPatient = {kind:"dg",name:'patient',title:"Patient data group",diff:[]}
+                let dgPatient = {kind:"dg",name:'Patient',title:"Patient data group",diff:[]}
                 dgPatient.diff.push({path:'name',title:'Patient name',type:['HumanName']})
                 dgPatient.diff.push({path:'gender',title:'Gender',type:['CodeableConcept'],valueSet:"https://genderoptions"})
                 dgPatient.diff.push({path:'nhi',title:'NHI number',type:['Identifier']})
                 hashDataGroups[dgPatient.name] = dgPatient
 
                 //DataGroup bodysite
-                let dgBodySite = {kind:"dg",name:'body-site',title:"BodySite",diff:[]}
+                let dgBodySite = {kind:"dg",name:'BodySite',title:"Body site",diff:[]}
                 dgBodySite.diff.push({path:'structure',title:"Structure",type:['CodeableConcept'],code:[{code:'code1'}],valueSet:"https://bodysite/alloptions"}) //will be overwritten
                 hashDataGroups[dgBodySite.name] = dgBodySite
 
                 //DG generic specimen
-                let dgSpecimen = {kind:"dg",name:'specimen',title:"Specimen",diff:[]}
+                let dgSpecimen = {kind:"dg",name:'Specimen',title:"Specimen",diff:[]}
                 dgSpecimen.diff.push({path:'type',title:'Specimen type',type:['CodeableConcept']})
                 dgSpecimen.diff.push({path:'collected',title:'When collected',type:['dateTime']})
-                dgSpecimen.diff.push({path:'bodysite',title:'Body site',type:['body-site']})
+                dgSpecimen.diff.push({path:'bodysite',title:'Body site',type:['BodySite']})
                 hashDataGroups[dgSpecimen.name] = dgSpecimen
 
                 //DG history
-                let dgHistory = {kind:"dg",name:'history',title:"History",diff:[]}
-                dgHistory.diff.push({path:'co-morbidity',title:'Co-morbidities',type:['condition'],mult:'0..*'})
-                dgHistory.diff.push({path:'family',title:'Family history',type:['fmh'],mult:'0..*'})
+                let dgHistory = {kind:"dg",name:'History',title:"History",diff:[]}
+                dgHistory.diff.push({path:'coMorbidity',title:'Co-morbidities',type:['Condition'],mult:'0..*'})
+                dgHistory.diff.push({path:'family',title:'Family history',type:['Fmh'],mult:'0..*'})
                 hashDataGroups[dgHistory.name] = dgHistory
 
                 //DG condition
-                let dgCondition= {kind:"dg",name:'condition',title:"Condition",diff:[]}
+                let dgCondition= {kind:"dg",name:'Condition',title:"Condition",diff:[]}
                 dgCondition.diff.push({path:'code',title:'Condition code',type:['CodeableConcept'],mult:'1..1'})
                 hashDataGroups[dgCondition.name] = dgCondition
 
-                //DG familymember hostory
-                let dgFMH = {kind:"dg",name:'fmh',title:"Family member history",diff:[]}
+                //DG familymember history
+                let dgFMH = {kind:"dg",name:'Fmh',title:"Family member history",diff:[]}
                 dgFMH.diff.push({path:'code',title:'Condition code',type:['CodeableConcept'],mult:'1..1'})
                 dgFMH.diff.push({path:'relation',title:'Relationship',type:['CodeableConcept'],mult:'1..1'})
                 hashDataGroups[dgFMH.name] = dgFMH
 
                 //DG assessment
-                let dgAssess = {kind:"dg",name:'assessment',title:"Assessment",diff:[]}
+                let dgAssess = {kind:"dg",name:'Assessment',title:"Assessment",diff:[]}
                 dgAssess.diff.push({path:'behaviour',title:'Behaviour',type:['CodeableConcept'],mult:'0..1'})
-                dgAssess.diff.push({path:'primary-bodysite',title:'Primary bodysite',type:['body-site'],mult:'0..1'})
-                dgAssess.diff.push({path:'secondary-bodysite',title:'Secondary bodysite',type:['body-site'],mult:'0..1'})
+                dgAssess.diff.push({path:'primaryBodysite',title:'Primary bodysite',type:['BodySite'],mult:'0..1'})
+                dgAssess.diff.push({path:'secondaryBodysite',title:'Secondary bodysite',type:['BodySite'],mult:'0..1'})
                 dgAssess.diff.push({path:'morphology',title:'Morphology',type:['CodeableConcept'],mult:'0..1'})
-                dgAssess.diff.push({path:'gradingsystem',title:'Grading system',type:['CodeableConcept'],mult:'0..1'})
+                dgAssess.diff.push({path:'gradingSystem',title:'Grading system',type:['CodeableConcept'],mult:'0..1'})
                 dgAssess.diff.push({path:'grade',title:'Grade',type:['CodeableConcept'],mult:'0..1'})
-                dgAssess.diff.push({path:'stagesystem',title:'Stage system',type:['CodeableConcept'],mult:'0..1'})
+                dgAssess.diff.push({path:'stageSystem',title:'Stage system',type:['CodeableConcept'],mult:'0..1'})
                 dgAssess.diff.push({path:'stage',title:'Stage',type:['CodeableConcept'],mult:'0..1'})
                 dgAssess.diff.push({path:'prognosticSystem',title:'Prognostic system',type:['CodeableConcept'],mult:'0..1'})
                 dgAssess.diff.push({path:'prognosis',title:'Prognosis',type:['CodeableConcept'],mult:'0..1'})
@@ -621,10 +694,10 @@ angular.module("pocApp")
                 //===================Compositions
                 //Base composition for Path request
                 let compPathRequest = {kind:"comp",name:'PathRequest',title: "Pathology request",diff:[]}
-                compPathRequest.diff.push({path:'patient',title:"Patient",type:['patient'],mult:'1..1'})
-                compPathRequest.diff.push({path:'history',title:"History",type:['history'],mult:'0..*'})
-                compPathRequest.diff.push({path:'specimen',title:"Specimen",type:['specimen'],mult:'0..*'})
-                compPathRequest.diff.push({path:'assessment',title:"Assessment",type:['assessment'],mult:'0..*'})
+                compPathRequest.diff.push({path:'patient',title:"Patient",type:['Patient'],mult:'1..1'})
+                compPathRequest.diff.push({path:'history',title:"History",type:['History'],mult:'0..*'})
+                compPathRequest.diff.push({path:'specimen',title:"Specimen",type:['Specimen'],mult:'0..*'})
+                compPathRequest.diff.push({path:'assessment',title:"Assessment",type:['Assessment'],mult:'0..*'})
 
                 //override the 'structure' path. completely replaces the  in the parent
                 //compPathRequest.diff.push({path:'structure',type:["CodeableConcept"], valueSet:"all-bodysite"})
@@ -636,17 +709,17 @@ angular.module("pocApp")
 
 
                 //--------  Composition for Breast biopsy - 'is-a' Path request
-                let compBreastBiopsy = {kind:"comp",name:'breast-biopsy',parent:"PathRequest",title: "Breast biopsy",diff:[]}
+                let compBreastBiopsy = {kind:"comp",name:'BreastBiopsy',parent:"PathRequest",title: "Breast biopsy",diff:[]}
                 //compBreastBiopsy.diff.push({path:'structure',type:['CodeableConcept'],valueSet:"http://bodysite/breastBiopsyRequestStructure"})
 
 
                 compBreastBiopsy.diff.push({path:'specimen.bodysite.structure',type:["CodeableConcept"], valueSet:"breast-biopsy-bodysite"})
 
-                compBreastBiopsy.diff.push({path:'added-element',type:["string"]})
+                compBreastBiopsy.diff.push({path:'addedElement',type:["string"]})
                 hashCompositions[compBreastBiopsy.name] = compBreastBiopsy
 
                 //--------------Composition for Breast frozen section - 'is-a' Path request
-                let compBreastFrozen = {kind:"comp",name:'breast-frozen',parent:"PathRequest",title: "Breast frozen section",diff:[]}
+                let compBreastFrozen = {kind:"comp",name:'BreastFrozen',parent:"PathRequest",title: "Breast frozen section",diff:[]}
                 //compBreastFrozen.diff.push({path:'structure',type:['CodeableConcept'],valueSet:"http://bodysite/breastFrozenRequestStructure"})
 
                 //compBreastFrozen.diff.push({path:'specimen',type:['specimen-frozen']})
