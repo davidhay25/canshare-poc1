@@ -5,6 +5,8 @@ angular.module("pocApp")
             $scope.input = {}
             $scope.isNew = isNew        //if new, then allow the model metadata to be set
 
+
+
             //create a list of potential parent types for a new composition
             $scope.input.possibleParents = []
             Object.keys(hashTypes).forEach(function (key) {
@@ -36,8 +38,20 @@ angular.module("pocApp")
             $scope.input.cards = ["0..1","1..1","0..*",'1..*']
             $scope.input.card = $scope.input.cards[0]
 
+            $scope.tabSelected = function (tab) {
+                $scope.selectedTab = tab
+            }
+
             $scope.setModelAttribute = function(attribute,value) {
                 $scope.model[attribute] = value
+            }
+
+            $scope.canEdit = function (element) {
+                //can the element be overridden - ie it comes from a referenced datatype not defined directly on the model
+                let ar = element.path.split('.')
+                if (ar.length > 2) {
+                    return true
+                }
             }
 
             $scope.checkName = function (name) {

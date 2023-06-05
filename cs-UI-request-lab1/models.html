@@ -52,6 +52,7 @@
 
     <script src="js/filters.js"></script>
     <script src="js/editModelCtrl.js"></script>
+    <script src="js/editVSCtrl.js"></script>
 
     <script src="directive/renderForm/renderFormSvc.js"></script>
     <script src="directive/renderForm/renderFormDir.js"></script>
@@ -179,7 +180,9 @@
 
                                     </div>
                                 </div>
-                                <div><button class="btn btn-link" ng-click="newModel('comp')">New Composition</button> </div>
+                                <div>
+                                    <button class="btn btn-link" ng-click="newModel('comp')">New Composition</button>
+                                </div>
                             </div>
 
                             <div uib-accordion-group class="panel-default">
@@ -202,6 +205,10 @@
                                         <div class="clickable" ng-click="editModel(v)"><em>{{k}}</em></div>
 -->
                                     </div>
+                                </div>
+
+                                <div>
+                                    <button class="btn btn-link" ng-click="newModel('dg')">New DataGroup</button>
                                 </div>
 
                             </div>
@@ -232,20 +239,41 @@
 
                 <div class="col-md-9" ng-show="selectedModel.kind == 'vs'">
                     <br/>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <pre>{{selectedModel | json}}</pre>
-                        </div>
-                        <div class="col-md-6">
-                            <table class="table table-bordered">
-                                <tr><th>Display</th><th>Code</th></tr>
-                                <tr ng-repeat="concept in selectedModel.concepts">
-                                    <td>{{concept.display}}</td>
-                                    <td>{{concept.code}}</td>
-                                </tr>
-                            </table>
-                        </div>
+
+                    <div ng-controller="editVSCtrl">
+                        <uib-tabset>
+                            <uib-tab heading="Table">
+
+                                <div class="row">
+                                    <div class="col-md-2">Name</div>
+                                    <div class="col-md-10">{{selectedModel.name}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-2">Title</div>
+                                    <div class="col-md-10">{{selectedModel.title}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-2">Url</div>
+                                    <div class="col-md-10">{{selectedModel.url}}</div>
+                                </div>
+                                <br/>
+                                <table class="table table-bordered">
+                                    <tr><th>Display</th><th>Code</th></tr>
+                                    <tr ng-repeat="concept in selectedModel.concepts">
+                                        <td>{{concept.display}}</td>
+                                        <td>{{concept.code}}</td>
+                                    </tr>
+                                </table>
+                            </uib-tab>
+                            <uib-tab heading="Json">
+                                <pre>{{selectedModel | json}}</pre>
+                            </uib-tab>
+                        </uib-tabset>
                     </div>
+
+
+
+
 
                 </div>
 
@@ -268,7 +296,14 @@
 
                                     <td>
                                         <div  ng-style="{ 'padding-left': (element.path | pathindent) }">
-                                            {{element.path | dropFirstInPath}}
+                                           <!-- {{element.path | dropFirstInPath}} -->
+                                            <div ng-hide="input.showFullModel">
+                                                {{element.path | dropFirstInPath}}
+                                            </div>
+                                            <div ng-show="input.showFullModel">
+                                                {{element.path | lastInPath}}
+
+                                            </div>
 
 
 
@@ -342,7 +377,45 @@
                                     <div id="graph"></div>
                                 </div>
                                 <div class="col-md-6">
-                                    <pre>{{selectedModelFromGraph | json}}</pre>
+                                    <uib-tabset ng-show="selectedModelFromGraph">
+                                        <uib-tab heading="Table">
+
+                                            <div class="row">
+                                                <div class="col-md-2">Name:</div>
+                                                <div class="col-md-10">{{selectedModelFromGraph.name}}</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-2">Title:</div>
+                                                <div class="col-md-10">{{selectedModelFromGraph.title}}</div>
+                                            </div>
+
+
+                                            <br/>
+                                            <table class="table-bordered table table-condensed">
+                                                <tr><th>Path</th><th>Type</th><th>Card.</th></tr>
+                                                <tr ng-repeat="ed in selectedModelFromGraph.diff">
+                                                    <td>{{ed.path}}</td>
+                                                    <td>{{ed.type[0]}}
+                                                        <div class="clickable"><em>{{ed.valueSet}}</em></div>
+                                                    </td>
+                                                    <!--
+                                                    <td>
+                                                        <div ng-repeat="code in code">
+                                                            {{code}}
+                                                        </div>
+                                                    </td>
+                                                    -->
+                                                    <td>{{ed.mult}}</td>
+                                                </tr>
+                                            </table>
+
+                                        </uib-tab>
+                                        <uib-tab heading="Json">
+                                            <pre>{{selectedModelFromGraph | json}}</pre>
+                                        </uib-tab>
+                                    </uib-tabset>
+
+
                                 </div>
                             </div>
 
@@ -413,7 +486,7 @@
             <pre>{{errors | json}}</pre>
         </uib-tab>
 
-        <uib-tab heading="The world">
+        <uib-tab heading="Full model">
             <uib-tabset>
                 <br/>
                 <uib-tab heading="Type usage summary">
@@ -468,6 +541,42 @@
             </uib-tabset>
 
         </uib-tab>
+
+        <uib-tab heading="LM StructureDefinitions">
+
+
+
+            <div class="row">
+                <div class="col-md-6">
+                    <button class="btn-link btn pull-right" ng-click="makeBundle()">Make Bundle</button>
+                    <div class="clearfix"></div>
+                    <pre>{{lmBundle | json}}</pre>
+                </div>
+                <div class="col-md-6">
+                    <div ng-show="lmBundle">
+                        <button class="btn-link btn pull-right" ng-click="validateBundle(lmBundle)">Validate</button>
+                        <div class="clearfix"></div>
+                        {{lmValidateStatus}}
+                        <pre>{{lmValidate | json}}</pre>
+                    </div>
+
+
+                </div>
+            </div>
+
+
+
+
+        </uib-tab>
+
+        <uib-tab heading="ValueSet">
+
+
+            <button class="btn-link btn" ng-click="importVS(input.pasteVS)">Import</button>
+
+            <textarea ng-model = "input.pasteVS" class="form-control" rows="20"></textarea>
+        </uib-tab>
+
 
     </uib-tabset>
 

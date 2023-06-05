@@ -7,24 +7,76 @@ angular.module("pocApp")
             $scope.input = {}
             $scope.input.showFullModel = true
 
-            $localStorage.world = modelsSvc.getDemo()
+           // $localStorage.world = modelsSvc.getDemo()
 
             if (! $localStorage.world) {
                 $localStorage.world = modelsSvc.getDemo()
             } else {
-                //$scope.world = modelsSvc.getDemo()
+                //$localStorage.world = modelsSvc.getDemo()
             }
+
+            $scope.world = $localStorage.world
+
+
 
             $scope.resetWorld = function () {
                 //not working
                 if (confirm("Are you wish to restore to the default demo state")) {
                     $localStorage.world = modelsSvc.getDemo()
+                    $scope.world = $localStorage.world
+                    validateModel()
                 }
 
             }
 
-            $scope.world = $localStorage.world      //so world can be accessed from html page
+           // $localStorage.world = $localStorage.world      //so world can be accessed from html page
 
+            //Generate a bundle of SD's to save on a FHIR server
+            //each model (comp or dg) will be an SD
+            $scope.makeBundle = function () {
+                $scope.lmBundle = modelsSvc.createLMBundle($localStorage.world)
+            }
+
+            $scope.validateBundle = function (bundle) {
+
+
+                let qry = "http://hapi.fhir.org/baseR4/Bundle/$validate"
+                $http.post(qry,bundle).then(
+                    function (data) {
+                        $scope.lmValidate = data.data
+                    }, function (err) {
+                        $scope.lmValidate = err.data
+                    }
+                )
+                /*
+                return
+
+                let qry = "http://hapi.fhir.org/baseR4/StructureDefinition/$validate"
+                $http.post(qry,bundle.entry[0].resource).then(
+                    function (data) {
+                        $scope.lmValidate = data.data
+                        $scope.lmValidateStatus = data.status
+                    }, function (err) {
+                        $scope.lmValidate = err.data
+                        $scope.lmValidateStatus = data.status
+                    }
+                )
+                */
+/*
+
+                */
+
+            }
+
+            $scope.importVS = function (txt) {
+                console.log(txt)
+                let ar = txt.split('\n')
+                ar.forEach(function (lne) {
+                    let ar1 = lne.split('\t')
+                    console.log(ar1)
+                })
+
+            }
 
             //create a new model
             $scope.newModel = function(kind) {
@@ -49,7 +101,7 @@ angular.module("pocApp")
                             return $scope.input.types
                         },
                         hashValueSets : function() {
-                            return $scope.world.valueSets
+                            return $localStorage.world.valueSets
                         },
                         isNew: function () {
                             return isNew
@@ -62,9 +114,9 @@ angular.module("pocApp")
 
 
                         if (newModel.kind == 'comp') {
-                            $scope.world.compositions[newModel.name] = newModel
+                            $localStorage.world.compositions[newModel.name] = newModel
                         } else {
-                            $scope.world.dataGroups[newModel.name] = newModel
+                            $localStorage.world.dataGroups[newModel.name] = newModel
                         }
 
                         let vo1 = modelsSvc.validateModel($localStorage.world)
@@ -72,7 +124,7 @@ angular.module("pocApp")
                         $scope.input.types = vo1.types      //a hash keyed by name
 
                         //a hash by type of all elements that reference it
-                        $scope.analysis = modelsSvc.analyseWorld($scope.world,$scope.input.types)
+                        $scope.analysis = modelsSvc.analyseWorld($localStorage.world,$scope.input.types)
 
                         $scope.selectModel(newModel)
 
@@ -86,14 +138,19 @@ angular.module("pocApp")
 
             }
 
-            // validate the model. This retruns a hash of all types defined in the model as well as errors
-            let vo1 = modelsSvc.validateModel($localStorage.world)
-            $scope.errors = vo1.errors
-            $scope.input.types = vo1.types      //a hash keyed by name
+            function validateModel() {
+                // validate the model. This retruns a hash of all types defined in the model as well as errors
+                let vo1 = modelsSvc.validateModel($localStorage.world)
+                $scope.errors = vo1.errors
+                $scope.input.types = vo1.types      //a hash keyed by name
+                $scope.input.arTypes = Object.keys(vo1.types)       //list of types foe new element dropdown
 
-            //a hash by type of all elements that reference it
-            $scope.analysis = modelsSvc.analyseWorld($scope.world,$scope.input.types)
 
+                //a hash by type of all elements that reference it
+                $scope.analysis = modelsSvc.analyseWorld($localStorage.world,$scope.input.types)
+
+            }
+            validateModel()
 
             $scope.selectModelFromTypeUsage = function (model) {
                 $scope.selectedModelFromTypeUsage = model
@@ -117,7 +174,7 @@ angular.module("pocApp")
             }
 
             //$scope.input.arTypes = []
-            $scope.input.arTypes = Object.keys(vo1.types)       //list of types foe new element dropdown
+
 
             $scope.addElement = function (name,type) {
                 //add a new element to the current model
@@ -145,7 +202,7 @@ angular.module("pocApp")
 
             $scope.showVS = function (name) {
                 //name could either be a url or the name of a VS in the world
-                let vsItem = $scope.world.valueSets[name]
+                let vsItem = $localStorage.world.valueSets[name]
                 if (vsItem) {
                     console.log(vsItem)
 

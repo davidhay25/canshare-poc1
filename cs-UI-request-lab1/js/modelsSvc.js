@@ -3,9 +3,68 @@ angular.module("pocApp")
     .service('modelsSvc', function($q,$http) {
         let cache = {}
 
+        this.fhir = {}
+
         return {
 
+            fhirDataTypes : function(){
+                return ['string','CodeableConcept','CodeableConcept','Quantity','HumanName','dateTime','Identifier']
+            },
            // findUsageOf
+
+            //create a bundle of LogicalModels
+            createLMBundle : function (world) {
+                let fhirDataTypes = this.fhirDataTypes()
+                let urlBase = "http://canshare.co.nz/fhir/StructureDefinition"
+                let bundle = {resourceType:"Bundle",type:"collection",entry:[]}
+                let merged = angular.copy({...world.compositions, ...world.dataGroups})     //all EDs
+                Object.keys(merged).forEach(function (key) {
+                    let model = merged[key]
+                    let SD = {resourceType:"StructureDefinition"}
+                    SD.id = `canshare-${model.name}`
+                    SD.url = `${urlBase}/${model.name}`
+                    SD.kind = "logical"
+                    SD.status = "active"
+                    SD.name = model.name
+                    SD.type = `${urlBase}/${model.name}`
+                    SD.fhirVersion = "4.0.1"
+                    SD.abstract = false
+                    //SD.baseDefinition = "http://hl7.org/fhir/StructureDefinition/Base"
+                    SD.baseDefinition = "http://hl7.org/fhir/StructureDefinition/Element"
+                    SD.derivation = "specialization"
+                    SD.differential = {element:[]}
+
+                    let elBase = {id:model.name,path:model.name,short:model.title}
+                    elBase.definition = model.title     //todo - ?description in model
+                    SD.differential.element.push(elBase)
+
+                    if (model.diff) {
+                        model.diff.forEach(function (ed) {
+                            let path = `${model.name}.${ed.path}`  //assume flat structure ATM
+                            let element = {id:path,path:path, short:ed.name}
+                            element.min = 0
+                            element.max = "1"
+                            //assume only a single DT
+                            if (fhirDataTypes.indexOf(ed.type[0].code) > -1) {
+                                //this is a fhir data type
+                                element.type = [{code:ed.type[0].code}]
+                            } else {
+                                element.type = [{code:"Reference"}]
+                            }
+
+
+                            SD.differential.element.push(element)
+
+                        })
+                    }
+                    let entry = {resource: SD}
+                    entry.request = {method:'PUT',url:`StructureDefinition/${SD.id}`}
+
+                    bundle.entry.push(entry)
+
+                })
+                return bundle
+            },
 
             makeQfromModel : function(model, types) {
                 //make a Q that represents a model
@@ -107,29 +166,10 @@ angular.module("pocApp")
                 //console.log(cache.analysis)
                 return cache.analysis
 
-                let hashReference = {}
-                let hashTarget = {}
+               // let hashReference = {}
+               // let hashTarget = {}
 
 /*
-                function populateModel(model,parent) {
-                    //add all the paths from a parent to the model
-                    if (merged[parent] && merged[parent].diff) {
-                        model.diff = model.diff || []
-                        merged[parent].diff.forEach(function (ed) {
-                            model.diff.push(ed)
-                        })
-                    }
-
-                    if (model.parent) {
-                        populateModel(model,model.parent)
-                    }
-                }
-
-                Object.keys(merged).forEach(function (key) {
-                    let obj = merged[key]
-                    populateModel(obj)
-                })
-*/
 
                 function analyseModel(model) {
                     if (model.parent) {
@@ -152,9 +192,8 @@ angular.module("pocApp")
                     let obj = merged[key]
                     analyseModel(obj)
                 })
-                //{compositions:hashCompositions,dataGroups:hashDataGroups,valueSets:hashVS}
 
-               // console.log(hashTarget)
+                */
 
             },
 
@@ -366,15 +405,20 @@ angular.module("pocApp")
                 //all known types. Start with fhir types. will add the types defined in the model
                 //let types = ['string','CodeableConcept','CodeableConcept','Quantity','HumanName']
 
-                //all types point to their definition todo - add defs for fhir datatypse
                 let types = {}
+                this.fhirDataTypes().forEach(function (code) {
+                    types[code] = {}
+                })
+
+                //all types point to their definition todo - add defs for fhir datatypse
+               /*
                 types['string'] = {}
                 types['CodeableConcept'] = {}
                 types['Quantity'] = {}
                 types['Identifier'] = {}
                 types['HumanName'] = {}
                 types['dateTime'] = {}
-
+*/
 
                 //add to the models hash. Will update types with custom types (ie the models) using model.name
                 //will check that all names are unique
@@ -566,7 +610,7 @@ angular.module("pocApp")
 
                 hashVS[vsBreastBiopsyBodySite.name] = vsBreastBiopsyBodySite
 
-                let vsFrozenBodySite = {kind:"vs",name:'breast-frozen-bodysite',title:'body sites for breast biopsy',url:'',concepts :[]}
+                let vsFrozenBodySite = {kind:"vs",name:'breast-frozen-bodysite',title:'body sites for frozen section',url:'',concepts :[]}
                 vsFrozenBodySite.concepts.push({display:"Option 4"})
                 vsFrozenBodySite.concepts.push({display:"Option 5"})
                 vsFrozenBodySite.concepts.push({display:"Option 6"})
@@ -576,7 +620,7 @@ angular.module("pocApp")
 
                 //===================Compositions
                 //Base composition for Path request
-                let compPathRequest = {kind:"comp",name:'path-request',title: "Pathology request",diff:[]}
+                let compPathRequest = {kind:"comp",name:'PathRequest',title: "Pathology request",diff:[]}
                 compPathRequest.diff.push({path:'patient',title:"Patient",type:['patient'],mult:'1..1'})
                 compPathRequest.diff.push({path:'history',title:"History",type:['history'],mult:'0..*'})
                 compPathRequest.diff.push({path:'specimen',title:"Specimen",type:['specimen'],mult:'0..*'})
@@ -592,7 +636,7 @@ angular.module("pocApp")
 
 
                 //--------  Composition for Breast biopsy - 'is-a' Path request
-                let compBreastBiopsy = {kind:"comp",name:'breast-biopsy',parent:"path-request",title: "Breast biopsy",diff:[]}
+                let compBreastBiopsy = {kind:"comp",name:'breast-biopsy',parent:"PathRequest",title: "Breast biopsy",diff:[]}
                 //compBreastBiopsy.diff.push({path:'structure',type:['CodeableConcept'],valueSet:"http://bodysite/breastBiopsyRequestStructure"})
 
 
@@ -602,7 +646,7 @@ angular.module("pocApp")
                 hashCompositions[compBreastBiopsy.name] = compBreastBiopsy
 
                 //--------------Composition for Breast frozen section - 'is-a' Path request
-                let compBreastFrozen = {kind:"comp",name:'breast-frozen',parent:"path-request",title: "Breast frozen section",diff:[]}
+                let compBreastFrozen = {kind:"comp",name:'breast-frozen',parent:"PathRequest",title: "Breast frozen section",diff:[]}
                 //compBreastFrozen.diff.push({path:'structure',type:['CodeableConcept'],valueSet:"http://bodysite/breastFrozenRequestStructure"})
 
                 //compBreastFrozen.diff.push({path:'specimen',type:['specimen-frozen']})

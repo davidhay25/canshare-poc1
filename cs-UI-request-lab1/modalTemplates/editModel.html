@@ -74,7 +74,7 @@
                     </div>
                 </div>
                 <br/>
-                <div class="row">
+                <div class="row" ng-show = "model.kind == 'comp'">
                     <div class="col-md-2">
                         Parent
                     </div>
@@ -108,7 +108,7 @@
                 <uib-tabset>
                     <uib-tab heading="Table">
                         <table class="table table-bordered">
-                            <tr><th>Path</th><th>Title</th><th>Type</th><th>Code</th><th>Card.</th><th>Move</th><th>Delete</th></tr>
+                            <tr><th>Path</th><th>Title</th><th>Type</th><th>Code</th><th>Card.</th><th>Move</th><th>Edit</th></tr>
                             <tr ng-repeat="element in model.diff">
                                 <td>{{element.path}}</td>
                                 <td>{{element.title}}</td>
@@ -195,7 +195,7 @@
 
 
             </uib-tab>
-            <uib-tab heading="Expanded model">
+            <uib-tab heading="Expanded model"  select="tabSelected('expanded')">
                 <em class="pull-right">Expanded from parent/s</em>
 
 
@@ -205,7 +205,9 @@
                             <tr><th>Path</th><th>Title</th><th>Type</th><th>Code</th><th>Card.</th></tr>
                             <tr ng-repeat="element in allElements" ng-class = "{required:isRequired(element),overridden: hasBeenOverridden(element)}">
                                 <td>
+                                    <div  ng-style="{ 'padding-left': (element.path | pathindent) }">
                                     {{element.path | dropFirstInPath}}
+                                    </div>
                                 </td>
                                 <td>{{element.title}}</td>
                                 <td>
@@ -269,27 +271,27 @@
                                     <br/>
                                     <input type="text" class="form-control" placeholder="VS Url or name" ng-model="input.newVS"/>
 
-                                    <!--
-                                                                <div class="row">
-                                                                    <div class="col-md-3">
-                                                                        Change ValueSet
-                                                                    </div>
-                                                                    <div class="col-md-3">
-                                                                        <input type="text" class="form-control" placeholder="VS Url or name" ng-model="input.newVS"/>
-                                                                    </div>
-                                                                    <div class="col-md-3">
-                                                                        todo: dropdown with named vs
-                                                                    </div>
-                                                                </div>
-                                                                -->
                                     <br/>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button class="btn btn-primary pull-right" ng-click = "applyOverride(selectedElement,input.newVS)">Apply override</button>
+                                            <button class="btn btn-primary pull-right"
+                                                    ng-click = "applyOverride(selectedElement,input.newVS)">Apply override</button>
 
                                         </div>
                                     </div>
 
+
+                                </div>
+
+
+                                <div ng-show="selectedElement && canEdit(selectedElement)">
+                                    Override this element in the model which has been inherited from the referenced
+                                    type, removing it.
+
+                                </div>
+
+                                <div ng-show="selectedElement && ! canEdit(selectedElement)">
+                                    If you want to remove this element, delete it in the 'Base model content' tab
 
                                 </div>
 
@@ -323,5 +325,7 @@
             <em>This model does not have a parent</em>
 
         </div>
+
+        {{selectedTab}}
     </div>
 </div>

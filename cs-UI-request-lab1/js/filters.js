@@ -14,6 +14,15 @@ angular.module("pocApp")
         }
     })
 
+    .filter('lastInPath',function(){
+        return function (path) {
+            if (path) {
+                let ar = path.split('.')
+                return ar[ar.length-1]
+            }
+        }
+    })
+
     .filter('dropFirstInPath',function(){
         return function (path) {
             if (path) {
