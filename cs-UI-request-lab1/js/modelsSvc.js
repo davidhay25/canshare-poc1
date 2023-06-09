@@ -96,6 +96,8 @@ angular.module("pocApp")
 
                     SD.id = `canshare-${model.name}`
                     SD.url = `${urlBase}/${model.name}`
+
+                    SD.identifier = {system:"http://canshare.co.nz/fhir/NamingSystem/logicalModels",value:model.name}
                     SD.kind = "logical"
                     SD.status = "active"
                     SD.name = model.name

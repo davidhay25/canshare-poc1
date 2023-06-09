@@ -549,29 +549,35 @@
             <div class="clearfix"></div>
 
             <uib-tabset>
+
                 <uib-tab heading="Bundle">
                     <pre>{{lmBundle | json}}</pre>
                 </uib-tab>
 
                 <uib-tab heading="Validation" ng-show="lmValidateSummary">
 
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="list-group">
-                            <div class="list-group-item"
-                                 ng-click="input.selectedValidationResource = resource"
-                                 ng-repeat="resource in lmValidateSummary.resources">
-                                <div class="pull-right badge"> {{resource.issues.length}}</div>
-                                {{resource.resource.name}}
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="list-group">
+                                <div ng-class="{'list-group-item':true,listItemSelected:input.selectedValidationResource == resource}"
+                                     ng-click="input.selectedValidationResource = resource"
+                                     style="cursor: pointer"
+                                     ng-repeat="resource in lmValidateSummary.resources">
+                                    <div class="pull-right badge"> {{resource.issues.length}}</div>
+                                    {{resource.resource.name}}
+                                </div>
                             </div>
                         </div>
+                        <div class="col-md-9">
+                            <pre ng-show="input.selectedValidationResource.issues.length > 0">{{input.selectedValidationResource.issues | json}}</pre>
+                            <pre ng-show="input.selectedValidationResource.resource">{{input.selectedValidationResource.resource | json}}</pre>
+                        </div>
                     </div>
-                    <div class="col-md-9">
-                        <pre>{{input.selectedValidationResource.issues | json}}</pre>
-                        <pre>{{input.selectedValidationResource.resource | json}}</pre>
-                    </div>
-                </div>
                 </uib-tab>
+
+
+
+
 
             </uib-tabset>
 

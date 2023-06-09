@@ -106,7 +106,7 @@
                 <em class="pull-right">Content directly defined by this model</em>
 
                 <uib-tabset>
-                    <uib-tab heading="Table">
+                    <uib-tab heading="Table view (for adding / moving / deleting)">
                         <table class="table table-bordered">
                             <tr><th>Path</th><th>Title</th><th>Type</th><th>Code</th><th>Card.</th><th>Move</th><th>Edit</th></tr>
                             <tr ng-repeat="element in model.diff">
@@ -177,15 +177,56 @@
 
                         </table>
                     </uib-tab>
-                    <uib-tab heading="List">
+                    <uib-tab heading="List view (for editing)">
 
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="list-group">
-                                    <div class="list-group-item" ng-repeat="element in model.diff">
+                                    <div ng-class={"list-group-item":true,listItemSelected:selectedElementFromList==element}
+                                         style="cursor: pointer"
+                                         ng-click = "selectElementFromList(element)"
+                                         ng-repeat="element in model.diff">
                                         {{element.path}}
                                     </div>
                                 </div>
+                            </div>
+
+                            <div class="col-md-9" ng-show="selectedElementFromList.path">
+                                <div class="pull-right">
+                                    <button class="btn btn-link" ng-click="updateElementFromList()">Update</button>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        Title
+                                    </div>
+                                    <div class="col-md-9">
+                                        <input type="text" class = "form-control"
+                                               ng-model="edit.title"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        Cardinality
+                                    </div>
+                                    <div class="col-md-9">
+                                        <input type="text" class = "form-control"
+                                               ng-model="edit.mult"/>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        Code
+                                    </div>
+                                    <div class="col-md-9">
+                                        <input type="text" class = "form-control"
+                                               ng-model="edit.code"/>
+                                    </div>
+                                </div>
+
+                                <pre>{{selectedElementFromList | json}}</pre>
+
                             </div>
                         </div>
 

@@ -3,6 +3,7 @@ angular.module("pocApp")
         function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc) {
             $scope.model=model
             $scope.input = {}
+            $scope.edit = {}
             $scope.isNew = isNew        //if new, then allow the model metadata to be set
 
 
@@ -85,6 +86,37 @@ angular.module("pocApp")
                     }
                 })
                 return result
+            }
+
+            //select element from base model list (so can edit the elements defined by the model)
+            $scope.selectElementFromList = function (element) {
+                $scope.selectedElementFromList = element
+                delete $scope.edit.code
+                delete $scope.edit.title
+                delete $scope.edit.mult
+
+                //use local vars for updateing
+                $scope.edit = $scope.edit || {}
+                $scope.edit.title = element.title
+                //$scope.edit.mult = element.title
+                $scope.edit.mult = element.mult
+                if (element.code && element.code.length > 0) {
+                    $scope.edit.code = element.code[0].code
+                }
+            }
+
+            $scope.updateElementFromList = function () {
+                $scope.selectedElementFromList.title = $scope.edit.title
+                $scope.selectedElementFromList.mult = $scope.edit.mult
+                if ($scope.edit.code) {
+                    $scope.selectedElementFromList.code = [{code:$scope.edit.code}]
+                }
+
+                delete $scope.edit.title
+                delete $scope.edit.code
+                delete $scope.edit.mult
+                delete $scope.selectedElementFromList
+                alert('Model has been updated')
             }
 
 
