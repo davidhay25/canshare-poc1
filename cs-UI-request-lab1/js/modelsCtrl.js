@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
-        function ($scope,$http,$localStorage,modelsSvc,$timeout,$uibModal) {
+        function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,$timeout,$uibModal,$filter) {
 
             //$scope.localStorage = $localStorage
 
@@ -10,25 +10,81 @@ angular.module("pocApp")
            // $localStorage.world = modelsSvc.getDemo()
 
             if (! $localStorage.world) {
-                $localStorage.world = modelsSvc.getDemo()
-            } else {
-                //$localStorage.world = modelsSvc.getDemo()
+                $localStorage.world = modelsDemoSvc.getDemo()
             }
 
             $scope.world = $localStorage.world
 
-
-
             $scope.resetWorld = function () {
-                //not working
+
                 if (confirm("Are you wish to restore to the default demo state")) {
-                    $localStorage.world = modelsSvc.getDemo()
+                    $localStorage.world = modelsDemoSvc.getDemo()
                     $scope.world = $localStorage.world
                     validateModel()
                 }
 
             }
 
+            $scope.dotCountDEP = function (s) {
+
+                let ar = s.match(/\./g)
+                console.log(ar)
+                if (ar) {
+                    console.log(ar.length)
+                    return ar.length
+
+                } else {
+                    return 0
+                }
+
+            }
+
+            //---------- functions to edit a model from the tree
+
+            //set the multiplicity of the element to 0..0
+            $scope.removeElement = function (element) {
+                element.mult = "0..0"
+                modelsSvc.updateOrAddElement($scope.selectedModel,element)
+            }
+
+            //removes the override
+            $scope.reinstateElementDEP = function (element) {
+                delete element.mult
+                modelsSvc.removeElement($scope.selectedModel,element)
+            }
+
+            //allow the user to set the VS for a given element
+            $scope.setValueSet = function (element) {
+                console.log(element)
+                let vs = prompt("ValueSet url")
+                if (vs) {
+                    element.valueSet = vs       //for the immediate display
+
+
+                    modelsSvc.updateOrAddElement($scope.selectedModel,element)
+/*
+                    //if there's already an overide in the model, then update it.
+                    let relativePath =  $filter('dropFirstInPath')(element.path);
+                    let found = false
+                    $scope.selectedModel.diff.forEach(function(ed) {
+                        if (ed.path == relativePath)  {
+                            ed.valueSet = vs
+                            found = true
+                        }
+                    })
+                    //if not, then add it
+                    if (! found) {
+                        let newElement = angular.copy(element)
+                        newElement.path = relativePath
+                        $scope.selectedModel.diff.push(newElement)
+                    }
+
+                    */
+                }
+
+            }
+
+            //------------
 
             //Generate a bundle of SD's to save on a FHIR server
             //each model (comp or dg) will be an SD
@@ -206,6 +262,8 @@ angular.module("pocApp")
             }
 
 
+
+
             $scope.showVS = function (name) {
                 //name could either be a url or the name of a VS in the world
                 let vsItem = $localStorage.world.valueSets[name]
@@ -224,6 +282,15 @@ angular.module("pocApp")
             $scope.selectModel = function (comp) {
                 clearB4Select()
                 $scope.selectedModel = comp
+
+                //create the list of override elements
+                $scope.overrides = []
+                $scope.selectedModel.diff.forEach(function (ed) {
+                    if (ed.path.indexOf('.') > -1 ) {
+                        $scope.overrides.push(ed)
+                    }
+
+                })
 
                 $scope.Qobject = modelsSvc.makeQfromModel(comp,$scope.input.types)
                 $scope.QR = {}

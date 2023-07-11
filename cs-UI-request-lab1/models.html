@@ -47,6 +47,7 @@
 
     <script src="js/modelsCtrl.js"></script>
     <script src="js/modelsSvc.js"></script>
+    <script src="js/modelsDemoSvc.js"></script>
 
     <script src="js/libs/vis.min.js"></script>
 
@@ -279,10 +280,100 @@
 
                 <div class="col-md-9" ng-show="selectedModel.kind == 'comp' || selectedModel.kind == 'dg'">
                     <br/>
-                    <div class="pull-right">
-                        <checkbox ng-model="input.showFullModel" ng-click="updateFullModelShow()"></checkbox> Show expanded model
+                    <div class="row">
+                        <div class="col-md-9">
+                            <strong>{{selectedModel.description}}</strong>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="pull-right">
+                                <checkbox ng-model="input.showFullModel" ng-click="updateFullModelShow()"></checkbox> Show expanded model
+                            </div>
+                        </div>
                     </div>
+                    <br/>
+
+
+
+
+
                     <uib-tabset>
+
+                        <uib-tab heading="Tree">
+                            <em>The model as a tree. Expanded if the checkbox is selected</em>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div id="compositionTree"></div>
+                                </div>
+                                <div class="col-md-6">
+
+                                    <div ng-show="selectedNode.data.ed">
+                                        <div>Path: <strong>{{selectedNode.data.ed.path}}</strong></div>
+                                        <br/>
+                                        <div>Type: {{selectedNode.data.ed.title}}  (<span ng-repeat="type in selectedNode.data.ed.type">
+                                            {{type}}&nbsp;</span>)
+                                        </div>
+                                        <div>Desc: {{selectedNode.data.ed.description}}</div>
+                                        <div ng-show="selectedNode.data.ed.valueSet">
+                                            VS:&nbsp;&nbsp;{{selectedNode.data.ed.valueSet}}
+                                        </div>
+                                    </div>
+
+                                    <br/>
+                                    <pre>{{selectedNode.data.ed | json}}</pre>
+
+
+
+                                    <div ng-show="selectedNode.data.ed.type.indexOf('CodeableConcept') > -1" >
+                                        <button class="btn btn-link" ng-click="setValueSet(selectedNode.data.ed)">
+                                            Set ValueSet
+                                        </button>
+                                    </div>
+
+                                    <div ng-hide="selectedNode.data.ed.mult.indexOf('0..0') > -1" >
+                                        <button class="btn btn-link" ng-click="removeElement(selectedNode.data.ed)">
+                                            Remove element
+                                        </button>
+                                    </div>
+
+                                    <!--
+                                    <div ng-show="selectedNode.data.ed.mult.indexOf('0..0') > -1" >
+                                        <button class="btn btn-link" ng-click="reinstateElement(selectedNode.data.ed)">
+                                            Reinstate element
+                                        </button>
+                                    </div>
+                                    -->
+
+
+
+                                    <!--
+                                    <div ng-hide="input.showFullModel" && selectedNode.data>
+                                        Add new element
+
+                                        <div>
+                                            <input type="text" class="form-control" ng-model="input.newName" placeholder="Name of element">
+                                        </div>
+
+                                        <div>
+                                        <select class="form-control" ng-model="input.newType"
+                                                ng-options="k for k in input.arTypes"></select>
+                                        </div>
+                                        <div ng-show="input.newType && input.newName">
+                                            <button class="btn btn-link pull-right"
+                                                    ng-click="addElement(input.newName,input.newType)">Add item</button>
+                                        </div>
+
+
+                                    </div>
+                                    -->
+
+                                </div>
+                            </div>
+
+
+
+                        </uib-tab>
+
+
                         <uib-tab heading="Table">
                             <em class="pull-right">The model as a table. Expanded if the checkbox is selected</em>
 
@@ -291,8 +382,8 @@
                             </div>
 
                             <table class="table-bordered table">
-                                <tr><th>Path</th><th>Title</th><th>Type</th><th>Mult.</th><th>Code</th></tr>
-                                <tr ng-repeat="element in fullElementList" ng-hide="$index==0">
+                                <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Code</th></tr>
+                                <tr ng-repeat="element in fullElementList" ng-hide="$index==0 || element.mult.indexOf('..0') > -1">
 
                                     <td>
                                         <div  ng-style="{ 'padding-left': (element.path | pathindent) }">
@@ -312,6 +403,7 @@
 
                                     </td>
                                     <td>{{element.title}}</td>
+                                    <td>{{element.description}}</td>
                                     <td>
                                         <div ng-repeat="type in element.type">
                                             {{type}}
@@ -328,45 +420,6 @@
 
                                 </tr>
                             </table>
-                        </uib-tab>
-                        <uib-tab heading="Json">
-                            <em>The definition for this model (not expanded)</em>
-                            <pre>{{selectedModel | json}}</pre>
-                        </uib-tab>
-
-                        <uib-tab heading="Tree">
-                            <em>The model as a tree. Expanded if the checkbox is selected</em>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div id="compositionTree"></div>
-                                </div>
-                                <div class="col-md-6">
-                                    <pre>{{selectedNode.data.ed | json}}</pre>
-
-                                    <div ng-hide="input.showFullModel" && selectedNode.data>
-                                        Add new element
-
-                                        <div>
-                                            <input type="text" class="form-control" ng-model="input.newName" placeholder="Name of element">
-                                        </div>
-
-                                        <div>
-                                        <select class="form-control" ng-model="input.newType"
-                                                ng-options="k for k in input.arTypes"></select>
-                                        </div>
-                                        <div ng-show="input.newType && input.newName">
-                                            <button class="btn btn-link pull-right"
-                                                    ng-click="addElement(input.newName,input.newType)">Add item</button>
-                                        </div>
-
-
-                                    </div>
-
-                                </div>
-                            </div>
-
-
-
                         </uib-tab>
 
 
@@ -394,7 +447,9 @@
                                             <table class="table-bordered table table-condensed">
                                                 <tr><th>Path</th><th>Type</th><th>Card.</th></tr>
                                                 <tr ng-repeat="ed in selectedModelFromGraph.diff">
-                                                    <td>{{ed.path}}</td>
+                                                    <td>{{ed.path}}
+                                                        <div style="padding-left: 8px"><em >{{ed.description}}</em></div>
+                                                    </td>
                                                     <td>{{ed.type[0]}}
                                                         <div class="clickable"><em>{{ed.valueSet}}</em></div>
                                                     </td>
@@ -438,11 +493,71 @@
 
                         </uib-tab>
 
+
+                        <uib-tab heading="Overrides">
+                            <em class="pull-right">Elements that have been overriden in this model</em>
+
+                            <div ng-show = "selectedModel.parent">
+                                <strong class="pull-left">Profiles: {{selectedModel.parent}}</strong>
+                            </div>
+
+                            <table class="table-bordered table">
+                                <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Code</th></tr>
+                                <tr ng-repeat="element in overrides">
+
+                                    <td>
+                                        <div>
+                                            {{element.path}}
+
+
+                                            <!-- {{element.path | dropFirstInPath}} -->
+                                            <!--
+                                            <div ng-hide="input.showFullModel">
+                                                {{element.path | dropFirstInPath}}
+                                            </div>
+                                            <div ng-show="input.showFullModel">
+                                                {{element.path | lastInPath}}
+
+                                            </div>
+-->
+
+
+                                        </div>
+
+
+                                    </td>
+                                    <td>{{element.title}}</td>
+                                    <td>{{element.description}}</td>
+                                    <td>
+                                        <div ng-repeat="type in element.type">
+                                            {{type}}
+                                        </div>
+                                        <div><em class="clickable" ng-click="showVS(element.valueSet)">{{element.valueSet}}</em></div>
+                                    </td>
+                                    <td>{{element.mult}}</td>
+                                    <td>
+                                        <div ng-repeat="code in element.code">
+                                            {{code.code}}
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            </table>
+                        </uib-tab>
+
+
+
+
                         <uib-tab ng-show="false" heading="Json">
                             <em>All the elements in a 'flattened' list (like a StructureDefinition).</em>
                             <pre>{{fullElementList | json}}</pre>
                         </uib-tab>
 
+                        <uib-tab heading="Json">
+                            <em>The definition for this model (not expanded)</em>
+                            <pre>{{selectedModel | json}}</pre>
+                        </uib-tab>
 
 
                     </uib-tabset>

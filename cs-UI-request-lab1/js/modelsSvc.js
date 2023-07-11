@@ -1,11 +1,44 @@
 angular.module("pocApp")
 
-    .service('modelsSvc', function($q,$http) {
+    .service('modelsSvc', function($q,$filter) {
         let cache = {}
 
         this.fhir = {}
 
         return {
+
+            removeElementDEP : function (model,element) {
+                //remove the element with the given path from the model
+                let relativePath =  $filter('dropFirstInPath')(element.path);
+                let pos = -1
+                model.diff.forEach(function(ed,inx) {
+                    if (ed.path == relativePath)  {
+                        pos = inx
+                    }
+                })
+                if (pos > -1) {
+                    model.diff.splice(pos,1)
+                }
+            },
+            updateOrAddElement : function(model,element) {
+                //if there's already an overide in the model, then update it.
+                //note sepecific elements only, ie: valueSet
+                let relativePath =  $filter('dropFirstInPath')(element.path);
+                let found = false
+                model.diff.forEach(function(ed) {
+                    if (ed.path == relativePath)  {
+                        ed.valueSet = element.valueSet
+                        ed.mult = element.mult
+                        found = true
+                    }
+                })
+                //if not, then add it
+                if (! found) {
+                    let newElement = angular.copy(element)
+                    newElement.path = relativePath
+                    model.diff.push(newElement)
+                }
+            },
 
             summarizeValidation : function(OO,bundle) {
                 //todo - do we need this???
@@ -77,7 +110,7 @@ angular.module("pocApp")
 
 
             fhirDataTypes : function(){
-                return ['string','CodeableConcept','CodeableConcept','Quantity','HumanName','dateTime','Identifier']
+                return ['string','CodeableConcept','CodeableConcept','Quantity','HumanName','dateTime','Identifier','ContactPoint','Address','code','Attachment']
             },
            // findUsageOf
 
@@ -289,7 +322,13 @@ angular.module("pocApp")
                     let id = ed.path
                     let text = ed.title || leafPath
                     let node = {id:id,text:text,parent:parent,data:{ed:ed}}
-                    treeData.push(node)
+
+                    if (ed.mult && ed.mult == '0..0') {
+                        //don't add removed elements
+                    } else {
+                        treeData.push(node)
+                    }
+
                 }
 
                 //console.log(treeData)
@@ -337,7 +376,7 @@ angular.module("pocApp")
                 return {allElements: allElements,graphData:graphData}
 
 
-                // add to list of elements, replacing any with the same path (as it has been overwtitten)
+                // add to list of elements, replacing any with the same path (as it has been overwritten)
                 function addToList(ed) {
                     //is there already an entry with this path
                     let path = ed.path
@@ -597,7 +636,7 @@ angular.module("pocApp")
 
 
             },
-            getDemo: function () {
+            getDemoDEP: function () {
 
                 //construct a graph of the Logical model types.
                 //Not sure if this belongs in here, but it will do for the moment.
