@@ -138,13 +138,12 @@
     </nav>
 
     <div>
+
+        <a class="btn pull-right" target="_blank" href="https://build.fhir.org/ig/HL7/fhir-mCODE-ig/">mCODE</a>
+
         <button class="pull-right btn-link btn" ng-click="resetWorld()">Reset</button>
 
         <a class="btn pull-right" target="_blank" href="https://docs.google.com/spreadsheets/d/1XU7Jc0BbC5nXgmTu-qVLS-WwJjKO9GLXgjVHVk2WRL0/edit#gid=0">Spreadsheet</a>
-
-
-
-
 
     </div>
 
@@ -152,13 +151,13 @@
 
 
         <uib-tab heading="Compositions and datagroups">
-
+            <br/>
             <div class="row">
                 <div class="col-md-3">
                     <div class="myScroll">
                         <uib-accordion close-others="true" >
 
-                            <div uib-accordion-group class="panel-default" is-open="true">
+                            <div uib-accordion-group class="panel-default" >
                                 <uib-accordion-heading>
                                     <span ng-click="accordianOpened('composition')">Compositions</span>
 
@@ -186,11 +185,15 @@
                                 </div>
                             </div>
 
-                            <div uib-accordion-group class="panel-default">
+                            <div uib-accordion-group class="panel-default" is-open="true">
                                 <uib-accordion-heading>
                                     <span ng-click="accordianOpened('datagroup')">DataGroups</span>
                                 </uib-accordion-heading>
 
+                                <div>
+                                    <button class="btn btn-link pull-right" ng-click="listAllDG()">List all</button>
+                                </div>
+                                <div class="clearfix"></div>
                                 <div class="list-group">
                                     <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
                                          ng-click="selectModel(v)"
@@ -200,8 +203,9 @@
                                            ng-click="editModel(v)"></i>
 
                                         {{v.title}}
-
-                                        <div><em>{{k}}</em></div>
+<!--
+                                        <div><em>{{v.description}}</em></div>
+                                        -->
 <!--
                                         <div class="clickable" ng-click="editModel(v)"><em>{{k}}</em></div>
 -->
@@ -238,7 +242,37 @@
                 </div>
 
 
-                <div class="col-md-9" ng-show="selectedModel.kind == 'vs'">
+                <div class="col-md-9" ng-show="input.showDGList">
+                    <div class="banner"> List of all DataGroups</div>
+
+                    <table class="table table-condensed table-bordered">
+                        <tr><th>Name</th><th>Title</th><th>Description</th><th>mCODE group</th><th># elements</th></tr>
+                        <tr ng-repeat="(k,v) in world.dataGroups">
+                            <td><div class="clickable" ng-click="selectModelFromList(k,v.kind)">{{v.name}}</div></td>
+                            <td>{{v.title}}</td>
+                            <td>{{v.description}}
+
+                                <div>
+                                    <div
+                                         ng-click="selectModelFromList(item.name,item.kind)"
+                                         ng-repeat="item in xref[v.name] track by $index">
+                                        {{item.kind}}: <span  class="clickable">{{item.name}}</span> (<em>{{item.path}}</em>)
+
+                                    </div>
+                                </div>
+
+                            </td>
+                            <td>
+                                <a ng-href="{{mCodeGroupPage[v.mcodegroup]}}" target="_blank">{{v.mcodegroup}}</a>
+                            </td>
+                            <td>{{v.diff.length}}</td>
+                        </tr>
+                    </table>
+
+                </div>
+
+
+                <div class="col-md-9" ng-show="!showDGList && selectedModel.kind == 'vs'">
                     <br/>
 
                     <div ng-controller="editVSCtrl">
@@ -278,7 +312,7 @@
 
                 </div>
 
-                <div class="col-md-9" ng-show="selectedModel.kind == 'comp' || selectedModel.kind == 'dg'">
+                <div class="col-md-9" ng-show="!showDGList && selectedModel.kind == 'comp' || selectedModel.kind == 'dg'">
                     <br/>
                     <div class="row">
                         <div class="col-md-9">
@@ -307,6 +341,20 @@
                                 <div class="col-md-6">
 
                                     <div ng-show="selectedNode.data.ed">
+
+                                        <table class="table table-bordered table-condensed">
+                                            <tr><td style="width : 20%">Path</td><td>{{selectedNode.data.ed.path}}</td></tr>
+                                            <tr><td>Type</td>
+                                                <td><div ng-repeat="type in selectedNode.data.ed.type">
+                                                    {{type}}&nbsp;</div>
+                                                </td></tr>
+                                            <tr><td>Description</td><td>{{selectedNode.data.ed.description}}</td></tr>
+                                            <tr ng-show="selectedNode.data.ed.valueSet">
+                                                <td>ValueSet</td>
+                                                <td>{{selectedNode.data.ed.valueSet}}</td>
+                                            </tr>
+                                        </table>
+<!--
                                         <div>Path: <strong>{{selectedNode.data.ed.path}}</strong></div>
                                         <br/>
                                         <div>Type: {{selectedNode.data.ed.title}}  (<span ng-repeat="type in selectedNode.data.ed.type">
@@ -316,24 +364,30 @@
                                         <div ng-show="selectedNode.data.ed.valueSet">
                                             VS:&nbsp;&nbsp;{{selectedNode.data.ed.valueSet}}
                                         </div>
+                                        -->
+
                                     </div>
 
                                     <br/>
-                                    <pre>{{selectedNode.data.ed | json}}</pre>
+                                    <pre ng-show="selectedNode">{{selectedNode.data.ed | json}}</pre>
 
 
+                                    <div ng-show="selectedModel.kind == 'comp'">
+                                        <div ng-show="selectedNode.data.ed.type.indexOf('CodeableConcept') > -1" >
+                                            <button class="btn btn-link" ng-click="setValueSet(selectedNode.data.ed)">
+                                                Set ValueSet
+                                            </button>
+                                        </div>
 
-                                    <div ng-show="selectedNode.data.ed.type.indexOf('CodeableConcept') > -1" >
-                                        <button class="btn btn-link" ng-click="setValueSet(selectedNode.data.ed)">
-                                            Set ValueSet
-                                        </button>
+                                        <div ng-hide="!selectedNode || selectedNode.data.ed.mult.indexOf('0..0') > -1" >
+                                            <button class="btn btn-link" ng-click="removeElement(selectedNode.data.ed)">
+                                                Remove element
+                                            </button>
+                                        </div>
+
                                     </div>
 
-                                    <div ng-hide="selectedNode.data.ed.mult.indexOf('0..0') > -1" >
-                                        <button class="btn btn-link" ng-click="removeElement(selectedNode.data.ed)">
-                                            Remove element
-                                        </button>
-                                    </div>
+
 
                                     <!--
                                     <div ng-show="selectedNode.data.ed.mult.indexOf('0..0') > -1" >
@@ -477,6 +531,10 @@
 
                         </uib-tab>
 
+                        <uib-tab ng-show="selectedModel.kind == 'dg'">
+                            <uib-tab-heading>Referenced by</uib-tab-heading>
+                        </uib-tab>
+
                         <uib-tab heading="Questionnaire">
                             <uib-tabset>
                                 <uib-tab heading="Form">
@@ -494,7 +552,7 @@
                         </uib-tab>
 
 
-                        <uib-tab heading="Overrides">
+                        <uib-tab ng-show="selectedModel.kind == 'comp'" heading="Overrides">
                             <em class="pull-right">Elements that have been overriden in this model</em>
 
                             <div ng-show = "selectedModel.parent">
@@ -564,24 +622,17 @@
 
 
                 </div>
+
             </div>
 
-<!--
-            <div class="row">
-                <div class="col-md-6">
-                    <pre>{{compositions | json}}</pre>
-                </div>
-                <div class="col-md-6">
-                    <pre>{{dataGroups | json}}</pre>
-                </div>
-            </div>
-            -->
+
         </uib-tab>
 
         <uib-tab>
             <uib-tab-heading>
                 Errors <span class="badge">{{errors.length}}</span>
             </uib-tab-heading>
+            <br/>
             <div class="row">
                 <div class="col-md-6">
                     <table class="table table-bordered">
@@ -598,7 +649,7 @@
             </div>
 
 
-            <pre>{{errors | json}}</pre>
+
         </uib-tab>
 
         <uib-tab heading="Full model">

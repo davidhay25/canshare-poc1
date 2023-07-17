@@ -7,6 +7,32 @@ angular.module("pocApp")
 
         return {
 
+            getReferencedModels : function (world) {
+                //create a hash showing references between models
+
+                let hashReferences = {}
+                let merged = angular.copy({...world.compositions, ...world.dataGroups})     //all EDs
+                Object.keys(merged).forEach(function (key) {
+                    let model = merged[key]
+                    if (model.diff) {
+                        model.diff.forEach(function (ed) {
+                            if (ed.type) {
+                                ed.type.forEach(function (typ) {
+                                    hashReferences[typ] = hashReferences[typ] || []
+                                    hashReferences[typ].push({name:model.name,kind:model.kind,path:ed.path})
+                                })
+                            }
+                        })
+                    }
+
+
+
+
+
+                })
+                return hashReferences
+
+            },
             removeElementDEP : function (model,element) {
                 //remove the element with the given path from the model
                 let relativePath =  $filter('dropFirstInPath')(element.path);
@@ -634,142 +660,6 @@ angular.module("pocApp")
                 //
 
 
-
-            },
-            getDemoDEP: function () {
-
-                //construct a graph of the Logical model types.
-                //Not sure if this belongs in here, but it will do for the moment.
-                //We have compositions, DataGroups & Items  Not clear what the difference between a comp and a dg is
-                //A compositions can 'descend' from others and reference datagroups and coomposotions
-
-                //default multiplicity to single optional unless otherwise stated
-                //if an object has something of the name name as a parent or reference it is overwritten - eg ValueSet
-
-                let hashCompositions = {}
-                let hashDataGroups = {}
-                let hashVS = {}         //VS by name (not url)
-
-                //---------- DataGroups
-                //DataGroup for patient
-                let dgPatient = {kind:"dg",name:'Patient',title:"Patient data group",diff:[]}
-                dgPatient.diff.push({path:'name',title:'Patient name',type:['HumanName']})
-                dgPatient.diff.push({path:'gender',title:'Gender',type:['CodeableConcept'],valueSet:"https://genderoptions"})
-                dgPatient.diff.push({path:'nhi',title:'NHI number',type:['Identifier']})
-                hashDataGroups[dgPatient.name] = dgPatient
-
-                //DataGroup bodysite
-                let dgBodySite = {kind:"dg",name:'BodySite',title:"Body site",diff:[]}
-                dgBodySite.diff.push({path:'structure',title:"Structure",type:['CodeableConcept'],code:[{code:'code1'}],valueSet:"https://bodysite/alloptions"}) //will be overwritten
-                hashDataGroups[dgBodySite.name] = dgBodySite
-
-                //DG generic specimen
-                let dgSpecimen = {kind:"dg",name:'Specimen',title:"Specimen",diff:[]}
-                dgSpecimen.diff.push({path:'type',title:'Specimen type',type:['CodeableConcept']})
-                dgSpecimen.diff.push({path:'collected',title:'When collected',type:['dateTime']})
-                dgSpecimen.diff.push({path:'bodysite',title:'Body site',type:['BodySite']})
-                hashDataGroups[dgSpecimen.name] = dgSpecimen
-
-                //DG history
-                let dgHistory = {kind:"dg",name:'History',title:"History",diff:[]}
-                dgHistory.diff.push({path:'coMorbidity',title:'Co-morbidities',type:['Condition'],mult:'0..*'})
-                dgHistory.diff.push({path:'family',title:'Family history',type:['Fmh'],mult:'0..*'})
-                hashDataGroups[dgHistory.name] = dgHistory
-
-                //DG condition
-                let dgCondition= {kind:"dg",name:'Condition',title:"Condition",diff:[]}
-                dgCondition.diff.push({path:'code',title:'Condition code',type:['CodeableConcept'],mult:'1..1'})
-                hashDataGroups[dgCondition.name] = dgCondition
-
-                //DG familymember history
-                let dgFMH = {kind:"dg",name:'Fmh',title:"Family member history",diff:[]}
-                dgFMH.diff.push({path:'code',title:'Condition code',type:['CodeableConcept'],mult:'1..1'})
-                dgFMH.diff.push({path:'relation',title:'Relationship',type:['CodeableConcept'],mult:'1..1'})
-                hashDataGroups[dgFMH.name] = dgFMH
-
-                //DG assessment
-                let dgAssess = {kind:"dg",name:'Assessment',title:"Assessment",diff:[]}
-                dgAssess.diff.push({path:'behaviour',title:'Behaviour',type:['CodeableConcept'],mult:'0..1'})
-                dgAssess.diff.push({path:'primaryBodysite',title:'Primary bodysite',type:['BodySite'],mult:'0..1'})
-                dgAssess.diff.push({path:'secondaryBodysite',title:'Secondary bodysite',type:['BodySite'],mult:'0..1'})
-                dgAssess.diff.push({path:'morphology',title:'Morphology',type:['CodeableConcept'],mult:'0..1'})
-                dgAssess.diff.push({path:'gradingSystem',title:'Grading system',type:['CodeableConcept'],mult:'0..1'})
-                dgAssess.diff.push({path:'grade',title:'Grade',type:['CodeableConcept'],mult:'0..1'})
-                dgAssess.diff.push({path:'stageSystem',title:'Stage system',type:['CodeableConcept'],mult:'0..1'})
-                dgAssess.diff.push({path:'stage',title:'Stage',type:['CodeableConcept'],mult:'0..1'})
-                dgAssess.diff.push({path:'prognosticSystem',title:'Prognostic system',type:['CodeableConcept'],mult:'0..1'})
-                dgAssess.diff.push({path:'prognosis',title:'Prognosis',type:['CodeableConcept'],mult:'0..1'})
-                hashDataGroups[dgAssess.name] = dgAssess
-
-
-/*
-                //DG specimen for frozen section
-                let dgSpecimenFrozen = {kind:"dg",name:'specimen-frozen',title:"Specimen for frozen section",parent:'specimen',diff:[]}
-
-                dgSpecimenFrozen.diff.push({path:'bodysite',title:'Body site',type:['CodeablConcept'],valueSet:'breast-frozen-bodysite'})
-                hashDataGroups[dgSpecimenFrozen.name] = dgSpecimenFrozen
-*/
-
-                //------------- ValueSets
-                let vsAllBodySite = {kind:"vs",name:'all-bodysite',title:'All body sites',url:'',concepts :[]}
-                vsAllBodySite.concepts.push({display:"Option 1"})
-                vsAllBodySite.concepts.push({display:"Option 2"})
-                vsAllBodySite.concepts.push({display:"Option 3"})
-                hashVS[vsAllBodySite.name] = vsAllBodySite
-
-                let vsBreastBiopsyBodySite = {kind:"vs",name:'breast-biopsy-bodysite',title:'body sites for breast biopsy',url:'',concepts :[]}
-                vsBreastBiopsyBodySite.concepts.push({display:"Option 4"})
-                vsBreastBiopsyBodySite.concepts.push({display:"Option 5"})
-                vsBreastBiopsyBodySite.concepts.push({display:"Option 6"})
-
-                hashVS[vsBreastBiopsyBodySite.name] = vsBreastBiopsyBodySite
-
-                let vsFrozenBodySite = {kind:"vs",name:'breast-frozen-bodysite',title:'body sites for frozen section',url:'',concepts :[]}
-                vsFrozenBodySite.concepts.push({display:"Option 4"})
-                vsFrozenBodySite.concepts.push({display:"Option 5"})
-                vsFrozenBodySite.concepts.push({display:"Option 6"})
-
-                hashVS[vsFrozenBodySite.name] = vsFrozenBodySite
-
-
-                //===================Compositions
-                //Base composition for Path request
-                let compPathRequest = {kind:"comp",name:'PathRequest',title: "Pathology request",diff:[]}
-                compPathRequest.diff.push({path:'patient',title:"Patient",type:['Patient'],mult:'1..1'})
-                compPathRequest.diff.push({path:'history',title:"History",type:['History'],mult:'0..*'})
-                compPathRequest.diff.push({path:'specimen',title:"Specimen",type:['Specimen'],mult:'0..*'})
-                compPathRequest.diff.push({path:'assessment',title:"Assessment",type:['Assessment'],mult:'0..*'})
-
-                //override the 'structure' path. completely replaces the  in the parent
-                //compPathRequest.diff.push({path:'structure',type:["CodeableConcept"], valueSet:"all-bodysite"})
-
-
-
-                //compPathRequest.diff.push({path:'dummy',type:["string"]})
-                hashCompositions[compPathRequest.name] = compPathRequest
-
-
-                //--------  Composition for Breast biopsy - 'is-a' Path request
-                let compBreastBiopsy = {kind:"comp",name:'BreastBiopsy',parent:"PathRequest",title: "Breast biopsy",diff:[]}
-                //compBreastBiopsy.diff.push({path:'structure',type:['CodeableConcept'],valueSet:"http://bodysite/breastBiopsyRequestStructure"})
-
-
-                compBreastBiopsy.diff.push({path:'specimen.bodysite.structure',type:["CodeableConcept"], valueSet:"breast-biopsy-bodysite"})
-
-                compBreastBiopsy.diff.push({path:'addedElement',type:["string"]})
-                hashCompositions[compBreastBiopsy.name] = compBreastBiopsy
-
-                //--------------Composition for Breast frozen section - 'is-a' Path request
-                let compBreastFrozen = {kind:"comp",name:'BreastFrozen',parent:"PathRequest",title: "Breast frozen section",diff:[]}
-                //compBreastFrozen.diff.push({path:'structure',type:['CodeableConcept'],valueSet:"http://bodysite/breastFrozenRequestStructure"})
-
-                //compBreastFrozen.diff.push({path:'specimen',type:['specimen-frozen']})
-
-
-
-                hashCompositions[compBreastFrozen.name] = compBreastFrozen
-
-                return {compositions:hashCompositions,dataGroups:hashDataGroups,valueSets:hashVS}
 
             }
         }

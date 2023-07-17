@@ -16,6 +16,12 @@ angular.module("pocApp")
                 }
             })
 
+            function getFullElementList() {
+                let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
+                console.log(vo)
+                $scope.allElements = vo.allElements
+            }
+
             //if not new, set the UI names & parent
             if (! isNew) {
                 $scope.input.newModelName = model.name
@@ -24,9 +30,10 @@ angular.module("pocApp")
                     $scope.input.newModelParent = model.parent
                 }
 
-                let vo = modelsSvc.getFullListOfElements(model,hashTypes,true)
-                console.log(vo)
-                $scope.allElements = vo.allElements
+                getFullElementList()
+               // let vo = modelsSvc.getFullListOfElements(model,hashTypes,true)
+               // console.log(vo)
+               // $scope.allElements = vo.allElements
             }
 
             $scope.input.types = Object.keys(hashTypes) //an array for the new type dropdown
@@ -45,6 +52,16 @@ angular.module("pocApp")
 
             $scope.setModelAttribute = function(attribute,value) {
                 $scope.model[attribute] = value
+
+                if (attribute == 'parent') {
+                    //if changing the parent, then re-generate the expanded model
+                    getFullElementList()
+
+                   // let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
+                   // console.log(vo)
+                   // $scope.allElements = vo.allElements
+                }
+
             }
 
             $scope.canEdit = function (element) {
@@ -205,22 +222,27 @@ angular.module("pocApp")
                 delete $scope.input.code
                 delete $scope.input.valueSet
                 $scope.input.card = $scope.input.cards[0]
+
+                getFullElementList()
             }
 
             $scope.remove = function (inx) {
                 if (confirm("Are you sure you wish to remove this element")) {
                     $scope.model.diff.splice(inx,1)
+                    getFullElementList()
                 }
             }
 
             $scope.moveUp = function (inx) {
                 let ar = $scope.model.diff.splice(inx,1)
                 $scope.model.diff.splice(inx-1,0,ar[0])
+                getFullElementList()
             }
 
             $scope.moveDn = function (inx) {
                 let ar = $scope.model.diff.splice(inx,1)
                 $scope.model.diff.splice(inx+1,0,ar[0])
+                getFullElementList()
             }
 
 

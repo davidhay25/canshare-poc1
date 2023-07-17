@@ -21,7 +21,8 @@ angular.module("pocApp")
                     //---------- DataGroups
 
                     //ancillary studies
-                    let dgAncillary = {kind:"dg",name:'AncillaryStudy',title:"Ancillary Study",diff:[],description:"Diagnostic or therapeutic procedure which is supplementary to the main test or treatment."}
+                    let dgAncillary = {kind:"dg",name:'AncillaryStudy',title:"Ancillary Study",diff:[],mcodegroup:'disease',
+                        description:"Diagnostic or therapeutic procedure which is supplementary to the main test or treatment."}
                     dgAncillary.diff.push({path:'type',title:'Type of study',type:['CodeableConcept'],
                         description:"The type of ancillary test"})
                     dgAncillary.diff.push({path:'method',title:'Method used',type:['CodeableConcept'],
@@ -45,7 +46,8 @@ angular.module("pocApp")
                     hashDataGroups[dgAssess.name] = dgAssess
 
                     //DataGroup bodysite
-                    let dgBodySite = {kind:"dg",name:'BodySite',title:"Body site",diff:[],description:"The details about an anatomical location or body part "}
+                    let dgBodySite = {kind:"dg",name:'BodySite',title:"Body site",diff:[],mcodegroup:"outcome",
+                        description:"The details about an anatomical location or body part "}
                     dgBodySite.diff.push({path:'structure',title:"Structure",type:['CodeableConcept'],code:[{code:'code1'}],
                         valueSet:"https://bodysite/alloptions",
                         description:"The anatomical structure being described"}) //will be overwritten
@@ -65,6 +67,7 @@ angular.module("pocApp")
 
                     //Cancer assessment
                     let dgCancerAssessment = {kind:"dg",name:'CancerAssessment',title:"Cancer assessment",diff:[],
+                        mcodegroup : "disease",
                         description:"A description of the current status of the cancer at a given point in time."}
                     dgCancerAssessment.diff.push({path:'pathwayType',title:'Pathway type',type:['CodeableConcept'],mult:'0..1',
                         description:'The type of the cancer pathway (e.g. screening, diagnostic, surveillance)'})

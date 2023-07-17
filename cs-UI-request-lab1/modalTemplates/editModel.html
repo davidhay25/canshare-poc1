@@ -79,9 +79,9 @@
                         Parent
                     </div>
                     <div class="col-md-3">
-                        <select class="form-control" ng-model="input.newModelParent"
+                        <select ng-disabled="! isNew" class="form-control" ng-model="input.newModelParent"
                                 ng-change="setModelAttribute('parent',input.newModelParent)"
-                                 ng-options = "parent for parent in input.possibleParents"></select>
+                                ng-options = "parent for parent in input.possibleParents"></select>
                     </div>
                     <div class="col-md-7">
                         If a parent is assigned to the model, then it will inherit all the elements
@@ -236,10 +236,40 @@
 
 
             </uib-tab>
-            <uib-tab heading="Expanded model"  select="tabSelected('expanded')">
+            <uib-tab heading="Expanded model" ng-show="model.kind == 'comp'" select="tabSelected('expanded')">
                 <em class="pull-right">Full expansion - parents and DataGroups</em>
+                <table class="table table-bordered">
+                    <tr><th>Path</th><th>Title</th><th>Type</th><th>Code</th><th>Card.</th></tr>
+                    <tr ng-repeat="element in allElements"
+                        ng-class = "{required:isRequired(element),overridden: hasBeenOverridden(element)}">
+                        <td>
+                            <div  ng-style="{ 'padding-left': (element.path | pathindent) }">
+                                {{element.path | dropFirstInPath}}
+                            </div>
+                        </td>
+                        <td>{{element.title}}</td>
+                        <td>
+                            <div ng-repeat="type in element.type">
+                                {{type}}
+                            </div>
 
+                            <div ng-show="element.valueSet">
+                                {{element.valueSet}}
+                            </div>
 
+                        </td>
+                        <td>
+
+                            <div ng-repeat="code in element.code">
+                                {{code.code}}
+                            </div>
+
+                        </td>
+                        <td>{{element.mult}}</td>
+
+                    </tr>
+                </table>
+<!--
                 <uib-tabset>
                     <uib-tab heading="Table">
                         <table class="table table-bordered">
@@ -342,6 +372,7 @@
                         </div>
                     </uib-tab>
                 </uib-tabset>
+                -->
 
 
             </uib-tab>

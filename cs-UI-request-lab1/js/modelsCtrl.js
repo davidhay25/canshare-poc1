@@ -7,6 +7,15 @@ angular.module("pocApp")
             $scope.input = {}
             $scope.input.showFullModel = true
 
+            $scope.mCodeGroupPage = {}
+            $scope.mCodeGroupPage.disease = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-disease.html"
+            $scope.mCodeGroupPage.patient = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-patient.html"
+            $scope.mCodeGroupPage.assessment = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-assessment.html"
+            $scope.mCodeGroupPage.treatment = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-treatment.html"
+            $scope.mCodeGroupPage.genomics = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-genomics.html"
+            $scope.mCodeGroupPage.outcome = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-outcome.html"
+
+
            // $localStorage.world = modelsSvc.getDemo()
 
             if (! $localStorage.world) {
@@ -14,6 +23,10 @@ angular.module("pocApp")
             }
 
             $scope.world = $localStorage.world
+
+            //xref is cross references between models/types
+            //hash[type name] - array of type name
+            $scope.xref = modelsSvc.getReferencedModels($scope.world)
 
             $scope.resetWorld = function () {
 
@@ -23,6 +36,11 @@ angular.module("pocApp")
                     validateModel()
                 }
 
+            }
+
+            $scope.listAllDG = function () {
+                $scope.input.showDGList = true
+                delete $scope.selectedModel
             }
 
             $scope.dotCountDEP = function (s) {
@@ -85,6 +103,33 @@ angular.module("pocApp")
             }
 
             //------------
+
+            //select a DataGroup or composition from the list / table
+            $scope.selectModelFromList = function (name,kind) {
+
+                let m
+                switch (kind) {
+                    case "dg" :
+                        m = $scope.world.dataGroups[name]
+                        if (! m) {
+                            alert (`No datagroup with the name: ${name}`)
+                        }
+                        break
+                    default :
+                        alert ("Only datagroups can be selected ATM")
+                        break
+                }
+
+                if (m) {
+                    $scope.selectedModel = m
+                    $scope.selectModel($scope.selectedModel)
+                    delete $scope.input.showDGList
+                }
+
+                //$scope.selectedModel = $scope.world.dataGroups[name]
+                //$scope.selectModel($scope.selectedModel)
+
+            }
 
             //Generate a bundle of SD's to save on a FHIR server
             //each model (comp or dg) will be an SD
@@ -259,6 +304,8 @@ angular.module("pocApp")
 
             function clearB4Select() {
                 delete $scope.selectedModel
+                delete $scope.selectedNode
+                delete $scope.input.showDGList
             }
 
 
