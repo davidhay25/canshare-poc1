@@ -533,6 +533,30 @@
 
                         <uib-tab ng-show="selectedModel.kind == 'dg'">
                             <uib-tab-heading>Referenced by</uib-tab-heading>
+
+
+                            <table class="table table-bordered">
+                                <tr><th>Name</th><th>Path</th><th>Kind</th></tr>
+                                <tr ng-repeat="item in xref[selectedModel.name] track by $index">
+                                    <td>
+                                        <div class="clickable" ng-click="selectModelFromList(item.name,item.kind)">
+                                            {{item.name}}
+                                        </div>
+
+
+                                    </td>
+                                    <td>{{item.path}}</td>
+                                    <td>{{item.kind}}</td>
+                                </tr>
+                            </table>
+<!--
+                            {{selectedModel.name}}
+                            <pre>{{xref | json}}</pre>
+
+-->
+
+
+
                         </uib-tab>
 
                         <uib-tab heading="Questionnaire">
