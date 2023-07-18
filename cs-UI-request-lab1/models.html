@@ -53,6 +53,7 @@
 
     <script src="js/filters.js"></script>
     <script src="js/editModelCtrl.js"></script>
+    <script src="js/editCompositionCtrl.js"></script>
     <script src="js/editVSCtrl.js"></script>
 
     <script src="directive/renderForm/renderFormSvc.js"></script>
@@ -157,7 +158,7 @@
                     <div class="myScroll">
                         <uib-accordion close-others="true" >
 
-                            <div uib-accordion-group class="panel-default" >
+                            <div uib-accordion-group class="panel-default" is-open="true">
                                 <uib-accordion-heading>
                                     <span ng-click="accordianOpened('composition')">Compositions</span>
 
@@ -165,12 +166,12 @@
 
                                 <div class="list-group">
                                     <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
-                                         ng-click="selectModel(v)"
+                                         ng-click="selectComposition(v)"
                                          ng-repeat="(k,v) in world.compositions">
 
 
                                         <i class="glyphicon glyphicon-edit pull-right clickable"
-                                           ng-click="editModel(v)"></i>
+                                           ng-click="editComposition(v)"></i>
                                         <div>{{v.title}}</div>
                                         <em>{{k}}</em>
 
@@ -181,11 +182,11 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <button class="btn btn-link" ng-click="newModel('comp')">New Composition</button>
+                                    <button class="btn btn-link" ng-click="newComposition()">New Composition</button>
                                 </div>
                             </div>
 
-                            <div uib-accordion-group class="panel-default" is-open="true">
+                            <div uib-accordion-group class="panel-default" >
                                 <uib-accordion-heading>
                                     <span ng-click="accordianOpened('datagroup')">DataGroups</span>
                                 </uib-accordion-heading>
