@@ -262,13 +262,7 @@ angular.module("pocApp")
                     })
                 }
 
-
-
                 return Q
-
-
-
-
 
             },
 
@@ -290,44 +284,14 @@ angular.module("pocApp")
                                 cache.analysis[type] = cache.analysis[type] || []
                                 cache.analysis[type].push({display:`from ${model.name} path ${ed.path}`,model:model,path:ed.path})
                             }
-
                         })
-
                     })
-
                 }
 
                 //console.log(cache.analysis)
                 return cache.analysis
 
-               // let hashReference = {}
-               // let hashTarget = {}
 
-/*
-
-                function analyseModel(model) {
-                    if (model.parent) {
-                        hashTarget[model.parent] = hashTarget[model.parent] || []
-                        hashTarget[model.parent].push({display : `specialized by '${model.name}'`})
-
-                    }
-                    if (model.diff) {
-                        model.diff.forEach(function (ed) {
-                            let type = ed.type[0]       //todo not checking for array
-                            hashTarget[type] = hashTarget[type] || []
-                            hashTarget[type].push({display : `referenced from '${model.name}' with path '${ed.path}'`})
-                        })
-                    }
-
-                }
-
-                //console.log(merged)
-                Object.keys(merged).forEach(function (key) {
-                    let obj = merged[key]
-                    analyseModel(obj)
-                })
-
-                */
 
             },
 

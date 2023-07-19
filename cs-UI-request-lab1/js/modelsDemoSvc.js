@@ -300,9 +300,6 @@ angular.module("pocApp")
                     dgProcedure.diff.push({path:'additionalDetails',title:'Additional details',type:['string'],
                         description:"Additional details about the procedure"})
 
-
-
-
                     hashDataGroups[dgProcedure.name] = dgProcedure
 
 
@@ -378,23 +375,46 @@ angular.module("pocApp")
 
                     hashVS[vsFrozenBodySite.name] = vsFrozenBodySite
 
-
                     //===================Compositions
                     //Base composition for Path request
-                    let compPathRequest = {kind:"comp",name:'PathRequest',title: "Pathology request",diff:[]}
-                    compPathRequest.diff.push({path:'patient',title:"Patient",type:['Patient'],mult:'1..1'})
-                    compPathRequest.diff.push({path:'history',title:"History",type:['ClinicalHistory'],mult:'0..*'})
-                    compPathRequest.diff.push({path:'specimen',title:"Specimen",type:['Specimen'],mult:'0..*'})
-                    compPathRequest.diff.push({path:'assessment',title:"Assessment",type:['Assessment'],mult:'0..*'})
+                    let compPathRequest = {kind:"comp",name:'PathRequest',title: "Pathology request",sections:[]}
 
-                    //override the 'structure' path. completely replaces the  in the parent
-                    //compPathRequest.diff.push({path:'structure',type:["CodeableConcept"], valueSet:"all-bodysite"})
+                    let s1 = {name:"demographics",kind:'section',items:[{path:'patient',title:"Patient",type:['Patient'],mult:'1..1'}]}
+                    compPathRequest.sections.push(s1)
+
+                    let s2 = {name:"history",kind:'section',items:[{path:'history',title:"History",type:['ClinicalHistory'],mult:'0..*'}]}
+                    compPathRequest.sections.push(s2)
+
+                    let s3 = {name:"findings",kind:'section',items:[]}
+                    s3.items.push({path:'specimen',title:"Specimen",type:['Specimen'],mult:'0..*'})
+                    s3.items.push({path:'assessment',title:"Assessment",type:['Assessment'],mult:'0..*'})
+                    compPathRequest.sections.push(s3)
+
+                    let s4 = {name:"investigations",kind:'section',items:[]}
+                    s4.items.push({path:'image',title:"Images",type:['RadiologyImage'],mult:'0..*'})
+
+                    let mamSlice = {path:'image',code:'xxx',title:"Mammogram"}
+                    s4.items.push({path:'mammogram', slice:mamSlice,title:"Mammogram",type:['RadiologyImage'],mult:'0..1'})
+
+                    let xraySlice = {path:'image',code:'yyy',title:"Echo"}
+                    s4.items.push({path:'echo', slice:xraySlice,title:"Echo",type:['RadiologyImage'],mult:'0..1'})
+
+                    compPathRequest.sections.push(s4)
+
+                    //compPathRequest.diff.push({path:'patient',title:"Patient",type:['Patient'],mult:'1..1'})
+                    //compPathRequest.diff.push({path:'history',title:"History",type:['ClinicalHistory'],mult:'0..*'})
+                    //compPathRequest.diff.push({path:'specimen',title:"Specimen",type:['Specimen'],mult:'0..*'})
+                    //compPathRequest.diff.push({path:'assessment',title:"Assessment",type:['Assessment'],mult:'0..*'})
 
 
-
-                    //compPathRequest.diff.push({path:'dummy',type:["string"]})
                     hashCompositions[compPathRequest.name] = compPathRequest
 
+                    let compPathRequestBB = {kind:"comp",
+                        parent:compPathRequest.name,
+                        name:'PathRequestBB',title: "Breast biopsy pathology request",sections:[]}
+
+                    hashCompositions[compPathRequestBB.name] = compPathRequestBB
+/*
 
                     //--------  Composition for Breast biopsy - 'is-a' Path request
                     let compBreastBiopsy = {kind:"comp",name:'BreastBiopsy',parent:"PathRequest",title: "Breast biopsy",diff:[]}
@@ -416,7 +436,7 @@ angular.module("pocApp")
 
                     hashCompositions[compBreastFrozen.name] = compBreastFrozen
 
-
+*/
                     //sort the hashDataGroups
 
 

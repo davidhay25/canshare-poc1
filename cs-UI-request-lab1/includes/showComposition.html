@@ -1,0 +1,53 @@
+<div>
+
+  <uib-tabset>
+
+    <uib-tab heading="Tree">
+      <em>The model as a tree. Expanded if the checkbox is selected</em>
+      <div class="row">
+        <div class="col-md-6">
+          <div id="compositionTree"></div>
+        </div>
+        <div class="col-md-6">
+        </div>
+      </div>
+    </uib-tab>
+
+    <uib-tab heading="Table">
+      <table class="table table-bordered">
+        <tr><th>Path</th><th>Title</th><th>Kind</th><th>Description</th><th>Type</th><th>Slice</th><th>Card.</th></tr>
+        <tr ng-repeat="ed in allCompElements track by $index">
+          <td>
+            <div  ng-style="{ 'padding-left': (ed.fullPath | pathindent) }">
+              <div ng-hide="input.showFullModel">
+                {{ed.fullPath | dropFirstInPath}}
+              </div>
+              <div ng-show="input.showFullModel">
+                {{ed.fullPath | lastInPath}}
+
+              </div>
+
+
+            </div>
+
+            </td>
+          <td>{{ed.title}}</td>
+          <td>{{ed.kind}}</td>
+          <td>{{ed.description}}</td>
+          <td>{{ed.type[0]}}</td>
+          <td>
+            <div ng-show = "ed.slice">
+              {{ed.slice.path}}
+              <div><em>code={{ed.slice.code}}</em></div>
+            </div>
+          </td>
+          <td>{{ed.mult}}</td>
+        </tr>
+      </table>
+    </uib-tab>
+    <uib-tab heading = "Json">
+      <pre>{{selectedModel | json}}</pre>
+    </uib-tab>
+  </uib-tabset>
+
+</div>

@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
-        function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,$timeout,$uibModal,$filter) {
+        function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc, $timeout,$uibModal,$filter) {
 
             //$scope.localStorage = $localStorage
 
@@ -385,9 +385,24 @@ angular.module("pocApp")
 
             }
 
+            $scope.selectComposition = function(comp){
+                clearB4Select()
+                $scope.selectedModel = comp
+
+                let vo = modelCompSvc.makeFullList(comp,$scope.input.types)
+                $scope.allCompElements = vo.allElements
+
+                console.log(vo)
+                let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
+                makeCompTree(treeData)
+
+            }
+
+            //only used for DG now
             $scope.selectModel = function (comp) {
                 clearB4Select()
                 $scope.selectedModel = comp
+
 
                 //create the list of override elements
                 $scope.overrides = []
@@ -403,17 +418,12 @@ angular.module("pocApp")
 
                 let vo = modelsSvc.getFullListOfElements(comp,$scope.input.types,$scope.input.showFullModel)
 
-                //modelsSvc.getFullListOfElements(comp,$scope.input.types,$scope.input.showFullModel)
-
                 $scope.fullElementList = vo.allElements
                 $scope.graphData = vo.graphData
                 makeGraph()
 
-
-
                 let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
                 makeTree(treeData)
-
 
             }
 
@@ -467,6 +477,29 @@ angular.module("pocApp")
             }
 
             function makeTree(treeData) {
+                $('#dgTree').jstree('destroy');
+
+                let x = $('#dg').jstree(
+                    {'core': {'multiple': false, 'data': treeData,
+
+                            'themes': {name: 'proton', responsive: true}}}
+                ).on('changed.jstree', function (e, data) {
+                    //seems to be the node selection event...
+
+                    if (data.node) {
+                        $scope.selectedNode = data.node;
+                        console.log(data.node)
+                    }
+
+                    $scope.$digest();       //as the event occurred outside of angular...
+                }).bind("loaded.jstree", function (event, data) {
+                    $(this).jstree("open_all");
+                    $scope.$digest();
+                });
+
+            }
+
+            function makeCompTree(treeData) {
                 $('#compositionTree').jstree('destroy');
 
                 let x = $('#compositionTree').jstree(
