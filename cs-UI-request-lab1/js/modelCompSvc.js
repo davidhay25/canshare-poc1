@@ -99,7 +99,8 @@ angular.module("pocApp")
                     } else {
                         //this is a 'leaf'
                         comp.sections.forEach(function (section) {
-                            let pathRoot = `${comp.name}.section-${section.name}`   //section root is model name + section name
+                            //let pathRoot = `${comp.name}.section-${section.name}`   //section root is model name + section name
+                            let pathRoot = `${comp.name}.${section.name}`   //section root is model name + section name
                             hashAllElements[pathRoot] = section
                             //each item is assumed to be a DG - think about others (Z & override) later
                             section.items.forEach(function (DG) {

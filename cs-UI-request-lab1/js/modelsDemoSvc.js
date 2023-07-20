@@ -197,14 +197,18 @@ angular.module("pocApp")
                         description:"The details of the facility where healthcare is provided"}
                     dgFacility.diff.push({path:'name',title:"Name",type:['string'],mult:'0..1',
                         description:"The name of the healthcare facility"})
+
                     dgFacility.diff.push({path:'identifier',title:"Identifier (eg HPI)",type:['Identifier'],mult:'0..1',
                         description:"The identifier of the healthcare facility"})
+
                     dgFacility.diff.push({path:'type',title:"Type of facility",type:['CodeableConcept'],mult:'0..1',
                         description:"The kind of healthcare facility, e.g. \"general practice\""})
                     dgFacility.diff.push({path:'address',title:"Address",type:['Address'],mult:'0..1',
                         description:"The identifier of the healthcare facility"})
-                    dgFacility.diff.push({path:'description',title:"Identifier (eg HPI)",type:['Identifier'],mult:'0..1',
-                        description:"The identifier of the healthcare facility"})
+
+                    dgFacility.diff.push({path:'description',title:"Description",type:['string'],mult:'0..1',
+                        description:"General description"})
+
                     dgFacility.diff.push({path:'contact',title:"Contacts",type:['ContactPoint'],mult:'0..*',
                         description:"eg Phone number, email, HealthLink"})
 

@@ -136,6 +136,11 @@
                            ng-options = "k for (k,v) in world.dataGroups">
                    </select>
                    <br/>
+
+                   <div>
+                     <input placeholder ="path (no spaces)" type="text" class="form-control" ng-model="input.newCompName"/>
+                   </div>
+
                    <button ng-show = "input.newCompType" class="btn btn-link"
                            ng-click="addDGtoSection(selectedCompositionNode.data.ed,input.newCompType)">Add DG</button>
                  </div>
