@@ -326,10 +326,18 @@ angular.module("pocApp")
                     let text = ed.title || leafPath
                     let node = {id:id,text:text,parent:parent,data:{ed:ed}}
 
-                    console.log(ed.kind)
+                    //console.log(ed.kind)
                     if (ed.kind) {
-                        let iconFile = `icons/${treeIcons[ed.kind]}`
-                        node.icon = iconFile
+
+                        //let iconFile = `icons/${treeIcons[ed.kind]}`
+                        if (treeIcons[ed.kind]) {
+                            node.icon = `icons/${treeIcons[ed.kind]}`
+                        }
+
+
+                        if (ed.type && ed.type[0] == 'CodeableConcept') {
+                          //  node.icon = "icons/icon-q-choice.png"
+                        }
 
                         switch (ed.kind) {
                             case 'slice' :

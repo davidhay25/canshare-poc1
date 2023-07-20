@@ -6,6 +6,10 @@
       color: #ebcccc;
     }
 
+    #section {
+      background-color: #00ff26;
+    }
+
   </style>
 
   <uib-tabset>
@@ -71,10 +75,56 @@
                   </div>
                   <div class="col-md-9">
                     {{selectedCompositionNode.data.ed.type[0]}}
-                    <div ng-show="selectedCompositionNode.data.ed.valueSet">
-                      <em>{{selectedCompositionNode.data.ed.valueSet}}</em>
-                      <span class="clickable">Show values</span>
+
+                      <div ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
+
+                      </div>
+
+                  </div>
+                </div>
+
+                <div class="row"  ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
+                  <div class="col-md-3">
+                    ValueSet
+                  </div>
+                  <div class="col-md-9">
+                    <div><em>{{selectedCompositionNode.data.ed.valueSet}}</em></div>
+                    <div>
+                      <span ng-show="selectedCompositionNode.data.ed.valueSet" class="clickable">View VS</span>
+
+                      <button ng-show="selectedCompositionNode.data.ed.valueSet"
+                              ng-click = "changeValueSet(selectedCompositionNode.data.ed)"
+                              class="btn-link btn">Change VS</button>
+
+                      <button ng-hide="selectedCompositionNode.data.ed.valueSet"
+                              ng-click = "changeValueSet(selectedCompositionNode.data.ed)"
+                              class="btn-link btn">Set VS</button>
+
+
+
                     </div>
+                  </div>
+                </div>
+
+                <div class="row"  ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
+                  <div class="col-md-3">
+                    Options List
+                  </div>
+                  <div class="col-md-9">
+                    <div ng-show="selectedCompositionNode.data.ed.options">
+                      There are {{selectedCompositionNode.data.ed.options.length}} options defined
+                    </div>
+
+                    <div ng-hide="selectedCompositionNode.data.ed.options">
+                      There are no options defined
+                    </div>
+                    <div><em>Options are used to build ValueSets</em></div>
+
+
+                      <button
+                              ng-click = "editOptionsList(selectedCompositionNode.data.ed)"
+                              class="btn-link btn">View / Edit list</button>
+
                   </div>
                 </div>
 
@@ -95,17 +145,16 @@
                    {{selectedCompositionNode.data.ed.slice.name}}
                  </div>
                </div>
-
-
               </div>
 
 
             <!-- If the root is selected, we can add a new section-->
             <div ng-show="selectedCompositionNode.id.indexOf('.') == -1">
+              <br/>
               <strong>Add section</strong>
               <div class="row">
                 <div class="col-md-4">
-                  <input type="text" class="form-control" ng-model="input.newSectionTitle"/>
+                  <input type="text" placeholder="Title" class="form-control" ng-model="input.newSectionTitle"/>
                 </div>
                 <div class="col-md-4">
                   <button class="btn-link btn" ng-click="addSection(selectedModel,input.newSectionTitle)">Add new section</button>
@@ -114,17 +163,16 @@
             </div>
 
             <div ng-hide ="selectedCompositionNode.data.ed.mult == '0..0'">
-              <button class="btn-link btn" ng-click="removeDGfromSection(selectedCompositionNode)">Remove this element</button>
+              <button class="btn-link btn pull-right"
+                      ng-click="removeElement(selectedCompositionNode.data.ed)">Remove this element</button>
             </div>
 
-           <div ng-show = "selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
+              <div ng-show ="selectedCompositionNode.data.ed.kind == 'dg'">
+                <button class="btn-link btn pull-right"
+                        ng-click="addZElement(selectedCompositionNode.data.ed)">Add Z element</button>
+              </div>
 
-               <button ng-show="selectedCompositionNode.data.ed.valueSet"
-                       class="btn-link btn">Change this ValueSet</button>
 
-               <button ng-hide="selectedCompositionNode.data.ed.valueSet"
-                       class="btn-link btn">Set the ValueSet</button>
-             </div>
 
                <div ng-show="selectedCompositionNode.data.ed.kind == 'section'">
                  <br/><br/>
@@ -169,7 +217,7 @@
 
 
             <uib-tab heading = "Json">
-              <pre>{{selectedCompositionNode.data | json}}</pre>
+              <pre>{{selectedCompositionNode.data.ed | json}}</pre>
             </uib-tab>
           </uib-tabset>
 
@@ -180,18 +228,12 @@
     <uib-tab heading="Table">
       <table class="table table-bordered">
         <tr><th>Path</th><th>Title</th><th>Kind</th><th>Description</th><th>Type</th><th>Slice</th><th>Card.</th></tr>
-        <tr ng-repeat="ed in allCompElements track by $index">
+        <tr
+                ng-style="{ 'background-color': getRowColour(ed) }"
+                ng-repeat="ed in allCompElements track by $index">
           <td>
-            <div  ng-style="{ 'padding-left': (ed.fullPath | pathindent) }">
-              <div ng-hide="input.showFullModel">
-                {{ed.fullPath | dropFirstInPath}}
-              </div>
-              <div ng-show="input.showFullModel">
-                {{ed.fullPath | lastInPath}}
-
-              </div>
-
-
+            <div ng-style="{ 'padding-left': (ed.path | pathindent) }">
+              {{ed.path | lastInPath}}
             </div>
 
             </td>
@@ -209,6 +251,28 @@
         </tr>
       </table>
     </uib-tab>
+
+    <uib-tab>
+      <uib-tab-heading>
+        Overrides <span class="badge">{{getOverridesCount()}}</span>
+      </uib-tab-heading>
+
+      <table class="table table-bordered">
+        <tr><th>Path</th><th>Title</th><th>ValueSet</th><th>Card.</th><th>Z</th><th></th></tr>
+        <tr ng-repeat="ed in selectedModel.override track by $index">
+          <td>
+            {{ed.path}}
+          </td>
+          <td>{{ed.title}}</td>
+          <td>{{ed.valueSet}}</td>
+          <td>{{ed.mult}}</td>
+          <td>{{ed.zElement}}</td>
+          <td><button class="btn-link btn" ng-click="revertOverride(ed.path)">Revert</button> </td>
+        </tr>
+      </table>
+    </uib-tab>
+
+
     <uib-tab heading = "Json">
       <pre>{{selectedModel | json}}</pre>
     </uib-tab>

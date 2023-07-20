@@ -314,7 +314,7 @@ angular.module("pocApp")
 
                     dgRadImage.diff.push({path:'type',title:'Type',type:['CodeableConcept'],mult:"1..1",
                         description:"The type of radiologic imaging performed"})
-                    dgRadImage.diff.push({path:'finding',title:'Findinge',type:['CodeableConcept'],mult:"0..*",
+                    dgRadImage.diff.push({path:'finding',title:'Findings',type:['CodeableConcept'],mult:"0..*",
                         description:"The findings as a results of radiologic imaging."})
                     dgRadImage.diff.push({path:'image',title:'Image',type:['Image'],mult:"0..*",
                         description:"The radiology image attachment."})

@@ -43,6 +43,7 @@ angular.module("pocApp")
                             } else {
                                 //this is a FHIR DT
                                 let path = `${pathRoot}.${ed.path}`
+                                ed.kind = 'element'
                                 hashAllElements[path] = ed
                             }
                         })
@@ -68,7 +69,7 @@ angular.module("pocApp")
                             //childPathRoot += '-' + DG.slice.name
 
                             childPathRoot = `${pathRoot}.${DG.name}`
-                            console.log('slice',childPathRoot,model)
+                            //console.log('slice',childPathRoot,model)
                             let slicedModel = angular.copy(model)
                             slicedModel.path += "-" + DG.slice.name
                             slicedModel.title = DG.slice.title
@@ -116,6 +117,20 @@ angular.module("pocApp")
                 }
 
                 processComp(comp)
+
+                //Now process any overrides
+                if (comp.override) {
+                    Object.keys(comp.override).forEach(function (path) {
+                        hashAllElements[path] =comp.override[path]
+                    })
+                    /*
+                    comp.override.forEach(function (ov) {
+                        console.log(ov)
+                        hashAllElements[ov.path] = ov
+
+                    })
+                    */
+                }
 
                 let ar = []
                 Object.keys(hashAllElements).forEach(function (key) {

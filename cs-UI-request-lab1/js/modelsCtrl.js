@@ -76,19 +76,7 @@ angular.module("pocApp")
                 delete $scope.selectedModel
             }
 
-            $scope.dotCountDEP = function (s) {
 
-                let ar = s.match(/\./g)
-                console.log(ar)
-                if (ar) {
-                    console.log(ar.length)
-                    return ar.length
-
-                } else {
-                    return 0
-                }
-
-            }
 
             //---------- functions to edit a model from the tree
 
@@ -106,7 +94,7 @@ angular.module("pocApp")
 
             //allow the user to set the VS for a given element
             $scope.setValueSet = function (element) {
-                console.log(element)
+                //console.log(element)
                 let vs = prompt("ValueSet url")
                 if (vs) {
                     element.valueSet = vs       //for the immediate display
@@ -380,6 +368,7 @@ angular.module("pocApp")
                 delete $scope.selectedModel
                 delete $scope.selectedNode
                 delete $scope.input.showDGList
+                delete $scope.selectedCompositionNode
             }
 
 
@@ -407,7 +396,7 @@ angular.module("pocApp")
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types)
                 $scope.allCompElements = vo.allElements
 
-                console.log(vo)
+                //console.log(vo)
                 let rootNodeId = $scope.allCompElements[0].path
                 let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
                 makeCompTree(treeData,rootNodeId)
@@ -504,7 +493,7 @@ angular.module("pocApp")
 
                     if (data.node) {
                         $scope.selectedNode = data.node;
-                        console.log(data.node)
+                       // console.log(data.node)
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...
@@ -531,14 +520,14 @@ angular.module("pocApp")
 
                     if (data.node) {
                         $scope.selectedCompositionNode = data.node;
-                        console.log(data.node)
+                        //console.log(data.node)
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...
                 }).bind("loaded.jstree", function (event, data) {
                     $(this).jstree("close_all");
                     $(this).jstree("open_node",rootNodeId);
-                    console.log(rootNodeId)
+                   // console.log(rootNodeId)
                     $scope.$digest();
                 });
 

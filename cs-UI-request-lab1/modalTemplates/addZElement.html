@@ -1,0 +1,82 @@
+
+<div>
+  <!--<div ng-controller="newResourceCtrl">-->
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-8 col-sm-8">
+        <h3 class="modal-title">
+          Add Z element
+        </h3>
+      </div>
+
+
+      <div class="col-md-4 col-sm-4">
+        <button class="btn btn-link" ng-click="$dismiss()">Cancel</button>
+        <button ng-show = "input.name"
+                class="btn btn-primary pull-right" ng-click="save()">Close</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-sm-3 col-md-3">
+        Name
+      </div>
+      <div class="col-sm-9 col-md-9">
+        <input type="text" class="form-control" ng-model="input.name"/>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-3 col-md-3">
+        Title
+      </div>
+      <div class="col-sm-9 col-md-9">
+        <input type="text" class="form-control" ng-model="input.title"/>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-3 col-md-3">
+        Description
+      </div>
+      <div class="col-sm-9 col-md-9">
+        <input type="text" class="form-control" ng-model="input.description"/>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-3 col-md-3">
+        Type
+      </div>
+      <div class="col-sm-9 col-md-9">
+        <select class="form-control" ng-model="input.type"
+                ng-options = "type for type in input.types">
+        </select>
+      </div>
+    </div>
+
+    <div class="row" ng-show="input.type == 'CodeableConcept'">
+      <div class="col-sm-3 col-md-3">
+        ValueSet
+      </div>
+      <div class="col-sm-9 col-md-9">
+        <input type="text" class="form-control" ng-model="input.valueSet"/>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-3 col-md-3">
+        Cardinality
+      </div>
+      <div class="col-sm-9 col-md-9">
+        <select class="form-control" ng-model="input.mult"
+                ng-options = "mult for mult in input.mults">
+        </select>
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-header">
+
+  </div>
+</div>
