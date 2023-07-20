@@ -154,9 +154,10 @@
 
 
         <uib-tab heading="Compositions and datagroups">
-            <br/>
+           
+            <button class="btn btn-link" ng-click="toggleLeftPanel()">Toggle side panel</button>
             <div class="row">
-                <div class="col-md-3">
+                <div ng-class="leftPanel">
                     <div class="myScroll">
                         <uib-accordion close-others="true" >
 
@@ -244,8 +245,9 @@
 
                 </div>
 
+                <div ng-class="rightPanel">
 
-                <div class="col-md-9" ng-show="input.showDGList">
+                <div  ng-show="input.showDGList">
                     <div class="banner"> List of all DataGroups</div>
 
                     <table class="table table-condensed table-bordered">
@@ -274,12 +276,12 @@
 
                 </div>
 
-                <div class="col-md-9" ng-show="!showDGList && selectedModel.kind == 'comp'">
+                <div  ng-show="!showDGList && selectedModel.kind == 'comp'">
                     <ng-include src="'/includes/showComposition.html'"></ng-include>
                 </div>
 
 
-                <div class="col-md-9" ng-show="!showDGList && selectedModel.kind == 'vs'">
+                <div ng-show="!showDGList && selectedModel.kind == 'vs'">
                     <br/>
 
                     <div ng-controller="editVSCtrl">
@@ -319,7 +321,7 @@
 
                 </div>
 
-                <div class="col-md-9" ng-show="!showDGList && selectedModel.kind == 'dg'">
+                <div  ng-show="!showDGList && selectedModel.kind == 'dg'">
                     <br/>
                     <div class="row">
                         <div class="col-md-9">
@@ -618,6 +620,7 @@
 
                 </div>
 
+                </div>
             </div>
 
 

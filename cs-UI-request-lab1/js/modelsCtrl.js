@@ -7,6 +7,19 @@ angular.module("pocApp")
             $scope.input = {}
             $scope.input.showFullModel = true
 
+            $scope.leftPanel = 'col-md-3'
+            $scope.rightPanel = 'col-md-9'
+
+            $scope.toggleLeftPanel = function(){
+                if ($scope.leftPanel == 'col-md-3') {
+                    $scope.leftPanel = 'hidden'
+                    $scope.rightPanel = 'col-md-12'
+                } else {
+                    $scope.leftPanel = 'col-md-3'
+                    $scope.rightPanel = 'col-md-9'
+                }
+            }
+
             $scope.mCodeGroupPage = {}
             $scope.mCodeGroupPage.disease = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-disease.html"
             $scope.mCodeGroupPage.patient = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-patient.html"
