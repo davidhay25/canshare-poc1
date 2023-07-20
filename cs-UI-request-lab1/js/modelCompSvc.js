@@ -24,6 +24,7 @@ angular.module("pocApp")
 
                 //allElements.push(edRoot)
 
+                //processes a single DG, adding child elements (recursively) to the hash
                 function processDG(DG,pathRoot) {
 
                     if (DG.parent) {
@@ -35,9 +36,9 @@ angular.module("pocApp")
                             let type = ed.type[0]
                             let model = types[type]
                             if (model && model.name) {
-                                console.log(types[type])
+                                //console.log(types[type])
                                 let childPath = `${pathRoot}.${model.name}`
-                                //hashAllElements[childPath] = model
+                                hashAllElements[childPath] = model
                                 processDG(model,childPath)
                             } else {
                                 //this is a FHIR DT
@@ -49,28 +50,30 @@ angular.module("pocApp")
 
                 }
 
-                function extractElements(DG,pathRoot) {
+                //process a single section item. Create and add the section to the hash, then call processDG to get the child elements of the DG
+                function processSectionItem(DG,pathRoot) {
                     //extract all the elements in the DG,
                     let type = DG.type[0]   //one type only
+                    //let type = DG.name   //one type only
                     let model = types[type]    //this could be a FHIR DT or a DG. A DG will have a name, a DT will not
 
                     if (model.name) {
                         //This is a DG. todo need to think about DG inheritance
 
                         let childPathRoot
-                        //If there is a slice, then use the path from the DG as the path.
-                        // Otherwise use the model name todo - should this be 'name' not 'path'?
-
                         //let childPathRoot = `${pathRoot}.${model.name}`
 
                         //if there's a slice, then add the slice name to the path..
                         if (DG.slice) {
                             //childPathRoot += '-' + DG.slice.name
 
-                            childPathRoot = `${pathRoot}.${DG.path}`
+                            childPathRoot = `${pathRoot}.${DG.name}`
                             console.log('slice',childPathRoot,model)
                             let slicedModel = angular.copy(model)
-                            slicedModel.path += "-" + DG.slice.path
+                            slicedModel.path += "-" + DG.slice.name
+                            slicedModel.title = DG.slice.title
+                            slicedModel.slice = DG.slice
+                            slicedModel.kind = 'slice'
                             hashAllElements[childPathRoot] = slicedModel
 
                         } else {
@@ -94,13 +97,14 @@ angular.module("pocApp")
                         //this composition has a parent, so process that first
                         //tmp processComp(types[comp.parent])     //the parent property is the name of the parent
                     } else {
-                        //this is a 'leaf
+                        //this is a 'leaf'
                         comp.sections.forEach(function (section) {
                             let pathRoot = `${comp.name}.section-${section.name}`   //section root is model name + section name
                             hashAllElements[pathRoot] = section
                             //each item is assumed to be a DG - think about others (Z & override) later
                             section.items.forEach(function (DG) {
-                                extractElements(DG,pathRoot)
+                               //{name: title: type: mult:}
+                                processSectionItem(DG,pathRoot)
                             })
 
                             //let DG = types[section.name]
@@ -116,8 +120,9 @@ angular.module("pocApp")
                 Object.keys(hashAllElements).forEach(function (key) {
                     let ed = hashAllElements[key]
                     //ed.fullPath = key
-                    ed.path = key
-                    ar.push(ed)
+                    let clone = angular.copy(ed)        //don't want to update the actual model
+                    clone.path = key
+                    ar.push(clone)
                 })
 
                 return {allElements:ar}

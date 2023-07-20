@@ -5,6 +5,9 @@ angular.module("pocApp")
 
         this.fhir = {}
 
+
+
+
         return {
 
             getReferencedModels : function (world) {
@@ -297,8 +300,18 @@ angular.module("pocApp")
 
             makeTreeFromElementList : function(arElements){
                 //construct a tree assuming that arElements is in path order
+                let that = this
                 let rootEd = arElements[0]
+                rootEd.kind = 'root'
                 let treeData = []
+
+                let treeIcons = {}
+                treeIcons.section = "icon-qi-horizontal.png"
+                treeIcons.dg = "icon-q-group.png"
+                treeIcons.slice = "icon-q-group.png"
+
+
+
 
                 //add the root
                 let root = {id:rootEd.path,text: rootEd.title,parent:'#',data:{ed:rootEd}}
@@ -312,6 +325,27 @@ angular.module("pocApp")
                     let id = ed.path
                     let text = ed.title || leafPath
                     let node = {id:id,text:text,parent:parent,data:{ed:ed}}
+
+                    console.log(ed.kind)
+                    if (ed.kind) {
+                        let iconFile = `icons/${treeIcons[ed.kind]}`
+                        node.icon = iconFile
+
+                        switch (ed.kind) {
+                            case 'slice' :
+                                //item['li_attr'] = {class: li_attr};
+                              //  node['a_attr'] = {class : 'slice'}
+                                //node['a_attr'] = { "style": "text-decoration: underline dotted red" }
+                                node['a_attr'] = { "style": "color : blue" }
+
+                                break
+                        }
+
+                    }
+                   // let iconFile = "icons/icon-q-" + child.type + ".png"
+                   // item.icon = iconFile
+
+
 
                     if (ed.mult && ed.mult == '0..0') {
                         //don't add removed elements

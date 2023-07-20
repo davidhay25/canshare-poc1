@@ -1,14 +1,173 @@
-<div>
+<div ng-controller="modelCompositionCtrl">
+
+  <style>
+
+    #slice {
+      color: #ebcccc;
+    }
+
+  </style>
 
   <uib-tabset>
 
     <uib-tab heading="Tree">
       <em>The model as a tree. Expanded if the checkbox is selected</em>
       <div class="row">
-        <div class="col-md-6">
-          <div id="compositionTree"></div>
+        <div class="col-md-4">
+          <div class="myScroll">
+            <div id="compositionTree"></div>
+          </div>
+
         </div>
-        <div class="col-md-6">
+        <div class="col-md-8">
+
+          <uib-tabset>
+
+            <uib-tab heading = "Details">
+
+              <div ng-show="selectedCompositionNode">
+
+              <div class="row">
+                <div class="col-md-3">
+                  Path
+                </div>
+                <div class="col-md-9">
+                  {{selectedCompositionNode.data.ed.path}}
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-3">
+                  Kind
+                </div>
+                <div class="col-md-9">
+                  {{selectedCompositionNode.data.ed.kind}}
+                </div>
+              </div>
+
+              <div ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
+
+                <div class="row">
+                  <div class="col-md-3">
+                    Title
+                  </div>
+                  <div class="col-md-9">
+                    {{selectedCompositionNode.data.ed.title}}
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-3">
+                    Description
+                  </div>
+                  <div class="col-md-9">
+                    {{selectedCompositionNode.data.ed.description}}
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-3">
+                    Type
+                  </div>
+                  <div class="col-md-9">
+                    {{selectedCompositionNode.data.ed.type[0]}}
+                    <div ng-show="selectedCompositionNode.data.ed.valueSet">
+                      <em>{{selectedCompositionNode.data.ed.valueSet}}</em>
+                      <span class="clickable">Show values</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-3">
+                    Cardinality
+                  </div>
+                  <div class="col-md-9">
+                    {{selectedCompositionNode.data.ed.mult}}
+                  </div>
+                </div>
+
+               <div class="row" ng-show="selectedCompositionNode.data.ed.slice">
+                 <div class="col-md-3">
+                   Slice Info
+                 </div>
+                 <div class="col-md-9">
+                   {{selectedCompositionNode.data.ed.slice.name}}
+                 </div>
+               </div>
+
+
+              </div>
+
+
+            <!-- If the root is selected, we can add a new section-->
+            <div ng-show="selectedCompositionNode.id.indexOf('.') == -1">
+              <strong>Add section</strong>
+              <div class="row">
+                <div class="col-md-4">
+                  <input type="text" class="form-control" ng-model="input.newSectionTitle"/>
+                </div>
+                <div class="col-md-4">
+                  <button class="btn-link btn" ng-click="addSection(selectedModel,input.newSectionTitle)">Add new section</button>
+                </div>
+              </div>
+            </div>
+
+            <div ng-hide ="selectedCompositionNode.data.ed.mult == '0..0'">
+              <button class="btn-link btn" ng-click="removeDGfromSection(selectedCompositionNode)">Remove this element</button>
+            </div>
+
+           <div ng-show = "selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
+
+               <button ng-show="selectedCompositionNode.data.ed.valueSet"
+                       class="btn-link btn">Change this ValueSet</button>
+
+               <button ng-hide="selectedCompositionNode.data.ed.valueSet"
+                       class="btn-link btn">Set the ValueSet</button>
+             </div>
+
+               <div ng-show="selectedCompositionNode.data.ed.kind == 'section'">
+                 <br/><br/>
+                 <strong>Add new item to section</strong>
+
+               <div class="row">
+                 <div class="col-md-4">
+                   <select class="form-control" ng-model="input.newCompType"
+                           ng-options = "k for (k,v) in world.dataGroups">
+                   </select>
+                   <br/>
+                   <button ng-show = "input.newCompType" class="btn btn-link"
+                           ng-click="addDGtoSection(selectedCompositionNode.data.ed,input.newCompType)">Add DG</button>
+                 </div>
+
+                 <div class="col-md-8">
+                   <table class="table-bordered table">
+                     <tr ng-repeat="ed in input.newCompType.diff">
+                       <td>{{ed.title}}</td>
+                       <td>{{ed.type[0]}}</td>
+                       <td>{{ed.mult}}</td>
+                       <td>{{ed.description}}</td>
+                     </tr>
+                   </table>
+
+                 </div>
+               </div>
+
+
+            </div>
+
+
+              </div>
+
+            </uib-tab>
+
+
+
+            <uib-tab heading = "Json">
+              <pre>{{selectedCompositionNode.data | json}}</pre>
+            </uib-tab>
+          </uib-tabset>
+
         </div>
       </div>
     </uib-tab>

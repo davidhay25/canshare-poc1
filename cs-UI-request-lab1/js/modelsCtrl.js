@@ -15,7 +15,6 @@ angular.module("pocApp")
             $scope.mCodeGroupPage.genomics = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-genomics.html"
             $scope.mCodeGroupPage.outcome = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-outcome.html"
 
-
            // $localStorage.world = modelsSvc.getDemo()
 
             if (! $localStorage.world) {
@@ -24,9 +23,13 @@ angular.module("pocApp")
 
             $scope.world = $localStorage.world
 
+
+
+
             //xref is cross references between models/types
             //hash[type name] - array of type name
             $scope.xref = modelsSvc.getReferencedModels($scope.world)
+
 
             $scope.resetWorld = function () {
 
@@ -37,6 +40,36 @@ angular.module("pocApp")
                 }
 
             }
+
+
+            //
+/*
+            //add the indicated DG to the section.
+            //Create a section item and add it to the section
+            $scope.addDGtoSection = function (section,DG) {
+                console.log(DG)
+                console.log(section)
+                //sectionItem is {name: title: type: mult:}
+                let sectionItem = {}
+                sectionItem.name = DG.name;
+                sectionItem.title = DG.title;
+                sectionItem.type = [DG.name]
+                sectionItem.mult = "0..1"
+                $scope.selectedModel.sections.forEach(function (sect) {
+                    console.log(sect)
+                    if (sect.name == section.name) {
+                        sect.items.push(sectionItem)
+                    }
+                })
+                $scope.selectComposition($scope.selectedModel)
+            }
+
+            $scope.removeDGfromSection = function(item) {
+                console.log(item)
+            }
+*/
+            // ------------
+
 
             $scope.listAllDG = function () {
                 $scope.input.showDGList = true
@@ -78,26 +111,8 @@ angular.module("pocApp")
                 if (vs) {
                     element.valueSet = vs       //for the immediate display
 
-
                     modelsSvc.updateOrAddElement($scope.selectedModel,element)
-/*
-                    //if there's already an overide in the model, then update it.
-                    let relativePath =  $filter('dropFirstInPath')(element.path);
-                    let found = false
-                    $scope.selectedModel.diff.forEach(function(ed) {
-                        if (ed.path == relativePath)  {
-                            ed.valueSet = vs
-                            found = true
-                        }
-                    })
-                    //if not, then add it
-                    if (! found) {
-                        let newElement = angular.copy(element)
-                        newElement.path = relativePath
-                        $scope.selectedModel.diff.push(newElement)
-                    }
 
-                    */
                 }
 
             }
@@ -393,8 +408,9 @@ angular.module("pocApp")
                 $scope.allCompElements = vo.allElements
 
                 console.log(vo)
+                let rootNodeId = $scope.allCompElements[0].path
                 let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
-                makeCompTree(treeData)
+                makeCompTree(treeData,rootNodeId)
 
             }
 
@@ -479,7 +495,7 @@ angular.module("pocApp")
             function makeTree(treeData) {
                 $('#dgTree').jstree('destroy');
 
-                let x = $('#dg').jstree(
+                let x = $('#dgTree').jstree(
                     {'core': {'multiple': false, 'data': treeData,
 
                             'themes': {name: 'proton', responsive: true}}}
@@ -499,7 +515,8 @@ angular.module("pocApp")
 
             }
 
-            function makeCompTree(treeData) {
+            //make the tree of the composition
+            function makeCompTree(treeData,rootNodeId) {
                 $('#compositionTree').jstree('destroy');
 
                 let x = $('#compositionTree').jstree(
@@ -509,14 +526,19 @@ angular.module("pocApp")
                 ).on('changed.jstree', function (e, data) {
                     //seems to be the node selection event...
 
+                    // $("#designTree").jstree("close_all");
+                    //                 $("#designTree").jstree("open_node","root");
+
                     if (data.node) {
-                        $scope.selectedNode = data.node;
+                        $scope.selectedCompositionNode = data.node;
                         console.log(data.node)
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...
                 }).bind("loaded.jstree", function (event, data) {
-                    $(this).jstree("open_all");
+                    $(this).jstree("close_all");
+                    $(this).jstree("open_node",rootNodeId);
+                    console.log(rootNodeId)
                     $scope.$digest();
                 });
 

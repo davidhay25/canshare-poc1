@@ -201,7 +201,7 @@ angular.module("pocApp")
                         description:"The identifier of the healthcare facility"})
                     dgFacility.diff.push({path:'type',title:"Type of facility",type:['CodeableConcept'],mult:'0..1',
                         description:"The kind of healthcare facility, e.g. \"general practice\""})
-                    dgFacility.diff.push({path:'address',title:"Identifier (eg HPI)",type:['Address'],mult:'0..1',
+                    dgFacility.diff.push({path:'address',title:"Address",type:['Address'],mult:'0..1',
                         description:"The identifier of the healthcare facility"})
                     dgFacility.diff.push({path:'description',title:"Identifier (eg HPI)",type:['Identifier'],mult:'0..1',
                         description:"The identifier of the healthcare facility"})
@@ -271,6 +271,7 @@ angular.module("pocApp")
                     dgPatient.diff.push({path:'address',title:'Address',type:['Address'],
                         description:"The person’s current address or location details if known (in NZ CIQ address profile format)"})
                     dgPatient.diff.push({path:'ethnicity',title:'Ethnicity',type:['CodeableConcept'],mult:"0..*",
+                        valueSet:"https://nzhts.digital.health.nz/fhir/ValueSet/ethnic-group-level-4-code",
                         description:"A classification of the ethnicity of an individual person as self-identified by the person"})
                     hashDataGroups[dgPatient.name] = dgPatient
 
@@ -336,7 +337,7 @@ angular.module("pocApp")
 
                     dgSpecimen.diff.push({path:'image',title:'Collection info',type:['Attachment'],mult:"0..1",
                         description:"An image of the specimen as a labelled file."})
-                    dgSpecimen.diff.push({path:'additionalDetails',title:'Containers ',type:['string'],mult:"0..1",
+                    dgSpecimen.diff.push({path:'additionalDetails',title:'Additional details',type:['string'],mult:"0..1",
                         description:"Additional details about the specimen"})
 
                     //dgSpecimen.diff.push({path:'collection.date',title:'When collected',type:['dateTime']})
@@ -379,25 +380,25 @@ angular.module("pocApp")
                     //Base composition for Path request
                     let compPathRequest = {kind:"comp",name:'PathRequest',title: "Pathology request",sections:[]}
 
-                    let s1 = {name:"demographics",kind:'section',items:[{path:'patient',title:"Patient",type:['Patient'],mult:'1..1'}]}
+                    let s1 = {name:"demographics",kind:'section',items:[{name:'patient',title:"Patient",type:['Patient'],mult:'1..1'}]}
                     compPathRequest.sections.push(s1)
 
-                    let s2 = {name:"history",kind:'section',items:[{path:'history',title:"History",type:['ClinicalHistory'],mult:'0..*'}]}
+                    let s2 = {name:"history",kind:'section',items:[{name:'history',title:"History",type:['ClinicalHistory'],mult:'0..*'}]}
                     compPathRequest.sections.push(s2)
 
                     let s3 = {name:"findings",kind:'section',items:[]}
-                    s3.items.push({path:'specimen',title:"Specimen",type:['Specimen'],mult:'0..*'})
-                    s3.items.push({path:'assessment',title:"Assessment",type:['Assessment'],mult:'0..*'})
+                    s3.items.push({name:'specimen',title:"Specimen",type:['Specimen'],mult:'0..*'})
+                    s3.items.push({name:'assessment',title:"Assessment",type:['Assessment'],mult:'0..*'})
                     compPathRequest.sections.push(s3)
 
                     let s4 = {name:"investigations",kind:'section',items:[]}
-                    s4.items.push({path:'image',title:"Images",type:['RadiologyImage'],mult:'0..*'})
+                    s4.items.push({name:'image',title:"Images",type:['RadiologyImage'],mult:'0..*'})
 
-                    let mamSlice = {path:'image',code:'xxx',title:"Mammogram"}
-                    s4.items.push({path:'mammogram', slice:mamSlice,title:"Mammogram",type:['RadiologyImage'],mult:'0..1'})
+                    let mamSlice = {name:'image',code:'xxx',title:"Mammogram"}
+                    s4.items.push({name:'mammogram', slice:mamSlice,title:"Mammogram",type:['RadiologyImage'],mult:'0..1'})
 
-                    let xraySlice = {path:'image',code:'yyy',title:"Echo"}
-                    s4.items.push({path:'echo', slice:xraySlice,title:"Echo",type:['RadiologyImage'],mult:'0..1'})
+                    let xraySlice = {name:'image',code:'yyy',title:"Echo"}
+                    s4.items.push({name:'echo', slice:xraySlice,title:"Echo",type:['RadiologyImage'],mult:'0..1'})
 
                     compPathRequest.sections.push(s4)
 
