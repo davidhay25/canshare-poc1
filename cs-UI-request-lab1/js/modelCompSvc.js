@@ -52,9 +52,11 @@ angular.module("pocApp")
                 }
 
                 //process a single section item. Create and add the section to the hash, then call processDG to get the child elements of the DG
-                function processSectionItem(DG,pathRoot) {
+                function processSectionItem(sectionItem,pathRoot) {
                     //extract all the elements in the DG,
-                    let type = DG.type[0]   //one type only
+                    let localPath = sectionItem.name         //the path in the section. Often the DG name
+                    let type = sectionItem.type[0]   //one type only
+
                     //let type = DG.name   //one type only
                     let model = types[type]    //this could be a FHIR DT or a DG. A DG will have a name, a DT will not
 
@@ -65,20 +67,21 @@ angular.module("pocApp")
                         //let childPathRoot = `${pathRoot}.${model.name}`
 
                         //if there's a slice, then add the slice name to the path..
-                        if (DG.slice) {
+                        if (sectionItem.slice) {
                             //childPathRoot += '-' + DG.slice.name
 
-                            childPathRoot = `${pathRoot}.${DG.name}`
+                            childPathRoot = `${pathRoot}.${sectionItem.name}`
                             //console.log('slice',childPathRoot,model)
                             let slicedModel = angular.copy(model)
-                            slicedModel.path += "-" + DG.slice.name
-                            slicedModel.title = DG.slice.title
-                            slicedModel.slice = DG.slice
+                            slicedModel.path += "-" + sectionItem.slice.name
+                            slicedModel.title = sectionItem.slice.title
+                            slicedModel.slice = sectionItem.slice
                             slicedModel.kind = 'slice'
                             hashAllElements[childPathRoot] = slicedModel
 
                         } else {
-                            childPathRoot = `${pathRoot}.${model.name}`
+                            //childPathRoot = `${pathRoot}.${model.name}`
+                            childPathRoot = `${pathRoot}.${localPath}`
                             hashAllElements[childPathRoot] = model
                         }
 
@@ -104,9 +107,9 @@ angular.module("pocApp")
                             let pathRoot = `${comp.name}.${section.name}`   //section root is model name + section name
                             hashAllElements[pathRoot] = section
                             //each item is assumed to be a DG - think about others (Z & override) later
-                            section.items.forEach(function (DG) {
+                            section.items.forEach(function (item) {
                                //{name: title: type: mult:}
-                                processSectionItem(DG,pathRoot)
+                                processSectionItem(item,pathRoot)
                             })
 
                             //let DG = types[section.name]

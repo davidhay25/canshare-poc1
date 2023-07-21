@@ -281,7 +281,7 @@
                 </div>
 
 
-                <div ng-show="!showDGList && selectedModel.kind == 'vs'">
+                <div ng-show="false || !showDGList && selectedModel.kind == 'vs'">
                     <br/>
 
                     <div ng-controller="editVSCtrl">
@@ -324,9 +324,14 @@
                 <div  ng-show="!showDGList && selectedModel.kind == 'dg'">
                     <br/>
                     <div class="row">
-                        <div class="col-md-9">
+                        <div class="col-md-6">
                             <strong>{{selectedModel.description}}</strong>
                         </div>
+
+                        <div class="col-md-3">
+                            FHIR resource: <a target = "_blank" ng-href="{{fhirRoot}}{{selectedModel.fhirResource}}">{{selectedModel.fhirResource}}</a>
+                        </div>
+
                         <div class="col-md-3">
                             <div class="pull-right">
                                 <checkbox ng-model="input.showFullModel" ng-click="updateFullModelShow()"></checkbox> Show expanded model
@@ -334,9 +339,6 @@
                         </div>
                     </div>
                     <br/>
-
-
-
 
 
                     <uib-tabset>

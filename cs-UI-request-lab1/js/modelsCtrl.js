@@ -10,6 +10,8 @@ angular.module("pocApp")
             $scope.leftPanel = 'col-md-3'
             $scope.rightPanel = 'col-md-9'
 
+            $scope.fhirRoot = "http://hl7.org/fhir/R4/"
+
             $scope.toggleLeftPanel = function(){
                 if ($scope.leftPanel == 'col-md-3') {
                     $scope.leftPanel = 'hidden'

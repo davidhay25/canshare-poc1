@@ -25,11 +25,21 @@ angular.module("pocApp")
                         description:"Diagnostic or therapeutic procedure which is supplementary to the main test or treatment."}
                     dgAncillary.diff.push({path:'type',title:'Type of study',type:['CodeableConcept'],
                         description:"The type of ancillary test"})
-                    dgAncillary.diff.push({path:'method',title:'Method used',type:['CodeableConcept'],
-                        description:"The method of how the ancillary study was performed"})
+
+                    let ancMethod = {path:'method',title:'Method used',type:['CodeableConcept'],
+                        description:"The method of how the ancillary study was performed"}
+                    
+                    dgAncillary.diff.push(ancMethod)
+
                     dgAncillary.diff.push({path:'result',title:'Result',type:['CodeableConcept'],
                         description:"The coded result of the ancillary study performed"})
+
+                    //dependencies
+
+
                     hashDataGroups[dgAncillary.name] = dgAncillary
+
+
 
                     //DG assessment
                     let dgAssess = {kind:"dg",name:'Assessment',title:"Assessment",diff:[]}
@@ -47,6 +57,7 @@ angular.module("pocApp")
 
                     //DataGroup bodysite
                     let dgBodySite = {kind:"dg",name:'BodySite',title:"Body site",diff:[],mcodegroup:"outcome",
+                        fhirResource:"BodyStructure",
                         description:"The details about an anatomical location or body part "}
                     dgBodySite.diff.push({path:'structure',title:"Structure",type:['CodeableConcept'],code:[{code:'code1'}],
                         valueSet:"https://bodysite/alloptions",

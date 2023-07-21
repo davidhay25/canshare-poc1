@@ -153,12 +153,10 @@ angular.module("pocApp")
 
             }
 
-            $scope.addDGtoSection = function (section,DG) {
-                //console.log(DG)
-                //console.log(section)
-                //sectionItem is {name: title: type: mult:}
+            $scope.addDGtoSection = function (section,DG,name) {
+
                 let sectionItem = {}
-                sectionItem.name = DG.name;
+                sectionItem.name = name || DG.name;
                 sectionItem.title = DG.title;
                 sectionItem.type = [DG.name]
                 sectionItem.mult = "0..1"
