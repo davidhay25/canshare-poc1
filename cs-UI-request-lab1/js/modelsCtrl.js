@@ -38,6 +38,28 @@ angular.module("pocApp")
 
             $scope.world = $localStorage.world
 
+            //process the world to get filter and other vars.
+            //todo split world into comp & DG, dropping VS
+
+            $scope.tumourStreams = ["All"]
+            $scope.compKinds = ["All"]
+
+            Object.keys($scope.world.compositions).forEach(function (key) {
+                let comp = $scope.world.compositions[key]
+                comp.meta = comp.meta || {}
+
+                let tumourStream = comp.meta.tumourStream
+                if (tumourStream && $scope.tumourStreams.indexOf(tumourStream) == -1) {
+                    $scope.tumourStreams.push(tumourStream)
+                }
+
+                let kind = comp.meta.kind
+                if (tumourStream && $scope.tumourStreams.indexOf(tumourStream) == -1) {
+                    $scope.tumourStreams.push(tumourStream)
+                }
+
+            })
+            $scope.input.selectedTumourStream = $scope.tumourStreams[0]
 
 
 
@@ -193,7 +215,7 @@ angular.module("pocApp")
 
             }
 
-            $scope.importVS = function (txt) {
+            $scope.importVSDEP = function (txt) {
                 console.log(txt)
                 let ar = txt.split('\n')
                 ar.forEach(function (lne) {
@@ -209,9 +231,28 @@ angular.module("pocApp")
                 $scope.editModel(newModel,true)
             }
 
+
+            $scope.showComposition = function (comp) {
+                let show = true
+                if ($scope.input.selectedTumourStream !== 'All') {
+                    if (comp.meta.tumourStream !== $scope.input.selectedTumourStream) {
+                        show = false
+                    }
+                }
+
+                return show
+            }
+
             $scope.newComposition = function() {
-                let newComp = {kind:'comp'}
-                $scope.editComposition(newComp,true)
+
+                let name = prompt("What is the name (no spaces, & must be unique)")
+                if (name) {
+                    let newComp = {kind:'comp', name:name, title:name, sections:[]}
+                    $localStorage.world.compositions[newComp.name] = newComp
+                    $scope.selectedModel = newComp
+                    $scope.selectComposition(newComp)
+                }
+                //$scope.editComposition(newComp,true)
             }
 
             $scope.editComposition = function (model,isNew) {
@@ -443,7 +484,7 @@ angular.module("pocApp")
                 makeGraph()
 
                 let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
-                makeTree(treeData)
+                makeDGTree(treeData)
 
             }
 
@@ -496,7 +537,7 @@ angular.module("pocApp")
                 }
             }
 
-            function makeTree(treeData) {
+            function makeDGTree(treeData) {
                 $('#dgTree').jstree('destroy');
 
                 let x = $('#dgTree').jstree(
@@ -528,14 +569,10 @@ angular.module("pocApp")
 
                             'themes': {name: 'proton', responsive: true}}}
                 ).on('changed.jstree', function (e, data) {
-                    //seems to be the node selection event...
-
-                    // $("#designTree").jstree("close_all");
-                    //                 $("#designTree").jstree("open_node","root");
 
                     if (data.node) {
                         $scope.selectedCompositionNode = data.node;
-                        //console.log(data.node)
+
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...

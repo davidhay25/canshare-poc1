@@ -57,7 +57,8 @@
     <script src="js/editCompositionCtrl.js"></script>
     <script src="js/editVSCtrl.js"></script>
     <script src="js/modelCompositionCtrl.js"></script>
-
+    <script src="js/modelDGCtrl.js"></script>
+    <script src="js/optionsCtrl.js"></script>
     <script src="directive/renderForm/renderFormSvc.js"></script>
     <script src="directive/renderForm/renderFormDir.js"></script>
 <!--
@@ -152,6 +153,139 @@
 
     <uib-tabset>
 
+        <uib-tab heading="DataGroups">
+
+
+            <div class="row">
+                <div ng-class="leftPanel">
+
+                    <div>
+                        <button class="btn btn-link pull-right" ng-click="listAllDG()">List all</button>
+                    </div>
+                    <div class="clearfix"></div>
+
+                    <div class="list-group">
+                        <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
+                             ng-click="selectModel(v)"
+                             ng-repeat="(k,v) in world.dataGroups">
+
+                            <i class="glyphicon glyphicon-edit pull-right clickable"
+                               ng-click="editModel(v)"></i>
+
+                            {{v.title}}
+                        </div>
+                    </div>
+
+                    <div>
+                        <button class="btn btn-link" ng-click="newModel('dg')">New DataGroup</button>
+                    </div>
+                </div>
+                <div ng-class="rightPanel">
+
+                    <div  ng-show="input.showDGList">
+                        <div class="banner"> List of all DataGroups</div>
+
+                        <table class="table table-condensed table-bordered">
+                            <tr><th>Name</th><th>Title</th><th>Description</th><th>mCODE group</th><th># elements</th></tr>
+                            <tr ng-repeat="(k,v) in world.dataGroups">
+                                <td><div class="clickable" ng-click="selectModelFromList(k,v.kind)">{{v.name}}</div></td>
+                                <td>{{v.title}}</td>
+                                <td>{{v.description}}
+
+                                    <div>
+                                        <div
+                                                ng-click="selectModelFromList(item.name,item.kind)"
+                                                ng-repeat="item in xref[v.name] track by $index">
+                                            {{item.kind}}: <span  class="clickable">{{item.name}}</span> (<em>{{item.path}}</em>)
+
+                                        </div>
+                                    </div>
+
+                                </td>
+                                <td>
+                                    <a ng-href="{{mCodeGroupPage[v.mcodegroup]}}" target="_blank">{{v.mcodegroup}}</a>
+                                </td>
+                                <td>{{v.diff.length}}</td>
+                            </tr>
+                        </table>
+
+                    </div>
+
+
+                    <div  ng-show="!showDGList && selectedModel.kind == 'dg'">
+                        <ng-include src="'/includes/showDG.html'"></ng-include>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </uib-tab>
+
+        <uib-tab heading="Compositions">
+            <button class="btn btn-link pull-right" ng-click="toggleLeftPanel()">Toggle list</button>
+
+            <div class="row">
+                <div ng-class="leftPanel">
+
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            Stream
+                        </div>
+                        <div class="col-md-9">
+                            <select ng-model="input.selectedTumourStream" class="form-control"
+                                    ng-options="ts for ts in tumourStreams"></select>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            Kind
+                        </div>
+                        <div class="col-md-9">
+                            <select ng-model="input.selectedCompKind" class="form-control"
+                                    ng-options="kind for kind in compKinds"></select>
+                        </div>
+
+                    </div>
+
+
+
+                    <br/>
+                    <div class="myScroll">
+
+                        <div class="list-group">
+                            <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
+                                 ng-click="selectComposition(v)"
+                                 ng-show="showComposition(v)"
+                                 ng-repeat="(k,v) in world.compositions">
+
+                                <div>{{v.title}}</div>
+                                <em>{{k}}</em>
+
+                            </div>
+                        </div>
+
+                        <div>
+                            <button class="btn btn-link" ng-click="newComposition()">New Composition</button>
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <div ng-class="rightPanel">
+                    <ng-include src="'/includes/showComposition.html'"></ng-include>
+                </div>
+            </div>
+
+        </uib-tab>
+
+
+
+<!--
 
         <uib-tab heading="Compositions and datagroups">
            
@@ -207,12 +341,7 @@
                                            ng-click="editModel(v)"></i>
 
                                         {{v.title}}
-<!--
-                                        <div><em>{{v.description}}</em></div>
-                                        -->
-<!--
-                                        <div class="clickable" ng-click="editModel(v)"><em>{{k}}</em></div>
--->
+
                                     </div>
                                 </div>
 
@@ -281,345 +410,9 @@
                 </div>
 
 
-                <div ng-show="false || !showDGList && selectedModel.kind == 'vs'">
-                    <br/>
-
-                    <div ng-controller="editVSCtrl">
-                        <uib-tabset>
-                            <uib-tab heading="Table">
-
-                                <div class="row">
-                                    <div class="col-md-2">Name</div>
-                                    <div class="col-md-10">{{selectedModel.name}}</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-2">Title</div>
-                                    <div class="col-md-10">{{selectedModel.title}}</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-2">Url</div>
-                                    <div class="col-md-10">{{selectedModel.url}}</div>
-                                </div>
-                                <br/>
-                                <table class="table table-bordered">
-                                    <tr><th>Display</th><th>Code</th></tr>
-                                    <tr ng-repeat="concept in selectedModel.concepts">
-                                        <td>{{concept.display}}</td>
-                                        <td>{{concept.code}}</td>
-                                    </tr>
-                                </table>
-                            </uib-tab>
-                            <uib-tab heading="Json">
-                                <pre>{{selectedModel | json}}</pre>
-                            </uib-tab>
-                        </uib-tabset>
-                    </div>
-
-
-
-
-
-                </div>
 
                 <div  ng-show="!showDGList && selectedModel.kind == 'dg'">
-                    <br/>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <strong>{{selectedModel.description}}</strong>
-                        </div>
-
-                        <div class="col-md-3">
-                            FHIR resource: <a target = "_blank" ng-href="{{fhirRoot}}{{selectedModel.fhirResource}}">{{selectedModel.fhirResource}}</a>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="pull-right">
-                                <checkbox ng-model="input.showFullModel" ng-click="updateFullModelShow()"></checkbox> Show expanded model
-                            </div>
-                        </div>
-                    </div>
-                    <br/>
-
-
-                    <uib-tabset>
-
-                        <uib-tab heading="Tree">
-                            <em>The model as a tree. Expanded if the checkbox is selected</em>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div id="dgTree"></div>
-                                </div>
-                                <div class="col-md-6">
-
-                                    <div ng-show="selectedNode.data.ed">
-
-                                        <table class="table table-bordered table-condensed">
-                                            <tr><td style="width : 20%">Path</td><td>{{selectedNode.data.ed.path}}</td></tr>
-                                            <tr><td>Type</td>
-                                                <td><div ng-repeat="type in selectedNode.data.ed.type">
-                                                    {{type}}&nbsp;</div>
-                                                </td></tr>
-                                            <tr><td>Description</td><td>{{selectedNode.data.ed.description}}</td></tr>
-                                            <tr ng-show="selectedNode.data.ed.valueSet">
-                                                <td>ValueSet</td>
-                                                <td>{{selectedNode.data.ed.valueSet}}</td>
-                                            </tr>
-                                        </table>
-
-
-                                    </div>
-
-                                    <br/>
-                                    <pre ng-show="selectedNode">{{selectedNode.data.ed | json}}</pre>
-
-
-                                    <div ng-show="selectedModel.kind == 'comp'">
-                                        <div ng-show="selectedNode.data.ed.type.indexOf('CodeableConcept') > -1" >
-                                            <button class="btn btn-link" ng-click="setValueSet(selectedNode.data.ed)">
-                                                Set ValueSet
-                                            </button>
-                                        </div>
-
-                                        <div ng-hide="!selectedNode || selectedNode.data.ed.mult.indexOf('0..0') > -1" >
-                                            <button class="btn btn-link" ng-click="removeElement(selectedNode.data.ed)">
-                                                Remove element
-                                            </button>
-                                        </div>
-
-                                    </div>
-
-
-
-
-
-
-
-
-                                </div>
-                            </div>
-
-
-
-                        </uib-tab>
-
-
-                        <uib-tab heading="Table">
-                            <em class="pull-right">The model as a table. Expanded if the checkbox is selected</em>
-
-                            <div ng-show = "selectedModel.parent">
-                                <strong class="pull-left">Profiles: {{selectedModel.parent}}</strong>
-                            </div>
-
-                            <table class="table-bordered table">
-                                <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Code</th></tr>
-                                <tr ng-repeat="element in fullElementList" ng-hide="$index==0 || element.mult.indexOf('..0') > -1">
-
-                                    <td>
-                                        <div  ng-style="{ 'padding-left': (element.path | pathindent) }">
-                                           <!-- {{element.path | dropFirstInPath}} -->
-                                            <div ng-hide="input.showFullModel">
-                                                {{element.path | dropFirstInPath}}
-                                            </div>
-                                            <div ng-show="input.showFullModel">
-                                                {{element.path | lastInPath}}
-
-                                            </div>
-
-
-
-                                        </div>
-
-
-                                    </td>
-                                    <td>{{element.title}}</td>
-                                    <td>{{element.description}}</td>
-                                    <td>
-                                        <div ng-repeat="type in element.type">
-                                            {{type}}
-                                        </div>
-                                        <div><em class="clickable" ng-click="showVS(element.valueSet)">{{element.valueSet}}</em></div>
-                                    </td>
-                                    <td>{{element.mult}}</td>
-                                    <td>
-                                        <div ng-repeat="code in element.code">
-                                            {{code.code}}
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-                            </table>
-                        </uib-tab>
-
-
-                        <uib-tab heading="Graph" select="fitGraph()">
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div id="graph"></div>
-                                </div>
-                                <div class="col-md-6">
-                                    <uib-tabset ng-show="selectedModelFromGraph">
-                                        <uib-tab heading="Table">
-
-                                            <div class="row">
-                                                <div class="col-md-2">Name:</div>
-                                                <div class="col-md-10">{{selectedModelFromGraph.name}}</div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-2">Title:</div>
-                                                <div class="col-md-10">{{selectedModelFromGraph.title}}</div>
-                                            </div>
-
-
-                                            <br/>
-                                            <table class="table-bordered table table-condensed">
-                                                <tr><th>Path</th><th>Type</th><th>Card.</th></tr>
-                                                <tr ng-repeat="ed in selectedModelFromGraph.diff">
-                                                    <td>{{ed.path}}
-                                                        <div style="padding-left: 8px"><em >{{ed.description}}</em></div>
-                                                    </td>
-                                                    <td>{{ed.type[0]}}
-                                                        <div class="clickable"><em>{{ed.valueSet}}</em></div>
-                                                    </td>
-                                                    <!--
-                                                    <td>
-                                                        <div ng-repeat="code in code">
-                                                            {{code}}
-                                                        </div>
-                                                    </td>
-                                                    -->
-                                                    <td>{{ed.mult}}</td>
-                                                </tr>
-                                            </table>
-
-                                        </uib-tab>
-                                        <uib-tab heading="Json">
-                                            <pre>{{selectedModelFromGraph | json}}</pre>
-                                        </uib-tab>
-                                    </uib-tabset>
-
-
-                                </div>
-                            </div>
-
-
-                        </uib-tab>
-
-                        <uib-tab ng-show="selectedModel.kind == 'dg'">
-                            <uib-tab-heading>Referenced by</uib-tab-heading>
-
-
-                            <table class="table table-bordered">
-                                <tr><th>Name</th><th>Path</th><th>Kind</th></tr>
-                                <tr ng-repeat="item in xref[selectedModel.name] track by $index">
-                                    <td>
-                                        <div class="clickable" ng-click="selectModelFromList(item.name,item.kind)">
-                                            {{item.name}}
-                                        </div>
-
-
-                                    </td>
-                                    <td>{{item.path}}</td>
-                                    <td>{{item.kind}}</td>
-                                </tr>
-                            </table>
-<!--
-                            {{selectedModel.name}}
-                            <pre>{{xref | json}}</pre>
-
--->
-
-
-
-                        </uib-tab>
-
-                        <uib-tab heading="Questionnaire">
-                            <uib-tabset>
-                                <uib-tab heading="Form">
-                                    <renderform q="Qobject" qr="QR"></renderform>
-                                </uib-tab>
-                                <uib-tab heading="Json">
-                                    <pre>{{Qobject | json}}</pre>
-                                </uib-tab>
-                            </uib-tabset>
-
-
-
-
-
-                        </uib-tab>
-
-
-                        <uib-tab ng-show="selectedModel.kind == 'comp'" heading="Overrides">
-                            <em class="pull-right">Elements that have been overriden in this model</em>
-
-                            <div ng-show = "selectedModel.parent">
-                                <strong class="pull-left">Profiles: {{selectedModel.parent}}</strong>
-                            </div>
-
-                            <table class="table-bordered table">
-                                <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Code</th></tr>
-                                <tr ng-repeat="element in overrides">
-
-                                    <td>
-                                        <div>
-                                            {{element.path}}
-
-
-                                            <!-- {{element.path | dropFirstInPath}} -->
-                                            <!--
-                                            <div ng-hide="input.showFullModel">
-                                                {{element.path | dropFirstInPath}}
-                                            </div>
-                                            <div ng-show="input.showFullModel">
-                                                {{element.path | lastInPath}}
-
-                                            </div>
--->
-
-
-                                        </div>
-
-
-                                    </td>
-                                    <td>{{element.title}}</td>
-                                    <td>{{element.description}}</td>
-                                    <td>
-                                        <div ng-repeat="type in element.type">
-                                            {{type}}
-                                        </div>
-                                        <div><em class="clickable" ng-click="showVS(element.valueSet)">{{element.valueSet}}</em></div>
-                                    </td>
-                                    <td>{{element.mult}}</td>
-                                    <td>
-                                        <div ng-repeat="code in element.code">
-                                            {{code.code}}
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-                            </table>
-                        </uib-tab>
-
-
-
-
-                        <uib-tab ng-show="false" heading="Json">
-                            <em>All the elements in a 'flattened' list (like a StructureDefinition).</em>
-                            <pre>{{fullElementList | json}}</pre>
-                        </uib-tab>
-
-                        <uib-tab heading="Json">
-                            <em>The definition for this model (not expanded)</em>
-                            <pre>{{selectedModel | json}}</pre>
-                        </uib-tab>
-
-
-                    </uib-tabset>
-
-
+                    <ng-include src="'/includes/showDG.html'"></ng-include>
                 </div>
 
                 </div>
@@ -627,6 +420,9 @@
 
 
         </uib-tab>
+
+
+        -->
 
         <uib-tab>
             <uib-tab-heading>
@@ -793,13 +589,7 @@
 
         </uib-tab>
 
-        <uib-tab heading="ValueSet">
 
-
-            <button class="btn-link btn" ng-click="importVS(input.pasteVS)">Import</button>
-
-            <textarea ng-model = "input.pasteVS" class="form-control" rows="20"></textarea>
-        </uib-tab>
 
 
     </uib-tabset>

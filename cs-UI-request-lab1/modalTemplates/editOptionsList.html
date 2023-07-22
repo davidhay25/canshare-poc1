@@ -4,16 +4,16 @@
 
   <div class="modal-header">
     <div class="row">
-      <div class="col-md-8 col-sm-8">
+      <div class="col-md-6 col-sm-6">
         <h3 class="modal-title">
           Options list
         </h3>
       </div>
 
 
-      <div class="col-md-4 col-sm-4">
+      <div class="col-md-6 col-sm-6">
         <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
-        <button class="btn btn-primary pull-right" ng-click="save()">Close</button>
+        <button ng-show = "input.dirty" class="btn btn-primary pull-right" ng-click="save()">Save and Close</button>
       </div>
     </div>
 
@@ -41,6 +41,7 @@
             <textarea class="form-control" rows = "8" ng-model="input.optionsSnomed"></textarea>
 
             <button class="btn-link btn" ng-click="parseSnomed(input.optionsSnomed)">Parse</button>
+
           </div>
         </div>
       </uib-tab>
@@ -65,6 +66,7 @@
 
   </div>
   <div class="modal-header">
+    <em>When updating, paste in the text and then click 'Parse'. This will activate the save button.</em>
 
   </div>
 </div>

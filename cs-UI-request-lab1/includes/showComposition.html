@@ -272,6 +272,53 @@
       </table>
     </uib-tab>
 
+    <uib-tab heading = "MetaData">
+
+      <div class="row">
+        <div class="col-md-6">
+          <table class="table">
+            <tr>
+              <td>Name</td>
+              <td>{{selectedModel.name}}</td>
+            </tr>
+            <tr>
+              <td>Title</td>
+              <td><input type="text" class="form-control" ng-model="selectedModel.title" />  </td>
+            </tr>
+            <tr>
+              <td>Description</td>
+              <td><textarea class="form-control" ng-model="selectedModel.description" ></textarea> </td>
+            </tr>
+
+          </table>
+        </div>
+        <div class="col-md-6">
+          <table class="table">
+
+            <tr>
+              <td>Tumour stream</td>
+              <td><input type="text" class="form-control" ng-model="selectedModel.meta.tumourStream" /> </td>
+            </tr>
+
+            <tr>
+              <td>Tags</td>
+              <td>
+                <div ng-repeat="tag in selectedModel.meta.tags">
+                  {{tag}}
+                </div>
+              </td>
+            </tr>
+
+
+          </table>
+        </div>
+      </div>
+
+
+
+
+
+    </uib-tab>
 
     <uib-tab heading = "Json">
       <pre>{{selectedModel | json}}</pre>

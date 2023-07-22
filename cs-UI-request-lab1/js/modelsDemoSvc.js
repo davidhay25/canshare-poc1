@@ -23,12 +23,18 @@ angular.module("pocApp")
                     //ancillary studies
                     let dgAncillary = {kind:"dg",name:'AncillaryStudy',title:"Ancillary Study",diff:[],mcodegroup:'disease',
                         description:"Diagnostic or therapeutic procedure which is supplementary to the main test or treatment."}
+
                     dgAncillary.diff.push({path:'type',title:'Type of study',type:['CodeableConcept'],
+                        valueSet : "http://canshare.co.nz/ValueSet/ancillary-type",
                         description:"The type of ancillary test"})
 
                     let ancMethod = {path:'method',title:'Method used',type:['CodeableConcept'],
                         description:"The method of how the ancillary study was performed"}
-                    
+
+                    ancMethod.dependVS = []
+                    ancMethod.dependVS.push({source:'type',value:{code:'HER2'},url:"https://canshare.co.nz/fhir/ValueSet/ancillary-method-HER2"})
+                    ancMethod.dependVS.push({source:'type',value:{code:'PT'},url:"https://canshare.co.nz/fhir/ValueSet/ancillary-method-PT"})
+
                     dgAncillary.diff.push(ancMethod)
 
                     dgAncillary.diff.push({path:'result',title:'Result',type:['CodeableConcept'],
@@ -393,7 +399,14 @@ angular.module("pocApp")
 
                     //===================Compositions
                     //Base composition for Path request
-                    let compPathRequest = {kind:"comp",name:'PathRequest',title: "Pathology request",sections:[]}
+                    let compPathRequest = {kind:"comp",name:'PathRequest',title: "Pathology request",meta:{},sections:[]}
+                    compPathRequest.meta.kind = "request"
+                    compPathRequest.meta.tumourStream = "lung"
+                    compPathRequest.meta.tags = ['tag1','tag2']
+
+
+
+
 
                     let s1 = {name:"demographics",kind:'section',items:[{name:'patient',title:"Patient",type:['Patient'],mult:'1..1'}]}
                     compPathRequest.sections.push(s1)
@@ -417,11 +430,6 @@ angular.module("pocApp")
 
                     compPathRequest.sections.push(s4)
 
-                    //compPathRequest.diff.push({path:'patient',title:"Patient",type:['Patient'],mult:'1..1'})
-                    //compPathRequest.diff.push({path:'history',title:"History",type:['ClinicalHistory'],mult:'0..*'})
-                    //compPathRequest.diff.push({path:'specimen',title:"Specimen",type:['Specimen'],mult:'0..*'})
-                    //compPathRequest.diff.push({path:'assessment',title:"Assessment",type:['Assessment'],mult:'0..*'})
-
 
                     hashCompositions[compPathRequest.name] = compPathRequest
 
@@ -429,7 +437,7 @@ angular.module("pocApp")
                         parent:compPathRequest.name,
                         name:'PathRequestBB',title: "Breast biopsy pathology request",sections:[]}
 
-                    hashCompositions[compPathRequestBB.name] = compPathRequestBB
+                    //hashCompositions[compPathRequestBB.name] = compPathRequestBB
 /*
 
                     //--------  Composition for Breast biopsy - 'is-a' Path request

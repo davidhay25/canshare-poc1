@@ -1,6 +1,11 @@
+//controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('modelCompositionCtrl',
         function ($scope,$uibModal) {
+
+
+            $scope.compositionKind = ['request','report','general']
+           // $scope.tumourStream = ['breast','gyne','lung','gi']
 
 
             $scope.editOptionsList = function (ed) {
@@ -8,45 +13,8 @@ angular.module("pocApp")
                     templateUrl: 'modalTemplates/editOptionsList.html',
                     backdrop: 'static',
                     //size : 'lg',
-                    controller : function ($scope,ed) {
-                        $scope.input = {}
-                        $scope.ed = ed
+                    controller: 'optionsCtrl',
 
-                        $scope.parseList = function (txt) {
-                            $scope.ed.options = []
-                            console.log(txt)
-                            let lines = txt.split('\n')
-                            lines.forEach(function (lne) {
-                                let option = {}
-                                option.pt = lne
-                                $scope.ed.options.push(option)
-
-                            })
-                            //console.log(ar)
-                        }
-
-
-                        $scope.parseSnomed = function (txt) {
-                            $scope.ed.options = []
-                            console.log(txt)
-                            let lines = txt.split('\n')
-                            lines.forEach(function (lne) {
-                                let ar = lne.split('\t')
-                                console.log(ar)
-                                let option = {}
-                                option.code = ar[0]
-                                option.pt = ar[1]
-                                $scope.ed.options.push(option)
-
-                            })
-                            //console.log(ar)
-                        }
-
-
-                        $scope.save = function () {
-                            $scope.$close($scope.ed)
-                        }
-                    },
 
                     resolve: {
                         ed: function () {
