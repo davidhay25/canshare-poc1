@@ -1,7 +1,7 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('modelDGCtrl',
-        function ($scope,$uibModal) {
+        function ($scope,$uibModal,$filter) {
 
 
             $scope.editDGOptionsList = function (ed) {
@@ -11,7 +11,6 @@ angular.module("pocApp")
                     //size : 'lg',
                     controller: 'optionsCtrl',
 
-
                     resolve: {
                         ed: function () {
                             return ed
@@ -19,13 +18,23 @@ angular.module("pocApp")
                     }
 
                 }).result.then(function (updatedEd) {
-                    //$scope.selectedCompositionNode.data.ed.options = updatedEd.options
-                    //return
+                    //need to update the .diff in the selected model
 
-                    $scope.selectedNode.data.ed.options = updatedEd.options
-                    //$scope.selectedModel.options = updatedEd.options
-                    //ed.options = updatedEd.options
+                    let p = $filter('lastInPath')(ed.path)
+                    for (const ed1 of $scope.selectedModel.diff) {
+                        if (ed1.path == p) {
+                            ed1.options = updatedEd.options
+                            //ed.valueSet = vsUrl
+                            break
+                        }
+                    }
 
+                    for (const ed1 of $scope.selectedModel.diff) {
+                        if (ed1.name == ed.name) {
+                            ed1.options = updatedEd.options  //this is the model ($localstorage)
+                            break
+                        }
+                    }
 
                 })
             }
@@ -34,8 +43,17 @@ angular.module("pocApp")
             $scope.changeDGValueSet = function (ed) {
                 let vsUrl = prompt("Enter the ValueSet url")
                 if (vsUrl) {
-                   // let newEd = angular.copy(ed)
-                    ed.valueSet = vsUrl
+
+                    let p = $filter('lastInPath')(ed.path)
+                    for (const ed1 of $scope.selectedModel.diff) {
+                        if (ed1.path == p) {
+                            ed1.valueSet = vsUrl        //this is the model ($localstorage)
+                            ed.valueSet = vsUrl         //this is the display
+                            break
+                        }
+                    }
+
+
 
 
                 }

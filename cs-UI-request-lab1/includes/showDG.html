@@ -39,16 +39,52 @@
                       {{type}}&nbsp;</div>
                     </td></tr>
                   <tr><td>Description</td><td>{{selectedNode.data.ed.description}}</td></tr>
-                  <tr ng-show="selectedNode.data.ed.valueSet">
+                  <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
                     <td>ValueSet</td>
-                    <td>{{selectedNode.data.ed.valueSet}}</td>
+                    <td>
+                      <div>{{selectedNode.data.ed.valueSet}}</div>
+                      <div>
+                        <span ng-show="selectedNode.data.ed.valueSet" class="clickable">View VS</span>
+
+                        <button ng-show="selectedNode.data.ed.valueSet"
+                                ng-click = "changeDGValueSet(selectedNode.data.ed)"
+                                class="btn-link btn">Change VS</button>
+
+                        <button ng-hide="selectedNode.data.ed.valueSet"
+                                ng-click = "changeDGValueSet(selectedNode.data.ed)"
+                                class="btn-link btn">Set VS</button>
+
+                      </div>
+                    </td>
+
+
                   </tr>
 
+                  <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
+                    <td>Options</td>
+                    <td>
+                      <div ng-show="selectedNode.data.ed.options">
+                        There are {{selectedNode.data.ed.options.length}} options defined
+                      </div>
 
+                      <div ng-hide="selectedNode.data.ed.options">
+                        There are no options defined
+                      </div>
+                      <div><em>Options are used to build ValueSets</em></div>
+
+
+                      <button
+                              ng-click = "editDGOptionsList(selectedNode.data.ed)"
+                              class="btn-link btn">View / Edit list</button>
+
+
+                    </td>
+                  </tr>
 
 
                 </table>
 
+                <!--
                 <div class="row"  ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
                   <div class="col-md-3">
                     ValueSet
@@ -72,7 +108,9 @@
                   </div>
                 </div>
 
+                -->
 
+                <!--
                 <div class="row"  ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
                   <div class="col-md-3">
                     Options List
@@ -94,11 +132,12 @@
 
                   </div>
                 </div>
-
+-->
 
                 <!-- If the ValueSet depends on some other value in the DG-->
                 <div ng-show="selectedNode.data.ed.dependVS">
-                  ValueSet is dependent on other DG values
+                  ValueSet is dependent on other DG values (Details in Dependencies tab)
+                  <!--
                   <br/>
                   <table class="table table-bordered">
                     <tr><th>Source</th><th>Value</th><th>Url</th></tr>
@@ -108,8 +147,22 @@
                       <td>{{dep.url}}</td>
                     </tr>
                   </table>
+                  -->
 
                 </div>
+              </uib-tab>
+              <uib-tab >
+
+                <uib-tab-heading>VS Dependencies <span class="badge">{{selectedNode.data.ed.dependVS.length || 0}}</span> </uib-tab-heading>
+                <br/>
+                <table class="table table-bordered">
+                  <tr><th>Source</th><th>Value</th><th>Url</th></tr>
+                  <tr ng-repeat="dep in selectedNode.data.ed.dependVS">
+                    <td>{{dep.source}}</td>
+                    <td>{{dep.value}}</td>
+                    <td>{{dep.url}}</td>
+                  </tr>
+                </table>
               </uib-tab>
               <uib-tab heading="Json">
                 <pre ng-show="selectedNode">{{selectedNode.data.ed | json}}</pre>
@@ -123,7 +176,7 @@
 
           <br/>
 
-
+<!--
 
           <div ng-show="selectedModel.kind == 'comp'">
             <div ng-show="selectedNode.data.ed.type.indexOf('CodeableConcept') > -1" >
@@ -139,6 +192,7 @@
             </div>
 
           </div>
+          -->
 
 
 

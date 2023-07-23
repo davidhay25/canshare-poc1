@@ -32,8 +32,10 @@ angular.module("pocApp")
                         description:"The method of how the ancillary study was performed"}
 
                     ancMethod.dependVS = []
-                    ancMethod.dependVS.push({source:'type',value:{code:'HER2'},url:"https://canshare.co.nz/fhir/ValueSet/ancillary-method-HER2"})
-                    ancMethod.dependVS.push({source:'type',value:{code:'PT'},url:"https://canshare.co.nz/fhir/ValueSet/ancillary-method-PT"})
+                    ancMethod.dependVS.push({source:'type',value:{code:'HER2'},
+                        url:"https://canshare.co.nz/fhir/ValueSet/ancillary-method-HER2"})
+                    ancMethod.dependVS.push({source:'type',value:{code:'PT'},
+                        url:"https://canshare.co.nz/fhir/ValueSet/ancillary-method-PT"})
 
                     dgAncillary.diff.push(ancMethod)
 

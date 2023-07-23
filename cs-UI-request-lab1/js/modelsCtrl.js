@@ -255,7 +255,7 @@ angular.module("pocApp")
                 //$scope.editComposition(newComp,true)
             }
 
-            $scope.editComposition = function (model,isNew) {
+            $scope.editCompositionDEP = function (model,isNew) {
 
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editComposition.html',

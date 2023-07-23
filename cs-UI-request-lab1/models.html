@@ -58,6 +58,7 @@
     <script src="js/editVSCtrl.js"></script>
     <script src="js/modelCompositionCtrl.js"></script>
     <script src="js/modelDGCtrl.js"></script>
+    <script src="js/modelTermCtrl.js"></script>
     <script src="js/optionsCtrl.js"></script>
     <script src="directive/renderForm/renderFormSvc.js"></script>
     <script src="directive/renderForm/renderFormDir.js"></script>
@@ -103,6 +104,7 @@
             </div>
             <div class="col-md-2">
                 <div class="navbar-text">
+                    <button class="btn btn-link pull-right" ng-click="toggleLeftPanel()">Toggle list</button>
                     <!--
                     <select class="form-control" ng-model="svr" ng-change="selectServer(svr)"
                             ng-options="svr.display for svr in allServers">
@@ -283,7 +285,9 @@
 
         </uib-tab>
 
-
+        <uib-tab heading="Terminology">
+            <ng-include src="'/includes/terminology.html'"></ng-include>
+        </uib-tab>
 
 <!--
 
