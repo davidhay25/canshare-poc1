@@ -12,14 +12,18 @@ angular.module("pocApp")
 
             $scope.fhirRoot = "http://hl7.org/fhir/R4/"
 
-            //allows a specific tab to be selected
+            //allows a specific tab in the mail UI to be selected
             $scope.ui = {}
-
             $scope.ui.tabDG = 0;
             $scope.ui.tabComp = 1;
             $scope.ui.tabTerminology = 2;
 
             $scope.input.mainTabActive = $scope.ui.tabTerminology;
+
+            //allows a specific tab in the showCompositions to e selected. Used by term summary (only need tree ATM)
+            $scope.compUi = {}
+            $scope.compUi.tree = 0
+            $scope.input.compTabActive = $scope.compUi.tree
 
 
 
@@ -55,7 +59,7 @@ angular.module("pocApp")
             //$scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
 
             //same as for DG's - a step towards separate objects for DG & comp
-            $scope.allCompositions = $localStorage.world.compositions
+            $scope.hashAllCompositions = $localStorage.world.compositions
             //make the term summary. These are the override elements in the models
            // $scope.compTermSummary = modelTermSvc.makeCompOverrideSummary($scope.allCompositions).list
 
@@ -65,9 +69,9 @@ angular.module("pocApp")
 
             $scope.updateTermSummary = function () {
                 $scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
-                $scope.compTermSummary = modelTermSvc.makeCompOverrideSummary($scope.allCompositions).list
-                $scope.hashVsSummary = modelTermSvc.makeValueSetSummary($scope.hashAllDG,$scope.allCompositions).hashVS
-                console.log($scope.vsSummary)
+                $scope.compTermSummary = modelTermSvc.makeCompOverrideSummary($scope.hashAllCompositions).list
+                $scope.hashVsSummary = modelTermSvc.makeValueSetSummary($scope.hashAllDG,$scope.hashAllCompositions).hashVS
+                console.log($scope.hashVsSummary)
                 console.log($scope.termSummary)
             }
 

@@ -31,7 +31,7 @@
 
       </uib-tab>
 
-      <uib-tab heading="Update list (SNOMED)">
+      <uib-tab heading="Update list (SNOMED)" ng-hide="readOnly">
         <div class="row">
           <div class="col-sm-1 col-md-1">
 
@@ -46,7 +46,7 @@
         </div>
       </uib-tab>
 
-      <uib-tab heading="Update list">
+      <uib-tab heading="Update list" ng-hide="readOnly">
         <div class="row">
           <div class="col-sm-1 col-md-1">
 
@@ -66,7 +66,7 @@
 
   </div>
   <div class="modal-header">
-    <em>When updating, paste in the text and then click 'Parse'. This will activate the save button.</em>
+    <em  ng-hide="readOnly">When updating, paste in the text and then click 'Parse'. This will activate the save button.</em>
 
   </div>
 </div>

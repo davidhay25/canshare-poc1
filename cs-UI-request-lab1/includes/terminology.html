@@ -24,14 +24,17 @@
     }
   </style>
 
+  <br/>
+  <div ng-click="updateTermSummary()" class="clickable pull-right">Refresh</div>
+
   <uib-tabset>
-    <br/>
+
 
     <uib-tab heading = "DataGroups">
 
 
       <div class="pull-right"> CodeableConcepts in the DataGroup. This is only in the DG - not in referenced DGs.
-        <span ng-click="updateTermSummary()" class="clickable">Refresh</span></div>
+       </div>
 
 
 
@@ -58,7 +61,9 @@
             <td>{{item.title}}</td>
             <td>{{item.description}}</td>
             <td>{{item.valueSet}}</td>
-            <td>{{item.options.length}}</td>
+            <td>
+              <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}}</span>
+            </td>
           </tr>
           </tbody>
 
@@ -67,14 +72,14 @@
       </div>
     </uib-tab>
     <uib-tab heading = "Compositions">
-      <div class="pull-right"> Composition overrides. These are (or should be) generally Terminology.
-        <span ng-click="updateTermSummary()" class="clickable">Refresh</span></div>
+      <div class="pull-right"> Composition overrides. These are (or should be) generally Terminology.</div>
 
 
       <table class="table table-bordered">
       <thead>
-      <tr>
-        <th>Composition name</th><th>Path</th><th>Title</th><th>Description</th><th>ValueSet</th><th>Previous ValueSet</th></tr>
+        <tr>
+          <th>Composition name</th><th>Path</th><th>Title</th><th>Description</th><th>ValueSet</th><th>Previous ValueSet</th>
+        </tr>
       </thead>
       <tbody>
       <tr ng-repeat="item in compTermSummary">
@@ -88,22 +93,42 @@
       </tbody>
       </table>
 
-
-
-
     </uib-tab>
     <uib-tab heading="ValueSets">
-
-      <table class="table table-bordered">
-
+      <div class="tableFixHead">
+        <table class="table table-bordered">
+          <thead>
+            <tr><th>Url</th><th>Where defined</th></tr>
+          </thead>
         <tbody>
         <tr ng-repeat="(k,v) in hashVsSummary">
           <td>{{k}}</td>
+          <td>
+            <div ng-repeat = "item in v">
+              <div ng-show="item.DGName">
+                DG: <span class="clickable" ng-click="termSelectDG(item)" >{{item.DGName}}</span>.
+                Path: <span class="clickable" ng-click="termSelectDGItem(item)">{{item.path}}</span>
+                <span ng-show = item.options>
+                  There are <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}} options</span> defined.
+                </span>
+              </div>
+
+              <div ng-show="item.compName">
+                Comp: <span class="clickable" ng-click="termSelectComp(item)" >{{item.compName}}</span>.
+                Path: <span class="clickable" ng-click="termSelectCompItem(item)">{{item.path}}</span>
+                <span ng-show = item.options>
+                  There are <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}} options</span> defined.
+                </span>
+              </div>
+
+            </div>
+          </td>
         </tr>
         </tbody>
 
       </table>
-
+      </div>
+      <pre>{{hashVsSummary | json}}</pre>
 
     </uib-tab>
   </uib-tabset>

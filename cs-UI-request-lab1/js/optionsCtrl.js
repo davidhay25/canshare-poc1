@@ -1,10 +1,11 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('optionsCtrl',
-        function ($scope,ed) {
+        function ($scope,ed,readOnly) {
 
             $scope.input = {}
             $scope.ed = ed
+            $scope.readOnly = readOnly
 
             $scope.parseList = function (txt) {
                 $scope.ed.options = []

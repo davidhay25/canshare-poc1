@@ -1,6 +1,58 @@
 angular.module("pocApp")
     .controller('modelTermCtrl',
-        function ($scope,$timeout) {
+        function ($scope,$timeout,$uibModal) {
+
+            $scope.viewOptions = function (item) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/editOptionsList.html',
+                    backdrop: 'static',
+                    //size : 'lg',
+                    controller: 'optionsCtrl',
+
+                    resolve: {
+                        ed: function () {
+                            return item     //just looks at the .options property
+                        },
+                        readOnly : function () {
+                            return true
+                        }
+                    }
+
+                })
+            }
+
+            //when a specific Composition is selected in the term summary
+            $scope.termSelectComp = function (item) {
+
+                //set the tab to the DG tab
+                $scope.input.mainTabActive = $scope.ui.tabComp
+                //$scope.hashAllCompositions[item.compName]
+
+                //select the composition - function is parent
+                $scope.selectComposition($scope.hashAllCompositions[item.compName])
+            }
+
+            $scope.termSelectCompItem = function (item) {
+
+
+                //set the tab to the Comp tab
+                $scope.input.mainTabActive = $scope.ui.tabComp
+                $scope.hashAllCompositions[item.compName]
+
+                //select the composition - function is parent
+                $scope.selectComposition($scope.hashAllCompositions[item.compName])
+
+                $timeout(function () {
+
+                    //let fullPath = `${item.hiddenDGName}.${item.path}`
+
+                    $("#compositionTree").jstree("select_node",  item.path);
+
+                    $scope.input.compTabActive = $scope.compUi.tree //make sure the tree is selected
+
+                },500)
+
+            }
 
             //when a specific DG is selected in the term summary
             $scope.termSelectDG = function (item) {
@@ -27,10 +79,9 @@ angular.module("pocApp")
                 //locate the DG with this name and set it active. This will select it in the DG tab
                 //Note that elements use a 'hidden' property to set the DG name
                 $scope.selectedModel = $scope.hashAllDG[item.hiddenDGName]
-
                 $scope.selectModel($scope.selectedModel)
 
-                //seelct the element in the DG tree. Need to wait for the tree to be built...
+                //selct the element in the DG tree. Need to wait for the tree to be built...
                 $timeout(function () {
                     let fullPath = `${item.hiddenDGName}.${item.path}`
 

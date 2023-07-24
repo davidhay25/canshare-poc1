@@ -71,6 +71,7 @@ angular.module("pocApp")
                         valueSet:"https://bodysite/alloptions",
                         description:"The anatomical structure being described"}) //will be overwritten
                     dgBodySite.diff.push({path:'laterality',title:'Laterality',type:['CodeableConcept'],mult:'0..1',
+                        valueSet : 'canshare-laterality',
                         description:'The laterality of a paired organ',valueSet:"canshare-laterality"})
                     dgBodySite.diff.push({path:'landmark',title:'Landmark',type:['CodeableConcept'],mult:'0..1',
                         description:'A significant landmark near the body site, e.g. nipple'})
@@ -81,6 +82,7 @@ angular.module("pocApp")
                     dgBodySite.diff.push({path:'description',title:'Description',type:['string'],mult:'0..1',
                         description:'Text description of the body site'})
 
+                    //https://nzhts.digital.health.nz/fhir/ValueSet/canshare-laterality
 
                     hashDataGroups[dgBodySite.name] = dgBodySite
 

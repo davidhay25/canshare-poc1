@@ -14,7 +14,8 @@ angular.module("pocApp")
                             dg.diff.forEach(function (ed) {
                                 //let item = {}
                                 if (ed.valueSet) {
-                                    let entry = {DGName : dg.name, path: ed.path}
+                                    //hiddenDGName is used when linking to the DG item
+                                    let entry = {DGName : dg.name,hiddenDGName : dg.name, path: ed.path}
                                     hashVS[ed.valueSet] = hashVS[ed.valueSet] || []
                                     //are there optyions defined as well?
                                     if (ed.options) {

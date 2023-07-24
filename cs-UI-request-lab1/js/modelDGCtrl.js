@@ -14,6 +14,9 @@ angular.module("pocApp")
                     resolve: {
                         ed: function () {
                             return ed
+                        },
+                        readOnly : function () {
+                            return false
                         }
                     }
 
