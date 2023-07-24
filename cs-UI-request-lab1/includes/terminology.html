@@ -1,3 +1,114 @@
 <div ng-controller="modelTermCtrl">
-  Terminology
+
+
+  <style>
+    .tableFixHead {
+      overflow-y: auto;
+      height: 800px;
+    }
+    .tableFixHead thead th {
+      position: sticky;
+      top: 0;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th,
+    td {
+      padding: 8px 16px;
+      border: 1px solid #ccc;
+    }
+    th {
+      background: #eee;
+    }
+  </style>
+
+  <uib-tabset>
+    <br/>
+
+    <uib-tab heading = "DataGroups">
+
+
+      <div class="pull-right"> CodeableConcepts in the DataGroup. This is only in the DG - not in referenced DGs.
+        <span ng-click="updateTermSummary()" class="clickable">Refresh</span></div>
+
+
+
+      <div class="clearfix"></div>
+      <div class="tableFixHead">
+        <table class="table table-bordered">
+          <thead>
+          <tr><th>DG Name</th><th>DG title</th><th>Element path</th>
+            <th>Element title</th><th>Element description</th><th>Element ValueSet</th><th># options</th></tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="item in termSummary">
+            <td>
+              <span class="clickable" ng-click="termSelectDG(item)">{{item.DGName}}</span>
+            </td>
+            <td>{{item.DGTitle}}</td>
+
+            <td>
+              <span class="clickable" ng-click="termSelectDGItem(item)">{{item.path}}</span>
+            </td>
+
+
+
+            <td>{{item.title}}</td>
+            <td>{{item.description}}</td>
+            <td>{{item.valueSet}}</td>
+            <td>{{item.options.length}}</td>
+          </tr>
+          </tbody>
+
+
+        </table>
+      </div>
+    </uib-tab>
+    <uib-tab heading = "Compositions">
+      <div class="pull-right"> Composition overrides. These are (or should be) generally Terminology.
+        <span ng-click="updateTermSummary()" class="clickable">Refresh</span></div>
+
+
+      <table class="table table-bordered">
+      <thead>
+      <tr>
+        <th>Composition name</th><th>Path</th><th>Title</th><th>Description</th><th>ValueSet</th><th>Previous ValueSet</th></tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="item in compTermSummary">
+        <td>{{item.compName}}</td>
+        <td>{{item.ov.path}}</td>
+        <td>{{item.ov.title}}</td>
+        <td>{{item.ov.description}}</td>
+        <td>{{item.ov.valueSet}}</td>
+        <td>{{item.ov.oldValueSet}}</td>
+      </tr>
+      </tbody>
+      </table>
+
+
+
+
+    </uib-tab>
+    <uib-tab heading="ValueSets">
+
+      <table class="table table-bordered">
+
+        <tbody>
+        <tr ng-repeat="(k,v) in hashVsSummary">
+          <td>{{k}}</td>
+        </tr>
+        </tbody>
+
+      </table>
+
+
+    </uib-tab>
+  </uib-tabset>
+
+
 </div>
+
+

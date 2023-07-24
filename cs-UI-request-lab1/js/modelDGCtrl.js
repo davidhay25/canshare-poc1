@@ -1,7 +1,7 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('modelDGCtrl',
-        function ($scope,$uibModal,$filter) {
+        function ($scope,$uibModal,$filter,modelTermSvc) {
 
 
             $scope.editDGOptionsList = function (ed) {
@@ -52,6 +52,11 @@ angular.module("pocApp")
                             break
                         }
                     }
+
+                    //make the term summary
+
+                    //$rootScope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
+
 
 
 

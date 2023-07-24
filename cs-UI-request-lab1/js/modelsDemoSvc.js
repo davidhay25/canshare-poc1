@@ -76,9 +76,9 @@ angular.module("pocApp")
                         description:'A significant landmark near the body site, e.g. nipple'})
                     dgBodySite.diff.push({path:'clockface',title:'Clockface',type:['CodeableConcept'],mult:'0..1',
                         description:'Clockface orientation from the landmark'})
-                    dgBodySite.diff.push({path:'distance',title:'Distance',type:['CodeableConcept'],mult:'0..1',
+                    dgBodySite.diff.push({path:'distance',title:'Distance',type:['Quantity'],mult:'0..1',
                         description:'The distance from the given landmark'})
-                    dgBodySite.diff.push({path:'description',title:'Description',type:['CodeableConcept'],mult:'0..1',
+                    dgBodySite.diff.push({path:'description',title:'Description',type:['string'],mult:'0..1',
                         description:'Text description of the body site'})
 
 

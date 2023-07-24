@@ -102,7 +102,10 @@ angular.module("pocApp")
                 let vsUrl = prompt("Enter the ValueSet url")
                 if (vsUrl) {
                     let newEd = angular.copy(ed)
+                    let oldVS = ed.valueSet
+
                     newEd.valueSet = vsUrl
+                    newEd.oldValueSet = oldVS
                     $scope.selectedModel.override = $scope.selectedModel.override || {}
                     $scope.selectedModel.override[newEd.path] = newEd
                     //delete $scope.selectedCompositionNode

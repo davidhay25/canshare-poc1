@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
-        function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc, $timeout,$uibModal,$filter) {
+        function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc, $timeout,$uibModal,$filter,modelTermSvc) {
 
             //$scope.localStorage = $localStorage
 
@@ -11,6 +11,17 @@ angular.module("pocApp")
             $scope.rightPanel = 'col-md-9'
 
             $scope.fhirRoot = "http://hl7.org/fhir/R4/"
+
+            //allows a specific tab to be selected
+            $scope.ui = {}
+
+            $scope.ui.tabDG = 0;
+            $scope.ui.tabComp = 1;
+            $scope.ui.tabTerminology = 2;
+
+            $scope.input.mainTabActive = $scope.ui.tabTerminology;
+
+
 
             $scope.toggleLeftPanel = function(){
                 if ($scope.leftPanel == 'col-md-3') {
@@ -37,6 +48,30 @@ angular.module("pocApp")
             }
 
             $scope.world = $localStorage.world
+
+            //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
+            $scope.hashAllDG = $localStorage.world.dataGroups
+            //make the term summary
+            //$scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
+
+            //same as for DG's - a step towards separate objects for DG & comp
+            $scope.allCompositions = $localStorage.world.compositions
+            //make the term summary. These are the override elements in the models
+           // $scope.compTermSummary = modelTermSvc.makeCompOverrideSummary($scope.allCompositions).list
+
+           // console.log($scope.compTermSummary)
+
+
+
+            $scope.updateTermSummary = function () {
+                $scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
+                $scope.compTermSummary = modelTermSvc.makeCompOverrideSummary($scope.allCompositions).list
+                $scope.hashVsSummary = modelTermSvc.makeValueSetSummary($scope.hashAllDG,$scope.allCompositions).hashVS
+                console.log($scope.vsSummary)
+                console.log($scope.termSummary)
+            }
+
+            $scope.updateTermSummary()
 
             //process the world to get filter and other vars.
             //todo split world into comp & DG, dropping VS
@@ -549,7 +584,7 @@ angular.module("pocApp")
 
                     if (data.node) {
                         $scope.selectedNode = data.node;
-                       // console.log(data.node)
+                        console.log(data.node)
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...

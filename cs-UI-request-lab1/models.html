@@ -59,23 +59,11 @@
     <script src="js/modelCompositionCtrl.js"></script>
     <script src="js/modelDGCtrl.js"></script>
     <script src="js/modelTermCtrl.js"></script>
+    <script src="js/modelTermSvc.js"></script>
     <script src="js/optionsCtrl.js"></script>
     <script src="directive/renderForm/renderFormSvc.js"></script>
     <script src="directive/renderForm/renderFormDir.js"></script>
-<!--
 
-   <script src="js/querySvc.js"></script>
-
-  <script src="js/makeLibraryQuery.js"></script>
-    <script src="js/showParameters.js"></script>
-
-    <script src="directive/viewBundle/viewBundleDir.js"></script>
-    <script src="directive/viewBundle/viewBundleSvc.js"></script>
-
-    <script src="directive/renderForm/renderFormDir.js"></script>
-    <script src="directive/renderForm/renderFormSvc.js"></script>
-
-    -->
 
     <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
 
@@ -105,22 +93,12 @@
             <div class="col-md-2">
                 <div class="navbar-text">
                     <button class="btn btn-link pull-right" ng-click="toggleLeftPanel()">Toggle list</button>
-                    <!--
-                    <select class="form-control" ng-model="svr" ng-change="selectServer(svr)"
-                            ng-options="svr.display for svr in allServers">
-
-                    </select>
-                    -->
-
-
                 </div>
             </div>
 
             <div class="col-md-4">
                 <div class="navbar-text">
-                    <!--
-                    {{selectedServer.url}}
-                    -->
+
                 </div>
             </div>
 
@@ -153,7 +131,8 @@
 
     </div>
 
-    <uib-tabset>
+    <uib-tabset  active="input.mainTabActive">
+
 
         <uib-tab heading="DataGroups">
 
@@ -169,7 +148,7 @@
                     <div class="list-group">
                         <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
                              ng-click="selectModel(v)"
-                             ng-repeat="(k,v) in world.dataGroups">
+                             ng-repeat="(k,v) in hashAllDG">
 
                             <i class="glyphicon glyphicon-edit pull-right clickable"
                                ng-click="editModel(v)"></i>
@@ -225,6 +204,7 @@
         </uib-tab>
 
         <uib-tab heading="Compositions">
+            <br/>
             <button class="btn btn-link pull-right" ng-click="toggleLeftPanel()">Toggle list</button>
 
             <div class="row">
@@ -285,9 +265,10 @@
 
         </uib-tab>
 
-        <uib-tab heading="Terminology">
+        <uib-tab heading="Terminology summary">
             <ng-include src="'/includes/terminology.html'"></ng-include>
         </uib-tab>
+
 
 <!--
 
