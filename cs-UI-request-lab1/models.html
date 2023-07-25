@@ -62,6 +62,8 @@
     <script src="js/modelTermCtrl.js"></script>
     <script src="js/modelTermSvc.js"></script>
     <script src="js/optionsCtrl.js"></script>
+    <script src="js/viewVSCtrl.js"></script>
+    <script src="js/showParameters.js"></script>
     <script src="directive/renderForm/renderFormSvc.js"></script>
     <script src="directive/renderForm/renderFormDir.js"></script>
 
@@ -134,6 +136,64 @@
 
     <uib-tabset  active="input.mainTabActive">
 
+        <uib-tab heading="Compositions">
+            <br/>
+            <button class="btn btn-link pull-right" ng-click="toggleLeftPanel()">Toggle list</button>
+
+            <div class="row">
+                <div ng-class="leftPanel">
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            Stream
+                        </div>
+                        <div class="col-md-9">
+                            <select ng-model="input.selectedTumourStream" class="form-control"
+                                    ng-options="ts for ts in tumourStreams"></select>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            Kind
+                        </div>
+                        <div class="col-md-9">
+                            <select ng-model="input.selectedCompKind" class="form-control"
+                                    ng-options="kind for kind in compKinds"></select>
+                        </div>
+
+                    </div>
+
+                    <br/>
+                    <div class="myScroll">
+
+                        <div class="list-group">
+                            <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
+                                 ng-click="selectComposition(v)"
+                                 ng-show="showComposition(v)"
+                                 ng-repeat="(k,v) in world.compositions">
+
+                                <div>{{v.title}}</div>
+                                <em>{{k}}</em>
+
+                            </div>
+                        </div>
+
+                        <div>
+                            <button class="btn btn-link" ng-click="newComposition()">New Composition</button>
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <div ng-class="rightPanel">
+                    <ng-include src="'/includes/showComposition.html'"></ng-include>
+                </div>
+            </div>
+
+        </uib-tab>
 
         <uib-tab heading="DataGroups">
 
@@ -201,65 +261,6 @@
             </div>
 
 
-
-        </uib-tab>
-
-        <uib-tab heading="Compositions">
-            <br/>
-            <button class="btn btn-link pull-right" ng-click="toggleLeftPanel()">Toggle list</button>
-
-            <div class="row">
-                <div ng-class="leftPanel">
-
-                    <div class="row">
-                        <div class="col-md-3">
-                            Stream
-                        </div>
-                        <div class="col-md-9">
-                            <select ng-model="input.selectedTumourStream" class="form-control"
-                                    ng-options="ts for ts in tumourStreams"></select>
-                        </div>
-
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-3">
-                            Kind
-                        </div>
-                        <div class="col-md-9">
-                            <select ng-model="input.selectedCompKind" class="form-control"
-                                    ng-options="kind for kind in compKinds"></select>
-                        </div>
-
-                    </div>
-
-                    <br/>
-                    <div class="myScroll">
-
-                        <div class="list-group">
-                            <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
-                                 ng-click="selectComposition(v)"
-                                 ng-show="showComposition(v)"
-                                 ng-repeat="(k,v) in world.compositions">
-
-                                <div>{{v.title}}</div>
-                                <em>{{k}}</em>
-
-                            </div>
-                        </div>
-
-                        <div>
-                            <button class="btn btn-link" ng-click="newComposition()">New Composition</button>
-                        </div>
-                    </div>
-
-
-
-                </div>
-                <div ng-class="rightPanel">
-                    <ng-include src="'/includes/showComposition.html'"></ng-include>
-                </div>
-            </div>
 
         </uib-tab>
 

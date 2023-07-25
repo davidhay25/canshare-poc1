@@ -124,7 +124,7 @@ angular.module("pocApp")
                 //Now process any overrides
                 if (comp.override) {
                     Object.keys(comp.override).forEach(function (path) {
-                        hashAllElements[path] =comp.override[path]
+                        hashAllElements[path] = comp.override[path]
                     })
                     /*
                     comp.override.forEach(function (ov) {

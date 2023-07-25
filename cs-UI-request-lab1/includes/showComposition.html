@@ -12,7 +12,7 @@
 
   </style>
 
-  <uib-tabset active="input.compTabActive">
+  <uib-tabset active="input.compTabActive" ng-show="selectedModel">
 
     <uib-tab heading="Tree">
       <em>The model as a tree. Expanded if the checkbox is selected</em>
@@ -90,7 +90,9 @@
                   <div class="col-md-9">
                     <div><em>{{selectedCompositionNode.data.ed.valueSet}}</em></div>
                     <div>
-                      <span ng-show="selectedCompositionNode.data.ed.valueSet" class="clickable">View VS</span>
+                      <button ng-show="selectedCompositionNode.data.ed.valueSet"
+                            ng-click="viewVS(selectedCompositionNode.data.ed.valueSet)"
+                            class="btn-link btn">View VS</button>
 
                       <button ng-show="selectedCompositionNode.data.ed.valueSet"
                               ng-click = "changeValueSet(selectedCompositionNode.data.ed)"
@@ -147,6 +149,16 @@
                </div>
               </div>
 
+              <div class="row" ng-show = "selectedCompositionNode.data.ed.zElement">
+                <div class="col-md-3">
+
+                </div>
+                <div class="col-md-9">
+                  <em>This element has been added directly (a 'Z' element)</em>
+                  
+                </div>
+              </div>
+
 
             <!-- If the root is selected, we can add a new section-->
             <div ng-show="selectedCompositionNode.id.indexOf('.') == -1">
@@ -162,7 +174,7 @@
               </div>
             </div>
 
-            <div ng-hide ="selectedCompositionNode.data.ed.mult == '0..0'">
+            <div ng-hide ="selectedCompositionNode.data.ed.mult == '0..0'  || selectedCompositionNode.data.ed.zElement">
               <button class="btn-link btn pull-right"
                       ng-click="removeElement(selectedCompositionNode.data.ed)">Remove this element</button>
             </div>
@@ -261,7 +273,8 @@
         <tr><th>Path</th><th>Title</th><th>ValueSet</th><th>Card.</th><th>Z</th><th></th></tr>
         <tr ng-repeat="ed in selectedModel.override track by $index">
           <td>
-            {{ed.path}}
+
+            <div class="clickable" ng-click="selectCompTreePath(ed.path)">{{ed.path}}</div>
           </td>
           <td>{{ed.title}}</td>
           <td>{{ed.valueSet}}</td>
@@ -288,6 +301,10 @@
             <tr>
               <td>Description</td>
               <td><textarea class="form-control" ng-model="selectedModel.description" ></textarea> </td>
+            </tr>
+            <tr>
+              <td>Kind</td>
+              <td><input type="text" class="form-control" ng-model="selectedModel.kind" />  </td>
             </tr>
 
           </table>

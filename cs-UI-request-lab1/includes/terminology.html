@@ -29,7 +29,44 @@
 
   <uib-tabset>
 
+    <uib-tab heading="ValueSets">
+      <div class="tableFixHead">
+        <table class="table table-bordered">
+          <thead>
+          <tr><th>Url</th><th>Where defined</th></tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="(k,v) in hashVsSummary">
+            <td>
+              <span class = 'clickable' ng-click="viewVS(k)">{{k}}</span></td>
+            <td>
+              <div ng-repeat = "item in v">
+                <div ng-show="item.DGName">
+                  DG: <span class="clickable" ng-click="termSelectDG(item)" >{{item.DGName}}</span>.
+                  Path: <span class="clickable" ng-click="termSelectDGItem(item)">{{item.path}}</span>
+                  <span ng-show = item.options>
+                  There are <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}} options</span> defined.
+                </span>
+                </div>
 
+                <div ng-show="item.compName">
+                  Comp: <span class="clickable" ng-click="termSelectComp(item)" >{{item.compName}}</span>.
+                  Path: <span class="clickable" ng-click="termSelectCompItem(item)">{{item.path}}</span>
+                  <span ng-show = item.options>
+                  There are <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}} options</span> defined.
+                </span>
+                </div>
+
+              </div>
+            </td>
+          </tr>
+          </tbody>
+
+        </table>
+      </div>
+      <pre>{{hashVsSummary | json}}</pre>
+
+    </uib-tab>
     <uib-tab heading = "DataGroups">
 
 
@@ -39,6 +76,7 @@
 
 
       <div class="clearfix"></div>
+
       <div class="tableFixHead">
         <table class="table table-bordered">
           <thead>
@@ -60,7 +98,10 @@
 
             <td>{{item.title}}</td>
             <td>{{item.description}}</td>
-            <td>{{item.valueSet}}</td>
+            <td>
+              <span class = 'clickable' ng-click="viewVS(item.valueSet)">{{item.valueSet}}</span>
+
+            </td>
             <td>
               <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}}</span>
             </td>
@@ -87,50 +128,20 @@
         <td>{{item.ov.path}}</td>
         <td>{{item.ov.title}}</td>
         <td>{{item.ov.description}}</td>
-        <td>{{item.ov.valueSet}}</td>
-        <td>{{item.ov.oldValueSet}}</td>
+        <td>
+          <span class = 'clickable' ng-click="viewVS(item.ov.valueSet)">{{item.ov.valueSet}}</span>
+
+        </td>
+        <td>
+          <span class = 'clickable' ng-click="viewVS(item.ov.oldValueSet)">{{item.ov.oldValueSet}}</span>
+
+        </td>
       </tr>
       </tbody>
       </table>
 
     </uib-tab>
-    <uib-tab heading="ValueSets">
-      <div class="tableFixHead">
-        <table class="table table-bordered">
-          <thead>
-            <tr><th>Url</th><th>Where defined</th></tr>
-          </thead>
-        <tbody>
-        <tr ng-repeat="(k,v) in hashVsSummary">
-          <td>{{k}}</td>
-          <td>
-            <div ng-repeat = "item in v">
-              <div ng-show="item.DGName">
-                DG: <span class="clickable" ng-click="termSelectDG(item)" >{{item.DGName}}</span>.
-                Path: <span class="clickable" ng-click="termSelectDGItem(item)">{{item.path}}</span>
-                <span ng-show = item.options>
-                  There are <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}} options</span> defined.
-                </span>
-              </div>
 
-              <div ng-show="item.compName">
-                Comp: <span class="clickable" ng-click="termSelectComp(item)" >{{item.compName}}</span>.
-                Path: <span class="clickable" ng-click="termSelectCompItem(item)">{{item.path}}</span>
-                <span ng-show = item.options>
-                  There are <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}} options</span> defined.
-                </span>
-              </div>
-
-            </div>
-          </td>
-        </tr>
-        </tbody>
-
-      </table>
-      </div>
-      <pre>{{hashVsSummary | json}}</pre>
-
-    </uib-tab>
   </uib-tabset>
 
 

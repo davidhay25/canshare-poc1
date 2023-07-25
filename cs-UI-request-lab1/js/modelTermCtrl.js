@@ -2,6 +2,24 @@ angular.module("pocApp")
     .controller('modelTermCtrl',
         function ($scope,$timeout,$uibModal) {
 
+
+            $scope.viewVSDEP = function (item) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/viewVS.html',
+                    backdrop: 'static',
+                    size : 'lg',
+                    controller: 'viewVSCtrl',
+
+                    resolve: {
+                        url: function () {
+                            return item     //just looks at the .options property
+                        }
+                    }
+
+                })
+            }
+
+
             $scope.viewOptions = function (item) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editOptionsList.html',

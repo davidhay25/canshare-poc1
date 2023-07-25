@@ -1,12 +1,27 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('modelCompositionCtrl',
-        function ($scope,$uibModal) {
+        function ($scope,$uibModal,$timeout) {
 
 
             $scope.compositionKind = ['request','report','general']
            // $scope.tumourStream = ['breast','gyne','lung','gi']
 
+            $scope.selectCompTreePath = function (path) {
+
+
+                $timeout(function () {
+
+                    //let fullPath = `${item.hiddenDGName}.${item.path}`
+
+                    $("#compositionTree").jstree("select_node",  path);
+
+                    $scope.input.compTabActive = $scope.compUi.tree //make sure the tree is selected
+
+                },500)
+
+
+            }
 
             $scope.editOptionsList = function (ed) {
                 $uibModal.open({
@@ -32,6 +47,7 @@ angular.module("pocApp")
                     $scope.selectedModel.override = $scope.selectedModel.override || {}
                     $scope.selectedModel.override[ed.path] = updatedEd
                     $scope.selectComposition($scope.selectedModel)  //in parent
+                    $scope.selectCompTreePath(ed.path)
 
                 })
             }
@@ -85,6 +101,7 @@ angular.module("pocApp")
                     $scope.selectedModel.override[ed.path] = ed
                     //delete $scope.selectedCompositionNode
                     $scope.selectComposition($scope.selectedModel)  //in parent
+                    $scope.selectCompTreePath(ed.path)
 
                 })
             }
@@ -99,6 +116,7 @@ angular.module("pocApp")
             $scope.revertOverride = function (path) {
                 delete $scope.selectedModel.override[path]
                 $scope.selectComposition($scope.selectedModel)  //in parent
+                $scope.selectCompTreePath(path)
             }
 
             $scope.changeValueSet = function (ed) {
@@ -113,6 +131,7 @@ angular.module("pocApp")
                     $scope.selectedModel.override[newEd.path] = newEd
                     //delete $scope.selectedCompositionNode
                     $scope.selectComposition($scope.selectedModel)  //in parent
+                    $scope.selectCompTreePath(ed.path)
                 }
             }
 

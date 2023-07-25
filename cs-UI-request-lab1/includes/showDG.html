@@ -44,7 +44,9 @@
                     <td>
                       <div>{{selectedNode.data.ed.valueSet}}</div>
                       <div>
-                        <span ng-show="selectedNode.data.ed.valueSet" class="clickable">View VS</span>
+                        <span ng-show="selectedNode.data.ed.valueSet"
+                          ng-click="viewVS(selectedNode.data.ed.valueSet)"
+                              class="clickable">View VS</span>
 
                         <button ng-show="selectedNode.data.ed.valueSet"
                                 ng-click = "changeDGValueSet(selectedNode.data.ed)"

@@ -14,11 +14,11 @@ angular.module("pocApp")
 
             //allows a specific tab in the mail UI to be selected
             $scope.ui = {}
-            $scope.ui.tabDG = 0;
-            $scope.ui.tabComp = 1;
+            $scope.ui.tabDG = 1;
+            $scope.ui.tabComp = 0;
             $scope.ui.tabTerminology = 2;
 
-            $scope.input.mainTabActive = $scope.ui.tabTerminology;
+            //$scope.input.mainTabActive = $scope.ui.tabTerminology;
 
             //allows a specific tab in the showCompositions to e selected. Used by term summary (only need tree ATM)
             $scope.compUi = {}
@@ -67,6 +67,7 @@ angular.module("pocApp")
 
 
 
+
             $scope.updateTermSummary = function () {
                 $scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
                 $scope.compTermSummary = modelTermSvc.makeCompOverrideSummary($scope.hashAllCompositions).list
@@ -76,6 +77,22 @@ angular.module("pocApp")
             }
 
             $scope.updateTermSummary()
+
+            $scope.viewVS = function (item) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/viewVS.html',
+                    backdrop: 'static',
+                    size : 'lg',
+                    controller: 'viewVSCtrl',
+
+                    resolve: {
+                        url: function () {
+                            return item     //just looks at the .options property
+                        }
+                    }
+
+                })
+            }
 
             //process the world to get filter and other vars.
             //todo split world into comp & DG, dropping VS

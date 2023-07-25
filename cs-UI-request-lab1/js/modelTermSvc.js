@@ -63,9 +63,9 @@ angular.module("pocApp")
                                     if (ov.options) {
                                         //This is where there are options but no VS
                                         let vsUrlTmp = `${comp.name}-${key}`
-                                        let entry = {DGName : dg.name, path: ed.path}
-                                        entry.options = ed.options
-                                        hashVS[vsUrlTmp] = hashVS[ed.valueSet] || []
+                                        let entry = {compName : comp.name, path: key}
+                                        entry.options = ov.options
+                                        hashVS[vsUrlTmp] = hashVS[ov.valueSet] || []
                                         hashVS[vsUrlTmp].push(entry)
                                     }
                                 }
