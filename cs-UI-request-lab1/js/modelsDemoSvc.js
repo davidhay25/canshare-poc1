@@ -9,7 +9,7 @@ angular.module("pocApp")
                     //construct a graph of the Logical model types.
                     //Not sure if this belongs in here, but it will do for the moment.
                     //We have compositions, DataGroups & Items  Not clear what the difference between a comp and a dg is
-                    //A compositions can 'descend' from others and reference datagroups and coomposotions
+                    //not now - A compositions can 'descend' from others and reference datagroups and coomposotions
 
                     //default multiplicity to single optional unless otherwise stated
                     //if an object has something of the name name as a parent or reference it is overwritten - eg ValueSet
@@ -82,7 +82,7 @@ angular.module("pocApp")
                     dgBodySite.diff.push({path:'description',title:'Description',type:['string'],mult:'0..1',
                         description:'Text description of the body site'})
 
-                    //https://nzhts.digital.health.nz/fhir/ValueSet/canshare-laterality
+
 
                     hashDataGroups[dgBodySite.name] = dgBodySite
 
@@ -115,11 +115,21 @@ angular.module("pocApp")
                         description:'The histologic type of the cancer'})
 
                     hashDataGroups[dgCancerAssessment.name] = dgCancerAssessment
-/*
-                      dgCancerAssessment.diff.push({path:'',title:'',type:['CodeableConcept'],mult:'0..1',
-                        description:''})
 
-*/
+                    //Care plan
+                    let dgCarePlan = {kind:"dg",name:'CarePlan',title:"Care plan",diff:[],
+                        description:"A plan for the delivery of care to the patient."}
+
+                    dgCarePlan.diff.push({path:'condition',title:'The condition which this plan addresses ',
+                        type:['Condition'],mult:'0..*',
+                        description:'Individual regimen instances of treatment'})
+
+                    dgCarePlan.diff.push({path:'regimen',title:'Regimens of chemotherapy treatment',
+                        type:['Regimen'],mult:'0..*',
+                        description:'Individual regimen instances of treatment'})
+
+                    hashDataGroups[dgCarePlan.name] = dgCarePlan
+
 
                     //todo - do we want the concept of an 'internal' type - ie one specifically used by another
                     let dgCollectionDetails = {kind:"dg",name:'CollectionDetails',title:"Collection details",diff:[],
@@ -141,6 +151,23 @@ angular.module("pocApp")
 
                     hashDataGroups[dgCollectionDetails.name] = dgCollectionDetails
 
+                    //DG condition
+                    let dgCondition= {kind:"dg",name:'Condition',title:"Condition",diff:[],
+                        description:"A clinical condition, problem, diagnosis, or other event, situation, issue, or clinical concept that has risen to a level of concern."}
+                    dgCondition.diff.push({path:'code',title:'Condition code',type:['CodeableConcept'],mult:'1..1',
+                        description:"A code that identifies the condition, problem, or diagnosis."})
+                    dgCondition.diff.push({path:'clinicalStatus',title:'Clinical status',type:['CodeableConcept'],mult:'0..1',
+                        description:"The status of the condition in terms of its clinical progresion, i.e. active, recurrence, relapse, inactive, remission, resolved, unknown"})
+                    dgCondition.diff.push({path:'verificationStatus',title:'Verification status',type:['CodeableConcept'],mult:'0..1',
+                        description:"The status of the condition from a certainty perspective, i.e. unconfirmed, provisional, differential, confirmed, refuted, entered-in-error"})
+                    dgCondition.diff.push({path:'otherDetails',title:'Other details',type:['string'],mult:'0..1',
+                        description:"Other details about the clinical condition"})
+
+                    dgCondition.diff.push({path:'histology',title:'Histology',type:['string'],mult:'0..1',
+                        description:"The histological findings that led to this diagnosis? is dx a separate DT"})
+
+                    hashDataGroups[dgCondition.name] = dgCondition
+
                     //DG Container
                     let dgContainer = {kind:"dg",name:'Container',title:"Container",diff:[],
                         description:"Details about a container used to carry something."}
@@ -156,7 +183,18 @@ angular.module("pocApp")
 
                     hashDataGroups[dgContainer.name] = dgContainer
 
+                    let dgCycle = {kind:"dg",name:'Cycle',title:"Cycle of treatment",diff:[],
+                        description:"An individual period of chemotherapy treatment."}
 
+                    dgCycle.diff.push({path:'period',title:'Period of treatment',type:['Period'],mult:"1..1",
+                        description:"Period over which a cycle of treatment is administered"})
+
+                    dgCycle.diff.push({path:'ma',title:'Medication administered',type:['MedicationAdministration'],mult:"0..*",
+                        description:"Medications administered to the patient as part of this cycle"})
+
+
+
+                    hashDataGroups[dgCycle.name] = dgCycle
 
                     //DG history
                     let dgHistory = {kind:"dg",name:'ClinicalHistory',title:"Clinical history",diff:[],
@@ -175,19 +213,7 @@ angular.module("pocApp")
                     hashDataGroups[dgHistory.name] = dgHistory
 
 
-                    //DG condition
-                    let dgCondition= {kind:"dg",name:'Condition',title:"Condition",diff:[],
-                        description:"A clinical condition, problem, diagnosis, or other event, situation, issue, or clinical concept that has risen to a level of concern."}
-                    dgCondition.diff.push({path:'code',title:'Condition code',type:['CodeableConcept'],mult:'1..1',
-                        description:"A code that identifies the condition, problem, or diagnosis."})
-                    dgCondition.diff.push({path:'clinicalStatus',title:'Clinical status',type:['CodeableConcept'],mult:'0..1',
-                        description:"The status of the condition in terms of its clinical progresion, i.e. active, recurrence, relapse, inactive, remission, resolved, unknown"})
-                    dgCondition.diff.push({path:'verificationStatus',title:'Verification status',type:['CodeableConcept'],mult:'0..1',
-                        description:"The status of the condition from a certainty perspective, i.e. unconfirmed, provisional, differential, confirmed, refuted, entered-in-error"})
-                    dgCondition.diff.push({path:'otherDetails',title:'Other details',type:['string'],mult:'0..1',
-                        description:"Other details about the clinical condition"})
 
-                    hashDataGroups[dgCondition.name] = dgCondition
 
                     //DG familymember history
                     let dgFMH = {kind:"dg",name:'Fmh',title:"Family member history",diff:[],
@@ -260,6 +286,15 @@ angular.module("pocApp")
                         description:"The body location of the lesion"})
                     hashDataGroups[dgLesion.name] = dgLesion
 
+                    let dgMedicationAdministration = {kind:"dg",name:'MedicationAdministration',title:"Medication administration",diff:[],
+                        description:"A record of a medication being administered to a patient"}
+                    dgMedicationAdministration.diff.push({path:'drug',title:'Drug',type:['CodeableConcept'],mult:"1..1",
+                        description:"The drug code"})
+                    dgMedicationAdministration.diff.push({path:'period',title:'Period',type:['Period'],mult:"1..1",
+                        description:"The period over which the drug was admnistered"})
+
+                    hashDataGroups[dgMedicationAdministration.name] = dgMedicationAdministration
+
                     //DG Observation
                     let dgObservation = {kind:"dg",name:'Observation',title:"Observation",diff:[],
                         description:"Measurements and simple assertions made about a patient, device or other subject"}
@@ -282,7 +317,7 @@ angular.module("pocApp")
                     hashDataGroups[dgObservation.name] = dgObservation
 
                     //DataGroup for patient
-                    let dgPatient = {kind:"dg",name:'Patient',title:"Patient data group",diff:[],description:"Name, identifiers, and demographic details about the patient"}
+                    let dgPatient = {kind:"dg",name:'Patient',title:"Patient",diff:[],description:"Name, identifiers, and demographic details about the patient"}
                     dgPatient.diff.push({path:'name',title:'Patient name',type:['HumanName'],
                         description:"Patients name - first, last alias"})
                     dgPatient.diff.push({path:'gender',title:'Gender',type:['CodeableConcept'],valueSet:"https://genderoptions",
@@ -343,6 +378,23 @@ angular.module("pocApp")
                     hashDataGroups[dgRadImage.name] = dgRadImage
 
 
+                    let dgRegimen = {kind:"dg",name:'Regimen',title:"Regimen of treatment",diff:[],
+                        description:"The plan for delivery of chemotherapy. "}
+
+                    dgRegimen.diff.push({path:'status',title:'Status',type:['CodeableConcept'],mult:"1..1",
+                        description:"The status of the regimen. eg In progress or completed."})
+
+                    dgRegimen.diff.push({path:'intent',title:'Intent of treatment',type:['CodeableConcept'],mult:"1..1",
+                        description:"The intent of treatment. eg curative or palliative"})
+
+                    dgRegimen.diff.push({path:'tnm',title:'TNM staging',type:['TNM'],mult:"0..1",
+                        description:"A cycle of treatment."})
+
+                    dgRegimen.diff.push({path:'cycle',title:'Cycle',type:['Cycle'],mult:"0..*",
+                        description:"A cycle of treatment."})
+
+
+                    hashDataGroups[dgRegimen.name] = dgRegimen
 
                     //DG generic specimen
                     let dgSpecimen = {kind:"dg",name:'Specimen',title:"Specimen",diff:[],description:"A sample to be used for analysis"}
@@ -350,7 +402,6 @@ angular.module("pocApp")
                         description:"The type of specimen e.g. biopsy specimen, cytologic material, surgical resection specimen [surgical excision specimen], frozen section breast specimen"})
                     dgSpecimen.diff.push({path:'subtype',title:'Specimen sub-type',type:['CodeableConcept'],
                         description:"The subtype of specimen (e.g. Core biopsy specimen, Punch biopsy specimen, Lymph node cytologic material, Lymph node tissue specimen)"})
-
 
                     dgSpecimen.diff.push({path:'collection',title:'Collection info',type:['CollectionDetails'],mult:"0..1",
                         description:"Details about the collection of the specimen."})
@@ -364,6 +415,21 @@ angular.module("pocApp")
                         description:"An image of the specimen as a labelled file."})
                     dgSpecimen.diff.push({path:'additionalDetails',title:'Additional details',type:['string'],mult:"0..1",
                         description:"Additional details about the specimen"})
+
+                    //TNM
+                    let dgTnmStaging = {kind:"dg",name:'TNM',title:"TNM staging",diff:[],
+                        description:"TNM staging is used to describe the aggregate information resulting from T, N and M categories combined with any prognostic factors relevant to the specifiic disease "}
+
+                    dgTnmStaging.diff.push({path:'timing',title:'Timing',type:['CodeableConcept'],mult:"0..1",
+                        description:"The stage classification according to the point in time of the patient's care in relation to diagnosis and treatment"})
+                    dgTnmStaging.diff.push({path:'tstage',title:'T stage',type:['CodeableConcept'],mult:"0..1",
+                        description:"The size and/or contiguous extension of the primary tumour"})
+                    dgTnmStaging.diff.push({path:'nstage',title:'N stage',type:['CodeableConcept'],mult:"0..1",
+                        description:"The involvement of regional lymph ncdes as defined for each cancer site, including absence or presence of cancer, number of positive regional nodes, involvement of specific regional nodal groups, size of nodal metastasis or extension etc "})
+                    dgTnmStaging.diff.push({path:'mstage',title:'M stage',type:['CodeableConcept'],mult:"0..1",
+                        description:"The absence or presence of distant metastases in site and/or organs outside the local tumour area and regional nodes as defined for each cancer site"})
+                    hashDataGroups[dgTnmStaging.name] = dgTnmStaging
+
 
                     //dgSpecimen.diff.push({path:'collection.date',title:'When collected',type:['dateTime']})
 
@@ -402,15 +468,29 @@ angular.module("pocApp")
                     hashVS[vsFrozenBodySite.name] = vsFrozenBodySite
 
                     //===================Compositions
-                    //Base composition for Path request
+
+                    //Act-now summary
+                    let actNowSummary = {kind:"comp",name:'ActNow',title: "Chemotherapy report",meta:{},sections:[]}
+                    actNowSummary.meta.kind = "summary"
+
+                    let an1 = {name:"demographics",kind:'section',items:[{name:'patient',title:"Patient",type:['Patient'],mult:'1..1'}]}
+                    actNowSummary.sections.push(an1)
+
+                    let an2 = {name:"history",kind:'section',items:[{name:'history',title:"History",type:['ClinicalHistory'],mult:'0..*'}]}
+                    actNowSummary.sections.push(an2)
+
+                    let an3 = {name:"regimens",kind:'section',
+                        items:[{name:'regimen',title:"Regimens",type:['Regimen'],mult:'0..*'}]}
+                    actNowSummary.sections.push(an3)
+
+                    hashCompositions[actNowSummary.name] = actNowSummary
+
+
+                    //------- Base composition for Path request
                     let compPathRequest = {kind:"comp",name:'PathRequest',title: "Pathology request",meta:{},sections:[]}
                     compPathRequest.meta.kind = "request"
                     compPathRequest.meta.tumourStream = "lung"
                     compPathRequest.meta.tags = ['tag1','tag2']
-
-
-
-
 
                     let s1 = {name:"demographics",kind:'section',items:[{name:'patient',title:"Patient",type:['Patient'],mult:'1..1'}]}
                     compPathRequest.sections.push(s1)

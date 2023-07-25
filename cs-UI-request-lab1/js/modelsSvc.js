@@ -139,7 +139,7 @@ angular.module("pocApp")
 
 
             fhirDataTypes : function(){
-                return ['string','CodeableConcept','CodeableConcept','Quantity','HumanName','dateTime','Identifier','ContactPoint','Address','code','Attachment']
+                return ['string','CodeableConcept','CodeableConcept','Quantity','HumanName','dateTime','Identifier','ContactPoint','Address','code','Attachment','Period']
             },
            // findUsageOf
 

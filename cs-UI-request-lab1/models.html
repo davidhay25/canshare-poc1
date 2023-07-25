@@ -138,8 +138,9 @@
 
         <uib-tab heading="Compositions">
             <br/>
+            <!--
             <button class="btn btn-link pull-right" ng-click="toggleLeftPanel()">Toggle list</button>
-
+-->
             <div class="row">
                 <div ng-class="leftPanel">
 
@@ -197,26 +198,29 @@
 
         <uib-tab heading="DataGroups">
 
-
+            <br/>
             <div class="row">
                 <div ng-class="leftPanel">
 
                     <div>
                         <button class="btn btn-link pull-right" ng-click="listAllDG()">List all</button>
                     </div>
-                    <div class="clearfix"></div>
 
-                    <div class="list-group">
-                        <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
-                             ng-click="selectModel(v)"
-                             ng-repeat="(k,v) in hashAllDG">
 
-                            <i class="glyphicon glyphicon-edit pull-right clickable"
-                               ng-click="editModel(v)"></i>
+                    <div class="myScroll">
+                        <div class="list-group">
+                            <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
+                                 ng-click="selectModel(v)"
+                                 ng-repeat="(k,v) in hashAllDG">
 
-                            {{v.title}}
+                                <i class="glyphicon glyphicon-edit pull-right clickable"
+                                   ng-click="editModel(v)"></i>
+
+                                {{v.title}}
+                            </div>
                         </div>
                     </div>
+
 
                     <div>
                         <button class="btn btn-link" ng-click="newModel('dg')">New DataGroup</button>

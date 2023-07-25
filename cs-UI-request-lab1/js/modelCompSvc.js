@@ -56,6 +56,7 @@ angular.module("pocApp")
                     //extract all the elements in the DG,
                     let localPath = sectionItem.name         //the path in the section. Often the DG name
                     let type = sectionItem.type[0]   //one type only
+                    //let mult = sectionItem.mult     //how many times this item (DT, DG) can appear in the section
 
                     //let type = DG.name   //one type only
                     let model = types[type]    //this could be a FHIR DT or a DG. A DG will have a name, a DT will not

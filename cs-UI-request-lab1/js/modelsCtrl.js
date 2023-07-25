@@ -61,9 +61,6 @@ angular.module("pocApp")
             //same as for DG's - a step towards separate objects for DG & comp
             $scope.hashAllCompositions = $localStorage.world.compositions
             //make the term summary. These are the override elements in the models
-           // $scope.compTermSummary = modelTermSvc.makeCompOverrideSummary($scope.allCompositions).list
-
-           // console.log($scope.compTermSummary)
 
 
 
@@ -129,6 +126,9 @@ angular.module("pocApp")
                 if (confirm("Are you wish to restore to the default demo state")) {
                     $localStorage.world = modelsDemoSvc.getDemo()
                     $scope.world = $localStorage.world
+                    $scope.hashAllDG = $localStorage.world.dataGroups
+                    $scope.hashAllCompositions = $localStorage.world.compositions
+
                     validateModel()
                 }
 

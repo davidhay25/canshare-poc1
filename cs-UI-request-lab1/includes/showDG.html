@@ -86,56 +86,6 @@
 
                 </table>
 
-                <!--
-                <div class="row"  ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
-                  <div class="col-md-3">
-                    ValueSet
-                  </div>
-                  <div class="col-md-9">
-                    <div><em>{{selectedNode.data.ed.valueSet}}</em></div>
-                    <div>
-                      <span ng-show="selectedNode.data.ed.valueSet" class="clickable">View VS</span>
-
-                      <button ng-show="selectedNode.data.ed.valueSet"
-                              ng-click = "changeDGValueSet(selectedNode.data.ed)"
-                              class="btn-link btn">Change VS</button>
-
-                      <button ng-hide="selectedNode.data.ed.valueSet"
-                              ng-click = "changeDGValueSet(selectedNode.data.ed)"
-                              class="btn-link btn">Set VS</button>
-
-
-
-                    </div>
-                  </div>
-                </div>
-
-                -->
-
-                <!--
-                <div class="row"  ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
-                  <div class="col-md-3">
-                    Options List
-                  </div>
-                  <div class="col-md-9">
-                    <div ng-show="selectedNode.data.ed.options">
-                      There are {{selectedNode.data.ed.options.length}} options defined
-                    </div>
-
-                    <div ng-hide="selectedNode.data.ed.options">
-                      There are no options defined
-                    </div>
-                    <div><em>Options are used to build ValueSets</em></div>
-
-
-                    <button
-                            ng-click = "editDGOptionsList(selectedNode.data.ed)"
-                            class="btn-link btn">View / Edit list</button>
-
-                  </div>
-                </div>
--->
-
                 <!-- If the ValueSet depends on some other value in the DG-->
                 <div ng-show="selectedNode.data.ed.dependVS">
                   ValueSet is dependent on other DG values (Details in Dependencies tab)
