@@ -156,14 +156,18 @@ angular.module("pocApp")
 
 
 
+            //used in the DG list filtering
             $scope.showDG = function(DG,filter) {
                 if (filter) {
 
                     let show = false
                     if (DG.name && DG.name.toLowerCase().indexOf(filter.toLowerCase()) > -1) {
-
                         show = true
                     }
+                    if (DG.description && DG.description.toLowerCase().indexOf(filter.toLowerCase()) > -1) {
+                        show = true
+                    }
+
                     return show
 
                 } else {
@@ -315,59 +319,6 @@ angular.module("pocApp")
                     $scope.selectComposition(newComp)
                 }
                 //$scope.editComposition(newComp,true)
-            }
-
-            $scope.editCompositionDEP = function (model,isNew) {
-
-                $uibModal.open({
-                    templateUrl: 'modalTemplates/editComposition.html',
-                    backdrop: 'static',
-                    size : 'lg',
-                    controller : "editCompositionCtrl",
-
-                    resolve: {
-                        model: function () {
-                            return model
-                        },
-                        hashTypes: function () {
-                            return $scope.input.types
-                        },
-                        hashValueSets : function() {
-                            return $localStorage.world.valueSets
-                        },
-                        isNew: function () {
-                            return isNew
-                        }
-                    }
-
-                }).result.then(function (newModel) {
-                    if (newModel) {
-                        //if a model is returned, then it is a new one and needs to be added to the world
-
-
-                        if (newModel.kind == 'comp') {
-                            $localStorage.world.compositions[newModel.name] = newModel
-                        } else {
-                            $localStorage.world.dataGroups[newModel.name] = newModel
-                        }
-
-                        let vo1 = modelsSvc.validateModel($localStorage.world)
-                        $scope.errors = vo1.errors
-                        $scope.input.types = vo1.types      //a hash keyed by name
-
-                        //a hash by type of all elements that reference it
-                        $scope.analysis = modelsSvc.analyseWorld($localStorage.world,$scope.input.types)
-
-                        $scope.selectModel(newModel)
-
-                    } else {
-                        //the model may have been updated - select it to refresh the various tabs
-                        //note this is the model passed in for editing
-                        $scope.selectModel(model)
-                    }
-
-                })
-
             }
 
 

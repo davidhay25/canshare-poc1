@@ -175,45 +175,55 @@
         <strong class="pull-left">Profiles: {{selectedModel.parent}}</strong>
       </div>
 
-      <table class="table-bordered table">
-        <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Code</th></tr>
-        <tr ng-repeat="element in fullElementList" ng-hide="$index==0 || element.mult.indexOf('..0') > -1">
+      <div class="tableFixHead">
+        <table class="table-bordered table">
+          <thead>
+          <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Code</th></tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="element in fullElementList" ng-hide="$index==0 || element.mult.indexOf('..0') > -1">
 
-          <td>
-            <div  ng-style="{ 'padding-left': (element.path | pathindent) }">
-              <!-- {{element.path | dropFirstInPath}} -->
-              <div ng-hide="input.showFullModel">
-                {{element.ed.path | dropFirstInPath}}
+            <td>
+              <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
+
+              
+
+                <!-- {{element.path | dropFirstInPath}} -->
+                <div ng-hide="input.showFullModel">
+                  {{element.ed.path | dropFirstInPath}}
+                </div>
+                <div ng-show="input.showFullModel">
+                  {{element.ed.path | lastInPath}}
+
+                </div>
+
+
+
               </div>
-              <div ng-show="input.showFullModel">
-                {{element.ed.path | lastInPath}}
 
+
+            </td>
+            <td>{{element.ed.title}}</td>
+            <td>{{element.ed.description}}</td>
+            <td>
+              <div ng-repeat="type in element.ed.type">
+                {{type}}
+              </div>
+              <div><em class="clickable" ng-click="viewVS(element.ed.valueSet)">{{element.ed.valueSet}}</em></div>
+            </td>
+            <td>{{element.ed.mult}}</td>
+            <td>
+              <div ng-repeat="code in element.ed.code">
+                {{code.code}}
               </div>
 
+            </td>
 
+          </tr>
+          </tbody>
+        </table>
+      </div>
 
-            </div>
-
-
-          </td>
-          <td>{{element.ed.title}}</td>
-          <td>{{element.ed.description}}</td>
-          <td>
-            <div ng-repeat="type in element.ed.type">
-              {{type}}
-            </div>
-            <div><em class="clickable" ng-click="viewVS(element.ed.valueSet)">{{element.ed.valueSet}}</em></div>
-          </td>
-          <td>{{element.ed.mult}}</td>
-          <td>
-            <div ng-repeat="code in element.ed.code">
-              {{code.code}}
-            </div>
-
-          </td>
-
-        </tr>
-      </table>
     </uib-tab>
 
 

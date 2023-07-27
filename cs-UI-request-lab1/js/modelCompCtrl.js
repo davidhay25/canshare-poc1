@@ -84,7 +84,8 @@ angular.module("pocApp")
 
                     resolve: {
                         hashTypes: function () {
-                            return $scope.input.types
+                            return $scope.hashAllDG
+                            //return $scope.input.types
                         }
                     }
 
@@ -154,21 +155,44 @@ angular.module("pocApp")
 
             $scope.addDGtoSection = function (section,DG,name,title) {
 
+
+                //remove any spaces from the name
                 if (name) {
                     name = name.replace(/\s/g,'')
                 }
 
+                //the name will become part of the path. it needs to be unique within this section (or it will be overwritten)
+                let path = name || DG.name;
+
+                //
+                let ctr = 0
+                //count the number of times (if any) that this path appears
+                section.items.forEach(function (item) {
+                    console.log(item)
+                    if (item.name == path) {
+                        ctr++
+                    }
+                })
+
+                if (ctr > 0) {
+                    path = path + ctr
+                }
+
+
                 let sectionItem = {}
-                sectionItem.name = name || DG.name;
+                sectionItem.name = path;
                 sectionItem.title = title || DG.title;
                 sectionItem.type = [DG.name]
                 sectionItem.mult = "0..1"
+
+                //need to operate on the selected model so it is updated
                 $scope.selectedModel.sections.forEach(function (sect) {
                     //console.log(sect)
                     if (sect.name == section.name) {
                         sect.items.push(sectionItem)
                     }
                 })
+
                 delete $scope.selectedCompositionNode
                 $scope.selectComposition($scope.selectedModel)  //in parent
 
