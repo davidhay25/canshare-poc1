@@ -20,7 +20,7 @@ angular.module("pocApp")
 
                 //create as ed to act as the root
                 let edRoot = {path:comp.name,title:comp.title}
-                hashAllElements[comp.name] = edRoot
+                hashAllElements[comp.name] = {ed:edRoot}
 
                 //allElements.push(edRoot)
 
@@ -38,13 +38,13 @@ angular.module("pocApp")
                             if (model && model.name) {
                                 //console.log(types[type])
                                 let childPath = `${pathRoot}.${model.name}`
-                                hashAllElements[childPath] = model
+                                hashAllElements[childPath] = {ed:model,host:ed}
                                 processDG(model,childPath)
                             } else {
                                 //this is a FHIR DT
                                 let path = `${pathRoot}.${ed.path}`
                                 ed.kind = 'element'
-                                hashAllElements[path] = ed
+                                hashAllElements[path] = {ed:ed}
                             }
                         })
                     }
@@ -78,12 +78,12 @@ angular.module("pocApp")
                             slicedModel.title = sectionItem.slice.title
                             slicedModel.slice = sectionItem.slice
                             slicedModel.kind = 'slice'
-                            hashAllElements[childPathRoot] = slicedModel
+                            hashAllElements[childPathRoot] = {ed:slicedModel}
 
                         } else {
                             //childPathRoot = `${pathRoot}.${model.name}`
                             childPathRoot = `${pathRoot}.${localPath}`
-                            hashAllElements[childPathRoot] = model
+                            hashAllElements[childPathRoot] = {ed:model,host:sectionItem}
                         }
 
 
@@ -106,7 +106,7 @@ angular.module("pocApp")
                         comp.sections.forEach(function (section) {
                             //let pathRoot = `${comp.name}.section-${section.name}`   //section root is model name + section name
                             let pathRoot = `${comp.name}.${section.name}`   //section root is model name + section name
-                            hashAllElements[pathRoot] = section
+                            hashAllElements[pathRoot] = {ed:section}
                             //each item is assumed to be a DG - think about others (Z & override) later
                             section.items.forEach(function (item) {
                                //{name: title: type: mult:}
@@ -125,7 +125,7 @@ angular.module("pocApp")
                 //Now process any overrides
                 if (comp.override) {
                     Object.keys(comp.override).forEach(function (path) {
-                        hashAllElements[path] = comp.override[path]
+                        hashAllElements[path] = {ed:comp.override[path]}
                     })
                     /*
                     comp.override.forEach(function (ov) {
@@ -138,10 +138,10 @@ angular.module("pocApp")
 
                 let ar = []
                 Object.keys(hashAllElements).forEach(function (key) {
-                    let ed = hashAllElements[key]
+                    let item = hashAllElements[key]         // {ed: sectionItem: }
                     //ed.fullPath = key
-                    let clone = angular.copy(ed)        //don't want to update the actual model
-                    clone.path = key
+                    let clone = angular.copy(item)        //don't want to update the actual model
+                    clone.ed.path = key
                     ar.push(clone)
                 })
 

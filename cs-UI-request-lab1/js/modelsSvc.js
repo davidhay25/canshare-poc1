@@ -10,11 +10,48 @@ angular.module("pocApp")
 
         return {
 
-            getReferencedModels : function (world) {
+            getReferencedModels : function (hashDG,hashComp) {
                 //create a hash showing references between models
 
                 let hashReferences = {}
-                let merged = angular.copy({...world.compositions, ...world.dataGroups})     //all EDs
+                //let merged = angular.copy({...world.compositions, ...world.dataGroups})     //all EDs
+
+                //DG's
+                Object.keys(hashDG).forEach(function (key) {
+                    let DG = hashDG[key]
+                    if (DG.diff) {
+                        DG.diff.forEach(function (ed) {
+                            if (ed.type) {
+                                ed.type.forEach(function (typ) {
+                                    hashReferences[typ] = hashReferences[typ] || []
+                                    hashReferences[typ].push({name:DG.name,kind:DG.kind,path:ed.path})
+                                })
+                            }
+                        })
+                    }
+                })
+
+                Object.keys(hashComp).forEach(function (key) {
+                    let comp = hashComp[key]
+                    if (comp.sections) {
+                        comp.sections.forEach(function (section) {
+                            if (section.items) {
+                                section.items.forEach(function (item) {
+                                    if (item.type) {
+                                        item.type.forEach(function (typ) {
+                                            hashReferences[typ] = hashReferences[typ] || []
+                                            hashReferences[typ].push({name:comp.name,kind:comp.kind,path:item.name})
+                                        })
+                                    }
+
+                                })
+                            }
+
+                        })
+                    }
+                })
+
+                /*
                 Object.keys(merged).forEach(function (key) {
                     let model = merged[key]
                     if (model.diff) {
@@ -33,6 +70,7 @@ angular.module("pocApp")
 
 
                 })
+                */
                 return hashReferences
 
             },
@@ -139,7 +177,7 @@ angular.module("pocApp")
 
 
             fhirDataTypes : function(){
-                return ['string','CodeableConcept','CodeableConcept','Quantity','HumanName','dateTime','Identifier','ContactPoint','Address','code','Attachment','Period']
+                return ['string','CodeableConcept','CodeableConcept','Quantity','HumanName','dateTime','Identifier','ContactPoint','Address','code','Attachment','Period','integer','boolean']
             },
            // findUsageOf
 
@@ -301,7 +339,7 @@ angular.module("pocApp")
             makeTreeFromElementList : function(arElements){
                 //construct a tree assuming that arElements is in path order
                 let that = this
-                let rootEd = arElements[0]
+                let rootEd = arElements[0].ed
                 rootEd.kind = 'root'
                 let treeData = []
 
@@ -311,20 +349,31 @@ angular.module("pocApp")
                 treeIcons.slice = "icon-q-group.png"
 
 
-
-
                 //add the root
                 let root = {id:rootEd.path,text: rootEd.title,parent:'#',data:{ed:rootEd}}
                 treeData.push(root)
 
                 for (let i=1; i < arElements.length; i++){          //skip the root
-                    let ed = arElements[i]
+                    let ed = arElements[i].ed
+                    let host = arElements[i].host         //will only be present in a composition section
+                    //console.log(ed.path)
                     let ar = ed.path.split('.')
                     let leafPath = ar.pop()     // the name is the last item.
                     let parent = ar.join(".")  //the
                     let id = ed.path
-                    let text = ed.title || leafPath
-                    let node = {id:id,text:text,parent:parent,data:{ed:ed}}
+
+                    //create the tree text
+                    let text
+                    if (host && host.title) {
+                        text = host.title
+                    }
+
+                    text = text || ed.title || leafPath
+                    //text =  text || leafPath
+
+                    let node = {id:id,text:text,parent:parent,data:{ed:ed,host:host}}
+
+                    node.icon = `icons/icon_primitive.png`  //the default icon
 
                     //console.log(ed.kind)
                     if (ed.kind) {
@@ -335,21 +384,22 @@ angular.module("pocApp")
                         }
 
 
-                        if (ed.type && ed.type[0] == 'CodeableConcept') {
-                          //  node.icon = "icons/icon-q-choice.png"
-                        }
 
                         switch (ed.kind) {
                             case 'slice' :
-                                //item['li_attr'] = {class: li_attr};
-                              //  node['a_attr'] = {class : 'slice'}
-                                //node['a_attr'] = { "style": "text-decoration: underline dotted red" }
                                 node['a_attr'] = { "style": "color : blue" }
-
                                 break
                         }
+                    }
+                    if (ed.zElement) {
+                        node.icon = `icons/icon-q-open-choice.png`
 
                     }
+
+                    if (ed.type && ed.type[0] == 'CodeableConcept') {
+                        node.icon = "icons/icon_datatype.gif"
+                    }
+
                    // let iconFile = "icons/icon-q-" + child.type + ".png"
                    // item.icon = iconFile
 
@@ -370,7 +420,7 @@ angular.module("pocApp")
             },
 
             getFullListOfElements(model,types,followReferences) {
-                //create a complete list of elements for a model, traversing up the inheritance chain (via parent)
+                //create a complete list of elements for a DG
 
                 let topModel = angular.copy(model)
                 let allElements = []
@@ -387,7 +437,7 @@ angular.module("pocApp")
                 //already one there (so it replaced the parental one)
 
                 //create as ed to act as the root
-                let edRoot = {path:model.name,title:model.title}
+                let edRoot = {ed:{path:model.name,title:model.title}}
                 allElements.push(edRoot)
 
                 extractElements(model,model.name)
@@ -409,7 +459,7 @@ angular.module("pocApp")
 
 
                 // add to list of elements, replacing any with the same path (as it has been overwritten)
-                function addToList(ed) {
+                function addToList(ed,host) {
                     //is there already an entry with this path
                     let path = ed.path
                     let pos = -1
@@ -420,9 +470,9 @@ angular.module("pocApp")
                     })
                     if (pos > -1) {
                         //replace the existing path
-                        allElements.splice(pos,1,ed)
+                        allElements.splice(pos,1,{ed:ed,host:host})
                     } else {
-                        allElements.push(ed)
+                        allElements.push({ed:ed,host})
                     }
                 }
 
@@ -444,6 +494,7 @@ angular.module("pocApp")
                 }
 
 
+                //process a single element at the root of the DG
                 function extractElements(model,pathRoot) {
 
                     //add to nodes list
@@ -460,7 +511,7 @@ angular.module("pocApp")
                     //arNodes.push(node);
 
 
-                    //do parents first.
+                    //do parents first.   (Not doing this ATM - inheritance not supported)
                     if (model.parent && followReferences) {
                       //  console.log('expanding ' + model.parent)
                         if (types[model.parent]) {
@@ -485,15 +536,12 @@ angular.module("pocApp")
 
                     if (model.diff) {
                         model.diff.forEach(function (ed) {
-                            //console.log(ed.path)
                             if (ed.type && ed.type.length > 0) {
                                 let type = ed.type[0]   //only look at the first code
-                                //console.log(type)
                                 if (types[type]) {
                                     //this is a known type. Is there a definition for this type (ie do we need to expand it)
                                     let childDefinition = types[type]
 
-                                    //console.log(childDefinition)
 
                                     if (childDefinition.diff && followReferences) {
                                         //if there is a diff element in the type, then it can be expanded
@@ -511,7 +559,7 @@ angular.module("pocApp")
                                         //console.log('expanding child: ' + childDefinition.name)
                                         let clone = angular.copy(ed)
                                         clone.path = pathRoot + "." + ed.path
-                                        addToList(clone)
+                                        addToList(clone,ed)
                                         //allElements.push(clone) //this is the BBE equivalent
                                         extractElements(childDefinition,pathRoot + "." + ed.path)
                                     } else {

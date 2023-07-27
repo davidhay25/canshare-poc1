@@ -120,14 +120,14 @@ angular.module("pocApp")
                     let dgCarePlan = {kind:"dg",name:'CarePlan',title:"Care plan",diff:[],
                         description:"A plan for the delivery of care to the patient."}
 
-                    dgCarePlan.diff.push({path:'condition',title:'The condition which this plan addresses ',
+                    dgCarePlan.diff.push({path:'condition',title:'Condition addressed ',
                         type:['Condition'],mult:'0..*',
-                        description:'Individual regimen instances of treatment'})
-
+                        description:'The condition which this plan addresses'})
+/*
                     dgCarePlan.diff.push({path:'regimen',title:'Regimens of chemotherapy treatment',
                         type:['Regimen'],mult:'0..*',
                         description:'Individual regimen instances of treatment'})
-
+*/
                     hashDataGroups[dgCarePlan.name] = dgCarePlan
 
 
@@ -378,6 +378,7 @@ angular.module("pocApp")
                     hashDataGroups[dgRadImage.name] = dgRadImage
 
 
+                    //-------- regimen
                     let dgRegimen = {kind:"dg",name:'Regimen',title:"Regimen of treatment",diff:[],
                         description:"The plan for delivery of chemotherapy. "}
 
@@ -386,6 +387,24 @@ angular.module("pocApp")
 
                     dgRegimen.diff.push({path:'intent',title:'Intent of treatment',type:['CodeableConcept'],mult:"1..1",
                         description:"The intent of treatment. eg curative or palliative"})
+
+                    dgRegimen.diff.push({path:'clinical-trial',title:'Clinical trial',type:['boolean'],mult:"0..1",
+                        description:"It this part of a clinical trial"})
+                    dgRegimen.diff.push({path:'cycle-count',title:'',type:['integer'],mult:"0..1",
+                        description:"The number of cycles in this regimen"})
+                    dgRegimen.diff.push({path:'discontinued',title:'',type:['CodeableConcept'],mult:"0..1",
+                        description:"Reason why the treatment was discontinued"})
+                    dgRegimen.diff.push({path:'utility',title:'Overall treatment utility',type:['CodeableConcept'],mult:"0..1",
+                        description:"A measure of how useful the regimen was"})
+                    dgRegimen.diff.push({path:'type',title:'Regiment type',type:['CodeableConcept'],mult:"0..1",
+                        description:"Identifies the regimen that was used"})
+
+                    dgRegimen.diff.push({path:'course-number',title:'Course number type',type:['integer'],mult:"0..1",
+                        description:"The course number (sequential number) for this regimen"})
+
+
+
+
 
                     dgRegimen.diff.push({path:'tnm',title:'TNM staging',type:['TNM'],mult:"0..1",
                         description:"A cycle of treatment."})
@@ -488,7 +507,7 @@ angular.module("pocApp")
 
                     //------- Base composition for Path request
                     let compPathRequest = {kind:"comp",name:'PathRequest',title: "Pathology request",meta:{},sections:[]}
-                    compPathRequest.meta.kind = "request"
+                    compPathRequest.meta.category = "request"
                     compPathRequest.meta.tumourStream = "lung"
                     compPathRequest.meta.tags = ['tag1','tag2']
 

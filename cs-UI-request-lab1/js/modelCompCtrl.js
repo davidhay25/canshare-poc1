@@ -15,6 +15,7 @@ angular.module("pocApp")
                     //let fullPath = `${item.hiddenDGName}.${item.path}`
 
                     $("#compositionTree").jstree("select_node",  path);
+                    $("#compositionTree").jstree("open_node",  path);
 
                     $scope.input.compTabActive = $scope.compUi.tree //make sure the tree is selected
 
@@ -144,13 +145,22 @@ angular.module("pocApp")
                 //delete $scope.selectedCompositionNode
                 $scope.selectComposition($scope.selectedModel)  //in parent
 
+                //display the section
+                let ar = ed.path.split('.')
+                ar.pop()
+                let sectionPath = ar.join('.')
+                $scope.selectCompTreePath(sectionPath)
             }
 
-            $scope.addDGtoSection = function (section,DG,name) {
+            $scope.addDGtoSection = function (section,DG,name,title) {
+
+                if (name) {
+                    name = name.replace(/\s/g,'')
+                }
 
                 let sectionItem = {}
                 sectionItem.name = name || DG.name;
-                sectionItem.title = DG.title;
+                sectionItem.title = title || DG.title;
                 sectionItem.type = [DG.name]
                 sectionItem.mult = "0..1"
                 $scope.selectedModel.sections.forEach(function (sect) {
@@ -161,6 +171,12 @@ angular.module("pocApp")
                 })
                 delete $scope.selectedCompositionNode
                 $scope.selectComposition($scope.selectedModel)  //in parent
+
+                delete $scope.input.newCompName
+                delete $scope.input.newCompTitle
+                delete $scope.input.newCompType
+
+                $scope.selectCompTreePath(`${section.path}.${sectionItem.name}`)
             }
 
 
@@ -170,7 +186,10 @@ angular.module("pocApp")
                 let section = {kind:'section',name:name,title:title,items:[]}
                 comp.sections = comp.sections || []
                 comp.sections.push(section)
+                delete $scope.input.newSectionTitle
                 $scope.selectComposition($scope.selectedModel)  //in parent
+                let id = `${comp.name}.${name}`
+                $scope.selectCompTreePath(id)
             }
 
         }

@@ -20,12 +20,15 @@ angular.module("pocApp")
 
             //$scope.input.mainTabActive = $scope.ui.tabTerminology;
 
+            //used in DG & Comp so when a type is a FHIR DT, we can create a link to the spec
+            //$scope.main = {fhirDataTypes:modelsSvc.fhirDataTypes()}
+            $scope.fhirDataTypes =modelsSvc.fhirDataTypes()
+
+//console.log($scope.main.fhirDataTypes)
             //allows a specific tab in the showCompositions to e selected. Used by term summary (only need tree ATM)
             $scope.compUi = {}
             $scope.compUi.tree = 0
             $scope.input.compTabActive = $scope.compUi.tree
-
-
 
             $scope.toggleLeftPanel = function(){
                 if ($scope.leftPanel == 'col-md-3') {
@@ -53,6 +56,9 @@ angular.module("pocApp")
 
             $scope.world = $localStorage.world
 
+
+
+
             //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
             $scope.hashAllDG = $localStorage.world.dataGroups
             //make the term summary
@@ -62,15 +68,23 @@ angular.module("pocApp")
             $scope.hashAllCompositions = $localStorage.world.compositions
             //make the term summary. These are the override elements in the models
 
+            //make an array for the type-ahead lookup. - needs to be retionalized... when i remove world...
+/* not just now - but keep
+            $scope.arDG = []
 
+            Object.keys($scope.hashAllDG).forEach(function (key) {
+                let DG = $scope.hashAllDG[key]
+                $scope.arDG.push({name:key})
+            })
+*/
 
 
             $scope.updateTermSummary = function () {
                 $scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
                 $scope.compTermSummary = modelTermSvc.makeCompOverrideSummary($scope.hashAllCompositions).list
                 $scope.hashVsSummary = modelTermSvc.makeValueSetSummary($scope.hashAllDG,$scope.hashAllCompositions).hashVS
-                console.log($scope.hashVsSummary)
-                console.log($scope.termSummary)
+                //console.log($scope.hashVsSummary)
+                //console.log($scope.termSummary)
             }
 
             $scope.updateTermSummary()
@@ -94,31 +108,36 @@ angular.module("pocApp")
             //process the world to get filter and other vars.
             //todo split world into comp & DG, dropping VS
 
-            $scope.tumourStreams = ["All"]
-            $scope.compKinds = ["All"]
+            $scope.updateMetaValues = function() {
+                $scope.tumourStreams = ["All"]
+                $scope.compCategories = ["All"]
 
-            Object.keys($scope.world.compositions).forEach(function (key) {
-                let comp = $scope.world.compositions[key]
-                comp.meta = comp.meta || {}
+                Object.keys($scope.world.compositions).forEach(function (key) {
+                    let comp = $scope.world.compositions[key]
+                    comp.meta = comp.meta || {}
 
-                let tumourStream = comp.meta.tumourStream
-                if (tumourStream && $scope.tumourStreams.indexOf(tumourStream) == -1) {
-                    $scope.tumourStreams.push(tumourStream)
-                }
+                    let tumourStream = comp.meta.tumourStream
+                    if (tumourStream && $scope.tumourStreams.indexOf(tumourStream) == -1) {
+                        $scope.tumourStreams.push(tumourStream)
+                    }
 
-                let kind = comp.meta.kind
-                if (tumourStream && $scope.tumourStreams.indexOf(tumourStream) == -1) {
-                    $scope.tumourStreams.push(tumourStream)
-                }
+                    let category = comp.meta.category
+                    if (category && $scope.compCategories.indexOf(category) == -1) {
+                        $scope.compCategories.push(category)
+                    }
 
-            })
+                })
+            }
+
+            $scope.updateMetaValues()
             $scope.input.selectedTumourStream = $scope.tumourStreams[0]
+            $scope.input.selectedCompCategory = $scope.compCategories[0]
 
 
 
             //xref is cross references between models/types
             //hash[type name] - array of type name
-            $scope.xref = modelsSvc.getReferencedModels($scope.world)
+            $scope.xref = modelsSvc.getReferencedModels($scope.hashAllDG,$scope.hashAllCompositions)
 
 
             $scope.resetWorld = function () {
@@ -128,6 +147,7 @@ angular.module("pocApp")
                     $scope.world = $localStorage.world
                     $scope.hashAllDG = $localStorage.world.dataGroups
                     $scope.hashAllCompositions = $localStorage.world.compositions
+                    $scope.xref = modelsSvc.getReferencedModels($scope.world)
 
                     validateModel()
                 }
@@ -135,34 +155,21 @@ angular.module("pocApp")
             }
 
 
-            //
-/*
-            //add the indicated DG to the section.
-            //Create a section item and add it to the section
-            $scope.addDGtoSection = function (section,DG) {
-                console.log(DG)
-                console.log(section)
-                //sectionItem is {name: title: type: mult:}
-                let sectionItem = {}
-                sectionItem.name = DG.name;
-                sectionItem.title = DG.title;
-                sectionItem.type = [DG.name]
-                sectionItem.mult = "0..1"
-                $scope.selectedModel.sections.forEach(function (sect) {
-                    console.log(sect)
-                    if (sect.name == section.name) {
-                        sect.items.push(sectionItem)
+
+            $scope.showDG = function(DG,filter) {
+                if (filter) {
+
+                    let show = false
+                    if (DG.name && DG.name.toLowerCase().indexOf(filter.toLowerCase()) > -1) {
+
+                        show = true
                     }
-                })
-                $scope.selectComposition($scope.selectedModel)
-            }
+                    return show
 
-            $scope.removeDGfromSection = function(item) {
-                console.log(item)
+                } else {
+                    return true
+                }
             }
-*/
-            // ------------
-
 
             $scope.listAllDG = function () {
                 $scope.input.showDGList = true
@@ -271,15 +278,7 @@ angular.module("pocApp")
 
             }
 
-            $scope.importVSDEP = function (txt) {
-                console.log(txt)
-                let ar = txt.split('\n')
-                ar.forEach(function (lne) {
-                    let ar1 = lne.split('\t')
-                    console.log(ar1)
-                })
 
-            }
 
             //create a new model
             $scope.newModel = function(kind) {
@@ -295,6 +294,13 @@ angular.module("pocApp")
                         show = false
                     }
                 }
+
+                if ($scope.input.selectedCompCategory !== 'All') {
+                    if (comp.meta.category !== $scope.input.selectedCompCategory) {
+                        show = false
+                    }
+                }
+
 
                 return show
             }
@@ -486,7 +492,7 @@ angular.module("pocApp")
 
 
 
-            $scope.showVS = function (name) {
+            $scope.showVSDEP = function (name) {
                 //name could either be a url or the name of a VS in the world
                 let vsItem = $localStorage.world.valueSets[name]
                 if (vsItem) {
@@ -610,9 +616,18 @@ angular.module("pocApp")
 
                     $scope.$digest();       //as the event occurred outside of angular...
                 }).bind("loaded.jstree", function (event, data) {
-                    $(this).jstree("open_all");
+                    let id = treeData[0].id
+                    $(this).jstree("open_node",id);
+                    //$(this).jstree("open_all");  //open all nodes
+
+
                     $scope.$digest();
                 });
+
+            }
+
+            $scope.expandCompTree = function () {
+                $('#compositionTree').jstree('open_all');
 
             }
 
@@ -620,21 +635,21 @@ angular.module("pocApp")
             function makeCompTree(treeData,rootNodeId) {
                 $('#compositionTree').jstree('destroy');
 
-                let x = $('#compositionTree').jstree(
+                $scope.compTree = $('#compositionTree').jstree(
                     {'core': {'multiple': false, 'data': treeData,
-
                             'themes': {name: 'proton', responsive: true}}}
                 ).on('changed.jstree', function (e, data) {
 
                     if (data.node) {
                         $scope.selectedCompositionNode = data.node;
-
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...
                 }).bind("loaded.jstree", function (event, data) {
-                    $(this).jstree("close_all");
-                    $(this).jstree("open_node",rootNodeId);
+                    let id = treeData[0].id
+                    //if ()
+                   // $(this).jstree("close_all");
+                    $(this).jstree("open_node",id);
                    // console.log(rootNodeId)
                     $scope.$digest();
                 });

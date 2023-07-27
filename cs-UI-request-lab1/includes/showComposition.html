@@ -15,15 +15,17 @@
   <uib-tabset active="input.compTabActive" ng-show="selectedModel">
 
     <uib-tab heading="Tree">
-      <em>The model as a tree. Expanded if the checkbox is selected</em>
+
       <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-5">
+          <em style="padding-top: 8px" class="pull-right clickable" ng-click="expandCompTree()">Expand all</em>
+          <br/>
           <div class="myScroll">
             <div id="compositionTree"></div>
           </div>
 
         </div>
-        <div class="col-md-8">
+        <div class="col-md-7">
 
           <uib-tabset>
 
@@ -74,11 +76,16 @@
                     Type
                   </div>
                   <div class="col-md-9">
-                    {{selectedCompositionNode.data.ed.type[0]}}
-
-                      <div ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
-
+                    <div ng-repeat="type in selectedCompositionNode.data.ed.type">
+                      <div ng-show="fhirDataTypes.indexOf(type) > -1" class="pull-right">
+                        <a target = "_blank" ng-href="{{fhirRoot}}datatypes.html#{{type}}">Details in spec</a>
                       </div>
+                      {{type}}
+                    </div>
+
+
+
+
 
                   </div>
                 </div>
@@ -101,8 +108,6 @@
                       <button ng-hide="selectedCompositionNode.data.ed.valueSet"
                               ng-click = "changeValueSet(selectedCompositionNode.data.ed)"
                               class="btn-link btn">Set VS</button>
-
-
 
                     </div>
                   </div>
@@ -135,7 +140,11 @@
                     Cardinality
                   </div>
                   <div class="col-md-9">
-                    {{selectedCompositionNode.data.ed.mult}}
+                    <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
+
+                    <div ng-show = "selectedCompositionNode.data.host">{{selectedCompositionNode.data.host.mult}}</div>
+                    <div ng-hide = "selectedCompositionNode.data.host">{{selectedCompositionNode.data.ed.mult}}</div>
+
                   </div>
                 </div>
 
@@ -167,19 +176,26 @@
               <div class="row">
                 <div class="col-md-4">
                   <input type="text" placeholder="Title" class="form-control" ng-model="input.newSectionTitle"/>
+
+
+
                 </div>
                 <div class="col-md-4">
-                  <button class="btn-link btn" ng-click="addSection(selectedModel,input.newSectionTitle)">Add new section</button>
+                  <button class="btn-link btn"
+                          ng-show="input.newSectionTitle"
+                          ng-click="addSection(selectedModel,input.newSectionTitle)">Add new section</button>
                 </div>
               </div>
             </div>
 
-            <div ng-hide ="selectedCompositionNode.data.ed.mult == '0..0'  || selectedCompositionNode.data.ed.zElement">
+            <div ng-hide ="selectedCompositionNode.data.ed.mult == '0..0'  ||
+              selectedCompositionNode.data.ed.zElement || selectedCompositionNode.data.ed.kind == 'root'">
               <button class="btn-link btn pull-right"
                       ng-click="removeElement(selectedCompositionNode.data.ed)">Remove this element</button>
             </div>
 
-              <div ng-show ="selectedCompositionNode.data.ed.kind == 'dg'">
+
+              <div ng-show ="selectedCompositionNode.data.ed.kind == 'dg' || selectedCompositionNode.data.ed.kind == 'section'">
                 <button class="btn-link btn pull-right"
                         ng-click="addZElement(selectedCompositionNode.data.ed)">Add Z element</button>
               </div>
@@ -192,17 +208,35 @@
 
                <div class="row">
                  <div class="col-md-4">
+<!--
+                   <input type="text" ng-model="input.newCompType"
+                          placeholder="DG name"
+                          uib-typeahead="item.name for item in arDG | filter:$viewValue | limitTo:8" class="form-control">
+
+-->
                    <select class="form-control" ng-model="input.newCompType"
                            ng-options = "k for (k,v) in world.dataGroups">
                    </select>
+
                    <br/>
 
                    <div>
-                     <input placeholder ="path (no spaces)" type="text" class="form-control" ng-model="input.newCompName"/>
+                     <input placeholder ="path (no spaces)" type="text" class="form-control"
+                            ng-model="input.newCompName"/>
                    </div>
 
+                   <div>
+                     <input placeholder ="Title (in tree)" type="text" class="form-control"
+                            ng-model="input.newCompTitle"/>
+                   </div>
                    <button ng-show = "input.newCompType" class="btn btn-link"
-                           ng-click="addDGtoSection(selectedCompositionNode.data.ed,input.newCompType,input.newCompName)">Add DG</button>
+                           ng-click="addDGtoSection(
+                            selectedCompositionNode.data.ed,
+                             input.newCompType,
+                             input.newCompName,
+                             input.newCompTitle)">Add DG</button>
+
+
                  </div>
 
                  <div class="col-md-8">
@@ -229,7 +263,7 @@
 
 
             <uib-tab heading = "Json">
-              <pre>{{selectedCompositionNode.data.ed | json}}</pre>
+              <pre>{{selectedCompositionNode.data | json}}</pre>
             </uib-tab>
           </uib-tabset>
 
@@ -238,30 +272,44 @@
     </uib-tab>
 
     <uib-tab heading="Table">
+      <div class="tableFixHead">
       <table class="table table-bordered">
+        <thead>
         <tr><th>Path</th><th>Title</th><th>Kind</th><th>Description</th><th>Type</th><th>Slice</th><th>Card.</th></tr>
+        </thead>
+        <tbody>
         <tr
-                ng-style="{ 'background-color': getRowColour(ed) }"
-                ng-repeat="ed in allCompElements track by $index">
+                ng-style="{ 'background-color': getRowColour(item.ed) }"
+                ng-repeat="item in allCompElements track by $index">
           <td>
-            <div ng-style="{ 'padding-left': (ed.path | pathindent) }">
-              {{ed.path | lastInPath}}
+            <div ng-style="{ 'padding-left': (item.ed.path | pathindent) }">
+              {{item.ed.path | lastInPath}}
             </div>
 
             </td>
-          <td>{{ed.title}}</td>
-          <td>{{ed.kind}}</td>
-          <td>{{ed.description}}</td>
-          <td>{{ed.type[0]}}</td>
+          <td>{{item.ed.title}}</td>
+          <td>{{item.ed.kind}}</td>
+          <td>{{item.ed.description}}</td>
+          <td>{{item.ed.type[0]}}</td>
           <td>
             <div ng-show = "ed.slice">
-              {{ed.slice.path}}
+              {{item.ed.slice.path}}
               <div><em>code={{ed.slice.code}}</em></div>
             </div>
           </td>
-          <td>{{ed.mult}}</td>
+          <td>
+
+
+            <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
+
+            <div ng-show = "item.host">{{item.host.mult}}</div>
+            <div ng-hide = "item.host">{{item.ed.mult}}</div>
+
+          </td>
         </tr>
+        </tbody>
       </table>
+      </div>
     </uib-tab>
 
     <uib-tab>
@@ -303,8 +351,10 @@
               <td><textarea class="form-control" ng-model="selectedModel.description" ></textarea> </td>
             </tr>
             <tr>
-              <td>Kind</td>
-              <td><input type="text" class="form-control" ng-model="selectedModel.kind" />  </td>
+              <td>Category</td>
+              <td><input type="text" class="form-control"
+                         ng-blur="updateMetaValues()"
+                         ng-model="selectedModel.meta.category" />  </td>
             </tr>
 
           </table>
@@ -314,7 +364,9 @@
 
             <tr>
               <td>Tumour stream</td>
-              <td><input type="text" class="form-control" ng-model="selectedModel.meta.tumourStream" /> </td>
+              <td><input type="text" class="form-control"
+                         ng-blur="updateMetaValues()"
+                         ng-model="selectedModel.meta.tumourStream" /> </td>
             </tr>
 
             <tr>

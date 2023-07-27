@@ -1,7 +1,7 @@
 <div ng-controller="modelDGCtrl">
   <br/>
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-9">
       <strong>{{selectedModel.description}}</strong>
     </div>
 
@@ -9,11 +9,7 @@
       FHIR resource: <a target = "_blank" ng-href="{{fhirRoot}}{{selectedModel.fhirResource}}">{{selectedModel.fhirResource}}</a>
     </div>
 
-    <div class="col-md-3">
-      <div class="pull-right">
-        <checkbox ng-model="input.showFullModel" ng-click="updateFullModelShow()"></checkbox> Show expanded model
-      </div>
-    </div>
+
   </div>
   <br/>
 
@@ -36,8 +32,19 @@
                   <tr><td style="width : 20%">Path</td><td>{{selectedNode.data.ed.path}}</td></tr>
                   <tr><td>Type</td>
                     <td><div ng-repeat="type in selectedNode.data.ed.type">
-                      {{type}}&nbsp;</div>
+
+                      <div ng-show="fhirDataTypes.indexOf(type) > -1" class="pull-right">
+                        <a target = "_blank" ng-href="{{fhirRoot}}datatypes.html#{{type}}">Details in spec</a>
+                      </div>
+
+                      {{type}}&nbsp;
+
+
+
+
+                    </div>
                     </td></tr>
+                  <tr><td>Cardinality</td><td>{{selectedNode.data.ed.mult}}</td></tr>
                   <tr><td>Description</td><td>{{selectedNode.data.ed.description}}</td></tr>
                   <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
                     <td>ValueSet</td>
@@ -162,7 +169,7 @@
 
 
     <uib-tab heading="Table">
-      <em class="pull-right">The model as a table. Expanded if the checkbox is selected</em>
+
 
       <div ng-show = "selectedModel.parent">
         <strong class="pull-left">Profiles: {{selectedModel.parent}}</strong>
@@ -176,10 +183,10 @@
             <div  ng-style="{ 'padding-left': (element.path | pathindent) }">
               <!-- {{element.path | dropFirstInPath}} -->
               <div ng-hide="input.showFullModel">
-                {{element.path | dropFirstInPath}}
+                {{element.ed.path | dropFirstInPath}}
               </div>
               <div ng-show="input.showFullModel">
-                {{element.path | lastInPath}}
+                {{element.ed.path | lastInPath}}
 
               </div>
 
@@ -189,17 +196,17 @@
 
 
           </td>
-          <td>{{element.title}}</td>
-          <td>{{element.description}}</td>
+          <td>{{element.ed.title}}</td>
+          <td>{{element.ed.description}}</td>
           <td>
-            <div ng-repeat="type in element.type">
+            <div ng-repeat="type in element.ed.type">
               {{type}}
             </div>
-            <div><em class="clickable" ng-click="showVS(element.valueSet)">{{element.valueSet}}</em></div>
+            <div><em class="clickable" ng-click="viewVS(element.ed.valueSet)">{{element.ed.valueSet}}</em></div>
           </td>
-          <td>{{element.mult}}</td>
+          <td>{{element.ed.mult}}</td>
           <td>
-            <div ng-repeat="code in element.code">
+            <div ng-repeat="code in element.ed.code">
               {{code.code}}
             </div>
 
@@ -282,11 +289,8 @@
           <td>{{item.kind}}</td>
         </tr>
       </table>
-      <!--
-                                  {{selectedModel.name}}
-                                  <pre>{{xref | json}}</pre>
 
-      -->
+
 
 
 
