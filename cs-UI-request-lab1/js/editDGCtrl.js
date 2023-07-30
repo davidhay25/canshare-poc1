@@ -1,25 +1,30 @@
 angular.module("pocApp")
-    .controller('editModelCtrl',
+    .controller('editDGCtrl',
         function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc) {
             $scope.model=model
             $scope.input = {}
             $scope.edit = {}
             $scope.isNew = isNew        //if new, then allow the model metadata to be set
 
+            //construct a has of all types (DT + FHIR) for the full list of elements routine
+            $scope.allTypes = angular.copy(hashTypes)
 
-
-            //create a list of potential parent types for a new composition
+            //create a list of potential parent types for a new DG -
             $scope.input.possibleParents = []
             Object.keys(hashTypes).forEach(function (key) {
-                if (hashTypes[key].kind == 'comp') {
+                if (hashTypes[key].kind == 'dg') {      //should only be DG
                     $scope.input.possibleParents.push(key)
                 }
             })
 
             function getFullElementList() {
+
                 let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
                 console.log(vo)
                 $scope.allElements = vo.allElements
+
+
+
             }
 
             //if not new, set the UI names & parent
@@ -36,8 +41,17 @@ angular.module("pocApp")
                // $scope.allElements = vo.allElements
             }
 
+            //start with the DGs...
             $scope.input.types = Object.keys(hashTypes) //an array for the new type dropdown
             $scope.input.types.sort()
+
+            //now add the FHIR datatypes
+            $scope.input.types = modelsSvc.fhirDataTypes().concat($scope.input.types) //.concat(modelsSvc.fhirDataTypes())
+
+
+            //modelsSvc.fhirDataTypes()
+
+
 
             $scope.input.valueSets = Object.keys(hashValueSets)
             $scope.input.valueSets.sort()
@@ -45,6 +59,39 @@ angular.module("pocApp")
 
             $scope.input.cards = ["0..1","1..1","0..*",'1..*']
             $scope.input.card = $scope.input.cards[0]
+
+            //set the override code. Like comp overrides, this sets an element with the appropriate
+            //path in the DG. todo checked nested DT paths...
+            //todo generalize to change other attrobutes - like title & mutiplicity
+            $scope.setFixedCode = function (element) {
+                let code = prompt("Enter the code")
+                if (code) {
+                    let path = element.ed.path
+                    let ar = path.split('.')
+                    let nameInOriginal = ar[ar.length-1]
+                    ar.splice(0,1)
+                    let pathInThisEd = ar.join('.')
+                    let sourceModel = hashTypes[element.sourceModelName]
+                    if (sourceModel) {
+                        //locate the original ed from the source
+                        sourceModel.diff.forEach(function (ed) {
+                            if (ed.path == nameInOriginal) {
+                                //this is the ed that is to be overriden. So a copy (with an updated path
+                                //is saved in this DT
+                                let newEd = angular.copy(ed)
+                                newEd.fixedValue = {code:code}
+                                newEd.status = 'new'
+                                newEd.path = pathInThisEd
+                                $scope.model.diff.push(newEd)
+                            }
+                        })
+                        getFullElementList()
+
+                    } else {
+                        alert(`Model: ${element.sourceModelName} not found.` )
+                    }
+                }
+            }
 
             $scope.tabSelected = function (tab) {
                 $scope.selectedTab = tab
@@ -89,7 +136,19 @@ angular.module("pocApp")
             //return true if there is an override element in the model for this path..
             $scope.hasBeenOverridden = function(element) {
                 //the path in the model.diff won't have the first field
-                let ar = element.path.split('.')
+console.log(element)
+                if (! $scope.model || !$scope.model.diff) {
+                    //when adding a new DG
+                    return false
+                }
+
+                //todo - not sure why there are elements with no ed...
+                if (! element.ed || !element.ed.path) {
+                    console.log ("missing ed or path",element)
+                   return  false
+                }
+
+                let ar = element.ed.path.split('.')
 
                 if (ar.length == 2){
                     return false // defined in the model
@@ -192,13 +251,13 @@ angular.module("pocApp")
 
                     }
                 }
-
-
             }
 
             //add a new item
             $scope.add = function () {
                 let element = {}
+                element.status = 'new'
+                //$scope.model.status = 'changed'
                 element.path = $scope.input.path
                 element.title = $scope.input.title
                 element.type = [$scope.input.type]
@@ -249,6 +308,7 @@ angular.module("pocApp")
             $scope.save = function () {
                 if (isNew) {
                     if ($scope.isUnique) {
+                        $scope.model.status = 'new'
                         $scope.model.diff = $scope.model.diff || []
                         $scope.$close($scope.model)
                     } else {

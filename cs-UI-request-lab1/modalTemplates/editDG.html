@@ -17,8 +17,8 @@
         <div class="row">
             <div class="col-md-8 col-sm-8">
                 <h3 class="modal-title">
-                    <div ng-hide="model.name">New model</div>
-                    {{model.name}}
+                    <div ng-hide="model.name">New DataGroup</div>
+                    DataGroup: {{model.name}}
                 </h3>
             </div>
 
@@ -50,7 +50,7 @@
                                class = "form-control" ng-model="input.newModelName"/>
 
                         <div style="color: green" ng-show="isNew && isUnique">Name is unique</div>
-                        <div style="color: red "ng-show="isnew && input.newModelName && ! isUnique">Name already in use</div>
+                        <div style="color: red "ng-show="isNew && input.newModelName && ! isUnique">Name already in use</div>
 
                     </div>
                     <div class="col-md-7">
@@ -74,7 +74,7 @@
                     </div>
                 </div>
                 <br/>
-                <div class="row" ng-show = "model.kind == 'comp'">
+                <div class="row">
                     <div class="col-md-2">
                         Parent
                     </div>
@@ -236,40 +236,55 @@
 
 
             </uib-tab>
-            <uib-tab heading="Expanded model" ng-show="model.kind == 'comp'" select="tabSelected('expanded')">
+
+            <uib-tab heading="Expanded model"  select="tabSelected('expanded')">
                 <em class="pull-right">Full expansion - parents and DataGroups</em>
                 <table class="table table-bordered">
-                    <tr><th>Path</th><th>Title</th><th>Type</th><th>Code</th><th>Card.</th></tr>
+                    <tr><th>Path</th><th>Title</th><th>Type</th><th>Code</th><th>Card.</th><th>Fixed value</th><th>Source DG</th></tr>
                     <tr ng-repeat="element in allElements"
                         ng-class = "{required:isRequired(element),overridden: hasBeenOverridden(element)}">
                         <td>
-                            <div  ng-style="{ 'padding-left': (element.path | pathindent) }">
-                                {{element.path | dropFirstInPath}}
+                            <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
+                                <!--{{element.ed.path | dropFirstInPath}}
+                                -->
+                                {{element.ed.path | lastInPath}}
                             </div>
                         </td>
-                        <td>{{element.title}}</td>
+                        <td>{{element.ed.title}}</td>
                         <td>
-                            <div ng-repeat="type in element.type">
+                            <div ng-repeat="type in element.ed.type">
                                 {{type}}
                             </div>
 
-                            <div ng-show="element.valueSet">
-                                {{element.valueSet}}
+                            <div ng-show="element.ed.valueSet">
+                                {{element.ed.valueSet}}
                             </div>
 
                         </td>
                         <td>
 
-                            <div ng-repeat="code in element.code">
+                            <div ng-repeat="code in element.ed.code">
                                 {{code.code}}
                             </div>
 
                         </td>
-                        <td>{{element.mult}}</td>
+                        <td>{{element.ed.mult}}</td>
+                        <td>
+                            {{element.ed.fixedValue}}
+                            <div ng-show = "element.ed.type[0] == 'CodeableConcept'
+                                && (! element.ed.fixedValue)
+                                && (element.sourceModelName !== model.name)">
+                                <span class="clickable" ng-click="setFixedCode(element)">Set value</span>
+                            </div>
+                        </td>
+                        <td>{{element.sourceModelName}}</td>
 
                     </tr>
                 </table>
-<!--
+
+
+
+<!-- <pre>{{allElements | json}}</pre>
                 <uib-tabset>
                     <uib-tab heading="Table">
                         <table class="table table-bordered">
@@ -390,7 +405,7 @@
     <div class="modal-header">
 
         <div ng-show="model.parent">
-            Composition parent: <em>{{model.parent}}</em>
+            DataGroup parent: <em>{{model.parent}}</em>
 
         </div>
         <div ng-hide="model.parent">

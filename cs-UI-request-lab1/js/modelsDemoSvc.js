@@ -20,6 +20,37 @@ angular.module("pocApp")
 
                     //---------- DataGroups
 
+                    //testing parent
+                    let dgParent = {kind:"dg",name:'a-Parent',title:"Parent DG",diff:[],
+                        description:"Host for testing inheritance"}
+                    dgParent.diff.push({path:'item1',title:'Item1',type:['CodeableConcept'],
+                        description:"item1"})
+                    dgParent.diff.push({path:'item2',title:'Item2',type:['CodeableConcept'],
+                        description:"item2"})
+                    hashDataGroups[dgParent.name] = dgParent
+
+                    let dgChild = {kind:"dg",name:'a-Child',parent:"a-Parent",title:"Child DG",diff:[],
+                        description:"Host for testing inheritance"}
+                    dgChild.diff.push({path:'item3',title:'Item3',type:['CodeableConcept'],
+                        description:"item3"})
+                    dgChild.diff.push({path:'item4',title:'Item4',type:['CodeableConcept'],
+                        description:"item4"})
+
+                    //override an element
+                    dgChild.diff.push({path:'item2',title:'Item2 override',type:['CodeableConcept'],
+                        description:"item2 ov",mult:'0..1',fixedValue:{code:'aaa'}})
+
+                    hashDataGroups[dgChild.name] = dgChild
+
+
+                    let dgGrandChild = {kind:"dg",name:'a-GrandChild',parent:"a-Child",title:"GrandChild DG",diff:[],
+                        description:"Host for testing inheritance"}
+
+                    dgGrandChild.diff.push({path:'item5',title:'Item5',type:['string'],
+                        description:"item5",mult:'0..1'})
+
+                    hashDataGroups[dgGrandChild.name] = dgGrandChild
+                    
                     //ancillary studies
                     let dgAncillary = {kind:"dg",name:'AncillaryStudy',title:"Ancillary Study",diff:[],mcodegroup:'disease',
                         description:"Diagnostic or therapeutic procedure which is supplementary to the main test or treatment."}
@@ -457,13 +488,18 @@ angular.module("pocApp")
                     hashDataGroups[dgSpecimen.name] = dgSpecimen
 
 
-                    /*
-                                    //DG specimen for frozen section
-                                    let dgSpecimenFrozen = {kind:"dg",name:'specimen-frozen',title:"Specimen for frozen section",parent:'specimen',diff:[]}
 
-                                    dgSpecimenFrozen.diff.push({path:'bodysite',title:'Body site',type:['CodeablConcept'],valueSet:'breast-frozen-bodysite'})
-                                    hashDataGroups[dgSpecimenFrozen.name] = dgSpecimenFrozen
-                    */
+
+
+
+                    //DG specimen for frozen section
+                    let dgSpecimenResection = {kind:"dg",name:'Specimen-resection',title:"Specimen from resection",parent:'Specimen',diff:[]}
+
+                    dgSpecimenResection.diff.push({path:'om',title:'Orientation marker',type:['string']})
+                    dgSpecimenResection.diff.push({path:'om.type',title:'Orientation marker',type:['CodeableConcept']})
+
+                    hashDataGroups[dgSpecimenResection.name] = dgSpecimenResection
+
 
                     //------------- ValueSets
                     let vsAllBodySite = {kind:"vs",name:'all-bodysite',title:'All body sites',url:'',concepts :[]}

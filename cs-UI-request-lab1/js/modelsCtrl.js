@@ -1,6 +1,7 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
-        function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc, $timeout,$uibModal,$filter,modelTermSvc) {
+        function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,
+                  $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc) {
 
             //$scope.localStorage = $localStorage
 
@@ -18,7 +19,7 @@ angular.module("pocApp")
             $scope.ui.tabComp = 0;
             $scope.ui.tabTerminology = 2;
 
-            //$scope.input.mainTabActive = $scope.ui.tabTerminology;
+            $scope.input.mainTabActive = $scope.ui.tabDG;
 
             //used in DG & Comp so when a type is a FHIR DT, we can create a link to the spec
             //$scope.main = {fhirDataTypes:modelsSvc.fhirDataTypes()}
@@ -64,6 +65,23 @@ angular.module("pocApp")
             //make the term summary
             //$scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
 
+            //make a sorted list for the UI
+            function sortDG() {
+                $scope.sortedDGList = []
+                Object.keys($scope.hashAllDG).forEach(function(key){
+                    $scope.sortedDGList.push($scope.hashAllDG[key])
+                })
+
+                $scope.sortedDGList.sort(function (a,b) {
+                    if (a.name.toLowerCase() < b.name.toLowerCase()) {
+                        return -1
+                    } else {
+                        return 1
+                    }
+                })
+
+            }
+            sortDG()
             //same as for DG's - a step towards separate objects for DG & comp
             $scope.hashAllCompositions = $localStorage.world.compositions
             //make the term summary. These are the override elements in the models
@@ -78,6 +96,7 @@ angular.module("pocApp")
             })
 */
 
+            $scope.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG)
 
             $scope.updateTermSummary = function () {
                 $scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
@@ -147,7 +166,7 @@ angular.module("pocApp")
                     $scope.world = $localStorage.world
                     $scope.hashAllDG = $localStorage.world.dataGroups
                     $scope.hashAllCompositions = $localStorage.world.compositions
-                    $scope.xref = modelsSvc.getReferencedModels($scope.world)
+                    $scope.xref = modelsSvc.getReferencedModels($scope.hashAllDG,$scope.hashAllCompositions)
 
                     validateModel()
                 }
@@ -326,17 +345,18 @@ angular.module("pocApp")
             $scope.editModel = function (model,isNew) {
 
                 $uibModal.open({
-                    templateUrl: 'modalTemplates/editModel.html',
+                    templateUrl: 'modalTemplates/editDG.html',
                     backdrop: 'static',
                     size : 'lg',
-                    controller : "editModelCtrl",
+                    controller : "editDGCtrl",
 
                     resolve: {
                         model: function () {
                             return model
                         },
                         hashTypes: function () {
-                            return $scope.input.types
+                            return $scope.hashAllDG
+                            //return $scope.input.types
                         },
                         hashValueSets : function() {
                             return $localStorage.world.valueSets
@@ -350,13 +370,18 @@ angular.module("pocApp")
                     if (newModel) {
                         //if a model is returned, then it is a new one and needs to be added to the world
 
+                        $localStorage.world.dataGroups[newModel.name] = newModel
+                        $scope.hashAllDG = $localStorage.world.dataGroups
+                        sortDG()
 
+
+/*
                         if (newModel.kind == 'comp') {
                             $localStorage.world.compositions[newModel.name] = newModel
                         } else {
                             $localStorage.world.dataGroups[newModel.name] = newModel
                         }
-
+*/
                         let vo1 = modelsSvc.validateModel($localStorage.world)
                         $scope.errors = vo1.errors
                         $scope.input.types = vo1.types      //a hash keyed by name

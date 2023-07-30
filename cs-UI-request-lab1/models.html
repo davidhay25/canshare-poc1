@@ -33,6 +33,10 @@
             background: #eee;
         }
 
+
+        modal-xlg {
+            width : 1200px
+        }
     </style>
 
     <script src="js/libs/jquery-1.9.0.min.js"></script>
@@ -76,13 +80,14 @@
     <script src="js/libs/vis.min.js"></script>
 
     <script src="js/filters.js"></script>
-    <script src="js/editModelCtrl.js"></script>
+    <script src="js/editDGCtrl.js"></script>
     <script src="js/editCompositionCtrl.js"></script>
     <!--
     <script src="js/editVSCtrl.js"></script>
     -->
     <script src="js/modelCompCtrl.js"></script>
     <script src="js/modelDGCtrl.js"></script>
+    <script src="js/modelDGSvc.js"></script>
     <script src="js/modelTermCtrl.js"></script>
     <script src="js/modelTermSvc.js"></script>
     <script src="js/optionsCtrl.js"></script>
@@ -221,11 +226,12 @@
 
                     <div>
                         <div class="row">
-                            <div class="col-md-8">
+                            <div class="col-md-6">
                                 <input type="text" placeholder="Filter" class="form-control"
                                        ng-model="input.dgFilter"/>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
+                                <button class="btn btn-link  pull-right" ng-click="newModel('dg')">New</button>
                                 <button class="btn btn-link pull-right" ng-click="listAllDG()">List all</button>
                             </div>
                         </div>
@@ -240,7 +246,7 @@
                             <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
                                  ng-click="selectModel(v)"
                                  ng-show="showDG(v,input.dgFilter)"
-                                 ng-repeat="(k,v) in hashAllDG">
+                                 ng-repeat="v in sortedDGList">
 
                                 <i class="glyphicon glyphicon-edit pull-right clickable"
                                    ng-click="editModel(v)"></i>
@@ -304,6 +310,16 @@
             <ng-include src="'/includes/terminology.html'"></ng-include>
         </uib-tab>
 
+        <uib-tab heading="DataGroup updates">
+            <em>Changes made to DataGroups</em>
+
+
+            <ng-include src="'/includes/dgReport.html'"></ng-include>
+
+
+            <pre>{{dgUpdates | json}}</pre>
+
+        </uib-tab>
 
         <uib-tab>
             <uib-tab-heading>

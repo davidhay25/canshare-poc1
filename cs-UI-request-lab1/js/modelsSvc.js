@@ -177,7 +177,7 @@ angular.module("pocApp")
 
 
             fhirDataTypes : function(){
-                return ['string','CodeableConcept','CodeableConcept','Quantity','HumanName','dateTime','Identifier','ContactPoint','Address','code','Attachment','Period','integer','boolean']
+                return ['string','CodeableConcept','Quantity','HumanName','dateTime','Identifier','ContactPoint','Address','code','Attachment','Period','integer','boolean']
             },
            // findUsageOf
 
@@ -383,8 +383,6 @@ angular.module("pocApp")
                             node.icon = `icons/${treeIcons[ed.kind]}`
                         }
 
-
-
                         switch (ed.kind) {
                             case 'slice' :
                                 node['a_attr'] = { "style": "color : blue" }
@@ -419,8 +417,19 @@ angular.module("pocApp")
 
             },
 
-            getFullListOfElements(model,types,followReferences) {
-                //create a complete list of elements for a DG
+            getFullListOfElements(inModel,inTypes,followReferences) {
+                //create a complete list of elements for a DG (Compositions have a separate function)
+
+                //processing the DG hierarchy is destructive (the parent element is removed after processing
+                //to avoid infinite recursion
+                let types = angular.copy(inTypes)
+                //ensure the types has the FHIR dts as well
+                let fdt = this.fhirDataTypes()
+                fdt.forEach(function (dt) {
+                    types[dt] = dt
+                })
+
+                let model = angular.copy(inModel)
 
                 let topModel = angular.copy(model)
                 let allElements = []
@@ -454,25 +463,35 @@ angular.module("pocApp")
                     edges: edges
                 };
 
-
                 return {allElements: allElements,graphData:graphData}
 
-
                 // add to list of elements, replacing any with the same path (as it has been overwritten)
-                function addToList(ed,host) {
+                //todo - what was 'host' for?
+                function addToList(ed,host,sourceModel) {
                     //is there already an entry with this path
                     let path = ed.path
                     let pos = -1
                     allElements.forEach(function (element,inx) {
-                        if (element.path == path) {     //should only be one (unless there are duplicate names in the model
+                        // if (element.path == path) {   //changed Jul-29
+                        if (element.ed.path == path) {     //should only be one (unless there are duplicate names in the model
                             pos = inx
                         }
                     })
+
+                    let itemToInsert = {ed:ed,host}
+                    if (host) {     //todo not sure if this is still used...
+                        itemToInsert.host = host
+                    }
+                    if (sourceModel) {
+                        itemToInsert.sourceModelName = sourceModel.name
+                    }
                     if (pos > -1) {
                         //replace the existing path
-                        allElements.splice(pos,1,{ed:ed,host:host})
+                        //allElements.splice(pos,1,{ed:ed,host:host,sourceModelName:})
+                        allElements.splice(pos,1,itemToInsert)
                     } else {
-                        allElements.push({ed:ed,host})
+                        //allElements.push({ed:ed,host})
+                        allElements.push(itemToInsert)
                     }
                 }
 
@@ -493,7 +512,6 @@ angular.module("pocApp")
                     }
                 }
 
-
                 //process a single element at the root of the DG
                 function extractElements(model,pathRoot) {
 
@@ -508,29 +526,31 @@ angular.module("pocApp")
 
                     addNodeToList(node)
 
-                    //arNodes.push(node);
-
-
-                    //do parents first.   (Not doing this ATM - inheritance not supported)
+                    //do parents first.   Only 1 level
                     if (model.parent && followReferences) {
                       //  console.log('expanding ' + model.parent)
                         if (types[model.parent]) {
-                         //   console.log(types[model.parent])
 
-                            //create the 'parent' link
+                            //to prevent infinite ercursion
+                            let parent = model.parent
+                            delete model.parent
+
+                            //create the 'parent' link  todo - graph needs to add parent
                             let edge = {id: 'e' + arEdges.length +1,
                                 from: model.name,
-                                to: model.parent,
+                                //to: model.parent,
+                                to: parent,
                                 color: 'red',
                                 width: 4,
                                 label: 'specializes',arrows : {to:true}}
                             arEdges.push(edge)
 
+                            extractElements(types[parent],pathRoot)
 
 
-                            extractElements(types[model.parent],pathRoot)
                         } else {
                             errors.push(`missing type name ${model.parent}`)
+                            console.log(`missing type name ${model.parent}`)
                         }
                     }
 
@@ -540,6 +560,7 @@ angular.module("pocApp")
                                 let type = ed.type[0]   //only look at the first code
                                 if (types[type]) {
                                     //this is a known type. Is there a definition for this type (ie do we need to expand it)
+                                    //a fhir datatype will not have a diff...
                                     let childDefinition = types[type]
 
 
@@ -559,15 +580,16 @@ angular.module("pocApp")
                                         //console.log('expanding child: ' + childDefinition.name)
                                         let clone = angular.copy(ed)
                                         clone.path = pathRoot + "." + ed.path
-                                        addToList(clone,ed)
+                                        addToList(clone,ed,model) //model will be the source
                                         //allElements.push(clone) //this is the BBE equivalent
                                         extractElements(childDefinition,pathRoot + "." + ed.path)
                                     } else {
                                         //list add the ed to the list
-                                        let clone = angular.copy(ed)
+                                        //this is a fhir dt
+                                        let clone = angular.copy(ed,null,model) //include the model so the source of the ed is known
 
                                         clone.path = pathRoot + '.' + ed.path
-                                        addToList(clone)
+                                        addToList(clone,null,model)
                                         //allElements.push(ed)
                                     }
 
@@ -604,21 +626,13 @@ angular.module("pocApp")
                     types[code] = {}
                 })
 
-                //all types point to their definition todo - add defs for fhir datatypse
-               /*
-                types['string'] = {}
-                types['CodeableConcept'] = {}
-                types['Quantity'] = {}
-                types['Identifier'] = {}
-                types['HumanName'] = {}
-                types['dateTime'] = {}
-*/
+
 
                 //add to the models hash. Will update types with custom types (ie the models) using model.name
                 //will check that all names are unique
                 addToHash(vo.dataGroups)
                 addToHash(vo.compositions)
-                addToHash(vo.valueSets)     //treat vs as a type for the purposes of validation
+                //addToHash(vo.valueSets)     //treat vs as a type for the purposes of validation
 
                // console.log(types)
 
@@ -633,50 +647,51 @@ angular.module("pocApp")
                         }
                     }
 
-                    if (model.kind == 'vs') {
-                        //validations that are specifically for ValueSets
 
+                    //validations that are specifically for Compositions & datagroup
+                    if (model.diff) {
+                        model.diff.forEach(function (ed,inx) {
+                            //this is an element definition
 
-                    } else {
-                        //validations that are specifically for Compositions & datagroup
-                        if (model.diff) {
-                            model.diff.forEach(function (ed,inx) {
-                                //this is an element definition
+                            //check for required elements in ED. Currently only path.
+                            if (! ed.path) {
+                                errors.push({msg:`Missing path in model ${model.name} at diff #${inx}`,model:model, ED:ed})
+                            }
 
-                                //check for required elements in ED. Currently only path.
-                                if (! ed.path) {
-                                    errors.push({msg:`Missing path in model ${model.name} at diff #${inx}`,model:model, ED:ed})
-                                }
+                            //check that the ED type is known
+                            //todo - should our model allow multiple types
+                            if (ed.type) {
 
-                                //check that the ED type is known
-                                //todo - should our model allow multiple types
-                                if (ed.type) {
-
-                                    ed.type.forEach(function (type) {
-                                        if ( !types[type]) {
-                                            errors.push({msg:`Unknown type ${ed.type} in model ${model.name} at diff #${inx}`,model:model, ED:ed})
-                                        }
-                                    })
-
-                                } else {
-                                    errors.push({msg:`Missing type in model ${model.name} at diff #${inx}`,model:model, ED:ed})
-                                }
-
-                                if (ed.valueSet) {
-                                    //check that the valueSet name is present in the world or is a url.
-                                    //If a url, then not defined in the world
-                                    if (! types[ed.valueSet] && ed.valueSet.substring(0,4) !== 'http') {
-                                        errors.push({msg:`Missing valueSet name ${ed.valueSet} in model ${model.name} at diff #${inx}. (It's not a Url either)`,model:model, ED:ed})
+                                ed.type.forEach(function (type) {
+                                    if ( !types[type]) {
+                                        errors.push({msg:`Unknown type ${ed.type} in model ${model.name} at diff #${inx}`,model:model, ED:ed})
                                     }
+                                })
+
+                            } else {
+                                errors.push({msg:`Missing type in model ${model.name} at diff #${inx}`,model:model, ED:ed})
+                            }
+
+                            /* currently not validating VS
+                            if (ed.valueSet) {
+                                //check that the valueSet name is present in the world or is a url.
+                                //If a url, then not defined in the world
+                                if (! types[ed.valueSet] && ed.valueSet.substring(0,4) !== 'http') {
+                                    errors.push({msg:`Missing valueSet name ${ed.valueSet} in model ${model.name} at diff #${inx}. (It's not a Url either)`,model:model, ED:ed})
                                 }
+                            }
+                            */
 
-                                //todo check for duplicated names in the model
+                            //todo check for duplicated names in the model
 
-                            })
-                        } else {
+                        })
+                    } else {
+                        if (model.kind == 'dg') {
                             errors.push({msg:"Missing diff",model:model})
                         }
+
                     }
+
 
 
 

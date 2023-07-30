@@ -90,6 +90,11 @@
                     </td>
                   </tr>
 
+                  <tr ng-show="selectedNode.data.ed.fixedValue">
+                    <td>Fixed value</td>
+                    <td> {{selectedNode.data.ed.fixedValue}}</td>
+                  </tr>
+
 
                 </table>
 
@@ -172,13 +177,15 @@
 
 
       <div ng-show = "selectedModel.parent">
-        <strong class="pull-left">Profiles: {{selectedModel.parent}}</strong>
+        <strong class="pull-left">Specializes: {{selectedModel.parent}}</strong>
+        <br/>
       </div>
 
+      <br/>
       <div class="tableFixHead">
         <table class="table-bordered table">
           <thead>
-          <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Code</th></tr>
+          <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Code</th><th>Fixed value</th></tr>
           </thead>
           <tbody>
           <tr ng-repeat="element in fullElementList" ng-hide="$index==0 || element.mult.indexOf('..0') > -1">
@@ -186,7 +193,7 @@
             <td>
               <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
 
-              
+
 
                 <!-- {{element.path | dropFirstInPath}} -->
                 <div ng-hide="input.showFullModel">
@@ -218,6 +225,7 @@
               </div>
 
             </td>
+            <td>{{element.ed.fixedValue}}</td>
 
           </tr>
           </tbody>
@@ -256,6 +264,7 @@
                   </td>
                   <td>{{ed.type[0]}}
                     <div class="clickable"><em>{{ed.valueSet}}</em></div>
+                    <div><em>{{ed.fixedValue}}</em></div>
                   </td>
                   <!--
                   <td>
@@ -281,7 +290,29 @@
 
     </uib-tab>
 
-    <uib-tab ng-show="selectedModel.kind == 'dg'">
+    <uib-tab ng-show="false" heading="Fixed values">
+
+      <br/>
+      <div class="tableFixHead">
+        <table class="table-bordered table">
+          <thead>
+          <tr><th>Path</th><th><th>Fixed value</th></tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="ed in selectedModel.diff" ng-show="ed.fixedValue">
+
+            <td>{{ed.path}}</td>
+            <td>{{ed.fixedValue}}</td>
+
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </uib-tab>
+
+
+    <uib-tab>
       <uib-tab-heading>Referenced by</uib-tab-heading>
 
 
