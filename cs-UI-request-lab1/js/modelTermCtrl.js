@@ -73,7 +73,7 @@ angular.module("pocApp")
             }
 
             //when a specific DG is selected in the term summary
-            $scope.termSelectDG = function (item) {
+            $scope.termSelectDGDEP = function (item) {
                 console.log(item)
 
                 //set the tab to the DG tab
@@ -81,14 +81,13 @@ angular.module("pocApp")
 
                 //locate the DG with this name and set it active. This will select it in the DG tab
                 $scope.selectedModel = $scope.hashAllDG[item.DGName]
-
                 $scope.selectModel($scope.selectedModel)
 
             }
 
             //selects both a DG and an element within that DG
 
-            $scope.termSelectDGItem = function (item) {
+            $scope.termSelectDGItemDEP = function (item) {
                 console.log(item)
 
                 //set the tab to the DG tab

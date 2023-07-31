@@ -1,10 +1,42 @@
 <div class="row">
-  <div class="col-md-2">
-    <div><strong>New DG</strong></div>
+  <div class="col-md-12">
+
+
+    <table class="table-condensed table table-bordered">
+      <tr><th>DG</th><th>Path</th><th>Change</th><th>Effects</th></tr>
+      <tr ng-repeat="item in dgUpdates">
+        <td>
+          <div class="clickable" ng-click="termSelectDG(item)">{{item.DGName}}</div>
 
 
 
-    <div><strong>Updated DG</strong></div>
+
+        </td>
+        <td>{{item.msg}}</td>
+        <td>{{item.path}}</td>
+
+        <td>
+          <div ng-repeat="xref in item.xref">
+            <div ng-hide="xref.path" >
+              <span class="clickable" ng-click="termSelectDG(item)">{{xref.name}}</span>  ({{xref.mode}})
+            </div>
+
+
+
+            <div ng-show="xref.path" >
+              <span  class="clickable" ng-click="termSelectDGItem({hiddenDGName: xref.name,path: xref.path})">{{xref.name}}.{{xref.path}}</span>  ({{xref.mode}})
+            </div>
+
+
+
+
+          </div>
+        </td>
+      </tr>
+    </table>
+
+
+
 
     <div class="list-group">
       <div class="list-group-item" ng-repeat="el in dgUpdates.newElement">
@@ -13,10 +45,8 @@
     </div>
 
   </div>
-  <div class="col-md-5">
+  <div class="col-md-6">
 
   </div>
-  <div class="col-md-5">
 
-  </div>
 </div>

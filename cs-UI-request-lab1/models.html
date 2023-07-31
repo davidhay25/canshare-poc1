@@ -310,14 +310,16 @@
             <ng-include src="'/includes/terminology.html'"></ng-include>
         </uib-tab>
 
-        <uib-tab heading="DataGroup updates">
+        <uib-tab>
+            <uib-tab-heading> DataGroup updates <span class="badge">{{dgUpdates.length}}</span> </uib-tab-heading>
             <em>Changes made to DataGroups</em>
 
 
             <ng-include src="'/includes/dgReport.html'"></ng-include>
 
-
+<!--
             <pre>{{dgUpdates | json}}</pre>
+            -->
 
         </uib-tab>
 

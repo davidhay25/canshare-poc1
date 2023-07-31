@@ -148,7 +148,10 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td><input class="form-control" type="text" ng-model="input.path"/></td>
+
+
+
+                                <td><input class="form-control" type="text" ng-model="input.path" ng-blur="setTitle(input.path)"/></td>
                                 <td><input class="form-control" type="text" ng-model="input.title"/></td>
                                 <td>
                                     <select class="form-control" ng-model="input.type"

@@ -13,18 +13,40 @@ angular.module("pocApp")
             getReferencedModels : function (hashDG,hashComp) {
                 //create a hash showing references between models
 
+                //hashReferences is keyed by A DG. It contains a list of all other DG's that reference it - including parental
                 let hashReferences = {}
+
                 //let merged = angular.copy({...world.compositions, ...world.dataGroups})     //all EDs
 
                 //DG's
                 Object.keys(hashDG).forEach(function (key) {
                     let DG = hashDG[key]
+
+                    let model = DG
+                    while (model.parent) {
+                        console.log(`Examining ${DG.name}: ${model.parent} is the parent of ${model.name}`)
+
+                        model = hashDG[model.parent]
+                        hashReferences[model.name] = hashReferences[model.name] || []
+                        hashReferences[model.name].push({name:DG.name,kind:model.kind,mode:'parent'})
+
+
+                    }
+
+                  /*
+                    if (DG.parent) {
+                        console.log(`${DG.parent} is the parent of ${DG.name}`)
+                        hashReferences[DG.parent] = hashReferences[DG.parent] || []
+                        hashReferences[DG.parent].push({name:DG.name,kind:DG.kind,mode:'parent'})
+                    }
+                    */
+
                     if (DG.diff) {
                         DG.diff.forEach(function (ed) {
                             if (ed.type) {
                                 ed.type.forEach(function (typ) {
                                     hashReferences[typ] = hashReferences[typ] || []
-                                    hashReferences[typ].push({name:DG.name,kind:DG.kind,path:ed.path})
+                                    hashReferences[typ].push({name:DG.name,kind:DG.kind,path:ed.path,mode:'uses'})
                                 })
                             }
                         })
@@ -175,9 +197,8 @@ angular.module("pocApp")
 
             },
 
-
             fhirDataTypes : function(){
-                return ['string','CodeableConcept','Quantity','HumanName','dateTime','Identifier','ContactPoint','Address','code','Attachment','Period','integer','boolean']
+                return ['string','CodeableConcept','Quantity','HumanName','dateTime','Identifier','ContactPoint','Address','code','Attachment','Period','integer','boolean','Group']
             },
            // findUsageOf
 

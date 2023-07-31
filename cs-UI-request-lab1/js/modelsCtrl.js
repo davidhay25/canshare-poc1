@@ -96,7 +96,43 @@ angular.module("pocApp")
             })
 */
 
-            $scope.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG)
+
+            //when a specific DG is selected in the term summary
+            //used by updates list as well = hence moved to main controller
+            $scope.termSelectDG = function (item) {
+                console.log(item)
+
+                //set the tab to the DG tab
+                $scope.input.mainTabActive = $scope.ui.tabDG;
+
+                //locate the DG with this name and set it active. This will select it in the DG tab
+                $scope.selectedModel = $scope.hashAllDG[item.DGName]
+                $scope.selectModel($scope.selectedModel)
+
+            }
+            //when a specific DG path is selected in the term summary
+            //used by updates list as well = hence moved to main controller
+            $scope.termSelectDGItem = function (item) {
+                console.log(item)
+
+                //set the tab to the DG tab
+                $scope.input.mainTabActive = $scope.ui.tabDG;
+
+                //locate the DG with this name and set it active. This will select it in the DG tab
+                //Note that elements use a 'hidden' property to set the DG name
+                $scope.selectedModel = $scope.hashAllDG[item.hiddenDGName]
+                $scope.selectModel($scope.selectedModel)
+
+                //selct the element in the DG tree. Need to wait for the tree to be built...
+                $timeout(function () {
+                    let fullPath = `${item.hiddenDGName}.${item.path}`
+
+                    $("#dgTree").jstree("select_node",  fullPath);
+                },500)
+
+
+
+            }
 
             $scope.updateTermSummary = function () {
                 $scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
@@ -157,6 +193,9 @@ angular.module("pocApp")
             //xref is cross references between models/types
             //hash[type name] - array of type name
             $scope.xref = modelsSvc.getReferencedModels($scope.hashAllDG,$scope.hashAllCompositions)
+
+            //updates to DG made over the ones in the code
+            $scope.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG, $scope.xref )
 
 
             $scope.resetWorld = function () {
@@ -374,6 +413,9 @@ angular.module("pocApp")
                         $scope.hashAllDG = $localStorage.world.dataGroups
                         sortDG()
 
+                        //updates to DG made over the ones in the code
+                       // $scope.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG,$scope.xref)
+
 
 /*
                         if (newModel.kind == 'comp') {
@@ -396,6 +438,8 @@ angular.module("pocApp")
                         //note this is the model passed in for editing
                         $scope.selectModel(model)
                     }
+
+                    $scope.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG, $scope.xref )
 
                 })
 

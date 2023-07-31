@@ -71,11 +71,22 @@ angular.module("pocApp")
                     let nameInOriginal = ar[ar.length-1]
                     ar.splice(0,1)
                     let pathInThisEd = ar.join('.')
+                    let pathInTarget
+                    if (ar.length == 1) {
+                        //if the pathlength is 1, then we're overriding an element on the root of the target model
+                        pathInTarget = ar[0]
+                    } else {
+                        //otherwise we're overriding a nested path in the target (under a group node)
+                        ar.splice(0,1)
+                        pathInTarget = ar.join('.')  //we assume that the first 2 elements in the path are the type name, and name of this element
+                    }
+
                     let sourceModel = hashTypes[element.sourceModelName]
                     if (sourceModel) {
                         //locate the original ed from the source
                         sourceModel.diff.forEach(function (ed) {
-                            if (ed.path == nameInOriginal) {
+                            if (ed.path == pathInTarget) {
+                                //if (ed.path == nameInOriginal) {
                                 //this is the ed that is to be overriden. So a copy (with an updated path
                                 //is saved in this DT
                                 let newEd = angular.copy(ed)
@@ -83,6 +94,11 @@ angular.module("pocApp")
                                 newEd.status = 'new'
                                 newEd.path = pathInThisEd
                                 $scope.model.diff.push(newEd)
+
+                                $scope.model.changes = $scope.model.changes || []
+                                msg = `Fix value to ${code}`
+                                $scope.model.changes.push({edPath: path, msg:msg})
+
                             }
                         })
                         getFullElementList()
@@ -136,7 +152,7 @@ angular.module("pocApp")
             //return true if there is an override element in the model for this path..
             $scope.hasBeenOverridden = function(element) {
                 //the path in the model.diff won't have the first field
-console.log(element)
+//console.log(element)
                 if (! $scope.model || !$scope.model.diff) {
                     //when adding a new DG
                     return false
@@ -182,9 +198,34 @@ console.log(element)
             }
 
             $scope.updateElementFromList = function () {
+
+
+
+                if ($scope.selectedElementFromList.title !== $scope.edit.title) {
+                    $scope.model.changes = $scope.model.changes || []
+                    msg = `Title changed from '${$scope.selectedElementFromList.title}' to '${$scope.edit.title}'`
+                    $scope.model.changes.push({edPath: $scope.selectedElementFromList.path, msg:msg})
+
+                }
+
+                if ($scope.selectedElementFromList.mult !== $scope.edit.mult) {
+                    $scope.model.changes = $scope.model.changes || []
+                    msg = `Cardinality changed from '${$scope.selectedElementFromList.mult}' to '${$scope.edit.mult}'`
+                    $scope.model.changes.push({edPath: $scope.selectedElementFromList.path, msg:msg})
+                }
+
+
                 $scope.selectedElementFromList.title = $scope.edit.title
                 $scope.selectedElementFromList.mult = $scope.edit.mult
+                $scope.selectedElementFromList.status = 'changed'
                 if ($scope.edit.code) {
+
+                    if ($scope.selectedElementFromList.code !== $scope.edit.code) {
+                        $scope.model.changes = $scope.model.changes || []
+                        msg = `Code changed from '${$scope.selectedElementFromList.code}' to '${$scope.edit.code}'`
+                        $scope.model.changes.push({edPath: $scope.selectedElementFromList.path, msg:msg})
+                    }
+
                     $scope.selectedElementFromList.code = [{code:$scope.edit.code}]
                 }
 
@@ -253,6 +294,10 @@ console.log(element)
                 }
             }
 
+            $scope.setTitle = function (name) {
+                $scope.input.title = name.charAt(0).toUpperCase() + name.slice(1)
+            }
+
             //add a new item
             $scope.add = function () {
                 let element = {}
@@ -275,6 +320,10 @@ console.log(element)
                 $scope.model.diff = $scope.model.diff || []
                 $scope.model.diff.push(element)
 
+                $scope.model.changes = $scope.model.changes || []
+                msg = `Added new element`
+                $scope.model.changes.push({edPath: element.path, msg:msg})
+
                 delete $scope.input.path
                 delete $scope.input.title
                 delete $scope.input.type
@@ -287,6 +336,11 @@ console.log(element)
 
             $scope.remove = function (inx) {
                 if (confirm("Are you sure you wish to remove this element")) {
+
+                    $scope.model.changes = $scope.model.changes || []
+                    msg = `remove element`
+                    $scope.model.changes.push({edPath: $scope.model.diff[inx].path, msg:msg})
+
                     $scope.model.diff.splice(inx,1)
                     getFullElementList()
                 }

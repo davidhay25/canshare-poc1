@@ -8,19 +8,27 @@ angular.module("pocApp")
         return {
 
 
-            makeUpdateList: function (allDG) {
-                let report = {newDG:[],newElement:[]}
+            makeUpdateList: function (allDG,xref) {
+                //let report = {newDG:[],newElement:[],changedElement:[]}
+                let report = []
+
+                console.log(xref)
+
                 Object.keys(allDG).forEach(function (key) {
                     let dg = allDG[key]
                     if (dg.status == 'new') {
-                        report.newDG.push(dg)
+                        let item = {DGName:dg.name,msg:"New DataGroup",xref:xref[dg.name]}
+                        report.push(item)
+
                     } else {
-                        dg.diff.forEach(function (ed) {
-                            if (ed.status == 'new') {
-                                let item = {dgName:dg.name, ed : ed}
-                                report.newElement.push(item)
-                            }
-                        })
+                        if (dg.changes) {
+                            dg.changes.forEach(function (change) {
+                                //{edPath: msg: }
+                                let item = {DGName:dg.name,msg:change.msg,path:change.edPath,xref:xref[dg.name]}
+                                report.push(item)
+                            })
+                        }
+
                     }
                 })
 

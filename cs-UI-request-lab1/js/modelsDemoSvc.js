@@ -123,7 +123,7 @@ angular.module("pocApp")
                         description:"A description of the current status of the cancer at a given point in time."}
                     dgCancerAssessment.diff.push({path:'pathwayType',title:'Pathway type',type:['CodeableConcept'],mult:'0..1',
                         description:'The type of the cancer pathway (e.g. screening, diagnostic, surveillance)'})
-                    dgCancerAssessment.diff.push({path:'assessedBy',title:'Assessed by',type:['Hcp'],mult:'0..1',
+                    dgCancerAssessment.diff.push({path:'assessedBy',title:'Assessed by',type:['HcProvider'],mult:'0..1',
                         description:'The healthcare practitioner that performed this cancer assessment.'})
                     dgCancerAssessment.diff.push({path:'primaryOrRecurrence',title:'Primary cancer or recurrance',type:['CodeableConcept'],mult:'0..1',
                         description:'An indication of where the cancer is in the lifecycle - e.g. new primary cancer or recurrence'})
@@ -257,17 +257,18 @@ angular.module("pocApp")
                         description:"The procedures that the related person had"})
                     hashDataGroups[dgFMH.name] = dgFMH
 
-                    //DataGroup HCP
-                    let dgHcp = {kind:"dg",name:'Hcp',title:"Healthcare practitioner",diff:[],
+                    //DataGroup HcProvider
+                    let dgHealthCareProvider = {kind:"dg",name:'HcProvider',title:"Healthcare practitioner",diff:[],
                         description:"The person who is directly or indirectly involved in the provising of healthcare or related services"}
-                    dgHcp.diff.push({path:'name',title:"Name",type:['HumanName'],mult:'0..1',
+                    dgHealthCareProvider.diff.push({path:'name',title:"Name",type:['HumanName'],mult:'0..1',
                         description : "The name of the healthcare practitioner"})
-                    dgHcp.diff.push({path:'hpi',title:"HPI number",type:['Identifier'],mult:'0..1',
+                    dgHealthCareProvider.diff.push({path:'hpi',title:"HPI number",type:['Identifier'],mult:'0..1',
                         description : "The identifier (eg HPI)of the healthcare practitioner"})
-                    dgHcp.diff.push({path:'contact',title:"Contact details",type :['ContactPoint'],mult:'0..1',
+                    dgHealthCareProvider.diff.push({path:'contact',title:"Contact details",type :['ContactPoint'],mult:'0..1',
                         description : "The contact information of the healthcare practitioner"})
 
-                    hashDataGroups[dgHcp.name] = dgHcp
+                    hashDataGroups[dgHealthCareProvider.name] = dgHealthCareProvider
+
 
 
                     //DataGroup HealthCareFacility
@@ -337,7 +338,7 @@ angular.module("pocApp")
                         description:"A classification of the type of observation being made"})
                     dgObservation.diff.push({path:'date',title:'Date',type:['dateTime'],mult:"0..1",
                         description:"TThe date and/or time that the observation was deemed to be taken"})
-                    dgObservation.diff.push({path:'performer',title:'Status',type:['Hcp'],mult:"0..1",
+                    dgObservation.diff.push({path:'performer',title:'Status',type:['HcProvider'],mult:"0..1",
                         description:"TThe healthcare practitioner who is reponsible for the observation"})
                     dgObservation.diff.push({path:'valueString',title:'Status',type:['string'],mult:"0..1",
                         description:"The plain text information determined as a result of making the observation"})
@@ -379,7 +380,7 @@ angular.module("pocApp")
                         description:"The high-level kind of procedure, e.g. surgical procedure, diagnostic procedure, education, counselling"})
                     dgProcedure.diff.push({path:'dateTime',title:'Datetime',type:['dateTime'],
                         description:"The date and/or time at which the procedure was performed"})
-                    dgProcedure.diff.push({path:'performer',title:'Performer',type:['Hcp'],
+                    dgProcedure.diff.push({path:'performer',title:'Performer',type:['HcProvider'],
                         description:"The healthcare practitioner who performed the procedure"})
                     dgProcedure.diff.push({path:'location',title:'Location',type:['Facility'],
                         description:"The healthcare facility at which the procedure was performed."})
@@ -495,8 +496,11 @@ angular.module("pocApp")
                     //DG specimen for frozen section
                     let dgSpecimenResection = {kind:"dg",name:'Specimen-resection',title:"Specimen from resection",parent:'Specimen',diff:[]}
 
-                    dgSpecimenResection.diff.push({path:'om',title:'Orientation marker',type:['string']})
-                    dgSpecimenResection.diff.push({path:'om.type',title:'Orientation marker',type:['CodeableConcept']})
+                    dgSpecimenResection.diff.push({path:'om',title:'Orientation markers of tissue sample',type:['Group']})
+                    dgSpecimenResection.diff.push({path:'om.technique',title:'Orientation marker technique used (e.g. surgical, radiological) ',type:['CodeableConcept']})
+                    dgSpecimenResection.diff.push({path:'om.type',title:'Orientation marker type used (e.g. suture, clip)',type:['CodeableConcept']})
+                    dgSpecimenResection.diff.push({path:'om.position',title:'The position of the orientation marker (e.g. superior, inferior, medial, lateral, anterior, posterior)',type:['CodeableConcept']})
+                    dgSpecimenResection.diff.push({path:'om.description',title:'Description of marker at the given position using the given technique',type:['CodeableConcept']})
 
                     hashDataGroups[dgSpecimenResection.name] = dgSpecimenResection
 
