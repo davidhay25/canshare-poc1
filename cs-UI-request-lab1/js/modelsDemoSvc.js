@@ -494,7 +494,7 @@ angular.module("pocApp")
 
 
                     //DG specimen for frozen section
-                    let dgSpecimenResection = {kind:"dg",name:'Specimen-resection',title:"Specimen from resection",parent:'Specimen',diff:[]}
+                    let dgSpecimenResection = {kind:"dg",name:'SpecimenResection',title:"Specimen from resection",parent:'Specimen',diff:[]}
 
                     dgSpecimenResection.diff.push({path:'om',title:'Orientation markers of tissue sample',type:['Group']})
                     dgSpecimenResection.diff.push({path:'om.technique',title:'Orientation marker technique used (e.g. surgical, radiological) ',type:['CodeableConcept']})

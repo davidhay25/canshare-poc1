@@ -22,29 +22,22 @@ angular.module("pocApp")
                 Object.keys(hashDG).forEach(function (key) {
                     let DG = hashDG[key]
 
-                    let model = DG
+                    let model = angular.copy(DG) //we're going to chane model so need a copy..
                     while (model.parent) {
                         console.log(`Examining ${DG.name}: ${model.parent} is the parent of ${model.name}`)
 
                         model = hashDG[model.parent]
                         hashReferences[model.name] = hashReferences[model.name] || []
                         hashReferences[model.name].push({name:DG.name,kind:model.kind,mode:'parent'})
-
-
                     }
 
-                  /*
-                    if (DG.parent) {
-                        console.log(`${DG.parent} is the parent of ${DG.name}`)
-                        hashReferences[DG.parent] = hashReferences[DG.parent] || []
-                        hashReferences[DG.parent].push({name:DG.name,kind:DG.kind,mode:'parent'})
-                    }
-                    */
 
+//console.log(`----- ${DG.name}`)
                     if (DG.diff) {
                         DG.diff.forEach(function (ed) {
                             if (ed.type) {
                                 ed.type.forEach(function (typ) {
+                                   // console.log(typ)
                                     hashReferences[typ] = hashReferences[typ] || []
                                     hashReferences[typ].push({name:DG.name,kind:DG.kind,path:ed.path,mode:'uses'})
                                 })

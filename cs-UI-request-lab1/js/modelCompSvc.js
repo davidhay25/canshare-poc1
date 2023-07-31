@@ -8,11 +8,16 @@ angular.module("pocApp")
         return {
 
 
-            makeFullList: function (comp,types) {
+            makeFullList: function (comp,inTypes) {
                 //generate a full list of elements. Like DG but need to accomodate sections
                 //section name is in the path...
                 //assume that composition hierarcy is only 2 levels - ie a comp can have a parent, but the parent cannot
                 //this simplifies the parsing. May need to revisit if too limiting
+
+                //processing the DG hierarchy is destructive (the parent element is removed after processing
+                //to avoid infinite recursion
+                let types = angular.copy(inTypes)
+
 
                 let allElements = []
 
@@ -29,6 +34,9 @@ angular.module("pocApp")
 
                     if (DG.parent) {
                         //todo
+                        let parentModel = types[DG.parent]
+                        delete DG.parent
+                        processDG(parentModel,pathRoot)
                     } else {
                         //This is a 'leaf' DG. Iterate through the diff
                         DG.diff.forEach(function (ed) {
