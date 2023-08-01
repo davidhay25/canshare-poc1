@@ -505,6 +505,46 @@ angular.module("pocApp")
                     hashDataGroups[dgSpecimenResection.name] = dgSpecimenResection
 
 
+
+
+                    let dgOperation = {kind:"dg",name:'Operation',title:"General operative details",diff:[],
+                        description:"General details for most operations"}
+                    dgOperation.diff.push({path:'date',title:'Date perfromed',type:['Period'],
+                        description:"The date & time of the procedure. Start and end dates can be recorded."})
+                    dgOperation.diff.push({path:'entry',title:'Surgical entry',type:['CodeableConcept'],
+                        description:"The entry method for the operation"})
+                    dgOperation.diff.push({path:'type',title:'Type of procedure',type:['CodeableConcept'],
+                        description:"The procedure performed - eg total colectomy"})
+                    dgOperation.diff.push({path:'performer-type',title:'Performer type',type:['CodeableConcept'],
+                        description:"Most senior performer type"})
+                    dgOperation.diff.push({path:'preparation',title:'Preparation',type:['CodeableConcept'],
+                        description:"What preparation was performed (enema, oral bowel antibiotic bowel)"})
+
+                    dgOperation.diff.push({path:'urgency',title:'Urgency of procedure',type:['Group'],
+                        description:""})
+                    dgOperation.diff.push({path:'urgency.code',title:'Urgency code',type:['CodeableConcept'],
+                        description:""})
+                    dgOperation.diff.push({path:'urgency.reason',title:'reason for this urgency',type:['CodeableConcept'],
+                        description:""})
+                    dgOperation.diff.push({path:'asa',title:'ASA score',type:['CodeableConcept'],
+                        description:"ASA (American Society of Anaesthesiologists physical status) score"})
+
+
+                    hashDataGroups[dgOperation.name] = dgOperation
+
+                    let dgColonOperation = {kind:"dg",name:'Operation-colon',parent:"Operation",title:"Colon operative details",diff:[],
+                        description:"Specific details for a Colon operation"}
+                    dgColonOperation.diff.push({path:'ureter',title:'Ureter notes',type:['Group'],
+                        description:""})
+                    dgColonOperation.diff.push({path:'ureter.laterality',title:'Ureter notes',type:['CodeableConcept'],
+                        description:"left, right, both"})
+                    dgColonOperation.diff.push({path:'ureter.preserved',title:'Ureter preserved',type:['CodeableConcept'],
+                        description:""})
+                    dgColonOperation.diff.push({path:'ureter.stents',title:'Were stents employed',type:['CodeableConcept'],
+                        description:""})
+
+                    hashDataGroups[dgColonOperation.name] = dgColonOperation
+
                     //------------- ValueSets
                     let vsAllBodySite = {kind:"vs",name:'all-bodysite',title:'All body sites',url:'',concepts :[]}
                     vsAllBodySite.concepts.push({display:"Option 1"})
