@@ -7,8 +7,12 @@ angular.module("pocApp")
 
         return {
 
+            makeDgDownload: function (allDG) {
+                //create a download of the DG
+            },
 
             makeUpdateList: function (allDG,xref) {
+                //create a list of all DG updates
                 //let report = {newDG:[],newElement:[],changedElement:[]}
                 let report = []
 
