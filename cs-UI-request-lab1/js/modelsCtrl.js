@@ -1,7 +1,7 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,
-                  $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc) {
+                  $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc) {
 
             //$scope.localStorage = $localStorage
 
@@ -19,7 +19,7 @@ angular.module("pocApp")
             $scope.ui.tabComp = 0;
             $scope.ui.tabTerminology = 2;
 
-            $scope.input.mainTabActive = $scope.ui.tabDG;
+           //temp $scope.input.mainTabActive = $scope.ui.tabDG;
 
             //used in DG & Comp so when a type is a FHIR DT, we can create a link to the spec
             //$scope.main = {fhirDataTypes:modelsSvc.fhirDataTypes()}
@@ -64,6 +64,11 @@ angular.module("pocApp")
             $scope.hashAllDG = $localStorage.world.dataGroups
             //make the term summary
             //$scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
+
+
+           // $scope.testQ = QutilitiesSvc.makeItemFromDG('Specimen',$scope.hashAllDG)
+
+
 
             //make a sorted list for the UI
             function sortDG() {
@@ -533,11 +538,17 @@ angular.module("pocApp")
 
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types)
                 $scope.allCompElements = vo.allElements
+                $scope.hashCompElements = vo.hashAllElements
 
                 //console.log(vo)
                 let rootNodeId = $scope.allCompElements[0].path
                 let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
+
+                console.log(treeData)
                 makeCompTree(treeData,rootNodeId)
+
+                $scope.compQ = QutilitiesSvc.makeQfromComposition(comp,vo.hashAllElements)
+
 
             }
 
@@ -556,17 +567,25 @@ angular.module("pocApp")
 
                 })
 
+                //these are for the renderer from forms - todo to be deprecated
                 $scope.Qobject = modelsSvc.makeQfromModel(comp,$scope.input.types)
                 $scope.QR = {}
 
                 let vo = modelsSvc.getFullListOfElements(comp,$scope.input.types,$scope.input.showFullModel)
 
+
+
                 $scope.fullElementList = vo.allElements
                 $scope.graphData = vo.graphData
+
+
+
                 makeGraph()
 
                 let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
                 makeDGTree(treeData)
+
+                $scope.testQ = QutilitiesSvc.makeItemFromDG(vo.allElements,$scope.hashAllDG)
 
             }
 
@@ -675,5 +694,17 @@ angular.module("pocApp")
                 });
 
             }
+
+
+            $timeout(function(){
+                    $scope.selectModel($scope.hashAllDG['Specimen'],$scope.hashAllDG)
+            },500)
+
+
+
+
         }
+
+
+
     )

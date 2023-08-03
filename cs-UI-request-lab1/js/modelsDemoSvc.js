@@ -490,17 +490,22 @@ angular.module("pocApp")
 
 
 
-
-
-
                     //DG specimen for frozen section
                     let dgSpecimenResection = {kind:"dg",name:'SpecimenResection',title:"Specimen from resection",parent:'Specimen',diff:[]}
 
                     dgSpecimenResection.diff.push({path:'om',title:'Orientation markers of tissue sample',type:['Group']})
-                    dgSpecimenResection.diff.push({path:'om.technique',title:'Orientation marker technique used (e.g. surgical, radiological) ',type:['CodeableConcept']})
-                    dgSpecimenResection.diff.push({path:'om.type',title:'Orientation marker type used (e.g. suture, clip)',type:['CodeableConcept']})
-                    dgSpecimenResection.diff.push({path:'om.position',title:'The position of the orientation marker (e.g. superior, inferior, medial, lateral, anterior, posterior)',type:['CodeableConcept']})
-                    dgSpecimenResection.diff.push({path:'om.description',title:'Description of marker at the given position using the given technique',type:['CodeableConcept']})
+                    dgSpecimenResection.diff.push({path:'om.technique',title:'Technique',
+                        description:"Orientation marker technique used (e.g. surgical, radiological)",
+                        type:['CodeableConcept']})
+                    dgSpecimenResection.diff.push({path:'om.type',title:'Type',
+                        description:"Orientation marker type used (e.g. suture, clip)",
+                        type:['CodeableConcept']})
+                    dgSpecimenResection.diff.push({path:'om.position',title:'Position',
+                        description:"The position of the orientation marker (e.g. superior, inferior, medial, lateral, anterior, posterior)",
+                        type:['CodeableConcept']})
+                    dgSpecimenResection.diff.push({path:'om.description',title:'Description',
+                        description:"Description of marker at the given position using the given technique",
+                        type:['CodeableConcept']})
 
                     hashDataGroups[dgSpecimenResection.name] = dgSpecimenResection
 

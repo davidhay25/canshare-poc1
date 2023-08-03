@@ -147,13 +147,17 @@ angular.module("pocApp")
                 let ar = []
                 Object.keys(hashAllElements).forEach(function (key) {
                     let item = hashAllElements[key]         // {ed: sectionItem: }
+                    delete item.ed.diff //don't think the diff is needed here...
                     //ed.fullPath = key
                     let clone = angular.copy(item)        //don't want to update the actual model
                     clone.ed.path = key
+
+
+                    //delete clone.ed.diff    //don't think the diff is needed here...
                     ar.push(clone)
                 })
 
-                return {allElements:ar}
+                return {allElements:ar,hashAllElements:hashAllElements}
 
 
 

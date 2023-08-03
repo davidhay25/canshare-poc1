@@ -460,7 +460,7 @@ angular.module("pocApp")
                 //already one there (so it replaced the parental one)
 
                 //create as ed to act as the root
-                let edRoot = {ed:{path:model.name,title:model.title}}
+                let edRoot = {ed:{path:model.name,title:model.title,description:model.description}}
                 allElements.push(edRoot)
 
                 extractElements(model,model.name)

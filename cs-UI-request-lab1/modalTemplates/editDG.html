@@ -91,7 +91,12 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-7">
+                    <div class="col-md-2">
+                        Description
+                    </div>
+                    <div class="col-md-3">
+                        <textarea class="form-control" ng-model="input.newModelDescription"
+                                  ng-change="setModelAttribute('description',input.newModelDescription)" ></textarea>
                     </div>
                     <div class="col-md-7">
                     </div>

@@ -18,12 +18,9 @@ angular.module("pocApp")
             })
 
             function getFullElementList() {
-
                 let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
                 console.log(vo)
                 $scope.allElements = vo.allElements
-
-
 
             }
 
@@ -31,6 +28,7 @@ angular.module("pocApp")
             if (! isNew) {
                 $scope.input.newModelName = model.name
                 $scope.input.newModelTitle = model.title
+                $scope.input.newModelTitle = model.description
                 if (model.parent) {
                     $scope.input.newModelParent = model.parent
                 }

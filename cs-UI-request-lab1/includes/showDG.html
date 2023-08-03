@@ -16,6 +16,8 @@
 
   <uib-tabset>
 
+
+
     <uib-tab heading="Tree">
       <em>The model as a tree. Expanded if the checkbox is selected</em>
       <div class="row">
@@ -345,7 +347,15 @@
 
     </uib-tab>
 
-    <uib-tab heading="Questionnaire">
+    <uib-tab heading="Qdev">
+      <pre>{{testQ | json}}</pre>
+    </uib-tab>
+
+    <uib-tab heading="Full element list">
+      <pre>{{fullElementList | json}}</pre>
+    </uib-tab>
+
+    <uib-tab ng-show = 'false' heading="Questionnaire">
       <uib-tabset>
         <uib-tab heading="Form">
           <renderform q="Qobject" qr="QR"></renderform>
@@ -362,7 +372,7 @@
     </uib-tab>
 
 
-    <uib-tab ng-show="selectedModel.kind == 'comp'" heading="Overrides">
+    <uib-tab ng-show="false && selectedModel.kind == 'comp'" heading="Overrides">
       <em class="pull-right">Elements that have been overriden in this model</em>
 
       <div ng-show = "selectedModel.parent">
@@ -377,17 +387,6 @@
             <div>
               {{element.path}}
 
-
-              <!-- {{element.path | dropFirstInPath}} -->
-              <!--
-              <div ng-hide="input.showFullModel">
-                  {{element.path | dropFirstInPath}}
-              </div>
-              <div ng-show="input.showFullModel">
-                  {{element.path | lastInPath}}
-
-              </div>
--->
 
 
             </div>
