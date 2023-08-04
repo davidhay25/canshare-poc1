@@ -12,11 +12,44 @@ angular.module("pocApp")
 
             // =============================================== functions to support ConceptMap work =================
 
+            querySvc.getConceptMaps().then(
+                function (data) {
+                    $scope.allConceptMaps = data
+                    console.log(data)
+                },function (err) {
+                    console.log(err)
+                }
+            )
+
+            $scope.selectCMItem = function (item) {
+                $scope.selectedCM = item.cm
+
+                querySvc.getOneConceptMap(item.cm.url).then(
+                    function (ar) {
+
+                        $scope.fullSelectedCM = ar[0]       //todo what of there's > 1
+                    }, function (err) {
+
+                    }
+                )
+
+            }
+
+            $scope.showCM = function (item) {
+                result = true
+                if ($scope.input.excludeHL7) {
+                    if (item.cm.url.indexOf("http://hl7.org/fhir/ConceptMap/")> -1) {
+                        result = false
+                    }
+                }
+                return result
+            }
+
+
             //load the tsv file extracted from the spreadsheet that defines the conceptmaps
 
 
-
-
+            /* not used any more
             $scope.input.id = "cs-test1"
 
             $scope.examples = []            //an array of possible values
@@ -29,6 +62,8 @@ angular.module("pocApp")
 
             let example3 = {display:"Line 22",id:"cs-test16",target:"253211000210102",source:"512001000004108",dep1:"394803006",prop1:"cancer-service"}
             $scope.examples.push(example3)
+
+            */
 
             $scope.setExample = function(example) {
                 $scope.input.id = example.id
@@ -131,7 +166,7 @@ angular.module("pocApp")
             //$scope.input.prop2 = "http://what-is-this"
 
             //download the map indicated by the current id
-            $scope.downloadMap = function () {
+            $scope.downloadMapDEP = function () {
                 let url = `${termServer}/ConceptMap/${$scope.input.id}`
                 $http.get(url).then(
                     function (data) {
@@ -148,7 +183,7 @@ angular.module("pocApp")
             }
 
 
-            $scope.uploadMap = function () {
+            $scope.uploadMapDEP = function () {
                 let url = `${termServer}/ConceptMap/${$scope.cm.id}`
                 $http.put(url,$scope.cm).then(
                     function (data) {
@@ -160,14 +195,14 @@ angular.module("pocApp")
 
             }
 
-            $scope.generateMapAndTranslate = function(){
+            $scope.generateMapAndTranslateDEP = function(){
                 $scope.generateMap()
                 //========  now the translate call
                 $scope.generateTranslate()
             }
 
             //Generate the ConceptMap
-            $scope.generateMap = function() {
+            $scope.generateMapDEP = function() {
 
                 //======== first the concept map
                 $scope.cm = {resourceType:"ConceptMap",status:"draft"}
@@ -216,7 +251,7 @@ angular.module("pocApp")
 
 
             //Generate the example translate parameters
-            $scope.generateTranslate = function() {
+            $scope.generateTranslateDEP = function() {
                 $scope.parameters = {resourceType:"Parameters", parameter:[]}
 
                 //the conceptmap url
@@ -252,7 +287,7 @@ angular.module("pocApp")
 
             }
 
-            $scope.executeTranslate = function () {
+            $scope.executeTranslateDEP = function () {
                 let url = `${termServer}ConceptMap/$translate`
                 console.log($scope.parameters)
                 $http.post(url,$scope.parameters).then(
@@ -329,6 +364,8 @@ angular.module("pocApp")
 
             //get the canshare valuesets from the TS
             $scope.showLoadingMessage = true
+
+
             querySvc.getValueSets().then(
                 function (ar) {
                     $scope.allVSItem = ar

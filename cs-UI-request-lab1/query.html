@@ -366,8 +366,38 @@
 
         </uib-tab>
 
+        <uib-tab  heading="ConceptMap">
+            <!-- This accesses, displays and uses Concept maps on the server. The CMs are created by a script from the spreadsheet.-->
+
+            <div class="row">
+                <div class="col-md-3">
+                    <br/>
+                    <checkbox ng-model = 'input.excludeHL7'></checkbox> Exclude HL7 maps
+                    <br/><br/>
+                    <div class="list-group">
+                        <div ng-class="{'list-group-item':true,listItemSelected:selectedItem==item}"
+                             ng-show="showCM(item)"
+                             style="cursor: pointer" ng-repeat="item in allConceptMaps" ng-click="selectCMItem(item)">
+                            {{item.display}}
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-9">
+
+
+                    <pre>{{fullSelectedCM | json}}</pre>
+
+                    <pre>{{selectedCM | json}}</pre>
+
+                </div>
+            </div>
+
+        </uib-tab>
+
 
         <uib-tab ng-show="false" heading="ConceptMap">
+            <!-- This was an experimental generate and save routine. To be removed-->
             <br/>
             <div>
                 <a href="http://hl7.org/fhir/R4B/conceptmap.html" target="_blank" class="btn-link btn pull-right">ConceptMap in spec</a>
