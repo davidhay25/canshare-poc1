@@ -30,7 +30,11 @@
                             </div>
 
                             <div ng-repeat ="part in param.part">
-                                {{part.name}}: {{part.valueString}} {{part.valueUri}} {{part.valueCode}} {{part.valueBoolean}}
+
+                                {{part.name}}:
+                                {{part.valueString}} {{part.valueUri}}
+                                <span ng-class="{clickable:part.valueCode=='parent'}" ng-click = "selectCode(param.part)">
+                                    {{part.valueCode}}</span> {{part.valueBoolean}}
 
                                 <div ng-show = "part.valueCoding">
                                     <div style="padding-left: 8px">S: {{part.valueCoding.system}}</div>

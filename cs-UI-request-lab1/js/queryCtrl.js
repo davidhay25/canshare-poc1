@@ -12,6 +12,10 @@ angular.module("pocApp")
 
             // =============================================== functions to support ConceptMap work =================
 
+            $scope.input.cmOptions = {}         //options by property
+
+            $scope.input.excludeHL7 = true
+            $scope.input.onlyCanShare = true
             querySvc.getConceptMaps().then(
                 function (data) {
                     $scope.allConceptMaps = data
@@ -21,22 +25,45 @@ angular.module("pocApp")
                 }
             )
 
-            $scope.selectCMItem = function (item) {
+            $scope.selectCMItem = function (item,expand) {
                 $scope.selectedCM = item.cm
+                delete $scope.fullSelectedCM
+                $scope.loadingCM = true
 
-                querySvc.getOneConceptMap(item.cm.url).then(
+                querySvc.getOneConceptMap(item.cm.url,expand).then(
                     function (ar) {
-
                         $scope.fullSelectedCM = ar[0]       //todo what of there's > 1
+
+                        //now get the set of 'dependsOn' properties (if any)
+                        $scope.doProperties = querySvc.getCMProperties($scope.fullSelectedCM)
+
                     }, function (err) {
 
                     }
-                )
+                ).finally(function () {
+                    $scope.loadingCM = false
+                })
 
             }
 
             $scope.showCM = function (item) {
                 result = true
+
+                if ($scope.input.onlyCanShare) {
+                    let identifier = item.cm.identifier
+                    if (identifier) {
+                        if (identifier.system  == 'http://canshare.co.nz/fhir/NamingSystem/conceptmaps') {
+                            return true
+                        } else {
+                            return false
+                        }
+                    } else {
+                        return false
+                    }
+                }
+
+
+
                 if ($scope.input.excludeHL7) {
                     if (item.cm.url.indexOf("http://hl7.org/fhir/ConceptMap/")> -1) {
                         result = false
@@ -44,6 +71,7 @@ angular.module("pocApp")
                 }
                 return result
             }
+
 
 
             //load the tsv file extracted from the spreadsheet that defines the conceptmaps
@@ -115,45 +143,42 @@ angular.module("pocApp")
 
             }
 
-            $scope.lookup = function (code) {
-
-
-                let qry = `CodeSystem/$lookup?system=${snomed}&code=${code}`
-
-
+            $scope.lookup = function (code,system) {
+                system = system || snomed
+                let qry = `CodeSystem/$lookup?system=${system}&code=${code}`
                 let encodedQry = encodeURIComponent(qry)
                 $scope.showWaiting = true
                 $http.get(`nzhts?qry=${encodedQry}`).then(
-
-                //$http.get(url).then(
                     function (data) {
-                        //console.log(data.data)
-                        //alert(data.data)
-                        $scope.showWaiting = false
+
                         $uibModal.open({
                             templateUrl: 'modalTemplates/showParameters.html',
                             //backdrop: 'static',
                             //size : 'lg',
                             controller : "showParametersCtrl",
-                            controllerDEP: function($scope,parameters){
-                                $scope.parameters = parameters
-                            },
                             resolve: {
                                 parameters: function () {
                                     return data.data
                                 },
                                 title : function () {
                                     return `Concept lookup (${code})`
+                                },
+                                code: function () {
+                                    return code
+                                },
+                                system : function () {
+                                    return system
                                 }
                             }
-
                         })
 
 
                     }, function (err) {
                         alert(angular.toJson(err.data))
                     }
-                )
+                ).finally(function () {
+                    $scope.showWaiting = false
+                })
             }
 
 

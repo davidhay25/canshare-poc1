@@ -113,6 +113,183 @@
 
     <uib-tabset>
 
+        <uib-tab  heading="ConceptMap">
+            <!-- This accesses, displays and uses Concept maps on the server. The CMs are created by a script from the spreadsheet.-->
+
+            <div class="row">
+                <div class="col-md-3">
+                    <br/>
+                    <checkbox ng-model = 'input.onlyCanShare'></checkbox> Only CanShare
+                    <br/>
+                    <checkbox ng-model = 'input.excludeHL7'></checkbox> Exclude HL7 maps
+                    <br/><br/>
+                    <div class="myScroll">
+                        <div class="list-group">
+                            <div ng-class="{'list-group-item':true,listItemSelected:fullSelectedCM.id==item.cm.id}"
+                                 ng-show="showCM(item)"
+                                 style="cursor: pointer" ng-repeat="item in allConceptMaps" ng-click="selectCMItem(item)">
+                                {{item.display}}
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-9">
+                    <div class="pull-right clickable" style="padding-top: 8px"
+                         ng-click="selectCMItem({cm:fullSelectedCM},true)">Get maps</div>
+                    <uib-tabset>
+                        <uib-tab heading="Json">
+                            <pre>{{fullSelectedCM | json}}</pre>
+                        </uib-tab>
+                        <uib-tab heading="Maps">
+
+                            <div ng-show="loadingCM">
+                                Loading the ConceptMap. This can take a few seconds if the mappings are large...
+                            </div>
+
+
+
+                            <div ng-show="fullSelectedCM">Source ValueSet: {{fullSelectedCM.sourceCanonical}} {{fullSelectedCM.sourceUri}}</div>
+                            <div ng-show="fullSelectedCM">Target ValueSet: {{fullSelectedCM.targetCanonical}} {{fullSelectedCM.targetUri}}</div>
+
+
+                            <br/>
+
+                            <div class="myScrollX">
+                                <div ng-repeat="group in fullSelectedCM.group">
+
+                                    <div class="tableFixHead">
+                                        <table class="table table-bordered table-condensed">
+                                            <thead>
+                                            <tr>
+                                                <th colspan="2">{{group.source}}</th>
+                                                <th>{{group.target}}</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-repeat="element in group.element">
+                                                <td><div class="clickable" ng-click="lookup(element.code,group.source)">{{element.code}}</div></td>
+                                                <td>{{element.display}}</td>
+                                                <td>
+                                                    <div ng-repeat="target in element.target">
+                                                        <span class="clickable" ng-click="lookup(target.code,group.target)">{{target.code}} </span>
+
+                                                        {{target.display}} <span > ({{target.equivalence}})</span>
+                                                        <span class="pull-right" ng-show="target.dependsOn">
+                                                            X
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                               <td>
+
+                                               </td>
+                                            </tr>
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </uib-tab>
+                        <uib-tab heading="CanShare lookup">
+                            <uib-tabset>
+
+                                <uib-tab heading="Perform lookup">
+
+
+                                    <table class="table table-bordered">
+                                        <tr ng-repeat = "(k,v) in doProperties">
+                                            <td>{{k}}</td>
+                                            <td>
+                                                <select class="form-control" ng-model="input.cmOptions[k]"
+                                                        ng-options="k for (k,v) in v">
+
+                                                </select>
+
+
+                                            </td>
+                                            <td>
+                                                {{v}}
+                                            </td>
+                                        </tr>
+
+                                    </table>
+
+                                    <div ng-repeat = "(k,v) in doProperties">
+                                        {{k}} {{v}}
+                                    </div>
+
+                                    <pre>{{input.cmOptions | json}}</pre>
+
+                                    <pre>{{doProperties | json}}</pre>
+
+                                </uib-tab>
+                                <uib-tab heading="Criteria">
+                                    <div ng-repeat="group in fullSelectedCM.group">
+                                        <div ng-repeat="element in group.element">
+                                            <br/>
+                                            <div>Looking for: {{element.code}} ({{element.display}})</div>
+                                            <div>Potential results</div>
+                                            <br/>
+                                            <div class="rounded-box" ng-repeat="target in element.target">
+                                                <div class="row">
+
+                                                    <div class="col-md-8">
+                                                        <div class="banner">Criteria</div>
+                                                        <table class="table table-bordered">
+                                                            <tr><th>Property</th><th>Code</th><th>System</th><th>Value</th></tr>
+                                                            <tr ng-repeat = "do in target.dependsOn">
+                                                                <td>{{do.property}}</td>
+                                                                <td>{{do.value}}</td>
+                                                                <td>{{do.system}}</td>
+
+                                                                <td>{{do.display}}</td>
+                                                            </tr>
+                                                        </table>
+
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <div class="banner">Match</div>
+                                                        <div>Code: {{target.code}}</div>
+                                                        <div>Display: {{target.display}}</div>
+                                                        <div>Equivalence: {{target.equivalence}}</div>
+                                                        <div>Comment: {{target.comment}}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+                                    </div>
+                                </uib-tab>
+                            </uib-tabset>
+
+
+
+
+
+                        </uib-tab>
+
+                    </uib-tabset>
+
+
+
+
+
+
+                </div>
+            </div>
+
+        </uib-tab>
+
+
+
 
         <uib-tab >
             <uib-tab-heading>NZHTS ValueSets <span class="badge">{{allVSItem.length}}</span> </uib-tab-heading>
@@ -363,35 +540,6 @@
             </uib-tabset>
 
 
-
-        </uib-tab>
-
-        <uib-tab  heading="ConceptMap">
-            <!-- This accesses, displays and uses Concept maps on the server. The CMs are created by a script from the spreadsheet.-->
-
-            <div class="row">
-                <div class="col-md-3">
-                    <br/>
-                    <checkbox ng-model = 'input.excludeHL7'></checkbox> Exclude HL7 maps
-                    <br/><br/>
-                    <div class="list-group">
-                        <div ng-class="{'list-group-item':true,listItemSelected:selectedItem==item}"
-                             ng-show="showCM(item)"
-                             style="cursor: pointer" ng-repeat="item in allConceptMaps" ng-click="selectCMItem(item)">
-                            {{item.display}}
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-9">
-
-
-                    <pre>{{fullSelectedCM | json}}</pre>
-
-                    <pre>{{selectedCM | json}}</pre>
-
-                </div>
-            </div>
 
         </uib-tab>
 

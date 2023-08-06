@@ -336,6 +336,8 @@ angular.module("pocApp")
                 $scope.fsFormData = {}
                 $scope.fsQR = {}
 
+                $scope.urlToQ = `Questionnaire/${miniQ.id}`
+
                 dashboardSvc.getSingleQFromFormsServer(miniQ).then(function (Q) {
                     $scope.selectedQfromFS = Q
                     $scope.codedElementsInSingleQ = dashboardSvc.getAllCodedElements(Q)

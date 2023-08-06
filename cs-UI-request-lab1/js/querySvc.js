@@ -4,10 +4,56 @@ angular.module("pocApp")
 
             return {
 
-                getOneConceptMap : function(url) {
+                getCMProperties : function (cm) {
+                    //return all the properties referred to in the 'depandsOn' element
+                    let hash = {}
+                    if (cm.group) {
+                        cm.group.forEach(function (group) {
+                            if (group.element) {
+                                group.element.forEach(function (element) {
+                                    if (element.target) {
+                                        element.target.forEach(function (target) {
+                                            if (target.dependsOn) {
+                                                target.dependsOn.forEach(function (don) {
+                                                    let property = don.property
+                                                    hash[property] = hash[property] || {}
+                                                    let obj = hash[property]
+                                                    let concept = {system:don.system,code:don.value,display:don.display}
+
+                                                    if (! obj[concept.code]) {
+                                                        obj[concept.code] = concept
+                                                    }
+                                                })
+                                            }
+
+                                        })
+                                    }
+
+
+                                })
+
+                            }
+
+
+
+
+                        })
+                    }
+
+                    return hash
+
+
+                },
+
+                getOneConceptMap : function(url,expand) {
                     let deferred = $q.defer()
 
-                    let qry = `ConceptMap?url=${url}&_summary=false`  //?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c`
+                    let qry = `ConceptMap?url=${url}`  //?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c`
+
+                    if (expand) {
+                        qry += "&_summary=false"
+                    }
+
                     console.log(qry)
                     let encodedQry = encodeURIComponent(qry)
 
