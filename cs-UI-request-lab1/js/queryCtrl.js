@@ -21,9 +21,12 @@ angular.module("pocApp")
 */
             $scope.input.excludeHL7 = true
             $scope.input.onlyCanShare = true
+            $scope.input.loadComplete = true
 
 
-            $scope.performExpand = function () {
+            $scope.performTranslate = function () {
+                delete $scope.resultParametersList
+                delete $scope.resultParameters
 
                 let p = $scope.generateTranslateQuery()
                 console.log(p)
@@ -93,12 +96,20 @@ angular.module("pocApp")
 
                 $scope.loadingCM = true
 
+                if ($scope.input.loadComplete) {
+                    expand = true
+                }
+
                 querySvc.getOneConceptMap(item.cm.url,expand).then(
                     function (ar) {
                         $scope.fullSelectedCM = ar[0]       //todo what of there's > 1
 
                         //now get the set of 'dependsOn' properties (if any)
                         $scope.doProperties = querySvc.getCMProperties($scope.fullSelectedCM)
+
+                        //decide whether to show 'canshare' tab
+                        $scope.showTranslate = Object.keys($scope.doProperties).length > 0
+
 
                     }, function (err) {
 
@@ -153,7 +164,7 @@ angular.module("pocApp")
                 let codeWeWant = $scope.fullSelectedCM.group[0].element[0].code
                 let displayWeWant = $scope.fullSelectedCM.group[0].element[0].display
 
-                let systemWeWant = $scope.fullSelectedCM.group[0].target || "http://snomed.info/sct"
+                let systemWeWant = $scope.fullSelectedCM.group[0].source || "http://snomed.info/sct"
 
                 //translateParameters.parameter.push({name:"sourceCoding",valueCoding:conceptWeWant})
 

@@ -122,7 +122,11 @@
                     <checkbox ng-model = 'input.onlyCanShare'></checkbox> Only CanShare
                     <br/>
                     <checkbox ng-model = 'input.excludeHL7'></checkbox> Exclude HL7 maps
+                    <br/>
+
+                    <checkbox ng-model = 'input.loadComplete'></checkbox> Load full map (including groups)
                     <br/><br/>
+
                     <div class="myScroll">
                         <div class="list-group">
                             <div ng-class="{'list-group-item':true,listItemSelected:fullSelectedCM.id==item.cm.id}"
@@ -142,13 +146,14 @@
                     -->
                     <uib-tabset>
                         <uib-tab heading="Json">
+                            <div ng-hide="fullSelectedCM.group">
+                                <br/>
+                                Click <span class="clickable" ng-click="selectCMItem({cm:fullSelectedCM},true)">here</span> to get the complete ConceptMap
+                                <br/>  <br/>
+                            </div>
                             <pre>{{fullSelectedCM | json}}</pre>
                         </uib-tab>
                         <uib-tab heading="Maps">
-
-
-
-
                             <div ng-hide="fullSelectedCM.group">
                                 <br/>
                                 Click <span class="clickable" ng-click="selectCMItem({cm:fullSelectedCM},true)">here</span> to get the complete ConceptMap
@@ -158,9 +163,6 @@
                             <div ng-show="loadingCM">
                                 Loading the ConceptMap. This can take a few seconds if the mappings are large...
                             </div>
-
-
-
                             <div ng-show="fullSelectedCM">Source ValueSet: {{fullSelectedCM.sourceCanonical}} {{fullSelectedCM.sourceUri}}</div>
                             <div ng-show="fullSelectedCM">Target ValueSet: {{fullSelectedCM.targetCanonical}} {{fullSelectedCM.targetUri}}</div>
 
@@ -209,7 +211,7 @@
 
 
 
-                        <uib-tab heading="CanShare lookup">
+                        <uib-tab heading="Translate operation" ng-show="showTranslate">
 
                             <div ng-hide="fullSelectedCM.group">
                                 <br/>
@@ -240,7 +242,7 @@
 
                                             </table>
 
-                                            <button class="btn btn-danger pull-right" ng-click="performExpand()">Perform translate</button>
+                                            <button class="btn btn-danger pull-right" ng-click="performTranslate()">Perform translate</button>
                                             <br/>
 
                                             <uib-tabset ng-show="resultParameters">
@@ -306,6 +308,14 @@
                                             <div class="rounded-box" ng-repeat="target in element.target">
                                                 <div class="row">
 
+                                                    <div class="col-md-4">
+                                                        <div class="banner">Match</div>
+                                                        <div>Code: {{target.code}}</div>
+                                                        <div>Display: {{target.display}}</div>
+                                                        <div>Equivalence: {{target.equivalence}}</div>
+                                                        <div>Comment: {{target.comment}}</div>
+                                                    </div>
+                                                    
                                                     <div class="col-md-8">
                                                         <div class="banner">Criteria</div>
                                                         <table class="table table-bordered">
@@ -321,13 +331,7 @@
 
                                                     </div>
 
-                                                    <div class="col-md-4">
-                                                        <div class="banner">Match</div>
-                                                        <div>Code: {{target.code}}</div>
-                                                        <div>Display: {{target.display}}</div>
-                                                        <div>Equivalence: {{target.equivalence}}</div>
-                                                        <div>Comment: {{target.comment}}</div>
-                                                    </div>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -360,7 +364,7 @@
 
 
         <uib-tab >
-            <uib-tab-heading>NZHTS ValueSets <span class="badge">{{allVSItem.length}}</span> </uib-tab-heading>
+            <uib-tab-heading>CanShare ValueSets <span class="badge">{{allVSItem.length}}</span> </uib-tab-heading>
             <br/>
             <em>This tab will make queries against the New Zealand National Terminology server</em>
             <div ng-show="showLoadingMessage">Loading ValueSets, please wait...</div>
