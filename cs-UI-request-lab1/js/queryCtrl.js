@@ -13,12 +13,20 @@ angular.module("pocApp")
             // =============================================== functions to support ConceptMap work =================
 
             $scope.input.cmOptions = {}         //options by property
+/*
+            $timeout(function () {
+                $scope.lookup ("394593009",snomed)
 
+            },500)
+*/
             $scope.input.excludeHL7 = true
             $scope.input.onlyCanShare = true
+            $scope.input.loadComplete = true
 
 
-            $scope.performExpand = function () {
+            $scope.performTranslate = function () {
+                delete $scope.resultParametersList
+                delete $scope.resultParameters
 
                 let p = $scope.generateTranslateQuery()
                 console.log(p)
@@ -84,8 +92,13 @@ angular.module("pocApp")
                 delete $scope.fullSelectedCM
                 delete $scope.resultParameters
                 delete $scope.resultParametersList
+                delete $scope.translateParameters
 
                 $scope.loadingCM = true
+
+                if ($scope.input.loadComplete) {
+                    expand = true
+                }
 
                 querySvc.getOneConceptMap(item.cm.url,expand).then(
                     function (ar) {
@@ -93,6 +106,10 @@ angular.module("pocApp")
 
                         //now get the set of 'dependsOn' properties (if any)
                         $scope.doProperties = querySvc.getCMProperties($scope.fullSelectedCM)
+
+                        //decide whether to show 'canshare' tab
+                        $scope.showTranslate = Object.keys($scope.doProperties).length > 0
+
 
                     }, function (err) {
 
@@ -147,10 +164,13 @@ angular.module("pocApp")
                 let codeWeWant = $scope.fullSelectedCM.group[0].element[0].code
                 let displayWeWant = $scope.fullSelectedCM.group[0].element[0].display
 
+                let systemWeWant = $scope.fullSelectedCM.group[0].source || "http://snomed.info/sct"
+
                 //translateParameters.parameter.push({name:"sourceCoding",valueCoding:conceptWeWant})
 
 
-                let conceptWeWant = {system:"http://snomed.info/sct",code:codeWeWant,display:displayWeWant}
+                let conceptWeWant = {system:systemWeWant,code:codeWeWant,display:displayWeWant}
+
                 translateParameters.parameter.push({name:"coding",valueCoding:conceptWeWant})
 
                 //add the dependencies
