@@ -13,7 +13,12 @@ angular.module("pocApp")
             // =============================================== functions to support ConceptMap work =================
 
             $scope.input.cmOptions = {}         //options by property
+/*
+            $timeout(function () {
+                $scope.lookup ("394593009",snomed)
 
+            },500)
+*/
             $scope.input.excludeHL7 = true
             $scope.input.onlyCanShare = true
             querySvc.getConceptMaps().then(
