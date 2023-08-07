@@ -67,7 +67,7 @@ angular.module("pocApp")
 
             }
 
-            
+
 
 
             querySvc.getConceptMaps().then(
