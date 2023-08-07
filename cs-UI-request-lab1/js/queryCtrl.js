@@ -21,10 +21,64 @@ angular.module("pocApp")
 */
             $scope.input.excludeHL7 = true
             $scope.input.onlyCanShare = true
+
+
+            $scope.performExpand = function () {
+
+                let p = $scope.generateTranslateQuery()
+                console.log(p)
+
+                $http.post('nzhts',p).then(
+                    function (data) {
+                        $scope.resultParameters = data.data
+                        $scope.resultParametersList = []
+                        //make a list of matches from the parameters
+                        if ($scope.resultParameters.parameter){
+                            $scope.resultParameters.parameter.forEach(function (param) {
+                                if (param.name == 'match' && param.part) {
+                                    param.part.forEach(function (part) {
+                                        if (part.name == 'concept') {
+                                            $scope.resultParametersList.push(part.valueCoding)
+                                        }
+                                    })
+                                }
+
+                            })
+                        }
+
+
+                        console.log(data)
+                    },function (err) {
+                        alert(angular.toJson(err.data))
+                        console.log(err)
+                    }
+                )
+
+                return
+
+
+                let qry = `ConceptMap/$translate?url=http://canshare.co.nz/fhir/ConceptMap/canshare-ecog`
+                qry += "&code=423740007&system=http://snomed.info/sct"
+                console.log(qry)
+                let encodedQry = encodeURIComponent(qry)
+
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        console.log(data)
+                    },function (err) {
+                        console.log(err)
+                    }
+                    )
+
+            }
+
+            
+
+
             querySvc.getConceptMaps().then(
                 function (data) {
                     $scope.allConceptMaps = data
-                    console.log(data)
+                    //console.log(data)
                 },function (err) {
                     console.log(err)
                 }
@@ -33,6 +87,9 @@ angular.module("pocApp")
             $scope.selectCMItem = function (item,expand) {
                 $scope.selectedCM = item.cm
                 delete $scope.fullSelectedCM
+                delete $scope.resultParameters
+                delete $scope.resultParametersList
+
                 $scope.loadingCM = true
 
                 querySvc.getOneConceptMap(item.cm.url,expand).then(
@@ -78,27 +135,78 @@ angular.module("pocApp")
             }
 
 
-
-            //load the tsv file extracted from the spreadsheet that defines the conceptmaps
-
-
-            /* not used any more
-            $scope.input.id = "cs-test1"
-
-            $scope.examples = []            //an array of possible values
-            let example1 = {display:"Line 16",id:"cs-test16",target:"399687005",dep1:"394803006",prop1:'http://what-is-this'}
-            $scope.examples.push(example1)
-
-            let example2 = {display:"Line 18",id:"cs-test16",target:"399687005",dep1:"394803006",prop1:'http://what-is-this',dep2:'372137005',prop2:'http://what-is-this'}
-            $scope.examples.push(example2)
+            //generate the translate query from the canshare lookup tab
+            $scope.generateTranslateQuery = function() {
 
 
-            let example3 = {display:"Line 22",id:"cs-test16",target:"253211000210102",source:"512001000004108",dep1:"394803006",prop1:"cancer-service"}
-            $scope.examples.push(example3)
+                let translateParameters = {resourceType:"Parameters", parameter:[]}
 
-            */
+                //$scope.parameters = {resourceType:"Parameters", parameter:[]}
 
-            $scope.setExample = function(example) {
+                //the conceptmap url
+                translateParameters.parameter.push({name:"url",valueUri: $scope.fullSelectedCM.url })
+
+                //add the target - what we are looking for. This is in the group.element.target.code
+                //is it really? I wonder if it's group.element.code
+                //Assuming that each CM is focussed on a single 'thing' to lookup - in group[0].element[0].code
+                let codeWeWant = $scope.fullSelectedCM.group[0].element[0].code
+                let displayWeWant = $scope.fullSelectedCM.group[0].element[0].display
+
+                //translateParameters.parameter.push({name:"sourceCoding",valueCoding:conceptWeWant})
+
+
+                let conceptWeWant = {system:"http://snomed.info/sct",code:codeWeWant,display:displayWeWant}
+                translateParameters.parameter.push({name:"coding",valueCoding:conceptWeWant})
+
+                //add the dependencies
+                if ($scope.input.cmOptions) {
+                    Object.keys($scope.input.cmOptions).forEach(function (key) {
+                        let p = $scope.input.cmOptions[key]
+
+                        let depParam1 = {name:"dependency",part :[]}
+                        translateParameters.parameter.push(depParam1)
+                        let part1 = {"name":"element","valueUri":key}
+                        depParam1.part.push(part1)
+                        //let ccValue = {coding:[{system:snomed,code:$scope.input.dep1}]}
+                        let ccValue = {coding:[p]}
+                        let part2 = {"name":"concept","valueCodeableConcept":ccValue}
+                        depParam1.part.push(part2)
+                    })
+                }
+
+
+                $scope.translateParameters = translateParameters
+
+                return translateParameters
+/*
+                //the dependency
+                if ( $scope.input.dep1) {
+                    let depParam1 = {name:"dependency",part :[]}
+                    $scope.parameters.parameter.push(depParam1)
+                    let part1 = {"name":"element","valueUri":$scope.input.prop1}
+                    depParam1.part.push(part1)
+                    let ccValue = {coding:[{system:snomed,code:$scope.input.dep1}]}
+                    let part2 = {"name":"concept","valueCodeableConcept":ccValue}
+                    depParam1.part.push(part2)
+                }
+
+                if ( $scope.input.dep2) {
+                    let depParam2 = {name:"dependency",part :[]}
+                    $scope.parameters.parameter.push(depParam2)
+                    let part1 = {"name":"element","valueUri":$scope.input.prop2}
+                    depParam2.part.push(part1)
+                    let ccValue = {coding:[{system:snomed,code:$scope.input.dep2}]}
+                    let part2 = {"name":"concept","valueCodeableConcept":ccValue}
+                    depParam2.part.push(part2)
+                }
+
+*/
+            }
+
+
+
+
+            $scope.setExampleDEP = function(example) {
                 $scope.input.id = example.id
                 $scope.input.target = example.target
                 $scope.input.source = example.source
@@ -399,7 +507,7 @@ angular.module("pocApp")
             querySvc.getValueSets().then(
                 function (ar) {
                     $scope.allVSItem = ar
-                    console.log(ar)
+                    //console.log(ar)
                     delete $scope.showLoadingMessage
                 }
             )

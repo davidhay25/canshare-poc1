@@ -202,23 +202,15 @@ function setup(app) {
             if (token) {
 
                 var decoded = jwt_decode(token);
-                // let expiry =
-                let timeToExpire = decoded.exp * 1000 - Date.now()       //exp is in seconds
-                // console.log(Date(decoded.exp).toString())
-
-                console.log(timeToExpire / (1000 * 60 *60 ));
+               // let timeToExpire = decoded.exp * 1000 - Date.now()       //exp is in seconds
+               // console.log(timeToExpire / (1000 * 60 *60 ));
 
                 let config = {headers:{authorization:'Bearer ' + token}}
                 config['content-type'] = "application/fhir+json"
 
                 axios.get(qry,config).then(function(data) {
-                    //console.log(data.data)
-                    //console.log(JSON.stringify(data.data))
                     res.json(data.data)
                 }).catch(function(ex) {
-                    //console.log(ex.code)
-                    //console.log(ex.response.status)
-                    //console.log(ex.response.data)
                     if (ex.response) {
                         res.status(ex.response.status).json(ex.response.data)
                     } else {
@@ -229,8 +221,62 @@ function setup(app) {
             } else {
                 res.status(ex.response.status).json({msg:"Unable to get Access Token."})
             }
+        } else {
+            res.status(400).json({msg:"Must have urlencoded qry query"})
+
+        }
 
 
+
+
+
+        //res.send(token)
+
+    })
+
+
+    //used for $translate
+    app.post('/nzhts',async function(req,res){
+        console.log(req.body)
+      //  res.json()
+
+     //   return
+
+        //let qry = req.query.query || `https://authoring.nzhts.digital.health.nz/fhir/ValueSet/$expand?url=https://nzhts.digital.health.nz/fhir/ValueSet/canshare-data-absent-reason`
+        if (req.body) {
+            let qry = nzhtsconfig.serverBase + "ConceptMap/$translate" // decodeURIComponent(req.query.qry)
+
+            //need to re-urlencode the |
+           // qry = qry.split('|').join("%7c")
+
+
+            //todo - check expiry and refresh if needed
+            console.log(qry)
+
+            let token = await getNZHTSAccessToken()
+            if (token) {
+
+                //var decoded = jwt_decode(token);
+                // let timeToExpire = decoded.exp * 1000 - Date.now()       //exp is in seconds
+                // console.log(timeToExpire / (1000 * 60 *60 ));
+
+                let config = {headers:{authorization:'Bearer ' + token}}
+                config['content-type'] = "application/fhir+json"
+
+                axios.post(qry,req.body,config).then(function(data) {
+                    res.json(data.data)
+                }).catch(function(ex) {
+                    if (ex.response) {
+                        console.log("err",ex.response.data)
+                        res.status(ex.response.status).json(ex.response.data)
+                    } else {
+                        res.status(500).json(ex)
+                    }
+
+                })
+            } else {
+                res.status(ex.response.status).json({msg:"Unable to get Access Token."})
+            }
         } else {
             res.status(400).json({msg:"Must have urlencoded qry query"})
 
