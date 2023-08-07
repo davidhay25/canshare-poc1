@@ -136,13 +136,24 @@
 
                 </div>
                 <div class="col-md-9">
+                    <!--
                     <div class="pull-right clickable" style="padding-top: 8px"
                          ng-click="selectCMItem({cm:fullSelectedCM},true)">Get maps</div>
+                    -->
                     <uib-tabset>
                         <uib-tab heading="Json">
                             <pre>{{fullSelectedCM | json}}</pre>
                         </uib-tab>
                         <uib-tab heading="Maps">
+
+
+
+
+                            <div ng-hide="fullSelectedCM.group">
+                                <br/>
+                                Click <span class="clickable" ng-click="selectCMItem({cm:fullSelectedCM},true)">here</span> to get the complete ConceptMap
+                                <br/>  <br/>
+                            </div>
 
                             <div ng-show="loadingCM">
                                 Loading the ConceptMap. This can take a few seconds if the mappings are large...
@@ -195,37 +206,94 @@
 
 
                         </uib-tab>
+
+
+
                         <uib-tab heading="CanShare lookup">
-                            <uib-tabset>
+
+                            <div ng-hide="fullSelectedCM.group">
+                                <br/>
+                                Click <span class="clickable" ng-click="selectCMItem({cm:fullSelectedCM},true)">here</span> to get the complete ConceptMap
+                                <br/>  <br/>
+                            </div>
+
+                            <uib-tabset ng-show = "fullSelectedCM.group">
 
                                 <uib-tab heading="Perform lookup">
 
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <table class="table table-bordered">
+                                                <tr ng-repeat = "(k,v) in doProperties">
+                                                    <td>{{k}}</td>
+                                                    <td>
+                                                        <select class="form-control" ng-model="input.cmOptions[k]"
+                                                                ng-change="generateTranslateQuery()"
+                                                                ng-options="v.display for (k,v) in v">
 
-                                    <table class="table table-bordered">
-                                        <tr ng-repeat = "(k,v) in doProperties">
-                                            <td>{{k}}</td>
-                                            <td>
-                                                <select class="form-control" ng-model="input.cmOptions[k]"
-                                                        ng-options="k for (k,v) in v">
-
-                                                </select>
+                                                        </select>
 
 
-                                            </td>
-                                            <td>
-                                                {{v}}
-                                            </td>
-                                        </tr>
+                                                    </td>
 
-                                    </table>
+                                                </tr>
 
-                                    <div ng-repeat = "(k,v) in doProperties">
-                                        {{k}} {{v}}
+                                            </table>
+
+                                            <button class="btn btn-danger pull-right" ng-click="performExpand()">Perform translate</button>
+                                            <br/>
+
+                                            <uib-tabset ng-show="resultParameters">
+                                                <uib-tab heading="List">
+                                                    <table class="table-bordered table">
+                                                        <tr ng-repeat = "concept in resultParametersList">
+                                                            <td>{{concept.code}}</td>
+                                                            <td>{{concept.display}}</td>
+                                                        </tr>
+                                                    </table>
+                                                </uib-tab>
+                                                <uib-tab heading="Json">
+                                                    <pre>{{resultParameters | json}}</pre>
+                                                </uib-tab>
+                                            </uib-tabset>
+
+
+
+
+
+
+                                            <!--
+                                            <div class="banner">Useful stuff during development</div>
+
+                                            <div><strong>List of possible properties (extracted from CM)</strong></div>
+
+
+                                            <div ng-repeat = "(k,v) in doProperties">
+                                                {{k}} {{v}}
+                                            </div>
+
+                                            <div><strong>Options</strong></div>
+                                            <pre>{{input.cmOptions | json}}</pre>
+
+
+                                            <div><strong>Selected properties</strong></div>
+                                            <pre>{{doProperties | json}}</pre>
+
+-->
+                                        </div>
+                                        <div class="col-md-6">
+                                            <strong>Request Parameters resource</strong>
+                                            <pre>{{translateParameters | json}}</pre>
+                                        </div>
                                     </div>
 
-                                    <pre>{{input.cmOptions | json}}</pre>
 
-                                    <pre>{{doProperties | json}}</pre>
+
+
+
+
+
+
 
                                 </uib-tab>
                                 <uib-tab heading="Criteria">
@@ -552,8 +620,6 @@
                 <a href="http://hl7.org/fhir/R4B/conceptmap-operation-translate.html" target="_blank" class="btn-link btn pull-right">Translate in spec</a>
                 <a href="https://terminology.hl7.org/SNOMEDCT.html" target="_blank" class="btn-link btn pull-right">SNOMED & FHIR in spec</a>
                 <a href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/view#gid=245875863" target="_blank" class="btn-link btn pull-right">Linda's spreadsheet</a>
-
-
 
             </div>
 

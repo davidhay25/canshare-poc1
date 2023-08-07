@@ -16,7 +16,9 @@ angular.module("pocApp")
                                             if (target.dependsOn) {
                                                 target.dependsOn.forEach(function (don) {
                                                     let property = don.property
-                                                    hash[property] = hash[property] || {}
+
+                                                    hash[property] = hash[property] || [{code:'dummy',display:'Nothing selected'}]
+
                                                     let obj = hash[property]
                                                     let concept = {system:don.system,code:don.value,display:don.display}
 
