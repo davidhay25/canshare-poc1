@@ -266,7 +266,9 @@ function setup(app) {
                 axios.post(qry,req.body,config).then(function(data) {
                     res.json(data.data)
                 }).catch(function(ex) {
+
                     if (ex.response) {
+                        console.log("Status code:",ex.response.status)
                         console.log("err",ex.response.data)
                         res.status(ex.response.status).json(ex.response.data)
                     } else {

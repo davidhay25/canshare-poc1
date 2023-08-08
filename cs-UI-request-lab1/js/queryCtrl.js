@@ -31,6 +31,12 @@ angular.module("pocApp")
                 let p = $scope.generateTranslateQuery()
                 console.log(p)
 
+                let bundle = {resourceType:"Bundle",type:"collection",entry:[]}
+                let entry = {fullUrl:`https://r4.ontoserver.csiro.au/fhir/Parameters/${p.id}`,resource:p}
+                bundle.entry.push(entry)
+                console.log(angular.toJson(bundle))
+
+
                 $http.post('nzhts',p).then(
                     function (data) {
                         $scope.resultParameters = data.data
@@ -93,6 +99,8 @@ angular.module("pocApp")
                 delete $scope.resultParameters
                 delete $scope.resultParametersList
                 delete $scope.translateParameters
+                delete $scope.doProperties
+                delete $scope.input.cmOptions
 
                 $scope.loadingCM = true
 

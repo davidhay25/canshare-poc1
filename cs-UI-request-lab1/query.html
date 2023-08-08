@@ -37,6 +37,7 @@
     <script src="js/makeLibraryQuery.js"></script>
     <script src="js/showParameters.js"></script>
     <script src="js/filters.js"></script>
+    <script src="js/makeCMCtrl.js"></script>
 
     <script src="directive/viewBundle/viewBundleDir.js"></script>
     <script src="directive/viewBundle/viewBundleSvc.js"></script>
@@ -211,7 +212,7 @@
 
 
 
-                        <uib-tab heading="Translate operation" ng-show="showTranslate">
+                        <uib-tab heading="Translate operation" >
 
                             <div ng-hide="fullSelectedCM.group">
                                 <br/>
@@ -1012,6 +1013,33 @@
                 </div>
             </div>
         </uib-tab>
+
+        <uib-tab heading="Make ConceptMap">
+            <em>This is just a temp tab</em>
+
+            <div ng-controller="makeCMCtrl">
+                 <textarea class="form-control" ng-model="input.ssCM">
+
+                </textarea>
+                <button class="btn btn-link" ng-click="makeCM(input.ssCM)">Make CM</button>
+                <pre>{{CM | json}}</pre>
+
+                
+
+                <div class="row">
+                    <div class="col-md-6">
+
+
+                    </div>
+                    <div class="col-md-6">
+
+
+                    </div>
+                </div>
+
+            </div>
+        </uib-tab>
+
 
     </uib-tabset>
 
