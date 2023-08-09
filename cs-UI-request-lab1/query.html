@@ -222,10 +222,15 @@
 
                             <uib-tabset ng-show = "fullSelectedCM.group">
 
-                                <uib-tab heading="Perform lookup">
+                                <uib-tab heading="Single item lookup">
 
                                     <div class="row">
                                         <div class="col-md-6">
+
+                                            <strong>What to look for</strong>
+                                            <select class="form-control" ng-model = "input.selectedCmSource"
+                                                    ng-options=   "v.display + '  (' + v.code + ')' for v in cmSources"></select>
+                                            <br/>
                                             <table class="table table-bordered">
                                                 <tr ng-repeat = "(k,v) in doProperties">
                                                     <td>{{k}}</td>
@@ -235,15 +240,39 @@
                                                                 ng-options="v.display for (k,v) in v">
 
                                                         </select>
-
-
                                                     </td>
-
                                                 </tr>
-
                                             </table>
 
-                                            <button class="btn btn-danger pull-right" ng-click="performTranslate()">Perform translate</button>
+                                            <button class="btn btn-danger pull-right" ng-click="performTranslate()">Perform lookup</button>
+                                            <br/><br/>
+
+                                            <strong>Internal filter (not using terminology server)</strong>
+
+                                            <uib-tabset ng-show="myResult">
+                                                <uib-tab heading="List">
+                                                    <table class="table-bordered table">
+                                                        <tr ng-repeat = "target in myResult">
+                                                            <td>{{target.code}}</td>
+                                                            <td>{{target.display}}</td>
+                                                            <td>
+                                                                <div ng-display="target.valueSet">
+                                                                    <div class="clickable" ng-click="expandVSFromCM(target.code)">Show VS</div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </uib-tab>
+                                                <uib-tab heading="Json">
+                                                    <pre>{{myResult | json}}</pre>
+                                                </uib-tab>
+                                            </uib-tabset>
+
+
+
+                                            <div class="pull-right clickable" ng-click="input.showParams = ! input.showParams">Show Parameters query</div>
+                                            <strong>Result from Terminology server</strong>
+                                            <pre ng-show="translateError">{{translateError | json}}</pre>
                                             <br/>
 
                                             <uib-tabset ng-show="resultParameters">
@@ -285,8 +314,31 @@
 -->
                                         </div>
                                         <div class="col-md-6">
-                                            <strong>Request Parameters resource</strong>
-                                            <pre>{{translateParameters | json}}</pre>
+
+                                            <div ng-show="input.showParams">
+                                                <strong>Request Parameters resource</strong>
+                                                <pre>{{translateParameters | json}}</pre>
+                                            </div>
+
+                                            <div ng-show = "expandedCMVS">
+                                                <strong>Expanded Value set.
+                                                    <span class="badge">{{expandedCMVS.expansion.contains.length}}</span>
+                                                </strong>
+                                                <div><em>{{expandedCMVS.url}}</em></div>
+                                                <table class="table table-bordered">
+                                                    <tr><th>Display</th><th>Code</th><th>System</th></tr>
+                                                    <tr ng-repeat="concept in expandedCMVS.expansion.contains">
+                                                        <td>{{concept.display}}</td>
+                                                        <td>
+                                                            <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
+                                                        <td>{{concept.system}}</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+
+
+
+
                                         </div>
                                     </div>
 
@@ -298,6 +350,11 @@
 
 
 
+                                </uib-tab>
+                                <uib-tab heading="All item lookup">
+                                    for multi source cm (multi element)
+                                    dropdowns for all properties
+                                    show options for all 'sources'
                                 </uib-tab>
                                 <uib-tab heading="Criteria">
                                     <div ng-repeat="group in fullSelectedCM.group">
@@ -1022,16 +1079,14 @@
 
                 </textarea>
                 <button class="btn btn-link" ng-click="makeCM(input.ssCM)">Make CM</button>
-                <pre>{{CM | json}}</pre>
-
-                
 
                 <div class="row">
                     <div class="col-md-6">
-
+                        <pre>{{CM | json}}</pre>
 
                     </div>
                     <div class="col-md-6">
+
 
 
                     </div>

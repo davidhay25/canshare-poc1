@@ -2,23 +2,113 @@ angular.module("pocApp")
 
     .service('querySvc', function($q,$http) {
 
+        function findExtension(item,url) {
+            //return an array with all matching extensions
+            let ar = []
+
+            if (item && item.extension) {
+                for (var i=0; i <  item.extension.length; i++){
+                    let ext = item.extension[i]
+                    if (ext.url == url) {
+                        ar.push(ext)
+                    }
+                }
+            }
+            return ar
+
+        }
+
             return {
 
+                processMyTranslate : function (lookingForCode,params,cm) {
+                    //performing the translate 'lookup' function using my simplified approach
+                    //lookingForCode is the code of the thing we want - eg Intentof treatment
+                    //params is {property: value:}    - key is the property in the dependsOn, value is the CodeableConcept value
+                    //cm is the concept map
+
+                    //iterate through the cm.group and group.element looking for a matching code. There should only be 1
+                    //when the element is found, iterate through all the targets.
+                    //for each target:
+                    //      if there is no dependsOn then the target is added to the result. Otherwise:
+                    //      for each item in params, look for a matching target with that property. The logic is AND
+                    //          if the matching property in the target does not match the param, then the comparison fails.
+                    //              any failure to match means the target is not added to the result
+                    //          if there is no target.property that matches the params.property then the comparison succeeds
+
+
+                    let results = []    //returns an array of matching target entries
+                    cm.group.forEach(function (group) {
+                        group.element.forEach(function (element) {
+                            if (element.code == lookingForCode.code) {
+                                element.target.forEach(function (target) {
+                                    if (target.dependsOn) {
+                                        //create a hash by property
+                                        let hashProperty = {}
+                                        target.dependsOn.forEach(function (dep) {
+                                            hashProperty[dep.property] = dep
+                                        })
+                                        //now iterate through the params, checking the property and value
+                                        let include = true     //whether to include the target. default true
+                                        params.forEach(function (param) {
+                                            if (hashProperty[param.property]) {
+                                                //check the value
+                                                let p = hashProperty[param.property]
+                                                if (p.value !== param.value.code) {
+                                                    include = false
+                                                }
+                                            } else {
+                                                //if the target doesn't have a corresponding property, then include it
+                                                //include = true
+                                            }
+
+                                        })
+
+                                        if (include) {
+                                            //add any ValueSet directly to the target
+                                            let ext = findExtension(target,"http://canshare.co.nz/fhir/StructureDefinition/conceptmap-valueset")
+                                            if (ext[0] && ext[0].valueUri) {
+                                                target.valueSet = ext[0].valueUri
+                                            }
+                                            results.push(target)
+                                        }
+
+
+                                    } else {
+                                        //if no dependsOn, then always add
+                                        results.push(target)
+                                    }
+
+                                })
+
+                                console.log('gotcha!')
+                            }
+                        })
+                    })
+
+                    return results
+
+                },
+
                 getCMProperties : function (cm) {
-                    //return all the properties referred to in the 'depandsOn' element
-                    let hash = {}
+                    //return all the properties referred to in the 'dependsOn' element
+                    let hash = {}       //will be a hash of all properties mentioned within the map
+                    let arSources = []  //all the element.code / element.display items. What can be searched for.
+
                     if (cm.group) {
                         cm.group.forEach(function (group) {
                             if (group.element) {
                                 group.element.forEach(function (element) {
+                                    //add the code / display to the list of 'sources'
+                                    //assume no dups.
+                                    let concept = {code:element.code,display:element.display}
+                                    arSources.push(concept)
                                     if (element.target) {
                                         element.target.forEach(function (target) {
                                             if (target.dependsOn) {
                                                 target.dependsOn.forEach(function (don) {
                                                     let property = don.property
-
-                                                    hash[property] = hash[property] || [{code:'dummy',display:'Nothing selected'}]
-
+                                                    //hash[property] = hash[property] || [{code:'dummy',display:'Nothing selected'}]
+                                                    hash[property] = hash[property] || []
                                                     let obj = hash[property]
                                                     let concept = {system:don.system,code:don.value,display:don.display}
 
@@ -27,22 +117,14 @@ angular.module("pocApp")
                                                     }
                                                 })
                                             }
-
                                         })
                                     }
-
-
                                 })
-
                             }
-
-
-
-
                         })
                     }
 
-                    return hash
+                    return {hashProperties:hash,arSources:arSources}
 
 
                 },

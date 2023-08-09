@@ -24,20 +24,55 @@ angular.module("pocApp")
             $scope.input.loadComplete = true
 
 
+            $scope.expandVSFromCM = function (code) {
+                //when a VS is selected in a CM expansion...
+
+
+                url = `http://snomed.info/sct?fhir_vs=refset/${code}`
+
+
+                $scope.input.showParams = false
+                delete $scope.expandedCMVS
+                //default to a canshare expansion
+                let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=en-x-sctlang-23162100-0210105`
+
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        $scope.expandedCMVS = data.data
+                    }, function (err) {
+                        alert(`ValueSet: ${url} not found`)
+                    }
+                ).finally(
+                    function () {
+                        $scope.showWaiting = false
+                    }
+                )
+
+
+            }
+
             $scope.performTranslate = function () {
                 delete $scope.resultParametersList
                 delete $scope.resultParameters
+                delete $scope.translateError
+                delete $scope.myResult
 
-                let p = $scope.generateTranslateQuery()
-                console.log(p)
+                let vo = $scope.generateTranslateQuery()
+                console.log(vo)
 
-                let bundle = {resourceType:"Bundle",type:"collection",entry:[]}
-                let entry = {fullUrl:`https://r4.ontoserver.csiro.au/fhir/Parameters/${p.id}`,resource:p}
-                bundle.entry.push(entry)
-                console.log(angular.toJson(bundle))
+                //my translate function
+                //let lookingForCode = $scope.fullSelectedCM.group[0].element[0]      //todo generalize
+                let lookingForCode = $scope.input.selectedCmSource
+
+                $scope.myResult = querySvc.processMyTranslate(lookingForCode,vo.myParams,$scope.fullSelectedCM)
 
 
-                $http.post('nzhts',p).then(
+                let parameters = vo.parameters  //the parameters resource
+
+
+                $http.post('nzhts',parameters).then(
                     function (data) {
                         $scope.resultParameters = data.data
                         $scope.resultParametersList = []
@@ -58,11 +93,12 @@ angular.module("pocApp")
 
                         console.log(data)
                     },function (err) {
-                        alert(angular.toJson(err.data))
+                        //alert(angular.toJson(err.data))
+                        $scope.translateError = err.data
                         console.log(err)
                     }
                 )
-
+/*
                 return
 
 
@@ -78,6 +114,7 @@ angular.module("pocApp")
                         console.log(err)
                     }
                     )
+                */
 
             }
 
@@ -101,6 +138,10 @@ angular.module("pocApp")
                 delete $scope.translateParameters
                 delete $scope.doProperties
                 delete $scope.input.cmOptions
+                delete $scope.cmSources
+                delete $scope.myResult
+                delete $scope.translateError
+                delete $scope.expandedCMVS
 
                 $scope.loadingCM = true
 
@@ -113,11 +154,13 @@ angular.module("pocApp")
                         $scope.fullSelectedCM = ar[0]       //todo what of there's > 1
 
                         //now get the set of 'dependsOn' properties (if any)
-                        $scope.doProperties = querySvc.getCMProperties($scope.fullSelectedCM)
+                        let vo = querySvc.getCMProperties($scope.fullSelectedCM)
+                        $scope.doProperties = vo.hashProperties // querySvc.getCMProperties($scope.fullSelectedCM)
+                        $scope.cmSources = vo.arSources
+                        $scope.input.selectedCmSource = $scope.cmSources[0]
 
                         //decide whether to show 'canshare' tab
                         $scope.showTranslate = Object.keys($scope.doProperties).length > 0
-
 
                     }, function (err) {
 
@@ -158,6 +201,7 @@ angular.module("pocApp")
             //generate the translate query from the canshare lookup tab
             $scope.generateTranslateQuery = function() {
 
+                let myParams = []    //an array of simplified parameters for my parser
 
                 let translateParameters = {resourceType:"Parameters", parameter:[]}
 
@@ -169,8 +213,9 @@ angular.module("pocApp")
                 //add the target - what we are looking for. This is in the group.element.target.code
                 //is it really? I wonder if it's group.element.code
                 //Assuming that each CM is focussed on a single 'thing' to lookup - in group[0].element[0].code
-                let codeWeWant = $scope.fullSelectedCM.group[0].element[0].code
-                let displayWeWant = $scope.fullSelectedCM.group[0].element[0].display
+
+                let codeWeWant = $scope.input.selectedCmSource.code
+                let displayWeWant = $scope.input.selectedCmSource.display
 
                 let systemWeWant = $scope.fullSelectedCM.group[0].source || "http://snomed.info/sct"
 
@@ -194,13 +239,21 @@ angular.module("pocApp")
                         let ccValue = {coding:[p]}
                         let part2 = {"name":"concept","valueCodeableConcept":ccValue}
                         depParam1.part.push(part2)
+
+                        //my parameters
+                        let item = {}
+                        item.property = key
+                        item.value = p
+                        myParams.push(item)
+
+
                     })
                 }
 
 
                 $scope.translateParameters = translateParameters
 
-                return translateParameters
+                return {parameters:translateParameters,myParams : myParams}
 /*
                 //the dependency
                 if ( $scope.input.dep1) {
