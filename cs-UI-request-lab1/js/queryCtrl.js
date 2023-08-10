@@ -35,6 +35,7 @@ angular.module("pocApp")
                     if (data.node) {
                         $scope.selectedCmTreeTarget = data.node.data;
                         console.log(data.node)
+                        delete $scope.expandedCMVS
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...

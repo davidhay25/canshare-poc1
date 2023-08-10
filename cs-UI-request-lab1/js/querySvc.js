@@ -29,21 +29,21 @@ angular.module("pocApp")
 
                     cm.group[0].element.forEach(function (element) {
 
-                        let elementNode = {id:element.code,text:element.display,parent:'root',data:element}
+                        let elementNode = {id:element.code,text:element.display,parent:'root',data:{type:'source',data:element}}
                         treeData.push(elementNode)
 
                         element.target.forEach(function (target) {
 
                             let id = `${element.code}-${target.code}`
 
-                            let targetNode = {id:id,text:target.display,parent:elementNode.id,data:target}
+                            let targetNode = {id:id,text:target.display,parent:elementNode.id,data:{type:'target',data:target}}
                             treeData.push(targetNode)
 
                             if (target.dependsOn) {
                                 target.dependsOn.forEach(function (dep) {
                                     let text = `${dep.property} = ${dep.value} (${dep.display})`
                                     let id = `${target.code}-${dep.property}-${dep.value}`
-                                    let depNode = {id:id,text:text,parent:targetNode.id,data:dep}
+                                    let depNode = {id:id,text:text,parent:targetNode.id,data:{type:'dependsOn',data:target}}
                                     treeData.push(depNode)
                                 })
                             }
