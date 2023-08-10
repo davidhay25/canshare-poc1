@@ -24,6 +24,31 @@ angular.module("pocApp")
             $scope.input.loadComplete = true
 
 
+            //display the tree view of a ConceptMap
+            function showCmTree(treeData) {
+                $('#cmTree').jstree('destroy');
+
+                let x = $('#cmTree').jstree(
+                    {'core': {'multiple': false, 'data': treeData,
+                            'themes': {name: 'proton', responsive: true}}}
+                ).on('changed.jstree', function (e, data) {
+                    if (data.node) {
+                        $scope.selectedCmTreeTarget = data.node.data;
+                        console.log(data.node)
+                    }
+
+                    $scope.$digest();       //as the event occurred outside of angular...
+                }).bind("loaded.jstree", function (event, data) {
+                    let id = treeData[0].id
+                    $(this).jstree("open_node",id);
+                    //$(this).jstree("open_all");  //open all nodes
+                    $scope.$digest();
+                });
+
+            }
+
+
+
             $scope.expandVSFromCM = function (code) {
                 //when a VS is selected in a CM expansion...
 
@@ -53,25 +78,36 @@ angular.module("pocApp")
 
             }
 
+            //translate for all sources, given a
+            $scope.performTranslateAllSources = function () {
+
+            }
+
+            //translate for a single source
             $scope.performTranslate = function () {
                 delete $scope.resultParametersList
                 delete $scope.resultParameters
                 delete $scope.translateError
                 delete $scope.myResult
 
+                //create the request parameters resource
                 let vo = $scope.generateTranslateQuery()
-                console.log(vo)
+                //console.log(vo)
 
                 //my translate function
                 //let lookingForCode = $scope.fullSelectedCM.group[0].element[0]      //todo generalize
                 let lookingForCode = $scope.input.selectedCmSource
 
+                //get the target/s for a single source
                 $scope.myResult = querySvc.processMyTranslate(lookingForCode,vo.myParams,$scope.fullSelectedCM)
 
+                //get the target/s for all sources
+                $scope.allTargets = querySvc.getTargetsAllSources(vo.myParams,$scope.fullSelectedCM)
+console.log($scope.allTargets)
+                //querySvc.getVSAllSources()
 
+                //process $translate via local server proxy
                 let parameters = vo.parameters  //the parameters resource
-
-
                 $http.post('nzhts',parameters).then(
                     function (data) {
                         $scope.resultParameters = data.data
@@ -119,8 +155,6 @@ angular.module("pocApp")
             }
 
 
-
-
             querySvc.getConceptMaps().then(
                 function (data) {
                     $scope.allConceptMaps = data
@@ -153,6 +187,10 @@ angular.module("pocApp")
                     function (ar) {
                         $scope.fullSelectedCM = ar[0]       //todo what of there's > 1
 
+                        let treeData = querySvc.makeTree($scope.fullSelectedCM)
+                        showCmTree(treeData)
+
+
                         //now get the set of 'dependsOn' properties (if any)
                         let vo = querySvc.getCMProperties($scope.fullSelectedCM)
                         $scope.doProperties = vo.hashProperties // querySvc.getCMProperties($scope.fullSelectedCM)
@@ -171,6 +209,7 @@ angular.module("pocApp")
 
             }
 
+            //the filter function wen displaying the list of maps
             $scope.showCM = function (item) {
                 result = true
 

@@ -15,10 +15,97 @@ angular.module("pocApp")
                 }
             }
             return ar
-
         }
 
             return {
+                makeTree : function (cm) {
+                    //generate a tree view of the conceptmap
+                    //assume only 1 group
+                    //assume that the cm is valid - all elements / targets have a code & display
+                    //todo - need cm validator
+                    let treeData = []
+                    let root = {id:'root',text: "CanShare ConceptMap",parent:'#',data:{}}
+                    treeData.push(root)
+
+                    cm.group[0].element.forEach(function (element) {
+
+                        let elementNode = {id:element.code,text:element.display,parent:'root',data:element}
+                        treeData.push(elementNode)
+
+                        element.target.forEach(function (target) {
+
+                            let id = `${element.code}-${target.code}`
+
+                            let targetNode = {id:id,text:target.display,parent:elementNode.id,data:target}
+                            treeData.push(targetNode)
+
+                            if (target.dependsOn) {
+                                target.dependsOn.forEach(function (dep) {
+                                    let text = `${dep.property} = ${dep.value} (${dep.display})`
+                                    let id = `${target.code}-${dep.property}-${dep.value}`
+                                    let depNode = {id:id,text:text,parent:targetNode.id,data:dep}
+                                    treeData.push(depNode)
+                                })
+                            }
+
+                        })
+                    })
+
+                    console.log(treeData)
+                    return treeData
+
+                },
+
+                getTargetsAllSources : function(params,cm){
+                    //get the vs for all elements
+                    //much common code with processMyTranslate()
+                    //todo extract to common function
+
+                    let results = {}    //returns an array of matching target entries
+                    cm.group.forEach(function (group) {
+                        group.element.forEach(function (element) {
+                            //let matchingTargets = []
+                            let sourceCode = element.code
+                            results[sourceCode] = []
+                            element.target.forEach(function (target) {
+                                if (target.dependsOn) {
+                                    //create a hash by property
+                                    let hashProperty = {}
+                                    target.dependsOn.forEach(function (dep) {
+                                        hashProperty[dep.property] = dep
+                                    })
+                                    //now iterate through the params, checking the property and value
+                                    let include = true     //whether to include the target. default true
+                                    params.forEach(function (param) {
+                                        if (hashProperty[param.property]) {
+                                            //check the value
+                                            let p = hashProperty[param.property]
+                                            if (p.value !== param.value.code) {
+                                                include = false
+                                            }
+                                        }
+                                    })
+
+                                    if (include) {
+                                        results[sourceCode].push(target)
+                                    }
+
+
+                                } else {
+                                    //if no dependsOn, then always add
+                                    results[sourceCode].push(target)
+                                }
+
+                            })
+
+                            console.log('gotchaX!')
+
+                        })
+                    })
+
+                    return results
+
+                },
 
                 processMyTranslate : function (lookingForCode,params,cm) {
                     //performing the translate 'lookup' function using my simplified approach
@@ -65,10 +152,13 @@ angular.module("pocApp")
 
                                         if (include) {
                                             //add any ValueSet directly to the target
+                                            //todo - not using this now...
+                                            /*
                                             let ext = findExtension(target,"http://canshare.co.nz/fhir/StructureDefinition/conceptmap-valueset")
                                             if (ext[0] && ext[0].valueUri) {
                                                 target.valueSet = ext[0].valueUri
                                             }
+                                            */
                                             results.push(target)
                                         }
 

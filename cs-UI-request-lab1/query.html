@@ -13,6 +13,10 @@
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/common.css"/>
     <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
+    <script src="js/libs/jstree.min.js"></script>
 
     <script>
         angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage']).config(function($locationProvider) {
@@ -146,14 +150,19 @@
                          ng-click="selectCMItem({cm:fullSelectedCM},true)">Get maps</div>
                     -->
                     <uib-tabset>
-                        <uib-tab heading="Json">
-                            <div ng-hide="fullSelectedCM.group">
-                                <br/>
-                                Click <span class="clickable" ng-click="selectCMItem({cm:fullSelectedCM},true)">here</span> to get the complete ConceptMap
-                                <br/>  <br/>
+
+                        <uib-tab heading="Tree">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div id="cmTree"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <pre>{{selectedCmTreeTarget | json}}</pre>
+                                </div>
                             </div>
-                            <pre>{{fullSelectedCM | json}}</pre>
+
                         </uib-tab>
+
                         <uib-tab heading="Maps">
                             <div ng-hide="fullSelectedCM.group">
                                 <br/>
@@ -209,8 +218,6 @@
 
 
                         </uib-tab>
-
-
 
                         <uib-tab heading="Translate operation" >
 
@@ -281,6 +288,11 @@
                                                         <tr ng-repeat = "concept in resultParametersList">
                                                             <td>{{concept.code}}</td>
                                                             <td>{{concept.display}}</td>
+                                                            <td>
+                                                                <div ng-display="target.valueSet">
+                                                                    <div class="clickable" ng-click="expandVSFromCM(concept.code)">Show VS</div>
+                                                                </div>
+                                                            </td>
                                                         </tr>
                                                     </table>
                                                 </uib-tab>
@@ -324,7 +336,7 @@
                                                 <strong>Expanded Value set.
                                                     <span class="badge">{{expandedCMVS.expansion.contains.length}}</span>
                                                 </strong>
-                                                <div><em>{{expandedCMVS.url}}</em></div>
+                                                <div><em>ValueSet/$expand?url={{expandedCMVS.url}}</em></div>
                                                 <table class="table table-bordered">
                                                     <tr><th>Display</th><th>Code</th><th>System</th></tr>
                                                     <tr ng-repeat="concept in expandedCMVS.expansion.contains">
@@ -355,6 +367,35 @@
                                     for multi source cm (multi element)
                                     dropdowns for all properties
                                     show options for all 'sources'
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <table class="table table-bordered">
+                                                <tr ng-repeat = "(k,v) in doProperties">
+                                                    <td>{{k}}</td>
+                                                    <td>
+                                                        <select class="form-control" ng-model="input.cmOptions[k]"
+                                                                ng-change="generateTranslateQuery()"
+                                                                ng-options="v.display for (k,v) in v">
+
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                            </table>
+
+                                            <button class="btn btn-danger pull-right" ng-click="performTranslateAllSources()">Perform lookup</button>
+                                            <br/><br/>
+                                        </div>
+                                        <div class="col-md-6">
+
+                                        </div>
+                                    </div>
+
+
+
+
+
+
                                 </uib-tab>
                                 <uib-tab heading="Criteria">
                                     <div ng-repeat="group in fullSelectedCM.group">
@@ -404,6 +445,15 @@
 
 
 
+                        </uib-tab>
+
+                        <uib-tab heading="Json">
+                            <div ng-hide="fullSelectedCM.group">
+                                <br/>
+                                Click <span class="clickable" ng-click="selectCMItem({cm:fullSelectedCM},true)">here</span> to get the complete ConceptMap
+                                <br/>  <br/>
+                            </div>
+                            <pre>{{fullSelectedCM | json}}</pre>
                         </uib-tab>
 
                     </uib-tabset>
