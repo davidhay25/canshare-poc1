@@ -7,8 +7,10 @@ angular.module("pocApp")
             $scope.input = {}
 
             $scope.languages = []       //languages that can be used for the expansion
-            $scope.languages.push({display:"Default",code:""})      //todo find nz expansion
+            $scope.languages.push({display:"Default",code:""})
             $scope.languages.push({display:"CanShare",code:"en-x-sctlang-23162100-0210105"})
+
+            let nzDisplayLanguage = "en-x-sctlang-23162100-0210105"
 
             // =============================================== functions to support ConceptMap work =================
 
@@ -60,8 +62,9 @@ angular.module("pocApp")
                 $scope.input.showParams = false
                 delete $scope.expandedCMVS
                 //default to a canshare expansion
-                let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=en-x-sctlang-23162100-0210105`
+                let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=${nzDisplayLanguage}`
 
+                $scope.expandVSFromCMQuery = qry
                 let encodedQry = encodeURIComponent(qry)
                 $scope.showWaiting = true
                 $http.get(`nzhts?qry=${encodedQry}`).then(
@@ -573,8 +576,6 @@ console.log($scope.allTargets)
             }
 
 
-
-
             $scope.expandFromAnalysisVS = function (url) {
                 delete $scope.expandedVSFromAnalysisVS
                 let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=en-x-sctlang-23162100-0210105`
@@ -633,7 +634,7 @@ console.log($scope.allTargets)
 
             $scope.expandVSInTS = function (vs) {
                 delete $scope.expandedVS
-                let qry = `ValueSet/$expand?url=${vs.url}&_summary=false`
+                let qry = `ValueSet/$expand?url=${vs.url}&_summary=false&displayLanguage=${nzDisplayLanguage}`
 
                 if ($scope.input.selectedLanguage && $scope.input.selectedLanguage.code) {
                     qry += `&displayLanguage=${$scope.input.selectedLanguage.code} `

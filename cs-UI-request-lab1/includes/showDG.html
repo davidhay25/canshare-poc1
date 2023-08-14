@@ -80,6 +80,42 @@
                   </tr>
 
                   <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
+                    <td>Mappings</td>
+                    <td>
+
+                      <div ng-repeat="code in selectedNode.data.ed.code">
+                        <div ng-repeat="target in conceptMap[code.code].targets">
+                          <div>{{target.display}} (<span class="clickable" ng-click="viewVS()">{{target.code}}</span> )</div>
+                          <table class="table table-bordered">
+                            <tr ng-repeat="dep in target.dependsOn">
+                              <td>{{dep.property}}</td>
+                              <td>{{dep.display}}</td>
+                              <td>{{dep.value}}</td>
+                            </tr>
+                          </table>
+                        </div>
+                      </div>
+
+
+<!--
+                      <table class="table table-bordered">
+                        <tr ng-repeat="target in conceptMap[selectedNode.data.ed.code].targets">
+                          <td>{{target.code}}</td>
+                          <td>{{target.display}}</td>
+                          <td>
+                            <div ng-repeat="dep in target.dependsOn">
+                              {{dep.property}}
+                            </div>
+                          </td>
+                        </tr>
+                      </table>
+                      <pre>{{conceptMap[selectedNode.data.ed.code] | json}}</pre>
+                      -->
+                    </td>
+
+                  </tr>
+
+                  <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
                     <td>Options</td>
                     <td>
                       <div ng-show="selectedNode.data.ed.options">
@@ -124,6 +160,7 @@
                   -->
 
                 </div>
+
               </uib-tab>
               <uib-tab >
 

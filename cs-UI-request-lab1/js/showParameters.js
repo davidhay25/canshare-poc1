@@ -3,7 +3,18 @@ angular.module("pocApp")
         function ($scope,parameters,title,system,code,$http) {
 
 
-            $scope.arHx = []
+            function getDisplay(params) {
+                for (const param of params.parameter) {
+                    if (param.name == 'display') {
+                        return param.valueString
+                        break
+                    }
+                }
+
+
+            }
+
+            $scope.arHx = [{code:code,display:getDisplay(parameters),params:parameters}]
 
             $scope.parameters = parameters
             $scope.title = title
@@ -11,9 +22,10 @@ angular.module("pocApp")
                 $scope.selectedParameter = param
             }
 
+            //select a different code
             $scope.selectCode = function (part) {
-                console.log(part)
-                let code
+                //console.log(part)
+                let code1
                 part.forEach(function (p) {1
                     if (p.name == 'value') {
                         code1 = p.valueCode
@@ -21,6 +33,7 @@ angular.module("pocApp")
                 })
 
                 if (code1) {
+
                     //system = system || snomed
                     let qry = `CodeSystem/$lookup?system=${system}&code=${code1}`
                     let encodedQry = encodeURIComponent(qry)
@@ -29,6 +42,9 @@ angular.module("pocApp")
                         function (data) {
                             $scope.title = code1
                             $scope.parameters = data.data
+
+                            $scope.arHx.push({code:code1,display:getDisplay(data.data),params:data.data})
+
                         }, function (err) {
 
                         }

@@ -58,6 +58,14 @@ angular.module("pocApp")
             $scope.world = $localStorage.world
 
 
+            //download the Concept map and generate the hash that lists conditional refsets by code
+
+            modelsSvc.getConceptMapHash().then(
+                function (map) {
+                    $scope.conceptMap = map
+                    console.log(map)
+                }
+            )
 
 
             //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
@@ -149,7 +157,8 @@ angular.module("pocApp")
 
             $scope.updateTermSummary()
 
-            $scope.viewVS = function (item) {
+            $scope.viewVS = function (item,refsetId) {
+
                 $uibModal.open({
                     templateUrl: 'modalTemplates/viewVS.html',
                     backdrop: 'static',
@@ -158,7 +167,9 @@ angular.module("pocApp")
 
                     resolve: {
                         url: function () {
-                            return item     //just looks at the .options property
+                            return item
+                        }, refsetId : function () {
+                            return refsetId
                         }
                     }
 

@@ -1,6 +1,6 @@
 angular.module("pocApp")
 
-    .service('modelsSvc', function($q,$filter) {
+    .service('modelsSvc', function($q,$filter,$http) {
         let cache = {}
 
         this.fhir = {}
@@ -9,6 +9,39 @@ angular.module("pocApp")
 
 
         return {
+
+            getConceptMapHash : function () {
+                let idOfConceptMap = "canshare-tnm-vs"
+                let deferred = $q.defer()
+
+                let qry = `ConceptMap/${idOfConceptMap}`
+                let encodedQry = encodeURIComponent(qry)
+
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        let cm = data.data
+                        let hashMaps = {}
+                        cm.group.forEach(function (group) {
+                            group.element.forEach(function (element) {
+                                let coding = {code:element.code,display:element.display}
+                                hashMaps[element.code] = {coding:coding,targets:element.target}
+
+                            })
+
+                        })
+
+                       // console.log(data.data)
+                        deferred.resolve(hashMaps)
+
+                    },function (err) {
+                        //todo what to do?
+                        deferred.reject({})
+                    }
+                )
+
+                return deferred.promise
+
+            },
 
             getReferencedModels : function (hashDG,hashComp) {
                 //create a hash showing references between models

@@ -164,10 +164,17 @@
                                         <br>
                                         <div class="clickable" ng-click="lookup(selectedCmTreeTarget.data.code)">Lookup {{selectedCmTreeTarget.data.code}}</div>
 
+<!--
+                                        <table class="table">
+                                            <tr
+                                        </table>
+-->
                                         <div class="myScroll">
                                             <pre>{{selectedCmTreeTarget.data | json}}</pre>
                                         </div>
                                     </div>
+
+
                                     <div ng-show="selectedCmTreeTarget.type == 'target'">
                                         These are the potential refsets that could be included in the source set. Each
                                         target has a set of properties (dependsOn) which determine if the target concept is to be
@@ -200,7 +207,7 @@
                                                     </tr>
                                                 </table>
 
-                                                <div ng-show="expandedCMVS.url"><em>ValueSet/$expand?url={{expandedCMVS.url}}</em></div>
+                                                <div ng-show="expandedCMVS.url"><em>{{expandVSFromCMQuery}}</em></div>
                                             </uib-tab>
                                             <uib-tab ng-show="expandedCMVS.url" heading = "ValueSet">
                                                 <pre>{{expandedCMVS | json}}</pre>
@@ -226,7 +233,7 @@
                                         </div>
 
                                         <div class="myScroll">
-                                            <pre>{{selectedCmTreeTarget.data | json}}</pre>
+                                            <pre>{{selectedCmTreeTarget.data.dependsOn | json}}</pre>
                                         </div>
 
                                     </div>
@@ -236,62 +243,6 @@
 
                                 </div>
                             </div>
-
-                        </uib-tab>
-
-                        <uib-tab heading="Maps">
-                            <div ng-hide="fullSelectedCM.group">
-                                <br/>
-                                Click <span class="clickable" ng-click="selectCMItem({cm:fullSelectedCM},true)">here</span> to get the complete ConceptMap
-                                <br/>  <br/>
-                            </div>
-
-                            <div ng-show="loadingCM">
-                                Loading the ConceptMap. This can take a few seconds if the mappings are large...
-                            </div>
-                            <div ng-show="fullSelectedCM">Source ValueSet: {{fullSelectedCM.sourceCanonical}} {{fullSelectedCM.sourceUri}}</div>
-                            <div ng-show="fullSelectedCM">Target ValueSet: {{fullSelectedCM.targetCanonical}} {{fullSelectedCM.targetUri}}</div>
-
-
-                            <br/>
-
-                            <div class="myScrollX">
-                                <div ng-repeat="group in fullSelectedCM.group">
-
-                                    <div class="tableFixHead">
-                                        <table class="table table-bordered table-condensed">
-                                            <thead>
-                                            <tr>
-                                                <th colspan="2">{{group.source}}</th>
-                                                <th>{{group.target}}</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr ng-repeat="element in group.element">
-                                                <td><div class="clickable" ng-click="lookup(element.code,group.source)">{{element.code}}</div></td>
-                                                <td>{{element.display}}</td>
-                                                <td>
-                                                    <div ng-repeat="target in element.target">
-                                                        <span class="clickable" ng-click="lookup(target.code,group.target)">{{target.code}} </span>
-
-                                                        {{target.display}} <span > ({{target.equivalence}})</span>
-                                                        <span class="pull-right" ng-show="target.dependsOn">
-                                                            X
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                               <td>
-
-                                               </td>
-                                            </tr>
-                                            </tbody>
-
-                                        </table>
-                                    </div>
-
-                                </div>
-                            </div>
-
 
                         </uib-tab>
 
@@ -412,7 +363,7 @@
                                                 <strong>Expanded Value set.
                                                     <span class="badge">{{expandedCMVS.expansion.contains.length}}</span>
                                                 </strong>
-                                                <div><em>ValueSet/$expand?url={{expandedCMVS.url}}</em></div>
+                                                <div><em>{{expandVSFromCMQuery}}</em></div>
                                                 <table class="table table-bordered">
                                                     <tr><th>Display</th><th>Code</th><th>System</th></tr>
                                                     <tr ng-repeat="concept in expandedCMVS.expansion.contains">
@@ -490,7 +441,7 @@
                                                         <div>Equivalence: {{target.equivalence}}</div>
                                                         <div>Comment: {{target.comment}}</div>
                                                     </div>
-                                                    
+
                                                     <div class="col-md-8">
                                                         <div class="banner">Criteria</div>
                                                         <table class="table table-bordered">
@@ -522,6 +473,66 @@
 
 
                         </uib-tab>
+
+                        <uib-tab heading="Maps">
+                            <div ng-hide="fullSelectedCM.group">
+                                <br/>
+                                Click <span class="clickable" ng-click="selectCMItem({cm:fullSelectedCM},true)">here</span> to get the complete ConceptMap
+                                <br/>  <br/>
+                            </div>
+
+                            <div ng-show="loadingCM">
+                                Loading the ConceptMap. This can take a few seconds if the mappings are large...
+                            </div>
+                            <div ng-show="fullSelectedCM">Source ValueSet: {{fullSelectedCM.sourceCanonical}} {{fullSelectedCM.sourceUri}}</div>
+                            <div ng-show="fullSelectedCM">Target ValueSet: {{fullSelectedCM.targetCanonical}} {{fullSelectedCM.targetUri}}</div>
+
+
+                            <br/>
+
+                            <div class="myScrollX">
+                                <div ng-repeat="group in fullSelectedCM.group">
+
+                                    <div class="tableFixHead">
+                                        <table class="table table-bordered table-condensed">
+                                            <thead>
+                                            <tr>
+                                                <th colspan="2">{{group.source}}</th>
+                                                <th>{{group.target}}</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-repeat="element in group.element">
+                                                <td><div class="clickable" ng-click="lookup(element.code,group.source)">{{element.code}}</div></td>
+                                                <td>{{element.display}}</td>
+                                                <td>
+                                                    <div ng-repeat="target in element.target">
+                                                        <span class="clickable" ng-click="lookup(target.code,group.target)">{{target.code}} </span>
+
+                                                        {{target.display}} <span > ({{target.equivalence}})</span>
+                                                        <span class="pull-right" ng-show="target.dependsOn">
+                                                            X
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                               <td>
+
+                                               </td>
+                                            </tr>
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </uib-tab>
+
+
+
+
 
                         <uib-tab heading="Json">
                             <div ng-hide="fullSelectedCM.group">

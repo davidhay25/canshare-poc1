@@ -1,8 +1,11 @@
 angular.module("pocApp")
     .controller('viewVSCtrl',
-        function ($scope,url,$http,$uibModal) {
+        function ($scope,url,refsetId,$http,$uibModal) {
+
             $scope.url = url
             $scope.input = {}
+
+            console.log(refsetId)
 
             let snomed = "http://snomed.info/sct"
 

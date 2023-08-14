@@ -473,14 +473,26 @@ angular.module("pocApp")
 
                     dgTnmStaging.diff.push({path:'timing',title:'Timing',type:['CodeableConcept'],mult:"0..1",
                         description:"The stage classification according to the point in time of the patient's care in relation to diagnosis and treatment"})
-                    dgTnmStaging.diff.push({path:'tstage',title:'T stage',type:['CodeableConcept'],mult:"0..1",
-                        description:"The size and/or contiguous extension of the primary tumour"})
+                    dgTnmStaging.diff.push(
+                        {path:'tstage',title:'T stage',type:['CodeableConcept'],mult:"0..1",
+
+                        description:"The size and/or contiguous extension of the primary tumour"}
+                    )
                     dgTnmStaging.diff.push({path:'nstage',title:'N stage',type:['CodeableConcept'],mult:"0..1",
                         description:"The involvement of regional lymph ncdes as defined for each cancer site, including absence or presence of cancer, number of positive regional nodes, involvement of specific regional nodal groups, size of nodal metastasis or extension etc "})
                     dgTnmStaging.diff.push({path:'mstage',title:'M stage',type:['CodeableConcept'],mult:"0..1",
                         description:"The absence or presence of distant metastases in site and/or organs outside the local tumour area and regional nodes as defined for each cancer site"})
                     hashDataGroups[dgTnmStaging.name] = dgTnmStaging
 
+                    //Clinical TNM
+                    let dgCTnmStaging = {kind:"dg",name:'cTNM',parent:"TNM",title:"Clinical TNM staging",diff:[],
+                        description:"TNM staging is used to describe the aggregate information resulting from T, N and M categories combined with any prognostic factors relevant to the specifiic disease "}
+                    dgCTnmStaging.diff.push(
+                        {path:'tstage',title:'cT stage',type:['CodeableConcept'],mult:"0..1",
+                            code:[{code:"384625004"}],
+                            description:"The size and/or contiguous extension of the primary tumour"}
+                    )
+                    hashDataGroups[dgCTnmStaging.name] = dgCTnmStaging
 
                     //dgSpecimen.diff.push({path:'collection.date',title:'When collected',type:['dateTime']})
 

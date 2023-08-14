@@ -64,6 +64,14 @@
                 </div>
 
             </uib-tab>
+            <uib-tab heading="History">
+                <table class="table-bordered table">
+                    <tr ng-repeat="item in arHx">
+                        <td>{{item.code}}</td>
+                        <td>{{item.display}}</td>
+                    </tr>
+                </table>
+            </uib-tab>
             <uib-tab heading="Json">
                 <pre>{{parameters | json}}</pre>
             </uib-tab>
@@ -74,6 +82,7 @@
 
     <div class="modal-header">
         {{item.notes}}
+
         <div class="row">
 
             <div class="col-md-2 col-sm-2">
