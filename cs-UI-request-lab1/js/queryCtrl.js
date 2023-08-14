@@ -10,6 +10,11 @@ angular.module("pocApp")
             $scope.languages.push({display:"Default",code:""})      //todo find nz expansion
             $scope.languages.push({display:"CanShare",code:"en-x-sctlang-23162100-0210105"})
 
+
+            let termServer = "https://r4.ontoserver.csiro.au/fhir/"
+            let snomed = "http://snomed.info/sct"
+
+
             // =============================================== functions to support ConceptMap work =================
 
             $scope.input.cmOptions = {}         //options by property
@@ -49,6 +54,12 @@ angular.module("pocApp")
             }
 
 
+            //when a source is selected in the ConceptMap mapper, set the possible 'depends on' properties
+            $scope.setDependsOnProperties = function (source) {
+                delete $scope.translateParameters
+                let vo = querySvc.getCMProperties($scope.fullSelectedCM,source.code)
+                $scope.doProperties = vo.hashProperties // querySvc.getCMProperties($scope.fullSelectedCM)
+            }
 
             $scope.expandVSFromCM = function (code) {
                 //when a VS is selected in a CM expansion...
@@ -90,6 +101,9 @@ angular.module("pocApp")
                 delete $scope.resultParameters
                 delete $scope.translateError
                 delete $scope.myResult
+                delete $scope.expandedCMVS
+
+
 
                 //create the request parameters resource
                 let vo = $scope.generateTranslateQuery()
@@ -197,6 +211,10 @@ console.log($scope.allTargets)
                         $scope.doProperties = vo.hashProperties // querySvc.getCMProperties($scope.fullSelectedCM)
                         $scope.cmSources = vo.arSources
                         $scope.input.selectedCmSource = $scope.cmSources[0]
+
+                        //actually, we need to set the doProperties for this particular source
+                        let vo1 = querySvc.getCMProperties($scope.fullSelectedCM,$scope.input.selectedCmSource.code)
+                        $scope.doProperties = vo1.hashProperties //
 
                         //decide whether to show 'canshare' tab
                         $scope.showTranslate = Object.keys($scope.doProperties).length > 0
@@ -412,96 +430,12 @@ console.log($scope.allTargets)
 
 
 
-            let termServer = "https://r4.ontoserver.csiro.au/fhir/"
-            let snomed = "http://snomed.info/sct"
 
 
-            //$scope.input.prop1 = "http://what-is-this"
-            //$scope.input.prop2 = "http://what-is-this"
-
-            //download the map indicated by the current id
-            $scope.downloadMapDEP = function () {
-                let url = `${termServer}/ConceptMap/${$scope.input.id}`
-                $http.get(url).then(
-                    function (data) {
-                        $scope.cm = data.data
-                        $timeout(function(){
-                            alert("ConceptMap downloaded")
-                        },100)
-
-                    }, function (err) {
-                        alert(angular.toJson(err.data))
-                    }
-                )
-
-            }
 
 
-            $scope.uploadMapDEP = function () {
-                let url = `${termServer}/ConceptMap/${$scope.cm.id}`
-                $http.put(url,$scope.cm).then(
-                    function (data) {
-                        alert("ConceptMap updated")
-                    }, function (err) {
-                        alert(angular.toJson(err.data))
-                    }
-                )
-
-            }
-
-            $scope.generateMapAndTranslateDEP = function(){
-                $scope.generateMap()
-                //========  now the translate call
-                $scope.generateTranslate()
-            }
-
-            //Generate the ConceptMap
-            $scope.generateMapDEP = function() {
-
-                //======== first the concept map
-                $scope.cm = {resourceType:"ConceptMap",status:"draft"}
-                $scope.cm.id = $scope.input.id
-                $scope.cm.url = `http://canshare.co.nz/fhir/ConceptMap/${$scope.input.id}`
-
-                $scope.cm.group = []
-
-                let group = {}
-                group.source = snomed
-                group.target = snomed
-                group.element = []
-
-                $scope.cm.group.push(group)
-                let element = {}
-                element.code = $scope.input.source
-                group.element.push(element)
-                element.target = []
-
-                let target = {}
-                target.code = $scope.input.target
-                target.equivalence = "relatedto"
-                target.dependsOn = []
-                element.target.push(target)
-
-                let do1 = {}        //first dependency
-                if ($scope.input.dep1) {
-                    do1.property = $scope.input.prop1
-                    do1.system =  snomed
-                    do1.value = $scope.input.dep1
-
-                    target.dependsOn.push(do1)
-                }
-
-                let do2 = {}        //second dependency
-                if ($scope.input.dep2) {
-                    do2.property = $scope.input.prop2
-                    do2.system =  snomed
-                    do2.value = $scope.input.dep2
-
-                    target.dependsOn.push(do2)
-                }
 
 
-            }
 
 
             //Generate the example translate parameters
@@ -541,20 +475,7 @@ console.log($scope.allTargets)
 
             }
 
-            $scope.executeTranslateDEP = function () {
-                let url = `${termServer}ConceptMap/$translate`
-                console.log($scope.parameters)
-                $http.post(url,$scope.parameters).then(
-                    function (data) {
-                        alert(angular.toJson(data.data))
-                        $scope.response = data.data
-                    }, function (err) {
-                        alert(angular.toJson(err.data))
-                        $scope.response = err.data
-                    }
-                )
 
-            }
 
             // ========================== end of conceptmap functions ====================
 
