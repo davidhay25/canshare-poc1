@@ -179,7 +179,7 @@ angular.module("pocApp")
 
                 },
 
-                getCMProperties : function (cm) {
+                getCMProperties : function (cm,elementCode) {
                     //return all the properties referred to in the 'dependsOn' element
                     let hash = {}       //will be a hash of all properties mentioned within the map
                     let arSources = []  //all the element.code / element.display items. What can be searched for.
@@ -188,28 +188,33 @@ angular.module("pocApp")
                         cm.group.forEach(function (group) {
                             if (group.element) {
                                 group.element.forEach(function (element) {
-                                    //add the code / display to the list of 'sources'
-                                    //assume no dups.
-                                    let concept = {code:element.code,display:element.display}
-                                    arSources.push(concept)
-                                    if (element.target) {
-                                        element.target.forEach(function (target) {
-                                            if (target.dependsOn) {
-                                                target.dependsOn.forEach(function (don) {
-                                                    let property = don.property
-                                                    //hash[property] = hash[property] || [{code:'dummy',display:'Nothing selected'}]
-                                                    hash[property] = hash[property] || []
-                                                    let obj = hash[property]
-                                                    let concept = {system:don.system,code:don.value,display:don.display}
+                                    if (! elementCode || (elementCode && element.code == elementCode ) ) {
+                                        //add the code / display to the list of 'sources'
+                                        //assume no dups.
+                                        let concept = {code:element.code,display:element.display}
+                                        arSources.push(concept)
+                                        if (element.target) {
+                                            element.target.forEach(function (target) {
+                                                if (target.dependsOn) {
+                                                    target.dependsOn.forEach(function (don) {
+                                                        let property = don.property
+                                                        //hash[property] = hash[property] || [{code:'dummy',display:'Nothing selected'}]
+                                                        hash[property] = hash[property] || []
+                                                        let obj = hash[property]
+                                                        let concept = {system:don.system,code:don.value,display:don.display}
 
-                                                    if (! obj[concept.code]) {
-                                                        obj[concept.code] = concept
-                                                    }
-                                                })
-                                            }
-                                        })
+                                                        if (! obj[concept.code]) {
+                                                            obj[concept.code] = concept
+                                                        }
+                                                    })
+                                                }
+                                            })
+                                        }
                                     }
+
                                 })
+
+
                             }
                         })
                     }

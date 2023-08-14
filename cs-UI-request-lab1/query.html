@@ -145,10 +145,7 @@
 
                 </div>
                 <div class="col-md-9">
-                    <!--
-                    <div class="pull-right clickable" style="padding-top: 8px"
-                         ng-click="selectCMItem({cm:fullSelectedCM},true)">Get maps</div>
-                    -->
+
                     <uib-tabset>
 
                         <uib-tab heading="Tree">
@@ -263,8 +260,10 @@
 
                                             <strong>What to look for</strong>
                                             <select class="form-control" ng-model = "input.selectedCmSource"
+                                                    ng-change="setDependsOnProperties(input.selectedCmSource)"
                                                     ng-options=   "v.display + '  (' + v.code + ')' for v in cmSources"></select>
                                             <br/>
+
                                             <table class="table table-bordered">
                                                 <tr ng-repeat = "(k,v) in doProperties">
                                                     <td>{{k}}</td>
@@ -332,25 +331,6 @@
 
 
 
-
-                                            <!--
-                                            <div class="banner">Useful stuff during development</div>
-
-                                            <div><strong>List of possible properties (extracted from CM)</strong></div>
-
-
-                                            <div ng-repeat = "(k,v) in doProperties">
-                                                {{k}} {{v}}
-                                            </div>
-
-                                            <div><strong>Options</strong></div>
-                                            <pre>{{input.cmOptions | json}}</pre>
-
-
-                                            <div><strong>Selected properties</strong></div>
-                                            <pre>{{doProperties | json}}</pre>
-
--->
                                         </div>
                                         <div class="col-md-6">
 
