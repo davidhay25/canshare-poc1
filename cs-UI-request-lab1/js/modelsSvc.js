@@ -10,6 +10,8 @@ angular.module("pocApp")
 
         return {
 
+
+
             getConceptMapHash : function () {
                 let idOfConceptMap = "canshare-tnm-vs"
                 let deferred = $q.defer()
@@ -49,7 +51,6 @@ angular.module("pocApp")
                 //hashReferences is keyed by A DG. It contains a list of all other DG's that reference it - including parental
                 let hashReferences = {}
 
-                //let merged = angular.copy({...world.compositions, ...world.dataGroups})     //all EDs
 
                 //DG's
                 Object.keys(hashDG).forEach(function (key) {
@@ -64,8 +65,6 @@ angular.module("pocApp")
                         hashReferences[model.name].push({name:DG.name,kind:model.kind,mode:'parent'})
                     }
 
-
-//console.log(`----- ${DG.name}`)
                     if (DG.diff) {
                         DG.diff.forEach(function (ed) {
                             if (ed.type) {
@@ -99,42 +98,10 @@ angular.module("pocApp")
                     }
                 })
 
-                /*
-                Object.keys(merged).forEach(function (key) {
-                    let model = merged[key]
-                    if (model.diff) {
-                        model.diff.forEach(function (ed) {
-                            if (ed.type) {
-                                ed.type.forEach(function (typ) {
-                                    hashReferences[typ] = hashReferences[typ] || []
-                                    hashReferences[typ].push({name:model.name,kind:model.kind,path:ed.path})
-                                })
-                            }
-                        })
-                    }
-
-
-
-
-
-                })
-                */
                 return hashReferences
 
             },
-            removeElementDEP : function (model,element) {
-                //remove the element with the given path from the model
-                let relativePath =  $filter('dropFirstInPath')(element.path);
-                let pos = -1
-                model.diff.forEach(function(ed,inx) {
-                    if (ed.path == relativePath)  {
-                        pos = inx
-                    }
-                })
-                if (pos > -1) {
-                    model.diff.splice(pos,1)
-                }
-            },
+
             updateOrAddElement : function(model,element) {
                 //if there's already an overide in the model, then update it.
                 //note sepecific elements only, ie: valueSet
@@ -273,7 +240,6 @@ angular.module("pocApp")
                             } else {
                                 element.type = [{code:"Reference"}]
                             }
-
 
                             SD.differential.element.push(element)
 

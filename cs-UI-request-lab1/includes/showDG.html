@@ -392,6 +392,21 @@
       <pre>{{fullElementList | json}}</pre>
     </uib-tab>
 
+    <uib-tab heading="FSH">
+
+      <uib-tabset>
+        <uib-tab heading = "LM">
+          The FHIR shorthand that represents this DG as a Logical Model
+          generated
+        </uib-tab>
+        <uib-tab heading = "Profile">
+          The FHIR shorthand that represents the FHIR profiles. Manually created for now
+          ? with generated start. stored in the db
+        </uib-tab>
+      </uib-tabset>
+
+    </uib-tab>
+
     <uib-tab ng-show = 'false' heading="Questionnaire">
       <uib-tabset>
         <uib-tab heading="Form">

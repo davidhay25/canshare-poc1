@@ -3,7 +3,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc) {
 
-            //$scope.localStorage = $localStorage
+
 
             $scope.input = {}
             $scope.input.showFullModel = true
@@ -41,6 +41,11 @@ angular.module("pocApp")
                 }
             }
 
+            //whether the current user can edit. Will set up the back end logic later
+            $scope.input.canEdit = true
+
+
+
             $scope.mCodeGroupPage = {}
             $scope.mCodeGroupPage.disease = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-disease.html"
             $scope.mCodeGroupPage.patient = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-patient.html"
@@ -49,7 +54,7 @@ angular.module("pocApp")
             $scope.mCodeGroupPage.genomics = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-genomics.html"
             $scope.mCodeGroupPage.outcome = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-outcome.html"
 
-           // $localStorage.world = modelsSvc.getDemo()
+
 
             if (! $localStorage.world) {
                 $localStorage.world = modelsDemoSvc.getDemo()
@@ -429,17 +434,7 @@ angular.module("pocApp")
                         $scope.hashAllDG = $localStorage.world.dataGroups
                         sortDG()
 
-                        //updates to DG made over the ones in the code
-                       // $scope.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG,$scope.xref)
 
-
-/*
-                        if (newModel.kind == 'comp') {
-                            $localStorage.world.compositions[newModel.name] = newModel
-                        } else {
-                            $localStorage.world.dataGroups[newModel.name] = newModel
-                        }
-*/
                         let vo1 = modelsSvc.validateModel($localStorage.world)
                         $scope.errors = vo1.errors
                         $scope.input.types = vo1.types      //a hash keyed by name
