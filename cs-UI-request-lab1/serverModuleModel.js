@@ -1,4 +1,5 @@
 
+// https://www.mongodb.com/developer/languages/javascript/node-connect-mongodb/
 //import { MongoClient } from "mongodb";
 let MongoClient = require('mongodb').MongoClient;
 
@@ -7,7 +8,6 @@ let MongoClient = require('mongodb').MongoClient;
 
 async function listDatabases(client){
     databasesList = await client.db().admin().listDatabases();
-
     console.log("Databases:");
     databasesList.databases.forEach(db => console.log(` - ${db.name}`));
 };
@@ -22,6 +22,9 @@ async function setup() {
     await client.connect()
     await listDatabases(client)
     console.log("connected")
+
+
+
 
 }
 
