@@ -6,7 +6,7 @@ const utilModule = require("../cs-customOps/serverModuleUtil.js")
 let serverBase = utilModule.checkUrlSlash(process.env.SERVERBASE)
 
 
-//set up the logging database
+//set up the logging database todo - don't think this is working atm..
 let MongoClient = require('mongodb').MongoClient;
 let dbAddress = process.env.LOGDB || "localhost"
 console.log(`Logger database name is ${dbAddress}`)
