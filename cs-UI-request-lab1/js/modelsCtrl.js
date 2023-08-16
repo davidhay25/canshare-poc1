@@ -1,7 +1,7 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,
-                  $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc) {
+                  $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc) {
 
 
 
@@ -19,7 +19,7 @@ angular.module("pocApp")
             $scope.ui.tabComp = 0;
             $scope.ui.tabTerminology = 2;
 
-           //temp $scope.input.mainTabActive = $scope.ui.tabDG;
+            $scope.input.mainTabActive = $scope.ui.tabDG;
 
             //used in DG & Comp so when a type is a FHIR DT, we can create a link to the spec
             //$scope.main = {fhirDataTypes:modelsSvc.fhirDataTypes()}
@@ -546,6 +546,8 @@ angular.module("pocApp")
                 $scope.allCompElements = vo.allElements
                 $scope.hashCompElements = vo.hashAllElements
 
+
+
                 //console.log(vo)
                 let rootNodeId = $scope.allCompElements[0].path
                 let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
@@ -559,9 +561,9 @@ angular.module("pocApp")
             }
 
             //only used for DG now
-            $scope.selectModel = function (comp) {
+            $scope.selectModel = function (dg) {
                 clearB4Select()
-                $scope.selectedModel = comp
+                $scope.selectedModel = dg
 
 
                 //create the list of override elements
@@ -574,17 +576,17 @@ angular.module("pocApp")
                 })
 
                 //these are for the renderer from forms - todo to be deprecated
-                $scope.Qobject = modelsSvc.makeQfromModel(comp,$scope.input.types)
+                $scope.Qobject = modelsSvc.makeQfromModel(dg,$scope.input.types)
                 $scope.QR = {}
 
-                let vo = modelsSvc.getFullListOfElements(comp,$scope.input.types,$scope.input.showFullModel)
+                let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.input.showFullModel)
 
 
 
                 $scope.fullElementList = vo.allElements
                 $scope.graphData = vo.graphData
 
-
+                $scope.dgFshLM = igSvc.makeFshForDG(dg,vo.allElements)
 
                 makeGraph()
 
@@ -595,10 +597,7 @@ angular.module("pocApp")
 
             }
 
-           // $scope.selectDataGroup = function (comp) {
-             //   clearB4Select()
-           //     $scope.selectedDataGroup = comp
-          //  }
+
 
             function makeGraph() {
 
