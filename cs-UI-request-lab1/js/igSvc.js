@@ -3,13 +3,33 @@ angular.module("pocApp")
 
     .service('igSvc', function(modelsSvc) {
 
-
-
         return {
-            makeFshForComp : function(comp,elements) {
+            makeFshForComp : function(comp,elements,hashElements) {
                 //generate a fsh file for a composition.
-                //the sections will be the top level entries
+                //the sections will be the top level entries. We use the composition to structure the model by
+                //iterating over the sections, then the contents of the sections.
+                //but because the composition can override the DG's, we need to iterate using the values in hashElements
+
+                //hashElements has all elements by path todo - check that DG inheritance works properly
+
+
+
+
+
+                console.log(comp)
+                console.log(elements)
+                let that = this
                 
+                comp.sections.forEach(function (sect) {
+                    sect.items.forEach(function (item) {
+                        let type = item.type[0]         //only have a single type
+                        let fsh = that.makeFshForDG()
+
+                    })
+                    
+                })
+
+
 
             },
             makeFshForDG : function (dg,elements) {
