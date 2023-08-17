@@ -55,15 +55,7 @@ angular.module("pocApp")
                             break
                         }
                     }
-
-                    //make the term summary
-
-                    //$rootScope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
-
-
-
-
-
+                    
                 }
             }
 

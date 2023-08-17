@@ -98,6 +98,7 @@ angular.module("pocApp")
                 function getFsh(ed) {
 
                     if (ed.type) {
+                        let arLne = []
                         let lne = ""
                         let type = ed.type[0]
                         //if the type is not a FHIR type, then it will be one of the DG. Replace it with 'BackboneElement'
@@ -109,7 +110,15 @@ angular.module("pocApp")
                         lne = `* ${ar[ar.length-1]}`
                         let mult = ed.mult || '0..1'
                         lne += ` ${mult} ${type} "${cleanString(ed.description)}"`
-                        return [lne]
+                        arLne.push(lne)
+                        if (ed.valueSet) {
+                            let lneVs =`* ${ar[ar.length-1]} from ${ed.valueSet}`
+                            arLne.push(lneVs)
+                            //let lneVs = `item2 from http://hl7.org/fhir/ValueSet/contact-point-system (required)`
+
+                        }
+
+                        return arLne
                     } else {
                         return []
                     }
