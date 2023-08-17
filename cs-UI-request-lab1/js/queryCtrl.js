@@ -207,6 +207,10 @@ console.log($scope.allTargets)
                     function (ar) {
                         $scope.fullSelectedCM = ar[0]       //todo what of there's > 1
 
+                        //make the download link
+                        $scope.downloadLinkMap = window.URL.createObjectURL(new Blob([angular.toJson($scope.fullSelectedCM,true) ],{type:"application/json"}))
+                        $scope.downloadLinkMapName = `ConceptMap-${$scope.fullSelectedCM.id}.json`
+
                         let treeData = querySvc.makeTree($scope.fullSelectedCM)
                         showCmTree(treeData)
 

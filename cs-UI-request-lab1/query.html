@@ -23,6 +23,11 @@
             $locationProvider.html5Mode(true);
             $locationProvider.hashPrefix('!');
         });
+
+        angular.module("pocApp").config(['$compileProvider', function ($compileProvider) {
+            $compileProvider.aHrefSanitizationWhitelist(/^\s*(http|https?|ftp|mailto|blob):/);
+        }]);
+
         angular.module("pocApp").constant("moment", moment);
 
         angular.module("formsApp",[])
@@ -510,11 +515,13 @@
 
                         </uib-tab>
 
-
-
-
-
                         <uib-tab heading="Json">
+                            <a ng-show="downloadLinkMapName" class="btn btn-link pull-right" download="{{downloadLinkMapName}}"
+                               href="{{downloadLinkMap}}" title="{{downloadLinkMapName}}" >
+                                Download ConceptMap
+                            </a>
+
+                            <div class="clearfix"></div>
                             <div ng-hide="fullSelectedCM.group">
                                 <br/>
                                 Click <span class="clickable" ng-click="selectCMItem({cm:fullSelectedCM},true)">here</span> to get the complete ConceptMap
@@ -524,10 +531,6 @@
                         </uib-tab>
 
                     </uib-tabset>
-
-
-
-
 
 
                 </div>
