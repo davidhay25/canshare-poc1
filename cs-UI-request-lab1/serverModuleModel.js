@@ -262,7 +262,7 @@ function getDG() {
 
     //override an element
     dgChild.diff.push({path:'item2',title:'Item2 override',type:['CodeableConcept'],
-        description:"item2 ov",mult:'0..1',fixedValue:{code:'aaa'}})
+        description:"item2 ov",mult:'0..1',fixedCoding:{code:'aaa'}})
 
     hashDataGroups[dgChild.name] = dgChild
 

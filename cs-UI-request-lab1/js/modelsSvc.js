@@ -451,7 +451,7 @@ angular.module("pocApp")
                 let arNodes = []      //for the graph
                 let arEdges = []      //for the graph
 
-               // let q = {item:[]}
+
 
                 //first follow the parental hierarchy to populate the initial list
                 //updates allElements as it extracts
@@ -539,7 +539,7 @@ angular.module("pocApp")
 
                     addNodeToList(node)
 
-                    //do parents first.   Only 1 level
+                    //do parents first.
                     if (model.parent && followReferences) {
                       //  console.log('expanding ' + model.parent)
                         if (types[model.parent]) {

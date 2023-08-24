@@ -3,8 +3,6 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc) {
 
-
-
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -19,13 +17,11 @@ angular.module("pocApp")
             $scope.ui.tabComp = 0;
             $scope.ui.tabTerminology = 2;
 
-            //$scope.input.mainTabActive = $scope.ui.tabDG;
+            $scope.input.mainTabActive = $scope.ui.tabDG;
 
             //used in DG & Comp so when a type is a FHIR DT, we can create a link to the spec
-            //$scope.main = {fhirDataTypes:modelsSvc.fhirDataTypes()}
             $scope.fhirDataTypes =modelsSvc.fhirDataTypes()
 
-//console.log($scope.main.fhirDataTypes)
             //allows a specific tab in the showCompositions to e selected. Used by term summary (only need tree ATM)
             $scope.compUi = {}
             $scope.compUi.tree = 0
@@ -64,7 +60,6 @@ angular.module("pocApp")
 
 
             //download the Concept map and generate the hash that lists conditional refsets by code
-
             modelsSvc.getConceptMapHash().then(
                 function (map) {
                     $scope.conceptMap = map
@@ -75,11 +70,6 @@ angular.module("pocApp")
 
             //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
             $scope.hashAllDG = $localStorage.world.dataGroups
-            //make the term summary
-            //$scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
-
-
-           // $scope.testQ = QutilitiesSvc.makeItemFromDG('Specimen',$scope.hashAllDG)
 
 
 
@@ -104,6 +94,9 @@ angular.module("pocApp")
             $scope.hashAllCompositions = $localStorage.world.compositions
             //make the term summary. These are the override elements in the models
 
+
+
+
             //make an array for the type-ahead lookup. - needs to be retionalized... when i remove world...
 /* not just now - but keep
             $scope.arDG = []
@@ -113,6 +106,8 @@ angular.module("pocApp")
                 $scope.arDG.push({name:key})
             })
 */
+
+
 
 
             //when a specific DG is selected in the term summary
@@ -156,8 +151,7 @@ angular.module("pocApp")
                 $scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
                 $scope.compTermSummary = modelTermSvc.makeCompOverrideSummary($scope.hashAllCompositions).list
                 $scope.hashVsSummary = modelTermSvc.makeValueSetSummary($scope.hashAllDG,$scope.hashAllCompositions).hashVS
-                //console.log($scope.hashVsSummary)
-                //console.log($scope.termSummary)
+
             }
 
             $scope.updateTermSummary()
@@ -212,7 +206,6 @@ angular.module("pocApp")
 
 
             //xref is cross references between models/types
-            //hash[type name] - array of type name
             $scope.xref = modelsSvc.getReferencedModels($scope.hashAllDG,$scope.hashAllCompositions)
 
             //updates to DG made over the ones in the code
@@ -269,11 +262,6 @@ angular.module("pocApp")
                 modelsSvc.updateOrAddElement($scope.selectedModel,element)
             }
 
-            //removes the override
-            $scope.reinstateElementDEP = function (element) {
-                delete element.mult
-                modelsSvc.removeElement($scope.selectedModel,element)
-            }
 
             //allow the user to set the VS for a given element
             $scope.setValueSet = function (element) {
@@ -341,23 +329,7 @@ angular.module("pocApp")
 
 
 
-                /*
-                return
 
-                let qry = "http://hapi.fhir.org/baseR4/StructureDefinition/$validate"
-                $http.post(qry,bundle.entry[0].resource).then(
-                    function (data) {
-                        $scope.lmValidate = data.data
-                        $scope.lmValidateStatus = data.status
-                    }, function (err) {
-                        $scope.lmValidate = err.data
-                        $scope.lmValidateStatus = data.status
-                    }
-                )
-                */
-/*
-
-                */
 
             }
 
@@ -474,24 +446,7 @@ angular.module("pocApp")
                 $scope.selectedModelFromTypeUsage = model
             }
 
-            //drop the first element in the path - used by the table display
-            $scope.condensedPathDEP = function (path) {
-                if (path) {
-                    let ar = path.split('.')
-                    ar.splice(0,1)
-                    return  ar.join('.')
-                    /*
-                    let padding = ""
-                    for (var i = 0; i < ar.length; i++) {
-                        padding += "&nbsp;&nbsp;"
-                    }
 
-                    return  padding + ar.join('.')
-                    */
-                }
-            }
-
-            //$scope.input.arTypes = []
 
 
             $scope.addElement = function (name,type) {
@@ -501,8 +456,6 @@ angular.module("pocApp")
                 $scope.selectModel($scope.selectedModel)
 
             }
-
-
 
             $scope.updateFullModelShow = function () {
                 //when the 'show full model' checkbox is checked
@@ -522,22 +475,6 @@ angular.module("pocApp")
 
 
 
-
-            $scope.showVSDEP = function (name) {
-                //name could either be a url or the name of a VS in the world
-                let vsItem = $localStorage.world.valueSets[name]
-                if (vsItem) {
-                    console.log(vsItem)
-
-                } else {
-                    alert(`There is no ValueSet in the model with the name: ${name}. `)
-                }
-            }
-
-            $scope.selectModelByName = function (name) {
-
-            }
-
             $scope.selectComposition = function(comp){
                 clearB4Select()
                 $scope.selectedModel = comp
@@ -547,8 +484,6 @@ angular.module("pocApp")
                 $scope.hashCompElements = vo.hashAllElements
 
 
-
-                //console.log(vo)
                 let rootNodeId = $scope.allCompElements[0].path
                 let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
 
@@ -570,11 +505,15 @@ angular.module("pocApp")
 
                 //create the list of override elements
                 $scope.overrides = []
+                //$scope.directElements = {}    //elements directly on the DG. These can have fixed values
                 $scope.selectedModel.diff.forEach(function (ed) {
+
+                 //   $scope.directElements[`${dg.name}.${ed.path}`] = ed     //the path (including model name) is needed
+
+                    //if there's a dot in the ed path, then it refers to an element in a child...
                     if (ed.path.indexOf('.') > -1 ) {
                         $scope.overrides.push(ed)
                     }
-
                 })
 
                 //these are for the renderer from forms - todo to be deprecated
@@ -693,19 +632,17 @@ angular.module("pocApp")
                     $scope.$digest();       //as the event occurred outside of angular...
                 }).bind("loaded.jstree", function (event, data) {
                     let id = treeData[0].id
-                    //if ()
-                   // $(this).jstree("close_all");
                     $(this).jstree("open_node",id);
-                   // console.log(rootNodeId)
                     $scope.$digest();
                 });
 
             }
 
 
-            $timeout(function(){
+            /*$timeout(function(){
                     $scope.selectModel($scope.hashAllDG['Specimen'],$scope.hashAllDG)
-            },500)
+            },500)*/
+
 
 
 

@@ -17,6 +17,7 @@ angular.module("pocApp")
                 }
             })
 
+            //get the full list of elements for a DG, following any inheritance chain..
             function getFullElementList() {
                 let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
                 console.log(vo)
@@ -34,9 +35,7 @@ angular.module("pocApp")
                 }
 
                 getFullElementList()
-               // let vo = modelsSvc.getFullListOfElements(model,hashTypes,true)
-               // console.log(vo)
-               // $scope.allElements = vo.allElements
+              
             }
 
             //start with the DGs...
@@ -88,7 +87,7 @@ angular.module("pocApp")
                                 //this is the ed that is to be overriden. So a copy (with an updated path
                                 //is saved in this DT
                                 let newEd = angular.copy(ed)
-                                newEd.fixedValue = {code:code}
+                                newEd.fixedCoding = {code:code}
                                 newEd.status = 'new'
                                 newEd.path = pathInThisEd
                                 $scope.model.diff.push(newEd)
@@ -118,11 +117,13 @@ angular.module("pocApp")
                     //if changing the parent, then re-generate the expanded model
                     getFullElementList()
 
-                   // let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
-                   // console.log(vo)
-                   // $scope.allElements = vo.allElements
+                   
                 }
 
+            }
+            
+            $scope.checkItemName = function () {
+                
             }
 
             $scope.canEdit = function (element) {
@@ -292,8 +293,24 @@ angular.module("pocApp")
                 }
             }
 
+            //check if this path has been used in the DG
+            $scope.checkDuplicatePath = function(path) {
+                $scope.isDuplicatePath = false
+                $scope.allElements.forEach(function (element) {
+                    //element.ed.path = full path
+                    let ar = element.ed.path.split('.')
+                    if (ar[ar.length-1] == path) {
+                        $scope.isDuplicatePath = true
+                    }
+                })
+            }
+
+            //called when a new element is being added. This is linked to the element name
             $scope.setTitle = function (name) {
                 $scope.input.title = name.charAt(0).toUpperCase() + name.slice(1)
+
+                //check to see if this name is the same as an inherited one
+                //checkDuplicatePath(name)
             }
 
             //add a new item

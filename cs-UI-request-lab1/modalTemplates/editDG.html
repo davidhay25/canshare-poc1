@@ -154,9 +154,15 @@
                             </tr>
                             <tr>
 
+                                <td><input class="form-control" type="text"
+                                           ng-change="checkDuplicatePath(input.path)"
+                                           ng-model="input.path" ng-blur="setTitle(input.path)"/>
 
-
-                                <td><input class="form-control" type="text" ng-model="input.path" ng-blur="setTitle(input.path)"/></td>
+                                    <div ng-show="isDuplicatePath" style="color: red;text-decoration-style: dotted"
+                                       uib-popover="This name has already been used in this DG, or inherited from a parent."
+                                       popover-placement="top"
+                                       popover-trigger="'mouseenter'">Duplicate path name</div>
+                                </td>
                                 <td><input class="form-control" type="text" ng-model="input.title"/></td>
                                 <td>
                                     <select class="form-control" ng-model="input.type"
@@ -278,9 +284,9 @@
                         </td>
                         <td>{{element.ed.mult}}</td>
                         <td>
-                            {{element.ed.fixedValue}}
+                            {{element.ed.fixedCoding}}
                             <div ng-show = "element.ed.type[0] == 'CodeableConcept'
-                                && (! element.ed.fixedValue)
+                                && (! element.ed.fixedCoding)
                                 && (element.sourceModelName !== model.name)">
                                 <span class="clickable" ng-click="setFixedCode(element)">Set value</span>
                             </div>
