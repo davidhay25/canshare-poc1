@@ -1,3 +1,5 @@
+//https://imagemap.org/
+
 angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,
@@ -96,6 +98,10 @@ angular.module("pocApp")
 
 
 
+            //shows the image of the DG summary. todo - may need to clear other stuff
+            $scope.showDGSummary = function () {
+                delete $scope.selectedModel
+            }
 
             //make an array for the type-ahead lookup. - needs to be retionalized... when i remove world...
 /* not just now - but keep
@@ -421,6 +427,11 @@ angular.module("pocApp")
                         //note this is the model passed in for editing
                         $scope.selectModel(model)
                     }
+
+                   // let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.input.showFullModel)
+                  //  $scope.fullElementList = vo.allElements
+                   // $scope.graphData = vo.graphData
+
 
                     $scope.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG, $scope.xref )
 

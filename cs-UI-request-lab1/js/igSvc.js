@@ -11,11 +11,6 @@ angular.module("pocApp")
                 //but because the composition can override the DG's, we need to iterate using the values in hashElements
 
                 //hashElements has all elements by path todo - check that DG inheritance works properly
-
-
-
-
-
                 console.log(comp)
                 console.log(elements)
                 let that = this
@@ -26,11 +21,7 @@ angular.module("pocApp")
                         let fsh = that.makeFshForDG()
 
                     })
-                    
                 })
-
-
-
             },
             makeFshForDG : function (dg,elements) {
                 //generate a FSH file for a given DG

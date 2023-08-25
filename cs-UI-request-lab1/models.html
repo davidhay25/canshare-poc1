@@ -161,9 +161,11 @@
     </nav>
 
     <div>
+
         <a class="btn pull-right" target="_blank" href="https://build.fhir.org/ig/HL7/fhir-mCODE-ig/">mCODE</a>
         <button class="pull-right btn-link btn" ng-click="resetWorld()">Reset</button>
         <a class="btn pull-right" target="_blank" href="https://docs.google.com/spreadsheets/d/1XU7Jc0BbC5nXgmTu-qVLS-WwJjKO9GLXgjVHVk2WRL0/edit#gid=0">Spreadsheet</a>
+        <button ng-show = "selectedModel" class="pull-right btn-link btn" ng-click="showDGSummary()">Show image</button>
     </div>
 
 
@@ -308,6 +310,12 @@
                     <div  ng-show="!showDGList && selectedModel.kind == 'dg'">
                         <ng-include src="'/includes/showDG.html'"></ng-include>
                     </div>
+
+                    <div ng-hide = "selectedModel">
+                        <div class="banner">Summary of DataGroups</div>
+                        <img width="100%" src="images/LIM-org.png"/>
+                    </div>
+
                 </div>
             </div>
 
