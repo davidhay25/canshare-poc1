@@ -64,16 +64,19 @@ angular.module("pocApp")
                 return colour
             }
 
-            $scope.addZElement = function (parentEd,types) {
+            $scope.addZElement = function (parentEd) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/addZElement.html',
                     backdrop: 'static',
                     //size : 'lg',
-                    controller : function ($scope,hashTypes) {
+                    controller : function ($scope,hashTypes,modelsSvc) {
                         $scope.input = {}
 
-                        $scope.input.types = Object.keys(hashTypes)
-                        $scope.input.types.sort()
+                        //let fhirDT = modelsSvc.fhirDataTypes()
+
+
+                        $scope.input.types = modelsSvc.fhirDataTypes().concat(Object.keys(hashTypes))
+                        //$scope.input.types.sort()
                         $scope.input.mults = ['0..1','1..1','0..*','1..*']
                         $scope.input.mult = $scope.input.mults[0]
 

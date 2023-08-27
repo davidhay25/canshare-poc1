@@ -14,26 +14,24 @@
   <br/>
 
 
+
+
   <uib-tabset>
 
 
 
-    <uib-tab heading="Tree">
+    <uib-tab heading="Editor tree">
       <em>The model as a tree. Expanded if the checkbox is selected</em>
       <div class="row">
         <div class="col-md-6">
           <div id="dgTree"></div>
+
+          <button class="btn btn-link" ng-click="editDGItem()">Add new element</button>
         </div>
         <div class="col-md-6">
 
           <div ng-show="selectedNode.data.ed">
 
-            <!--
-         {{selectedModel}}
-         <div ng-show="selectedModel.parent">
-           Parent: {{selectedModel.parent}}
-         </div>
-         -->
 
 
             <uib-tabset>
@@ -43,6 +41,13 @@
                   <tr><td style="width : 20%">Source model</td>
                     <td>{{getSourceModelName(selectedNode.data.ed)}}</td>
                   </tr>
+                  <tr><td style="width : 20%">Title</td>
+                    <td>
+                    <i class="glyphicon glyphicon-edit pull-right clickable"
+                       ng-click="editDGItem(selectedNode.data)"></i>
+                   {{selectedNode.data.ed.title}}</td>
+                  </tr>
+
                   <tr><td>Type</td>
                     <td><div ng-repeat="type in selectedNode.data.ed.type">
 
@@ -54,8 +59,16 @@
 
                     </div>
                     </td></tr>
-                  <tr><td>Cardinality</td><td>{{selectedNode.data.ed.mult}}</td></tr>
-                  <tr><td>Description</td><td>{{selectedNode.data.ed.description}}</td></tr>
+                  <tr><td>Cardinality</td><td>
+                    <i class="glyphicon glyphicon-edit pull-right clickable"
+                       ng-click="editDGItem(selectedNode.data)"></i>
+                    {{selectedNode.data.ed.mult}}
+                  </td></tr>
+                  <tr><td>Description</td><td>
+                    <i class="glyphicon glyphicon-edit pull-right clickable"
+                       ng-click="editDGItem(selectedNode.data)"></i>
+                    {{selectedNode.data.ed.description}}
+                  </td></tr>
                   <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
                     <td>ValueSet</td>
                     <td>
@@ -110,7 +123,7 @@
                       <div ng-hide="selectedNode.data.ed.options">
                         There are no options defined
                       </div>
-                      <div><em>Options are used to build ValueSets</em></div>
+                      <div><em>Options are used to define or build ValueSets</em></div>
 
 
                       <button
@@ -120,17 +133,39 @@
 
                     </td>
                   </tr>
+                  <tr ng-show="selectedNode.data.ed.type[0] == 'Quantity'">
+                    <td>Units</td>
+                    <td>
+                      <i class="glyphicon glyphicon-edit pull-right clickable"
+                         ng-click=""></i>
+
+                      <span ng-repeat="unit in selectedNode.data.ed.units">
+                        {{unit}}&nbsp;
+                      </span>
 
 
+                    </td>
+                  </tr>
 
-                  <tr>
+                  <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
                     <td>Fixed value</td>
                     <td> {{selectedNode.data.ed.fixedCoding}}
+
                       <span ng-show="selectedNode.data.ed.fixedCoding"
-                            class="clickable pull-right" ng-click="clearFixedValue(selectedNode.data.ed)">
-                        Clear fixed value
+                            class=" pull-right">
+
+                        <span ng-show="getSourceModelName(selectedNode.data.ed) !== selectedModel.name">
+                          set on {{getSourceModelName(selectedNode.data.ed)}}
+                        </span>
+
+                        <span ng-hide="getSourceModelName(selectedNode.data.ed) !== selectedModel.name"
+                              class="clickable"
+                              ng-click="clearFixedValue(selectedNode.data.ed)">Clear fixed value</span>
                       </span>
-                      <div class="clickable" ng-click="setFixedValue(selectedNode.data.ed)">Set fixed value</div>
+
+                      <div class="clickable"  ng-hide="selectedNode.data.ed.fixedCoding"
+                           ng-click="setFixedValue(selectedNode.data.ed)">Set fixed value</div>
+
 
 
 
@@ -203,11 +238,12 @@
       <div class="tableFixHead">
         <table class="table-bordered table">
           <thead>
-          <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Code</th><th>Fixed value</th></tr>
+          <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Fixed value</th><th>Source</th></tr>
           </thead>
           <tbody>
-          <tr ng-repeat="element in fullElementList">
-<!--- <tr ng-repeat="element in fullElementList" ng-hide="$index==0 || element.mult.indexOf('..0') > -1">  ->
+          <!---     <tr ng-repeat="element in fullElementList">-->
+      <tr ng-repeat="element in fullElementList"
+          ng-hide="$index==0 || (element.ed.mult.indexOf('..0') > -1)">
             <td>
               <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
 
@@ -229,7 +265,10 @@
 
             </td>
             <td>{{element.ed.title}}</td>
-            <td>{{element.ed.description}}</td>
+            <td>
+
+              {{element.ed.description}}
+            </td>
             <td>
               <div ng-repeat="type in element.ed.type">
                 {{type}}
@@ -237,13 +276,19 @@
               <div><em class="clickable" ng-click="viewVS(element.ed.valueSet)">{{element.ed.valueSet}}</em></div>
             </td>
             <td>{{element.ed.mult}}</td>
+        <!--
             <td>
               <div ng-repeat="code in element.ed.code">
                 {{code.code}}
               </div>
 
             </td>
+        -->
             <td>{{element.ed.fixedCoding}}</td>
+            <td>{{element.sourceModelName}}</td>
+
+
+
 
           </tr>
           </tbody>
@@ -355,12 +400,80 @@
 
     </uib-tab>
 
-    <uib-tab ng-show = "false" heading="Qdev">
-      <pre>{{testQ | json}}</pre>
-    </uib-tab>
+
 
     <uib-tab heading="Full element list">
-      <pre>{{fullElementList | json}}</pre>
+      <em>Includes items with a Cardinality of 0..0</em>
+      <uib-tabset>
+        <uib-tab heading="List">
+          <div class="tableFixHead">
+            <table class="table-bordered table">
+              <thead>
+              <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Fixed value</th><th>Source</th></tr>
+              </thead>
+              <tbody>
+              <!---     <tr ng-repeat="element in fullElementList">-->
+              <tr ng-repeat="element in fullElementList"
+                  ng-hide="$index==0">
+                <td>
+                  <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
+
+
+
+                    <!-- {{element.path | dropFirstInPath}} -->
+                    <div ng-hide="input.showFullModel">
+                      {{element.ed.path | dropFirstInPath}}
+                    </div>
+                    <div ng-show="input.showFullModel">
+                      {{element.ed.path | lastInPath}}
+
+                    </div>
+
+
+
+                  </div>
+
+
+                </td>
+                <td>{{element.ed.title}}</td>
+                <td>
+
+                  {{element.ed.description}}
+                </td>
+                <td>
+                  <div ng-repeat="type in element.ed.type">
+                    {{type}}
+                  </div>
+                  <div><em class="clickable" ng-click="viewVS(element.ed.valueSet)">{{element.ed.valueSet}}</em></div>
+                </td>
+                <td>{{element.ed.mult}}</td>
+                <!--
+                    <td>
+                      <div ng-repeat="code in element.ed.code">
+                        {{code.code}}
+                      </div>
+
+                    </td>
+                -->
+                <td>{{element.ed.fixedCoding}}</td>
+                <td>{{element.sourceModelName}}</td>
+
+                <td>
+                  <i class="glyphicon glyphicon-edit pull-right clickable"
+                     ng-click="editDGItem(element)"></i>
+                </td>
+
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </uib-tab>
+        <uib-tab heading="Json">
+          <pre>{{fullElementList | json}}</pre>
+        </uib-tab>
+      </uib-tabset>
+
     </uib-tab>
 
     <uib-tab heading="FSH">

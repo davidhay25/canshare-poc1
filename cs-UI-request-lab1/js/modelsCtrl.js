@@ -29,6 +29,11 @@ angular.module("pocApp")
             $scope.compUi.tree = 0
             $scope.input.compTabActive = $scope.compUi.tree
 
+            $('.mapbodyarea').on('click',function (e) {
+                e.preventDefault()
+                alert('ba')
+            })
+
             $scope.toggleLeftPanel = function(){
                 if ($scope.leftPanel == 'col-md-3') {
                     $scope.leftPanel = 'hidden'
@@ -73,6 +78,14 @@ angular.module("pocApp")
             //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
             $scope.hashAllDG = $localStorage.world.dataGroups
 
+            //create a list of all DT + fhir types
+            function makeAllDTList() {
+                $scope.allTypes = modelsSvc.fhirDataTypes()
+                Object.keys($scope.hashAllDG).forEach(function (key) {
+                    $scope.allTypes.push(key)
+                })
+            }
+            makeAllDTList()
 
 
             //make a sorted list for the UI
@@ -101,6 +114,7 @@ angular.module("pocApp")
             //shows the image of the DG summary. todo - may need to clear other stuff
             $scope.showDGSummary = function () {
                 delete $scope.selectedModel
+                $scope.input.mainTabActive = $scope.ui.tabDG;
             }
 
             //make an array for the type-ahead lookup. - needs to be retionalized... when i remove world...
@@ -113,6 +127,92 @@ angular.module("pocApp")
             })
 */
 
+            //$scope.addNewED = func
+
+            //edits some of the attributes of a single ED
+            $scope.editDGItem = function (item) {
+                let originalED = {}
+                if (item) {
+                    originalED = angular.copy(item.ed)        //used for changes display
+                }
+
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/editDGItem.html',
+                    backdrop: 'static',
+                    //size : 'lg',
+                    controller: 'editDGItemCtrl',
+
+                    resolve: {
+                        item: function () {
+                            return item
+                        },
+                        allTypes : function () {
+                            return $scope.allTypes
+                        }
+                    }
+
+                }).result.then(function (ed) {
+                    //update specific items. Not the whole ED
+                    //let p = $filter('lastInPath')(ed.path) - I think it's the first that gets chopped off
+
+                    let p = $filter('dropFirstInPath')(ed.path)
+
+
+                    /*
+                    $scope.selectedModel.diff.forEach(function (ed1) {
+                        if (ed1.path == p) {
+                            ed1.description = ed.description
+                            //ed.valueSet = vsUrl
+                           // break
+                        }
+                    })
+                    */
+
+                    //what changed
+                    let changes = ""
+                    if (ed.description !== originalED.description) {
+                        changes += "Description changed. "
+                    }
+                    if (ed.title !== originalED.title) {
+                        changes += "Title changed. "
+                    }
+                    if (ed.mult !== originalED.mult) {
+                        changes += "Cardinality changed."
+                    }
+
+
+                    let found = false
+                    //let changes = []    //this is the list of changes
+                    for (const ed1 of $scope.selectedModel.diff) {
+                        if (ed1.path == p) {
+                            found = true
+                            ed1.title = ed.title
+                            ed1.description = ed.description
+                            ed1.mult = ed.mult
+                            break
+                        }
+                    }
+
+                    if (! found) {
+                        //The attribute that was edited (eg edscription) is inherited
+                        //Need to create an 'overrite' element and add to the DG
+                        let ar = ed.path.split('.')
+                        ar.splice(0,1)
+                        ed.path = ar.join('.')
+                        $scope.selectedModel.diff.push(ed)
+                    }
+
+                    //record that changes were made
+                    modelDGSvc.updateChanges($scope.selectedModel,
+                        {edPath:ed.path,
+                            msg:changes},$scope)
+
+                    //rebuild fullList and re-draw the tree
+                    refreshFullList($scope.selectedModel)
+
+                })
+            }
 
 
 
@@ -131,6 +231,10 @@ angular.module("pocApp")
             }
             //when a specific DG path is selected in the term summary
             //used by updates list as well = hence moved to main controller
+            //item = {hiddenDGName:, path:}  (path doesn't have leading gg name
+
+
+
             $scope.termSelectDGItem = function (item) {
                 console.log(item)
 
@@ -210,12 +314,20 @@ angular.module("pocApp")
             $scope.input.selectedCompCategory = $scope.compCategories[0]
 
 
+            $scope.refreshUpdates = function(){
+                //xref is cross references between models/types
+                $scope.xref = modelsSvc.getReferencedModels($scope.hashAllDG,$scope.hashAllCompositions)
 
-            //xref is cross references between models/types
-            $scope.xref = modelsSvc.getReferencedModels($scope.hashAllDG,$scope.hashAllCompositions)
+                //updates to DG made over the ones in the code
+                $scope.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG, $scope.xref )
 
-            //updates to DG made over the ones in the code
-            $scope.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG, $scope.xref )
+            }
+            $scope.refreshUpdates()
+
+            $scope.$on('dgUpdated',function(ev,obj){
+                console.log('i')
+                $scope.refreshUpdates()
+            })
 
 
             $scope.resetWorld = function () {
@@ -428,9 +540,6 @@ angular.module("pocApp")
                         $scope.selectModel(model)
                     }
 
-                   // let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.input.showFullModel)
-                  //  $scope.fullElementList = vo.allElements
-                   // $scope.graphData = vo.graphData
 
 
                     $scope.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG, $scope.xref )
@@ -508,6 +617,21 @@ angular.module("pocApp")
 
             }
 
+
+            refreshFullList = function (dg) {
+                let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,true)
+
+                $scope.fullElementList = vo.allElements
+                $scope.graphData = vo.graphData
+
+                $scope.dgFshLM = igSvc.makeFshForDG(dg,vo.allElements)
+
+                makeGraph()
+
+                let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
+                makeDGTree(treeData)
+            }
+
             //only used for DG now
             $scope.selectModel = function (dg) {
                 clearB4Select()
@@ -531,10 +655,9 @@ angular.module("pocApp")
                 $scope.Qobject = modelsSvc.makeQfromModel(dg,$scope.input.types)
                 $scope.QR = {}
 
+                refreshFullList(dg)
+/*
                 let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.input.showFullModel)
-
-
-
                 $scope.fullElementList = vo.allElements
                 $scope.graphData = vo.graphData
 
@@ -544,8 +667,8 @@ angular.module("pocApp")
 
                 let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
                 makeDGTree(treeData)
-
-                $scope.testQ = QutilitiesSvc.makeItemFromDG(vo.allElements,$scope.hashAllDG)
+*/
+              //  $scope.testQ = QutilitiesSvc.makeItemFromDG(vo.allElements,$scope.hashAllDG)
 
             }
 

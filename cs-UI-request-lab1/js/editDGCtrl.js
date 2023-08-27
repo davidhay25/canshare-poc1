@@ -321,16 +321,16 @@ angular.module("pocApp")
                 element.path = $scope.input.path
                 element.title = $scope.input.title
                 element.type = [$scope.input.type]
-
+                element.description = $scope.input.description
 
                 if ($scope.input.valueSet) {
                     element.valueSet = $scope.input.valueSet
                 }
-
+/*
                 if ($scope.input.code) {
                     element.code = [{code:$scope.input.code}]
                 }
-
+*/
                 element.mult = $scope.input.card
                 $scope.model.diff = $scope.model.diff || []
                 $scope.model.diff.push(element)

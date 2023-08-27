@@ -1,8 +1,9 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('modelDGCtrl',
-        function ($scope,$uibModal,$filter,modelsSvc) {
+        function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc) {
 
+            //locate the model where this item was defined
             $scope.getSourceModelName = function (ed) {
                 if (ed) {
                     for (const element of $scope.fullElementList) {
@@ -43,12 +44,19 @@ angular.module("pocApp")
                         }
                     }
 
+                    //todo - why twice ???
                     for (const ed1 of $scope.selectedModel.diff) {
                         if (ed1.name == ed.name) {
                             ed1.options = updatedEd.options  //this is the model ($localstorage)
                             break
                         }
                     }
+
+                    modelDGSvc.updateChanges($scope.selectedModel,
+                        {edPath:p,
+                            msg:`Update options list`},
+                        $scope)
+
 
                 })
             }
@@ -67,6 +75,15 @@ angular.module("pocApp")
                     for (const ed of $scope.selectedModel.diff) {
                         if (ed.path == path) {
                             ed.fixedCoding = {code:code}
+
+                            modelDGSvc.updateChanges($scope.selectedModel,
+                                {edPath:ed.path,
+                                    msg:`Set fixed coding to ${angular.toJson(ed.fixedCoding)}`},
+                                $scope)
+
+                            //$scope.selectedModel.changes = $scope.selectedModel.changes || []
+                            //$scope.selectedModel.changes.push({edPath:ed.path, msg:`Set fixed coding to ${ed.fixedCoding}`})
+
                             found = true
                             break
                         }
@@ -74,9 +91,20 @@ angular.module("pocApp")
 
                     if (! found) {
                         let overrideEd = angular.copy(ed)
+
                         overrideEd.fixedCoding = {code:code}
                         overrideEd.path = path
                         $scope.selectedModel.diff.push(overrideEd)
+
+                        modelDGSvc.updateChanges($scope.selectedModel,
+                            {edPath:ed.path,
+                                msg:`Set fixed coding to ${angular.toJson(overrideEd.fixedCoding)}`},
+                            $scope)
+
+
+                        //$scope.selectedModel.changes = $scope.selectedModel.changes || []
+                        //$scope.selectedModel.changes.push({edPath:ed.path, msg:`Set fixed coding to ${overrideEd.fixedCoding}`})
+
                     }
 
                     ed.fixedCoding = {code:code}        //for the display
@@ -94,17 +122,37 @@ angular.module("pocApp")
                 ar.splice(0,1)
                 let path = ar.join('.')
 
-                for (const ed of $scope.selectedModel.diff) {
-                    if (ed.path == path) {
-                        delete ed.fixedCoding
+                let found
+                for (const ed1 of $scope.selectedModel.diff) {
+                    if (ed1.path == path) {
+                        found = true
+
+                        modelDGSvc.updateChanges($scope.selectedModel,
+                            {edPath:ed1.path, msg:`clear fixed coding`},$scope)
+
+                        //$scope.selectedModel.changes = $scope.selectedModel.changes || []
+                        //$scope.selectedModel.changes.push({edPath:ed1.path, msg:`clear fixed coding`})
+
+                        delete ed.fixedCoding   //for the display
+                        delete ed1.fixedCoding
+
                         break
                     }
                 }
 
-                delete ed.fixedCoding   //for the display
+                //this should no longer be triggerred as routine is only called when can be cleared
+                if (! found) {
+                    let sourceModeName = $scope.getSourceModelName(ed)
+                    alert(`Fixed values can only be removed on the DG where it was set (${sourceModeName})`)
+                }
+
+
                 //rebuild the full element list for the table
                 let vo = modelsSvc.getFullListOfElements($scope.selectedModel,$scope.input.types,$scope.input.showFullModel)
                 $scope.fullElementList = vo.allElements
+
+                //$scope.$parent.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG, $scope.xref )
+
             }
 
             //change the valueset. This actually changes the model - the composition doesn't (it sets an override)
@@ -117,6 +165,13 @@ angular.module("pocApp")
                         if (ed1.path == p) {
                             ed1.valueSet = vsUrl        //this is the model ($localstorage)
                             ed.valueSet = vsUrl         //this is the display
+
+
+                            modelDGSvc.updateChanges($scope.selectedModel,
+                                {edPath:ed.path,
+                                    msg:`Set ValueSet to ${vsUrl}`},
+                                $scope)
+
                             break
                         }
                     }

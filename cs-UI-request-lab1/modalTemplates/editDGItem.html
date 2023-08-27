@@ -1,0 +1,71 @@
+<div>
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-8 col-sm-8">
+        <h3 class="modal-title">
+          Edit DG Item
+        </h3>
+      </div>
+
+
+      <div class="col-md-4 col-sm-4">
+
+        <button ng-show="isNew" class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+
+        <button ng-show="input.path"
+                class="btn btn-primary pull-right" ng-click="save()">Close</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-body">
+    <uib-tabset>
+      <uib-tab heading="Details">
+        <table class="table-bordered table table-condensed">
+          <tr>
+            <td>Path</td>
+            <td><input type="text" ng-disabled="! isNew" class="form-control" ng-model="input.path"/> </td>
+          </tr>
+          <tr>
+            <td>Type</td>
+            <td>
+              <select ng-disabled="! isNew" ng-model="input.type" class="form-control"
+                      ng-options="typ for typ in allTypes"></select>
+
+               </td>
+          </tr>
+
+          <tr>
+            <td>Title</td>
+            <td><input type="text" class="form-control" ng-model="input.title"/> </td>
+          </tr>
+          <tr>
+            <td>Description</td>
+            <td><textarea class="form-control" ng-model="input.description"></textarea> </td>
+          </tr>
+
+          <tr>
+            <td>Cardinality</td>
+            <td>
+              <select ng-model="input.mult" class="form-control"
+                      ng-options="opt for opt in mult">
+
+              </select>
+            </td>
+          </tr>
+
+        </table>
+
+      </uib-tab>
+      <uib-tab heading="Json">
+        <pre>{{item | json}}</pre>
+      </uib-tab>
+    </uib-tabset>
+
+
+  </div>
+  <div class="modal-header">
+
+    </div>
+</div>

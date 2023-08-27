@@ -8,15 +8,15 @@
         <td>
           <div class="clickable" ng-click="termSelectDG(item)">{{item.DGName}}</div>
 
-
-
-
         </td>
         <td>{{item.msg}}</td>
-        <td>{{item.path}}</td>
+        <td>
+          <div class="clickable" ng-click="termSelectDGItem({hiddenDGName:item.DGName, path:item.path})">{{item.path}}</div>
+        </td>
 
         <td>
           <div ng-repeat="xref in item.xref">
+
             <div ng-hide="xref.path" >
               <span class="clickable" ng-click="termSelectDG(item)">{{xref.name}}</span>  ({{xref.mode}})
             </div>

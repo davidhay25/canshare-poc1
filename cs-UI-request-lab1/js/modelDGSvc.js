@@ -7,6 +7,14 @@ angular.module("pocApp")
 
         return {
 
+            updateChanges : function (DG,change,scope) {
+                DG.changes = DG.changes || []
+                DG.changes.push(change)
+                console.log('emitting')
+                scope.$emit("dgUpdated",{})
+
+            },
+
             makeDgDownload: function (allDG) {
                 //create a download of the DG
             },

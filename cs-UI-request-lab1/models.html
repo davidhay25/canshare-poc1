@@ -93,7 +93,7 @@
     <script src="js/optionsCtrl.js"></script>
     <script src="js/viewVSCtrl.js"></script>
     <script src="js/showParameters.js"></script>
-
+    <script src="js/editDGItemCtrl.js"></script>
 
     <script src="js/QutilitiesSvc.js"></script>
     <script src="js/igSvc.js"></script>
@@ -165,7 +165,7 @@
         <a class="btn pull-right" target="_blank" href="https://build.fhir.org/ig/HL7/fhir-mCODE-ig/">mCODE</a>
         <button class="pull-right btn-link btn" ng-click="resetWorld()">Reset</button>
         <a class="btn pull-right" target="_blank" href="https://docs.google.com/spreadsheets/d/1XU7Jc0BbC5nXgmTu-qVLS-WwJjKO9GLXgjVHVk2WRL0/edit#gid=0">Spreadsheet</a>
-        <button ng-show = "selectedModel" class="pull-right btn-link btn" ng-click="showDGSummary()">Show image</button>
+        <button ng-show = "selectedModel" class="pull-right btn-link btn" ng-click="showDGSummary()">Show DG image</button>
     </div>
 
 
@@ -313,7 +313,15 @@
 
                     <div ng-hide = "selectedModel">
                         <div class="banner">Summary of DataGroups</div>
-                        <img width="100%" src="images/LIM-org.png"/>
+                        <img width="100%" src="images/LIM-1.png" usemap="#image_map"/>
+                        <!--
+                        <img src="LIM-org.png" usemap="#image_map">
+                        -->
+                        <map name="image_map">
+                            <area class="mapbodyarea" href="" coords="0,100,0,100" shape="rect">
+                        </map>
+
+
                     </div>
 
                 </div>
@@ -327,14 +335,14 @@
 
         <uib-tab>
             <uib-tab-heading> DataGroup updates <span class="badge">{{dgUpdates.length}}</span> </uib-tab-heading>
+            <span class="pull-right">
+                <span class="clickable" ng-click="refreshUpdates()">Refresh</span>
+            </span>
             <em>Changes made to DataGroups</em>
-
 
             <ng-include src="'/includes/dgReport.html'"></ng-include>
 
-<!--
-            <pre>{{dgUpdates | json}}</pre>
-            -->
+
 
         </uib-tab>
 

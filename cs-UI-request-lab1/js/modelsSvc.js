@@ -193,7 +193,6 @@ angular.module("pocApp")
             fhirDataTypes : function(){
                 return ['string','CodeableConcept','Quantity','HumanName','dateTime','Identifier','ContactPoint','Address','code','Attachment','Period','integer','boolean','Group']
             },
-           // findUsageOf
 
             //create a bundle of LogicalModels
             createLMBundle : function (world) {

@@ -113,7 +113,7 @@
                 <uib-tabset>
                     <uib-tab heading="Table view (for adding / moving / deleting)">
                         <table class="table table-bordered">
-                            <tr><th>Path</th><th>Title</th><th>Type</th><th>Code</th><th>Card.</th><th>Move</th><th>Edit</th></tr>
+                            <tr><th>Path</th><th>Title</th><th>Type</th><th>Description</th><th>Card.</th><th>Move</th><th>Edit</th></tr>
                             <tr ng-repeat="element in model.diff">
                                 <td>{{element.path}}</td>
                                 <td>{{element.title}}</td>
@@ -129,10 +129,12 @@
 
                                 </td>
                                 <td>
-
+                                    {{element.description}}
+<!--
                                     <div ng-repeat="code in element.code">
                                         {{code.code}}
                                     </div>
+                                    -->
 
                                 </td>
                                 <td>{{element.mult}}</td>
@@ -176,7 +178,8 @@
                                     </div>
 
                                 </td>
-                                <td><input class="form-control" type="text" ng-model="input.code"/></td>
+                                <td><textarea class="form-control" type="text" ng-model="input.description"></textarea></td>
+                              <!--  <td><input class="form-control" type="text" ng-model="input.code"/></td> -->
                                 <td><select class="form-control" ng-model="input.card"
                                             ng-options = "card for card in input.cards"></select></td>
                                 <td></td>
