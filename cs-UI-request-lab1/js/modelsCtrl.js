@@ -133,6 +133,7 @@ angular.module("pocApp")
             $scope.editDGItem = function (item) {
                 let originalED = {}
                 if (item) {
+                    //if item is null, then this is a new item
                     originalED = angular.copy(item.ed)        //used for changes display
                 }
 
@@ -154,20 +155,10 @@ angular.module("pocApp")
 
                 }).result.then(function (ed) {
                     //update specific items. Not the whole ED
-                    //let p = $filter('lastInPath')(ed.path) - I think it's the first that gets chopped off
 
                     let p = $filter('dropFirstInPath')(ed.path)
 
 
-                    /*
-                    $scope.selectedModel.diff.forEach(function (ed1) {
-                        if (ed1.path == p) {
-                            ed1.description = ed.description
-                            //ed.valueSet = vsUrl
-                           // break
-                        }
-                    })
-                    */
 
                     //what changed
                     let changes = ""
@@ -211,8 +202,13 @@ angular.module("pocApp")
                     //rebuild fullList and re-draw the tree
                     refreshFullList($scope.selectedModel)
 
+                    //select the new item
+
+                    $scope.termSelectDGItem({hiddenDGName: $scope.selectedModel.name,path: ed.path})
+
                 })
             }
+
 
 
 
@@ -652,10 +648,16 @@ angular.module("pocApp")
                 })
 
                 //these are for the renderer from forms - todo to be deprecated
-                $scope.Qobject = modelsSvc.makeQfromModel(dg,$scope.input.types)
-                $scope.QR = {}
+                //$scope.Qobject = modelsSvc.makeQfromModel(dg,$scope.input.types)
+                //$scope.QR = {}
+
+
+
 
                 refreshFullList(dg)
+
+                $scope.dgQ = modelsSvc.makeQforDG($scope.fullElementList)
+
 /*
                 let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.input.showFullModel)
                 $scope.fullElementList = vo.allElements

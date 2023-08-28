@@ -16,6 +16,34 @@ angular.module("pocApp")
             }
 
 
+            //set the possiblu units for a Quantity DT
+            $scope.setUnits = function (ed) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/setUnits.html',
+                    backdrop: 'static',
+                    //size : 'lg',
+                    controller: 'setUnitsCtrl',
+
+                    resolve: {
+                        ED: function () {
+                            return ed
+                        }
+                    }
+
+                }).result.then(function (ed) {
+                    //copy the units to the current item
+                    //need to update the .diff in the selected model
+                    let p = $filter('lastInPath')(ed.path)
+                    for (const ed1 of $scope.selectedModel.diff) {
+                        if (ed1.path == p) {
+                            ed1.units = ed.units
+                            //ed.valueSet = vsUrl
+                            break
+                        }
+                    }
+                })
+            }
+
             $scope.editDGOptionsList = function (ed) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editOptionsList.html',

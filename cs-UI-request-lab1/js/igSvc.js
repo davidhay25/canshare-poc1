@@ -103,7 +103,7 @@ angular.module("pocApp")
                         lne += ` ${mult} ${type} "${cleanString(ed.description)}"`
                         arLne.push(lne)
                         if (ed.valueSet) {
-                            let lneVs =`* ${ar[ar.length-1]} from ${ed.valueSet}`
+                            let lneVs =`* ${ar[ar.length-1]} from ${ed.valueSet} (preferred)`
                             arLne.push(lneVs)
                             //let lneVs = `item2 from http://hl7.org/fhir/ValueSet/contact-point-system (required)`
 

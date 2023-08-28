@@ -72,10 +72,18 @@ angular.module("pocApp")
                     controller : function ($scope,hashTypes,modelsSvc) {
                         $scope.input = {}
 
-                        //let fhirDT = modelsSvc.fhirDataTypes()
+                       // let fhirDT = modelsSvc.fhirDataTypes()
+                        let DGs = Object.keys(hashTypes).sort(function(a,b){
+                            if (a.toLowerCase() > b.toLowerCase()) {
+                                return 1
+                            } else {
+                                return -1
+                            }
+                        })
+
+                        $scope.input.types = modelsSvc.fhirDataTypes().concat(DGs)
 
 
-                        $scope.input.types = modelsSvc.fhirDataTypes().concat(Object.keys(hashTypes))
                         //$scope.input.types.sort()
                         $scope.input.mults = ['0..1','1..1','0..*','1..*']
                         $scope.input.mult = $scope.input.mults[0]

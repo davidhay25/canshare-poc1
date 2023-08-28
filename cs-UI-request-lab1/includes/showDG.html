@@ -78,13 +78,13 @@
                           ng-click="viewVS(selectedNode.data.ed.valueSet)"
                               class="clickable">View VS</span>
 
-                        <button ng-show="selectedNode.data.ed.valueSet"
+                        <span ng-show="selectedNode.data.ed.valueSet"
                                 ng-click = "changeDGValueSet(selectedNode.data.ed)"
-                                class="btn-link btn">Change VS</button>
+                                class="clickable pull-right">Change VS</span>
 
-                        <button ng-hide="selectedNode.data.ed.valueSet"
+                        <span ng-hide="selectedNode.data.ed.valueSet"
                                 ng-click = "changeDGValueSet(selectedNode.data.ed)"
-                                class="btn-link btn">Set VS</button>
+                                class="clickable pull-right">Set VS</span>
 
                       </div>
                     </td>
@@ -137,7 +137,8 @@
                     <td>Units</td>
                     <td>
                       <i class="glyphicon glyphicon-edit pull-right clickable"
-                         ng-click=""></i>
+                         ng-click="setUnits(selectedNode.data.ed)"></i>
+
 
                       <span ng-repeat="unit in selectedNode.data.ed.units">
                         {{unit}}&nbsp;
@@ -487,6 +488,23 @@
 
     </uib-tab>
 
+
+
+    <uib-tab heading="Questionnaire">
+      <uib-tabset>
+
+        <uib-tab heading="Json">
+          <pre>{{dgQ | json}}</pre>
+        </uib-tab>
+
+        <uib-tab heading="Form">
+
+        </uib-tab>
+
+
+      </uib-tabset>
+    </uib-tab>
+
     <uib-tab ng-show = 'false' heading="Questionnaire">
       <uib-tabset>
         <uib-tab heading="Form">
@@ -496,11 +514,6 @@
           <pre>{{Qobject | json}}</pre>
         </uib-tab>
       </uib-tabset>
-
-
-
-
-
     </uib-tab>
 
 

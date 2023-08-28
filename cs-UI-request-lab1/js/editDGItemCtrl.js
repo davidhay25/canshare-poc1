@@ -36,6 +36,13 @@ angular.module("pocApp")
                 $scope.isNew = true         //allows cancel
             }
 
+            $scope.setTitle = function (path) {
+                if (! $scope.input.title) {
+                    $scope.input.title = path
+                }
+
+            }
+
             $scope.save = function() {
                 if ($scope.isNew) {
                     let ed = {}

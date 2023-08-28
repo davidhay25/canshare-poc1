@@ -253,6 +253,93 @@ angular.module("pocApp")
                 return bundle
             },
 
+            makeQforDG : function (fullElementList) {
+                //make the items object a Q for a DG
+                //todo - use by Composition Q eventually
+
+
+                function createObjectFromPathList(pathValueList) {
+                    const result = {};
+
+                    pathValueList.forEach(item => {
+                        const { path, value } = item;
+                        const pathArray = path.split('.');
+                        let currentObj = result;
+
+                        for (let i = 0; i < pathArray.length - 1; i++) {
+                            const key = pathArray[i];
+                            if (!currentObj[key]) {
+                                currentObj[key] = {};
+                            }
+                            currentObj = currentObj[key];
+                        }
+
+                        currentObj[pathArray[pathArray.length - 1]] = value;
+                    });
+
+                    return result;
+                }
+
+// Example list of items with paths and values
+
+                let pathValueList = []
+                fullElementList.forEach(function (item) {
+                    let ed = item.ed
+                    let path = item.ed.path
+                    pathValueList.push({path:path,value:ed})
+                })
+
+                /*
+                const pathValueList = [
+                    { path: 'parent.child.grandchild', value: 42 },
+                    { path: 'parent.anotherChild', value: 'hello' },
+                    { path: 'something', value: [1, 2, 3] }
+                ];
+*/
+                const resultObject = createObjectFromPathList(pathValueList);
+                console.log(resultObject);
+
+                return resultObject
+
+
+                //-------------
+
+                let currentItem = {item:[]}     //the item that currently has the ed
+                let currentDepth = 0
+                let pathRoot = "test"
+                let hash = {}
+
+                fullElementList.forEach(function (item) {
+                    let ed = item.ed
+                    let path = item.ed.path
+                    let ar = path.split('.')
+                    let leaf = ar[ar.length-1]   //the name od the element
+
+
+
+
+                    let depth = path.split('.').length
+                    if (depth !== currentDepth) {
+                        //this is a nested entry
+                        let previousItem = currentItem
+                        let currentItem = {}
+
+                    } else {
+
+                    }
+
+
+                    
+                })
+
+                
+
+
+                return rootItem
+
+
+            },
+
             makeQfromModel : function(model, types) {
                 //make a Q that represents a model
                 //all the top level elements on the model are a section
@@ -494,9 +581,11 @@ angular.module("pocApp")
                     if (host) {     //todo not sure if this is still used...
                         itemToInsert.host = host
                     }
+                    //record the sourceModel - ie where in the hierarchy this element came from
                     if (sourceModel) {
                         itemToInsert.sourceModelName = sourceModel.name
                     }
+
                     if (pos > -1) {
                         //replace the existing path
                         //allElements.splice(pos,1,{ed:ed,host:host,sourceModelName:})

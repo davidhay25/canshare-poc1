@@ -27,7 +27,8 @@
         <table class="table-bordered table table-condensed">
           <tr>
             <td>Path</td>
-            <td><input type="text" ng-disabled="! isNew" class="form-control" ng-model="input.path"/> </td>
+            <td><input type="text"
+                       ng-blur="setTitle(input.path)" ng-disabled="! isNew" class="form-control" ng-model="input.path"/> </td>
           </tr>
           <tr>
             <td>Type</td>
