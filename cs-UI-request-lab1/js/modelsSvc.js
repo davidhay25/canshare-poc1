@@ -58,7 +58,7 @@ angular.module("pocApp")
 
                     let model = angular.copy(DG) //we're going to chane model so need a copy..
                     while (model.parent) {
-                        console.log(`Examining ${DG.name}: ${model.parent} is the parent of ${model.name}`)
+                       // console.log(`Examining ${DG.name}: ${model.parent} is the parent of ${model.name}`)
 
                         model = hashDG[model.parent]
                         hashReferences[model.name] = hashReferences[model.name] || []

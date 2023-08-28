@@ -19,7 +19,7 @@ angular.module("pocApp")
             $scope.ui.tabComp = 0;
             $scope.ui.tabTerminology = 2;
 
-            $scope.input.mainTabActive = $scope.ui.tabDG;
+            //$scope.input.mainTabActive = $scope.ui.tabDG;
 
             //used in DG & Comp so when a type is a FHIR DT, we can create a link to the spec
             $scope.fhirDataTypes =modelsSvc.fhirDataTypes()
@@ -627,13 +627,14 @@ angular.module("pocApp")
 
                 let rootNodeId = $scope.allCompElements[0].path
                 let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
+                $scope.treeData = treeData      //used in the Q builder
 
                 console.log(treeData)
                 makeCompTree(treeData,rootNodeId)
 
                 igSvc.makeFshForComp(comp,$scope.allCompElements,$scope.hashCompElements)
 
-                $scope.compQ = QutilitiesSvc.makeQfromComposition(comp,vo.hashAllElements)
+                //$scope.compQ = QutilitiesSvc.makeQfromComposition(comp,vo.hashAllElements)
 
 
             }
@@ -798,6 +799,7 @@ angular.module("pocApp")
                 });
 
             }
+
 
 
             /*$timeout(function(){
