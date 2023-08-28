@@ -65,7 +65,7 @@ angular.module("pocApp")
 
             $scope.world = $localStorage.world
 
-
+/* - leave until we figure out dependencies
             //download the Concept map and generate the hash that lists conditional refsets by code
             modelsSvc.getConceptMapHash().then(
                 function (map) {
@@ -73,7 +73,7 @@ angular.module("pocApp")
                     console.log(map)
                 }
             )
-
+*/
 
             //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
             $scope.hashAllDG = $localStorage.world.dataGroups
@@ -110,6 +110,18 @@ angular.module("pocApp")
             //make the term summary. These are the override elements in the models
 
 
+            $scope.copyToClipboard = function (json) {
+                let text = angular.toJson(json,true)
+                navigator.clipboard.writeText(text).then(
+                    () => {
+                        alert('Content copied to clipboard');
+                    },
+                    () => {
+                        alert('Content not copied to clipboard');
+                    },
+                )
+
+            }
 
             //shows the image of the DG summary. todo - may need to clear other stuff
             $scope.showDGSummary = function () {
@@ -150,6 +162,9 @@ angular.module("pocApp")
                         },
                         allTypes : function () {
                             return $scope.allTypes
+                        },
+                        fullElementList : function () {
+                            return $scope.fullElementList
                         }
                     }
 
@@ -157,8 +172,6 @@ angular.module("pocApp")
                     //update specific items. Not the whole ED
 
                     let p = $filter('dropFirstInPath')(ed.path)
-
-
 
                     //what changed
                     let changes = ""
@@ -172,6 +185,10 @@ angular.module("pocApp")
                         changes += "Cardinality changed."
                     }
 
+                    if (ed.valueSet !== originalED.valueSet) {
+                        changes += "ValueSet changed."
+                    }
+
 
                     let found = false
                     //let changes = []    //this is the list of changes
@@ -181,13 +198,14 @@ angular.module("pocApp")
                             ed1.title = ed.title
                             ed1.description = ed.description
                             ed1.mult = ed.mult
+                            ed1.valueSet = ed.valueSet
                             break
                         }
                     }
 
                     if (! found) {
                         //The attribute that was edited (eg edscription) is inherited
-                        //Need to create an 'overrite' element and add to the DG
+                        //Need to create an 'override' element and add to the DG
                         let ar = ed.path.split('.')
                         ar.splice(0,1)
                         ed.path = ar.join('.')
@@ -202,10 +220,17 @@ angular.module("pocApp")
                     //rebuild fullList and re-draw the tree
                     refreshFullList($scope.selectedModel)
 
+                    $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:p})
+                        //$scope.termSelectDGItem({hiddenDGName: $scope.selectedModel.name,path: ed.path})
+/*
+<<<<<<< HEAD
                     //select the new item
 
                     $scope.termSelectDGItem({hiddenDGName: $scope.selectedModel.name,path: ed.path})
-
+=======
+                    $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:p})
+>>>>>>> b0706aa3d2969185143c2c1671eb634b2e92dc09
+*/
                 })
             }
 
