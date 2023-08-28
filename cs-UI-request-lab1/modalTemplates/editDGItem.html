@@ -16,7 +16,7 @@
 
         <button ng-show="isNew" class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
 
-     
+
       </div>
     </div>
 
@@ -27,7 +27,8 @@
         <table class="table-bordered table table-condensed">
           <tr>
             <td>Path</td>
-            <td><input type="text" ng-disabled="! isNew" class="form-control" ng-model="input.path"/> </td>
+            <td><input type="text" ng-blur="setTitle(input.path)"
+                       ng-disabled="! isNew" class="form-control" ng-model="input.path"/> </td>
           </tr>
           <tr>
             <td>Type</td>
@@ -57,11 +58,32 @@
             </td>
           </tr>
 
+          <tr ng-show="input.type == 'CodeableConcept'">
+            <td>ValueSet</td>
+
+            <td>
+              <input type="text"
+                       class="form-control" ng-model="input.valueSet"/>
+            </td>
+
+
+          </tr>
+
         </table>
 
       </uib-tab>
-      <uib-tab heading="Json">
+      <uib-tab ng-show = "item.path" heading="Json">
         <pre>{{item | json}}</pre>
+      </uib-tab>
+      <uib-tab heading="All elements in DG">
+        <br/>
+        <table class="table-condensed table table-bordered">
+          <tr ng-repeat="item in fullElementList">
+            <td>{{item.ed.path | dropFirstInPath}}</td>
+            <td>{{item.ed.title}}</td>
+            <td>{{item.ed.description}}</td>
+          </tr>
+        </table>
       </uib-tab>
     </uib-tabset>
 

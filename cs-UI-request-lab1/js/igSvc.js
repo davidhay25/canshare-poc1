@@ -5,6 +5,7 @@ angular.module("pocApp")
 
         return {
             makeFshForComp : function(comp,elements,hashElements) {
+                return //todo - finish later
                 //generate a fsh file for a composition.
                 //the sections will be the top level entries. We use the composition to structure the model by
                 //iterating over the sections, then the contents of the sections.

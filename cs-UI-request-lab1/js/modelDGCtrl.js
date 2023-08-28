@@ -156,7 +156,7 @@ angular.module("pocApp")
             }
 
             //change the valueset. This actually changes the model - the composition doesn't (it sets an override)
-            $scope.changeDGValueSet = function (ed) {
+            $scope.changeDGValueSetDEP = function (ed) {
                 let vsUrl = prompt("Enter the ValueSet url")
                 if (vsUrl) {
 
