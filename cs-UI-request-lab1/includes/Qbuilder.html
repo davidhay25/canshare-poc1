@@ -1,22 +1,24 @@
 <div ng-controller="QbuilderCtrl">
 
-  Q designer
 
-  <button class="btn btn-link pull-right" ng-click="setupQ()">Setup</button>
+
+  <button class="btn btn-link" ng-click="setupQ()">Setup</button>
 
   <div class="row">
-    <div class="col-md-5">
+    <div class="col-md-4">
       <div id="QcompositionTree"></div>
     </div>
-    <div class="col-md-2">
-
-      <i class="glyphicon glyphicon-arrow-right clickable"
-         ng-click=""></i>
+    <div class="col-md-8">
 
 
-    </div>
-    <div class="col-md-5">
-      <div id="Qtree"></div>
+
+      <pre>{{selectedQNode.data.ed | json}}</pre>
+
+      <button ng-show="selectedQNode" class="btn-danger btn" ng-click = "deleteNode()">Delete</button>
+
+      <button class="btn btn-link" ng-click="addControl('id1','text','demo box')">Add</button>
+
+      <div id="Qform"></div>
     </div>
   </div>
 

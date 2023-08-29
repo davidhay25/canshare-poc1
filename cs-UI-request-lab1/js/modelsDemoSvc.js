@@ -79,6 +79,62 @@ angular.module("pocApp")
                     hashDataGroups[dgAncillary.name] = dgAncillary
 
 
+                    //DG staging component
+                    let dgComponent = {kind:"dg",name:'Component',title:"Component",diff:[]}
+                    dgComponent.diff.push({path:'status',title:'Status',type:['CodeableConcept'],mult:'1..1'})
+                    dgComponent.diff.push({path:'category',title:'Category',type:['CodeableConcept'],mult:'0..1'})
+                    dgComponent.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:'1..1'})
+                    dgComponent.diff.push({path:'date',title:'Date',type:['dateTime'],mult:'0..1'})
+                    dgComponent.diff.push({path:'performer',title:'Performer',type:['HcProvider'],mult:'0..1'})
+                    dgComponent.diff.push({path:'valueInteger',title:'Integer value',type:['integer'],mult:'0..1'})
+                    dgComponent.diff.push({path:'valueQuantity',title:'Quantity value',type:['Quantity'],mult:'0..1'})
+                    dgComponent.diff.push({path:'valueCoded',title:'Coded value',type:['CodeableConcept'],mult:'0..1'})
+                    dgComponent.diff.push({path:'valueString',title:'String value',type:['string'],mult:'0..1'})
+                    dgComponent.diff.push({path:'interpretation',title:'Interpretation',type:['CodeableConcept'],mult:'0..1'})
+
+
+                    hashDataGroups[dgComponent.name] = dgComponent
+
+                    //DG staging
+                    let dgStaging = {kind:"dg",name:'Staging',title:"Staging",diff:[],
+                        description:"Staging information used to describe the prognosis of the specific disease at a given time in the patient's cancer journey."}
+                    dgStaging.diff.push({path:'system',title:'System',type:['CodeableConcept'],mult:'0..1'})
+                    dgStaging.diff.push({path:'date',title:'Date',type:['date'],mult:'0..1'})
+                    dgStaging.diff.push({path:'timing',title:'Timing',type:['CodeableConcept'],mult:'0..1'})
+                    dgStaging.diff.push({path:'component',title:'Component',type:['Component'],mult:'0..*'})
+                    dgStaging.diff.push({path:'stage',title:'Stage',type:['CodeableConcept'],mult:'0..1'})
+                    dgStaging.diff.push({path:'additionalDetails',title:'Additional details',type:['string'],mult:'0..1'})
+                    hashDataGroups[dgStaging.name] = dgStaging
+
+                    //DG grading
+                    let dgGrading = {kind:"dg",name:'Grading',title:"Grading",diff:[],
+                        description:"The degree of differentiation of a tumour, e.g. the extent to which a tumour resembles the normal tissue at that site (also known as histological grade)"}
+                    dgGrading.diff.push({path:'system',title:'System',type:['CodeableConcept'],mult:'0..1'})
+                    dgGrading.diff.push({path:'date',title:'Date',type:['date'],mult:'0..1'})
+                    dgGrading.diff.push({path:'component',title:'Component',type:['Component'],mult:'0..*'})
+                    dgGrading.diff.push({path:'grade',title:'Grade',type:['CodeableConcept'],mult:'0..1'})
+                    dgGrading.diff.push({path:'additionalDetails',title:'Additional details',type:['string'],mult:'0..1'})
+                    hashDataGroups[dgGrading.name] = dgGrading
+
+                    //DG Blood pressure - just an example
+                    let dgBP = {kind:"dg",name:'Bloodpressure',title:"Blood pressure",diff:[]}
+                    dgBP.diff.push({path:'systolic',title:'Systolic pressure',type:['Component'],mult:'1..1'})
+                    dgBP.diff.push({path:'diastolic',title:'Diastolic pressure',type:['Component'],mult:'1..1'})
+                    hashDataGroups[dgBP.name] = dgBP
+
+
+                    //DG prognostic scoring
+                    let dgPrognosticScore = {kind:"dg",name:'PrognosticScore',title:"Prognostic score",diff:[]}
+                    dgPrognosticScore.diff.push({path:'system',title:'System',type:['CodeableConcept'],mult:'0..1',
+                        description:"The system used to score the disease's prognosis."})
+                    dgPrognosticScore.diff.push({path:'date',title:'Date',type:['date'],mult:'0..1',
+                        description:"The date on which the prognostic score was assigned"})
+                    dgPrognosticScore.diff.push({path:'component',title:'Component',type:['Component'],mult:'0..*'})
+                    dgPrognosticScore.diff.push({path:'score',title:'Score',type:['CodeableConcept'],mult:'0..*'})
+
+                    dgPrognosticScore.diff.push({path:'additionalDetails',title:'Additional details',type:['string'],mult:'0..1'})
+
+                    hashDataGroups[dgPrognosticScore.name] = dgPrognosticScore
 
                     //DG assessment
                     let dgAssess = {kind:"dg",name:'Assessment',title:"Assessment",diff:[]}
@@ -121,31 +177,75 @@ angular.module("pocApp")
                     let dgCancerAssessment = {kind:"dg",name:'CancerAssessment',title:"Cancer assessment",diff:[],
                         mcodegroup : "disease",
                         description:"A description of the current status of the cancer at a given point in time."}
+
+                    dgCancerAssessment.diff.push({path:'behaviour',title:'Behaviour',type:['CodeableConcept'],mult:'0..1',
+                        description:'An evaluation of the behaviour of the cancer, as best understood with the given information. This may be an initial clinical impression, through to a confirmed histological analysis - e,g, Normal, benign, malignant, indeterminate etc'})
+
+                    // >>> todo add lesion
+
+                    dgCancerAssessment.diff.push({path:'primaryLocation',title:'Primary location',type:['BodySite'],mult:'0..1',
+                        description:'The location in the body where the cancer originated.'})
+
+                    dgCancerAssessment.diff.push({path:'adjacentOrganInvolvementStatus',title:'Adjacent organ involvement status',type:['CodeableConcept'],mult:'0..1',
+                        description:'status of involvement of adjacent organs'})
+
+                    dgCancerAssessment.diff.push({path:'adjacentOrganInvaded',title:'Adjacent organ invaded',type:['CodeableConcept'],mult:'0..*',
+                        description:'The adjacent organs into which the tumour has invaded.'})
+
+                    dgCancerAssessment.diff.push({path:'regionalLocation',title:'Regional location',type:['BodySite'],mult:'0..*',
+                        description:'The regional location(s) in the body to which the primary cancer has spread.'})
+
+                    dgCancerAssessment.diff.push({path:'distantMetastatisLocation',title:'Distant metastatis location',type:['BodySite'],mult:'0..*',
+                        description:'The distant location(s) in the body to which the primary cancer has spread.'})
+
+                    dgCancerAssessment.diff.push({path:'histologicType',title:'Histologic type',type:['Observation'],mult:'0..1',
+                        description:'The histologic type of the cancer'})
+
+                    dgCancerAssessment.diff.push({path:'coexistingPathology',title:'CoexistingPathology',type:['Observation'],mult:'0..1',
+                        description:'Other microscopically identifiable abnormalities relevant to the diagnosis.'})
+
+                    dgCancerAssessment.diff.push({path:'grading',title:'Grading',type:['Grading'],mult:'0..*',
+                        description:'The degree of differentiation of a tumour eg the extent to which a tumour resembles the normal tissue at that site'})
+
+                    dgCancerAssessment.diff.push({path:'staging',title:'Staging',type:['Staging'],mult:'0..*',
+                        description:'A categorisation of the cancer to determine the prognosis.'})
+
+                    dgCancerAssessment.diff.push({path:'prognosticScoring',title:'Prognostic scoring',type:['PrognosticScore'],mult:'0..*',
+                        description:'The prognostic score of the patient\'s cancer diagnosis, based on a relevant prognostic scoring system'})
+
+                    dgCancerAssessment.diff.push({path:'prognosticFactor',title:'Prognostic factor',type:['Observation'],mult:'0..*',
+                        description:'Other prognostic factors that aren\'t recorded as part of the grading, staging or prognostic scoring components.'})
+
+                    dgCancerAssessment.diff.push({path:'additionalDetails',title:'Additional details',type:['string'],mult:'0..1',
+                        description:'Additional details about this cancer assessment.'})
+
+                    hashDataGroups[dgCancerAssessment.name] = dgCancerAssessment
+
+
+
+                    //------
+
+/*
                     dgCancerAssessment.diff.push({path:'pathwayType',title:'Pathway type',type:['CodeableConcept'],mult:'0..1',
                         description:'The type of the cancer pathway (e.g. screening, diagnostic, surveillance)'})
                     dgCancerAssessment.diff.push({path:'assessedBy',title:'Assessed by',type:['HcProvider'],mult:'0..1',
                         description:'The healthcare practitioner that performed this cancer assessment.'})
+
                     dgCancerAssessment.diff.push({path:'primaryOrRecurrence',title:'Primary cancer or recurrance',type:['CodeableConcept'],mult:'0..1',
                         description:'An indication of where the cancer is in the lifecycle - e.g. new primary cancer or recurrence'})
+
                     dgCancerAssessment.diff.push({path:'recurranceType',title:'Recurrance type',type:['CodeableConcept'],mult:'0..1',
                         description:'The type of spread of the cancer - e.g. local, regional, distant metastasis'})
                     dgCancerAssessment.diff.push({path:'clinicalFinding',title:'Clinical Finding',type:['CodeableConcept'],mult:'0..*',
                         description:'A relevant clinical finding or symptom that may indicate the presence of cancer (e.g. lump, nipple discharge).'})
-                    dgCancerAssessment.diff.push({path:'behaviour',title:'Behaviour',type:['CodeableConcept'],mult:'0..1',
-                        description:'An evaluation of the behaviour of the cancer, as best understood with the given information. This may be an initial clinical impression, through to a confirmed histological analysis - e,g, Normal, benign, malignant, indeterminate etc'})
-                    dgCancerAssessment.diff.push({path:'primaryType',title:'Primary type',type:['CodeableConcept'],mult:'0..1',
+                     dgCancerAssessment.diff.push({path:'primaryType',title:'Primary type',type:['CodeableConcept'],mult:'0..1',
                         description:'The type of the primary cancer being assessed.'})
-                    dgCancerAssessment.diff.push({path:'primaryLocation',title:'Primary location',type:['BodySite'],mult:'0..1',
-                        description:'The location in the body where the cancer originated.'})
-                    dgCancerAssessment.diff.push({path:'regionalLocation',title:'Regional location',type:['BodySite'],mult:'0..*',
-                        description:'The regional location(s) in the body to which the primary cancer has spread.'})
-                    dgCancerAssessment.diff.push({path:'metastaticLocation',title:'Metastatic location',type:['BodySite'],mult:'0..*',
-                        description:'The distant location(s) in the body to which the primary cancer has spread.'})
 
-                    dgCancerAssessment.diff.push({path:'histologicType',title:'Histologic type',type:['CodeableConcept'],mult:'0..1',
-                        description:'The histologic type of the cancer'})
 
-                    hashDataGroups[dgCancerAssessment.name] = dgCancerAssessment
+*/
+
+
+
 
                     //Care plan
                     let dgCarePlan = {kind:"dg",name:'CarePlan',title:"Care plan",diff:[],
@@ -663,6 +763,13 @@ angular.module("pocApp")
 */
                     //sort the hashDataGroups
 
+
+
+                    Object.keys(hashDataGroups).forEach(function (key) {
+                        let dg = hashDataGroups[key]
+                        dg.mult = dg.mult || '0..1'
+
+                    })
 
 
                     return {compositions:hashCompositions,dataGroups:hashDataGroups,valueSets:hashVS}
