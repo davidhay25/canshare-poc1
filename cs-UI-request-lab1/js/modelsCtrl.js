@@ -101,7 +101,7 @@ angular.module("pocApp")
                 })
             }
             makeAllDTList()
-            console.log($scope.tags = {})
+            console.log($scope.tags)
 
 
             //make a sorted list for the UI
