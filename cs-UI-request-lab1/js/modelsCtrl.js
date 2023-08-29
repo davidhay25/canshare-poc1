@@ -29,6 +29,8 @@ angular.module("pocApp")
             $scope.compUi.tree = 0
             $scope.input.compTabActive = $scope.compUi.tree
 
+            $scope.hxDGLoad = []        //a history of DG's that were loaded by termSelectDGItem
+
             $('.mapbodyarea').on('click',function (e) {
                 e.preventDefault()
                 alert('ba')
@@ -80,12 +82,26 @@ angular.module("pocApp")
 
             //create a list of all DT + fhir types
             function makeAllDTList() {
+                $scope.tags = {}
                 $scope.allTypes = modelsSvc.fhirDataTypes()
+
                 Object.keys($scope.hashAllDG).forEach(function (key) {
                     $scope.allTypes.push(key)
+                    //now look for tags
+                    let dt = $scope.hashAllDG[key]
+
+                    if (dt.tags) {
+                        dt.tags.forEach(function (tag) {
+                            $scope.tags[tag] = $scope.tags[tag] || []
+                            $scope.tags[tag].push(dt)
+
+                        })
+                    }
+
                 })
             }
             makeAllDTList()
+            console.log($scope.tags = {})
 
 
             //make a sorted list for the UI
@@ -239,7 +255,7 @@ angular.module("pocApp")
 
             //when a specific DG is selected in the term summary
             //used by updates list as well = hence moved to main controller
-            $scope.termSelectDG = function (item) {
+            $scope.termSelectDG = function (item,previous) {
                 console.log(item)
 
                 //set the tab to the DG tab
@@ -249,7 +265,23 @@ angular.module("pocApp")
                 $scope.selectedModel = $scope.hashAllDG[item.DGName]
                 $scope.selectModel($scope.selectedModel)
 
+                if (previous) {
+                    $scope.hxDGLoad.push(previous)  //for the 'back' function
+                }
+
+
             }
+
+            //return to the previously selected DG
+            $scope.back = function () {
+                if ($scope.hxDGLoad.length > 0) {
+                    let DGName = $scope.hxDGLoad.pop()
+                    //console.lo
+                    $scope.termSelectDG({DGName:DGName})
+                }
+
+            }
+
             //when a specific DG path is selected in the term summary
             //used by updates list as well = hence moved to main controller
             //item = {hiddenDGName:, path:}  (path doesn't have leading gg name
@@ -722,18 +754,26 @@ angular.module("pocApp")
 
                     //https://stackoverflow.com/questions/32403578/stop-vis-js-physics-after-nodes-load-but-allow-drag-able-nodes
                     $scope.graph.on("stabilizationIterationsDone", function () {
-
                         $scope.graph.setOptions({physics: false});
                     });
 
                     $scope.graph.on("click", function (obj) {
                         delete $scope.selectedModelFromGraph
+                        delete $scope.selectedModelFromGraphFull
                         let nodeId = obj.nodes[0];  //get the first node
 
                         let node = $scope.graphData.nodes.get(nodeId);
 
                         if (node.data && node.data.model) {
                             $scope.selectedModelFromGraph = node.data.model;
+
+                            //now get the full list of elements for this DT. Used in the graph details view
+                            let dg = $scope.hashAllDG[node.data.model.name]
+                            let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,true)
+
+                            $scope.selectedModelFromGraphFull = vo.allElements
+
+
                             $scope.$digest()
                         }
                     })

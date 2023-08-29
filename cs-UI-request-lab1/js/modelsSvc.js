@@ -617,6 +617,7 @@ angular.module("pocApp")
                 function extractElements(model,pathRoot) {
 
                     //add to nodes list
+                    //let lable =
                     let node = {id: model.name, label: model.name,shape: 'box'}
                     node.data = {model:model}
                     if (model.name == topModel.name) {
@@ -670,12 +671,14 @@ angular.module("pocApp")
 
 
                                         //create an edge. todo This is to ALL elements, so may want to filter
+                                        let label = `${ed.path} ${ed.mult}`
                                         let edge = {id: 'e' + arEdges.length +1,
                                             from: model.name,
                                             to: childDefinition.name,
                                             color : 'blue',
                                             dashes : true,
-                                            label: ed.path,arrows : {to:true}}
+                                            label: label,
+                                            arrows : {to:true}}
                                         arEdges.push(edge)
 
                                         //console.log('expanding child: ' + childDefinition.name)

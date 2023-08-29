@@ -2,12 +2,28 @@
   <br/>
   <div class="row">
     <div class="col-md-9">
-      <strong>{{selectedModel.description}}</strong>
+      <strong>{{selectedModel.name}}</strong>: <em>{{selectedModel.description}}</em>
     </div>
 
     <div class="col-md-3">
+      <div ng-show = "hxDGLoad.length > 0">
+        <div ng-click="back()" class="clickable pull-right">
+          Reload {{hxDGLoad[hxDGLoad.length-1]}}
+        </div>
+       <!--
+        <i class="glyphicon glyphicon-chevron-left pull-right clickable"
+           ng-click="back()">
+
+        </i>
+        -->
+      </div>
+      <!--
       FHIR resource: <a target = "_blank" ng-href="{{fhirRoot}}{{selectedModel.fhirResource}}">{{selectedModel.fhirResource}}</a>
+    -->
     </div>
+
+
+
 
 
   </div>
@@ -54,6 +70,15 @@
                       <div ng-show="fhirDataTypes.indexOf(type) > -1" class="pull-right">
                         <a target = "_blank" ng-href="{{fhirRoot}}datatypes.html#{{type}}">Details in spec</a>
                       </div>
+
+                      <div ng-hide="fhirDataTypes.indexOf(type) > -1" class="pull-right clickable"
+                           ng-click="termSelectDG({DGName:type},selectedModel.name)">
+                        Load
+                      </div>
+
+
+
+
 
                       {{type}}&nbsp;
 
@@ -303,12 +328,21 @@
           <div id="graph"></div>
         </div>
         <div class="col-md-6">
+
+
           <uib-tabset ng-show="selectedModelFromGraph">
+
             <uib-tab heading="Table">
 
               <div class="row">
                 <div class="col-md-2">Name:</div>
-                <div class="col-md-10">{{selectedModelFromGraph.name}}</div>
+                <div class="col-md-10">
+                  {{selectedModelFromGraph.name}}
+
+                  <div class="clickable pull-right"
+                       ng-click="termSelectDG({DGName:selectedModelFromGraph.name},selectedModel.name)">Load
+                  </div>
+                </div>
               </div>
               <div class="row">
                 <div class="col-md-2">Title:</div>
@@ -317,26 +351,69 @@
 
 
               <br/>
-              <table class="table-bordered table table-condensed">
-                <tr><th>Path</th><th>Type</th><th>Card.</th></tr>
-                <tr ng-repeat="ed in selectedModelFromGraph.diff">
-                  <td>{{ed.path}}
-                    <div style="padding-left: 8px"><em >{{ed.description}}</em></div>
-                  </td>
-                  <td>{{ed.type[0]}}
-                    <div class="clickable"><em>{{ed.valueSet}}</em></div>
-                    <div><em>{{ed.fixedCoding}}</em></div>
-                  </td>
-                  <!--
-                  <td>
-                      <div ng-repeat="code in code">
-                          {{code}}
-                      </div>
-                  </td>
-                  -->
-                  <td>{{ed.mult}}</td>
-                </tr>
-              </table>
+
+              <uib-tabset>
+                <uib-tab heading="Directly defined">
+                  <table class="table-bordered table table-condensed">
+                    <tr><th>Path</th><th>Type</th><th>Card.</th></tr>
+                    <tr ng-repeat="ed in selectedModelFromGraph.diff">
+                      <td>
+                        <div class="clickableDotted" uib-popover="{{ed.description}}"
+                             popover-placement="right"
+                             popover-trigger="'mouseenter'">{{ed.path}}</div>
+
+                        <!--
+                        <div style="padding-left: 8px"><em >{{ed.description}}</em></div>
+-->
+                      </td>
+                      <td>{{ed.type[0]}}
+                        <div class="clickable"><em>{{ed.valueSet}}</em></div>
+                        <div><em>{{ed.fixedCoding}}</em></div>
+                      </td>
+                      <!--
+                      <td>
+                          <div ng-repeat="code in code">
+                              {{code}}
+                          </div>
+                      </td>
+                      -->
+                      <td>{{ed.mult}}</td>
+                    </tr>
+                  </table>
+                  <em>This is only elements directly defined in the DG, including overrides</em>
+
+                </uib-tab>
+                <uib-tab heading="Full list">
+                  <table class="table-bordered table table-condensed">
+                    <tr><th>Path</th><th>Type</th><th>Card.</th></tr>
+                    <tr ng-repeat="item in selectedModelFromGraphFull">
+                      <td>
+                        <div class="clickableDotted" uib-popover="{{ed.description}}"
+                             popover-placement="right"
+                             popover-trigger="'mouseenter'">{{ed.path}}</div>
+                        <!--
+                        {{item.ed.path}}
+                        <div style="padding-left: 8px"><em >{{item.ed.description}}</em></div> -->
+                      </td>
+                      <td>{{item.ed.type[0]}}
+                        <div class="clickable"><em>{{item.ed.valueSet}}</em></div>
+                        <div><em>{{item.ed.fixedCoding}}</em></div>
+                      </td>
+                      <!--
+                      <td>
+                          <div ng-repeat="code in code">
+                              {{code}}
+                          </div>
+                      </td>
+                      -->
+                      <td>{{item.ed.mult}}</td>
+                    </tr>
+                  </table>
+                  <em>These are all elements, including inherited</em>
+
+                </uib-tab>
+              </uib-tabset>
+
 
             </uib-tab>
             <uib-tab heading="Json">

@@ -180,7 +180,7 @@ angular.module("pocApp")
 
                     //Cancer assessment
                     let dgCancerAssessment = {kind:"dg",name:'CancerAssessment',title:"Cancer assessment",diff:[],
-                        mcodegroup : "disease",
+                        mcodegroup : "disease", tags:['main'],
                         description:"A description of the current status of the cancer at a given point in time."}
 
                     dgCancerAssessment.diff.push({path:'behaviour',title:'Behaviour',type:['CodeableConcept'],mult:'0..1',
