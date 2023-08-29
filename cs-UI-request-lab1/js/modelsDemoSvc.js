@@ -118,9 +118,12 @@ angular.module("pocApp")
 
                     //DG Blood pressure - just an example
                     let dgBP = {kind:"dg",name:'Bloodpressure',title:"Blood pressure",diff:[]}
-                    dgBP.diff.push({path:'systolic',title:'Systolic pressure',type:['Component'],mult:'1..1',
+                    dgBP.diff.push({path:'systolic',title:'Systolic pressure',type:['Component'],mult:'1..1'})
+                    dgBP.diff.push({path:'systolic.code',title:'Code',type:['CodeableConcept'],mult:'1..1',
                         fixedCoding:{code:'8480-6'}})
-                    dgBP.diff.push({path:'diastolic',title:'Diastolic pressure',type:['Component'],mult:'1..1',
+
+                    dgBP.diff.push({path:'diastolic',title:'Diastolic pressure',type:['Component'],mult:'1..1'})
+                    dgBP.diff.push({path:'diastolic.code',title:'Code',type:['CodeableConcept'],mult:'1..1',
                         fixedCoding:{code:'8462-4'}})
                     hashDataGroups[dgBP.name] = dgBP
 
@@ -769,7 +772,10 @@ angular.module("pocApp")
 
                     Object.keys(hashDataGroups).forEach(function (key) {
                         let dg = hashDataGroups[key]
-                        dg.mult = dg.mult || '0..1'
+                        dg.diff.forEach(function (ed) {
+                            ed.mult = ed.mult || '0..1'
+                        })
+
 
                     })
 
