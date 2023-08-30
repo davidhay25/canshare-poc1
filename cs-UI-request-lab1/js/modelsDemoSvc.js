@@ -254,23 +254,23 @@ angular.module("pocApp")
                          tags:['main'],
                         description:"A description of the current status of a sarcoma at a given point in time."}
 
-                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.radiology',title:'Radiological evidence',type:['Group'],mult:'1..1',
+                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.evidence:radiology',title:'Radiological evidence',type:['Group'],mult:'1..1',
                         description:'The radiological evidence on which a cancer diagnosis is based.'})
 
-                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.radiology.type',title:'Evidence type',type:['CodeableConcept'],mult:'0..*',
+                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.evidence:radiology.type',title:'Evidence type',type:['CodeableConcept'],mult:'0..*',
                         fixedCoding : {code:'radiol',display:'Radiology'},
                         description:'The type of evidence on which a cancer diagnosis is based.'})
 
-                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.radiology.details',
+                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.evidence:radiology.details',
                         title:'Radiological details',type:['Observation'],mult:'1..1',
                         description:'Radiological evidence'})
 
-                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.radiology.details.category',title:'Category',
+                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.evidence:radiology.details.category',title:'Category',
                         type:['CodeableConcept'],mult:'1..1',
                         fixedCoding : {code:'radiol',display:'Radiology'},
                         description:'Obs code'})
 
-                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.radiology.details.valueQuantity',title:'Quantity',
+                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.evidence:radiology.details.valueQuantity',title:'Quantity',
                         type:['CodeableConcept'],mult:'0..0',
                         description:'Obs code'})
 
