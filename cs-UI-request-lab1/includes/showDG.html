@@ -251,7 +251,7 @@
 
     <uib-tab heading="Table">
 
-
+      <em class="pull-right">Expanded. Excludes items with a Cardinality of 0..0</em>
       <div ng-show = "selectedModel.parent">
         <strong class="pull-left">Specializes: {{selectedModel.parent}}</strong>
         <br/>
@@ -476,9 +476,8 @@
     </uib-tab>
 
 
-
     <uib-tab heading="Full element list">
-      <em class="pull-right">Includes items with a Cardinality of 0..0</em>
+      <em class="pull-right">Expanded. Includes items with a Cardinality of 0..0</em>
       <uib-tabset>
         <uib-tab heading="List">
           <div class="tableFixHead">

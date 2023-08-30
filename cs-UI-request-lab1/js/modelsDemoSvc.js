@@ -183,14 +183,24 @@ angular.module("pocApp")
                         mcodegroup : "disease", tags:['main'],
                         description:"A description of the current status of the cancer at a given point in time."}
 
-                    dgCancerAssessment.diff.push({path:'basisOfDiagnosis',title:'Basis of diagnosis',type:['Group'],mult:'0..*',
+                    dgCancerAssessment.diff.push({path:'basisOfDiagnosis',title:'Basis of diagnosis',type:['Group'],mult:'0..1',
                         description:'The evidence on which a cancer diagnosis is based.'})
 
-                    dgCancerAssessment.diff.push({path:'basisOfDiagnosis.type',title:'Evidence type',type:['CodeableConcept'],mult:'0..*',
+                    dgCancerAssessment.diff.push({path:'basisOfDiagnosis.evidence',title:'General evidence',type:['Group'],mult:'0..*',
                         description:'The type of evidence on which a cancer diagnosis is based.'})
 
-                    dgCancerAssessment.diff.push({path:'basisOfDiagnosis.evidence',title:'Evidence',type:['Observation'],mult:'0..*',
-                        description:'A relevant observation (e.g. symptom, physical finding, radiological finding, or pathological finding) that may indicate the presence of cancer'})
+                    dgCancerAssessment.diff.push({path:'basisOfDiagnosis.evidence.type',title:'Evidence type',type:['CodeableConcept'],mult:'1..1',
+                        description:'The type of evidence on which a cancer diagnosis is based.'})
+
+                    dgCancerAssessment.diff.push({path:'basisOfDiagnosis.evidence.details',title:'Evidence details',type:['Observation'],mult:'1..1',
+                             description:'A relevant observation (e.g. symptom, physical finding, radiological finding, or pathological finding) that may indicate the presence of cancer'})
+
+
+                        // dgCancerAssessment.diff.push({path:'basisOfDiagnosis.type',title:'Evidence type',type:['CodeableConcept'],mult:'0..*',
+                    //    description:'The type of evidence on which a cancer diagnosis is based.'})
+
+                  //  dgCancerAssessment.diff.push({path:'basisOfDiagnosis.evidence',title:'Evidence',type:['Observation'],mult:'0..*',
+                   //     description:'A relevant observation (e.g. symptom, physical finding, radiological finding, or pathological finding) that may indicate the presence of cancer'})
 
                     dgCancerAssessment.diff.push({path:'behaviour',title:'Behaviour',type:['CodeableConcept'],mult:'0..1',
                         description:'An evaluation of the behaviour of the cancer, as best understood with the given information. This may be an initial clinical impression, through to a confirmed histological analysis - e,g, Normal, benign, malignant, indeterminate etc'})
@@ -244,21 +254,25 @@ angular.module("pocApp")
                          tags:['main'],
                         description:"A description of the current status of a sarcoma at a given point in time."}
 
-                    dgCancerAssessment.diff.push({path:'RadBasisOfDiagnosis',title:'Radiological basis of diagnosis',type:['Group'],mult:'1..1',
+                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.radiology',title:'Radiological evidence',type:['Group'],mult:'1..1',
                         description:'The radiological evidence on which a cancer diagnosis is based.'})
 
-                    dgCancerAssessment.diff.push({path:'RadBasisOfDiagnosis.type',title:'Evidence type',type:['CodeableConcept'],mult:'0..*',
+                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.radiology.type',title:'Evidence type',type:['CodeableConcept'],mult:'0..*',
                         fixedCoding : {code:'radiol',display:'Radiology'},
                         description:'The type of evidence on which a cancer diagnosis is based.'})
 
-                    dgCancerAssessmentSarcoma.diff.push({path:'RadBasisOfDiagnosis.evidence',
-                        title:'Radiological Evidence',type:['Observation'],mult:'1..1',
+                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.radiology.details',
+                        title:'Radiological details',type:['Observation'],mult:'1..1',
                         description:'Radiological evidence'})
 
-                    dgCancerAssessmentSarcoma.diff.push({path:'RadBasisOfDiagnosis.evidence.category',title:'Category',
+                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.radiology.details.category',title:'Category',
                         type:['CodeableConcept'],mult:'1..1',
                         fixedCoding : {code:'radiol',display:'Radiology'},
-                        description:'Radiological evidence'})
+                        description:'Obs code'})
+
+                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.radiology.details.valueQuantity',title:'Quantity',
+                        type:['CodeableConcept'],mult:'0..0',
+                        description:'Obs code'})
 
 
                     hashDataGroups[dgCancerAssessmentSarcoma.name] = dgCancerAssessmentSarcoma

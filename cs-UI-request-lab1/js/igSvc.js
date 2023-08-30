@@ -101,7 +101,11 @@ angular.module("pocApp")
                         let ar =  ed.path.split('.')
                         lne = `* ${ar[ar.length-1]}`
                         let mult = ed.mult || '0..1'
-                        lne += ` ${mult} ${type} "${cleanString(ed.description)}"`
+                        lne += ` ${mult} ${type} `
+
+                        if (ed.description) {
+                            lne += `"${cleanString(ed.description)}"`
+                        }
                         arLne.push(lne)
                         if (ed.valueSet) {
                             let lneVs =`* ${ar[ar.length-1]} from ${ed.valueSet} (preferred)`
@@ -120,8 +124,11 @@ angular.module("pocApp")
                 function cleanString(s) {
                     if (s) {
                         s = s.replace(/"/g, "'");
+                        return s
+                    } else {
+                        return ""
                     }
-                    return s
+
 
                 }
 
