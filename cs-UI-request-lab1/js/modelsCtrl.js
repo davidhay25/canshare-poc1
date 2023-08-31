@@ -2,11 +2,36 @@
 
 angular.module("pocApp")
     .controller('modelsCtrl',
-        function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,
+        function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc) {
 
             $scope.input = {}
             $scope.input.showFullModel = true
+
+            let search = $window.location.search;
+
+            if (search) {
+
+                let srch = search.substr(1)
+                let ar = srch.split('=')
+                if (ar.length == 2) {
+                    if (ar[0] == 'dt') {
+                        $scope.initialDT = ar[1]
+                        console.log($scope.initialDT)
+
+                        //wait a second then select the DT. todo really need to refactor this controller...
+                        $timeout(function () {
+                            if ($scope.hashAllDG[$scope.initialDT]) {
+                                $scope.selectModel($scope.hashAllDG[$scope.initialDT])
+                            }
+
+                        },500)
+
+                    }
+                }
+            }
+
+
 
             $scope.leftPanel = 'col-md-3'
             $scope.rightPanel = 'col-md-9'
@@ -428,7 +453,7 @@ angular.module("pocApp")
             //---------- functions to edit a model from the tree
 
             //set the multiplicity of the element to 0..0
-            $scope.removeElement = function (element) {
+            $scope.removeElementDEP = function (element) {
                 element.mult = "0..0"
                 modelsSvc.updateOrAddElement($scope.selectedModel,element)
             }
@@ -544,7 +569,7 @@ angular.module("pocApp")
             }
 
 
-            //edit an existing model
+            //edit an existing model (DG)
             $scope.editModel = function (model,isNew) {
 
                 $uibModal.open({
@@ -618,9 +643,6 @@ angular.module("pocApp")
             $scope.selectModelFromTypeUsage = function (model) {
                 $scope.selectedModelFromTypeUsage = model
             }
-
-
-
 
             $scope.addElement = function (name,type) {
                 //add a new element to the current model
@@ -731,8 +753,6 @@ angular.module("pocApp")
               //  $scope.testQ = QutilitiesSvc.makeItemFromDG(vo.allElements,$scope.hashAllDG)
 
             }
-
-
 
             function makeGraph() {
 
