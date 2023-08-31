@@ -113,25 +113,26 @@ angular.module("pocApp")
                     dgGrading.diff.push({path:'system',title:'System',type:['CodeableConcept'],mult:'0..1'})
                     dgGrading.diff.push({path:'date',title:'Date',type:['date'],mult:'0..1'})
                     dgGrading.diff.push({path:'criteria',title:'Criteria',type:['Group'],mult:'0..1'})
-                    dgGrading.diff.push({path:'criteria.criteria:general',title:'General criteria',type:['Observation'],
+                    dgGrading.diff.push({path:'criteria.general',title:'General criteria',type:['Observation'],
                         mult:'0..*'})
 
                     dgGrading.diff.push({path:'grade',title:'Grade',type:['CodeableConcept'],mult:'0..1'})
                     dgGrading.diff.push({path:'additionalDetails',title:'Additional details',type:['string'],mult:'0..1'})
                     hashDataGroups[dgGrading.name] = dgGrading
 
+                    //sarcoma grading
                     let dgGradingSarcoma = {kind:"dg",parent:'Grading', name:'GradingSarcoma',title:"Sarcoma grading",diff:[],
                         tags:['main'],
                         description:"The degree of differentiation of a sarcoma, e.g. the extent to which a tumour resembles the normal tissue at that site (also known as histological grade)"}
-                    dgGradingSarcoma.diff.push({path:'criteria.criteria:mitoticCount',title:'Mitotic count',
+                    dgGradingSarcoma.diff.push({path:'criteria.mitoticCount',title:'Mitotic count',
                         type:['Observation'],mult:'1..1'})
-                    dgGradingSarcoma.diff.push({path:'criteria.criteria:mitoticCount.code',title:'Code',
+                    dgGradingSarcoma.diff.push({path:'criteria.mitoticCount.code',title:'Code',
                         fixedCoding : {display:'mitotic count'},
                         type:['CodeableConcept'],mult:'0..1'})
 
-                    dgGradingSarcoma.diff.push({path:'criteria.criteria:necrosisPercentage',title:'Necrosis percentage',
+                    dgGradingSarcoma.diff.push({path:'criteria.necrosisPercentage',title:'Necrosis percentage',
                         type:['Observation'],mult:'1..1'})
-                    dgGradingSarcoma.diff.push({path:'criteria.criteria:necrosisPercentage.code',title:'Code',
+                    dgGradingSarcoma.diff.push({path:'criteria.necrosisPercentage.code',title:'Code',
                         fixedCoding : {display:'necrosis percentage'},
                         type:['CodeableConcept'],mult:'1..1'})
 

@@ -83,7 +83,8 @@ angular.module("pocApp")
                 }
 
                 processNode(arLines,hash[rootPath],"")
-                return arLines.join('\r\n')
+                //return arLines.join('\r\n')
+                return arLines.join('\n')
 
                 //get the fsh lines for an ed
                 //can be more than one
@@ -105,6 +106,8 @@ angular.module("pocApp")
 
                         if (ed.description) {
                             lne += `"${cleanString(ed.description)}"`
+                        } else {
+                            lne += `"${cleanString(ed.path)}"`  //description is required
                         }
                         arLne.push(lne)
                         if (ed.valueSet) {
