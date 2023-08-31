@@ -1,11 +1,16 @@
 <div ng-controller="modelDGCtrl">
   <br/>
   <div class="row">
-    <div class="col-md-9">
+    <div class="col-md-7">
       <strong>{{selectedModel.name}}</strong>: <em>{{selectedModel.description}}</em>
     </div>
 
+
     <div class="col-md-3">
+      FHIR resource: <a target = "_blank" ng-href="{{fhirRoot}}{{selectedModel.fhirResource}}">{{selectedModel.fhirResource}}</a>
+    </div>
+
+    <div class="col-md-2">
       <div ng-show = "hxDGLoad.length > 0">
         <div ng-click="back()" class="clickable pull-right">
           Reload {{hxDGLoad[hxDGLoad.length-1]}}
@@ -76,10 +81,6 @@
                         Load
                       </div>
 
-
-
-
-
                       {{type}}&nbsp;
 
                     </div>
@@ -111,7 +112,17 @@
                     </td>
                   </tr>
 
-<!-- don't delete until we have dependencies sorted
+                  <tr>
+                    <td>Mapping notes</td>
+                    <td>
+                      <i class="glyphicon glyphicon-edit pull-right clickable"
+                         ng-click="editDGItem(selectedNode.data)"></i>
+                      {{selectedNode.data.ed.mapping}}
+                    </td>
+                  </tr>
+
+
+<!-- don't delete until we have dependencies sorted, But don't call it mapping - that's for the FHIR maping
                   <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
                     <td>Mappings</td>
                     <td>
@@ -555,7 +566,7 @@
       The FHIR shorthand that represents this DataGroup as a FHIR Logical Model.
       <span class="pull-right">
        <i class="glyphicon glyphicon-paperclip pull-right clickable"
-          ng-click="copyToClipboard(selectedModel)"></i>
+          ng-click="copyFshToClipboard(dgFshLM)"></i>
       </span>
       <br/>
       <pre>{{dgFshLM}}</pre>

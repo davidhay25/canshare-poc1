@@ -150,6 +150,18 @@ angular.module("pocApp")
             $scope.hashAllCompositions = $localStorage.world.compositions
             //make the term summary. These are the override elements in the models
 
+            $scope.copyFshToClipboard = function (fsh) {
+
+                navigator.clipboard.writeText(fsh).then(
+                    () => {
+                        alert('FSH text copied to clipboard');
+                    },
+                    () => {
+                        alert('FSH text not copied to clipboard');
+                    },
+                )
+
+            }
 
             $scope.copyToClipboard = function (json) {
                 let text = angular.toJson(json,true)
@@ -194,7 +206,7 @@ angular.module("pocApp")
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editDGItem.html',
                     backdrop: 'static',
-                    //size : 'lg',
+                    size : 'lg',
                     controller: 'editDGItemCtrl',
 
                     resolve: {
@@ -222,6 +234,11 @@ angular.module("pocApp")
                     if (ed.title !== originalED.title) {
                         changes += "Title changed. "
                     }
+
+                    if (ed.mapping !== originalED.mapping) {
+                        changes += "Mapping notes changed. "
+                    }
+
                     if (ed.mult !== originalED.mult) {
                         changes += "Cardinality changed."
                     }
@@ -237,6 +254,7 @@ angular.module("pocApp")
                         if (ed1.path == p) {
                             found = true
                             ed1.title = ed.title
+                            ed1.mapping = ed.mapping
                             ed1.description = ed.description
                             ed1.mult = ed.mult
                             ed1.valueSet = ed.valueSet

@@ -14,6 +14,7 @@ angular.module("pocApp")
             if (item && item.ed) {
                 $scope.input.description = item.ed.description
                 $scope.input.title = item.ed.title
+                $scope.input.mapping = item.ed.mapping
                 $scope.input.valueSet = item.ed.valueSet
                 $scope.input.path =  $filter('dropFirstInPath')(item.ed.path)
                 for (typ of allTypes) {
@@ -83,6 +84,7 @@ angular.module("pocApp")
                     ed.type = [$scope.input.type]
                     ed.path = `new.${$scope.input.path}`        //the 'new.' is stripped off, as the full path is passed in for editing existing
                     ed.description = $scope.input.description
+                    ed.mapping = $scope.input.mapping
                     ed.title = $scope.input.title
                     ed.mult = $scope.input.mult
                     ed.valueSet = $scope.input.valueSet
@@ -90,6 +92,7 @@ angular.module("pocApp")
                     $scope.$close(ed)
 
                 } else {
+                    item.ed.mapping = $scope.input.mapping
                     item.ed.description = $scope.input.description
                     item.ed.title = $scope.input.title
                     item.ed.mult = $scope.input.mult

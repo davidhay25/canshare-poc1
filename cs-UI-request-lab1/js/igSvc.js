@@ -4,6 +4,9 @@ angular.module("pocApp")
     .service('igSvc', function(modelsSvc) {
 
         return {
+
+
+
             makeFshForComp : function(comp,elements,hashElements) {
                 return //todo - finish later
                 //generate a fsh file for a composition.
@@ -83,7 +86,7 @@ angular.module("pocApp")
                 }
 
                 processNode(arLines,hash[rootPath],"")
-                //return arLines.join('\r\n')
+
                 return arLines.join('\n')
 
                 //get the fsh lines for an ed
@@ -95,7 +98,7 @@ angular.module("pocApp")
                         let lne = ""
                         let type = ed.type[0]
                         //if the type is not a FHIR type, then it will be one of the DG. Replace it with 'BackboneElement'
-                        if (fhirDT.indexOf(type) == -1) {
+                        if (fhirDT.indexOf(type) == -1 || type == 'Group') {
                             type = "BackboneElement"
                         }
 
@@ -111,7 +114,7 @@ angular.module("pocApp")
                         }
                         arLne.push(lne)
                         if (ed.valueSet) {
-                            let lneVs =`* ${ar[ar.length-1]} from ${ed.valueSet} (preferred)`
+                            let lneVs =`* ${ar[ar.length-1]} from https://nzhts.digital.health.nz/fhir/ValueSet/${ed.valueSet} (preferred)`
                             arLne.push(lneVs)
                             //let lneVs = `item2 from http://hl7.org/fhir/ValueSet/contact-point-system (required)`
 

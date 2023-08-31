@@ -189,7 +189,7 @@ angular.module("pocApp")
                         description:"The anatomical structure being described"}) //will be overwritten
                     dgBodySite.diff.push({path:'laterality',title:'Laterality',type:['CodeableConcept'],mult:'0..1',
                         valueSet : 'canshare-laterality',
-                        description:'The laterality of a paired organ',valueSet:"canshare-laterality"})
+                        description:'The laterality of a paired organ'})
                     dgBodySite.diff.push({path:'landmark',title:'Landmark',type:['CodeableConcept'],mult:'0..1',
                         description:'A significant landmark near the body site, e.g. nipple'})
                     dgBodySite.diff.push({path:'clockface',title:'Clockface',type:['CodeableConcept'],mult:'0..1',
@@ -205,11 +205,13 @@ angular.module("pocApp")
 
                     //Cancer assessment
                     let dgCancerAssessment = {kind:"dg",name:'CancerAssessment',title:"Cancer assessment",diff:[],
-                        mcodegroup : "disease", tags:['main'],
+                        mcodegroup : "disease", tags:['main'], fhirResource:"ClinicalImpression",
                         description:"A description of the current status of the cancer at a given point in time."}
 
                     dgCancerAssessment.diff.push({path:'basisOfDiagnosis',title:'Basis of diagnosis',type:['Group'],mult:'0..1',
-                        description:'The evidence on which a cancer diagnosis is based.'})
+                        description:'The evidence on which a cancer diagnosis is based.',
+                        mapping : "This will be a complex extension",
+                        })
 
                     dgCancerAssessment.diff.push({path:'basisOfDiagnosis.evidence',title:'General evidence',type:['Group'],mult:'0..*',
                         description:'The type of evidence on which a cancer diagnosis is based.'})
@@ -275,27 +277,27 @@ angular.module("pocApp")
 
                     //SarcomaCancer assessment
                     let dgCancerAssessmentSarcoma = {kind:"dg",parent:"CancerAssessment", name:'CancerAssessmentSarcoma',
-                        title:"Sarcoma cancer assessment",diff:[],
+                        title:"Sarcoma cancer assessment",diff:[], fhirResource:"ClinicalImpression",
                          tags:['main'],
                         description:"A description of the current status of a sarcoma at a given point in time."}
 
-                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.evidence:radiology',title:'Radiological evidence',type:['Group'],mult:'1..1',
+                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.evidenceRadiology',title:'Radiological evidence',type:['Group'],mult:'1..1',
                         description:'The radiological evidence on which a cancer diagnosis is based.'})
 
-                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.evidence:radiology.type',title:'Evidence type',type:['CodeableConcept'],mult:'0..*',
+                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.evidenceRadiology.type',title:'Evidence type',type:['CodeableConcept'],mult:'0..*',
                         fixedCoding : {code:'radiol',display:'Radiology'},
                         description:'The type of evidence on which a cancer diagnosis is based.'})
 
-                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.evidence:radiology.details',
+                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.evidenceRadiology.details',
                         title:'Radiological details',type:['Observation'],mult:'1..1',
                         description:'Radiological evidence'})
 
-                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.evidence:radiology.details.category',title:'Category',
+                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.evidenceRadiology.details.category',title:'Category',
                         type:['CodeableConcept'],mult:'1..1',
                         fixedCoding : {code:'radiol',display:'Radiology'},
                         description:'Obs code'})
 
-                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.evidence:radiology.details.valueQuantity',title:'Quantity',
+                    dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.evidenceRadiology.details.valueQuantity',title:'Quantity',
                         type:['CodeableConcept'],mult:'0..0',
                         description:'Obs code'})
 
@@ -517,7 +519,7 @@ angular.module("pocApp")
                     dgObservation.diff.push({path:'category',title:'Category',type:['CodeableConcept'],mult:"0..1",
                         description:"A classification of the type of observation being made"})
                     dgObservation.diff.push({path:'date',title:'Date',type:['dateTime'],mult:"0..1",
-                        description:"TThe date and/or time that the observation was deemed to be taken"})
+                        description:"The date and/or time that the observation was deemed to be taken"})
                     dgObservation.diff.push({path:'performer',title:'Performer',type:['HcProvider'],mult:"0..1",
                         description:"The healthcare practitioner who is reponsible for the observation"})
                     dgObservation.diff.push({path:'valueString',title:'Text',type:['string'],mult:"0..1",

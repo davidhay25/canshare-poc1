@@ -74,12 +74,28 @@
 
           </tr>
 
+          <tr>
+            <td>Mapping notes</td>
+            <td>
+              <textarea ng-model="input.mapping" class="form-control"></textarea>
+            </td>
+          </tr>
+
         </table>
 
       </uib-tab>
+
+      <uib-tab heading="Mapping">
+
+
+
+
+      </uib-tab>
+
       <uib-tab ng-show = "item.path" heading="Json">
         <pre>{{item | json}}</pre>
       </uib-tab>
+
       <uib-tab heading="All elements in DG">
         <br/>
         <table class="table-condensed table table-bordered">
