@@ -521,13 +521,19 @@ angular.module("pocApp")
                     dgObservation.diff.push({path:'date',title:'Date',type:['dateTime'],mult:"0..1",
                         description:"The date and/or time that the observation was deemed to be taken"})
                     dgObservation.diff.push({path:'performer',title:'Performer',type:['HcProvider'],mult:"0..1",
-                        description:"The healthcare practitioner who is reponsible for the observation"})
+                        description:"The healthcare practitioner who is responsible for the observation"})
+
+                    dgObservation.diff.push({path:'interpretation',title:'Interpretation',type:['CodeableConcept'],mult:"0..1",
+                        description:"The interpretation"})
+
                     dgObservation.diff.push({path:'valueString',title:'Text',type:['string'],mult:"0..1",
                         description:"The plain text information determined as a result of making the observation"})
                     dgObservation.diff.push({path:'valueCodeableConcept',title:'Coded value',type:['CodeableConcept'],mult:"0..1",
                         description:"A reference to a code defined by a terminology system determined as a result of making the observation"})
                     dgObservation.diff.push({path:'valueQuantity',title:'Quantity value',type:['Quantity'],mult:"0..1",
                         description:"The measured or measurable amount determined as a result of making the observation"})
+                    dgObservation.diff.push({path:'valueRatio',title:'Quantity value',type:['Ratio'],mult:"0..1",
+                        description:"The ratio"})
                     hashDataGroups[dgObservation.name] = dgObservation
 
                     //DataGroup for patient
