@@ -2,6 +2,9 @@
 angular.module("pocApp")
     .controller('modelDGCtrl',
         function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc) {
+        
+        
+
 
             //locate the model where this item was defined
             $scope.getSourceModelName = function (ed) {
@@ -15,6 +18,9 @@ angular.module("pocApp")
                 }
             }
 
+            $scope.expandDTTree = function () {
+                $('#dgTree').jstree('open_all');
+            }
 
             //set the possiblu units for a Quantity DT
             $scope.setUnits = function (ed) {

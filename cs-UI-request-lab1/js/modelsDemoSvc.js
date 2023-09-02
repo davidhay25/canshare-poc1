@@ -1,3 +1,5 @@
+
+//todo add direct lint to SS from DT
 angular.module("pocApp")
 
     .service('modelsDemoSvc', function() {
@@ -108,7 +110,7 @@ angular.module("pocApp")
 
                     //DG grading
                     let dgGrading = {kind:"dg",name:'Grading',title:"Grading",diff:[],
-                        tags:['main'],
+                        tags:'main',
                         description:"The degree of differentiation of a tumour, e.g. the extent to which a tumour resembles the normal tissue at that site (also known as histological grade)"}
                     dgGrading.diff.push({path:'system',title:'System',type:['CodeableConcept'],mult:'0..1'})
                     dgGrading.diff.push({path:'date',title:'Date',type:['date'],mult:'0..1'})
@@ -122,7 +124,7 @@ angular.module("pocApp")
 
                     //sarcoma grading
                     let dgGradingSarcoma = {kind:"dg",parent:'Grading', name:'GradingSarcoma',title:"Sarcoma grading",diff:[],
-                        tags:['main'],
+                        tags:'main',
                         description:"The degree of differentiation of a sarcoma, e.g. the extent to which a tumour resembles the normal tissue at that site (also known as histological grade)"}
                     dgGradingSarcoma.diff.push({path:'criteria.mitoticCount',title:'Mitotic count',
                         type:['Observation'],mult:'1..1'})
@@ -140,7 +142,7 @@ angular.module("pocApp")
 
                     hashDataGroups[dgGradingSarcoma.name] = dgGradingSarcoma
 
-
+/*
                     //DG Blood pressure - just an example
                     let dgBP = {kind:"dg",name:'Bloodpressure',title:"Blood pressure",diff:[]}
                     dgBP.diff.push({path:'systolic',title:'Systolic pressure',type:['Component'],mult:'1..1'})
@@ -150,8 +152,8 @@ angular.module("pocApp")
                     dgBP.diff.push({path:'diastolic',title:'Diastolic pressure',type:['Component'],mult:'1..1'})
                     dgBP.diff.push({path:'diastolic.code',title:'Code',type:['CodeableConcept'],mult:'1..1',
                         fixedCoding:{code:'8462-4'}})
-                    hashDataGroups[dgBP.name] = dgBP
-
+                    // hashDataGroups[dgBP.name] = dgBP
+*/
 
                     //DG prognostic scoring
                     let dgPrognosticScore = {kind:"dg",name:'PrognosticScore',title:"Prognostic score",diff:[]}
@@ -205,7 +207,7 @@ angular.module("pocApp")
 
                     //Cancer assessment
                     let dgCancerAssessment = {kind:"dg",name:'CancerAssessment',title:"Cancer assessment",diff:[],
-                        mcodegroup : "disease", tags:['main'], fhirResource:"ClinicalImpression",
+                        mcodegroup : "disease", tags:'main', fhirResource:"ClinicalImpression",
                         description:"A description of the current status of the cancer at a given point in time."}
 
                     dgCancerAssessment.diff.push({path:'basisOfDiagnosis',title:'Basis of diagnosis',type:['Group'],mult:'0..1',
@@ -278,7 +280,7 @@ angular.module("pocApp")
                     //SarcomaCancer assessment
                     let dgCancerAssessmentSarcoma = {kind:"dg",parent:"CancerAssessment", name:'CancerAssessmentSarcoma',
                         title:"Sarcoma cancer assessment",diff:[], fhirResource:"ClinicalImpression",
-                         tags:['main'],
+                         tags:'main',
                         description:"A description of the current status of a sarcoma at a given point in time."}
 
                     dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.evidenceRadiology',title:'Radiological evidence',type:['Group'],mult:'1..1',
@@ -788,7 +790,7 @@ angular.module("pocApp")
                     let compPathRequest = {kind:"comp",name:'PathRequest',title: "Pathology request",meta:{},sections:[]}
                     compPathRequest.meta.category = "request"
                     compPathRequest.meta.tumourStream = "lung"
-                    compPathRequest.meta.tags = ['tag1','tag2']
+                    //compPathRequest.meta.tags = ['tag1','tag2']
 
                     let s1 = {name:"demographics",kind:'section',items:[{name:'patient',title:"Patient",type:['Patient'],mult:'1..1'}]}
                     compPathRequest.sections.push(s1)

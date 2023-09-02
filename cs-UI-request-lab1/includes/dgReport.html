@@ -9,7 +9,15 @@
           <div class="clickable" ng-click="termSelectDG(item)">{{item.DGName}}</div>
 
         </td>
-        <td>{{item.msg}}</td>
+        <td>
+
+
+          <span ng-show="hashAllDG[item.DGName].status == 'new'">
+            <div class="clickable pull-right" ng-click="deleteDG(item.DGName)" >Delete</div>
+          </span>
+          {{item.msg}}
+
+        </td>
         <td>
           <div class="clickable" ng-click="termSelectDGItem({hiddenDGName:item.DGName, path:item.path})">{{item.path}}</div>
         </td>
@@ -35,18 +43,24 @@
       </tr>
     </table>
 
+<!--
+
+    <br/>
+    <strong>User created DataTypes</strong>
+  <br/>
+    <table class="table-condensed table table-bordered">
+      <tr ng-repeat="(k,v) in hashAllDG" ng-show="v.status == 'new'">
+        <td>{{k}}</td>
+        <td>{{v.title}}</td>
+        <td>{{v.description}}</td>
+      </tr>
+    </table>
+
+    -->
 
 
-
-    <div class="list-group">
-      <div class="list-group-item" ng-repeat="el in dgUpdates.newElement">
-        {{el.dgName}}
-      </div>
-    </div>
 
   </div>
-  <div class="col-md-6">
 
-  </div>
 
 </div>

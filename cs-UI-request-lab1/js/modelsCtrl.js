@@ -5,8 +5,12 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc) {
 
+
+            $scope.version = "0.3"
             $scope.input = {}
             $scope.input.showFullModel = true
+
+            $scope.input.selectedTag = 'main'       //default tag for tag filtered list
 
             let search = $window.location.search;
 
@@ -106,27 +110,46 @@ angular.module("pocApp")
             $scope.hashAllDG = $localStorage.world.dataGroups
 
             //create a list of all DT + fhir types
-            function makeAllDTList() {
+            makeAllDTList = function() {
                 $scope.tags = {}
+                $scope.tagNames = []        //use an array for the list filtered by tag
                 $scope.allTypes = modelsSvc.fhirDataTypes()
 
+                let userTags = $localStorage.userTags || {}     //if the user has customized the tags - keyed by name
+
+
+                //iterate through DT assembling the tag name list, tag hash
                 Object.keys($scope.hashAllDG).forEach(function (key) {
                     $scope.allTypes.push(key)
                     //now look for tags
                     let dt = $scope.hashAllDG[key]
 
-                    if (dt.tags) {
-                        dt.tags.forEach(function (tag) {
+                    let tagsForThisDG = userTags[key] || dt.tags
+
+                    if (tagsForThisDG) {
+                        let ar = tagsForThisDG.split(" ")
+                        ar.forEach(function (tag) {
+                            if ($scope.tagNames.indexOf(tag) == -1) {
+                                $scope.tagNames.push(tag)
+                            }
                             $scope.tags[tag] = $scope.tags[tag] || []
                             $scope.tags[tag].push(dt)
-
                         })
                     }
-
                 })
             }
             makeAllDTList()
-            console.log($scope.tags)
+
+            //console.log($scope.tags)
+
+            //when a tag is update in the UI - save a copy in the browser cache
+            $scope.updateTag = function (tags) {
+
+                $localStorage.userTags = $localStorage.userTags  || {}
+                $localStorage.userTags[$scope.selectedModel.name] = tags
+
+                makeAllDTList()
+            }
 
 
             //make a sorted list for the UI
@@ -173,6 +196,40 @@ angular.module("pocApp")
                         alert('Content not copied to clipboard');
                     },
                 )
+
+            }
+
+            //can only delete user defined DGs
+            $scope.deleteDG = function (dgName) {
+                //if this DG is a parent of another, or references by another it cannot be removed
+                let arRejectMessage = []
+                Object.keys($scope.hashAllDG).forEach(function (key) {
+                    let dg = $scope.hashAllDG[key]
+                    if (dg.parent == dgName) {
+                        arRejectMessage.push(`This DG is a parent to ${dg.name}`)
+                    }
+
+                    dg.diff.forEach(function (ed) {
+                        ed.type.forEach(function (typ) {
+                            if (typ == dgName) {
+                                arRejectMessage.push(`This DG is referenced by ${dg.name} (${ed.path})`)
+                            }
+                        })
+
+                    })
+
+                })
+                if (arRejectMessage.length > 0) {
+                    //let msg =
+                    let fullMsg = `Cannot delete this DG. ${arRejectMessage.join(' ')}`
+                    alert(fullMsg)
+                } else {
+                    if (confirm("Are you sure you wish to delete this DG? It cannot be recovered")) {
+                        delete $scope.hashAllDG[dgName]
+                        makeAllDTList()
+                        $scope.refreshUpdates()
+                    }
+                }
 
             }
 
@@ -280,16 +337,7 @@ angular.module("pocApp")
                     refreshFullList($scope.selectedModel)
 
                     $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:p})
-                        //$scope.termSelectDGItem({hiddenDGName: $scope.selectedModel.name,path: ed.path})
-/*
-<<<<<<< HEAD
-                    //select the new item
 
-                    $scope.termSelectDGItem({hiddenDGName: $scope.selectedModel.name,path: ed.path})
-=======
-                    $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:p})
->>>>>>> b0706aa3d2969185143c2c1671eb634b2e92dc09
-*/
                 })
             }
 
@@ -429,7 +477,17 @@ angular.module("pocApp")
             $scope.resetWorld = function () {
 
                 if (confirm("Are you wish to restore to the default demo state")) {
-                    $localStorage.world = modelsDemoSvc.getDemo()
+                    //make a copy of the current DTs - this will include any DT created by the user
+                    let temp = angular.copy($scope.hashAllDG)
+
+                    $localStorage.world = modelsDemoSvc.getDemo()    //{dataGroups: compositions: }
+
+                    //Now update the world with any user created DTs. todo - may do this with compositions as well
+                    Object.keys(temp).forEach(function (key) {
+                        let dt = temp[key]
+                        $localStorage.world.dataGroups[key] = $localStorage.world.dataGroups[key] || dt
+                    })
+
                     $scope.world = $localStorage.world
                     $scope.hashAllDG = $localStorage.world.dataGroups
                     $scope.hashAllCompositions = $localStorage.world.compositions
@@ -853,8 +911,9 @@ angular.module("pocApp")
 
             $scope.expandCompTree = function () {
                 $('#compositionTree').jstree('open_all');
-
             }
+
+
 
             //make the tree of the composition
             function makeCompTree(treeData,rootNodeId) {

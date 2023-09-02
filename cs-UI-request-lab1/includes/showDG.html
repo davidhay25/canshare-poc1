@@ -1,38 +1,68 @@
 <div ng-controller="modelDGCtrl">
-  <br/>
+
+
   <div class="row">
     <div class="col-md-7">
       <strong>{{selectedModel.name}}</strong>: <em>{{selectedModel.description}}</em>
+      <div ng-show="selectedModel.parent">
+        <strong>Parent</strong>:
+        <span class="clickable"
+            ng-click="termSelectDG({DGName:selectedModel.parent},selectedModel.name)">{{selectedModel.parent}}
+        </span>
+
+      </div>
     </div>
 
 
-    <div class="col-md-3">
+    <div class="col-md-5">
+      <table class="table table-condensed">
+        <tr>
+          <td>FHIR resource:</td>
+          <td><a target = "_blank" ng-href="{{fhirRoot}}{{selectedModel.fhirResource}}">{{selectedModel.fhirResource}}</a></td>
+        </tr>
+        <tr><td>Tags:</td>
+          <td> <input type = "text" class="form-control" ng-blur="updateTag(selectedModel.tags)" ng-model="selectedModel.tags"/></td>
+        </tr>
+        <tr ng-show = "hxDGLoad.length > 0">
+          <td></td>
+          <td>
+
+            <div ng-show = "hxDGLoad.length > 0">
+              <div ng-click="back()" class="clickable pull-right">
+                Reload {{hxDGLoad[hxDGLoad.length-1]}}
+              </div>
+
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+<!--
       FHIR resource: <a target = "_blank" ng-href="{{fhirRoot}}{{selectedModel.fhirResource}}">{{selectedModel.fhirResource}}</a>
+      <div>
+        Tags: <input type = "text" class="form-control" ng-blur="updateTag()" ng-model="selectedModel.tags"/>
+      </div>
     </div>
-
+-->
+    <!--
     <div class="col-md-2">
       <div ng-show = "hxDGLoad.length > 0">
         <div ng-click="back()" class="clickable pull-right">
           Reload {{hxDGLoad[hxDGLoad.length-1]}}
         </div>
-       <!--
-        <i class="glyphicon glyphicon-chevron-left pull-right clickable"
-           ng-click="back()">
 
-        </i>
-        -->
       </div>
-      <!--
-      FHIR resource: <a target = "_blank" ng-href="{{fhirRoot}}{{selectedModel.fhirResource}}">{{selectedModel.fhirResource}}</a>
-    -->
+
     </div>
+    -->
 
 
 
 
 
   </div>
-  <br/>
+
 
 
 
@@ -45,6 +75,7 @@
       <br/>
       <div class="row">
         <div class="col-md-6">
+          <div class="pull-right clickable" ng-click="expandDTTree()">Expand all</div>
           <div id="dgTree"></div>
 
           <button class="btn btn-link" ng-click="editDGItem()">Add new element</button>
@@ -263,7 +294,7 @@
     <uib-tab heading="Table">
 
       <em class="pull-right">Expanded. Excludes items with a Cardinality of 0..0</em>
-      <div ng-show = "selectedModel.parent">
+      <div ng-show = "false && selectedModel.parent">
         <strong class="pull-left">Specializes: {{selectedModel.parent}}</strong>
         <br/>
       </div>
@@ -334,6 +365,8 @@
 
     <uib-tab heading="Graph" select="fitGraph()">
 
+      <em class="pull-right">DT inheritance hierarchy and referenced DTs</em>
+      <br/>
       <div class="row">
         <div class="col-md-6">
           <div id="graph"></div>
@@ -351,8 +384,10 @@
                   {{selectedModelFromGraph.name}}
 
                   <div class="clickable pull-right"
+                       ng-show="selectedModelFromGraph.name !== selectedModel.name"
                        ng-click="termSelectDG({DGName:selectedModelFromGraph.name},selectedModel.name)">Load
                   </div>
+
                 </div>
               </div>
               <div class="row">
