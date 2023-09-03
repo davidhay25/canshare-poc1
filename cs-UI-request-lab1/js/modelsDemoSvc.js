@@ -548,7 +548,8 @@ angular.module("pocApp")
                     //DG Observation
                     let dgObservation = {kind:"dg",name:'Observation',title:"Observation",diff:[],
                         ss:"https://docs.google.com/spreadsheets/d/1XU7Jc0BbC5nXgmTu-qVLS-WwJjKO9GLXgjVHVk2WRL0/edit#gid=1502765034",
-                        description:"Measurements and simple assertions made about a patient, device or other subject"}
+                        description:"Measurements and simple assertions made about a patient, device or other subject. Intended as abstract."}
+
                     dgObservation.diff.push({path:'status',title:'Status',type:['code'],mult:"1..1",
                         description:"The status of the result value - i.e. registered, preliminary, final, amended"})
 
@@ -568,6 +569,7 @@ angular.module("pocApp")
                     dgObservation.diff.push({path:'interpretation',title:'Interpretation',type:['CodeableConcept'],mult:"0..1",
                         description:"The interpretation"})
 
+                    /* rather than defineing the valusDT here, have child DG's add the one they want
                     dgObservation.diff.push({path:'valueString',title:'Text',type:['string'],mult:"0..1",
                         description:"The plain text information determined as a result of making the observation"})
                     dgObservation.diff.push({path:'valueCodeableConcept',title:'Coded value',type:['CodeableConcept'],mult:"0..1",
@@ -576,6 +578,8 @@ angular.module("pocApp")
                         description:"The measured or measurable amount determined as a result of making the observation"})
                     dgObservation.diff.push({path:'valueRatio',title:'Ratio value',type:['Ratio'],mult:"0..1",
                         description:"The ratio"})
+
+                    */
                     hashDataGroups[dgObservation.name] = dgObservation
 
 
@@ -595,8 +599,39 @@ angular.module("pocApp")
                     dgObservationMC.diff.push({path:'valueRatio',title:'Ratio value',type:['Ratio'],mult:"0..1",
                         description:"The ratio"})
 
+                    dgObservationMC.diff.push({path:'valueRatio.denominator',title:'denominator',type:['Quantity'],mult:"1..1",
+                        description:"The denominator of the ratio"})
+
+                    dgObservationMC.diff.push({path:'valueRatio.denominator.unit',title:'Denominator units',type:['string'],mult:"1..1",
+                        fixedString:"mm^2",
+                        description:"Fix the units for the denominator to mm squared"})
+
 
                     hashDataGroups[dgObservationMC.name] = dgObservationMC
+
+                    //DG for FNCLCC mitotic observation
+                    let dgObservationMC_FNCLCC = {kind:"dg",parent:"ObservationMitoticCount",name:'ObservationMitoticCountFNCLCC',
+                        title:"FNCLCC Mitotic count observation",diff:[],
+                        description:"FNCLCC specialization of Mitotic count observation"}
+
+                    dgObservationMC_FNCLCC.diff.push({path:'valueRatio.denominator.value',title:'Denominator value',type:['decimal'],mult:"1..1",
+                        fixedDecimal:2,
+                        description:"Fix the value for the denominator to  2 mm squared"})
+
+                    dgObservationMC_FNCLCC.diff.push({path:'interpretation',title:'Interpretation',type:['CodeableConcept'],mult:"1..1",
+                        options:[
+                            {pt:"FNCLCC sarcoma mitotic count score 1"},
+                            {pt:"FNCLCC sarcoma mitotic count score 2"},
+                            {pt:"FNCLCC sarcoma mitotic count score 3"}
+                        ],
+                        description:"The interpretation"})
+
+
+
+                    hashDataGroups[dgObservationMC_FNCLCC.name] = dgObservationMC_FNCLCC
+
+
+
 
                     //DataGroup for patient
                     let dgPatient = {kind:"dg",name:'Patient',title:"Patient",diff:[],description:"Name, identifiers, and demographic details about the patient"}

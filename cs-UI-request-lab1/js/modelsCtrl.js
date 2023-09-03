@@ -103,6 +103,10 @@ angular.module("pocApp")
 
             $scope.world = $localStorage.world
 
+            let size = modelsSvc.getSizeOfObject($scope.world)
+
+            console.log(`Size of world: ${size/1000} K`)
+
 /* - leave until we figure out dependencies
             //download the Concept map and generate the hash that lists conditional refsets by code
             modelsSvc.getConceptMapHash().then(
@@ -131,9 +135,19 @@ angular.module("pocApp")
                     //now look for tags
                     let dt = $scope.hashAllDG[key]
 
+
+
                     let tagsForThisDG = userTags[key] || dt.tags
 
                     if (tagsForThisDG) {
+
+                        //todo - changed the multiplicity of tag - now a space delimited string rather than an array
+                        //todo will be able to delete this check after others have refreshed
+                        if (Array.isArray(tagsForThisDG)) {
+                            tagsForThisDG = tagsForThisDG[0]
+                        }
+
+
                         let ar = tagsForThisDG.split(" ")
                         ar.forEach(function (tag) {
                             if ($scope.tagNames.indexOf(tag) == -1) {
@@ -505,8 +519,8 @@ angular.module("pocApp")
                     $scope.hashAllCompositions = $localStorage.world.compositions
                     $scope.xref = modelsSvc.getReferencedModels($scope.hashAllDG,$scope.hashAllCompositions)
 
+                    //makeAllDTList() - this mucked up the tags - seemed to remove them from the model...
                     validateModel()
-
                     clearB4Select()
                     sortDG()
                 }
