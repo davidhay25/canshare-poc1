@@ -1,14 +1,50 @@
 <div ng-controller="modelDGCtrl">
 
 
-  <div class="row">
+  <style>
+    .dgInfo {
+      background-color: lightgoldenrodyellow;
+      border: 1px solid gainsboro;
+      padding : 3px;
+      margin: 3px;
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px;
+    }
+  </style>
+
+  <div class="dgInfo row">
     <div class="col-md-7">
       <strong>{{selectedModel.name}}</strong>: <em>{{selectedModel.description}}</em>
-      <div ng-show="selectedModel.parent">
-        <strong>Parent</strong>:
-        <span class="clickable"
-            ng-click="termSelectDG({DGName:selectedModel.parent},selectedModel.name)">{{selectedModel.parent}}
+      <br/><br/>
+      <div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div ng-show="selectedModel.parent">
+              <strong>Parent</strong>:
+              <span class="clickable"
+                    ng-click="termSelectDG({DGName:selectedModel.parent},selectedModel.name)">{{selectedModel.parent}}
         </span>
+            </div>
+
+          </div>
+          <div class="col-md-3">
+            <div ng-show="selectedModel.profile">
+              <a ng-href="{{igBase}}{{selectedModel.profile}}" target="_blank">Profile</a>
+            </div>
+          </div>
+          <div class="col-md-3">
+
+            <div ng-show="selectedModel.ss">
+              <a ng-href="{{selectedModel.ss}}" target="_blank">SpreadSheet</a>
+            </div>
+          </div>
+        </div>
+
+
+
+
 
       </div>
     </div>
@@ -23,6 +59,7 @@
         <tr><td>Tags:</td>
           <td> <input type = "text" class="form-control" ng-blur="updateTag(selectedModel.tags)" ng-model="selectedModel.tags"/></td>
         </tr>
+        <!--
         <tr ng-show = "hxDGLoad.length > 0">
           <td></td>
           <td>
@@ -34,19 +71,9 @@
 
             </div>
           </td>
-        </tr>
+        </tr-->
       </table>
-    </div>
 
-<!--
-      FHIR resource: <a target = "_blank" ng-href="{{fhirRoot}}{{selectedModel.fhirResource}}">{{selectedModel.fhirResource}}</a>
-      <div>
-        Tags: <input type = "text" class="form-control" ng-blur="updateTag()" ng-model="selectedModel.tags"/>
-      </div>
-    </div>
--->
-    <!--
-    <div class="col-md-2">
       <div ng-show = "hxDGLoad.length > 0">
         <div ng-click="back()" class="clickable pull-right">
           Reload {{hxDGLoad[hxDGLoad.length-1]}}
@@ -55,7 +82,8 @@
       </div>
 
     </div>
-    -->
+
+
 
 
 
@@ -75,7 +103,7 @@
       <br/>
       <div class="row">
         <div class="col-md-6">
-          <div class="pull-right clickable" ng-click="expandDTTree()">Expand all</div>
+          <div class="pull-right clickable" ng-click="expandDTTree()">Expand all ({{fullElementList.length}})</div>
           <div id="dgTree"></div>
 
           <button class="btn btn-link" ng-click="editDGItem()">Add new element</button>
@@ -214,9 +242,12 @@
                     </td>
                   </tr>
 
-                  <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
+                  <tr ng-show="isFixedType(selectedNode.data.ed)">
                     <td>Fixed value</td>
+
                     <td> {{selectedNode.data.ed.fixedCoding}}
+                      {{selectedNode.data.ed.fixedString}}
+                      {{selectedNode.data.ed.fixedDecimal}}
 
                       <span ng-show="selectedNode.data.ed.fixedCoding"
                             class=" pull-right">
@@ -311,20 +342,12 @@
           ng-hide="$index==0 || (element.ed.mult.indexOf('..0') > -1)">
             <td>
               <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
-
-
-
-                <!-- {{element.path | dropFirstInPath}} -->
                 <div ng-hide="input.showFullModel">
                   {{element.ed.path | dropFirstInPath}}
                 </div>
                 <div ng-show="input.showFullModel">
                   {{element.ed.path | lastInPath}}
-
                 </div>
-
-
-
               </div>
 
 
@@ -339,6 +362,12 @@
                 {{type}}
               </div>
               <div><em class="clickable" ng-click="viewVS(element.ed.valueSet)">{{element.ed.valueSet}}</em></div>
+
+              <div ng-show="element.ed.options">
+                <em class="clickable"
+                    ng-click = "editDGOptionsList(element.ed)">View {{element.ed.options.length}} options
+                </em> </div>
+
             </td>
             <td>{{element.ed.mult}}</td>
         <!--
@@ -349,7 +378,9 @@
 
             </td>
         -->
-            <td>{{element.ed.fixedCoding}}</td>
+            <td>
+              {{element.ed.fixedCoding}}{{element.ed.fixedDecimal}}{{element.ed.fixedString}}
+            </td>
             <td>{{element.sourceModelName}}</td>
 
 
@@ -475,6 +506,7 @@
     </uib-tab>
 
     <uib-tab ng-show="false" heading="Fixed values">
+      todo: add other fixed types
 
       <br/>
       <div class="tableFixHead">

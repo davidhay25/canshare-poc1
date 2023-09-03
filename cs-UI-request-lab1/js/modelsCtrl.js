@@ -6,11 +6,18 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc) {
 
 
-            $scope.version = "0.3"
+            $scope.version = "0.3.1"
             $scope.input = {}
             $scope.input.showFullModel = true
 
-            $scope.input.selectedTag = 'main'       //default tag for tag filtered list
+            $scope.igBase = "https://build.fhir.org/ig/davidhay25/canshare-LIM/branches/main/"
+
+
+
+
+
+            $localStorage.selectedTag = $localStorage.selectedTag || 'main'
+            $scope.input.selectedTag = $localStorage.selectedTag       //default tag for tag filtered list
 
             let search = $window.location.search;
 
@@ -150,6 +157,11 @@ angular.module("pocApp")
 
                 makeAllDTList()
             }
+
+            $scope.rememberSelectedTag = function (tag) {
+                $localStorage.selectedTag = tag
+            }
+
 
 
             //make a sorted list for the UI
@@ -476,7 +488,7 @@ angular.module("pocApp")
 
             $scope.resetWorld = function () {
 
-                if (confirm("Are you wish to restore to the default demo state")) {
+                if (confirm("Are you wish to restore to the default demo state (This will not remove custom DTs)")) {
                     //make a copy of the current DTs - this will include any DT created by the user
                     let temp = angular.copy($scope.hashAllDG)
 
@@ -494,6 +506,9 @@ angular.module("pocApp")
                     $scope.xref = modelsSvc.getReferencedModels($scope.hashAllDG,$scope.hashAllCompositions)
 
                     validateModel()
+
+                    clearB4Select()
+                    sortDG()
                 }
 
             }
@@ -795,8 +810,6 @@ angular.module("pocApp")
                 //$scope.directElements = {}    //elements directly on the DG. These can have fixed values
                 $scope.selectedModel.diff.forEach(function (ed) {
 
-                 //   $scope.directElements[`${dg.name}.${ed.path}`] = ed     //the path (including model name) is needed
-
                     //if there's a dot in the ed path, then it refers to an element in a child...
                     if (ed.path.indexOf('.') > -1 ) {
                         $scope.overrides.push(ed)
@@ -851,6 +864,8 @@ angular.module("pocApp")
                     //https://stackoverflow.com/questions/32403578/stop-vis-js-physics-after-nodes-load-but-allow-drag-able-nodes
                     $scope.graph.on("stabilizationIterationsDone", function () {
                         $scope.graph.setOptions({physics: false});
+
+
                     });
 
                     $scope.graph.on("click", function (obj) {

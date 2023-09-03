@@ -254,10 +254,10 @@
                                 <div class="col-md-7">
                                     <select style="margin-top: 2px" class="form-control"
                                             ng-options="k for k in tagNames"
+                                            ng-change = "rememberSelectedTag(input.selectedTag)"
                                             ng-model = "input.selectedTag"></select>
                                 </div>
                             </div>
-
 
 
 
@@ -320,7 +320,7 @@
 
 
                     <div>
-                        <button class="btn btn-link" ng-click="newModel('dg')">New DataGroup</button>
+                        <button class="btn btn-link" ng-click="newModel('dg')">Custom DataGroup</button>
                     </div>
                 </div>
                 <div ng-class="rightPanel">

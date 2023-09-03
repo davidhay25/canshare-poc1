@@ -29,6 +29,34 @@ angular.module("pocApp")
                         description:"item1"})
                     dgParent.diff.push({path:'item2',title:'Item2',type:['CodeableConcept'],
                         description:"item2"})
+
+                    dgParent.diff.push({path:'ratioTest',title:'Ratio test',type:['Ratio'],
+                        description:"Testing fixed values for ratio"})
+
+                    dgParent.diff.push({path:'ratioTest.denominator',title:'denominator',type:['Quantity'],
+                        description:"Denominator"})
+
+                    dgParent.diff.push({path:'ratioTest.denominator.value',title:'denominator value',type:['decimal'],
+                        fixedDecimal : 2,
+                        description:"Denominator"})
+
+                    dgParent.diff.push({path:'ratioTest.denominator.unit',title:'denominator unit',type:['string'],
+                        fixedString: "mm^2",
+                        description:"Denominator"})
+
+
+                    dgParent.diff.push({path:'interpretation',title:'Interpretation',type:['CodeableConcept'],
+                        options:[{pt:"FNCLCC sarcoma mitotic count score 1"},
+                            {pt:"FNCLCC sarcoma mitotic count score 2"},
+                            {pt:"FNCLCC sarcoma mitotic count score 3"}],
+                        description:"Testing fixed values for ratio"})
+
+
+
+
+
+
+
                     hashDataGroups[dgParent.name] = dgParent
 
                     let dgChild = {kind:"dg",name:'a-Child',parent:"a-Parent",title:"Child DG",diff:[],
@@ -111,6 +139,7 @@ angular.module("pocApp")
                     //DG grading
                     let dgGrading = {kind:"dg",name:'Grading',title:"Grading",diff:[],
                         tags:'main',
+                        ss:'https://docs.google.com/spreadsheets/d/1XU7Jc0BbC5nXgmTu-qVLS-WwJjKO9GLXgjVHVk2WRL0/edit#gid=2058860673',
                         description:"The degree of differentiation of a tumour, e.g. the extent to which a tumour resembles the normal tissue at that site (also known as histological grade)"}
                     dgGrading.diff.push({path:'system',title:'System',type:['CodeableConcept'],mult:'0..1'})
                     dgGrading.diff.push({path:'date',title:'Date',type:['date'],mult:'0..1'})
@@ -125,7 +154,11 @@ angular.module("pocApp")
                     //sarcoma grading
                     let dgGradingSarcoma = {kind:"dg",parent:'Grading', name:'GradingSarcoma',title:"Sarcoma grading",diff:[],
                         tags:'main',
+                        profile: "StructureDefinition-SarcomaGrading.html",
+                        LM: "StructureDefinition-GradingSarcoma.html",
                         description:"The degree of differentiation of a sarcoma, e.g. the extent to which a tumour resembles the normal tissue at that site (also known as histological grade)"}
+
+
                     dgGradingSarcoma.diff.push({path:'criteria.mitoticCount',title:'Mitotic count',
                         type:['Observation'],mult:'1..1'})
                     dgGradingSarcoma.diff.push({path:'criteria.mitoticCount.code',title:'Code',
@@ -333,6 +366,7 @@ angular.module("pocApp")
 
                     //Care plan
                     let dgCarePlan = {kind:"dg",name:'CarePlan',title:"Care plan",diff:[],
+                        fhirResource:"CarePlan",
                         description:"A plan for the delivery of care to the patient."}
 
                     dgCarePlan.diff.push({path:'condition',title:'Condition addressed ',
@@ -513,11 +547,17 @@ angular.module("pocApp")
 
                     //DG Observation
                     let dgObservation = {kind:"dg",name:'Observation',title:"Observation",diff:[],
+                        ss:"https://docs.google.com/spreadsheets/d/1XU7Jc0BbC5nXgmTu-qVLS-WwJjKO9GLXgjVHVk2WRL0/edit#gid=1502765034",
                         description:"Measurements and simple assertions made about a patient, device or other subject"}
                     dgObservation.diff.push({path:'status',title:'Status',type:['code'],mult:"1..1",
                         description:"The status of the result value - i.e. registered, preliminary, final, amended"})
+
                     dgObservation.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"0..1",
                         description:"The type of observation what was observed"})
+
+                    dgObservation.diff.push({path:'dar',title:'Data absent reason',type:['CodeableConcept'],mult:"0..1",
+                        description:"The reason why an observation is not available"})
+
                     dgObservation.diff.push({path:'category',title:'Category',type:['CodeableConcept'],mult:"0..1",
                         description:"A classification of the type of observation being made"})
                     dgObservation.diff.push({path:'date',title:'Date',type:['dateTime'],mult:"0..1",
@@ -534,9 +574,29 @@ angular.module("pocApp")
                         description:"A reference to a code defined by a terminology system determined as a result of making the observation"})
                     dgObservation.diff.push({path:'valueQuantity',title:'Quantity value',type:['Quantity'],mult:"0..1",
                         description:"The measured or measurable amount determined as a result of making the observation"})
-                    dgObservation.diff.push({path:'valueRatio',title:'Quantity value',type:['Ratio'],mult:"0..1",
+                    dgObservation.diff.push({path:'valueRatio',title:'Ratio value',type:['Ratio'],mult:"0..1",
                         description:"The ratio"})
                     hashDataGroups[dgObservation.name] = dgObservation
+
+
+                    //DG for mitotic observation
+                    let dgObservationMC = {kind:"dg",parent:"Observation",name:'ObservationMitoticCount',
+                        title:"Mitotic count observation",diff:[],
+                        description:"Mitotic count observation"}
+
+                    dgObservationMC.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
+                        fixedCoding:{code:'371472000',display:"Mitotic count"},
+                        description:"The code for mitotic count"})
+
+                    dgObservationMC.diff.push({path:'dar',title:'Data absent reason',type:['CodeableConcept'],mult:"0..1",
+                        fixedCoding:{code:"1156316003",display:"Cannot be assessed"},
+                        description:"The mitotic count cannot be assessed"})
+
+                    dgObservationMC.diff.push({path:'valueRatio',title:'Ratio value',type:['Ratio'],mult:"0..1",
+                        description:"The ratio"})
+
+
+                    hashDataGroups[dgObservationMC.name] = dgObservationMC
 
                     //DataGroup for patient
                     let dgPatient = {kind:"dg",name:'Patient',title:"Patient",diff:[],description:"Name, identifiers, and demographic details about the patient"}
@@ -638,7 +698,9 @@ angular.module("pocApp")
                     hashDataGroups[dgRegimen.name] = dgRegimen
 
                     //DG generic specimen
-                    let dgSpecimen = {kind:"dg",name:'Specimen',title:"Specimen",diff:[],description:"A sample to be used for analysis"}
+                    let dgSpecimen = {kind:"dg",name:'Specimen',title:"Specimen",diff:[],
+                        fhirResource:"Specimen",
+                        description:"A sample to be used for analysis"}
                     dgSpecimen.diff.push({path:'type',title:'Specimen type',type:['CodeableConcept'],
                         description:"The type of specimen e.g. biopsy specimen, cytologic material, surgical resection specimen [surgical excision specimen], frozen section breast specimen"})
                     dgSpecimen.diff.push({path:'subtype',title:'Specimen sub-type',type:['CodeableConcept'],

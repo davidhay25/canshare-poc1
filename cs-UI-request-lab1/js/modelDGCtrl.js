@@ -3,8 +3,22 @@ angular.module("pocApp")
     .controller('modelDGCtrl',
         function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc) {
         
-        
 
+            let fixedValueText = {}
+            fixedValueText.coding = "What is the SNOMED code and display (separated by space)"
+            fixedValueText.string = "What is the fixed string"
+            fixedValueText.decimal = "What is the fixed decimal"
+
+            //retur true if the datatype can have a fixed value
+            $scope.isFixedType = function (ed) {
+                if (ed && ed.type) {
+                    let type = ed.type[0]       //only look at the first
+                    if (type == 'CodeableConcept' || type == 'decimal' || type == 'string') {
+                        return true
+                    }
+                }
+
+            }
 
             //locate the model where this item was defined
             $scope.getSourceModelName = function (ed) {
@@ -98,8 +112,45 @@ angular.module("pocApp")
             //set the fixed value for a CC - creates / update override element
             //todo may be able to use this code for comp as well
             $scope.setFixedValue = function(ed) {
-                let code = prompt(`What is the SNOMED code for ${ed.path}`)
-                if (code) {
+
+                //figure out the type from the ed
+                let type = 'coding'         //the default
+                switch (ed.type[0]) {
+                    case "string" :
+                        type = 'string'
+                        break
+                    case "decimal" :
+                        type = 'decimal'
+                        break
+                }
+
+                //console.log(ed)
+
+
+                let value = prompt(`${fixedValueText[type]} for ${ed.path}`)
+
+                if (value) {
+                    //set the element name and value based on DataType. default to stirng
+                    let elName = "fixedString"
+                    let elValue = value
+                    switch (type) {
+                        case 'coding' :
+                            //can enter code & display separated by space
+                            let t = value.replace(/\s+/g, ' ').trim()
+                            let ar = t.split(' ')
+                            elName = "fixedCoding"
+                            elValue = {code:ar[0]}
+                            if (ar.length > 1) {
+                                elValue.display = ar[1]
+                            }
+                            break
+                        case 'decimal' :
+                            elName = "fixedDecimal"
+                            elValue = parseFloat(value)
+                            break
+
+                    }
+
                     let ar = ed.path.split('.')  //need to remove the first part of the path
                     ar.splice(0,1)
                     let path = ar.join('.')
@@ -108,15 +159,12 @@ angular.module("pocApp")
                     let found = false
                     for (const ed of $scope.selectedModel.diff) {
                         if (ed.path == path) {
-                            ed.fixedCoding = {code:code}
+                            ed[elName] = elValue
 
                             modelDGSvc.updateChanges($scope.selectedModel,
                                 {edPath:ed.path,
-                                    msg:`Set fixed coding to ${angular.toJson(ed.fixedCoding)}`},
+                                    msg:`Set fixed ${type} to ${angular.toJson(elValue)}`},
                                 $scope)
-
-                            //$scope.selectedModel.changes = $scope.selectedModel.changes || []
-                            //$scope.selectedModel.changes.push({edPath:ed.path, msg:`Set fixed coding to ${ed.fixedCoding}`})
 
                             found = true
                             break
@@ -126,22 +174,23 @@ angular.module("pocApp")
                     if (! found) {
                         let overrideEd = angular.copy(ed)
 
-                        overrideEd.fixedCoding = {code:code}
+                        //overrideEd.fixedCoding = {code:value}
+
+                        overrideEd[elName] = elValue
+
                         overrideEd.path = path
                         $scope.selectedModel.diff.push(overrideEd)
 
                         modelDGSvc.updateChanges($scope.selectedModel,
                             {edPath:ed.path,
-                                msg:`Set fixed coding to ${angular.toJson(overrideEd.fixedCoding)}`},
+                                msg:`Set fixed ${type} to ${angular.toJson(elValue)}`},
                             $scope)
-
-
-                        //$scope.selectedModel.changes = $scope.selectedModel.changes || []
-                        //$scope.selectedModel.changes.push({edPath:ed.path, msg:`Set fixed coding to ${overrideEd.fixedCoding}`})
 
                     }
 
-                    ed.fixedCoding = {code:code}        //for the display
+                    ed[elName] = elValue   //for the display
+                    //ed.fixedCoding = {code:value}        //for the display
+
 
                     //rebuild the full element list for the table
                     let vo = modelsSvc.getFullListOfElements($scope.selectedModel,$scope.input.types,$scope.input.showFullModel)
@@ -162,14 +211,25 @@ angular.module("pocApp")
                         found = true
 
                         modelDGSvc.updateChanges($scope.selectedModel,
-                            {edPath:ed1.path, msg:`clear fixed coding`},$scope)
+                            {edPath:ed1.path, msg:`clear fixed value`},$scope)
 
-                        //$scope.selectedModel.changes = $scope.selectedModel.changes || []
-                        //$scope.selectedModel.changes.push({edPath:ed1.path, msg:`clear fixed coding`})
 
+                        Object.keys(ed).forEach(function (key) {
+                            if (key.substring(0,5) == 'fixed') {
+                                delete ed[key]
+                                delete ed1[key]
+                            }
+
+                        })
+
+                        /*
                         delete ed.fixedCoding   //for the display
                         delete ed1.fixedCoding
-
+                        delete ed.fixedDecimal   //for the display
+                        delete ed1.fixedDecimal
+                        delete ed.fixedString   //for the display
+                        delete ed1.fixedString
+*/
                         break
                     }
                 }
