@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>Review Model</title>
+
+    <script src="js/libs/jquery-1.9.0.min.js"></script>
+    <script src="js/libs/angular.min1-5.js"></script>
+    <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+    <script src="js/libs/moment.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
+    <script src="js/libs/jstree.min.js"></script>
+
+    <script>
+        angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage']).config(function($locationProvider) {
+
+            // enable html5Mode for pushstate ('#'-less URLs)
+            $locationProvider.html5Mode(true);
+            $locationProvider.hashPrefix('!');
+        });
+        angular.module("pocApp").constant("moment", moment);
+
+        //this allows the directives (which are in the formsApp) to be used. see https://stackoverflow.com/questions/15641730/angular-js-directives-in-different-modules
+        angular.module("formsApp",[])
+        angular.module('topApp', ['pocApp', 'formsApp'])
+
+    </script>
+
+    <script src="js/modelReviewCtrl.js"></script>
+    <script src="js/modelsSvc.js"></script>
+    <script src="js/modelsDemoSvc.js"></script>
+    <script src="js/libs/ngStorage.min.js"></script>
+    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
+    <script src="js/libs/vis.min.js"></script>
+
+    <script src="js/modelCompSvc.js"></script>
+</head>
+
+<body style="padding: 8px;padding-top: 80px">
+    <div ng-app="topApp" ng-controller="modelReviewCtrl" class="container-fluid">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+        <div class="container-fluid">
+            <div class="col-md-2">
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            Review model
+                        </a>
+                    </span>
+
+            </div>
+
+            <div class="col-md-3">
+                <div class="navbar-text">
+
+                    <select class="form-control" ng-model="selectedComp"
+                        ng-change="selectComposition(selectedComp)"
+                            ng-options = "k for (k,v) in hashAllCompositions"></select>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="navbar-text">
+
+                </div>
+            </div>
+            <div class="col-md-1 col-sm-1">
+                <form class="navbar-form navbar-left">
+                    <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+                </form>
+            </div>
+            <div class="col-md-2">
+                <div class="navbar-text">
+
+                </div>
+            </div>
+            <div class="col-md-2">
+                <a href="https://teaho.govt.nz/" target="_blank">
+                    <img width="150" height="auto" class="pull-right"
+                         style="padding: 3px"
+                         src="images/TAK-logo-midgreen.png"/>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+
+    <uib-tabset>
+        <uib-tab heading="Tree">
+
+            <div class="row">
+                <div class="col-md-3">
+                    <div id="compositionTree"></div>
+                </div>
+                <div class="col-md-4">
+
+                    <div ng-show="selectedCompositionNode">
+                        <strong>Details</strong>
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                Path
+                            </div>
+                            <div class="col-md-9">
+                                {{selectedCompositionNode.data.ed.path}}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                Kind
+                            </div>
+                            <div class="col-md-9">
+                                {{selectedCompositionNode.data.ed.kind}}
+                            </div>
+                        </div>
+
+                        <div ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    Title
+                                </div>
+                                <div class="col-md-9">
+                                    {{selectedCompositionNode.data.ed.title}}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    Description
+                                </div>
+                                <div class="col-md-9">
+                                    {{selectedCompositionNode.data.ed.description}}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    Type
+                                </div>
+                                <div class="col-md-9">
+                                    <div ng-repeat="type in selectedCompositionNode.data.ed.type">
+                                        <div ng-show="fhirDataTypes.indexOf(type) > -1" class="pull-right">
+                                            <a target = "_blank" ng-href="{{fhirRoot}}datatypes.html#{{type}}">Details in spec</a>
+                                        </div>
+                                        {{type}}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
+                                <div class="col-md-3">
+                                    ValueSet
+                                </div>
+                                <div class="col-md-9">
+                                    <div><em>{{selectedCompositionNode.data.ed.valueSet}}</em></div>
+                                    <div>
+                                        <button ng-show="selectedCompositionNode.data.ed.valueSet"
+                                                ng-click="viewVS(selectedCompositionNode.data.ed.valueSet)"
+                                                class="btn-link btn">View VS</button>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row"  ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
+                                <div class="col-md-3">
+                                    Options List
+                                </div>
+                                <div class="col-md-9">
+                                    <div ng-show="selectedCompositionNode.data.ed.options">
+                                        There are {{selectedCompositionNode.data.ed.options.length}} options defined
+                                    </div>
+
+                                    <div ng-hide="selectedCompositionNode.data.ed.options">
+                                        There are no options defined
+                                    </div>
+                                    <div><em>Options are used to build ValueSets</em></div>
+
+
+                                    <button
+                                            ng-click = "editOptionsList(selectedCompositionNode.data.ed)"
+                                            class="btn-link btn">View / Edit list</button>
+
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    Cardinality
+                                </div>
+                                <div class="col-md-9">
+                                    <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
+
+                                    <div ng-show = "selectedCompositionNode.data.host">{{selectedCompositionNode.data.host.mult}}</div>
+                                    <div ng-hide = "selectedCompositionNode.data.host">{{selectedCompositionNode.data.ed.mult}}</div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row" ng-show = "selectedCompositionNode.data.ed.zElement">
+                            <div class="col-md-3">
+
+                            </div>
+                            <div class="col-md-9">
+                                <em>This element has been added directly (a 'Z' element)</em>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+                <div class="col-md-4">
+                    <div ng-show="selectedCompositionNode">
+                        <strong>Comments</strong>
+
+                        <textarea class="form-control" ng-model="input.comment"></textarea>
+                        <div>
+                            <button class="btn btn-link" ng-click="addComment(input.comment)">Add comment</button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+
+
+
+
+
+        </uib-tab>
+
+        <uib-tab heading="All comments">
+            <table class="table-condensed table-bordered table">
+                <tr ng-repeat="comment in allComments">
+                    <td>{{comment.path}}</td>
+                    <td>{{comment.comment}}</td>
+                </tr>
+            </table>
+
+        </uib-tab>
+
+        <uib-tab heading="Json">
+            <pre>{{selectedComp | json}}</pre>
+        </uib-tab>
+    </uib-tabset>
+
+
+
+</div>
+
+</body>
+</html>

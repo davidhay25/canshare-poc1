@@ -12,10 +12,6 @@ angular.module("pocApp")
 
             $scope.igBase = "https://build.fhir.org/ig/davidhay25/canshare-LIM/branches/main/"
 
-
-
-
-
             $localStorage.selectedTag = $localStorage.selectedTag || 'main'
             $scope.input.selectedTag = $localStorage.selectedTag       //default tag for tag filtered list
 
@@ -84,8 +80,6 @@ angular.module("pocApp")
 
             //whether the current user can edit. Will set up the back end logic later
             $scope.input.canEdit = true
-
-
 
             $scope.mCodeGroupPage = {}
             $scope.mCodeGroupPage.disease = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-disease.html"
@@ -940,6 +934,10 @@ angular.module("pocApp")
                     $(this).jstree("open_node",id);
                     //$(this).jstree("open_all");  //open all nodes
 
+
+
+                    //console.log($("#dgTree").jstree(true).get_json('#', { 'flat': true }))
+                    console.log($("#dgTree").jstree(true).get_json('#'))
 
                     $scope.$digest();
                 });
