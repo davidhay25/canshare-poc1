@@ -42,6 +42,7 @@
     <script src="js/libs/vis.min.js"></script>
 
     <script src="js/modelCompSvc.js"></script>
+    <script src="js/viewVSCtrl.js"></script>
 </head>
 
 <body style="padding: 8px;padding-top: 80px">
@@ -99,13 +100,17 @@
 
             <div class="row">
                 <div class="col-md-3">
-                    <div id="compositionTree"></div>
+                    <div class="pull-right clickable" ng-click="expandCompTree()">Expand all ({{allCompElements.length}})</div>
+                    <div class="myScroll">
+                        <div id="compositionTree"></div>
+                    </div>
+
                 </div>
                 <div class="col-md-4">
 
                     <div ng-show="selectedCompositionNode">
                         <strong>Details</strong>
-
+<!--
                         <div class="row">
                             <div class="col-md-3">
                                 Path
@@ -123,6 +128,7 @@
                                 {{selectedCompositionNode.data.ed.kind}}
                             </div>
                         </div>
+                        -->
 
                         <div ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
 
@@ -158,6 +164,19 @@
                                 </div>
                             </div>
 
+                            <div class="row">
+                                <div class="col-md-3">
+                                    Cardinality
+                                </div>
+                                <div class="col-md-9">
+                                    <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
+
+                                    <div ng-show = "selectedCompositionNode.data.host">{{selectedCompositionNode.data.host.mult}}</div>
+                                    <div ng-hide = "selectedCompositionNode.data.host">{{selectedCompositionNode.data.ed.mult}}</div>
+
+                                </div>
+                            </div>
+
                             <div class="row" ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
                                 <div class="col-md-3">
                                     ValueSet
@@ -173,40 +192,23 @@
                                 </div>
                             </div>
 
-                            <div class="row"  ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
+                            <div class="row" ng-show="selectedCompositionNode.data.ed.options">
                                 <div class="col-md-3">
                                     Options List
                                 </div>
                                 <div class="col-md-9">
-                                    <div ng-show="selectedCompositionNode.data.ed.options">
-                                        There are {{selectedCompositionNode.data.ed.options.length}} options defined
-                                    </div>
 
-                                    <div ng-hide="selectedCompositionNode.data.ed.options">
-                                        There are no options defined
-                                    </div>
-                                    <div><em>Options are used to build ValueSets</em></div>
+                                    <ul>
+                                        <li ng-repeat="opt in selectedCompositionNode.data.ed.options ">
+                                            {{opt.pt}}
+                                        </li>
+                                    </ul>
 
-
-                                    <button
-                                            ng-click = "editOptionsList(selectedCompositionNode.data.ed)"
-                                            class="btn-link btn">View / Edit list</button>
 
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-3">
-                                    Cardinality
-                                </div>
-                                <div class="col-md-9">
-                                    <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
 
-                                    <div ng-show = "selectedCompositionNode.data.host">{{selectedCompositionNode.data.host.mult}}</div>
-                                    <div ng-hide = "selectedCompositionNode.data.host">{{selectedCompositionNode.data.ed.mult}}</div>
-
-                                </div>
-                            </div>
 
                         </div>
 
@@ -216,7 +218,6 @@
                             </div>
                             <div class="col-md-9">
                                 <em>This element has been added directly (a 'Z' element)</em>
-
                             </div>
                         </div>
 
@@ -228,9 +229,32 @@
                     <div ng-show="selectedCompositionNode">
                         <strong>Comments</strong>
 
+                        <table class="table table-condensed">
+                            <tr><th>Comment</th><th>Author</th><th>Disposition</th></tr>
+                            <tr ng-repeat = "com in commentsThisPath">
+                                <td>{{com.comment}}</td>
+                                <td>{{com.author}}</td>
+                                <td>{{com.disposition.display}}
+                                    <div><em>{{com.dispositionNote}}</em></div>
+
+                                </td>
+                            </tr>
+
+                        </table>
+
+                        <strong>New comment</strong>
+
                         <textarea class="form-control" ng-model="input.comment"></textarea>
-                        <div>
-                            <button class="btn btn-link" ng-click="addComment(input.comment)">Add comment</button>
+                        <br/>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" ng-model="input.author" placeholder="Your name"/>
+                            </div>
+                            <div class="col-md-6">
+                                <button ng-show="input.comment"
+                                        class="btn btn-link pull-right" ng-click="addComment(input.comment)">Add comment</button>
+                            </div>
+
                         </div>
 
                     </div>
@@ -238,18 +262,26 @@
 
             </div>
 
-
-
-
-
-
         </uib-tab>
 
-        <uib-tab heading="All comments">
+        <uib-tab>
+            <uib-tab-heading>All comments <span class="badge">{{allComments.length}}</span> </uib-tab-heading>
             <table class="table-condensed table-bordered table">
+                <tr><th>Path</th><th>Comment</th><th>Author</th><th>Disposition</th></tr>
                 <tr ng-repeat="comment in allComments">
                     <td>{{comment.path}}</td>
                     <td>{{comment.comment}}</td>
+                    <td>{{comment.author}}</td>
+                    <td>
+                        <div ng-show="comment.disposition">
+                            {{comment.disposition.display}}
+                            <div><em>{{comment.dispositionNote}}</em></div>
+                        </div>
+                        <div ng-show="! comment.disposition">
+                            <div class="clickable" ng-click="addDisposition(comment)">Add disposition</div>
+                        </div>
+
+                    </td>
                 </tr>
             </table>
 

@@ -1,0 +1,88 @@
+
+<div>
+    <div class="modal-header">
+
+        <div class="row">
+            <div class="col-md-6 col-sm-6 ">
+
+                <h3>Add Disposition</h3>
+
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <button class="btn btn-primary pull-right"
+                        ng-show="input.disposition"
+                        ng-click="saveDisposition()">Add disposition</button>
+                <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal-body">
+
+        <!--
+        <div class="row">
+            <div class="col-sm-3 col-md-3">
+                Author
+            </div>
+            <div class="col-sm-7 col-md-7">
+                <div class="rounded-box">{{QR.author.display}}</div>
+            </div>
+        </div>
+        -->
+
+
+
+        <div class="row">
+            <div class="col-sm-3 col-md-3">
+                Comment
+            </div>
+            <div class="col-sm-7 col-md-7">
+                <div class="rounded-box">{{comment.comment}}</div>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row">
+            <div class="col-sm-3 col-md-3">
+                Disposition
+            </div>
+            <div class="col-sm-7 col-md-7">
+                <select ng-model = "input.disposition" class = "form-control"
+                        ng-options = "disp.display for disp in input.dispositionOptions"></select>
+
+
+            </div>
+        </div>
+        <br/>
+        <div class="row">
+            <div class="col-sm-3 col-md-3">
+                Note
+            </div>
+            <div class="col-sm-7 col-md-7">
+                <textarea class="form-control" ng-model="input.dispositionNote"></textarea>
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+    <div class="modal-header">
+        <pre>{{comment | json}}</pre>
+<!--
+        <div class="row">
+
+            <div class="col-md-6 col-sm-6">
+
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <button class="btn btn-primary pull-right" ng-click="saveDisposition()">Add disposition</button>
+
+            </div>
+        </div>
+        -->
+    </div>
+</div>
