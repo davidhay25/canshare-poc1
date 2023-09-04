@@ -551,6 +551,52 @@ angular.module("pocApp")
 
             },
 
+            makeOrderedFullList : function (elements) {
+                //generate a list of elements for a given DG (based on the allElements array) that follows the slicing order
+                //elements is the complete list of elements, including those derived from parents referenced eds
+
+                //first construct an object that represents the hierarchy (rather than a flat list of elements).
+                let hash = {}
+                let rootPath
+                elements.forEach(function (item,inx) {
+                    let ed = item.ed
+                    let path = ed.path
+                    hash[path] = {ed:ed,children:[]}  //add to the hash in case it is a parent...
+
+                    //add the ed to the parent
+                    let ar = ed.path.split('.')
+                    if (ar.length > 1) {
+                        ar.pop()
+                        let parentPath = ar.join('.')
+                        hash[parentPath].children.push(hash[path])
+                    } else {
+                        rootPath = ar[0]
+                    }
+
+                })
+
+                // now we can build the ordered list
+
+                let arLines = []
+
+                //the recursive processing function
+                function processNode(ar,node,spacer) {
+                    ar.push(node)
+                    if (node.children) {
+                        node.children.forEach(function (child) {
+                            processNode(ar,child,spacer)
+                        })
+                    }
+                }
+
+                processNode(arLines,hash[rootPath],"")
+
+                return arLines
+
+
+
+            },
+
             getFullListOfElements(inModel,inTypes,followReferences) {
                 //create a complete list of elements for a DG (Compositions have a separate function)
 
@@ -604,6 +650,9 @@ angular.module("pocApp")
                 function addToList(ed,host,sourceModel) {
                     //is there already an entry with this path
                     let path = ed.path
+
+
+
                     let pos = -1
                     allElements.forEach(function (element,inx) {
                         // if (element.path == path) {   //changed Jul-29
@@ -626,8 +675,24 @@ angular.module("pocApp")
                         //allElements.splice(pos,1,{ed:ed,host:host,sourceModelName:})
                         allElements.splice(pos,1,itemToInsert)
                     } else {
-                        //allElements.push({ed:ed,host})
-                        allElements.push(itemToInsert)
+                        //determine where to insert based on the path
+                        //first, find the root of this path (ie removing the rigth most leaf
+/* not working atm
+                        let ar = path.split(".")
+                        ar.pop()
+                        let root = ar.join('.')
+                        console.log(path,root)
+                        //now locate the last element in the array that uses that path
+                        let inx = 0
+                        allElements.forEach(function (ed,ctr) {
+                            if (ed.path && ed.path.startsWith(root)) {
+                                inx = ctr
+                            }
+                        })
+*/
+                        //allElements.splice(inx+1,0,itemToInsert)
+
+                        allElements.push(itemToInsert)          //this is what was working - just at the end
                     }
                 }
 

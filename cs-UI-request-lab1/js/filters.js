@@ -33,6 +33,16 @@ angular.module("pocApp")
         }
     })
 
+    .filter('dropLastInPath',function(){
+        return function (path) {
+            if (path) {
+                let ar = path.split('.')
+                ar.splice(-1, 1)
+                return ar.join('.')
+            }
+        }
+    })
+
     .filter('pathindent', function() {
         return function(path) {
             if (path) {

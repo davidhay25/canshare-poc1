@@ -802,8 +802,16 @@ angular.module("pocApp")
             refreshFullList = function (dg) {
                 let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,true)
 
-                $scope.fullElementList = vo.allElements
+
+
+                //$scope.fullElementList = vo.allElements
                 $scope.graphData = vo.graphData
+
+                //sort the elements list to better display slicing
+                $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
+
+
+               // console.log(modelsSvc.makeOrderedFullList(vo.allElements))
 
                 $scope.dgFshLM = igSvc.makeFshForDG(dg,vo.allElements)
 
