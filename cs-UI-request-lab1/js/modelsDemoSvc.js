@@ -160,7 +160,7 @@ angular.module("pocApp")
 
 
                     dgGradingSarcoma.diff.push({path:'criteria.mitoticCount',title:'Mitotic count',
-                        type:['Observation'],mult:'1..1'})
+                        type:['ObservationMitoticCount'],mult:'1..1'})
                     dgGradingSarcoma.diff.push({path:'criteria.mitoticCount.code',title:'Code',
                         fixedCoding : {display:'mitotic count'},
                         type:['CodeableConcept'],mult:'0..1'})

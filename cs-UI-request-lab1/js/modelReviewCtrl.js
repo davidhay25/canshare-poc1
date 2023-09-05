@@ -6,6 +6,7 @@ angular.module("pocApp")
 
             if (! $localStorage.world) {
                     $localStorage.world = modelsDemoSvc.getDemo()
+                console.log("Re-creating world")
             }
 
             //todo while developing, store commemts in browser cache. Move to db later
