@@ -106,7 +106,8 @@
           <div class="pull-right clickable" ng-click="expandDTTree()">Expand all ({{fullElementList.length}})</div>
           <div id="dgTree"></div>
 
-          <button class="btn btn-link" ng-click="editDGItem()">Add new element</button>
+          <button class="btn btn-link"
+                  ng-click="editDGItem()">Add new element <span ng-show="selectedNode">to {{selectedNode.data.ed.path}}</span></button>
         </div>
         <div class="col-md-6">
 

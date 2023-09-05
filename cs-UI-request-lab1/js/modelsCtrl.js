@@ -274,11 +274,12 @@ angular.module("pocApp")
             //edits some of the attributes of a single ED
             $scope.editDGItem = function (item) {
                 let originalED = {}
+                let isNew = true
                 if (item) {
                     //if item is null, then this is a new item
                     originalED = angular.copy(item.ed)        //used for changes display
+                    isNew = false
                 }
-
 
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editDGItem.html',
@@ -300,53 +301,86 @@ angular.module("pocApp")
 
                 }).result.then(function (ed) {
                     //update specific items. Not the whole ED
-
-                    let p = $filter('dropFirstInPath')(ed.path)
-
                     //what changed
                     let changes = ""
-                    if (ed.description !== originalED.description) {
-                        changes += "Description changed. "
-                    }
-                    if (ed.title !== originalED.title) {
-                        changes += "Title changed. "
-                    }
+                    let displayPath = ""  //this will be the path in the changes display
+                    if (isNew) {
+                        //if it's new, then add it as a child of the currently selected element
+                        changes = "New element"
 
-                    if (ed.mapping !== originalED.mapping) {
-                        changes += "Mapping notes changed. "
-                    }
+                        //need to determine the 'root' path.
+                        let pathOfCurrentElement = ""  //$scope.selectedModel.name  //by default, add to the DG root
+                        if ($scope.selectedNode) {
+                            //If a selected element (which may be the root) then add as a child to that root
+                            pathOfCurrentElement = $scope.selectedNode.data.ed.path
 
-                    if (ed.mult !== originalED.mult) {
-                        changes += "Cardinality changed."
-                    }
-
-                    if (ed.valueSet !== originalED.valueSet) {
-                        changes += "ValueSet changed."
-                    }
-
-
-                    let found = false
-                    //let changes = []    //this is the list of changes
-                    for (const ed1 of $scope.selectedModel.diff) {
-                        if (ed1.path == p) {
-                            found = true
-                            ed1.title = ed.title
-                            ed1.mapping = ed.mapping
-                            ed1.description = ed.description
-                            ed1.mult = ed.mult
-                            ed1.valueSet = ed.valueSet
-                            break
+                            //need to remove the first segment in the path (it will be the DG name)
+                            let ar = pathOfCurrentElement.split('.')
+                            ar.splice(0,1)
+                            pathOfCurrentElement = ar.join('.') + "."
                         }
-                    }
 
-                    if (! found) {
-                        //The attribute that was edited (eg edscription) is inherited
-                        //Need to create an 'override' element and add to the DG
+
+                        //if a new element, then the string 'new' will have been pre-pended to the path...
                         let ar = ed.path.split('.')
                         ar.splice(0,1)
-                        ed.path = ar.join('.')
+                        //ed.path = ar.join('.')
+
+                        ed.path = `${pathOfCurrentElement}${ar.join('.')}`
                         $scope.selectedModel.diff.push(ed)
+                        displayPath = ed.path
+
+                    } else {
+                        //If an edit, then need to see if the item is directly defined on the DG (which will be updated),
+                        //or whether it is an inherited element, in which case an override element is added...
+                        displayPath = $filter('dropFirstInPath')(ed.path)
+
+
+                        if (ed.description !== originalED.description) {
+                            changes += "Description changed. "
+                        }
+                        if (ed.title !== originalED.title) {
+                            changes += "Title changed. "
+                        }
+
+                        if (ed.mapping !== originalED.mapping) {
+                            changes += "Mapping notes changed. "
+                        }
+
+                        if (ed.mult !== originalED.mult) {
+                            changes += "Cardinality changed."
+                        }
+
+                        if (ed.valueSet !== originalED.valueSet) {
+                            changes += "ValueSet changed."
+                        }
+
+                        let found = false
+                        //let changes = []    //this is the list of changes
+                        //is the path in the DG diff?
+                        for (const ed1 of $scope.selectedModel.diff) {
+                            if (ed1.path == p) {
+                                found = true
+                                ed1.title = ed.title
+                                ed1.mapping = ed.mapping
+                                ed1.description = ed.description
+                                ed1.mult = ed.mult
+                                ed1.valueSet = ed.valueSet
+                                break
+                            }
+                        }
+
+                        if (! found) {
+                            //The attribute that was edited (eg edscription) is inherited
+                            //Need to create an 'override' element and add to the DG
+                            let ar = ed.path.split('.')
+                            ar.splice(0,1)
+                            ed.path = ar.join('.')
+                            $scope.selectedModel.diff.push(ed)
+                        }
+
                     }
+
 
                     //record that changes were made
                     modelDGSvc.updateChanges($scope.selectedModel,
@@ -356,7 +390,7 @@ angular.module("pocApp")
                     //rebuild fullList and re-draw the tree
                     refreshFullList($scope.selectedModel)
 
-                    $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:p})
+                    $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:displayPath})
 
                 })
             }

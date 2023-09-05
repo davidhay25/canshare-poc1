@@ -61,6 +61,12 @@ angular.module("pocApp")
                         }
                     }
 
+                    //check that there are no spaces in the path
+                    if ($scope.input.path.indexOf(" ") > -1) {
+                        alert("The path cannot contain spaces")
+                        return
+                    }
+
                     //check the path. if it has a '.' then there must be a parent in the fullelement list
                     let ar = $scope.input.path.split('.')
                     if (ar.length > 1) {
