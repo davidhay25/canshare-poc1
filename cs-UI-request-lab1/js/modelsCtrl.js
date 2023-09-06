@@ -271,6 +271,44 @@ angular.module("pocApp")
 
             //$scope.addNewED = func
 
+
+            //delete the selected item. If the item exists in the DG then it can be removed (or possibly set the mult to 0..0)
+            //if not (ie it's inherited) then create an override element
+            $scope.deleteDGItemDEP = function (item) {
+                let pathToDelete =  $filter('dropFirstInPath')(item.path)
+
+
+
+                let inx = -1
+                let ctr = -1
+                //let changes = []    //this is the list of changes
+                //is the path in the DG diff?
+                for (const ed1 of $scope.selectedModel.diff) {
+                    ctr ++
+                    if (ed1.path == pathToDelete) {
+                        inx = ctr
+                        break
+                    }
+                }
+
+                if (inx > -1) {
+                    $scope.selectedModel.diff.splice(inx,1)
+                } else {
+                    //The attribute that was edited (eg edscription) is inherited
+                    //Need to create an 'override' element and add to the DG
+
+
+                    //let ar = ed.path.split('.')
+                    //ar.splice(0,1)
+                    //set the minimum required elements..
+                    let ed = {path:pathToDelete,mult:"0..0",type:['string']}
+                    //ed.path = ar.join('.')
+                    $scope.selectedModel.diff.push(ed)
+                }
+
+            }
+
+
             //edits some of the attributes of a single ED
             $scope.editDGItem = function (item) {
                 let originalED = {}
@@ -388,7 +426,7 @@ angular.module("pocApp")
                             msg:changes},$scope)
 
                     //rebuild fullList and re-draw the tree
-                    refreshFullList($scope.selectedModel)
+                    $scope.refreshFullList($scope.selectedModel)
 
                     $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:displayPath})
 
@@ -827,7 +865,7 @@ angular.module("pocApp")
             }
 
 
-            refreshFullList = function (dg) {
+            $scope.refreshFullList = function (dg) {
                 let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,true)
 
 
@@ -873,7 +911,7 @@ angular.module("pocApp")
 
 
 
-                refreshFullList(dg)
+                $scope.refreshFullList(dg)
 
                 $scope.dgQ = modelsSvc.makeQforDG($scope.fullElementList)
 

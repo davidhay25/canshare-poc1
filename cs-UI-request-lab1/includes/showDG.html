@@ -271,22 +271,7 @@
 
                 </table>
 
-                <!-- If the ValueSet depends on some other value in the DG-->
-                <div ng-show="selectedNode.data.ed.dependVS">
-                  ValueSet is dependent on other DG values (Details in Dependencies tab)
-                  <!--
-                  <br/>
-                  <table class="table table-bordered">
-                    <tr><th>Source</th><th>Value</th><th>Url</th></tr>
-                    <tr ng-repeat="dep in selectedNode.data.ed.dependVS">
-                      <td>{{dep.source}}</td>
-                      <td>{{dep.value}}</td>
-                      <td>{{dep.url}}</td>
-                    </tr>
-                  </table>
-                  -->
-
-                </div>
+                <button class="btn-link btn" ng-click="deleteDGItem(selectedNode.data.ed)">Delete this item</button>
 
               </uib-tab>
 
@@ -302,6 +287,10 @@
                     <td>{{dep.url}}</td>
                   </tr>
                 </table>
+              </uib-tab>
+
+              <uib-tab heading="Hierarchy">
+                Navigate to parent/s & children here. click to select.
               </uib-tab>
 
               <uib-tab heading="Json">
