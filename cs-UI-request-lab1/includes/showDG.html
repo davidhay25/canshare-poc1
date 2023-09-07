@@ -15,7 +15,7 @@
 
   <div class="dgInfo row">
     <div class="col-md-7">
-      <strong>{{selectedModel.name}}</strong>: <em>{{selectedModel.description}}</em>
+      <strong>{{selectedModel.title}} </strong> ({{selectedModel.name}}): <em>{{selectedModel.description}}</em>
       <br/><br/>
       <div>
 
@@ -121,17 +121,22 @@
                     <td style="width : 20%">Path</td><td>{{selectedNode.data.ed.path | dropFirstInPath}}</td>
                   </tr>
 
-
-
                   <tr><td style="width : 20%">Source model</td>
                     <td>{{getSourceModelName(selectedNode.data.ed)}}</td>
                   </tr>
+
                   <tr><td style="width : 20%">Title</td>
                     <td>
                     <i class="glyphicon glyphicon-edit pull-right clickable"
                        ng-click="editDGItem(selectedNode.data)"></i>
                    {{selectedNode.data.ed.title}}</td>
                   </tr>
+
+                  <tr><td>Description</td><td>
+                    <i class="glyphicon glyphicon-edit pull-right clickable"
+                       ng-click="editDGItem(selectedNode.data)"></i>
+                    {{selectedNode.data.ed.description}}
+                  </td></tr>
 
                   <tr><td>Type</td>
                     <td><div ng-repeat="type in selectedNode.data.ed.type">
@@ -153,9 +158,38 @@
                   <tr ng-show = "selectedNode.data.ed.path !== selectedModel.name">
                     <td>Input control</td>
                     <td>
-                      <div>
-                        <input type="text" class="form-control" ng-model="input.control">
+
+                      <div class="row">
+                        <div class="col-md-12">
+                          <div ng-switch="getControlType(selectedNode.data.ed)">
+
+                            <div ng-switch-when= "dropdown">
+                              <select class="form-control" ng-model="input.dropdownControl"
+                                      ng-options="item.pt for item in selectedNode.data.ed.options">
+                                <option value="" disabled selected hidden>Please choose option</option>
+                              </select>
+                            </div>
+
+                            <div ng-switch-when= "input">
+                              <input type="text" class="form-control"
+                                     placeholder="Enter text value"
+                                     ng-model="input.textControl">
+                            </div>
+
+                            <div ng-switch-when= "dg">
+                              This is a DataGroup. Click <span ng-click="displayDGDialog(selectedNode.data.ed)"
+                                                               class="clickable">here</span> for a sample dialog.
+                            </div>
+
+
+                          </div>
+                        </div>
+                        <div class="col-md-0">
+
+                        </div>
                       </div>
+
+
                     </td>
 
 
@@ -168,11 +202,7 @@
                        ng-click="editDGItem(selectedNode.data)"></i>
                     {{selectedNode.data.ed.mult}}
                   </td></tr>
-                  <tr><td>Description</td><td>
-                    <i class="glyphicon glyphicon-edit pull-right clickable"
-                       ng-click="editDGItem(selectedNode.data)"></i>
-                    {{selectedNode.data.ed.description}}
-                  </td></tr>
+
                   <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
                     <td>ValueSet</td>
                     <td>

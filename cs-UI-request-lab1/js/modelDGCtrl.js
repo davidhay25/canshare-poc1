@@ -10,6 +10,58 @@ angular.module("pocApp")
             fixedValueText.decimal = "What is the fixed decimal"
 
 
+            $scope.displayDGDialog = function (ed) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/dgDialog.html',
+                    backdrop: 'static',
+                    //size : 'lg',
+                    controller: 'modelDGDialogCtrl',
+
+                    resolve: {
+                        ED: function () {
+                            return ed
+                        },
+                        hashAllDG : function () {
+                            return $scope.hashAllDG
+                        },
+                        fullElementList : function () {
+                            return $scope.fullElementList
+                        }
+                    }
+
+                }).result.then(function (ed) {
+                    //copy the units to the current item
+                    //need to update the .diff in the selected model
+                    let p = $filter('lastInPath')(ed.path)
+                    for (const ed1 of $scope.selectedModel.diff) {
+                        if (ed1.path == p) {
+                            ed1.units = ed.units
+                            //ed.valueSet = vsUrl
+                            break
+                        }
+                    }
+                })
+                
+            }
+
+            $scope.getControlType = function (ed) {
+                if (ed) {
+                    let controlType = "input"
+                    if (ed.options) {
+                        controlType = 'dropdown'
+                    }
+
+                    let type = ed.type[0]
+                    if ($scope.hashAllDG[type] && $scope.hashAllDG[type].diff) {
+                        controlType = "dg"
+                    }
+
+                    console.log(controlType)
+                    return controlType
+                }
+
+
+            }
 
             //delete the selected item. If the item exists in the DG then it can be removed (or possibly set the mult to 0..0)
             //if not (ie it's inherited) then create an override element

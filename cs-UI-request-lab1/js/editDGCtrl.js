@@ -17,6 +17,8 @@ angular.module("pocApp")
                 }
             })
 
+
+
             //get the full list of elements for a DG, following any inheritance chain..
             function getFullElementList() {
                 let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
