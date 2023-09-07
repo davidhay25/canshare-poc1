@@ -18,7 +18,7 @@ angular.module("pocApp")
             })
 
             function getFullElementList() {
-                let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
+                let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,$scope.hashAllDG)
                 console.log(vo)
                 $scope.allElements = vo.allElements
             }
@@ -161,7 +161,7 @@ angular.module("pocApp")
                 newElement.valueSet = vsUrl
                 $scope.model.diff.push(newElement)
                 //rebuild the all elements
-                let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
+                let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,$scope.hashAllDG)
                 console.log(vo)
                 $scope.allElements = vo.allElements
 
@@ -185,7 +185,7 @@ angular.module("pocApp")
                         delete $scope.selectedElementOverridden
 
                         //rebuild the all elements
-                        let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
+                        let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,$scope.hashAllDG)
                         console.log(vo)
                         $scope.allElements = vo.allElements
 

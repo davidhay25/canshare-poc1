@@ -20,31 +20,43 @@
       <div>
 
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-5">
             <div ng-show="selectedModel.parent">
-              <strong>Parent</strong>:
-              <span class="clickable"
-                    ng-click="termSelectDG({DGName:selectedModel.parent},selectedModel.name)">{{selectedModel.parent}}
-        </span>
+              <strong>Parents</strong>
+
+              <div ng-repeat = "parent in relationshipsSummary.parents">
+                <span class="clickable" style="margin-left: 8px"
+                      ng-click="termSelectDG({DGName:parent},selectedModel.name)">
+                  {{hashAllDG[parent].title}}  <!--  ({{parent}}) -->
+                </span>
+              </div>
+
+
             </div>
 
           </div>
-          <div class="col-md-3">
-            <div ng-show="selectedModel.profile">
-              <a ng-href="{{igBase}}{{selectedModel.profile}}" target="_blank">Profile</a>
+
+          <div class="col-md-5">
+            <strong>Children</strong>
+            <div ng-repeat = "child in relationshipsSummary.children">
+                <span class="clickable" style="margin-left: 8px"
+                      ng-click="termSelectDG({DGName:child},selectedModel.name)">
+                  {{hashAllDG[child].title}}  <!--  ({{parent}}) -->
+                </span>
             </div>
           </div>
-          <div class="col-md-3">
+
+
+          <div class="col-md-2">
 
             <div ng-show="selectedModel.ss">
+              <div ng-show="selectedModel.profile">
+                <a ng-href="{{igBase}}{{selectedModel.profile}}" target="_blank">Profile</a>
+              </div>
               <a ng-href="{{selectedModel.ss}}" target="_blank">SpreadSheet</a>
             </div>
           </div>
         </div>
-
-
-
-
 
       </div>
     </div>
@@ -59,41 +71,18 @@
         <tr><td>Tags:</td>
           <td> <input type = "text" class="form-control" ng-blur="updateTag(selectedModel.tags)" ng-model="selectedModel.tags"/></td>
         </tr>
-        <!--
-        <tr ng-show = "hxDGLoad.length > 0">
-          <td></td>
-          <td>
 
-            <div ng-show = "hxDGLoad.length > 0">
-              <div ng-click="back()" class="clickable pull-right">
-                Reload {{hxDGLoad[hxDGLoad.length-1]}}
-              </div>
-
-            </div>
-          </td>
-        </tr-->
       </table>
 
       <div ng-show = "hxDGLoad.length > 0">
         <div ng-click="back()" class="clickable pull-right">
-          Reload {{hxDGLoad[hxDGLoad.length-1]}}
+          Reload {{ hashAllDG[hxDGLoad[hxDGLoad.length-1]].title }}
         </div>
 
       </div>
 
     </div>
-
-
-
-
-
-
-
   </div>
-
-
-
-
 
   <uib-tabset>
 
@@ -118,7 +107,11 @@
             <uib-tabset>
               <uib-tab heading="Details">
                 <table class="table table-bordered table-condensed">
-                  <tr><td style="width : 20%">Path</td><td>{{selectedNode.data.ed.path | dropFirstInPath}}</td></tr>
+
+                  <tr ng-show = "selectedNode.data.ed.path !== selectedModel.name">
+                    <td style="width : 20%">Path</td><td>{{selectedNode.data.ed.path | dropFirstInPath}}</td>
+                  </tr>
+
                   <tr><td style="width : 20%">Source model</td>
                     <td>{{getSourceModelName(selectedNode.data.ed)}}</td>
                   </tr>
@@ -289,9 +282,7 @@
                 </table>
               </uib-tab>
 
-              <uib-tab heading="Hierarchy">
-                Navigate to parent/s & children here. click to select.
-              </uib-tab>
+
 
               <uib-tab heading="Json">
                 <pre ng-show="selectedNode">{{selectedNode.data.ed | json}}</pre>
@@ -515,8 +506,85 @@
 
     </uib-tab>
 
+    <uib-tab heading="Relationships">
 
-    <uib-tab>
+      <strong>DataGroups related to this one via the hierarchy</strong>
+      <br/> <br/>
+      <div class="row">
+        <div class="col-md-3">
+
+          <strong>Ancestry</strong>
+          <br/>
+          <div>
+            <div ng-repeat="parent in relationshipsSummary.parents">
+              <div class = 'clickable' ng-click="termSelectDG({DGName:parent},selectedModel.name)">{{hashAllDG[parent].title}}</div>
+              <div>
+                <i style="margin-left: 40px" class="glyphicon glyphicon-arrow-down"></i>
+              </div>
+            </div>
+
+            <div ng-show="relationshipsSummary.parents.length > 0">
+              <div  class="rounded-box">{{selectedModel.title}}</div>
+            </div>
+
+            <div  ng-show="relationshipsSummary.parents.length == 0">
+              <em>There is no parent</em>
+            </div>
+
+          </div>
+
+        </div>
+        <div class="col-md-3">
+          <strong>Direct children</strong>
+          <br/>
+          <div ng-repeat="child in relationshipsSummary.children">
+            <div class = 'clickable' ng-click="termSelectDG({DGName:child},selectedModel.name)">{{hashAllDG[child].title}}</div>
+          </div>
+
+        </div>
+        <div class="col-md-6">
+          <strong>References directly from this DG</strong>
+          <br/>
+          <table class="table table-bordered">
+            <tr><th>Path</th><th>Type</th></tr>
+            <tr ng-repeat="reference in relationshipsSummary.references">
+              <td>{{reference.path}}</td>
+              <td>
+                <div class = 'clickable' ng-click="termSelectDG({DGName:reference.type},selectedModel.name)">
+                  {{reference.type}}
+                </div>
+              </td>
+            </tr>
+          </table>
+
+        </div>
+      </div>
+
+<hr/>
+      
+      <strong>DataGroups that reference this one</strong>
+      <table class="table table-bordered">
+        <tr><th>Name</th><th>Path</th><th>Kind</th></tr>
+        <tr ng-repeat="item in xref[selectedModel.name] track by $index">
+          <td>
+            <div class="clickable" ng-click="selectModelFromList(item.name,item.kind)">
+              {{item.name}}
+            </div>
+
+
+          </td>
+          <td>{{item.path}}</td>
+          <td>{{item.kind}}</td>
+        </tr>
+      </table>
+
+
+<!--
+      <pre>{{relationshipsSummary | json}}</pre>
+-->
+    </uib-tab>
+
+    <uib-tab ng-show="false">
       <uib-tab-heading>Referenced by</uib-tab-heading>
 
 

@@ -14,8 +14,28 @@ angular.module("pocApp")
             //delete the selected item. If the item exists in the DG then it can be removed (or possibly set the mult to 0..0)
             //if not (ie it's inherited) then create an override element
             $scope.deleteDGItem = function (item) {
+                let ar = item.path.split(".")
+                let dgName = ar[0]
 
-                let pathToDelete =  $filter('dropFirstInPath')(item.path)
+                let pathToDelete =  ar.join(".") // $filter('dropFirstInPath')(item.path)   //remove the DT name from the path
+
+                //check that there aren't any child elements off this one
+                let canDelete = true
+                let dg = $scope.hashAllDG[dg]
+                if (dg && dg.diff) {
+                    dg.diff.forEach(function (ed) {
+                        if (ed.path.startsWith(pathToDelete)) {
+                            canDelete = false
+                        }
+                    })
+                } else {
+                    alert("DG has become corrupted. You'll need to reset.")
+                }
+
+                if (! canDelete) {
+                    alert("You must delete any child nodes first.")
+                    return
+                }
 
                 let inx = -1
                 let ctr = -1

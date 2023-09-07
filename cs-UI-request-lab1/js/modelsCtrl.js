@@ -6,7 +6,7 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc) {
 
 
-            $scope.version = "0.3.1"
+            $scope.version = "0.3.2"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -152,6 +152,17 @@ angular.module("pocApp")
                         })
                     }
                 })
+
+                //build the graph of all DT
+                let vo = modelDGSvc.makeFullGraph($scope.hashAllDG)
+
+                //todo - should move the js
+                $timeout(function () {
+                    makeGraphAllDG(vo.graphData)
+                },500)
+
+
+
             }
             makeAllDTList()
 
@@ -180,11 +191,16 @@ angular.module("pocApp")
                 })
 
                 $scope.sortedDGList.sort(function (a,b) {
-                    if (a.name.toLowerCase() < b.name.toLowerCase()) {
-                        return -1
-                    } else {
-                        return 1
+                    try {
+                        if (a.title.toLowerCase() < b.title.toLowerCase()) {
+                            return -1
+                        } else {
+                            return 1
+                        }
+                    } catch (ex) {
+                        //swallow errors where title is missing (shouldn't happen)
                     }
+
                 })
 
             }
@@ -353,9 +369,16 @@ angular.module("pocApp")
                             pathOfCurrentElement = $scope.selectedNode.data.ed.path
 
                             //need to remove the first segment in the path (it will be the DG name)
+                            //unless the selectedElement is actually the first element in the tree - the root
+
                             let ar = pathOfCurrentElement.split('.')
-                            ar.splice(0,1)
-                            pathOfCurrentElement = ar.join('.') + "."
+                            if (ar.length > 1) {
+                                ar.splice(0,1)
+                                pathOfCurrentElement = ar.join('.') + "."
+                            } else {
+                                pathOfCurrentElement = ""
+                            }
+
                         }
 
 
@@ -865,13 +888,14 @@ angular.module("pocApp")
             }
 
 
+            //refresh the complete list of elements for this DG
+            //also draw the graph & tree
             $scope.refreshFullList = function (dg) {
-                let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,true)
+                let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
 
 
-
-                //$scope.fullElementList = vo.allElements
                 $scope.graphData = vo.graphData
+                $scope.relationshipsSummary = vo.relationshipsSummary   //all the relationships - parent and reference - for this type
 
                 //sort the elements list to better display slicing
                 $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
@@ -891,6 +915,8 @@ angular.module("pocApp")
             $scope.selectModel = function (dg) {
                 clearB4Select()
                 $scope.selectedModel = dg
+
+                $scope.refreshUpdates()
 
 
                 //create the list of override elements
@@ -912,6 +938,8 @@ angular.module("pocApp")
 
 
                 $scope.refreshFullList(dg)
+
+
 
                 $scope.dgQ = modelsSvc.makeQforDG($scope.fullElementList)
 
@@ -968,7 +996,7 @@ angular.module("pocApp")
 
                             //now get the full list of elements for this DT. Used in the graph details view
                             let dg = $scope.hashAllDG[node.data.model.name]
-                            let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,true)
+                            let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
 
                             $scope.selectedModelFromGraphFull = vo.allElements
 
@@ -1051,11 +1079,68 @@ angular.module("pocApp")
             },500)*/
 
 
+            $scope.fitAllDGGraph = function () {
+                if ($scope.graphAllDG) {
+                    $timeout(function(){$scope.graphAllDG.fit()},500)
+                }
+            }
 
+            function makeGraphAllDG(graphData) {
+
+                let container = document.getElementById('graphAllDG');
+                if (container) {
+                    let graphOptions = {
+                        physics: {
+                            enabled: true,
+                            barnesHut: {
+                                gravitationalConstant: -10000,
+                            }
+                        }
+                    };
+                    if ($scope.graphAllDG) {
+                        $scope.graphAllDG.destroy()
+                    }
+
+                    $scope.graphAllDG = new vis.Network(container, graphData, graphOptions);
+
+                    //https://stackoverflow.com/questions/32403578/stop-vis-js-physics-after-nodes-load-but-allow-drag-able-nodes
+                    $scope.graphAllDG.on("stabilizationIterationsDone", function () {
+                        $scope.graphAllDG.setOptions({physics: false});
+
+
+                    });
+
+                    $scope.graphAllDG.on("click", function (obj)
+                    {
+                        /*
+                        delete $scope.selectedModelFromGraph
+                        delete $scope.selectedModelFromGraphFull
+                        let nodeId = obj.nodes[0];  //get the first node
+
+                        let node = $scope.graphData.nodes.get(nodeId);
+
+                        if (node.data && node.data.model) {
+                            $scope.selectedModelFromGraph = node.data.model;
+
+                            //now get the full list of elements for this DT. Used in the graph details view
+                            let dg = $scope.hashAllDG[node.data.model.name]
+                            let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
+
+                            $scope.selectedModelFromGraphFull = vo.allElements
+
+
+                            $scope.$digest()
+                        }
+                        */
+                    })
+                }
 
 
         }
 
 
+}
 
-    )
+
+
+)

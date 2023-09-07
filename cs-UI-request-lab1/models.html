@@ -12,6 +12,14 @@
             border: 1px solid lightgray;
         }
 
+        #graphAllDG {
+            width: 100%;
+            height: 400px;
+            border: 1px solid lightgray;
+        }
+
+
+
          .tableFixHead {
              overflow-y: auto;
              height: 800px;
@@ -383,14 +391,18 @@
                     </div>
 
                     <div ng-hide = "selectedModel">
-                        <div class="banner">Summary of DataGroups</div>
-                        <img width="100%" src="images/LIM-1.png" usemap="#image_map"/>
-                        <!--
-                        <img src="LIM-org.png" usemap="#image_map">
-                        -->
-                        <map name="image_map">
-                            <area class="mapbodyarea" href="" coords="0,100,0,100" shape="rect">
-                        </map>
+                        <uib-tabset>
+                            <uib-tab heading="Summary">
+                                <div class="banner">Summary of DataGroups</div>
+                                <img width="100%" src="images/LIM-1.png" usemap="#image_map"/>
+                            </uib-tab>
+                            <uib-tab heading="Graph" select="fitAllDGGraph()">
+                                <div id="graphAllDG"></div>
+                            </uib-tab>
+                        </uib-tabset>
+
+
+
 
 
                     </div>

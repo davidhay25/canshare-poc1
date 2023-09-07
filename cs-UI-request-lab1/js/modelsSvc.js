@@ -556,6 +556,7 @@ angular.module("pocApp")
                 //elements is the complete list of elements, including those derived from parents referenced eds
 
                 //first construct an object that represents the hierarchy (rather than a flat list of elements).
+                let dgName = elements[0].ed.path
                 let hash = {}
                 let rootPath
                 elements.forEach(function (item,inx) {
@@ -568,7 +569,13 @@ angular.module("pocApp")
                     if (ar.length > 1) {
                         ar.pop()
                         let parentPath = ar.join('.')
-                        hash[parentPath].children.push(hash[path])
+                        if (!hash[parentPath]) {
+                            alert(`The paths in DG ${dgName} have become corrupted. You'll need to reset.`)
+                        } else {
+                            hash[parentPath].children.push(hash[path])
+                        }
+
+
                     } else {
                         rootPath = ar[0]
                     }
@@ -597,7 +604,7 @@ angular.module("pocApp")
 
             },
 
-            getFullListOfElements(inModel,inTypes,followReferences) {
+            getFullListOfElements(inModel,inTypes,hashAllDG) {
                 //create a complete list of elements for a DG (Compositions have a separate function)
 
                 //processing the DG hierarchy is destructive (the parent element is removed after processing
@@ -609,6 +616,8 @@ angular.module("pocApp")
                     types[dt] = dt
                 })
 
+                let relationshipsSummary = {parents:[],references:[],children:[]}       //all the relationships for this DG (reference 1 level only)
+
                 let model = angular.copy(inModel)
 
                 let topModel = angular.copy(model)
@@ -617,8 +626,6 @@ angular.module("pocApp")
 
                 let arNodes = []      //for the graph
                 let arEdges = []      //for the graph
-
-
 
                 //first follow the parental hierarchy to populate the initial list
                 //updates allElements as it extracts
@@ -631,11 +638,8 @@ angular.module("pocApp")
 
                 extractElements(model,model.name)
 
-                //set up the visjs objects
-
                 let nodes = new vis.DataSet(arNodes)
                 let edges = new vis.DataSet(arEdges);
-
 
                 // provide the data in the vis format
                 let graphData = {
@@ -643,7 +647,14 @@ angular.module("pocApp")
                     edges: edges
                 };
 
-                return {allElements: allElements,graphData:graphData}
+                //now populate the children array
+                Object.keys(hashAllDG).forEach(function (key) {
+                    if (hashAllDG[key].parent == inModel.name) {
+                        relationshipsSummary.children.push(key)
+                    }
+                })
+
+                return {allElements: allElements,graphData:graphData,relationshipsSummary:relationshipsSummary}
 
                 // add to list of elements, replacing any with the same path (as it has been overwritten)
                 //todo - what was 'host' for?
@@ -696,7 +707,7 @@ angular.module("pocApp")
                     }
                 }
 
-                //add note to the nodelist, replacing any with the same id
+                //add note to the node list, replacing any with the same id
                 function addNodeToList(node) {
                     let pos = -1
                     arNodes.forEach(function (iNode,inx) {
@@ -729,11 +740,19 @@ angular.module("pocApp")
                     addNodeToList(node)
 
                     //do parents first.
-                    if (model.parent && followReferences) {
-                      //  console.log('expanding ' + model.parent)
+                    if (model.parent ) {
                         if (types[model.parent]) {
+                            //this is called whenever there is a DG to be expanded
+                            if (pathRoot.split('.').length == 1) {
+                                //if there is no '.' then this must be a DG parent
+                                relationshipsSummary.parents.splice(0,0,model.parent)         //the name of the parent
+                            } else {
+                                //this must be a DG referenced by an element within the DG (or one of its ancestors)
+                                relationshipsSummary.references.push({path:pathRoot,type:model.name})
+                            }
 
-                            //to prevent infinite ercursion
+
+                            //to prevent infinite recursion
                             let parent = model.parent
                             delete model.parent
 
@@ -766,9 +785,9 @@ angular.module("pocApp")
                                     let childDefinition = types[type]
 
 
-                                    if (childDefinition.diff && followReferences) {
+                                    if (childDefinition.diff ) {
                                         //if there is a diff element in the type, then it can be expanded
-
+                                        relationshipsSummary.references.push({path:ed.path,type:childDefinition.name})
 
                                         //create an edge. todo This is to ALL elements, so may want to filter
                                         let label = `${ed.path} ${ed.mult}`
