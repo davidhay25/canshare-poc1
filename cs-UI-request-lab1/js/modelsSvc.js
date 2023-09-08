@@ -571,7 +571,7 @@ angular.module("pocApp")
                         ar.pop()
                         let parentPath = ar.join('.')
                         if (!hash[parentPath]) {
-                            alert(`The paths in DG ${dgName} have become corrupted. You'll need to reset.`)
+                            alert(`The paths in DG ${dgName} have become corrupted. The path ${parentPath} could not be found. You'll need to reset.`)
                         } else {
                             hash[parentPath].children.push(hash[path])
                         }
@@ -612,6 +612,7 @@ angular.module("pocApp")
             },
 
             getFullListOfElements(inModel,inTypes,hashAllDG) {
+                //console.trace()
                 //create a complete list of elements for a DG (Compositions have a separate function)
 
                 //processing the DG hierarchy is destructive (the parent element is removed after processing
@@ -654,7 +655,7 @@ angular.module("pocApp")
                     edges: edges
                 };
 
-                //now populate the children array
+                //now populate the children array - ie models that have this dg as a parent
                 Object.keys(hashAllDG).forEach(function (key) {
                     if (hashAllDG[key].parent == inModel.name) {
                         relationshipsSummary.children.push(key)
@@ -717,7 +718,7 @@ angular.module("pocApp")
                 function extractElements(model,pathRoot) {
 
                     //add to nodes list
-                    //let lable =
+
                     let node = {id: model.name, label: model.name,shape: 'box'}
                     node.data = {model:model}
                     if (model.name == topModel.name) {
@@ -808,11 +809,13 @@ angular.module("pocApp")
 
                                 } else {
                                     errors.push(`missing type ${model.name}`)
+                                    alert(`The type ${type} could not be found looking at DG ${model.name}`)
                                 }
 
 
                             } else {
-                                errors.push(`ed ${model.name} ${ed.path} is missing type `)
+                                alert(`ed ${model.name} ${ed.path} is missing the type `)
+                                errors.push(`ed ${model.name} ${ed.path} is missing the type `)
                             }
                         })
                     }

@@ -10,10 +10,40 @@ angular.module("pocApp")
             fixedValueText.decimal = "What is the fixed decimal"
 
 
+            //is this element able to be sliced
+            $scope.canSlice = function (ed) {
+                if (ed.mult.indexOf('..*')  == -1 ) {
+                    return false
+                }
+
+                let type = ed.type[0]
+                let dg = $scope.hashAllDG[type]
+                if (dg && dg.diff.length > 0) {
+                    return true
+                }
+
+                if (type == 'Group') {
+                    return true
+                }
+
+
+
+
+            }
+
             //slicing makes a copy of the ed and adds it as a child
+            //note that the path in the ed includes the dg name
+            //limit slicing to DG's - ie with a .diff  If we need to slice, say, identifiers then make an Identifier DG
             $scope.slice = function (ed) {
-                let sliceName = prompt("Enter the name for the slice. It will become a child of this one. Esc to exit.")
+                let sliceName = prompt("Enter the name for the slice (no spaces). It will become a child of this one. Esc to exit.")
                 if (sliceName) {
+
+                    if (sliceName.split(' ').length > 1) {
+                        alert("Spaces are not allowed")
+                        return
+                    }
+
+
                     let clone = angular.copy(ed)  //copy to insert
                     let basePath = $filter('dropFirstInPath')(ed.path)
                     let newPath = `${basePath}.${sliceName}`
@@ -37,7 +67,7 @@ angular.module("pocApp")
                     }
 
                     //set the type of the element being sliced to group
-                    ed.type = ['group']
+                    ed.type = ['Group']
 
                     //TODO - this update not working...
                     //update the selectedModel
@@ -46,7 +76,9 @@ angular.module("pocApp")
                         inx++
                         let shortPath = $filter('dropFirstInPath')(ed.path)
                         if (ed1.path == shortPath) {
+                            ed.path = shortPath
                             $scope.selectedModel.diff.splice(inx,1,angular.copy(ed))
+                            break
                         }
                     }
 

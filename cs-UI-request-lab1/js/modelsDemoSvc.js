@@ -66,6 +66,9 @@ angular.module("pocApp")
                     dgChild.diff.push({path:'item4',title:'Item4',type:['CodeableConcept'],
                         description:"item4"})
 
+                    dgChild.diff.push({path:'practitioner',title:'Practitioners',type:['HcProvider'],
+                        description:"item4",mult:'0..*'})
+
                     //override an element
                     dgChild.diff.push({path:'item2',title:'Item2 override',type:['CodeableConcept'],
                         description:"item2 ov",mult:'0..1',fixedCoding:{code:'aaa'}})
