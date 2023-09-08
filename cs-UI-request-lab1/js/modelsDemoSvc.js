@@ -957,6 +957,7 @@ angular.module("pocApp")
 
                     Object.keys(hashDataGroups).forEach(function (key) {
                         let dg = hashDataGroups[key]
+                        dg.isCore = true        //flag that this is a core DG
                         dg.diff.forEach(function (ed) {
                             ed.mult = ed.mult || '0..1'
                         })
