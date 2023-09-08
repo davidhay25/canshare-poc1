@@ -112,6 +112,18 @@
           <div ng-show="selectedNode.data.ed">
 
 
+          <div class="row">
+            <div class="col-md-6">
+            </div>
+            <div class="col-md-6">
+
+              <button class="btn-link btn  pull-right" ng-click="deleteDGItem(selectedNode.data.ed)">Delete this item</button>
+
+              <button class="btn btn-link pull-right"
+                      ng-show="selectedNode.data.ed.mult.indexOf('..*') > -1"
+                      ng-click="slice(selectedNode.data.ed)">Slice</button>
+            </div>
+          </div>
 
             <uib-tabset>
               <uib-tab heading="Details">
@@ -319,7 +331,8 @@
 
                 </table>
 
-                <button class="btn-link btn" ng-click="deleteDGItem(selectedNode.data.ed)">Delete this item</button>
+                <!--<button class="btn-link btn" ng-click="deleteDGItem(selectedNode.data.ed)">Delete this item</button> -->
+
 
               </uib-tab>
 

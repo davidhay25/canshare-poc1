@@ -420,7 +420,7 @@ angular.module("pocApp")
                         //let changes = []    //this is the list of changes
                         //is the path in the DG diff?
                         for (const ed1 of $scope.selectedModel.diff) {
-                            if (ed1.path == p) {
+                            if (ed1.path == displayPath) {
                                 found = true
                                 ed1.title = ed.title
                                 ed1.mapping = ed.mapping
@@ -898,8 +898,11 @@ angular.module("pocApp")
                 $scope.relationshipsSummary = vo.relationshipsSummary   //all the relationships - parent and reference - for this type
 
                 //sort the elements list to better display slicing
-                $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
 
+             //   $scope.fullElementList = vo.allElements
+
+                $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
+console.log($scope.fullElementList)
 
                // console.log(modelsSvc.makeOrderedFullList(vo.allElements))
 
@@ -941,7 +944,8 @@ angular.module("pocApp")
 
 
 
-                $scope.dgQ = modelsSvc.makeQforDG($scope.fullElementList)
+                //warning! this implementation direclty updates fullElementb list
+                //$scope.dgQ = modelsSvc.makeQforDG($scope.fullElementList)
 
 /*
                 let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.input.showFullModel)

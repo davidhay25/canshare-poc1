@@ -10,6 +10,64 @@ angular.module("pocApp")
             fixedValueText.decimal = "What is the fixed decimal"
 
 
+            //slicing makes a copy of the ed and adds it as a child
+            $scope.slice = function (ed) {
+                let sliceName = prompt("Enter the name for the slice. It will become a child of this one. Esc to exit.")
+                if (sliceName) {
+                    let clone = angular.copy(ed)  //copy to insert
+                    let basePath = $filter('dropFirstInPath')(ed.path)
+                    let newPath = `${basePath}.${sliceName}`
+                    clone.path = newPath
+                    clone.title = `Slice ${sliceName} from ${basePath}`
+                    clone.mult = "0..1"         //set to single, optional
+
+                    //if the ed has already been sliced, then originalType saves what it was before setting to group
+                    if (ed.originalType) {
+                        clone.type = ed.originalType
+                    }
+                    clone.slicedFrom = ed.path      //link back to edlement that was sliced . So we know it's a slice, and what of
+                    console.log(clone)
+                    $scope.selectedModel.diff.push(clone)
+
+                    //also need to change the type of the element that was sliced. hmmm.
+                    //what happens if sliced twice - original dt lost? ?store original??
+
+                    if (! ed.originalType) {
+                        ed.originalType = ed.type
+                    }
+
+                    //set the type of the element being sliced to group
+                    ed.type = ['group']
+
+                    //TODO - this update not working...
+                    //update the selectedModel
+                    let inx = -1
+                    for (const ed1 of $scope.selectedModel.diff) {
+                        inx++
+                        let shortPath = $filter('dropFirstInPath')(ed.path)
+                        if (ed1.path == shortPath) {
+                            $scope.selectedModel.diff.splice(inx,1,angular.copy(ed))
+                        }
+                    }
+
+
+
+                    //update the global change log
+                    modelDGSvc.updateChanges($scope.selectedModel,
+                        {edPath:newPath,
+                            msg:`Update options list`},
+                        $scope)
+
+                    //rebuild fullList and re-draw the tree
+                    $scope.refreshFullList($scope.selectedModel)
+
+                    $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:newPath})
+
+
+                }
+
+            }
+
             $scope.displayDGDialog = function (ed) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/dgDialog.html',
@@ -73,19 +131,24 @@ angular.module("pocApp")
 
                 //check that there aren't any child elements off this one
                 let canDelete = true
-                let dg = $scope.hashAllDG[dg]
+                let dg = $scope.hashAllDG[dgName]
                 if (dg && dg.diff) {
                     dg.diff.forEach(function (ed) {
                         if (ed.path.startsWith(pathToDelete)) {
                             canDelete = false
                         }
                     })
+
                 } else {
                     alert("DG has become corrupted. You'll need to reset.")
                 }
 
                 if (! canDelete) {
                     alert("You must delete any child nodes first.")
+                    return
+                }
+
+                if (! confirm("Are you sure you wish to delete this element")) {
                     return
                 }
 

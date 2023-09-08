@@ -559,6 +559,7 @@ angular.module("pocApp")
                 let dgName = elements[0].ed.path
                 let hash = {}
                 let rootPath
+
                 elements.forEach(function (item,inx) {
                     let ed = item.ed
                     let path = ed.path
@@ -574,21 +575,27 @@ angular.module("pocApp")
                         } else {
                             hash[parentPath].children.push(hash[path])
                         }
-
-
                     } else {
+                        //this is the top node
+
                         rootPath = ar[0]
                     }
-
                 })
 
                 // now we can build the ordered list
+                console.log(hash)
 
                 let arLines = []
 
                 //the recursive processing function
                 function processNode(ar,node,spacer) {
-                    ar.push(node)
+                    //sep 8 - there was a 'children' element - don't think we want that
+                    let clone = angular.copy(node)
+                    delete clone.children
+                    console.log(clone)
+                    ar.push(clone)
+                    //ar.push(node)
+
                     if (node.children) {
                         node.children.forEach(function (child) {
                             processNode(ar,child,spacer)
@@ -662,8 +669,6 @@ angular.module("pocApp")
                     //is there already an entry with this path
                     let path = ed.path
 
-
-
                     let pos = -1
                     allElements.forEach(function (element,inx) {
                         // if (element.path == path) {   //changed Jul-29
@@ -676,6 +681,7 @@ angular.module("pocApp")
                     if (host) {     //todo not sure if this is still used...
                         itemToInsert.host = host
                     }
+
                     //record the sourceModel - ie where in the hierarchy this element came from
                     if (sourceModel) {
                         itemToInsert.sourceModelName = sourceModel.name
@@ -683,31 +689,14 @@ angular.module("pocApp")
 
                     if (pos > -1) {
                         //replace the existing path
-                        //allElements.splice(pos,1,{ed:ed,host:host,sourceModelName:})
+
                         allElements.splice(pos,1,itemToInsert)
                     } else {
-                        //determine where to insert based on the path
-                        //first, find the root of this path (ie removing the rigth most leaf
-/* not working atm
-                        let ar = path.split(".")
-                        ar.pop()
-                        let root = ar.join('.')
-                        console.log(path,root)
-                        //now locate the last element in the array that uses that path
-                        let inx = 0
-                        allElements.forEach(function (ed,ctr) {
-                            if (ed.path && ed.path.startsWith(root)) {
-                                inx = ctr
-                            }
-                        })
-*/
-                        //allElements.splice(inx+1,0,itemToInsert)
-
                         allElements.push(itemToInsert)          //this is what was working - just at the end
                     }
                 }
 
-                //add note to the node list, replacing any with the same id
+                //add graph node to the node list, replacing any with the same id
                 function addNodeToList(node) {
                     let pos = -1
                     arNodes.forEach(function (iNode,inx) {
@@ -804,7 +793,7 @@ angular.module("pocApp")
                                         let clone = angular.copy(ed)
                                         clone.path = pathRoot + "." + ed.path
                                         addToList(clone,ed,model) //model will be the source
-                                        //allElements.push(clone) //this is the BBE equivalent
+
                                         extractElements(childDefinition,pathRoot + "." + ed.path)
                                     } else {
                                         //list add the ed to the list
@@ -813,7 +802,7 @@ angular.module("pocApp")
 
                                         clone.path = pathRoot + '.' + ed.path
                                         addToList(clone,null,model)
-                                        //allElements.push(ed)
+
                                     }
 
 
