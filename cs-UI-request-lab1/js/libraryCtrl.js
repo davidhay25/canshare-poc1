@@ -1,6 +1,6 @@
-//controller for the 'showComposition' include
+
 angular.module("pocApp")
-    .controller('serverInteractionCtrl',
+    .controller('libraryCtrl',
         function ($scope,$http,DG) {
            // $scope.direction = direction
             $scope.DG = DG

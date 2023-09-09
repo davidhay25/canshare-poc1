@@ -11,10 +11,10 @@ angular.module("pocApp")
             $scope.serverInteraction = function (DG) {
 
                 $uibModal.open({
-                    templateUrl: 'modalTemplates/serverInteraction.html',
+                    templateUrl: 'modalTemplates/library.html',
                     backdrop: 'static',
                     size : 'lg',
-                    controller: 'serverInteractionCtrl',
+                    controller: 'libraryCtrl',
 
                     resolve: {
                         DG: function () {
