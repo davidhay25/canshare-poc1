@@ -323,6 +323,11 @@
       </div>
     </uib-tab>
 
+
+    <uib-tab heading="Graph">
+      Graph of all DG linked back to Composition
+    </uib-tab>
+
     <uib-tab>
       <uib-tab-heading>
         Overrides <span class="badge">{{getOverridesCount()}}</span>
@@ -400,7 +405,7 @@
 
     </uib-tab>
 
-    <uib-tab heading="Questionnaire">
+    <uib-tab ng-show="false" heading="Questionnaire">
 
       <ng-include src="'/includes/Qbuilder.html'"></ng-include>
 

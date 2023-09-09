@@ -22,25 +22,26 @@
 
     <div class="row">
       <div class="col-md-4">
-        <button class="btn btn-primary" ng-click="refreshFromRepo()">Refresh local store
+        <button class="btn btn-danger" ng-click="refreshFromRepo()">Refresh local store
           <i class="glyphicon glyphicon-arrow-down"></i>
         </button>
       </div>
       <div class="col-md-8">
         Will <strong>download the latest copies</strong> of all the DataGroups from the Library. This includes
         both core and custom (user created) DGs. This will replace any local copies with the one from the library. eg
-        if you have changed a core DG locally, that change will be lost.
+        if you have changed a core DG locally, that change will be lost. If you have local custom DGs that haven't yet
+        been saved in the Library, they will still be there
 
       </div>
     </div>
 <br/>
     <div class="row">
       <div class="col-md-4">
-        <button class="btn btn-primary" ng-click="updateRepo()">Update Library  <i class="glyphicon glyphicon-arrow-up"></i></button>
+        <button class="btn btn-danger" ng-click="updateRepo()">Update Library  <i class="glyphicon glyphicon-arrow-up"></i></button>
       </div>
       <div class="col-md-8">
         Will <strong>upload all the DataGroups</strong> on the Library from any local copies you may have. This includes
-        both core and custom (user created) DGs. Your local store will not be effected, but the library will be updated
+        both core and custom (user created) DGs. Your local store will not be affected, but the library will be updated
         with any changes you may have made to any DataGroup.
 
       </div>
