@@ -685,7 +685,7 @@ angular.module("pocApp")
 
                     //record the sourceModel - ie where in the hierarchy this element came from
                     if (sourceModel) {
-                        itemToInsert.sourceModelName = sourceModel.name
+                        itemToInsert.ed.sourceModelName = sourceModel.name
                     }
 
                     if (pos > -1) {
@@ -757,8 +757,6 @@ angular.module("pocApp")
                             arEdges.push(edge)
 
                             extractElements(types[parent],pathRoot)
-
-
                         } else {
                             errors.push(`missing type name ${model.parent}`)
                             console.log(`missing type name ${model.parent}`)
@@ -793,6 +791,7 @@ angular.module("pocApp")
                                         //console.log('expanding child: ' + childDefinition.name)
                                         let clone = angular.copy(ed)
                                         clone.path = pathRoot + "." + ed.path
+                                        // function addToList(ed,host,sourceModel) {
                                         addToList(clone,ed,model) //model will be the source
 
                                         extractElements(childDefinition,pathRoot + "." + ed.path)
@@ -802,6 +801,7 @@ angular.module("pocApp")
                                         let clone = angular.copy(ed,null,model) //include the model so the source of the ed is known
 
                                         clone.path = pathRoot + '.' + ed.path
+                                        // function addToList(ed,host,sourceModel) {
                                         addToList(clone,null,model)
 
                                     }

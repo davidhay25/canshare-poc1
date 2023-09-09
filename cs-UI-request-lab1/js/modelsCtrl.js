@@ -6,7 +6,7 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc) {
 
 
-            $scope.version = "0.3.2"
+            $scope.version = "0.4.0"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -67,6 +67,27 @@ angular.module("pocApp")
                 e.preventDefault()
                 alert('ba')
             })
+
+            $scope.serverSync = function () {
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/serverSync.html',
+                    backdrop: 'static',
+                    //size : 'lg',
+                    controller: 'serverSyncCtrl',
+
+                    resolve: {
+                        allDG: function () {
+                            return $scope.hashAllDG
+                        }
+                    }
+
+                }).result.then(function (ed) {
+                    // //rebuild fullList and re-draw the tree
+                    alert("The local copies have been updated. You should re-load the page to see the changes. ")
+                     //$scope.refreshFullList($scope.selectedModel)
+                })
+            }
 
             $scope.toggleLeftPanel = function(){
                 if ($scope.leftPanel == 'col-md-3') {
@@ -591,7 +612,7 @@ angular.module("pocApp")
 
             $scope.resetWorld = function () {
 
-                if (confirm("Are you wish to restore to the default demo state (This will not remove custom DTs)")) {
+                if (confirm("Are you wish to restore the core DT to their original state (This will not remove custom DTs)")) {
                     //make a copy of the current DTs - this will include any DT created by the user
                     let temp = angular.copy($scope.hashAllDG)
 

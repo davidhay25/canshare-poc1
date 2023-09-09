@@ -2,29 +2,59 @@
 angular.module("pocApp")
     .controller('modelDGCtrl',
         function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc) {
-        
 
             let fixedValueText = {}
             fixedValueText.coding = "What is the SNOMED code and display (separated by space)"
             fixedValueText.string = "What is the fixed string"
             fixedValueText.decimal = "What is the fixed decimal"
 
+            $scope.serverInteraction = function (DG) {
 
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/serverInteraction.html',
+                    backdrop: 'static',
+                    size : 'lg',
+                    controller: 'serverInteractionCtrl',
+
+                    resolve: {
+                        DG: function () {
+                            return DG
+                        }
+                    }
+
+                }).result.then(function (ed) {
+                    //copy the units to the current item
+                    //need to update the .diff in the selected model
+                    let p = $filter('lastInPath')(ed.path)
+                    for (const ed1 of $scope.selectedModel.diff) {
+                        if (ed1.path == p) {
+                            ed1.units = ed.units
+                            //ed.valueSet = vsUrl
+                            break
+                        }
+                    }
+                })
+                
+            }
+            
             //is this element able to be sliced
             $scope.canSlice = function (ed) {
-                if (ed.mult.indexOf('..*')  == -1 ) {
-                    return false
+                if (ed) {
+                    if (ed.mult.indexOf('..*')  == -1 ) {
+                        return false
+                    }
+
+                    let type = ed.type[0]
+                    let dg = $scope.hashAllDG[type]
+                    if (dg && dg.diff.length > 0) {
+                        return true
+                    }
+
+                    if (type == 'Group') {
+                        return true
+                    }
                 }
 
-                let type = ed.type[0]
-                let dg = $scope.hashAllDG[type]
-                if (dg && dg.diff.length > 0) {
-                    return true
-                }
-
-                if (type == 'Group') {
-                    return true
-                }
 
 
 
@@ -156,9 +186,10 @@ angular.module("pocApp")
             //delete the selected item. If the item exists in the DG then it can be removed (or possibly set the mult to 0..0)
             //if not (ie it's inherited) then create an override element
             $scope.deleteDGItem = function (item) {
-                let ar = item.path.split(".")
-                let dgName = ar[0]
+                let ar = item.path.split(".")       //this i sthe full path - with prepended dg name
+                let dgName = ar[0]      //so the DG name is the first segment (should be the same as selectedModel
 
+                ar.splice(0,1)          //remove the first element
                 let pathToDelete =  ar.join(".") // $filter('dropFirstInPath')(item.path)   //remove the DT name from the path
 
                 //check that there aren't any child elements off this one
@@ -166,13 +197,15 @@ angular.module("pocApp")
                 let dg = $scope.hashAllDG[dgName]
                 if (dg && dg.diff) {
                     dg.diff.forEach(function (ed) {
-                        if (ed.path.startsWith(pathToDelete)) {
+                        //let path = ed.path
+                        if (ed.path.startsWith(pathToDelete) && ed.path !== pathToDelete) { //don't want it matching on itself!
                             canDelete = false
                         }
                     })
 
                 } else {
-                    alert("DG has become corrupted. You'll need to reset.")
+                    alert(`DG ${dgName} cannot be found, or has no diff. You'll need to reset.`)
+                    return
                 }
 
                 if (! canDelete) {
@@ -187,7 +220,8 @@ angular.module("pocApp")
                 let inx = -1
                 let ctr = -1
                 //let changes = []    //this is the list of changes
-                //is the path in the DG diff?
+
+                //is the path in the DG diff? (or is it inherited from an ancestor)
                 for (const ed1 of $scope.selectedModel.diff) {
                     ctr ++
                     if (ed1.path == pathToDelete) {
@@ -197,7 +231,10 @@ angular.module("pocApp")
                 }
 
                 if (inx > -1) {
-                    $scope.selectedModel.diff.splice(inx,1)
+                    //set the mult to 0..0
+                    $scope.selectedModel.diff[inx].mult = '0..0'
+
+                    //$scope.selectedModel.diff.splice(inx,1)
                 } else {
                     //The attribute that was edited (eg edscription) is inherited
                     //Need to create an 'override' element and add to the DG
@@ -214,7 +251,7 @@ angular.module("pocApp")
                 //rebuild fullList and re-draw the tree
                 $scope.refreshFullList($scope.selectedModel)
 
-                $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:displayPath})
+                //$scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:displayPath})
 
 
             }
@@ -231,7 +268,11 @@ angular.module("pocApp")
             }
 
             //locate the model where this item was defined
-            $scope.getSourceModelName = function (ed) {
+            $scope.getSourceModelNameDEP = function (ed) {
+
+                return element.sourceModelName
+
+                //why do this?
                 if (ed) {
                     for (const element of $scope.fullElementList) {
                         if (element.ed.path == ed.path) {

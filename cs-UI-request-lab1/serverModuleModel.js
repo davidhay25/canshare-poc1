@@ -42,11 +42,13 @@ async function setup(app) {
         const query = {active:true} // active: { $lt: 15 } };
 
         const cursor = await colDG.find(query).toArray()
-        let hash = {}
+        let arDG = []
         cursor.forEach(function (doc) {
-            hash[doc.name] = doc
+            delete doc['_id']
+            arDG.push(doc)
         })
-        res.json(hash)
+
+        res.json(arDG)
     })
 
     //get a single DG by name
@@ -71,6 +73,36 @@ async function setup(app) {
         const query = {name:name}
         const cursor = await database.collection("dg").replaceOne(query,dg)
         res.json(dg)
+    })
+
+    //receive a hash of DG (the hashAllDG) and update the server.
+    //start with a simple update for now - get fancier later
+    app.post('/model/DG', async function(req,res) {
+
+        let hashAllDG = req.body
+
+        //create the query
+        //right now, updating each one individually. There will be a more efficient way
+
+        //hash is keyed on dg.name
+        for (const key of Object.keys(hashAllDG)) {
+            //console.log(key)
+            let dg = hashAllDG[key]
+            dg.active = true        //to provide a way to de-activate DG's. The query will only return active ones.
+            delete dg['_id']
+            const query = {name:key}
+            const options = {upsert:true}
+            //console.log(dg)
+            const cursor = await database.collection("dg").replaceOne(query,dg,options)
+            //console.log(cursor)
+        }
+
+
+
+
+        //const query = {name:name}
+        //const cursor = await database.collection("dg").replaceOne(query,dg)
+        res.json(hashAllDG)
     })
 
     // ============ compositions

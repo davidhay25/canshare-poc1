@@ -11,6 +11,10 @@
       -moz-border-radius: 5px;
       border-radius: 5px;
     }
+
+    .myIcon {
+      margin: 8px;
+    }
   </style>
 
   <div class="dgInfo row">
@@ -93,6 +97,25 @@
     </div>
   </div>
 
+  <div class = "clickable pull-right">
+
+    <button class="btn-link btn pull-right" ng-click="serverInteraction(selectedModel)">Compare to library</button>
+<!--
+    <i class="glyphicon glyphicon-cloud-upload pull-right clickable myIcon"
+       uib-popover="Upload this DG to the server"
+       popover-placement="left"
+       popover-trigger="'mouseenter'"
+       ng-click="serverInteraction('up',selectedModel)"></i>
+
+    <i class="glyphicon glyphicon-download-alt pull-right clickable myIcon"
+       uib-popover="Download this DG from the server"
+       popover-placement="left"
+       popover-trigger="'mouseenter'"
+       ng-click="serverInteraction('down',selectedModel)"></i>
+    -->
+
+  </div>
+
   <uib-tabset>
 
 
@@ -117,7 +140,7 @@
             </div>
             <div class="col-md-6">
 
-              <button class="btn-link btn  pull-right" ng-click="deleteDGItem(selectedNode.data.ed)">Delete this item</button>
+              <button class="btn-link btn  pull-right" ng-click="deleteDGItem(selectedNode.data.ed)">Delete this item ({{selectedNode.data.ed.title}})</button>
 
               <button class="btn btn-link pull-right"
 
@@ -135,8 +158,12 @@
                     <td style="width : 20%">Path</td><td>{{selectedNode.data.ed.path | dropFirstInPath}}</td>
                   </tr>
 
-                  <tr><td style="width : 20%">Source model</td>
-                    <td>{{getSourceModelName(selectedNode.data.ed)}}</td>
+                  <tr ng-hide ="selectedNode.data.ed.sourceModelName == selectedModel.name">
+                    <td style="width : 20%">Source model</td>
+                    <td>{{selectedNode.data.ed.sourceModelName}}
+                      <!-- {{getSourceModelName(selectedNode.data.ed)}}-->
+
+                    </td>
                   </tr>
 
                   <tr><td style="width : 20%">Title</td>
@@ -169,7 +196,7 @@
                     </div>
                     </td></tr>
 
-                  <tr ng-show = "selectedNode.data.ed.path !== selectedModel.name">
+                  <tr ng-show = "selectedNode.data.ed.path !== selectedModel.name && selectedNode.data.ed.type[0] !== 'Group'">
                     <td>Input control</td>
                     <td>
 
@@ -687,7 +714,7 @@
           <div class="tableFixHead">
             <table class="table-bordered table">
               <thead>
-              <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Fixed value</th><th>Source</th></tr>
+              <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Fixed value</th><th>Source</th><th>Edit</th></tr>
               </thead>
               <tbody>
               <!---     <tr ng-repeat="element in fullElementList">-->

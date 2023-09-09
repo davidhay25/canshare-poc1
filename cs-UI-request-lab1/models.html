@@ -110,6 +110,8 @@
 
     <script src="js/modelDGDialogCtrl.js"></script>
     <script src="js/modelDGDialogSvc.js"></script>
+    <script src="js/serverSync.js"></script>
+    <script src="js/serverInteractionCtrl.js"></script>
     <script src="directive/renderForm/renderFormSvc.js"></script>
     <script src="directive/renderForm/renderFormDir.js"></script>
 
@@ -135,7 +137,7 @@
             </div>
 
 
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <div class="navbar-text">
                     <button class="btn btn-link pull-right" ng-click="toggleLeftPanel()">Toggle list</button>
                 </div>
@@ -164,6 +166,11 @@
                 </div>
             </div>
 
+            <div class="col-md-1">
+                <div class="navbar-text" >
+                    <button class="btn btn-success" ng-click="serverSync()">Library</button>
+                </div>
+            </div>
 
             <div class="col-md-2">
                 <a href="https://teaho.govt.nz/" target="_blank">
@@ -340,16 +347,7 @@
                             <div class="col-md-12">
                                 <div style="margin-top: 7px" class="banner"> List of all DataGroups</div>
                             </div>
-                            <!--
-                            <div class="col-md-1">
-                                <div class="pull-right" style="margin-top: 8px">Tag</div>
-                            </div>
-                            <div class="col-md-2">
-                                <select style="margin-top: 2px" class="form-control"
-                                        ng-options="k for (k,v) in tags"
-                                        ng-model = "input.selectedTag"></select>
-                            </div>
-                            -->
+
                         </div>
 
 
@@ -387,8 +385,6 @@
 
                     <div  ng-show="!showDGList && selectedModel.kind == 'dg'">
 
-
-
                         <ng-include src="'/includes/showDG.html'"></ng-include>
                     </div>
 
@@ -402,11 +398,6 @@
                                 <div id="graphAllDG"></div>
                             </uib-tab>
                         </uib-tabset>
-
-
-
-
-
                     </div>
 
                 </div>

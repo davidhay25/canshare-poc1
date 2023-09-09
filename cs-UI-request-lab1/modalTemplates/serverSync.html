@@ -1,0 +1,66 @@
+
+<div>
+  <!--<div ng-controller="newResourceCtrl">-->
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-8 col-sm-8">
+        <h3 class="modal-title">
+          Library synchronisation
+        </h3>
+      </div>
+
+
+      <div class="col-md-4 col-sm-4">
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
+
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-body">
+
+    <div class="row">
+      <div class="col-md-4">
+        <button class="btn btn-primary" ng-click="refreshFromRepo()">Refresh local store
+          <i class="glyphicon glyphicon-arrow-down"></i>
+        </button>
+      </div>
+      <div class="col-md-8">
+        Will <strong>download the latest copies</strong> of all the DataGroups from the Library. This includes
+        both core and custom (user created) DGs. This will replace any local copies with the one from the library. eg
+        if you have changed a core DG locally, that change will be lost.
+
+      </div>
+    </div>
+<br/>
+    <div class="row">
+      <div class="col-md-4">
+        <button class="btn btn-primary" ng-click="updateRepo()">Update Library  <i class="glyphicon glyphicon-arrow-up"></i></button>
+      </div>
+      <div class="col-md-8">
+        Will <strong>upload all the DataGroups</strong> on the Library from any local copies you may have. This includes
+        both core and custom (user created) DGs. Your local store will not be effected, but the library will be updated
+        with any changes you may have made to any DataGroup.
+
+      </div>
+    </div>
+<!--
+    <br/>
+    <div class="row">
+      <div class="col-md-4">
+        <button class="btn btn-primary" ng-click="updateRepo()">Reset local </button>
+      </div>
+      <div class="col-md-8">
+        Will <strong>reset the core DataGroups</strong> in your local store. This does
+
+      </div>
+    </div>
+    -->
+
+  </div>
+  <div class="modal-header">
+    <em>These options to synchronise ALL DataGroups between the library and the local browser store. If you just want to
+    upload / download a single DataGroup theres a 'Compare to Library' link on the tree details page of each DataGroup.</em>
+  </div>
+</div>
