@@ -40,28 +40,39 @@ async function setup(app) {
 
         const colDG = database.collection("dg");
         const query = {active:true} // active: { $lt: 15 } };
+        try {
+            const cursor = await colDG.find(query).toArray()
+            let arDG = []
+            cursor.forEach(function (doc) {
+                delete doc['_id']
+                arDG.push(doc)
+            })
 
-        const cursor = await colDG.find(query).toArray()
-        let arDG = []
-        cursor.forEach(function (doc) {
-            delete doc['_id']
-            arDG.push(doc)
-        })
+            res.json(arDG)
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
 
-        res.json(arDG)
+        }
     })
 
     //get a single DG by name
     app.get('/model/DG/:name', async function(req,res) {
         let name = req.params.name
         const query = {name:name}
-        const cursor = await database.collection("comp").find(query).toArray()
-        if (cursor.length == 1) {
-            let comp = cursor[0]
-            delete comp['_id']
-            res.json(comp)
-        } else {
-            res.status(404).json({msg:'DG not found, or there are multiple with the same name'})
+        try {
+            const cursor = await database.collection("comp").find(query).toArray()
+            if (cursor.length == 1) {
+                let comp = cursor[0]
+                delete comp['_id']
+                res.json(comp)
+            } else {
+                res.status(404).json({msg:'DG not found, or there are multiple with the same name'})
+            }
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
         }
     })
 
@@ -71,8 +82,14 @@ async function setup(app) {
         let dg = req.body
         dg.updated = true           //so we know it was updated
         const query = {name:name}
-        const cursor = await database.collection("dg").replaceOne(query,dg,{upsert:true})
-        res.json(dg)
+        try {
+            const cursor = await database.collection("dg").replaceOne(query,dg,{upsert:true})
+            res.json(dg)
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
     })
 
     //receive a hash of DG (the hashAllDG) and update the server.
@@ -84,25 +101,27 @@ async function setup(app) {
         //create the query
         //right now, updating each one individually. There will be a more efficient way
 
-        //hash is keyed on dg.name
-        for (const key of Object.keys(hashAllDG)) {
-            //console.log(key)
-            let dg = hashAllDG[key]
-            dg.active = true        //to provide a way to de-activate DG's. The query will only return active ones.
-            delete dg['_id']
-            const query = {name:key}
-            const options = {upsert:true}
-            //console.log(dg)
-            const cursor = await database.collection("dg").replaceOne(query,dg,options)
-            //console.log(cursor)
+        try {
+
+            //hash is keyed on dg.name
+            for (const key of Object.keys(hashAllDG)) {
+                //console.log(key)
+                let dg = hashAllDG[key]
+                dg.active = true        //to provide a way to de-activate DG's. The query will only return active ones.
+                delete dg['_id']
+                const query = {name:key}
+                const options = {upsert:true}
+                //console.log(dg)
+                const cursor = await database.collection("dg").replaceOne(query,dg,options)
+                //console.log(cursor)
+            }
+            res.json(hashAllDG)
+
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
         }
-
-
-
-
-        //const query = {name:name}
-        //const cursor = await database.collection("dg").replaceOne(query,dg)
-        res.json(hashAllDG)
     })
 
     // ============ compositions
@@ -110,25 +129,38 @@ async function setup(app) {
     //get all active compositions
     app.get('/model/allCompositions', async function(req,res) {
         const query = {}  // bring them all back ATM{active:true} // active: { $lt: 15 } };
-        const cursor = await database.collection("comp").find(query).toArray()
-        let arComp = []
-        cursor.forEach(function (doc) {
-            arComp.push(doc)
-        })
-        res.json(arComp)
+        try {
+            const cursor = await database.collection("comp").find(query).toArray()
+            let arComp = []
+            cursor.forEach(function (doc) {
+                delete doc['_id']
+                arComp.push(doc)
+            })
+            res.json(arComp)
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
     })
 
     //get a single composition by name
     app.get('/model/comp/:name', async function(req,res) {
         let name = req.params.name
         const query = {name:name}
-        const cursor = await database.collection("comp").find(query).toArray()
-        if (cursor.length == 1) {
-            let comp = cursor[0]
-            delete comp['_id']
-            res.json(comp)
-        } else {
-            res.status(404).json({msg:'Composition not found, or there are multiple with the same name'})
+        try {
+            const cursor = await database.collection("comp").find(query).toArray()
+            if (cursor.length == 1) {
+                let comp = cursor[0]
+                delete comp['_id']
+                res.json(comp)
+            } else {
+                res.status(404).json({msg:'Composition not found, or there are multiple with the same name'})
+            }
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
         }
     })
 
@@ -136,10 +168,19 @@ async function setup(app) {
     app.put('/model/comp/:name', async function(req,res) {
         let name = req.params.name
         let comp = req.body
+        delete comp['_id']
         comp.updated = true           //so we know it was updated
         const query = {name:name}
-        const cursor = await database.collection("comp").replaceOne(query,comp,{upsert:true})
-        res.json(comp)
+        try {
+            const cursor = await database.collection("comp").replaceOne(query,comp,{upsert:true})
+            res.json(comp)
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+
+
     })
 
 

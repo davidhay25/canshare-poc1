@@ -52,8 +52,36 @@
         </table>
 
       </uib-tab>
-      <uib-tab heading="DataGroups" >
+
+      <uib-tab heading="DataGroups list" >
         <br/>
+
+
+        <div>Library DG count: {{libraryDGCount}}</div>
+        <div>Local DG count: {{localDGCount}}</div>
+
+
+        <table class="table table-bordered table-condensed">
+          <tr><th>Title</th><th>Local count</th><th>Library count</th><th>Note</th></tr>
+          <tr ng-repeat="item in summary">
+            <td>{{item.title}}</td>
+            <td>{{item.local.diff.length}}
+              <!--
+              <div class="clickableDotted"
+                   uib-popover-html="getPopoverHtml(item.local)"
+                   popover-placement="right"
+                   popover-trigger="'mouseenter'">
+                {{item.local.diff.length}}
+              </div>
+              -->
+
+            </td>
+            <td>{{item.library.diff.length}}</td>
+            <td>{{item.note}}</td>
+          </tr>
+        </table>
+
+<!--
         <uib-tabset>
           <uib-tab heading="Summary">
 
@@ -65,7 +93,17 @@
               <tr><th>Title</th><th>Local count</th><th>Library count</th><th>Note</th></tr>
               <tr ng-repeat="item in summary">
                 <td>{{item.title}}</td>
-                <td>{{item.local.diff.length}}</td>
+                <td>{{item.local.diff.length}}
+
+                  <div class="clickableDotted"
+                       uib-popover-html="getPopoverHtml(item.local)"
+                       popover-placement="right"
+                       popover-trigger="'mouseenter'">
+                    {{item.local.diff.length}}
+                  </div>
+                
+
+                </td>
                 <td>{{item.library.diff.length}}</td>
                 <td>{{item.note}}</td>
               </tr>
@@ -96,7 +134,7 @@
                 <button class="btn btn-danger" ng-click="updateRepo()">Update Library  <i class="glyphicon glyphicon-arrow-up"></i></button>
               </div>
               <div class="col-md-8">
-                Will <strong>upload all the DataGroups</strong> on the Library from any local copies you may have. This includes
+                Will <strong>upload all the DataGroups</strong> to the Library from any local copies you may have. This includes
                 both core and custom (user created) DGs. Your local store will not be affected, but the library will be updated
                 with any changes you may have made to any DataGroup.
 
@@ -108,8 +146,42 @@
           </uib-tab>
         </uib-tabset>
 
+-->
 
+      </uib-tab>
 
+      <uib-tab heading="DataGroups sync" >
+
+        <br/>
+        <div class="row">
+          <div class="col-md-4">
+            <button class="btn btn-danger" ng-click="refreshFromRepo()">Refresh local store
+              <i class="glyphicon glyphicon-arrow-down"></i>
+            </button>
+          </div>
+          <div class="col-md-8">
+            Will <strong>download the latest copies</strong> of all the DataGroups from the Library. This includes
+            both core and custom (user created) DGs. This will replace any local copies with the one from the library. eg
+            if you have changed a core DG locally, that change will be lost. If you have local custom DGs that haven't yet
+            been saved in the Library, they will still be there
+
+          </div>
+        </div>
+        <br/>
+        <div class="row">
+          <div class="col-md-4">
+            <button class="btn btn-danger" ng-click="updateRepo()">Update Library  <i class="glyphicon glyphicon-arrow-up"></i></button>
+          </div>
+          <div class="col-md-8">
+            Will <strong>upload all the DataGroups</strong> to the Library from any local copies you may have. This includes
+            both core and custom (user created) DGs. Your local store will not be affected, but the library will be updated
+            with any changes you may have made to any DataGroup.
+
+          </div>
+        </div>
+        <br/>
+        <em>These options to synchronise ALL DataGroups between the library and the local browser store. If you just want to
+          upload / download a single DataGroup theres a 'Compare to Library' link on the tree details page of each DataGroup.</em>
       </uib-tab>
     </uib-tabset>
 

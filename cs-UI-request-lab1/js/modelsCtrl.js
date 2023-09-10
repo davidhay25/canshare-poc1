@@ -738,8 +738,6 @@ angular.module("pocApp")
             }
 
             $scope.validateBundle = function (bundle) {
-
-
                 delete $scope.lmValidate
                 let qry = "http://hapi.fhir.org/baseR4/Bundle/$validate"
                 $http.post(qry,bundle).then(
@@ -752,10 +750,6 @@ angular.module("pocApp")
                         $scope.lmValidateSummary = modelsSvc.summarizeValidation(data.data,bundle)
                     }
                 )
-
-
-
-
 
             }
 
@@ -790,10 +784,19 @@ angular.module("pocApp")
 
                 let name = prompt("What is the name (no spaces, & must be unique)")
                 if (name) {
-                    let newComp = {kind:'comp', name:name, title:name, sections:[]}
-                    $localStorage.world.compositions[newComp.name] = newComp
-                    $scope.selectedModel = newComp
-                    $scope.selectComposition(newComp)
+
+                    let isUnique = (modelsSvc.isUniqueNameOnLibrary(name,'comp')
+                        && ! $scope.hashAllCompositions[name])
+
+                    if (isUnique) {
+                        let newComp = {kind:'comp', name:name, title:name, sections:[]}
+                        $localStorage.world.compositions[newComp.name] = newComp
+                        //$scope.selectedModel = newComp
+                        $scope.selectComposition(newComp)
+                    } else {
+                        alert("Sorry, that name has already been used.")
+                    }
+
                 }
                 //$scope.editComposition(newComp,true)
             }

@@ -41,7 +41,7 @@ angular.module("pocApp")
             
             //is this element able to be sliced
             $scope.canSlice = function (ed) {
-                if (ed) {
+                if (ed && ed.mult) {
                     if (ed.mult.indexOf('..*')  == -1 ) {
                         return false
                     }
@@ -173,10 +173,14 @@ angular.module("pocApp")
                         controlType = 'dropdown'
                     }
 
-                    let type = ed.type[0]
-                    if ($scope.hashAllDG[type] && $scope.hashAllDG[type].diff) {
-                        controlType = "dg"
+                    //the root element has no type
+                    if (ed.type) {
+                        let type = ed.type[0]
+                        if ($scope.hashAllDG[type] && $scope.hashAllDG[type].diff) {
+                            controlType = "dg"
+                        }
                     }
+
 
                     console.log(controlType)
                     return controlType

@@ -57,7 +57,7 @@
     <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
 
     <script>
-        angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage']).config(function($locationProvider) {
+        angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage','ngSanitize']).config(function($locationProvider) {
             $locationProvider.html5Mode(true);
             $locationProvider.hashPrefix('!');
         });
@@ -72,6 +72,7 @@
 
 
     <script src="js/libs/ngStorage.min.js"></script>
+    <script src="js/libs/angular-sanitize.js"></script>
 
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
 

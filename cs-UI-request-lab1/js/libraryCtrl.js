@@ -1,12 +1,22 @@
 //seversync is actually the main library interface
 angular.module("pocApp")
     .controller('libraryCtrl',
-        function ($scope,$http,allDG,allComp) {
+        function ($scope,$http,allDG,allComp,$sce) {
 
             $scope.input = {}
-            $scope.input.mainTabActive = 1
+            //$scope.input.mainTabActive = 1
 
             $scope.localDGCount = Object.keys(allDG).length
+
+            let trusted = {}; //https://stackoverflow.com/questions/33297444/uib-popover-html-wont-accept-my-html-string
+            $scope.getPopoverHtml = function(obj) {
+                //let content = "<bold>Test</bold>"
+                let content = `<pre>${angular.toJson(obj,true)}</pre>`
+                return trusted[content] || (trusted[content] = $sce.trustAsHtml(content));
+
+                //return $sce.trustAsHtml("<bold>Test</bold>");
+                //return "<bold>Test</bold>"
+            }
 
             //get all the DG
             let qry = `/model/allDG`

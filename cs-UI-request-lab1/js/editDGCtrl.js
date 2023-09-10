@@ -137,9 +137,11 @@ angular.module("pocApp")
             }
 
             $scope.checkName = function (name) {
+
                 $scope.model.name = name  //we can use the 'isUnique' to know if the model can be added
                 let ar = $scope.input.types.filter(type => type == name)
                 console.log(ar.length)
+
                 $scope.isUnique = (ar.length == 0) //temp
             }
 

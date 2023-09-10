@@ -7,6 +7,8 @@ angular.module("pocApp")
             $scope.compositionKind = ['request','report','general']
            // $scope.tumourStream = ['breast','gyne','lung','gi']
 
+
+            //Open the library interaction screen that is specific to compositions
             $scope.libraryInteraction = function (comp) {
 
                 $uibModal.open({
@@ -21,7 +23,13 @@ angular.module("pocApp")
                         }
                     }
 
-                }).result.then(function (ed) {
+                }).result.then(function (comp) {
+                    if (comp) {
+                        //If a composition is passed back, then download was selected
+                        $scope.hashAllCompositions[comp.name] = comp
+                        $scope.selectComposition(comp)
+
+                    }
 
                 })
 

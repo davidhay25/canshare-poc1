@@ -10,6 +10,13 @@ angular.module("pocApp")
 
         return {
 
+            isUniqueNameOnLibrary : function (name, modelType) {
+                //check that the name is unique for the modelType (comp, dt)
+                //just check the library
+                //todo
+                return true
+
+            },
 
 
             getSizeOfObject : function( object ) {

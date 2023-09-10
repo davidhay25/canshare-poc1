@@ -5,6 +5,7 @@ angular.module("pocApp")
            // $scope.direction = direction
             $scope.comp = comp
             //download the current composition with this name
+
             let qry = `/model/comp/${comp.name}`
             $http.get(qry).then(
                 function (data) {
@@ -22,23 +23,10 @@ angular.module("pocApp")
             )
 
             $scope.download = function() {
-                //need to update the DG in the allDG hash.
 
-
-                /*
-                for (const ed1 of $scope.selectedModel.diff) {
-                    ctr ++
-                    if (ed1.path == pathToDelete) {
-                        inx = ctr
-                        break
-                    }
+                if (confirm("Are you sure you wish to download the Library version of this Composition. It will replace any changes you have made")) {
+                    $scope.$close($scope.libraryComp)
                 }
-
-                if (inx > -1) {
-                    //set the mult to 0..0
-                    $scope.selectedModel.diff[inx].mult = '0..0'
-                }
-*/
                 }
 
             $scope.upload = function () {
@@ -47,6 +35,7 @@ angular.module("pocApp")
                     $http.put(qry,comp).then(
                         function (data) {
                             alert("Composition uploaded to Library")
+                            $scope.$close()
                         }, function (err) {
                             alert(angular.toJson(err.data))
                         }
@@ -56,9 +45,7 @@ angular.module("pocApp")
 
             }
 
-            $scope.download = function () {
 
-            }
 
 
 
