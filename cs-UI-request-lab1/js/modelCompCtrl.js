@@ -7,6 +7,34 @@ angular.module("pocApp")
             $scope.compositionKind = ['request','report','general']
            // $scope.tumourStream = ['breast','gyne','lung','gi']
 
+            $scope.libraryInteraction = function (comp) {
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/libraryComp.html',
+                    backdrop: 'static',
+                    size : 'lg',
+                    controller: 'libraryCompCtrl',
+
+                    resolve: {
+                        comp: function () {
+                            return comp
+                        }
+                    }
+
+                }).result.then(function (ed) {
+
+                })
+
+            }
+
+
+            $scope.deleteComposition = function (comp) {
+                if (confirm("Are you sure you want to remove this composition from the local store")) {
+                    delete $scope.hashAllCompositions[comp.name]
+                }
+            }
+
+
             $scope.selectCompTreePath = function (path) {
 
 

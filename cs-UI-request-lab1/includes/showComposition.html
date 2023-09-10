@@ -12,7 +12,25 @@
 
   </style>
 
-  <uib-tabset active="input.compTabActive" ng-show="selectedModel">
+  <div ng-show="selectedModel">
+
+  <div class="modelInfo row">
+    <div class="col-md-7">
+      Stuff about the composition
+      <div class="row">
+        <div class="col-md-12">
+          <button class="btn btn-link" ng-click="deleteComposition(selectedModel)">Remove from local store</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class = "clickable pull-right">
+
+    <button class="btn-link btn pull-right" ng-click="libraryInteraction(selectedModel)">Compare to library</button>
+  </div>
+
+  <uib-tabset active="input.compTabActive" >
 
 
 
@@ -427,4 +445,6 @@
     </uib-tab>
   </uib-tabset>
 
+
+  </div>
 </div>

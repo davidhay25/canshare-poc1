@@ -51,7 +51,7 @@ angular.module("pocApp")
             $scope.ui.tabComp = 0;
             $scope.ui.tabTerminology = 2;
 
-            $scope.input.mainTabActive = $scope.ui.tabDG;
+            //$scope.input.mainTabActive = $scope.ui.tabDG;
 
             //used in DG & Comp so when a type is a FHIR DT, we can create a link to the spec
             $scope.fhirDataTypes =modelsSvc.fhirDataTypes()
@@ -68,23 +68,38 @@ angular.module("pocApp")
                 alert('ba')
             })
 
-            $scope.serverSync = function () {
+            //The main library button
+            $scope.library = function () {
 
                 $uibModal.open({
-                    templateUrl: 'modalTemplates/serverSync.html',
+                    templateUrl: 'modalTemplates/library.html',
                     backdrop: 'static',
                     //size : 'lg',
-                    controller: 'serverSyncCtrl',
+                    controller: 'libraryCtrl',
 
                     resolve: {
                         allDG: function () {
                             return $scope.hashAllDG
+                        },
+                        allComp: function () {
+                            return $scope.hashAllCompositions
                         }
                     }
 
-                }).result.then(function (ed) {
+                }).result.then(function (vo) {
+
+
+                    if (vo.comp) {
+                        //a composition was passed in. Update (or add to) the $scope.hashAllCompositions
+                        $scope.hashAllCompositions[vo.comp.name] = vo.comp
+                       // alert("The composition has been added")
+
+                    }
+
+
+
                     // //rebuild fullList and re-draw the tree
-                    alert("The local copies have been updated. You should re-load the page to see the changes. ")
+                    //alert("The local copies have been updated. You should re-load the page to see the changes. ")
                      //$scope.refreshFullList($scope.selectedModel)
                 })
             }
@@ -898,7 +913,7 @@ angular.module("pocApp")
                 let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
                 $scope.treeData = treeData      //used in the Q builder
 
-                console.log(treeData)
+                //console.log(treeData)
                 makeCompTree(treeData,rootNodeId)
 
                 igSvc.makeFshForComp(comp,$scope.allCompElements,$scope.hashCompElements)

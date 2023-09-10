@@ -55,13 +55,13 @@ async function setup(app) {
     app.get('/model/DG/:name', async function(req,res) {
         let name = req.params.name
         const query = {name:name}
-        const cursor = await database.collection("dg").find(query).toArray()
+        const cursor = await database.collection("comp").find(query).toArray()
         if (cursor.length == 1) {
-            let dg = cursor[0]
-            delete dg['_id']
-            res.json(dg)
+            let comp = cursor[0]
+            delete comp['_id']
+            res.json(comp)
         } else {
-            res.status(400).json({msg:'DG not found, or there are multiple with the same name'})
+            res.status(404).json({msg:'DG not found, or there are multiple with the same name'})
         }
     })
 
@@ -71,7 +71,7 @@ async function setup(app) {
         let dg = req.body
         dg.updated = true           //so we know it was updated
         const query = {name:name}
-        const cursor = await database.collection("dg").replaceOne(query,dg)
+        const cursor = await database.collection("dg").replaceOne(query,dg,{upsert:true})
         res.json(dg)
     })
 
@@ -109,13 +109,13 @@ async function setup(app) {
 
     //get all active compositions
     app.get('/model/allCompositions', async function(req,res) {
-        const query = {active:true} // active: { $lt: 15 } };
+        const query = {}  // bring them all back ATM{active:true} // active: { $lt: 15 } };
         const cursor = await database.collection("comp").find(query).toArray()
-        let hash = {}
+        let arComp = []
         cursor.forEach(function (doc) {
-            hash[doc.name] = doc
+            arComp.push(doc)
         })
-        res.json(hash)
+        res.json(arComp)
     })
 
     //get a single composition by name
@@ -128,7 +128,7 @@ async function setup(app) {
             delete comp['_id']
             res.json(comp)
         } else {
-            res.status(400).json({msg:'Composition not found, or there are multiple with the same name'})
+            res.status(404).json({msg:'Composition not found, or there are multiple with the same name'})
         }
     })
 
@@ -138,7 +138,7 @@ async function setup(app) {
         let comp = req.body
         comp.updated = true           //so we know it was updated
         const query = {name:name}
-        const cursor = await database.collection("comp").replaceOne(query,comp)
+        const cursor = await database.collection("comp").replaceOne(query,comp,{upsert:true})
         res.json(comp)
     })
 

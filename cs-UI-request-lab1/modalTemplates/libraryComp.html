@@ -1,0 +1,124 @@
+
+<div>
+  <!--<div ng-controller="newResourceCtrl">-->
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-10 col-sm-10">
+        <h3 class="modal-title">
+
+          Library Composition compare: {{comp.title}}
+
+        </h3>
+      </div>
+
+
+      <div class="col-md-2 col-sm-2">
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
+
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-body">
+
+    <div class="row">
+      <div class="col-md-4">
+        <div class="banner">Local copy of Composition</div>
+        <button  style="width: 100%" class="btn btn-primary" ng-click="upload()"><strong>Upload</strong> to Library</button>
+        <br/><br/>
+
+        <uib-tabset>
+          <uib-tab heading="Sections">
+
+
+
+            <div ng-repeat = "section in comp.sections">
+              <div><strong>{{section.name}}</strong></div>
+              <div ng-repeat="item in section.items" style="margin-left: 8px">
+                {{item.title}} ({{item.type[0]}})
+              </div>
+            </div>
+
+          </uib-tab>
+          <uib-tab heading="Json">
+            <pre>{{comp | json}}</pre>
+          </uib-tab>
+        </uib-tabset>
+
+
+
+      </div>
+      <div class="col-md-4">
+        <div class="banner">Library copy of Composition</div>
+        <button style="width: 100%" class="btn btn-success" ng-click="download()"><strong>Download</strong> into Local copy</button>
+        <br/><br/>
+
+
+        <div ng-hide = "libraryComp">
+          This composition is not in the Library
+        </div>
+
+        <uib-tabset ng-show="libraryComp">
+          <uib-tab heading="Sections">
+
+            <div ng-repeat = "section in libraryComp.sections">
+              <div><strong>{{section.name}}</strong></div>
+              <div ng-repeat="item in section.items" style="margin-left: 8px">
+                {{item.title}} ({{item.type[0]}})
+              </div>
+            </div>
+
+          </uib-tab>
+          <uib-tab heading="Json">
+            <pre>{{libraryComp | json}}</pre>
+          </uib-tab>
+        </uib-tabset>
+
+
+
+      </div>
+      <div class="col-md-4">
+
+        <!--
+
+        <div class="banner">Differences</div>
+
+        <table class="table-bordered table-bordered">
+          <tr><th></th><th>Local</th><th>Library</th></tr>
+          <tr>
+            <td>Row count</td>
+            <td>{{DG.diff.length}}</td>
+            <td>{{serverDG.diff.length}}</td>
+          </tr>
+        </table>
+
+
+        <br/> <br/>
+
+        -->
+
+        <div class="banner">Messages from compare</div>
+        <ul>
+          <li ng-repeat = "msg in messages">{{msg}}</li>
+        </ul>
+
+        <br/> <br/>
+
+      </div>
+    </div>
+
+
+
+  </div>
+  <div class="modal-header">
+
+
+    <div><strong>Title:</strong> {{comp.title}}</div>
+    <div><strong>Name: </strong>{{comp.name}}</div>
+    <div><strong>Description:</strong> {{comp.description}}</div>
+    <br/>
+    <em>Options to synchronise a single Composition between the Library and the local browser cache</em>
+
+  </div>
+</div>

@@ -11,10 +11,10 @@ angular.module("pocApp")
             $scope.serverInteraction = function (DG) {
 
                 $uibModal.open({
-                    templateUrl: 'modalTemplates/library.html',
+                    templateUrl: 'modalTemplates/libraryDG.html',
                     backdrop: 'static',
                     size : 'lg',
-                    controller: 'libraryCtrl',
+                    controller: 'libraryDGCtrl',
 
                     resolve: {
                         DG: function () {
@@ -25,6 +25,8 @@ angular.module("pocApp")
                 }).result.then(function (ed) {
                     //copy the units to the current item
                     //need to update the .diff in the selected model
+
+                    //todo - what is this code doing???
                     let p = $filter('lastInPath')(ed.path)
                     for (const ed1 of $scope.selectedModel.diff) {
                         if (ed1.path == p) {

@@ -4,16 +4,14 @@
 
   <div class="modal-header">
     <div class="row">
-      <div class="col-md-10 col-sm-10">
+      <div class="col-md-8 col-sm-8">
         <h3 class="modal-title">
-
-          Library compare: {{DG.title}}
-
+          Library
         </h3>
       </div>
 
 
-      <div class="col-md-2 col-sm-2">
+      <div class="col-md-4 col-sm-4">
         <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
 
       </div>
@@ -22,112 +20,101 @@
   </div>
   <div class="modal-body">
 
-    <div class="row">
-      <div class="col-md-4">
-        <div class="banner">Local copy of DG</div>
-        <button  style="width: 100%" class="btn btn-primary" ng-click="upload()"><strong>Upload</strong> to Library</button>
-        <br/><br/>
+    <uib-tabset active="input.mainTabActive">
+      <uib-tab heading="Compositions">
 
-        <uib-tabset>
-          <uib-tab heading="Elements">
-            <div class="list-group">
-              <div class="list-group-item" ng-repeat = "ed in DG.diff">
-                {{ed.path}}
-              </div>
-            </div>
-
-          </uib-tab>
-          <uib-tab heading="Json">
-            <pre>{{DG | json}}</pre>
-          </uib-tab>
-        </uib-tabset>
+        <table class="table table-bordered table-condensed">
+          <tr><th>Title</th><th>Local sections</th><th>Library sections</th><th>Note</th></tr>
+          <tr ng-repeat="item in summaryComp">
+            <td>
+              {{item.title}}
+              <div class="clickable" ng-show="item.library" ng-click="downloadComp(item.library)">Download</div>
+            </td>
+            <td>
+              <ul class="list-unstyled">
+                <li ng-repeat="section in item.local.sections">
+                  {{section.name}} ({{section.items.length}})
+                </li>
+              </ul>
 
 
+            </td>
+            <td>
+              <ul class="list-unstyled">
+                <li ng-repeat="section in item.library.sections">
+                  {{section.name}} ({{section.items.length}})
+                </li>
+              </ul>
 
-      </div>
-      <div class="col-md-4">
-        <div class="banner">Library copy of DG</div>
-        <button style="width: 100%" class="btn btn-success" ng-click="download()"><strong>Download</strong> into Local copy</button>
-        <br/><br/>
-
-
-        <uib-tabset>
-          <uib-tab heading="Elements">
-            <div class="list-group">
-              <div class="list-group-item" ng-repeat = "ed in serverDG.diff">
-                {{ed.path}}
-              </div>
-            </div>
-
-          </uib-tab>
-          <uib-tab heading="Json">
-            <pre>{{serverDG | json}}</pre>
-          </uib-tab>
-        </uib-tabset>
-
-
-
-      </div>
-      <div class="col-md-4">
-
-        <div class="banner">Differences</div>
-
-
-        <table class="table-bordered table-bordered">
-          <tr><th></th><th>Local</th><th>Library</th></tr>
-          <tr>
-            <td>Row count</td>
-            <td>{{DG.diff.length}}</td>
-            <td>{{serverDG.diff.length}}</td>
+            </td>
+            <td>{{item.note}}</td>
           </tr>
         </table>
 
+      </uib-tab>
+      <uib-tab heading="DataGroups" >
+        <br/>
+        <uib-tabset>
+          <uib-tab heading="Summary">
 
-        <br/> <br/> <br/>
-
-        <div class="banner">Messages from compare</div>
-        <ul>
-          <li ng-repeat = "msg in messages">{{msg}}</li>
-        </ul>
-<!--
-        <pre>{{messages | json}}</pre>
-        <pre>{{summaryDiff | json}}</pre>
-
--->
-      </div>
-    </div>
+            <div>Library DG count: {{libraryDGCount}}</div>
+            <div>Local DG count: {{localDGCount}}</div>
 
 
+            <table class="table table-bordered table-condensed">
+              <tr><th>Title</th><th>Local count</th><th>Library count</th><th>Note</th></tr>
+              <tr ng-repeat="item in summary">
+                <td>{{item.title}}</td>
+                <td>{{item.local.diff.length}}</td>
+                <td>{{item.library.diff.length}}</td>
+                <td>{{item.note}}</td>
+              </tr>
+            </table>
 
-    <!--
+            <pre>{{summary}}</pre>
 
-    <div class="row">
-      <div class="col-md-4">
-        <button class="btn btn-primary" ng-click="refreshFromRepo()">Refresh local store
-          <i class="glyphicon glyphicon-arrow-down"></i>
-        </button>
-      </div>
-      <div class="col-md-8">
-        Will <strong>download the latest copies</strong> of all the DataGroups from the server repository. This includes
-        both core and custom (user created) DGs. This will replace any local copies with the one from the repository. eg
-        if you have changed a core DG, that change will be lost.
+          </uib-tab>
+          <uib-tab heading="Synchronise">
+            <br/>
+            <div class="row">
+              <div class="col-md-4">
+                <button class="btn btn-danger" ng-click="refreshFromRepo()">Refresh local store
+                  <i class="glyphicon glyphicon-arrow-down"></i>
+                </button>
+              </div>
+              <div class="col-md-8">
+                Will <strong>download the latest copies</strong> of all the DataGroups from the Library. This includes
+                both core and custom (user created) DGs. This will replace any local copies with the one from the library. eg
+                if you have changed a core DG locally, that change will be lost. If you have local custom DGs that haven't yet
+                been saved in the Library, they will still be there
 
-      </div>
-    </div>
-<br/>
-    <div class="row">
-      <div class="col-md-4">
-        <button class="btn btn-primary" ng-click="updateRepo()">Update repository  <i class="glyphicon glyphicon-arrow-up"></i></button>
-      </div>
-      <div class="col-md-8">
-        Will <strong>upload all the DataGroups</strong> on the repository from any local copies you may have. This includes
-        both core and custom (user created) DGs. Your local store will not be effected, but the repository will be updated
-        with any changes you may have made to any DataGroup.
+              </div>
+            </div>
+            <br/>
+            <div class="row">
+              <div class="col-md-4">
+                <button class="btn btn-danger" ng-click="updateRepo()">Update Library  <i class="glyphicon glyphicon-arrow-up"></i></button>
+              </div>
+              <div class="col-md-8">
+                Will <strong>upload all the DataGroups</strong> on the Library from any local copies you may have. This includes
+                both core and custom (user created) DGs. Your local store will not be affected, but the library will be updated
+                with any changes you may have made to any DataGroup.
 
-      </div>
-    </div>
+              </div>
+            </div>
+            <br/>
+            <em>These options to synchronise ALL DataGroups between the library and the local browser store. If you just want to
+              upload / download a single DataGroup theres a 'Compare to Library' link on the tree details page of each DataGroup.</em>
+          </uib-tab>
+        </uib-tabset>
 
-    -->
+
+
+      </uib-tab>
+    </uib-tabset>
+
+
+
 <!--
     <br/>
     <div class="row">
@@ -144,14 +131,5 @@
   </div>
   <div class="modal-header">
 
-
-    <div><strong>Title:</strong> {{DG.title}}</div>
-    <div><strong>Name: </strong>{{DG.name}}</div>
-    <div><strong>Description:</strong> {{DG.description}}</div>
-    <br/>
-    <em>Options to synchronise a single DataGroup between the Library and the local browser cache</em>
-    <div><strong>Note that the elements in the DG are only those defined or overridden in the DG.
-      Inherited items are not shown (or saved in the DG anyway)
-      </strong></div>
   </div>
 </div>

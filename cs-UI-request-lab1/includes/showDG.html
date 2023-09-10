@@ -2,7 +2,7 @@
 
 
   <style>
-    .dgInfo {
+    .dgInfoDEP {
       background-color: lightgoldenrodyellow;
       border: 1px solid gainsboro;
       padding : 3px;
@@ -17,7 +17,7 @@
     }
   </style>
 
-  <div class="dgInfo row">
+  <div class="modelInfo row">
     <div class="col-md-7">
       <strong>{{selectedModel.title}} </strong> ({{selectedModel.name}}): <em>{{selectedModel.description}}</em>
       <br/><br/>
@@ -115,7 +115,7 @@
 
   <div class = "clickable pull-right">
 
-    <button class="btn-link btn pull-right" ng-click="serverInteraction(selectedModel)">Compare to library</button>
+    <button class="btn-link btn pull-right" ng-click="libraryInteraction(selectedModel)">Compare to library</button>
 <!--
     <i class="glyphicon glyphicon-cloud-upload pull-right clickable myIcon"
        uib-popover="Upload this DG to the server"

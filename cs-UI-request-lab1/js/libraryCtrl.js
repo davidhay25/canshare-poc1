@@ -1,106 +1,113 @@
-
+//seversync is actually the main library interface
 angular.module("pocApp")
     .controller('libraryCtrl',
-        function ($scope,$http,DG) {
-           // $scope.direction = direction
-            $scope.DG = DG
-            //download the current DG
-            let qry = `/model/DG/${DG.name}`
+        function ($scope,$http,allDG,allComp) {
+
+            $scope.input = {}
+            $scope.input.mainTabActive = 1
+
+            $scope.localDGCount = Object.keys(allDG).length
+
+            //get all the DG
+            let qry = `/model/allDG`
             $http.get(qry).then(
                 function (data) {
-                    $scope.serverDG = data.data
-
-                    $scope.summaryDiff = summarizeDG(DG,$scope.serverDG)
-
-
-                    function summarizeDG(local,server) {
-                        let summary = {}
-                        summary.rows = [local.diff.length,server.diff.length]
-
-                        //create a hash of the server version to compare
-                        let serverHash = {}
-                        server.diff.forEach(function (ed) {
-                            serverHash[ed.path] = ed
-                        })
-
-                        //go through each ed in the source. compare type, mult
-                        $scope.messages = []
-                        let localHash = {}  //track the paths that the local has checked.
-                        local.diff.forEach(function (ed) {
-                            let path = ed.path
-                            if (serverHash[path]) {
-                                let serverED = serverHash[path]
-                                console.log(path,ed.mult,serverED.mult)
-                                if (ed.mult !== serverED.mult) {
-                                    $scope.messages.push(`Cardinality different in ${path}`)
-                                }
-
-                                if (ed.title !== serverED.title) {
-                                    $scope.messages.push(`Title different in ${path}`)
-                                }
-
-                                if (ed.description !== serverED.description) {
-                                    $scope.messages.push(`Description different in ${path}`)
-                                }
-
-
-                            } else {
-                                //this ed is ont on the server - it's a new one.
-                                $scope.messages.push(`Local has a new element: ${path}`)
-                            }
-                        })
-
-
-                        return summary
-                    }
-
+                    $scope.libraryDG = data.data
+                    $scope.libraryDGCount = $scope.libraryDG.length
+                    console.log($scope.libraryDG)
+                    makeDGSummary(allDG,$scope.libraryDG)
                 }, function (err) {
                     alert(angular.toJson(err.data))
-                }
-            )
+                })
+
+            //get all the compositions
+            let qryComp = `/model/allCompositions`
+            $http.get(qryComp).then(
+                function (data) {
+                    $scope.libraryComp = data.data
+                    $scope.libraryCompCount = $scope.libraryComp.length
+                    console.log($scope.libraryComp)
+                    makeCompSummary(allComp,$scope.libraryComp)
+                }, function (err) {
+                    alert(angular.toJson(err.data))
+                })
 
 
-            $scope.download = function() {
-                //need to update the DG in the allDG hash.
+            function makeCompSummary(allComp,libraryComp) {
+                let libraryHash = {}
 
+                libraryComp.forEach(function (comp) {
+                    libraryHash[comp.name] = comp
+                })
 
-                /*
-                for (const ed1 of $scope.selectedModel.diff) {
-                    ctr ++
-                    if (ed1.path == pathToDelete) {
-                        inx = ctr
-                        break
+                $scope.summaryComp = []        //the summary array
+
+                Object.keys(allComp).forEach(function (key) {
+                    let localComp = allComp[key]
+                    let item = {name:key,title:localComp.title,local:localComp}
+                    if (libraryHash[key]) {
+                        item.library = libraryHash[key]
+                        delete libraryHash[key]      //any left in the hash at the end are new on the library
+                    } else {
+                        item.note = "Not in Library"
                     }
-                }
+                    $scope.summaryComp.push(item)
+                })
 
-                if (inx > -1) {
-                    //set the mult to 0..0
-                    $scope.selectedModel.diff[inx].mult = '0..0'
-                }
-*/
-                }
-
-            $scope.upload = function () {
-                let qry = `/model/DG/${DG.name}`
-                $http.put(qry,DG).then(
-                    function (data) {
-                        alert("DG uploaded to repository")
-                    }, function (err) {
-                        alert(angular.toJson(err.data))
-                    }
-                )
+                //Any DG left in the serverHash are new on the server
+                Object.keys(libraryHash).forEach(function (key) {
+                    let libraryComp = libraryHash[key]
+                    let item = {name:key, title:libraryComp.title, library:libraryComp,note:"Library only"}
+                    $scope.summaryComp.push(item)
+                })
 
             }
 
-            $scope.download = function () {
+
+
+            //create the summary between library DG & local DG
+            function makeDGSummary(allDG,libraryDG) {
+                let libraryHash = {}
+
+                libraryDG.forEach(function (dg) {
+                    libraryHash[dg.name] = dg
+                })
+
+                $scope.summary = []        //the summary array
+                Object.keys(allDG).forEach(function (key) {
+                    let localDG = allDG[key]
+                    let item = {name:key,title:localDG.title,local:localDG}
+                    if (libraryHash[key]) {
+                        item.library = libraryHash[key]
+                        delete libraryHash[key]      //any left in the hash at the end are new on the library
+
+
+                    } else {
+                        item.note = "Not in Library"
+                        //the library  doesn't have this DG
+                    }
+                    $scope.summary.push(item)
+                })
+
+                //Any DG left in the serverHash are new on the server
+                Object.keys(libraryHash).forEach(function (key) {
+                    let libraryDG = libraryHash[key]
+                    let item = {name:key, title:libraryDG.title, library:libraryDG,note:"Library only"}
+                    $scope.summary.push(item)
+                })
+
+
 
             }
 
+            $scope.downloadComp = function(comp) {
+                //set the comp property of the vo and exit. The caller (modelsCtrl.js) will update
+                $scope.$close({comp:comp})
 
+            }
 
-/*
             $scope.refreshFromRepo = function () {
-                if (confirm('Are you sure you wish to refresh your local DGs from the Repository')) {
+                if (confirm('Are you sure you wish to refresh your local DGs from the Library')) {
                     let qry = '/model/allDG'
                     $http.get(qry).then(
                         function (data) {
@@ -116,9 +123,6 @@ angular.module("pocApp")
 
                             $scope.$close(true)
 
-
-
-
                         },
                         function (err) {
                             console.log(err)
@@ -130,7 +134,7 @@ angular.module("pocApp")
 
             //update all the DG on the server...
             $scope.updateRepo = function () {
-                if (confirm('Are you sure you wish to update the Repository')) {
+                if (confirm('Are you sure you wish to update the Library')) {
                         let qry = "/model/DG"
                     $http.post(qry,allDG).then(
                         function (data) {
@@ -142,5 +146,5 @@ angular.module("pocApp")
                     )
                 }
             }
-*/
+
         })
