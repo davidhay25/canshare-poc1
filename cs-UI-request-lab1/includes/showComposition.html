@@ -238,6 +238,12 @@
               </div>
 
 
+                <div ng-show ="selectedCompositionNode.data.ed.kind == 'dg'">
+                  <button class="btn-link btn pull-right"
+                          ng-click="termSelectDG({DGName:selectedCompositionNode.data.ed.name})">Display DT in DT tab</button>
+                </div>
+
+
 
                <div ng-show="selectedCompositionNode.data.ed.kind == 'section'">
                  <br/><br/>
@@ -288,14 +294,9 @@
 
                  </div>
                </div>
-
-
             </div>
 
-
               </div>
-
-
 
             </uib-tab>
 

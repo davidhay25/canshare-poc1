@@ -72,15 +72,19 @@ angular.module("pocApp")
                             //backdrop: 'static',
                             //size : 'lg',
                             controller : "showParametersCtrl",
-                            controllerDEP: function($scope,parameters){
-                                $scope.parameters = parameters
-                            },
+
                             resolve: {
                                 parameters: function () {
                                     return data.data
                                 },
                                 title : function () {
                                     return `Concept lookup (${code})`
+                                },
+                                code: function () {
+                                    return code
+                                },
+                                system : function () {
+                                    return snomed
                                 }
                             }
 

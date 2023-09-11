@@ -2,7 +2,7 @@
 //todo add direct lint to SS from DT
 angular.module("pocApp")
 
-    .service('modelsDemoSvc', function() {
+    .service('modelsDemoSvc', function(modelsObservationSvc) {
 
             return {
 
@@ -19,6 +19,8 @@ angular.module("pocApp")
                     let hashCompositions = {}
                     let hashDataGroups = {}
                     let hashVS = {}         //VS by name (not url)
+
+                    modelsObservationSvc.getModels(hashDataGroups)      //Observations and children
 
                     //---------- DataGroups
 
@@ -550,7 +552,7 @@ angular.module("pocApp")
                         description:"The period over which the drug was admnistered"})
 
                     hashDataGroups[dgMedicationAdministration.name] = dgMedicationAdministration
-
+/*
                     //DG Observation
                     let dgObservation = {kind:"dg",name:'Observation',title:"Observation",diff:[],
                         ss:"https://docs.google.com/spreadsheets/d/1XU7Jc0BbC5nXgmTu-qVLS-WwJjKO9GLXgjVHVk2WRL0/edit#gid=1502765034",
@@ -575,6 +577,8 @@ angular.module("pocApp")
                     dgObservation.diff.push({path:'interpretation',title:'Interpretation',type:['CodeableConcept'],mult:"0..1",
                         description:"The interpretation"})
 
+                    */
+
                     /* rather than defineing the valusDT here, have child DG's add the one they want
                     dgObservation.diff.push({path:'valueString',title:'Text',type:['string'],mult:"0..1",
                         description:"The plain text information determined as a result of making the observation"})
@@ -586,34 +590,10 @@ angular.module("pocApp")
                         description:"The ratio"})
 
                     */
-                    hashDataGroups[dgObservation.name] = dgObservation
+                   // hashDataGroups[dgObservation.name] = dgObservation
 
 
-                    //DG for mitotic observation
-                    let dgObservationMC = {kind:"dg",parent:"Observation",name:'ObservationMitoticCount',
-                        title:"Mitotic count observation",diff:[],
-                        description:"Mitotic count observation"}
 
-                    dgObservationMC.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
-                        fixedCoding:{code:'371472000',display:"Mitotic count"},
-                        description:"The code for mitotic count"})
-
-                    dgObservationMC.diff.push({path:'dar',title:'Data absent reason',type:['CodeableConcept'],mult:"0..1",
-                        fixedCoding:{code:"1156316003",display:"Cannot be assessed"},
-                        description:"The mitotic count cannot be assessed"})
-
-                    dgObservationMC.diff.push({path:'valueRatio',title:'Ratio value',type:['Ratio'],mult:"0..1",
-                        description:"The ratio"})
-
-                    dgObservationMC.diff.push({path:'valueRatio.denominator',title:'denominator',type:['Quantity'],mult:"1..1",
-                        description:"The denominator of the ratio"})
-
-                    dgObservationMC.diff.push({path:'valueRatio.denominator.unit',title:'Denominator units',type:['string'],mult:"1..1",
-                        fixedString:"mm^2",
-                        description:"Fix the units for the denominator to mm squared"})
-
-
-                    hashDataGroups[dgObservationMC.name] = dgObservationMC
 
                     //DG for FNCLCC mitotic observation
                     let dgObservationMC_FNCLCC = {kind:"dg",parent:"ObservationMitoticCount",name:'ObservationMitoticCountFNCLCC',
