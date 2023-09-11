@@ -16,13 +16,24 @@
 
   <div class="modelInfo row">
     <div class="col-md-7">
-      Stuff about the composition
-      <div class="row">
-        <div class="col-md-12">
+
+        <strong>{{selectedModel.title}} </strong> ({{selectedModel.name}})
+        <div><em>{{selectedModel.description}}</em></div>
+        <br/><br/>
+        <div>
           <button class="btn btn-link" ng-click="deleteComposition(selectedModel)">Remove from local store</button>
         </div>
-      </div>
     </div>
+    <div class="col-md-5">
+      <table class="table-condensed table table-bordered">
+        <tr><td>Tumour stream</td><td>{{selectedModel.meta.tumourStream}}</td></tr>
+        <tr><td>Category</td><td>{{selectedModel.meta.category}}</td></tr>
+
+        <tr><td></td><td><em>Set these in the Metadata tab</em></td></tr>
+      </table>
+    </div>
+
+
   </div>
 
   <div class = "clickable pull-right">

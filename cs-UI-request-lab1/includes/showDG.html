@@ -358,6 +358,7 @@
                       <span ng-show="selectedNode.data.ed.fixedCoding"
                             class=" pull-right">
 
+
                         <span ng-show="getSourceModelName(selectedNode.data.ed) !== selectedModel.name">
                           set on {{getSourceModelName(selectedNode.data.ed)}}
                         </span>
@@ -366,6 +367,8 @@
                               class="clickable"
                               ng-click="clearFixedValue(selectedNode.data.ed)">Clear fixed value</span>
                       </span>
+
+
 
                       <div class="clickable"  ng-hide="selectedNode.data.ed.fixedCoding"
                            ng-click="setFixedValue(selectedNode.data.ed)">Set fixed value</div>

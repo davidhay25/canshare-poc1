@@ -9,13 +9,11 @@ angular.module("pocApp")
             $scope.localDGCount = Object.keys(allDG).length
 
             let trusted = {}; //https://stackoverflow.com/questions/33297444/uib-popover-html-wont-accept-my-html-string
-            $scope.getPopoverHtml = function(obj) {
+            $scope.getPopoverHtmlDEP = function(obj) {
+                //works, but I don't want to use it here. Leaving so I know how to do it later on
                 //let content = "<bold>Test</bold>"
                 let content = `<pre>${angular.toJson(obj,true)}</pre>`
                 return trusted[content] || (trusted[content] = $sce.trustAsHtml(content));
-
-                //return $sce.trustAsHtml("<bold>Test</bold>");
-                //return "<bold>Test</bold>"
             }
 
             //get all the DG
@@ -106,6 +104,18 @@ angular.module("pocApp")
                     $scope.summary.push(item)
                 })
 
+                try {
+                    $scope.summary.sort(function (a,b) {
+                        if (a.title.toLowerCase() > b.title.toLowerCase()) {
+                            return 1
+                        } else {
+                            return -1
+                        }
+                    })
+                } catch (ex) {
+                    console.log("Issue sorting DG - likey a missing title",ex)
+                }
+
 
 
             }
@@ -125,7 +135,7 @@ angular.module("pocApp")
 
                             let arDG = data.data
 
-                            //replace each one.
+                            //replace each one. Leaves any that aren't in the library
                             arDG.forEach(function (dg) {
                                 allDG[dg.name] = dg
 

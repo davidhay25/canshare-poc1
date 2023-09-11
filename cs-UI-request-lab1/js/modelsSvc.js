@@ -5,16 +5,38 @@ angular.module("pocApp")
 
         this.fhir = {}
 
-
-
-
         return {
 
             isUniqueNameOnLibrary : function (name, modelType) {
-                //check that the name is unique for the modelType (comp, dt)
+                let deferred = $q.defer()
+                //check that the name is unique for the modelType (comp, dt) Case sensitive.
                 //just check the library
                 //todo
-                return true
+
+                let url = `/model/DG/${name}`
+                if (modelType == 'comp') {
+                    `/model/comp/${name}`
+                }
+
+                $http.get(url).then(
+                    function (data) {
+                        //if something it returned, then this is not a unique name
+                        deferred.reject(data.data)  //reject it, returning the one that was found
+                    },
+                    function (err) {
+                        if (err.status == 404) {
+                            deferred.resolve()      //a 404, all good
+                        } else {
+                            alert(angular.toJson(err))
+                            deferred.reject()       //something else? reject
+                        }
+
+                    }
+                )
+
+
+
+                return deferred.promise
 
             },
 
@@ -539,10 +561,7 @@ angular.module("pocApp")
                         node.icon = "icons/icon_datatype.gif"
                     }
 
-                   // let iconFile = "icons/icon-q-" + child.type + ".png"
-                   // item.icon = iconFile
-
-
+               
 
                     if (ed.mult && ed.mult == '0..0') {
                         //don't add removed elements
@@ -590,7 +609,7 @@ angular.module("pocApp")
                 })
 
                 // now we can build the ordered list
-                console.log(hash)
+                //console.log(hash)
 
                 let arLines = []
 
@@ -599,7 +618,7 @@ angular.module("pocApp")
                     //sep 8 - there was a 'children' element - don't think we want that
                     let clone = angular.copy(node)
                     delete clone.children
-                    console.log(clone)
+                    //console.log(clone)
                     ar.push(clone)
                     //ar.push(node)
 

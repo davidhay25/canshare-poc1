@@ -24,7 +24,7 @@ angular.module("pocApp")
                 if (ar.length == 2) {
                     if (ar[0] == 'dt') {
                         $scope.initialDT = ar[1]
-                        console.log($scope.initialDT)
+                        //console.log($scope.initialDT)
 
                         //wait a second then select the DT. todo really need to refactor this controller...
                         $timeout(function () {
@@ -74,7 +74,7 @@ angular.module("pocApp")
                 $uibModal.open({
                     templateUrl: 'modalTemplates/library.html',
                     backdrop: 'static',
-                    //size : 'lg',
+                    size : 'lg',
                     controller: 'libraryCtrl',
 
                     resolve: {
@@ -498,7 +498,7 @@ angular.module("pocApp")
             //when a specific DG is selected in the term summary
             //used by updates list as well = hence moved to main controller
             $scope.termSelectDG = function (item,previous) {
-                console.log(item)
+                //console.log(item)
 
                 //set the tab to the DG tab
                 $scope.input.mainTabActive = $scope.ui.tabDG;
@@ -518,7 +518,7 @@ angular.module("pocApp")
             $scope.back = function () {
                 if ($scope.hxDGLoad.length > 0) {
                     let DGName = $scope.hxDGLoad.pop()
-                    //console.lo
+
                     $scope.termSelectDG({DGName:DGName})
                 }
 
@@ -531,7 +531,7 @@ angular.module("pocApp")
 
 
             $scope.termSelectDGItem = function (item) {
-                console.log(item)
+                // console.log(item)
 
                 //set the tab to the DG tab
                 $scope.input.mainTabActive = $scope.ui.tabDG;
@@ -620,7 +620,7 @@ angular.module("pocApp")
             $scope.refreshUpdates()
 
             $scope.$on('dgUpdated',function(ev,obj){
-                console.log('i')
+
                 $scope.refreshUpdates()
             })
 
@@ -691,7 +691,7 @@ angular.module("pocApp")
 
             //allow the user to set the VS for a given element
             $scope.setValueSet = function (element) {
-                //console.log(element)
+
                 let vs = prompt("ValueSet url")
                 if (vs) {
                     element.valueSet = vs       //for the immediate display
@@ -785,17 +785,29 @@ angular.module("pocApp")
                 let name = prompt("What is the name (no spaces, & must be unique)")
                 if (name) {
 
-                    let isUnique = (modelsSvc.isUniqueNameOnLibrary(name,'comp')
-                        && ! $scope.hashAllCompositions[name])
+                    modelsSvc.isUniqueNameOnLibrary(name,'comp').then(
+                        function () {
+                            //name is unique
+                            let isUnique =  ! $scope.hashAllCompositions[name]
 
-                    if (isUnique) {
-                        let newComp = {kind:'comp', name:name, title:name, sections:[]}
-                        $localStorage.world.compositions[newComp.name] = newComp
-                        //$scope.selectedModel = newComp
-                        $scope.selectComposition(newComp)
-                    } else {
-                        alert("Sorry, that name has already been used.")
-                    }
+                            if (isUnique) {
+                                let newComp = {kind:'comp', name:name, title:name, sections:[]}
+                                $localStorage.world.compositions[newComp.name] = newComp
+                                //$scope.selectedModel = newComp
+                                $scope.selectComposition(newComp)
+                            } else {
+                                alert("Sorry, that name has already been used locally.")
+                            }
+
+                        },
+                        function () {
+                            alert("Sorry, that name has already been used on the Library.")
+                            //name is not unique
+                        }
+                    )
+
+
+
 
                 }
                 //$scope.editComposition(newComp,true)
@@ -916,7 +928,7 @@ angular.module("pocApp")
                 let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
                 $scope.treeData = treeData      //used in the Q builder
 
-                //console.log(treeData)
+
                 makeCompTree(treeData,rootNodeId)
 
                 igSvc.makeFshForComp(comp,$scope.allCompElements,$scope.hashCompElements)
@@ -941,7 +953,7 @@ angular.module("pocApp")
              //   $scope.fullElementList = vo.allElements
 
                 $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
-console.log($scope.fullElementList)
+
 
                // console.log(modelsSvc.makeOrderedFullList(vo.allElements))
 
@@ -1068,7 +1080,7 @@ console.log($scope.fullElementList)
 
                     if (data.node) {
                         $scope.selectedNode = data.node;
-                        console.log(data.node)
+
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...
@@ -1080,7 +1092,7 @@ console.log($scope.fullElementList)
 
 
                     //console.log($("#dgTree").jstree(true).get_json('#', { 'flat': true }))
-                    console.log($("#dgTree").jstree(true).get_json('#'))
+                    //console.log($("#dgTree").jstree(true).get_json('#'))
 
                     $scope.$digest();
                 });

@@ -481,6 +481,9 @@ angular.module("pocApp")
                     //DataGroup HcProvider
                     let dgHealthCareProvider = {kind:"dg",name:'HcProvider',title:"Healthcare practitioner",diff:[],
                         description:"The person who is directly or indirectly involved in the provising of healthcare or related services"}
+
+                    dgHealthCareProvider.diff.push({path:'role',title:"Role",type:['CodeableConcept'],mult:'0..1',
+                        description : "The role of the healthcare practitioner"})
                     dgHealthCareProvider.diff.push({path:'name',title:"Name",type:['HumanName'],mult:'0..1',
                         description : "The name of the healthcare practitioner"})
                     dgHealthCareProvider.diff.push({path:'hpi',title:"HPI number",type:['Identifier'],mult:'0..1',
@@ -566,7 +569,7 @@ angular.module("pocApp")
                         description:"A classification of the type of observation being made"})
                     dgObservation.diff.push({path:'date',title:'Date',type:['dateTime'],mult:"0..1",
                         description:"The date and/or time that the observation was deemed to be taken"})
-                    dgObservation.diff.push({path:'performer',title:'Performer',type:['HcProvider'],mult:"0..1",
+                    dgObservation.diff.push({path:'performer',title:'Performer',type:['HcProvider'],mult:"0..*",
                         description:"The healthcare practitioner who is responsible for the observation"})
 
                     dgObservation.diff.push({path:'interpretation',title:'Interpretation',type:['CodeableConcept'],mult:"0..1",

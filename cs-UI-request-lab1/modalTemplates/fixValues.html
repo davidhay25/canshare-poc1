@@ -1,0 +1,42 @@
+
+<div>
+  <!--<div ng-controller="newResourceCtrl">-->
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-8 col-sm-8">
+        <h3 class="modal-title">
+         Fix values
+        </h3>
+      </div>
+
+
+      <div class="col-md-4 col-sm-4">
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
+
+        <button ng-show = "input.system && input.code"
+                class="btn btn-primary pull-right" ng-click="save()">Save</button>
+
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-body">
+
+    <div ng-show = "type == 'coding'">
+
+     <table class="table">
+       <tr><td>System</td> <td><input type="text" class="form-control" ng-model="input.system"/> </td></tr>
+       <tr><td>Code</td> <td><input type="text" class="form-control" ng-model="input.code"/> </td></tr>
+       <tr><td>Display</td> <td><input type="text" class="form-control" ng-model="input.display"/> </td></tr>
+     </table>
+
+    </div>
+
+
+
+  </div>
+  <div class="modal-header">
+
+  </div>
+</div>

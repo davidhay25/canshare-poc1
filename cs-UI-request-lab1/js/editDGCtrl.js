@@ -48,9 +48,6 @@ angular.module("pocApp")
             $scope.input.types = modelsSvc.fhirDataTypes().concat($scope.input.types) //.concat(modelsSvc.fhirDataTypes())
 
 
-            //modelsSvc.fhirDataTypes()
-
-
 
             $scope.input.valueSets = Object.keys(hashValueSets)
             $scope.input.valueSets.sort()
@@ -62,7 +59,7 @@ angular.module("pocApp")
             //set the override code. Like comp overrides, this sets an element with the appropriate
             //path in the DG. todo checked nested DT paths...
             //todo generalize to change other attrobutes - like title & mutiplicity
-            $scope.setFixedCode = function (element) {
+            $scope.setFixedCodeDEP = function (element) {
                 let code = prompt("Enter the code")
                 if (code) {
                     let path = element.ed.path
@@ -143,6 +140,19 @@ angular.module("pocApp")
                 console.log(ar.length)
 
                 $scope.isUnique = (ar.length == 0) //temp
+
+                //check on the library. Is this going to be a performance hit?
+                if ($scope.isUnique) {
+                    modelsSvc.isUniqueNameOnLibrary(name,'comp').then(
+                        function () {
+                            //name is unique
+                        }, function (err) {
+                            $scope.isUnique = false
+                        }
+                    )
+                }
+
+
             }
 
             $scope.isRequired = function (element) {

@@ -270,13 +270,16 @@ angular.module("pocApp")
                         return true
                     }
                 }
-
             }
 
             //locate the model where this item was defined
-            $scope.getSourceModelNameDEP = function (ed) {
+            //todo - this needs a little work
+            $scope.getSourceModelName = function (ed) {
+//return "test"
+                if (ed) {
+                    return ed.sourceModelName
+                }
 
-                return element.sourceModelName
 
                 //why do this?
                 if (ed) {
@@ -381,8 +384,83 @@ angular.module("pocApp")
                         break
                 }
 
-                //console.log(ed)
 
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/fixValues.html',
+                    backdrop: 'static',
+                    //size : 'lg',
+                    controller: 'fixValuesCtrl',
+
+                    resolve: {
+                        type: function () {
+                            return type
+                        }
+                    }
+
+                }).result.then(function (vo) {
+                    //the type of vo is appropriate to the type
+                    let elValue = vo
+                    let elName
+
+                    switch (type) {
+                        case "coding":
+                            elName = "fixedCoding"
+                            break
+                    }
+
+
+
+                    let ar = ed.path.split('.')  //need to remove the first part of the path
+                    ar.splice(0,1)
+                    let path = ar.join('.')
+
+                    //remove the fixedCode from any existing element with this path
+                    let found = false
+                    for (const ed of $scope.selectedModel.diff) {
+                        if (ed.path == path) {
+                            ed[elName] = elValue
+
+                            modelDGSvc.updateChanges($scope.selectedModel,
+                                {edPath:ed.path,
+                                    msg:`Set fixed ${type} to ${angular.toJson(elValue)}`},
+                                $scope)
+
+                            found = true
+                            break
+                        }
+                    }
+
+                    if (! found) {
+                        let overrideEd = angular.copy(ed)
+
+                        //overrideEd.fixedCoding = {code:value}
+
+                        overrideEd[elName] = elValue
+
+                        overrideEd.path = path
+                        $scope.selectedModel.diff.push(overrideEd)
+
+                        modelDGSvc.updateChanges($scope.selectedModel,
+                            {edPath:ed.path,
+                                msg:`Set fixed ${type} to ${angular.toJson(elValue)}`},
+                            $scope)
+
+                    }
+
+                    ed[elName] = elValue   //for the display
+                    //ed.fixedCoding = {code:value}        //for the display
+
+
+                    //rebuild the full element list for the table
+                    let vo1 = modelsSvc.getFullListOfElements($scope.selectedModel,$scope.input.types,$scope.input.showFullModel)
+                    $scope.fullElementList = vo1.allElements
+
+
+
+
+                })
+
+return
 
                 let value = prompt(`${fixedValueText[type]} for ${ed.path}`)
 
