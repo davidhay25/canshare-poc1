@@ -7,20 +7,22 @@ angular.module("pocApp")
 
         return {
 
-            makeFullGraph : function(hashAllDG,) {
+            makeFullGraph : function(in_hashAllDG,) {
                 //create a single graph with all DGs. include hierarchy and references
 
+                let hashAllDG = angular.copy(in_hashAllDG)
                 let arNodes = []
                 let arEdges = []
-/*
-                //create the root node
-                let rootNode = {id:"root", label: "root",shape: 'box'}
-                //node.data = {dg:DG}
-                arNodes.push(rootNode)
-*/
+
+                //create the root node. This is the default parent (unless a DG already has one
+                let rootNode = {id:"root", label: "root",shape: 'box',color:'white'}
+                rootNode.data = {dg:{}}
+                //arNodes.push(rootNode)
+
 
                 Object.keys(hashAllDG).forEach(function (key) {
-                    let DG = hashAllDG[key]
+
+                    let DG = angular.copy(hashAllDG[key])
 
 
 
@@ -38,17 +40,26 @@ angular.module("pocApp")
                         label: '',arrows : {to:true}}
                     arEdges.push(edge)
 */
+
+                    //add the defauls parent if needed
+                    if (! DG.parent) {
+                        DG.parent = "root"
+                    }
+
                     //check for parent
                     if (DG.parent) {
                         //create the 'parent' link  todo - graph needs to add parent
                         let edge = {id: 'e' + arEdges.length +1,
                             from: DG.name,
                             //to: model.parent,
-                            to: parent,
+                            to: DG.parent,
                             color: 'red',
-                            width: 4,
+                            //width: 4,
                             label: 'specializes',arrows : {to:true}}
                         arEdges.push(edge)
+                        console.log(edge)
+                    } else {
+                        //there is
                     }
 
                     DG.diff.forEach(function (ed) {

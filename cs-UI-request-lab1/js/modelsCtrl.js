@@ -165,8 +165,6 @@ angular.module("pocApp")
                     //now look for tags
                     let dt = $scope.hashAllDG[key]
 
-
-
                     let tagsForThisDG = userTags[key] || dt.tags
 
                     if (tagsForThisDG) {
@@ -1142,6 +1140,7 @@ angular.module("pocApp")
             }
 
             function makeGraphAllDG(graphData) {
+                $scope.allGraphData = graphData
 
                 let container = document.getElementById('graphAllDG');
                 if (container) {
@@ -1151,6 +1150,9 @@ angular.module("pocApp")
                             barnesHut: {
                                 gravitationalConstant: -10000,
                             }
+                        },
+                        layout : {
+                            hierarchical : false
                         }
                     };
                     if ($scope.graphAllDG) {
@@ -1168,6 +1170,11 @@ angular.module("pocApp")
 
                     $scope.graphAllDG.on("click", function (obj)
                     {
+
+                        let nodeId = obj.nodes[0];  //get the first node
+                        let node = $scope.allGraphData.nodes.get(nodeId);
+                        $scope.selectedNodeFromFull = node.data
+                        $scope.$digest()
                         /*
                         delete $scope.selectedModelFromGraph
                         delete $scope.selectedModelFromGraphFull

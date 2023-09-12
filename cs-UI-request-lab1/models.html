@@ -404,7 +404,17 @@
                                 <img width="100%" src="images/LIM-1.png" usemap="#image_map"/>
                             </uib-tab>
                             <uib-tab heading="Graph" select="fitAllDGGraph()">
-                                <div id="graphAllDG"></div>
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div id="graphAllDG"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <pre>{{selectedNodeFromFull.dg | json}}</pre>
+                                    </div>
+                                </div>
+
+
+
                             </uib-tab>
                         </uib-tabset>
                     </div>

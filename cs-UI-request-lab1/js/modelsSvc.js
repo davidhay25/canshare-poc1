@@ -121,12 +121,21 @@ angular.module("pocApp")
                     let DG = hashDG[key]
 
                     let model = angular.copy(DG) //we're going to chane model so need a copy..
-                    while (model.parent) {
+
+                    let currentModelParent = model.parent
+
+                    while (model && model.parent) {
                        // console.log(`Examining ${DG.name}: ${model.parent} is the parent of ${model.name}`)
 
+
                         model = hashDG[model.parent]
-                        hashReferences[model.name] = hashReferences[model.name] || []
-                        hashReferences[model.name].push({name:DG.name,kind:model.kind,mode:'parent'})
+                        if (model) {
+                            hashReferences[model.name] = hashReferences[model.name] || []
+                            hashReferences[model.name].push({name:DG.name,kind:model.kind,mode:'parent'})
+                        } else {
+                            alert(`The DG ${key} has a parent of ${currentModelParent} which is not a DG`)
+                        }
+
                     }
 
                     if (DG.diff) {
@@ -565,6 +574,11 @@ angular.module("pocApp")
                     if (ed.fixedCoding || ed.fixedString) {
                         node['a_attr'] = { "style": "color : blue" }
                     }
+
+                    if (ed.mult && ed.mult.indexOf('1..') > -1) {
+                        node['a_attr'] = { "style": "color : red" }
+                    }
+
 
                     if (ed.mult && ed.mult == '0..0') {
                         //don't add removed elements
