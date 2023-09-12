@@ -536,14 +536,14 @@ angular.module("pocApp")
 
                 //now the slice for tumour differentiation
 
-                dgGradingSarcoma.diff.push({path:'parameter.tumourDiff',title:'Tumour differentiation',
+                dgGradingSarcoma.diff.push({path:'parameter.slice:tumourDiff',title:'Tumour differentiation',
                     type:['Observation'],mult:'1..1'})
 
-                dgGradingSarcoma.diff.push({path:'parameter.tumourDiff.code',title:'Code',
+                dgGradingSarcoma.diff.push({path:'parameter.slice:tumourDiff.code',title:'Code',
                     fixedCoding : {display:'tumour differentiation code'},
                     type:['CodeableConcept'],mult:'0..1'})
 
-                dgGradingSarcoma.diff.push({path:'parameter.tumourDiff.interpretation',title:'Interpretation',type:['CodeableConcept'],mult:"1..1",
+                dgGradingSarcoma.diff.push({path:'parameter.slice:tumourDiff.interpretation',title:'Interpretation',type:['CodeableConcept'],mult:"1..1",
                     options:[
                         {pt:"FNCLCC tumour differentiation score 1"},
                         {pt:"FNCLCC tumour differentiation score 2"},
@@ -554,14 +554,14 @@ angular.module("pocApp")
 
 
                 //now the slice for mitotic count
-                dgGradingSarcoma.diff.push({path:'parameter.mitoticCount',title:'Mitotic count',
+                dgGradingSarcoma.diff.push({path:'parameter.slice:mitoticCount',title:'Mitotic count',
                     type:['Observation'],mult:'1..1'})
 
-                dgGradingSarcoma.diff.push({path:'parameter.mitoticCount.code',title:'Code',
+                dgGradingSarcoma.diff.push({path:'parameter.slice:mitoticCount.code',title:'Code',
                     fixedCoding : {display:'mitotic count code'},
                     type:['CodeableConcept'],mult:'0..1'})
 
-                dgGradingSarcoma.diff.push({path:'parameter.mitoticCount.interpretation',title:'Interpretation',type:['CodeableConcept'],mult:"1..1",
+                dgGradingSarcoma.diff.push({path:'parameter.slice:mitoticCount.interpretation',title:'Interpretation',type:['CodeableConcept'],mult:"1..1",
                     options:[
                         {pt:"FNCLCC sarcoma mitotic count score 1"},
                         {pt:"FNCLCC sarcoma mitotic count score 2"},
@@ -571,9 +571,9 @@ angular.module("pocApp")
 
 
                 //now the slice for necrosis percentage
-                dgGradingSarcoma.diff.push({path:'parameter.necrosisPercentage',title:'Necrosis percentage',
+                dgGradingSarcoma.diff.push({path:'parameter.slice:necrosisPercentage',title:'Necrosis percentage',
                     type:['Observation'],mult:'1..1'})
-                dgGradingSarcoma.diff.push({path:'parameter.necrosisPercentage.code',title:'Code',
+                dgGradingSarcoma.diff.push({path:'parameter.slice:necrosisPercentage.code',title:'Code',
                     fixedCoding : {display:'necrosis percentage code'},
                     type:['CodeableConcept'],mult:'1..1'})
 

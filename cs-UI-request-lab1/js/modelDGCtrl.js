@@ -78,7 +78,7 @@ angular.module("pocApp")
 
                     let clone = angular.copy(ed)  //copy to insert
                     let basePath = $filter('dropFirstInPath')(ed.path)
-                    let newPath = `${basePath}.${sliceName}`
+                    let newPath = `${basePath}.slice:${sliceName}`
                     clone.path = newPath
                     clone.title = `Slice ${sliceName} from ${basePath}`
                     clone.mult = "0..1"         //set to single, optional
@@ -101,17 +101,25 @@ angular.module("pocApp")
                     //set the type of the element being sliced to group
                     ed.type = ['Group']
 
-                    //TODO - this update not working...
+
                     //update the selectedModel
+                    //if you're slicing an inherited path, will need to add an override element
                     let inx = -1
+                    let found
                     for (const ed1 of $scope.selectedModel.diff) {
                         inx++
                         let shortPath = $filter('dropFirstInPath')(ed.path)
                         if (ed1.path == shortPath) {
                             ed.path = shortPath
                             $scope.selectedModel.diff.splice(inx,1,angular.copy(ed))
+                            found = true
                             break
                         }
+                    }
+
+                    if (! found) {
+                        ed.path = $filter('dropFirstInPath')(ed.path)
+                        $scope.selectedModel.diff.push(ed)
                     }
 
 
@@ -119,7 +127,7 @@ angular.module("pocApp")
                     //update the global change log
                     modelDGSvc.updateChanges($scope.selectedModel,
                         {edPath:newPath,
-                            msg:`Update options list`},
+                            msg:`Sliced ${ed.path}`},
                         $scope)
 
                     //rebuild fullList and re-draw the tree
