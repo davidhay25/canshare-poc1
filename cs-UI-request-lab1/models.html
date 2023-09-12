@@ -291,7 +291,7 @@
                             <div class="list-group">
                                 <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
                                      ng-click="selectModel(v)"
-                                     ng-show="showDG(v,input.dgFilter)"
+                                        ng-show="true || showDG(v,input.dgFilter)"
                                      ng-repeat="v in tags[input.selectedTag]">
 
                                     <i class="glyphicon glyphicon-edit pull-right clickable"

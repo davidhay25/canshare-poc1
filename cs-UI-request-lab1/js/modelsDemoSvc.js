@@ -183,7 +183,9 @@ angular.module("pocApp")
 
                     //Cancer assessment
                     let dgCancerAssessment = {kind:"dg",name:'CancerAssessment',title:"Cancer assessment",diff:[],
-                        mcodegroup : "disease", tags:'main', fhirResource:"ClinicalImpression",
+                        mcodegroup : "disease",
+                        tags:[{system:'bespoke', code: 'main'}],
+                        fhirResource:"ClinicalImpression",
                         description:"A description of the current status of the cancer at a given point in time."}
 
                     dgCancerAssessment.diff.push({path:'basisOfDiagnosis',title:'Basis of diagnosis',type:['Group'],mult:'0..1',
@@ -256,7 +258,7 @@ angular.module("pocApp")
                     //SarcomaCancer assessment
                     let dgCancerAssessmentSarcoma = {kind:"dg",parent:"CancerAssessment", name:'CancerAssessmentSarcoma',
                         title:"Sarcoma cancer assessment",diff:[], fhirResource:"ClinicalImpression",
-                         tags:'main',
+                        tags:[{system:'bespoke', code: 'main'}],
                         description:"A description of the current status of a sarcoma at a given point in time."}
 
                     dgCancerAssessmentSarcoma.diff.push({path:'basisOfDiagnosis.evidenceRadiology',title:'Radiological evidence',type:['Group'],mult:'1..1',

@@ -15,8 +15,13 @@ angular.module("pocApp")
             $localStorage.selectedTag = $localStorage.selectedTag || 'main'
             $scope.input.selectedTag = $localStorage.selectedTag       //default tag for tag filtered list
 
-            let search = $window.location.search;
+            let tagSystem = {}
+            tagSystem.bespoke = {code:'bespoke'}
+            tagSystem.dgcategory = {code:'dgcategory'}
 
+
+            //was the page called with a DG name?
+            let search = $window.location.search;
             if (search) {
 
                 let srch = search.substr(1)
@@ -150,21 +155,92 @@ angular.module("pocApp")
             //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
             $scope.hashAllDG = $localStorage.world.dataGroups
 
+            //return a string list of the tags for this DG
+            //todo this could be optimized...
+            $scope.getTagListForDG = function (DG) {
+                let arTags = []
+                if (DG) {
+                    Object.keys($scope.tags).forEach(function (tagName) {
+                        $scope.tags[tagName].forEach(function (dg) {
+                            if (dg.name == DG.name) {
+                                arTags.push(tagName)
+                            }
+                        })
+                    })
+                }
+
+                return arTags
+            }
+
+            //clear the tag from the DG (if it exists) and the $scope.tags
+            $scope.removeTagFromDT = function (tagName) {
+
+                //remove from the DG (if present)
+                let ctr = -1
+                for (const tag of $scope.selectedModel.tags) {
+                    ctr ++
+                    if (tag.system == tagSystem.bespoke.code && tag.code == tagName) {
+                        $scope.selectedModel.tags.splice(ctr,1)
+                        break
+                    }
+                }
+                //remove from the tags object
+                ctr = -1
+                for (const dg of $scope.tags[tagName]) {
+                    ctr ++
+                    if (dg.name == $scope.selectedModel.name) {
+                        $scope.tags[tagName].splice(ctr,1)
+                        break
+                    }
+                }
+
+
+                Object.keys($scope.tags).forEach(function (key) {
+
+                })
+
+
+
+
+            }
+
             //create a list of all DT + fhir types
+            //also assemble a list of bespoke tage (ie tags where the system is 'bespoke'
             makeAllDTList = function() {
-                $scope.tags = {}
-                $scope.tagNames = []        //use an array for the list filtered by tag
+                $scope.tags = {} //a hash keyed on tag code containing an array of DG with that tag
+
+                $scope.tagNames = []        //use an array for the list filtered by tag. This is a string list of codes where system == bespoke
                 $scope.allTypes = modelsSvc.fhirDataTypes()
 
+                //This allows tags that survive re-setting. A hash, keyed by DG name with a collection of bespoke codings
                 let userTags = $localStorage.userTags || {}     //if the user has customized the tags - keyed by name
+
 
 
                 //iterate through DT assembling the tag name list, tag hash
                 Object.keys($scope.hashAllDG).forEach(function (key) {
                     $scope.allTypes.push(key)
                     //now look for tags
-                    let dt = $scope.hashAllDG[key]
 
+                    let dt = $scope.hashAllDG[key]
+                    if (dt.tags && Array.isArray(dt.tags)) {   //as was using string
+                        dt.tags.forEach(function (tag) {
+                            if (tag.system == tagSystem.bespoke.code) {
+                                //this is a bespoke tag. It can also be in core
+                                let tagName = tag.code
+
+                                //this is the list of tagnames. used to populate the dropdown tag selector...
+                                if ($scope.tagNames.indexOf(tagName) == -1) {
+                                    $scope.tagNames.push(tagName)
+                                }
+
+                                //This is tha set of DG's that have this particular tag
+                                $scope.tags[tagName] = $scope.tags[tagName] || []
+                                $scope.tags[tagName].push(dt)
+                            }
+                        })
+                    }
+/*
                     let tagsForThisDG = userTags[key] || dt.tags
 
                     if (tagsForThisDG) {
@@ -185,6 +261,8 @@ angular.module("pocApp")
                             $scope.tags[tag].push(dt)
                         })
                     }
+
+                    */
                 })
 
                 //build the graph of all DT
@@ -653,6 +731,7 @@ angular.module("pocApp")
 
 
             //used in the DG list filtering
+            //filter is the selected bespoke code (if any)
             $scope.showDG = function(DG,filter) {
                 if (filter) {
 

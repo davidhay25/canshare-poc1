@@ -27,14 +27,17 @@ angular.module("pocApp")
                 $scope.allComments = []
                 let compName = $scope.selectedComp.name
                 let temp = $localStorage.world.comments[compName]       //hash keyed by path
-                Object.keys(temp).forEach(function (key) {
-                    let arComments = temp[key]
-                    arComments.forEach(function (note) {
-                        let comment = {id:note.id,comment:note.comment,path:key,disposition : note.disposition,
-                            dispositionNote: note.dispositionNote,author:note.author}
-                        $scope.allComments.push(comment)
+                if (temp) {
+                    Object.keys(temp).forEach(function (key) {
+                        let arComments = temp[key]
+                        arComments.forEach(function (note) {
+                            let comment = {id:note.id,comment:note.comment,path:key,disposition : note.disposition,
+                                dispositionNote: note.dispositionNote,author:note.author}
+                            $scope.allComments.push(comment)
+                        })
                     })
-                })
+                }
+
 
             }
 

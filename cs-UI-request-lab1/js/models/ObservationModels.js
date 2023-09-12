@@ -11,7 +11,7 @@ angular.module("pocApp")
                 //Observation datagroup
                 let dgObservation = {kind:"dg",name:'Observation',title:"Observation",diff:[],
                     ss:"https://docs.google.com/spreadsheets/d/1XU7Jc0BbC5nXgmTu-qVLS-WwJjKO9GLXgjVHVk2WRL0/edit#gid=1502765034",
-                    tags:'working',
+                    tags:[{system:'bespoke', code: 'working'}],
                     description:"Measurements and simple assertions made about a patient, device or other subject. Intended as abstract."}
 
                 dgObservation.diff.push({path:'status',title:'Status',type:['code'],mult:"1..1",
@@ -295,7 +295,7 @@ angular.module("pocApp")
 
                 //ancillary studies
                 let dgAncillary = {kind:"dg",parent: "Observation",name:'AncillaryStudy',title:"Ancillary Study",diff:[],mcodegroup:'disease',
-                    tags:'working',
+                    tags:[{system:'bespoke', code: 'working'}],
                     description:"Diagnostic or therapeutic procedure which is supplementary to the main test or treatment."}
 
                 dgAncillary.diff.push({path:'valueCodeableConcept',title:'Coded value',type:['CodeableConcept'],mult:"1..1",
@@ -479,7 +479,9 @@ angular.module("pocApp")
 
                 //DG grading
                 let dgGrading = {kind:"dg",name:'Grading',title:"Grading",diff:[],
-                    tags:'main',
+                    tags:[{system:'bespoke', code: 'main'},
+                        {system:'bespoke', code: 'working'},
+                        {system:'dgcategory', code: 'grading'}],
                     ss:'https://docs.google.com/spreadsheets/d/1XU7Jc0BbC5nXgmTu-qVLS-WwJjKO9GLXgjVHVk2WRL0/edit#gid=2058860673',
                     description:"The degree of differentiation of a tumour, e.g. the extent to which a tumour resembles the normal tissue at that site (also known as histological grade)"}
                 dgGrading.diff.push({path:'system',title:'System',type:['CodeableConcept'],mult:'1..1',
@@ -509,7 +511,7 @@ angular.module("pocApp")
 
                 //sarcoma grading
                 let dgGradingSarcoma = {kind:"dg",parent:'Grading', name:'GradingSarcoma',title:"Sarcoma grading",diff:[],
-                    tags:'main',
+                    tags:[{system:'bespoke', code: 'main'},{system:'dgcategory', code: 'grading'}],
                     profile: "StructureDefinition-SarcomaGrading.html",
                     description:"The grading of a sarcoma using the French Federation of Cancer Centers sarcoma grading system (FNCLCC = Fédération Nationale des Centres de Lutte contre le Cancer). Reference: FNCLCC grading"}
 

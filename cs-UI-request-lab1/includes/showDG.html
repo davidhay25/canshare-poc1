@@ -97,26 +97,57 @@
         <tr><td>Tags</td>
           <td>
 
-            <input type = "text" class="form-control"
-                   placeholder="New tag "
-                   ng-blur="updateTag(selectedModel.tags)" ng-model="selectedModel.tags"/>
+            <div class="row">
+              <div class="col-md-6">
+                <div ng-repeat = "tag in getTagListForDG(selectedModel)">
+                  <div>
+
+                    <span class="pull-right">
+                      <i class="glyphicon glyphicon-remove-sign pull-right clickable"
+                         uib-popover="Remove this tag"
+                         popover-placement="left"
+                         popover-trigger="'mouseenter'"
+                         ng-click="removeTagFromDT(tag,selectedModel)"></i>
+                    </span>
 
 
+
+                    {{tag}}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <select class="form-control" ng-model="input.newTag"
+                        ng-options="tag for tag in tagNames"></select>
+                <div ng-show="input.newTag">
+                  <button class="btn btn-link">Add this tag</button>
+                </div>
+
+              </div>
+            </div>
 
 
             <!--
-            <div class="row">
+                       <input type = "text" class="form-control"
+                              placeholder="New tag "
+                              ng-blur="updateTag(selectedModel.tags)" ng-model="selectedModel.tags"/>
 
-              <div class="col-md-5">
-                <input type = "text" class="form-control"
-                       placeholder="New tag "
-                       ng-blur="updateTag(selectedModel.tags)" ng-model="selectedModel.tags"/>
-              </div>
-              <div class="col-md-7">
-                {{selectedModel.tags}}
-              </div>
-            </div>
-            -->
+
+
+
+
+                       <div class="row">
+
+                         <div class="col-md-5">
+                           <input type = "text" class="form-control"
+                                  placeholder="New tag "
+                                  ng-blur="updateTag(selectedModel.tags)" ng-model="selectedModel.tags"/>
+                         </div>
+                         <div class="col-md-7">
+                           {{selectedModel.tags}}
+                         </div>
+                       </div>
+                       -->
 
 
 
