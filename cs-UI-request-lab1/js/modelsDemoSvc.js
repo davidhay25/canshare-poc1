@@ -86,32 +86,7 @@ angular.module("pocApp")
 
                     hashDataGroups[dgGrandChild.name] = dgGrandChild
                     
-                    //ancillary studies
-                    let dgAncillary = {kind:"dg",name:'AncillaryStudy',title:"Ancillary Study",diff:[],mcodegroup:'disease',
-                        description:"Diagnostic or therapeutic procedure which is supplementary to the main test or treatment."}
 
-                    dgAncillary.diff.push({path:'type',title:'Type of study',type:['CodeableConcept'],
-                        valueSet : "http://canshare.co.nz/ValueSet/ancillary-type",
-                        description:"The type of ancillary test"})
-
-                    let ancMethod = {path:'method',title:'Method used',type:['CodeableConcept'],
-                        description:"The method of how the ancillary study was performed"}
-
-                    ancMethod.dependVS = []
-                    ancMethod.dependVS.push({source:'type',value:{code:'HER2'},
-                        url:"https://canshare.co.nz/fhir/ValueSet/ancillary-method-HER2"})
-                    ancMethod.dependVS.push({source:'type',value:{code:'PT'},
-                        url:"https://canshare.co.nz/fhir/ValueSet/ancillary-method-PT"})
-
-                    dgAncillary.diff.push(ancMethod)
-
-                    dgAncillary.diff.push({path:'result',title:'Result',type:['CodeableConcept'],
-                        description:"The coded result of the ancillary study performed"})
-
-                    //dependencies
-
-
-                    hashDataGroups[dgAncillary.name] = dgAncillary
 
 
                     //DG staging component
@@ -141,44 +116,7 @@ angular.module("pocApp")
                     dgStaging.diff.push({path:'additionalDetails',title:'Additional details',type:['string'],mult:'0..1'})
                     hashDataGroups[dgStaging.name] = dgStaging
 
-                    //DG grading
-                    let dgGrading = {kind:"dg",name:'Grading',title:"Grading",diff:[],
-                        tags:'main',
-                        ss:'https://docs.google.com/spreadsheets/d/1XU7Jc0BbC5nXgmTu-qVLS-WwJjKO9GLXgjVHVk2WRL0/edit#gid=2058860673',
-                        description:"The degree of differentiation of a tumour, e.g. the extent to which a tumour resembles the normal tissue at that site (also known as histological grade)"}
-                    dgGrading.diff.push({path:'system',title:'System',type:['CodeableConcept'],mult:'0..1'})
-                    dgGrading.diff.push({path:'date',title:'Date',type:['date'],mult:'0..1'})
-                    dgGrading.diff.push({path:'criteria',title:'Criteria',type:['Group'],mult:'0..1'})
-                    dgGrading.diff.push({path:'criteria.general',title:'General criteria',type:['Observation'],
-                        mult:'0..*'})
 
-                    dgGrading.diff.push({path:'grade',title:'Grade',type:['CodeableConcept'],mult:'0..1'})
-                    dgGrading.diff.push({path:'additionalDetails',title:'Additional details',type:['string'],mult:'0..1'})
-                    hashDataGroups[dgGrading.name] = dgGrading
-
-                    //sarcoma grading
-                    let dgGradingSarcoma = {kind:"dg",parent:'Grading', name:'GradingSarcoma',title:"Sarcoma grading",diff:[],
-                        tags:'main',
-                        profile: "StructureDefinition-SarcomaGrading.html",
-                        LM: "StructureDefinition-GradingSarcoma.html",
-                        description:"The degree of differentiation of a sarcoma, e.g. the extent to which a tumour resembles the normal tissue at that site (also known as histological grade)"}
-
-
-                    dgGradingSarcoma.diff.push({path:'criteria.mitoticCount',title:'Mitotic count',
-                        type:['ObservationMitoticCount'],mult:'1..1'})
-                    dgGradingSarcoma.diff.push({path:'criteria.mitoticCount.code',title:'Code',
-                        fixedCoding : {display:'mitotic count'},
-                        type:['CodeableConcept'],mult:'0..1'})
-
-                    dgGradingSarcoma.diff.push({path:'criteria.necrosisPercentage',title:'Necrosis percentage',
-                        type:['Observation'],mult:'1..1'})
-                    dgGradingSarcoma.diff.push({path:'criteria.necrosisPercentage.code',title:'Code',
-                        fixedCoding : {display:'necrosis percentage'},
-                        type:['CodeableConcept'],mult:'1..1'})
-
-
-
-                    hashDataGroups[dgGradingSarcoma.name] = dgGradingSarcoma
 
 /*
                     //DG Blood pressure - just an example

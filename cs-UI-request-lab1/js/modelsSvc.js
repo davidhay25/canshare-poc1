@@ -548,20 +548,22 @@ angular.module("pocApp")
 
                         switch (ed.kind) {
                             case 'slice' :
-                                node['a_attr'] = { "style": "color : blue" }
+                                node['a_attr'] = { "style": "color : purple" }
                                 break
                         }
                     }
                     if (ed.zElement) {
                         node.icon = `icons/icon-q-open-choice.png`
-
                     }
 
                     if (ed.type && ed.type[0] == 'CodeableConcept') {
                         node.icon = "icons/icon_datatype.gif"
                     }
 
-               
+
+                    if (ed.fixedCoding || ed.fixedString) {
+                        node['a_attr'] = { "style": "color : blue" }
+                    }
 
                     if (ed.mult && ed.mult == '0..0') {
                         //don't add removed elements

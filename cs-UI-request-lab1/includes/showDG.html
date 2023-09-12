@@ -90,7 +90,16 @@
         <tr><td>Tags:</td>
           <td>
 
+            <input type = "text" class="form-control"
+                   placeholder="New tag "
+                   ng-blur="updateTag(selectedModel.tags)" ng-model="selectedModel.tags"/>
+
+
+
+
+            <!--
             <div class="row">
+
               <div class="col-md-5">
                 <input type = "text" class="form-control"
                        placeholder="New tag "
@@ -100,6 +109,7 @@
                 {{selectedModel.tags}}
               </div>
             </div>
+            -->
 
 
 
