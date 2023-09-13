@@ -12,7 +12,7 @@ angular.module("pocApp")
                 let dgObservation = {kind:"dg",name:'Observation',title:"Observation",diff:[],
                     ss:"https://docs.google.com/spreadsheets/d/1XU7Jc0BbC5nXgmTu-qVLS-WwJjKO9GLXgjVHVk2WRL0/edit#gid=1502765034",
                     tags:[{system:'bespoke', code: 'working'}],
-                    description:"Measurements and simple assertions made about a patient, device or other subject. Intended as abstract."}
+                    description:"Measurements and simple assertions made about a patient, device or other subject. Intended as abstract, so no value type specified. This must be specified by child DGs."}
 
                 dgObservation.diff.push({path:'status',title:'Status',type:['code'],mult:"1..1",
                     description:"The status of the result value - i.e. registered, preliminary, final, amended"})

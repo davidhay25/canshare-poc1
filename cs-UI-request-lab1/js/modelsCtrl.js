@@ -245,8 +245,6 @@ angular.module("pocApp")
                 //This allows tags that survive re-setting. A hash, keyed by DG name with a collection of bespoke codings
                 let userTags1 = $localStorage.userTags1 || {}     //if the user has customized the tags - keyed by name
 
-
-
                 //iterate through DT assembling the tag name list, tag hash
                 Object.keys($scope.hashAllDG).forEach(function (key) {
                     $scope.allTypes.push(key)
@@ -270,8 +268,6 @@ angular.module("pocApp")
                             }
                         })
                     }
-
-
 
 
 /*
@@ -299,7 +295,7 @@ angular.module("pocApp")
                     */
                 })
 
-                //now add any tags form the user store. This supports local tags that may have been removed from the DG
+                //now add any tags from the user store. This supports local tags that may have been removed from the DG
                 if ($localStorage.userTags1) {     //   a hash keyed by tagName with an array og DG names
                     Object.keys($localStorage.userTags1).forEach(function (tagName) {
                         let arDGName = $localStorage.userTags1[tagName]      //the local list of DG's with this tag
@@ -324,18 +320,22 @@ angular.module("pocApp")
                     })
                 }
 
-                //build the graph of all DT
+                //----------build the graph of all DT
                 let vo = modelDGSvc.makeFullGraph($scope.hashAllDG)
 
-                //todo - should move the js
+                //todo - should move the js to the bottom of the page so it's loaded before the script runs...!
                 $timeout(function () {
                     makeGraphAllDG(vo.graphData)
+                    //--------- build the tree with all DG
+                    let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
+                    showAllDGTree(vo1.treeData)
                 },500)
 
 
 
+
             }
-            makeAllDTList()
+            makeAllDTList()         //initial invokation on load
 
             //console.log($scope.tags)
 
@@ -353,6 +353,30 @@ angular.module("pocApp")
             }
 
 
+            //display the tree with all DG
+            function showAllDGTree(treeData) {
+                $('#allDGTree').jstree('destroy');
+
+                $scope.allDGTree = $('#allDGTree').jstree(
+                    {'core': {'multiple': false, 'data': treeData,
+                            'themes': {name: 'proton', responsive: true}}}
+                ).on('changed.jstree', function (e, data) {
+
+                    if (data.node) {
+                        let dg = data.node.data.dg
+
+                        //use the dg out of $scope.hashAllDG - not the copy in the tree data
+                        $scope.selectModel($scope.hashAllDG[dg.name])
+
+                    }
+
+                    $scope.$digest();       //as the event occurred outside of angular...
+                }).bind("loaded.jstree", function (event, data) {
+                    let id = treeData[0].id
+                    $(this).jstree("open_node",id);
+                    $scope.$digest();
+                });
+            }
 
             //make a sorted list for the UI
             function sortDG() {

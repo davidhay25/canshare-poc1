@@ -7,6 +7,40 @@ angular.module("pocApp")
 
         return {
 
+            makeTreeViewOfDG : function(hashAllDG) {
+                //create a treeview ordered by parent
+                //add the root
+                let treeData = []
+                let root = {id:"root",text: "Root",parent:'#',data:{}}
+                treeData.push(root)
+
+                //make sorted list
+                let ar = []
+                Object.keys(hashAllDG).forEach(function (key) {
+                    let dg = hashAllDG[key]
+                    ar.push(dg)
+                })
+
+                ar.sort(function (a,b) {
+                    if (a.title > b.title) {
+                        return 1
+                    } else { return -1}
+                })
+
+                ar.forEach(function (dg) {
+                //Object.keys(hashAllDG).forEach(function (key) {
+                  //  let dg = hashAllDG[key]
+                    let text = dg.title || dg.name
+                    let parent = dg.parent || "root"
+                    console.log(text,parent)
+                    let node = {id:dg.name,text:text,parent:parent,data:{dg:dg}}
+                    treeData.push(node)
+                })
+
+                return {treeData:treeData}
+
+            },
+
             makeFullGraph : function(in_hashAllDG,) {
                 //create a single graph with all DGs. include hierarchy and references
 

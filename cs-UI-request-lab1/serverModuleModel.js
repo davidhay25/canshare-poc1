@@ -61,7 +61,7 @@ async function setup(app) {
         let name = req.params.name
         const query = {name:name}
         try {
-            const cursor = await database.collection("comp").find(query).toArray()
+            const cursor = await database.collection("dg").find(query).toArray()
             if (cursor.length == 1) {
                 let comp = cursor[0]
                 delete comp['_id']

@@ -268,10 +268,9 @@
                 <div ng-class="leftPanel">
 
 
-
-
                     <uib-tabset>
-                        <uib-tab heading="Tagged DG">
+
+                        <uib-tab heading="Tagged">
                             <div class="row" style="padding: 8px">
 
                                 <div class="col-md-2">
@@ -305,11 +304,20 @@
 
                         </uib-tab>
 
-                        <uib-tab heading = "By Category">
-                            <em> a tree view of DG by inheritance</em>
+                        <uib-tab heading = "Tree">
+                            <em> A tree view of DG by inheritance</em>
+                            <div class="myScroll">
+                                <div id="allDGTree"></div>
+                            </div>
+
                         </uib-tab>
 
-                        <uib-tab heading="All DG">
+                        <uib-tab heading = "Category">
+                            <em>Matching what's in the image</em>
+
+                        </uib-tab>
+
+                        <uib-tab heading="All">
                             <div style="padding: 8px">
                                 <div class="row">
                                     <div class="col-md-6">

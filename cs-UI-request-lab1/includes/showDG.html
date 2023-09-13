@@ -18,7 +18,7 @@
   </style>
 
   <div class="modelInfo row">
-    <div class="col-md-7">
+    <div class="col-md-6">
       <strong>{{selectedModel.title}} </strong> ({{selectedModel.name}}): <em>{{selectedModel.description}}</em>
       <br/><br/>
       <div>
@@ -81,17 +81,17 @@
     </div>
 
 
-    <div class="col-md-5">
-      <table class="table table-condensed">
+    <div class="col-md-6">
+      <table class="table table-condensed" style="margin-top: 8px">
         <tr>
-          <td>FHIR resource</td>
+          <td style="width: 25%">FHIR resource</td>
           <td><a target = "_blank" ng-href="{{fhirRoot}}{{selectedModel.fhirResource}}">{{selectedModel.fhirResource}}</a></td>
         </tr>
         <tr>
-          <td>Group</td>
+          <td>Category</td>
 
           <td>
-           <em>The group from the summary picture. Category.</em>
+           <em>The group from the summary picture.</em>
           </td>
         </tr>
         <tr><td>Tags</td>
@@ -136,7 +136,7 @@
                 <select class="form-control" ng-model="input.newTag"
                         ng-options="tag for tag in tagNames"></select>
                 <div ng-show="input.newTag">
-                  <button class="btn btn-link" ng-click="addTagToDT(input.newTag)">Add this tag</button>
+                  <button class="btn btn-link pull-right" ng-click="addTagToDT(input.newTag)">Add this tag</button>
                 </div>
 
               </div>
@@ -185,7 +185,7 @@
 
   <div class = "clickable pull-right">
 
-    <button class="btn-link btn pull-right" ng-click="libraryInteraction(selectedModel)">Compare to library</button>
+    <button class="btn-link btn pull-right" ng-click="dglibraryInteraction(selectedModel)">Compare to library</button>
 <!--
     <i class="glyphicon glyphicon-cloud-upload pull-right clickable myIcon"
        uib-popover="Upload this DG to the server"

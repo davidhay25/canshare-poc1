@@ -8,7 +8,7 @@ angular.module("pocApp")
             fixedValueText.string = "What is the fixed string"
             fixedValueText.decimal = "What is the fixed decimal"
 
-            $scope.serverInteraction = function (DG) {
+            $scope.dglibraryInteraction = function (DG) {
 
                 $uibModal.open({
                     templateUrl: 'modalTemplates/libraryDG.html',
