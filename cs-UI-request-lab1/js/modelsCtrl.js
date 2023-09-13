@@ -270,29 +270,6 @@ angular.module("pocApp")
                     }
 
 
-/*
-                    let tagsForThisDG = userTags1[key] || dt.tags
-
-                    if (tagsForThisDG) {
-
-                        //todo - changed the multiplicity of tag - now a space delimited string rather than an array
-                        //todo will be able to delete this check after others have refreshed
-                        if (Array.isArray(tagsForThisDG)) {
-                            tagsForThisDG = tagsForThisDG[0]
-                        }
-
-
-                        let ar = tagsForThisDG.split(" ")
-                        ar.forEach(function (tag) {
-                            if ($scope.tagNames.indexOf(tag) == -1) {
-                                $scope.tagNames.push(tag)
-                            }
-                            $scope.tags[tag] = $scope.tags[tag] || []
-                            $scope.tags[tag].push(dt)
-                        })
-                    }
-
-                    */
                 })
 
                 //now add any tags from the user store. This supports local tags that may have been removed from the DG
@@ -329,6 +306,15 @@ angular.module("pocApp")
                     //--------- build the tree with all DG
                     let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
                     showAllDGTree(vo1.treeData)
+
+                    //--- make the category hash
+                    let hashCategories = modelDGSvc.analyseCategories($scope.hashAllDG)
+
+                    let vo2 = modelDGSvc.makeTreeViewOfCategories(hashCategories)
+
+
+                    showCategoryDGTree(vo2.treeData)
+
                 },500)
 
 
@@ -368,6 +354,30 @@ angular.module("pocApp")
                         //use the dg out of $scope.hashAllDG - not the copy in the tree data
                         $scope.selectModel($scope.hashAllDG[dg.name])
 
+                    }
+
+                    $scope.$digest();       //as the event occurred outside of angular...
+                }).bind("loaded.jstree", function (event, data) {
+                    let id = treeData[0].id
+                    $(this).jstree("open_node",id);
+                    $scope.$digest();
+                });
+            }
+
+            //display the tree with categories
+            function showCategoryDGTree(treeData) {
+                $('#categoryDGTree').jstree('destroy');
+
+                $scope.categoryDGTree = $('#categoryDGTree').jstree(
+                    {'core': {'multiple': false, 'data': treeData,
+                            'themes': {name: 'proton', responsive: true}}}
+                ).on('changed.jstree', function (e, data) {
+
+                    if (data.node) {
+                        let dg = data.node.data.dg
+
+                        //use the dg out of $scope.hashAllDG - not the copy in the tree data
+                        $scope.selectModel($scope.hashAllDG[dg.name])
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...
@@ -470,17 +480,6 @@ angular.module("pocApp")
                 $scope.input.mainTabActive = $scope.ui.tabDG;
             }
 
-            //make an array for the type-ahead lookup. - needs to be retionalized... when i remove world...
-/* not just now - but keep
-            $scope.arDG = []
-
-            Object.keys($scope.hashAllDG).forEach(function (key) {
-                let DG = $scope.hashAllDG[key]
-                $scope.arDG.push({name:key})
-            })
-*/
-
-            //$scope.addNewED = func
 
 
             //delete the selected item. If the item exists in the DG then it can be removed (or possibly set the mult to 0..0)
@@ -1014,6 +1013,8 @@ angular.module("pocApp")
 
                         //a hash by type of all elements that reference it
                         $scope.analysis = modelsSvc.analyseWorld($localStorage.world,$scope.input.types)
+
+                        makeAllDTList()      //updated
 
                         $scope.selectModel(newModel)
 

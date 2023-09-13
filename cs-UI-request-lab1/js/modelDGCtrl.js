@@ -3,6 +3,7 @@ angular.module("pocApp")
     .controller('modelDGCtrl',
         function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc) {
 
+        //todo - is this still being used
             let fixedValueText = {}
             fixedValueText.coding = "What is the SNOMED code and display (separated by space)"
             fixedValueText.string = "What is the fixed string"
@@ -12,6 +13,45 @@ angular.module("pocApp")
                 //create a reusable 'type selection dialog' - will be potentially be widely used
                 //needs to be hierarchy aware
                 alert("This will change the type of this element. Care is needed")
+            }
+
+            $scope.getCategory = function (DG) {
+                if (!DG) {
+                    return {}
+                }
+                let categoryTag = {}
+                //first look in the DG itself
+                categoryTag = findCategoryTag(DG)
+
+                if (!categoryTag.code) {
+                    //if there isn't a category on the DG, is there one on any of their parents
+                    let clone = angular.copy(DG)
+                    while (clone.parent && ! categoryTag.code) {
+                        categoryTag = findCategoryTag($scope.hashAllDG[clone.parent])
+                        //if (categoryTag.code) {
+                        //    categoryTag.source = clone.name
+                       // }
+                        clone = angular.copy($scope.hashAllDG[clone.parent])
+                        if (! clone) {
+                            console.log('>>>', clone.parent)
+                        }
+                    }
+                }
+
+                function findCategoryTag(DG) {
+                    let cTag = {}
+                    if (DG && DG.tags) {
+                        DG.tags.forEach(function (tag) {
+                            if (tag.system == "dgcategory") {
+                                cTag = tag
+                            }
+                        })
+                    }
+                    return cTag
+                }
+
+
+                return categoryTag
             }
 
             $scope.dglibraryInteraction = function (DG) {

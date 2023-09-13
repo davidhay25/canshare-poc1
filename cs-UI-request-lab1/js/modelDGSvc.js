@@ -7,6 +7,76 @@ angular.module("pocApp")
 
         return {
 
+            makeTreeViewOfCategories: function(hashCategories) {
+                let treeData = []
+                let root = {id:"root",text: "Categories",parent:'#',data:{}}
+                treeData.push(root)
+
+                Object.keys(hashCategories).forEach(function (key) {
+                    let arCategory = hashCategories[key]
+
+                    let node = {id:key,text: key,parent:'root',data:{}}
+                    treeData.push(node)
+                    arCategory.forEach(function (dg) {
+                        let child = {id:dg.name,text: dg.title, parent:key,data:{dg:dg}}
+                        treeData.push(child)
+                    })
+
+                })
+                return {treeData:treeData}
+
+            },
+
+            analyseCategories: function(hashAllDG) {
+                //create a hash by category of all DG
+                let hashCategory = {}       //the return - keyed by categort code
+                let hashDG = {}         //working - category for a DG keyed by DG name
+                //first, add all the DG's that have the category directlt defined
+                Object.keys(hashAllDG).forEach(function (key) {
+                    let dg = hashAllDG[key]
+                    let cTag = findCategoryTag(dg)
+                    if (cTag.code) {
+                        hashCategory[cTag.code] = hashCategory[cTag.code] || []
+
+                        hashCategory[cTag.code].push(dg)
+                        hashDG[dg.name] = cTag.code         //we'll use this when we check for inherited catgories
+                    }
+                })
+
+                //now run through all DGs again looking for inherited categories
+                Object.keys(hashAllDG).forEach(function (key) {
+                    let clone = hashAllDG[key]
+                    while (clone.parent && ! hashDG[clone.name]) {
+                        if (hashDG[clone.parent]) {
+                            //the parent has a category
+                            let category = hashDG[clone.parent]         //the parents category
+                            hashCategory[category].push(clone)
+                            hashDG[clone.parent] = category
+                        }
+                        clone = angular.copy(hashAllDG[clone.parent])
+
+                    }
+                })
+
+                console.log(hashCategory,hashDG)
+                return hashCategory
+
+
+
+                function findCategoryTag(DG) {
+                    let cTag = {}
+                    if (DG && DG.tags) {
+                        console.log(DG.name,DG.tags)
+                        DG.tags.forEach(function (tag) {
+                            if (tag.system == "dgcategory") {
+                                cTag = tag
+                            }
+                        })
+                    }
+                    return cTag
+                }
+            },
+
             makeTreeViewOfDG : function(hashAllDG) {
                 //create a treeview ordered by parent
                 //add the root
@@ -32,7 +102,7 @@ angular.module("pocApp")
                   //  let dg = hashAllDG[key]
                     let text = dg.title || dg.name
                     let parent = dg.parent || "root"
-                    console.log(text,parent)
+                   // console.log(text,parent)
                     let node = {id:dg.name,text:text,parent:parent,data:{dg:dg}}
                     treeData.push(node)
                 })
