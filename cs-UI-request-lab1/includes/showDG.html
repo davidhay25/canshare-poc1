@@ -91,7 +91,7 @@
           <td>Group</td>
 
           <td>
-           <em>The group from the summary picture</em>
+           <em>The group from the summary picture. Category.</em>
           </td>
         </tr>
         <tr><td>Tags</td>
@@ -99,28 +99,44 @@
 
             <div class="row">
               <div class="col-md-6">
-                <div ng-repeat = "tag in getTagListForDG(selectedModel)">
+                <div ng-repeat = "tag in getTagListForDG(selectedModel) track by $index">
                   <div>
 
-                    <span class="pull-right">
+                    {{tag}}
+
                       <i class="glyphicon glyphicon-remove-sign pull-right clickable"
                          uib-popover="Remove this tag"
                          popover-placement="left"
                          popover-trigger="'mouseenter'"
+
                          ng-click="removeTagFromDT(tag,selectedModel)"></i>
-                    </span>
 
 
 
-                    {{tag}}
+
+
                   </div>
                 </div>
+
+                <div class="row">
+                  <div class="col-md-8">
+                    <input type="text" class = "form-control" placeholder="New tag" ng-model = "input.newBespokeTag"/>
+                  </div>
+                  <div class="col-md-4">
+                    <i class="glyphicon glyphicon-plus-sign pull-right"
+                       ng-show="input.newBespokeTag"
+                      style="padding-top: 8px;color: green"
+                       ng-click="addTagToDT(input.newBespokeTag)"></i>
+                  </div>
+                </div>
+
+
               </div>
               <div class="col-md-6">
                 <select class="form-control" ng-model="input.newTag"
                         ng-options="tag for tag in tagNames"></select>
                 <div ng-show="input.newTag">
-                  <button class="btn btn-link">Add this tag</button>
+                  <button class="btn btn-link" ng-click="addTagToDT(input.newTag)">Add this tag</button>
                 </div>
 
               </div>

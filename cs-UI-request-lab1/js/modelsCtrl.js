@@ -172,6 +172,30 @@ angular.module("pocApp")
                 return arTags
             }
 
+
+            $scope.addTagToDT = function (tagName) {
+
+                $scope.selectedModel.tags = $scope.selectedModel.tags || []
+                $scope.selectedModel.tags.push({system:tagSystem.bespoke.code,code:tagName})
+
+                $scope.tags[tagName] = $scope.tags[tagName] || []
+                $scope.tags[tagName].push($scope.selectedModel)
+
+
+
+                //now to add this to the local user store = a
+                $localStorage.userTags1  = $localStorage.userTags1 || {}
+                $localStorage.userTags1[tagName] = $localStorage.userTags1[tagName] || []
+                $localStorage.userTags1[tagName].push($scope.selectedModel.name)
+
+                if ($scope.tagNames.indexOf(tagName) == -1) {
+                    $scope.tagNames.push(tagName)
+                }
+
+                //$scope.selectModel($scope.selectedModel)
+                delete $scope.input.newBespokeTag
+            }
+
             //clear the tag from the DG (if it exists) and the $scope.tags
             $scope.removeTagFromDT = function (tagName) {
 
@@ -194,10 +218,16 @@ angular.module("pocApp")
                     }
                 }
 
+                //and remove from the userTags1
+                if ($localStorage.userTags1 && $localStorage.userTags1[tagName]) {
+                    let userTags1 = $localStorage.userTags1[tagName]
+                    let g = userTags1.indexOf($scope.selectedModel.name)
+                    if (g > -1) {
+                        userTags1.splice(g,1)
+                    }
+                }
 
-                Object.keys($scope.tags).forEach(function (key) {
 
-                })
 
 
 
@@ -213,7 +243,7 @@ angular.module("pocApp")
                 $scope.allTypes = modelsSvc.fhirDataTypes()
 
                 //This allows tags that survive re-setting. A hash, keyed by DG name with a collection of bespoke codings
-                let userTags = $localStorage.userTags || {}     //if the user has customized the tags - keyed by name
+                let userTags1 = $localStorage.userTags1 || {}     //if the user has customized the tags - keyed by name
 
 
 
@@ -240,8 +270,12 @@ angular.module("pocApp")
                             }
                         })
                     }
+
+
+
+
 /*
-                    let tagsForThisDG = userTags[key] || dt.tags
+                    let tagsForThisDG = userTags1[key] || dt.tags
 
                     if (tagsForThisDG) {
 
@@ -265,6 +299,31 @@ angular.module("pocApp")
                     */
                 })
 
+                //now add any tags form the user store. This supports local tags that may have been removed from the DG
+                if ($localStorage.userTags1) {     //   a hash keyed by tagName with an array og DG names
+                    Object.keys($localStorage.userTags1).forEach(function (tagName) {
+                        let arDGName = $localStorage.userTags1[tagName]      //the local list of DG's with this tag
+
+                        //go through each of the DG names against this tag...
+                        arDGName.forEach(function (dgName) {
+                            // ... and add if not already there
+                            if ($scope.tags[tagName]) {
+                                let arDG = $scope.tags[tagName]         //this is an array of DG
+                                let ar1 = arDG.filter(dg => dg.name == dgName)
+
+                                if (ar1.length == 0) {
+                                    $scope.tags[tagName].push($scope.hashAllDG[dgName])
+                                }
+
+                            } else {
+                                $scope.tags[tagName] = [$scope.hashAllDG[dgName]]
+                                $scope.tagNames.push(tagName)
+                            }
+
+                        })
+                    })
+                }
+
                 //build the graph of all DT
                 let vo = modelDGSvc.makeFullGraph($scope.hashAllDG)
 
@@ -283,8 +342,8 @@ angular.module("pocApp")
             //when a tag is update in the UI - save a copy in the browser cache
             $scope.updateTag = function (tags) {
 
-                $localStorage.userTags = $localStorage.userTags  || {}
-                $localStorage.userTags[$scope.selectedModel.name] = tags
+                $localStorage.userTags1 = $localStorage.userTags1  || {}
+                $localStorage.userTags1[$scope.selectedModel.name] = tags
 
                 makeAllDTList()
             }

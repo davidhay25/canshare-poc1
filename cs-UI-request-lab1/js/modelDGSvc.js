@@ -57,7 +57,7 @@ angular.module("pocApp")
                             //width: 4,
                             label: 'specializes',arrows : {to:true}}
                         arEdges.push(edge)
-                        console.log(edge)
+                        //console.log(edge)
                     } else {
                         //there is
                     }

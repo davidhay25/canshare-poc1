@@ -292,7 +292,7 @@
                                 <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
                                      ng-click="selectModel(v)"
                                         ng-show="true || showDG(v,input.dgFilter)"
-                                     ng-repeat="v in tags[input.selectedTag]">
+                                     ng-repeat="v in tags[input.selectedTag] track by $index">
 
                                     <i class="glyphicon glyphicon-edit pull-right clickable"
                                        ng-click="editModel(v)"></i>
@@ -304,6 +304,11 @@
 
 
                         </uib-tab>
+
+                        <uib-tab heading = "By Category">
+                            <em> a tree view of DG by inheritance</em>
+                        </uib-tab>
+
                         <uib-tab heading="All DG">
                             <div style="padding: 8px">
                                 <div class="row">
@@ -400,7 +405,7 @@
                     <div ng-hide = "selectedModel">
                         <uib-tabset>
                             <uib-tab heading="Summary">
-                                <div class="banner">Summary of DataGroups</div>
+                                <div class="banner">Summary of DataGroups. Shows Categories.</div>
                                 <img width="100%" src="images/LIM-1.png" usemap="#image_map"/>
                             </uib-tab>
                             <uib-tab heading="Graph" select="fitAllDGGraph()">
