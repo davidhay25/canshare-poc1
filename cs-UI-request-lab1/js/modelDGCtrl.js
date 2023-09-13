@@ -8,6 +8,12 @@ angular.module("pocApp")
             fixedValueText.string = "What is the fixed string"
             fixedValueText.decimal = "What is the fixed decimal"
 
+            $scope.changeDGType = function (ed) {
+                //create a reusable 'type selection dialog' - will be potentially be widely used
+                //needs to be hierarchy aware
+                alert("This will change the type of this element. Care is needed")
+            }
+
             $scope.dglibraryInteraction = function (DG) {
 
                 $uibModal.open({

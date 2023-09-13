@@ -272,9 +272,15 @@
                         <a target = "_blank" ng-href="{{fhirRoot}}datatypes.html#{{type}}">Details in spec</a>
                       </div>
 
+
                       <div ng-hide="fhirDataTypes.indexOf(type) > -1" class="pull-right clickable"
                            ng-click="termSelectDG({DGName:type},selectedModel.name)">
                         Load
+                      </div>
+
+                      <div class="pull-right clickable"
+                           ng-click="changeDGType(selectedNode.data.ed)">
+                        Change&nbsp;
                       </div>
 
                       {{type}}&nbsp;
