@@ -635,13 +635,14 @@
 
                 </uib-tab>
                 <uib-tab heading="Full list">
+
                   <table class="table-bordered table table-condensed">
                     <tr><th>Path</th><th>Type</th><th>Card.</th></tr>
                     <tr ng-repeat="item in selectedModelFromGraphFull">
                       <td>
-                        <div class="clickableDotted" uib-popover="{{ed.description}}"
+                        <div class="clickableDotted" uib-popover="{{item.ed.description}}"
                              popover-placement="right"
-                             popover-trigger="'mouseenter'">{{ed.path}}</div>
+                             popover-trigger="'mouseenter'">{{item.ed.path | dropFirstInPath}}</div>
                         <!--
                         {{item.ed.path}}
                         <div style="padding-left: 8px"><em >{{item.ed.description}}</em></div> -->

@@ -575,8 +575,10 @@ angular.module("pocApp")
                         node['a_attr'] = { "style": "color : blue" }
                     }
 
+                    //required
                     if (ed.mult && ed.mult.indexOf('1..') > -1) {
-                        node['a_attr'] = { "style": "color : red" }
+                        //node['a_attr'] = { "style": "color : red" }
+                        node['a_attr'] = { "style": "font-weight:bold" }
                     }
 
 
