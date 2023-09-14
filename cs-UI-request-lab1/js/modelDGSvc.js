@@ -58,7 +58,7 @@ angular.module("pocApp")
                     }
                 })
 
-                console.log(hashCategory,hashDG)
+                //console.log(hashCategory,hashDG)
                 return hashCategory
 
 
@@ -66,7 +66,7 @@ angular.module("pocApp")
                 function findCategoryTag(DG) {
                     let cTag = {}
                     if (DG && DG.tags) {
-                        console.log(DG.name,DG.tags)
+                        //console.log(DG.name,DG.tags)
                         DG.tags.forEach(function (tag) {
                             if (tag.system == "dgcategory") {
                                 cTag = tag
@@ -81,7 +81,7 @@ angular.module("pocApp")
                 //create a treeview ordered by parent
                 //add the root
                 let treeData = []
-                let root = {id:"root",text: "Root",parent:'#',data:{}}
+                let root = {id:"root",text: "DataGroup",parent:'#',data:{}}
                 treeData.push(root)
 
                 //make sorted list

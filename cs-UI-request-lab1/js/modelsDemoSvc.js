@@ -196,10 +196,12 @@ angular.module("pocApp")
                     dgCancerAssessment.diff.push({path:'basisOfDiagnosis.evidence',title:'General evidence',type:['Group'],mult:'0..*',
                         description:'The type of evidence on which a cancer diagnosis is based.'})
 
-                    dgCancerAssessment.diff.push({path:'basisOfDiagnosis.evidence.type',title:'Evidence type',type:['CodeableConcept'],mult:'1..1',
+                    dgCancerAssessment.diff.push({path:'basisOfDiagnosis.evidence.type',title:'Evidence type',type:['CodeableConcept'],
+                        mult: '1..1',
                         description:'The type of evidence on which a cancer diagnosis is based.'})
 
-                    dgCancerAssessment.diff.push({path:'basisOfDiagnosis.evidence.details',title:'Evidence details',type:['Observation'],mult:'1..1',
+                    dgCancerAssessment.diff.push({path:'basisOfDiagnosis.evidence.details',title:'Evidence details',
+                        type:['Observation'], mult:'1..1',
                              description:'A relevant observation (e.g. symptom, physical finding, radiological finding, or pathological finding) that may indicate the presence of cancer'})
 
 

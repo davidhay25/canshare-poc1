@@ -653,18 +653,18 @@ angular.module("pocApp")
                 //There's a particular issue in that slicing changes the datatype for the 'parent' element to Group
                 //but parents of that element may still perist (they get added as the parents are processed first
                 //so create a list of all elements with a type of Group. Then, from the originalType we can create
-                // a list of elements that came dorectly from the type and remove them (or set mult = 0..0)
+                // a list of elements that came directly from the type and remove them (or set mult = 0..0)
+                //only do this if the element was sliced (originalType present).
 
                 let arHiddenElements = []  //an array of elements whose children should be hidden unless they are slices
 
                 arLines.forEach(function (item) {
                     if (item.ed && item.ed.type) {
                         let type = item.ed.type[0]
-                        if (type == 'Group') {
+                        if (type == 'Group' && item.ed.originalType) {  //presence of originalType indicates this element was sliced
                             console.log("Group!",item.ed)
                             arHiddenElements.push(item.ed.path)
                             //if there are any elements that
-
                         } else{
                             arHiddenElements.forEach(function (prefix) {
                                 let pathToTest = item.ed.path
@@ -710,6 +710,8 @@ angular.module("pocApp")
                 let topModel = angular.copy(model)
                 let allElements = []
                 let errors = []
+
+                let hashEdges = {}      //a has to track edges between nodes to adoid duplication
 
                 let arNodes = []      //for the graph
                 let arEdges = []      //for the graph
@@ -854,18 +856,31 @@ angular.module("pocApp")
 
                                     if (childDefinition.diff ) {
                                         //if there is a diff element in the type, then it can be expanded
-                                        relationshipsSummary.references.push({path:ed.path,type:childDefinition.name})
 
-                                        //create an edge. todo This is to ALL elements, so may want to filter
-                                        let label = `${ed.path} ${ed.mult}`
-                                        let edge = {id: 'e' + arEdges.length +1,
-                                            from: model.name,
-                                            to: childDefinition.name,
-                                            color : 'blue',
-                                            dashes : true,
-                                            label: label,
-                                            arrows : {to:true}}
-                                        arEdges.push(edge)
+                                        let relativePath =  $filter('dropFirstInPath')(`${pathRoot}.${ed.path}`)
+
+                                        //let fullPath =   `${pathRoot}.${ed.path}`
+                                        relationshipsSummary.references.push({path:relativePath,type:childDefinition.name})
+
+                                        //avoid duplicates. where one DG refers to Observation multiple times, each results in Observation -> HCP
+                                        let refHash = `${model.name}-${childDefinition.name}-${ed.path}`
+
+                                        //only add an edge for a given source / target / path once
+                                        if (! hashEdges[refHash]) {
+                                            hashEdges[refHash] = true
+                                            //create an edge. todo This is to ALL elements, so may want to filter
+                                            let label = `${ed.path} ${ed.mult}`
+                                            let edge = {id: 'e' + arEdges.length +1,
+                                                from: model.name,
+                                                to: childDefinition.name,
+                                                color : 'blue',
+                                                dashes : true,
+                                                label: label,
+                                                arrows : {to:true}}
+                                            arEdges.push(edge)
+                                        }
+
+
 
                                         //console.log('expanding child: ' + childDefinition.name)
                                         let clone = angular.copy(ed)
