@@ -576,11 +576,26 @@ angular.module("pocApp")
                     }
 
                     //required
+
+                    if (ed.mult) {
+                        //required bolding
+                        if (ed.mult.indexOf('1..') > -1) {
+                            //node['a_attr'] = { "style": "color : red" }
+                            node['a_attr'] = { "style": "font-weight:bold" }
+                        }
+                        //multiple
+                        if (ed.mult.indexOf('..*') > -1) {
+                            node.text += " *"
+                        }
+
+                    }
+
+                    /*
                     if (ed.mult && ed.mult.indexOf('1..') > -1) {
                         //node['a_attr'] = { "style": "color : red" }
                         node['a_attr'] = { "style": "font-weight:bold" }
                     }
-
+*/
 
                     if (ed.mult && ed.mult == '0..0') {
                         //don't add removed elements

@@ -6,7 +6,7 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc) {
 
 
-            $scope.version = "0.4.0"
+            $scope.version = "0.4.2"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -118,6 +118,9 @@ angular.module("pocApp")
                     $scope.rightPanel = 'col-md-9'
                 }
             }
+
+
+
 
             //whether the current user can edit. Will set up the back end logic later
             $scope.input.canEdit = true
@@ -303,16 +306,15 @@ angular.module("pocApp")
                 //todo - should move the js to the bottom of the page so it's loaded before the script runs...!
                 $timeout(function () {
                     makeGraphAllDG(vo.graphData)
+
                     //--------- build the tree with all DG
                     let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
+
                     showAllDGTree(vo1.treeData)
 
-                    //--- make the category hash
+                    //--- make the category hash for the category tree display of DG
                     let hashCategories = modelDGSvc.analyseCategories($scope.hashAllDG)
-
                     let vo2 = modelDGSvc.makeTreeViewOfCategories(hashCategories)
-
-
                     showCategoryDGTree(vo2.treeData)
 
                 },500)
@@ -1104,6 +1106,8 @@ angular.module("pocApp")
             //refresh the complete list of elements for this DG
             //also draw the graph & tree
             $scope.refreshFullList = function (dg) {
+
+
                 let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
 
 
@@ -1139,7 +1143,6 @@ angular.module("pocApp")
                 $scope.overrides = []
                 //$scope.directElements = {}    //elements directly on the DG. These can have fixed values
                 $scope.selectedModel.diff.forEach(function (ed) {
-
                     //if there's a dot in the ed path, then it refers to an element in a child...
                     if (ed.path.indexOf('.') > -1 ) {
                         $scope.overrides.push(ed)

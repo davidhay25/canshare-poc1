@@ -29,8 +29,21 @@
 
      <table class="table">
        <tr><td>System</td> <td><input type="text" class="form-control" ng-model="input.system"/> </td></tr>
-       <tr><td>Code</td> <td><input type="text" class="form-control" ng-model="input.code"/> </td></tr>
+       <tr><td>Code</td>
+         <td>
+         <div class="row">
+           <div class="col-md-9">
+             <input type="text" class="form-control" ng-model="input.code"/>
+           </div>
+           <div class="col-md-3">
+            <div class="btn btn-info pull-right" ng-click = "lookupFSN()">Lookup</div>
+           </div>
+         </div>
+
+         </td>
+       </tr>
        <tr><td>Display</td> <td><input type="text" class="form-control" ng-model="input.display"/> </td></tr>
+       <tr><td>FSN</td> <td><input type="text" class="form-control" ng-model="input.fsn"/> </td></tr>
      </table>
 
     </div>

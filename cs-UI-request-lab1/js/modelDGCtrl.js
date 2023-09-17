@@ -3,7 +3,7 @@ angular.module("pocApp")
     .controller('modelDGCtrl',
         function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc) {
 
-        //todo - is this still being used
+        //todo - is this still being used?
             let fixedValueText = {}
             fixedValueText.coding = "What is the SNOMED code and display (separated by space)"
             fixedValueText.string = "What is the fixed string"
@@ -12,7 +12,27 @@ angular.module("pocApp")
             $scope.changeDGType = function (ed) {
                 //create a reusable 'type selection dialog' - will be potentially be widely used
                 //needs to be hierarchy aware
-                alert("This will change the type of this element. Care is needed")
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/changeType.html',
+                    backdrop: 'static',
+                    size : 'lg',
+                    controller: 'changeTypeCtrl',
+
+                    resolve: {
+                        ed: function () {
+                            return ed
+                        },
+                        hashAllDG: function () {
+                            return $scope.hashAllDG
+                        }
+                    }
+
+                }).result.then(function (ed) {
+
+                })
+
+
             }
 
             $scope.getCategory = function (DG) {

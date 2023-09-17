@@ -52,10 +52,13 @@ angular.module("pocApp")
 
             //$scope.expandVSInTS(url)
 
-            $scope.lookup = function (code) {
+            $scope.lookup = function (concept) {
 
 
-                let qry = `CodeSystem/$lookup?system=${snomed}&code=${code}`
+                let code = concept.code
+                let system = concept.system || snomed
+
+                let qry = `CodeSystem/$lookup?system=${system}&code=${code}`
 
 
                 let encodedQry = encodeURIComponent(qry)

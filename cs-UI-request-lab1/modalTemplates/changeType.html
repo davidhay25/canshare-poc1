@@ -1,0 +1,128 @@
+
+<div>
+  <!--<div ng-controller="newResourceCtrl">-->
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-10 col-sm-10">
+        <h3 class="modal-title">
+          Select / Change type: {{ed.title}}
+        </h3>
+      </div>
+
+
+      <div class="col-md-2 col-sm-2">
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
+
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-body">
+
+    <div class="row">
+      <div class="col-md-8">
+        <h3>{{ed.title}}</h3>
+        <div><em>{{ed.description}}</em></div>
+      </div>
+      <div class="col-md-4">
+        <div class="pull-right">
+          Current type: <strong>{{ed.type[0]}}</strong>
+        </div>
+      </div>
+    </div>
+    <br/>
+
+
+
+    <div class="row">
+      <div class="col-md-4">
+        <ul class="list-group">
+          <li class="list-group-item" ng-repeat = "(k,v) in hashChildren"
+              style="cursor: pointer"
+            ng-click="selectDG(v)">
+            {{v.title}}
+          </li>
+        </ul>
+      </div>
+      <div class="col-md-8">
+        <uib-tabset>
+
+          <uib-tab heading="Tree">
+            <div id="cdtTree"></div>
+          </uib-tab>
+
+          <uib-tab heading="Table">
+            <div class="tableFixHead">
+              <table class="table-bordered table">
+                <thead>
+                <tr><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Fixed value</th></tr>
+                </thead>
+                <tbody>
+                <!---     <tr ng-repeat="element in fullElementList">-->
+                <tr ng-repeat="element in cdFullElementList"
+                    ng-hide="$index==0 || (element.ed.mult.indexOf('..0') > -1)">
+
+                  <td>{{element.ed.title}}</td>
+                  <td>
+
+                    {{element.ed.description}}
+                  </td>
+                  <td>
+                    <div ng-repeat="type in element.ed.type">
+                      {{type}}
+                    </div>
+                    <div><em class="clickable" ng-click="viewVS(element.ed.valueSet)">{{element.ed.valueSet}}</em></div>
+
+                    <div ng-show="element.ed.options">
+                      <em class="clickable"
+                          ng-click = "editDGOptionsList(element.ed)">View {{element.ed.options.length}} options
+                      </em> </div>
+
+                  </td>
+                  <td>{{element.ed.mult}}</td>
+                  <!--
+                      <td>
+                        <div ng-repeat="code in element.ed.code">
+                          {{code.code}}
+                        </div>
+
+                      </td>
+                  -->
+                  <td>
+                    {{element.ed.fixedCoding.code}}
+                    {{element.ed.fixedCoding.display}}
+                    {{element.ed.fixedDecimal}}
+                    {{element.ed.fixedString}}
+                  </td>
+
+
+
+
+
+                </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </uib-tab>
+
+
+
+          <uib-tab heading="Json">
+            <pre>{{selectedDG | json}}</pre>
+          </uib-tab>
+        </uib-tabset>
+
+      </div>
+    </div>
+
+
+
+
+
+  </div>
+  <div class="modal-header">
+    <em>Allows the type to be changed</em>
+  </div>
+</div>
