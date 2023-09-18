@@ -1,11 +1,49 @@
 angular.module("pocApp")
     .controller('changeTypeCtrl',
-        function ($scope,ed,hashAllDG,modelsSvc) {
+        function ($scope,ed,hashAllDG,modelsSvc,$uibModal) {
             $scope.ed = ed
             $scope.input = {}
+
+            $scope.input.class = "dg"   //show the DataGroups as the default to select
+
+            let fhirBase = "http://hl7.org/fhir/R4B/datatypes.html"
+
+
             let currentType = ed.type[0]
 
             $scope.fhirTypes = modelsSvc.fhirDataTypes()
+
+            if (currentType && $scope.fhirTypes.indexOf(currentType) > -1) {
+                $scope.input.class = "dt"
+                $scope.selectedDT = currentType
+                $scope.typeUrl = `${fhirBase}#${currentType}`
+            }
+
+
+
+
+            function sortDG() {
+                $scope.sortedDGList1 = []
+
+                Object.keys(hashAllDG).forEach(function(key){
+                    $scope.sortedDGList1.push(hashAllDG[key])
+                })
+
+                $scope.sortedDGList1.sort(function (a,b) {
+                    try {
+                        if (a.title.toLowerCase() < b.title.toLowerCase()) {
+                            return -1
+                        } else {
+                            return 1
+                        }
+                    } catch (ex) {
+                        //swallow errors where title is missing (shouldn't happen)
+                    }
+
+                })
+
+            }
+            sortDG()
 
             if (hashAllDG[currentType]) {
                 //this is a DG - find the subtypes / supertypes
@@ -31,6 +69,45 @@ angular.module("pocApp")
                     })
                 }
                 console.log($scope.hashChildren)
+            }
+            
+            $scope.viewVS = function (vs) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/viewVS.html',
+                    //backdrop: 'static',
+                    size : 'lg',
+                    controller: 'viewVSCtrl',
+
+                    resolve: {
+                        url: function () {
+                            return vs
+                        }, refsetId : function () {
+                            return "unknown"
+                        }
+                    }
+
+                })
+            }
+
+            //select this type to change to
+            $scope.select = function () {
+
+                let vo = {class:$scope.input.class}
+
+
+                if ($scope.input.class == 'dg') {
+                    vo.value = $scope.selectedDG
+                } else {
+                    vo.value = $scope.selectedDT
+                }
+                $scope.$close(vo)
+
+
+            }
+
+            $scope.selectDT = function (dt) {
+                $scope.selectedDT = dt
+                $scope.typeUrl = `${fhirBase}#${dt}`
             }
 
             $scope.selectDG = function (dg) {
@@ -80,6 +157,23 @@ angular.module("pocApp")
 
             }
 
+            $scope.showDG = function(DG,filter) {
+                if (filter) {
+
+                    let show = false
+                    if (DG.name && DG.name.toLowerCase().indexOf(filter.toLowerCase()) > -1) {
+                        show = true
+                    }
+                    if (DG.description && DG.description.toLowerCase().indexOf(filter.toLowerCase()) > -1) {
+                        show = true
+                    }
+
+                    return show
+
+                } else {
+                    return true
+                }
+            }
 
 
         })

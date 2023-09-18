@@ -1,7 +1,7 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('modelDGCtrl',
-        function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc) {
+        function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc,$timeout) {
 
         //todo - is this still being used?
             let fixedValueText = {}
@@ -15,8 +15,8 @@ angular.module("pocApp")
 
                 $uibModal.open({
                     templateUrl: 'modalTemplates/changeType.html',
-                    backdrop: 'static',
-                    size : 'lg',
+                    //backdrop: 'static',
+                    size : 'xlg',
                     controller: 'changeTypeCtrl',
 
                     resolve: {
@@ -28,8 +28,57 @@ angular.module("pocApp")
                         }
                     }
 
-                }).result.then(function (ed) {
+                }).result.then(function (vo) {
+                    //now we can change the type
 
+                    let shortPath = $filter('dropFirstInPath')(ed.path)     //remove the leading type name
+
+                    let newType
+                    if (vo.class == 'dg') {
+                        newType = vo.value.name
+                    } else {
+                        newType = vo.value
+                    }
+
+                    let found = false           //does the element being edited exist in the diff...
+                    for (var ed1 of $scope.selectedModel.diff) {
+
+                        let pathString = $scope.selectedModel.name + "." + ed1.path
+                        if (ed.path == pathString) {
+                            //this is the one to change
+                            found = true
+                            ed1.type = [newType]
+                           // break don't break as we have to de-activate any child elements. They will be overrides of an existing DG
+
+                        }
+
+                        //if the path in the diff starts with the path being changed, then set the multiplicity to 0..0
+                        //it's an override
+                        if (ed1.path.startsWith( shortPath + ".") ) {
+                            ed1.mult = '0..0'
+                        }
+
+
+                    }
+
+                    if (!found) {
+                        //the element was not found in the diff, so needs to be added to it as an override
+                        //let ar = ed.path.split('.')
+                       // ar.splice(0,1)
+                       // ed.path = ar.join('.')
+
+                        ed.path = $filter('dropFirstInPath')(ed.path)
+                        ed.type = [newType]
+
+                        $scope.selectedModel.diff.push(ed)
+
+                    }
+
+                    //force the re-draw
+                    $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path: $filter('dropFirstInPath')(ed.path)})
+
+
+                    console.log(vo)
                 })
 
 
@@ -91,7 +140,7 @@ angular.module("pocApp")
                 }).result.then(function (ed) {
                     //copy the units to the current item
                     //need to update the .diff in the selected model
-
+/*
                     //todo - what is this code doing???
                     let p = $filter('lastInPath')(ed.path)
                     for (const ed1 of $scope.selectedModel.diff) {
@@ -101,6 +150,8 @@ angular.module("pocApp")
                             break
                         }
                     }
+
+                    */
                 })
                 
             }
@@ -226,6 +277,7 @@ angular.module("pocApp")
                     }
 
                 }).result.then(function (ed) {
+                    /*
                     //copy the units to the current item
                     //need to update the .diff in the selected model
                     let p = $filter('lastInPath')(ed.path)
@@ -236,6 +288,7 @@ angular.module("pocApp")
                             break
                         }
                     }
+                    */
                 })
                 
             }
@@ -256,7 +309,7 @@ angular.module("pocApp")
                     }
 
 
-                    console.log(controlType)
+                    //console.log(controlType)
                     return controlType
                 }
 

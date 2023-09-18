@@ -8,7 +8,7 @@ angular.module("pocApp")
 
             console.log(allTypes)
 
-            $scope.mult = ['0..0','0..1','0..*','1..1','1..*']
+       //     $scope.mult = ['0..0','0..1','0..*','1..1','1..*']
 
             //when an item is passed in for editing
             if (item && item.ed) {
@@ -23,11 +23,14 @@ angular.module("pocApp")
                     }
                 }
 
+                $scope.input.mult = item.ed.mult
+                /*
                 for (var m of $scope.mult) {
                     if (item.ed.mult == m) {
                         $scope.input.mult = m
                     }
                 }
+                */
             } else {
                 $scope.input.mult = $scope.mult[1]      //default to 0..1
 

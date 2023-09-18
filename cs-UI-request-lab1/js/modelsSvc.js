@@ -264,7 +264,8 @@ angular.module("pocApp")
             },
 
             fhirDataTypes : function(){
-                return ['string','CodeableConcept','Quantity','decimal','HumanName','date','dateTime','Identifier','ContactPoint','Address','code','Attachment','Period','integer','boolean','Group','Ratio']
+
+                return ['boolean','code','date','dateTime','decimal','integer','string','Address','Attachment','CodeableConcept','ContactPoint','Group','HumanName','Identifier','Period','Quantity','Ratio']
             },
 
             //create a bundle of LogicalModels

@@ -57,10 +57,24 @@
           <tr>
             <td>Cardinality</td>
             <td>
+
+              <div class="btn-group">
+                <label class="btn btn-default" ng-model="input.mult" uib-btn-radio="'0..0'">0..0</label>
+                <label class="btn btn-default" ng-model="input.mult" uib-btn-radio="'0..1'">0..1</label>
+                <label class="btn btn-default" ng-model="input.mult" uib-btn-radio="'0..*'">0..*</label>
+                <label class="btn btn-default" ng-model="input.mult" uib-btn-radio="'1..1'">1..1</label>
+                <label class="btn btn-default" ng-model="input.mult" uib-btn-radio="'1..*'">1..*</label>
+
+              </div>
+
+<!--
+
               <select ng-model="input.mult" class="form-control"
                       ng-options="opt for opt in mult">
 
               </select>
+-->
+
             </td>
           </tr>
 

@@ -121,7 +121,6 @@ angular.module("pocApp")
 
 
 
-
             //whether the current user can edit. Will set up the back end logic later
             $scope.input.canEdit = true
 

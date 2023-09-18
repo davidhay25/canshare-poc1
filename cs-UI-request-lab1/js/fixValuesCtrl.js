@@ -6,7 +6,7 @@ angular.module("pocApp")
             $scope.input = {}
             $scope.input.system = "http://snomed.info/sct"
 
-            $scope.input.code = "1229901006"
+           // $scope.input.code = "1229901006"
 
 /*
 
