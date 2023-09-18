@@ -14,7 +14,7 @@
       <div class="col-md-2 col-sm-2">
         <button class="btn btn-primary pull-right"
                 ng-show="(input.class=='dg' && selectedDG) || (input.class=='dt' && selectedDT)"
-                ng-click="select()">Select</button>
+                ng-click="select()">Change</button>
         <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
 
 
@@ -54,18 +54,6 @@
 
         <uib-tabset>
 
-          <uib-tab heading = "All children">
-
-            {{Object.keys(hashChildren).length}}
-            <ul class="list-group">
-              <li class="list-group-item" ng-repeat = "(k,v) in hashChildren"
-                  style="cursor: pointer"
-                  ng-class="{listItemSelected:selectedDG == v}"
-                  ng-click="selectDG(v)">
-                <div >{{v.title}}</div>
-              </li>
-            </ul>
-          </uib-tab>
 
           <uib-tab heading="All DG">
 
@@ -91,6 +79,21 @@
               </div>
             </div>
           </uib-tab>
+
+          <uib-tab ng-show="childCount > 0">
+            <uib-tab-heading>All children of {{ed.type[0]}} <span class="badge">{{childCount}} </span></uib-tab-heading>
+
+
+            <ul class="list-group">
+              <li class="list-group-item" ng-repeat = "(k,v) in hashChildren"
+                  style="cursor: pointer"
+                  ng-class="{listItemSelected:selectedDG == v}"
+                  ng-click="selectDG(v)">
+                <div >{{v.title}}</div>
+              </li>
+            </ul>
+          </uib-tab>
+
 
         </uib-tabset>
 

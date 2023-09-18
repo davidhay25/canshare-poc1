@@ -68,6 +68,7 @@ angular.module("pocApp")
 
                     })
                 }
+                $scope.childCount = Object.keys($scope.hashChildren).length
                 console.log($scope.hashChildren)
             }
             

@@ -8,38 +8,12 @@ angular.module("pocApp")
 
            // $scope.input.code = "1229901006"
 
-/*
 
-            {
-                "name": "designation",
-                "part": [
-                {
-                    "name": "language",
-                    "valueCode": "en"
-                },
-                {
-                    "name": "use",
-                    "valueCoding": {
-                        "system": "http://snomed.info/sct",
-                        "code": "900000000000003001",
-                        "display": "Fully specified name"
-                    }
-                },
-                {
-                    "name": "value",
-                    "valueString": "American Joint Committee on Cancer cM1a(0) (qualifier value)"
-                }
-            ]
-            }
-
-            */
 
             //lookup from the TS
             $scope.lookupFSN = function () {
 
                 let qry = `CodeSystem/$lookup?system=${$scope.input.system}&code=${$scope.input.code}`
-
-
 
                 let encodedQry = encodeURIComponent(qry)
                 $scope.showWaiting = true
