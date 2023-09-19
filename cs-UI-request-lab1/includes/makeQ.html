@@ -1,0 +1,51 @@
+<div>
+
+  <div>
+
+    <div class="row">
+      <div class="col-md-3">
+        <select class="form-control" ng-model="input.selectedComp"
+                ng-change="initQ(input.selectedComp)"
+                ng-options="v.title for (k,v) in world.compositions">
+
+        </select>
+      </div>
+      <div class="col-md-9">
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3">
+      Selector tree here
+      <div id="qtree">
+
+      </div>
+    </div>
+    <div class="col-md-9">
+      <div>
+        Selected DG here
+        <div class="row">
+          <div class="col-md-3">
+            <div class="list-group">
+              <div class="list-group-item" ng-repeat="dg in possibleDG track by $index">
+                {{dg.title}}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-9">
+          </div>
+        </div>
+
+
+      </div>
+      <div>
+        Rendered form here
+      </div>
+    </div>
+  </div>
+
+
+</div>

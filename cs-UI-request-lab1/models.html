@@ -117,6 +117,7 @@
 
     <script src="js/fixValuesCtrl.js"></script>
     <script src="js/changeTypeCtrl.js"></script>
+    <script src="js/makeQCtrl.js"></script>
 
     <script src="directive/renderForm/renderFormSvc.js"></script>
     <script src="directive/renderForm/renderFormDir.js"></script>
@@ -444,6 +445,12 @@
                 </div>
             </div>
 
+        </uib-tab>
+
+        <uib-tab heading="Q builder">
+            <div ng-controller="makeQCtrl">
+                <ng-include src="'/includes/makeQ.html'"></ng-include>
+            </div>
         </uib-tab>
 
         <uib-tab heading="Terminology reports">

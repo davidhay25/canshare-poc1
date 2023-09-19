@@ -131,7 +131,7 @@ angular.module("pocApp")
                     let qry = '/model/allDG'
                     $http.get(qry).then(
                         function (data) {
-                            console.log(data)
+                            //console.log(data)
 
                             let arDG = data.data
 
@@ -141,6 +141,7 @@ angular.module("pocApp")
 
                             })
 
+                            alert("Local DataGroups have been updated. Any local ones not in the library are untouched.")
                             $scope.$close(true)
 
                         },
@@ -155,10 +156,12 @@ angular.module("pocApp")
             //update all the DG on the server...
             $scope.updateRepo = function () {
                 if (confirm('Are you sure you wish to update the Library')) {
-                        let qry = "/model/DG"
+                    let qry = "/model/DG"
                     $http.post(qry,allDG).then(
                         function (data) {
                             console.log(data)
+                            alert("All local DataGroups have been uploaded to the Library")
+                            $scope.$close()
                         },
                         function (err) {
                             console.log(err)

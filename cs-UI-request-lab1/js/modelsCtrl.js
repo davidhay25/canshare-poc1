@@ -10,6 +10,9 @@ angular.module("pocApp")
             $scope.input = {}
             $scope.input.showFullModel = true
 
+            //record access
+            $http.post("model/access",{})
+
             $scope.igBase = "https://build.fhir.org/ig/davidhay25/canshare-LIM/branches/main/"
 
             $localStorage.selectedTag = $localStorage.selectedTag || 'main'
@@ -94,7 +97,7 @@ angular.module("pocApp")
                 }).result.then(function (vo) {
 
 
-                    if (vo.comp) {
+                    if (vo && vo.comp) {
                         //a composition was passed in. Update (or add to) the $scope.hashAllCompositions
                         $scope.hashAllCompositions[vo.comp.name] = vo.comp
                        // alert("The composition has been added")

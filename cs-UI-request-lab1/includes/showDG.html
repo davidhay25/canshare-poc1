@@ -215,8 +215,14 @@
           <div class="pull-right clickable" ng-click="expandDTTree()">Expand all ({{fullElementList.length}})</div>
           <div id="dgTree"></div>
 
-          <button class="btn btn-link"
+          <div>
+          <button class="btn btn-link pull-right"
                   ng-click="editDGItem()">Add new element <span ng-show="selectedNode">to {{selectedNode.data.ed.path}}</span></button>
+          </div>
+          <br/><br/>
+        <div>Legend:</div>
+          <div><strong style="margin-left: 8px">Bold</strong> elements are required</div>
+          <div><span style="color: blue; margin-left: 8px">Blue</span>  elements have a fixed value</div>
         </div>
         <div class="col-md-6">
 

@@ -17,7 +17,7 @@ let MongoClient = require('mongodb').MongoClient;
 let database        //this will be the database connection
 
 //just a test function
-async function listDatabases(client){
+async function listDatabasesDEP(client){
     databasesList = await client.db().admin().listDatabases();
     console.log("Databases:");
     databasesList.databases.forEach(db => console.log(` - ${db.name}`));
@@ -29,8 +29,28 @@ async function setup(app) {
     const client = new MongoClient(uri);
     database = client.db("canShare")
     await client.connect()
-    await listDatabases(client)
+    //await listDatabases(client)
     console.log("connected")
+
+    //==== access
+
+    //record an access
+    app.post('/model/access', async function(req,res) {
+        let clientIp = req.headers['x-forwarded-for'] ||
+            req.connection.remoteAddress ||
+            req.socket.remoteAddress ||
+            req.connection.socket.remoteAddress
+        let doc = {ip:clientIp,date: new Date()}
+        try {
+            await database.collection("access").insertOne(doc)
+            res.json(doc)
+        } catch (ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+        }
+
+
+    })
 
     //======== datagroups
 
