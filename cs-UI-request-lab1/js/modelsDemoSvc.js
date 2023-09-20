@@ -397,7 +397,7 @@ angular.module("pocApp")
                         description:"A record of previous diagnoses, findings, and procedure performed that are relevant to a patient's current state of health"}
                     dgHistory.diff.push({path:'coMorbidity',title:'Co-morbidities',type:['Condition'],mult:'0..*',
                         description:"The simultaneous presence of two or more medical conditions in a patient"})
-                    dgHistory.diff.push({path:'menopausalStatus',title:'Family history',type:['CodeableConcept'],mult:'0..*',
+                    dgHistory.diff.push({path:'menopausalStatus',title:'Menopausal status',type:['CodeableConcept'],mult:'0..*',
                         description:"Indicate whether the (female) patient is pre or post menopausal"})
 
                     dgHistory.diff.push({path:'previousFinding',title:'Previous findings',type:['CodeableConcept'],mult:'0..*',

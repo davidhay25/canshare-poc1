@@ -1,0 +1,41 @@
+<div>
+
+
+
+    <div ng-switch="item.controlType">
+        <div ng-switch-when="text">
+            <input type="text" ng-model="local.form[item.ed.path]" class="form-control"/>
+        </div>
+
+        <div ng-switch-when="optionsDD">
+            <select class="form-control" ng-model="local.form[item.ed.path]"
+                    ng-options = "option.pt for option in item.ed.options">
+
+            </select>
+
+        </div>
+
+        <div ng-switch-when="dateTime">
+            <input class="form-control" type="datetime-local" ng-model="local.form[item.ed.pat]">
+        </div>
+
+        <div ng-switch-when="lookup">
+            <div class="row">
+                <div class="col-md-8">
+
+                </div>
+                <div class="col-md-4">
+                    <div class="btn btn-link" ng-click="selectFromTS(item.ed.valueSet)">Lookup</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+</div>

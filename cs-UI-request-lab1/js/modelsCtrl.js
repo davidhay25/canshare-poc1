@@ -57,9 +57,11 @@ angular.module("pocApp")
             $scope.ui = {}
             $scope.ui.tabDG = 1;
             $scope.ui.tabComp = 0;
-            $scope.ui.tabTerminology = 2;
+            $scope.ui.tabQ = 2;
+            $scope.ui.tabTerminology = 3;
 
-            $scope.input.mainTabActive = $scope.ui.tabDG;
+            //$scope.input.mainTabActive = $scope.ui.tabDG
+            $scope.input.mainTabActive = $scope.ui.tabQ
 
             //used in DG & Comp so when a type is a FHIR DT, we can create a link to the spec
             $scope.fhirDataTypes =modelsSvc.fhirDataTypes()

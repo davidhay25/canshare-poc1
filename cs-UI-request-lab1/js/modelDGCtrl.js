@@ -478,7 +478,7 @@ angular.module("pocApp")
                             break
                         }
                     }
-
+/*
                     //todo - why twice ???
                     for (const ed1 of $scope.selectedModel.diff) {
                         if (ed1.name == ed.name) {
@@ -486,7 +486,7 @@ angular.module("pocApp")
                             break
                         }
                     }
-
+*/
                     modelDGSvc.updateChanges($scope.selectedModel,
                         {edPath:p,
                             msg:`Update options list`},

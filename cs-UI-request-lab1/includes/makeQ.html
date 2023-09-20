@@ -4,8 +4,8 @@
 
     <div class="row">
       <div class="col-md-3">
-        <select class="form-control" ng-model="input.selectedComp"
-                ng-change="initQ(input.selectedComp)"
+        <select class="form-control" ng-model="local.selectedComp"
+                ng-change="initQ(local.selectedComp)"
                 ng-options="v.title for (k,v) in world.compositions">
 
         </select>
@@ -19,31 +19,112 @@
 
   <div class="row">
     <div class="col-md-3">
-      Selector tree here
+
       <div id="qtree">
 
       </div>
+
+      <div ng-show="allowAddGroup" ng-click="addGroup(selectedQNode)">
+        Add Group
+      </div>
     </div>
-    <div class="col-md-9">
+    <div class="col-md-4">
       <div>
-        Selected DG here
-        <div class="row">
-          <div class="col-md-3">
-            <div class="list-group">
-              <div class="list-group-item" ng-repeat="dg in possibleDG track by $index">
-                {{dg.title}}
-              </div>
-            </div>
-          </div>
-          <div class="col-md-9">
-          </div>
+
+        <div ng-repeat="ed in allElementsThisSection"
+             style="cursor: pointer"
+          ng-click="selectElementToAdd($index)">
+          {{ed.shortPath}}
         </div>
 
 
+
+
+
+
       </div>
-      <div>
-        Rendered form here
+
+
+
+    </div>
+    <div  class="col-md-5">
+
+      <!--
+        <button class="btn btn-default"
+                ng-click="selectQtab(section)"
+                ng-repeat = "section in Q.item">
+          {{section.text}}
+        </button>
+
+
+      -->
+
+
+        <div class="banner">{{selectedSection.text}}</div>
+
+        <div ng-repeat = 'item in selectedSection.item'>
+
+          <div class="row">
+            <div class="col-sm-3 col-md-3">
+              {{item.text}}
+            </div>
+            <div class="col-sm-6 col-md-6">
+              <div style="padding-left: 15px" ng-switch="item.level">
+
+                <div ng-switch-when="group">
+                  group
+                </div>
+
+                <div ng-switch-when="element">
+                  <rendersingleitem item="item"></rendersingleitem>
+                  <!--
+                  <div ng-include = "'./includes/renderSingleItem.html'"></div>
+                  -->
+                </div>
+
+
+              </div>
+
+            </div>
+          </div>
+
+          <div ng-repeat = 'groupItem in item.item'>
+            <div class="row">
+              <div class="col-sm-3 col-md-3">
+                {{groupItem.text}}
+              </div>
+              <div class="col-sm-6 col-md-6">
+
+                <rendersingleitem item="groupItem"></rendersingleitem>
+
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <hr/>
+        <pre>{{selectedSection | json}}</pre>
+
+
+
+<!--
+      <div class="btn-group">
+
       </div>
+
+
+      <uib-tabset>
+        <uib-tab ng-repeat="section in Q.item">
+          <uib-tab-heading>{{section.text}}</uib-tab-heading>
+
+          <pre>{{section | json}}</pre>
+        </uib-tab>
+      </uib-tabset>
+-->
     </div>
   </div>
 

@@ -108,7 +108,7 @@
             </div>
 
             <div ng-switch-when="text">
-                <div >
+                <div>
 
                     <textarea ng-class="{'form-control':true,userComment:cell.item.code[0].system=='http://clinfhir.com/fhir/CodeSystem/review-comment' }"
                               ng-model="input.form[cell.item.linkId]" class="form-control"
@@ -131,7 +131,6 @@
 
 
             <div ng-switch-when="choice">
-
 
                 <div ng-show = "cell.item.answerOption">
 
