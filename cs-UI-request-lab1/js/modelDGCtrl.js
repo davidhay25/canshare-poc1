@@ -474,7 +474,6 @@ angular.module("pocApp")
                     for (const ed1 of $scope.selectedModel.diff) {
                         if (ed1.path == p) {
                             ed1.options = updatedEd.options
-                            //ed.valueSet = vsUrl
                             break
                         }
                     }
