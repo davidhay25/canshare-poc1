@@ -11,9 +11,17 @@
       </div>
     </div>
 
+    <br/>
     <div class="row">
       <div class="col-md-3">
-        <uib-tabset>
+
+        <select class="form-control" ng-model="local.selectedComp"
+                ng-change="initQ(local.selectedComp)"
+                ng-options="v.title for (k,v) in world.compositions">
+
+        </select>
+
+        <uib-tabset ng-show="false">
           <uib-tab heading="New Q">
             <select class="form-control" ng-model="local.selectedComp"
                     ng-change="initQ(local.selectedComp)"
@@ -50,6 +58,15 @@
     <div class="col-md-4">
       <div>
 
+        <div ng-show="selectedQNode.data.level == 'group'">
+          <div class="banner">Group details</div>
+          <table class="table table-bordered">
+            <tr><td>Name</td><td>{{selectedQNode.text}}</td></tr>
+          </table>
+
+          <br/>
+        </div>
+
         <div ng-show="selectedQNode.data.level == 'element'">
           <div class="banner">Selected element details</div>
 
@@ -76,7 +93,9 @@
             <div ng-repeat="ed in allElementsThisSection"
                  style="cursor: pointer"
                  ng-click="selectElementToAdd($index)">
-              {{ed.shortPath}}
+                <div ng-class="{clickable:ed.type}">{{ed.shortPath}}</div>
+
+
             </div>
           </div>
 

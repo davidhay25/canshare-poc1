@@ -48,6 +48,8 @@ angular.module("pocApp")
                     let prefix = `${$scope.selectedComp.name}.${$scope.selectedQNode.data.name}.`
 
                     let node = {id:nodeId,text:groupName,parent:parentId,data:{level:'group',sectionPrefix:prefix}}
+
+                    $scope.selectedQNode = node
                     node.icon = "icons/icon-q-group.png"
                     $scope.treeData.push(node)
                     drawtree($scope.treeData)
@@ -79,7 +81,9 @@ angular.module("pocApp")
                         //this element is to be added
                         //teh controlHint values are drawn from the Q extension at https://hl7.org/fhir/R4B/valueset-questionnaire-item-control.html
 
-                        //todo - incorporate standard Q types + control Hint - ie 2 elements
+                        hashElementsUsed[ed.path] = true
+
+
                         let controlHint = "string"            //this can be any value - it will be an extension in the Q - https://hl7.org/fhir/R4B/extension-questionnaire-itemcontrol.html
                         let controlType = "string"          //this has to be one of the defined type values
                         if (ed.options && ed.options.length > 0) {
@@ -101,7 +105,10 @@ angular.module("pocApp")
                         let node = {id:ed.path,text:ed.title,parent:parentId,data:{ed:ed,level:'element',controlType:controlType,controlHint:controlHint}}
                         $scope.treeData.push(node)
                     } else {
-                        //This is not in the same path
+                        //This is not in the same path, or has no type
+                        if (! ed.type) {
+                            //alert("This element has no type. It's a reference to the DG whose contents follow.")
+                        }
                         ar.push(ed)
                     }
                 })
@@ -178,20 +185,13 @@ angular.module("pocApp")
 
                 //console.log($scope.allCompElements,$scope.hashCompElements)
 
-                //create initial tree
+                //create initial tree with empty sections
                 $scope.treeData = []
                 let root = {id:"root",text: "root",parent:'#',data:{level:'root'}}
                 $scope.treeData.push(root)
                 comp.sections.forEach(function (sect) {
                     let sectionData = {level:'section',name:sect.name}
-                    //add all the DG to the section data. todo - need to incorporate all overrides
-                    //there is other section level metadata that may be useful as well
-                    /*
-                    sect.items.forEach(function (item) {
-                        let dg = $scope.hashAllDG[item.type[0]]
-                        sectionData.DG.push(dg)
-                    })
-*/
+
                     let sectionNode = {id:sect.name,text:sect.name,parent:'root',data:sectionData}
                     sectionNode.icon = `icons/icon-q-group.png`  //the default icon
 
@@ -215,9 +215,7 @@ angular.module("pocApp")
                             'themes': {name: 'proton', responsive: true}}}
                 ).on('changed.jstree', function (e, data) {
 
-
                     if (data.node) {
-
                         //This is a list of all elements from the comp available to add to the Q section
                         $scope.allElementsThisSection = []
                         $scope.selectedQNode = data.node;
@@ -248,6 +246,7 @@ angular.module("pocApp")
 
                         }
 
+                        //set the list of possible elements for this section / group
                         function setElementList(prefix) {
                             $scope.allCompElements.forEach(function (item) {
                                 let ed = angular.copy(item.ed)
@@ -271,6 +270,10 @@ angular.module("pocApp")
 
                 }).bind("loaded.jstree", function (event, data) {
                     $(this).jstree("open_all");
+
+                    if ($scope.selectedQNode) {
+                        $(this).jstree("select_node",$scope.selectedQNode.id);
+                    }
 
                     let v = $(this).jstree(true).get_json('#', { 'flat': false })
                     $scope.Q = makeObject(v) //not a complete Q, but compatible
