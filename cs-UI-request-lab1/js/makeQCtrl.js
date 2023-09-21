@@ -341,25 +341,26 @@ console.log(node.data.level)
                         item.type = 'group'
                     }
 
-
-
                     item.linkId = node.id
                     parent.item = parent.item || []
                     parent.item.push(item)
 
-
-
-
                     if (node.children && node.children.length > 0) {
                         node.children.forEach(function (childNode) {
+
                             addChild(item,childNode)
                         })
                     }
 
                 }
 
-                treeObject[0].children.forEach(function (child) {
-                    addChild(Q,child)
+
+                treeObject[0].children.forEach(function (section) {
+                    //only add a section if it has children
+                    if (section.children && section.children.length > 0) {
+                        addChild(Q,section)
+                    }
+
                 })
 
                //console.log(Q)
