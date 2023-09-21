@@ -2,12 +2,18 @@
 
 
 
-    <div ng-switch="item.controlType">
-        <div ng-switch-when="text">
+    <div ng-switch="item.controlHint">
+        <div ng-switch-when="string">
             <input type="text" ng-model="local.form[item.ed.path]" class="form-control"/>
         </div>
 
-        <div ng-switch-when="optionsDD">
+        <div ng-switch-when="text">
+            <textarea ng-model="local.form[item.ed.path]" class="form-control">
+
+            </textarea>
+        </div>
+
+        <div ng-switch-when="drop-down">
             <select class="form-control" ng-model="local.form[item.ed.path]"
                     ng-options = "option.pt for option in item.ed.options">
 

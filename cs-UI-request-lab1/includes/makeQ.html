@@ -2,13 +2,31 @@
 
   <div>
 
+    <div ng-show = "false" class="row">
+      <div class="col-md-3">
+
+      </div>
+      <div class="col-md-9">
+        <button class="btn btn-danger">Publish to POC</button>
+      </div>
+    </div>
+
     <div class="row">
       <div class="col-md-3">
-        <select class="form-control" ng-model="local.selectedComp"
-                ng-change="initQ(local.selectedComp)"
-                ng-options="v.title for (k,v) in world.compositions">
+        <uib-tabset>
+          <uib-tab heading="New Q">
+            <select class="form-control" ng-model="local.selectedComp"
+                    ng-change="initQ(local.selectedComp)"
+                    ng-options="v.title for (k,v) in world.compositions">
 
-        </select>
+            </select>
+          </uib-tab>
+          <uib-tab heading="Existing Q">
+            <em>Existing Q's that have been defined for Compositions</em>
+          </uib-tab>
+        </uib-tabset>
+
+
       </div>
       <div class="col-md-9">
 
@@ -20,111 +38,125 @@
   <div class="row">
     <div class="col-md-3">
 
-      <div id="qtree">
+      <div id="qtree"></div>
 
-      </div>
-
-      <div ng-show="allowAddGroup" ng-click="addGroup(selectedQNode)">
+      <br/>
+      <div ng-show="allowAddGroup" class="clickable" ng-click="addGroup(selectedQNode)">
         Add Group
       </div>
     </div>
+
+
     <div class="col-md-4">
       <div>
 
-        <div ng-repeat="ed in allElementsThisSection"
-             style="cursor: pointer"
-          ng-click="selectElementToAdd($index)">
-          {{ed.shortPath}}
+        <div ng-show="selectedQNode.data.level == 'element'">
+          <div class="banner">Selected element details</div>
+
+          <table class="table table-bordered">
+            <tr><td>Path</td><td>{{selectedQNode.data.ed.path | dropFirstInPath}}</td></tr>
+            <tr><td>Title</td><td>{{selectedQNode.data.ed.title }}</td></tr>
+            <tr><td>Description</td><td>{{selectedQNode.data.ed.description }}</td></tr>
+            <tr><td>Data type</td><td>{{selectedQNode.data.ed.type[0] }}</td></tr>
+            <tr><td>Control type</td><td>{{selectedQNode.data.controlType }}</td></tr>
+            <tr><td>Cardinality</td><td>{{selectedQNode.data.ed.mult }}</td></tr>
+          </table>
+
+          <div class="clickable" ng-click="removeElement()">Remove this element</div>
+<!--
+          <pre>{{selectedQNode.data | json}}</pre>
+-->
+
         </div>
 
 
+        <div ng-hide="selectedQNode.data.level == 'element'">
+          <div ng-show="allElementsThisSection">
+            <div class="banner">Element that can be added</div>
+            <div ng-repeat="ed in allElementsThisSection"
+                 style="cursor: pointer"
+                 ng-click="selectElementToAdd($index)">
+              {{ed.shortPath}}
+            </div>
+          </div>
 
 
-
+        </div>
 
       </div>
 
 
 
     </div>
+
     <div  class="col-md-5">
-
-      <!--
-        <button class="btn btn-default"
-                ng-click="selectQtab(section)"
-                ng-repeat = "section in Q.item">
-          {{section.text}}
-        </button>
-
-
-      -->
-
-
-        <div class="banner">{{selectedSection.text}}</div>
-
-        <div ng-repeat = 'item in selectedSection.item'>
-
-          <div class="row">
-            <div class="col-sm-3 col-md-3">
-              {{item.text}}
-            </div>
-            <div class="col-sm-6 col-md-6">
-              <div style="padding-left: 15px" ng-switch="item.level">
-
-                <div ng-switch-when="group">
-                  group
-                </div>
-
-                <div ng-switch-when="element">
-                  <rendersingleitem item="item"></rendersingleitem>
-                  <!--
-                  <div ng-include = "'./includes/renderSingleItem.html'"></div>
-                  -->
-                </div>
-
-
-              </div>
-
-            </div>
-          </div>
-
-          <div ng-repeat = 'groupItem in item.item'>
-            <div class="row">
-              <div class="col-sm-3 col-md-3">
-                {{groupItem.text}}
-              </div>
-              <div class="col-sm-6 col-md-6">
-
-                <rendersingleitem item="groupItem"></rendersingleitem>
-
-
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <hr/>
-        <pre>{{selectedSection | json}}</pre>
-
-
-
-<!--
-      <div class="btn-group">
-
-      </div>
 
 
       <uib-tabset>
-        <uib-tab ng-repeat="section in Q.item">
-          <uib-tab-heading>{{section.text}}</uib-tab-heading>
+        <uib-tab heading="Form">
+          <div class="banner">{{selectedSection.text}}</div>
 
-          <pre>{{section | json}}</pre>
+          <div ng-repeat = 'item in selectedSection.item'>
+
+            <div class="row">
+              <div class="col-sm-3 col-md-3">
+                <div ng-show="item.level == 'group'">
+                  <strong>{{item.text}}</strong>
+                </div>
+                <div ng-hide="item.level == 'group'">
+                  {{item.text}}
+                </div>
+
+
+
+
+              </div>
+              <div class="col-sm-6 col-md-6">
+                <div style="padding-left: 15px" ng-switch="item.level">
+                  <!--
+                                  <div ng-switch-when="group">
+                                    group: {{item.text}}
+                                  </div>
+                  -->
+                  <div ng-switch-when="element">
+                    <div style="padding-top: 8px">
+                      <rendersingleitem item="item"></rendersingleitem>
+                    </div>
+
+                  </div>
+
+
+                </div>
+
+              </div>
+            </div>
+
+            <div ng-repeat = 'groupItem in item.item'>
+              <div class="row">
+                <div class="col-sm-3 col-md-3">
+                  {{groupItem.text}}
+                </div>
+                <div class="col-sm-6 col-md-6">
+                  <div  style="padding-top: 8px">
+                    <rendersingleitem item="groupItem"></rendersingleitem>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </uib-tab>
+        <uib-tab  heading="Q">
+          <pre>{{Qresource | json}}</pre>
+
         </uib-tab>
       </uib-tabset>
--->
+
+
+
     </div>
   </div>
 

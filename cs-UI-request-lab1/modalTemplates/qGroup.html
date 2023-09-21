@@ -1,0 +1,47 @@
+
+<div>
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-8 col-sm-8">
+        <h3 class="modal-title">
+          Q group details
+        </h3>
+      </div>
+
+
+      <div class="col-md-4 col-sm-4">
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+        <button ng-show = "input.name"
+                class="btn btn-primary pull-right" ng-click="close()">Close</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-sm-3 col-md-3">
+        Name
+      </div>
+      <div class="col-sm-3 col-md-3">
+        <input type="text" class="form-control" ng-model="input.name"/>
+      </div>
+    </div>
+<!--
+    <div class="row">
+      <div class="col-sm-3 col-md-3">
+        Text
+      </div>
+      <div class="col-sm-3 col-md-3">
+        <input type="text" class="form-control" ng-model="input.text"/>
+      </div>
+    </div>
+-->
+
+  </div>
+  <div class="modal-header">
+    <em>Defines the information for a Questionnaire group. Currently only name, but other details to follow -
+      similar to the Designer (though simpler)</em>
+  </div>
+</div>
