@@ -32,7 +32,7 @@ angular.module("pocApp")
                 }
                 */
             } else {
-                $scope.input.mult = $scope.mult[1]      //default to 0..1
+                $scope.input.mult = "0..1"// $scope.mult[1]      //default to 0..1
 
                 for (typ of allTypes) {
                     if (typ == 'CodeableConcept') {
