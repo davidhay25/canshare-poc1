@@ -1,0 +1,77 @@
+<!-- create a QObject - name and composition. Other details are in a pane  -->
+<div>
+
+    <div class="modal-header">
+
+        <div class="row">
+            <div class="col-md-8 col-sm-8">
+                <h3 class="modal-title">New Questionnaire</h3>
+            </div>
+
+
+            <div class="col-md-4 col-sm-4">
+                <button class="btn btn-primary pull-right" ng-click="create()">Create</button>
+
+                <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+    <div class="modal-body">
+
+        <div class="row">
+            <div class="col-md-3">
+                Name
+            </div>
+            <div class="col-md-9">
+                <input class="form-control" placeholder="Unique name for this Questionnaire" ng-model = "input.name"/>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                Description
+            </div>
+            <div class="col-md-9">
+                <textarea class="form-control" placeholder="Purpose of the Q" ng-model = "input.description"></textarea>
+            </div>
+        </div>
+
+
+
+        <div class="row">
+            <div class="col-md-3">
+                Composition
+            </div>
+            <div class="col-md-9">
+                <select class="form-control" ng-model="input.selectedComp"
+                        ng-options="v.title for (k,v) in allCompositions">
+
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                Type
+            </div>
+            <div class="col-md-9">
+
+                Request / report (& others). ?Derive from composition
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <div class="modal-header">
+
+        {{description}}
+    </div>
+</div>

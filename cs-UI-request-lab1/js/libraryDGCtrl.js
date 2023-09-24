@@ -1,4 +1,4 @@
-
+// The controller for the DG 'compare to library'
 angular.module("pocApp")
     .controller('libraryDGCtrl',
         function ($scope,$http,DG) {
@@ -55,6 +55,7 @@ angular.module("pocApp")
                     }
 
                 }, function (err) {
+                    $scope.notInLibrary = true
                     alert(angular.toJson(err.data))
                 }
             )

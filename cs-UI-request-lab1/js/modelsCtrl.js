@@ -48,6 +48,9 @@ angular.module("pocApp")
 
 
 
+           // $scope.leftPanel = 'col-md-3'
+           // $scope.rightPanel = 'col-md-9'
+
             $scope.leftPanel = 'col-md-3'
             $scope.rightPanel = 'col-md-9'
 
@@ -124,7 +127,15 @@ angular.module("pocApp")
                 }
             }
 
-
+/* $scope.toggleLeftPanel = function(){
+                if ($scope.leftPanel == 'col-md-3') {
+                    $scope.leftPanel = 'hidden'
+                    $scope.rightPanel = 'col-md-12'
+                } else {
+                    $scope.leftPanel = 'col-md-3'
+                    $scope.rightPanel = 'col-md-9'
+                }
+            }*/
 
             //whether the current user can edit. Will set up the back end logic later
             $scope.input.canEdit = true

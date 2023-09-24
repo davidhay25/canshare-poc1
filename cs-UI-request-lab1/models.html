@@ -219,10 +219,10 @@
                 <div ng-class="leftPanel">
 
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             Stream
                         </div>
-                        <div class="col-md-9">
+                        <div class="col-md-8">
                             <select ng-model="input.selectedTumourStream" class="form-control"
                                     ng-options="ts for ts in tumourStreams"></select>
                         </div>
@@ -230,10 +230,10 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             Category
                         </div>
-                        <div class="col-md-9">
+                        <div class="col-md-8">
                             <select ng-model="input.selectedCompCategory" class="form-control"
                                     ng-options="cat for cat in compCategories"></select>
                         </div>
@@ -457,12 +457,12 @@
             </div>
         </uib-tab>
 
-        <uib-tab heading="Terminology reports">
+        <uib-tab heading="Reports">
             <ng-include src="'/includes/terminology.html'"></ng-include>
         </uib-tab>
 
         <uib-tab>
-            <uib-tab-heading> DataGroup updates <span class="badge">{{dgUpdates.length}}</span> </uib-tab-heading>
+            <uib-tab-heading>DG updates <span class="badge">{{dgUpdates.length}}</span> </uib-tab-heading>
             <span class="pull-right">
                 <span class="clickable" ng-click="refreshUpdates()">Refresh</span>
             </span>

@@ -2,6 +2,12 @@
 <div>
   <!--<div ng-controller="newResourceCtrl">-->
 
+  <style>
+    .dtDifferent {
+      background-color: lightgoldenrodyellow;
+    }
+  </style>
+
   <div class="modal-header">
     <div class="row">
       <div class="col-md-8 col-sm-8">
@@ -65,7 +71,7 @@
                <table class="table table-bordered table-condensed">
                  <tr><th>Title</th><th>Local count</th><th>Library count</th><th>Note</th></tr>
                  <tr ng-repeat="item in summary"
-                    ng-class="{listItemSelected:item == input.selectedItem}">
+                    ng-class="{listItemSelected:item == input.selectedItem,dtDifferent:item.local.diff.length !== item.library.diff.length}">
                    <td>
                      <div class="clickable" ng-click="input.selectedItem = item">{{item.title}}</div>
                    </td>

@@ -1,16 +1,68 @@
 angular.module("pocApp")
     .controller('makeQCtrl',
-        function ($scope,modelCompSvc,$timeout,$uibModal) {
+        function ($scope,modelCompSvc,$timeout,$uibModal,$localStorage,$uibModal) {
 
             //don't use 'input' as we need $scope.input.types
             $scope.local = {}
 
+
+            //list of Q on this browser. Interact with the library to save / download (like comp & DG)
+            //The list is the internal Q object - not the FHIR resource (as the Q can be build from that object)
+            //$scope.listQObjects = $localStorage || []
+
+            //create a new Q object
+            $scope.newQObject = function () {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/newQObject.html',
+                    //backdrop: 'static',
+                    //size : 'lg',
+                    controller: function ($scope,allCompositions) {
+                        $scope.input = {}
+                        $scope.allCompositions = allCompositions
+                        console.log($scope.input)
+
+                        $scope.create = function () {
+                            let vo = {}
+                            vo.name = $scope.input.name
+                            vo.comp = $scope.input.selectedComp
+                            $scope.$close(vo)
+                        }
+                    },
+
+                    resolve: {
+                        allCompositions: function () {
+                            return $localStorage.world.compositions
+                        }
+                    }
+
+                }).result.then(function (vo) {
+                   // content is the treeData array that builds the tree
+
+                    $scope.currentQName = vo.name
+
+                    let QObject = {meta:{},content:[]}
+                    QObject.meta.compName = vo.comp.name
+                    QObject.meta.qName = vo.name
+
+                    $localStorage.allQ = $localStorage.allQ || {}
+                    $localStorage.allQ[$scope.currentQName] = QObject
+
+                    $scope.initQ(vo.comp)
+
+                })
+
+            }
+
+
+            $scope.selectQObject = function () {
+
+            }
+
             //a hash of all elements that have been added to the Q. Used to avoid duplicate entries
             let hashElementsUsed = {}
 
-            $scope.selectQtab = function (section) {
+            $scope.selectQtabDEP = function (section) {
                 $scope.selectedSection = section
-
             }
 
             //groups can only be added to sections
@@ -79,13 +131,14 @@ angular.module("pocApp")
 
                        // if (ed.type && ed.path.startsWith(path)) {    //ed without a type are the section.DGName elements
                         //this element is to be added
-                        //teh controlHint values are drawn from the Q extension at https://hl7.org/fhir/R4B/valueset-questionnaire-item-control.html
+                        //the controlHint values are drawn from the Q extension at https://hl7.org/fhir/R4B/valueset-questionnaire-item-control.html
 
                         hashElementsUsed[ed.path] = true
 
 
                         let controlHint = "string"            //this can be any value - it will be an extension in the Q - https://hl7.org/fhir/R4B/extension-questionnaire-itemcontrol.html
                         let controlType = "string"          //this has to be one of the defined type values
+
                         if (ed.options && ed.options.length > 0) {
                             controlHint = "drop-down"
                             controlType = "choice"
@@ -115,44 +168,6 @@ angular.module("pocApp")
 
                 $scope.allElementsThisSection = ar      //replace the allElements list
                 drawtree($scope.treeData)
-
-                //Object.keys($scope.allElementsThisSection).forEach()
-
-/*
-
-                //This is a has of all elements added to the Q (so unavailable to add later)
-                hashElementsUsed[ed.path] = true
-
-                $scope.allElementsThisSection.splice(inx,1)
-
-
-                let parentId = $scope.selectedQNode.id  //this is either a section or a group
-
-
-                let controlType = "text"
-                if (ed.options && ed.options.length > 0) {
-                    controlType = "optionsDD"
-                }
-                switch (ed.type[0]) {
-                    case 'dateTime' :
-                        controlType = "dateTime"
-                        break
-                    case 'CodeableConcept' :
-                        if (ed.valueSet) {
-                            controlType = "lookup"
-                        }
-                }
-
-                let node = {id:ed.path,text:ed.title,parent:parentId,data:{ed:ed,level:'element',controlType:controlType}}
-                $scope.treeData.push(node)
-  drawtree($scope.treeData)
-*/
-
-
-
-
-
-
             }
 
             $scope.removeElement = function () {
@@ -171,6 +186,8 @@ angular.module("pocApp")
                     }
 
                 }
+
+                delete $scope.selectedQNode
 
             }
 
@@ -198,19 +215,21 @@ angular.module("pocApp")
                     $scope.treeData.push(sectionNode)
                 })
 
+
                 drawtree($scope.treeData)
 
             }
-
+/*
             $timeout(function () {
                 $scope.initQ($scope.world.compositions['PathRequest'])
 
             },500)
-
+*/
             function drawtree(treeData) {
-                $('#qtree').jstree('destroy');
+                $localStorage.allQ[$scope.currentQName].content = treeData
+                    $('#qtree').jstree('destroy');
                 // console.log(treeData)
-                $scope.allDGTree = $('#qtree').jstree(
+                $scope.qTree = $('#qtree').jstree(
                     {'core': {'multiple': false, 'data': treeData,
                             'themes': {name: 'proton', responsive: true}}}
                 ).on('changed.jstree', function (e, data) {
@@ -276,6 +295,7 @@ angular.module("pocApp")
                     }
 
                     let v = $(this).jstree(true).get_json('#', { 'flat': false })
+
                     $scope.Q = makeObject(v) //not a complete Q, but compatible
 
                     if ($scope.sectionNameFromTree) {
