@@ -1,7 +1,7 @@
 //seversync is actually the main library interface
 angular.module("pocApp")
     .controller('libraryCtrl',
-        function ($scope,$http,allDG,allComp,$sce) {
+        function ($scope,$http,allDG,allComp,$sce,allQObject) {
 
             $scope.input = {}
             //$scope.input.mainTabActive = 1
@@ -22,7 +22,7 @@ angular.module("pocApp")
                 function (data) {
                     $scope.libraryDG = data.data
                     $scope.libraryDGCount = $scope.libraryDG.length
-                    console.log($scope.libraryDG)
+                    //console.log($scope.libraryDG)
                     makeDGSummary(allDG,$scope.libraryDG)
                 }, function (err) {
                     alert(angular.toJson(err.data))
@@ -34,8 +34,21 @@ angular.module("pocApp")
                 function (data) {
                     $scope.libraryComp = data.data
                     $scope.libraryCompCount = $scope.libraryComp.length
-                    console.log($scope.libraryComp)
+                    //console.log($scope.libraryComp)
                     makeCompSummary(allComp,$scope.libraryComp)
+                }, function (err) {
+                    alert(angular.toJson(err.data))
+                })
+
+
+            //get all the QO
+            let qryQO = `/model/allQObject`
+            $http.get(qryQO).then(
+                function (data) {
+                    $scope.libraryQO = data.data
+                    $scope.libraryQOCount = $scope.libraryQO.length
+                    //console.log($scope.libraryComp)
+                   // makeCompSummary(allComp,$scope.libraryComp)
                 }, function (err) {
                     alert(angular.toJson(err.data))
                 })

@@ -67,7 +67,7 @@ angular.module("pocApp")
             $scope.input.mainTabActive = $scope.ui.tabQ
 
             //used in DG & Comp so when a type is a FHIR DT, we can create a link to the spec
-            $scope.fhirDataTypes =modelsSvc.fhirDataTypes()
+            $scope.fhirDataTypes = modelsSvc.fhirDataTypes()
 
             //allows a specific tab in the showCompositions to e selected. Used by term summary (only need tree ATM)
             $scope.compUi = {}
@@ -76,10 +76,9 @@ angular.module("pocApp")
 
             $scope.hxDGLoad = []        //a history of DG's that were loaded by termSelectDGItem
 
-            $('.mapbodyarea').on('click',function (e) {
-                e.preventDefault()
-                alert('ba')
-            })
+
+            //all the questionnaire objects (not actual Q)
+            $scope.allQObject = $localStorage.allQObject
 
             //The main library button
             $scope.library = function () {
@@ -96,6 +95,9 @@ angular.module("pocApp")
                         },
                         allComp: function () {
                             return $scope.hashAllCompositions
+                        },
+                        allQObject : function () {
+                            $scope.allQObject
                         }
                     }
 

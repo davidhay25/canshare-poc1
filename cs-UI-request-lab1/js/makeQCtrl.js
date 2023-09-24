@@ -6,9 +6,84 @@ angular.module("pocApp")
             $scope.local = {}
 
 
+            //a hash of all elements that have been added to the Q. Used to avoid duplicate entries
+            //is specific to the currently selected Q
+            let hashElementsUsed = {}
+
             //list of Q on this browser. Interact with the library to save / download (like comp & DG)
             //The list is the internal Q object - not the FHIR resource (as the Q can be build from that object)
             //$scope.listQObjects = $localStorage || []
+
+            $localStorage.allQObject = $localStorage.allQObject || {}
+
+            $scope.allQObject = $localStorage.allQObject
+
+            $scope.qlibraryInteraction = function (QObject) {
+
+                alert("Library integration here")
+
+                return
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/libraryQ.html',
+                    backdrop: 'static',
+                    size : 'lg',
+                    controller: 'libraryQCtrl',
+
+                    resolve: {
+                        QObject: function () {
+                            return QObject
+                        }
+                    }
+
+                }).result.then(function (ed) {
+                    //copy the units to the current item
+                    //need to update the .diff in the selected model
+                    /*
+                                        //todo - what is this code doing???
+                                        let p = $filter('lastInPath')(ed.path)
+                                        for (const ed1 of $scope.selectedModel.diff) {
+                                            if (ed1.path == p) {
+                                                ed1.units = ed.units
+                                                //ed.valueSet = vsUrl
+                                                break
+                                            }
+                                        }
+
+                                        */
+                })
+
+            }
+
+
+            $scope.selectQObject = function (QObject) {
+
+                delete $scope.selectedQNode
+
+                $scope.currentQObject = QObject
+                //inialise the screen with the selected cmposition
+                $scope.selectedComp = $localStorage.world.compositions[QObject.meta.compName]
+
+                //get all the elements for this composition
+                let vo = modelCompSvc.makeFullList($scope.selectedComp,$scope.input.types) //input.types created on the parent scope
+                $scope.allCompElements = vo.allElements
+
+                //needs global scope...
+                $scope.treeData = QObject.content
+
+                //set the hashElementsUsed for this Q
+                hashElementsUsed = {}
+                $scope.treeData.forEach(function (node) {
+                    let ed = node.data.ed
+                    if (ed) {
+                        hashElementsUsed[ed.path] = true
+                    }
+                })
+
+
+                // $scope.initQ($scope.allQObject[QObject.meta.name])
+                drawtree($scope.treeData)
+            }
 
             //create a new Q object
             $scope.newQObject = function () {
@@ -24,6 +99,7 @@ angular.module("pocApp")
                         $scope.create = function () {
                             let vo = {}
                             vo.name = $scope.input.name
+                            vo.description = $scope.input.description
                             vo.comp = $scope.input.selectedComp
                             $scope.$close(vo)
                         }
@@ -38,28 +114,29 @@ angular.module("pocApp")
                 }).result.then(function (vo) {
                    // content is the treeData array that builds the tree
 
-                    $scope.currentQName = vo.name
+                    //$scope.currentQName = vo.name
 
                     let QObject = {meta:{},content:[]}
                     QObject.meta.compName = vo.comp.name
-                    QObject.meta.qName = vo.name
+                    QObject.meta.name = vo.name
+                    QObject.meta.description = vo.description
 
-                    $localStorage.allQ = $localStorage.allQ || {}
-                    $localStorage.allQ[$scope.currentQName] = QObject
+                    $scope.currentQObject = QObject
 
-                    $scope.initQ(vo.comp)
+                    //$localStorage.allQObject = $localStorage.allQObject || {}
+                    //$localStorage.allQObject[$scope.currentQObject.name] = QObject
+
+                    $scope.allQObject[$scope.currentQObject.meta.name] = $scope.currentQObject
+
+                    //inialise the screen with the selected cmposition
+                    $scope.initQ($scope.currentQObject)
 
                 })
 
             }
 
 
-            $scope.selectQObject = function () {
 
-            }
-
-            //a hash of all elements that have been added to the Q. Used to avoid duplicate entries
-            let hashElementsUsed = {}
 
             $scope.selectQtabDEP = function (section) {
                 $scope.selectedSection = section
@@ -191,16 +268,23 @@ angular.module("pocApp")
 
             }
 
-            $scope.initQ = function (comp) {
-                $scope.selectedComp = comp
-                console.log(comp)
 
-                let vo = modelCompSvc.makeFullList(comp,$scope.input.types) //input.types created on the parent scope
+            //initialize a new QObject
+            $scope.initQ = function (QObject) {
+
+
+
+
+
+                //console.log(comp)
+
+                //get the composition and construct the complete list of elements
+                $scope.selectedComp = $localStorage.world.compositions[QObject.meta.compName]
+                //$scope.selectedComp = QObject.meta.compName
+                let vo = modelCompSvc.makeFullList($scope.selectedComp,$scope.input.types) //input.types created on the parent scope
+
 
                 $scope.allCompElements = vo.allElements     //an array
-                //$scope.hashCompElements = vo.hashAllElements
-
-                //console.log($scope.allCompElements,$scope.hashCompElements)
 
                 //create initial tree with empty sections
                 $scope.treeData = []
@@ -215,10 +299,12 @@ angular.module("pocApp")
                     $scope.treeData.push(sectionNode)
                 })
 
-
+                QObject.content = $scope.treeData
                 drawtree($scope.treeData)
 
             }
+
+
 /*
             $timeout(function () {
                 $scope.initQ($scope.world.compositions['PathRequest'])
@@ -226,9 +312,9 @@ angular.module("pocApp")
             },500)
 */
             function drawtree(treeData) {
-                $localStorage.allQ[$scope.currentQName].content = treeData
+                //$localStorage.allQ[$scope.currentQObject.name].content = treeData
                     $('#qtree').jstree('destroy');
-                // console.log(treeData)
+
                 $scope.qTree = $('#qtree').jstree(
                     {'core': {'multiple': false, 'data': treeData,
                             'themes': {name: 'proton', responsive: true}}}
@@ -349,7 +435,7 @@ angular.module("pocApp")
                     let item = {text:node.text}
 
                     //if the node is a section or group, then the type must also be 'group. Only 'element' types can be different
-console.log(node.data.level)
+//console.log(node.data.level)
                     if (node.data.level == 'element') {
                         item.type = data.controlType    //the 'official' type for the item
                         if (data.controlType !== data.controlHint)  {

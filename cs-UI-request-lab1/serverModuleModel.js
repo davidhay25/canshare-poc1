@@ -204,6 +204,68 @@ async function setup(app) {
     })
 
 
+    // ============== questionnnaire objects - not Q resources
+
+
+    //get all active datagroups
+    app.get('/model/allQObject', async function(req,res) {
+        //retrieve the QO
+
+        const colQO = database.collection("qobject");
+        const query =  {}// {active:true} // active: { $lt: 15 } };
+        try {
+            const cursor = await colQO.find(query).toArray()
+            let arQO = []
+            cursor.forEach(function (doc) {
+                delete doc['_id']
+                arQO.push(doc)
+            })
+
+            res.json(arQO)
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+    })
+
+    //get a single QO by name
+    app.get('/model/QObject/:name', async function(req,res) {
+        let name = req.params.name
+        const query = {name:name}
+        try {
+            const cursor = await database.collection("qobject").find(query).toArray()
+            if (cursor.length == 1) {
+                let qo = cursor[0]
+                delete qo['_id']
+                res.json(qo)
+            } else {
+                res.status(404).json({msg:'Q not found, or there are multiple with the same name'})
+            }
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+    })
+
+    //create / update a single QuestionnaireObject (QO). In theory the name param is not needed, but cleaner
+    app.put('/model/QObject/:name', async function(req,res) {
+        let name = req.params.name
+        let qo = req.body
+        qo.updated = true           //so we know it was updated
+        const query = {name:name}
+        try {
+            const cursor = await database.collection("qobject").replaceOne(query,qo,{upsert:true})
+            res.json(qo)
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+    })
+
+
     // =========== database refresh routines ==============
 
     //a routine to refresh the composition collection from hard coded values.

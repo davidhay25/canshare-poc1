@@ -47,155 +47,177 @@
   <div class="row">
     <div ng-class="leftPanel">
 
+      <div class="list-group">
+        <div ng-class="{'list-group-item':true,listItemSelected:currentQObject.meta.name == k}"
+             style="cursor: pointer"
+             ng-repeat = "(k,v) in allQObject"
+             ng-click = "selectQObject(v)">
+          {{v.meta.name}}
+          <div><em>{{v.meta.compName}}</em></div>
+        </div>
+      </div>
+
 
 
       <button class="btn btn-link" ng-click="newQObject()">New Q</button>
     </div>
     <div ng-class="rightPanel">
 
-      <div class="row">
+      <div class="modelInfo">
+        <div class="pull-right">{{currentQObject.meta.compName}}</div>
+        <div>{{currentQObject.meta.name}}</div>
+        <div>{{currentQObject.meta.description}}</div>
 
-        <div class="modelInfo">
-          Details about current Q
-        </div>
+      </div>
 
+      <div class="pull-right" ng-click="qlibraryInteraction(currentQObject)">Compare to library</div>
 
-        <div class="col-md-3">
+      <uib-tabset>
+        <uib-tab heading="Editor tree">
+          <div class="row">
 
-          <div id="qtree"></div>
+            <div class="col-md-3">
 
-          <br/>
-          <div ng-show="allowAddGroup" class="clickable" ng-click="addGroup(selectedQNode)">
-            Add Group
-          </div>
-        </div>
-
-
-        <div class="col-md-4">
-          <div>
-
-            <div ng-show="selectedQNode.data.level == 'group'">
-              <div class="banner">Group details</div>
-              <table class="table table-bordered">
-                <tr><td>Name</td><td>{{selectedQNode.text}}</td></tr>
-              </table>
+              <div id="qtree"></div>
 
               <br/>
-            </div>
-
-            <div ng-show="selectedQNode.data.level == 'element'">
-              <div class="banner">Selected element details</div>
-
-              <table class="table table-bordered">
-                <tr><td>Path</td><td>{{selectedQNode.data.ed.path | dropFirstInPath}}</td></tr>
-                <tr><td>Title</td><td>{{selectedQNode.data.ed.title }}</td></tr>
-                <tr><td>Description</td><td>{{selectedQNode.data.ed.description }}</td></tr>
-                <tr><td>Data type</td><td>{{selectedQNode.data.ed.type[0] }}</td></tr>
-                <tr><td>Control type</td><td>{{selectedQNode.data.controlType }}</td></tr>
-                <tr><td>Cardinality</td><td>{{selectedQNode.data.ed.mult }}</td></tr>
-              </table>
-
-              <div class="clickable" ng-click="removeElement()">Remove this element</div>
-              <!--
-                        <pre>{{selectedQNode.data | json}}</pre>
-              -->
-
+              <div ng-show="allowAddGroup" class="clickable" ng-click="addGroup(selectedQNode)">
+                Add Group
+              </div>
             </div>
 
 
-            <div ng-hide="selectedQNode.data.level == 'element'">
-              <div ng-show="allElementsThisSection">
-                <div class="banner">Element that can be added</div>
-                <div ng-repeat="ed in allElementsThisSection"
-                     style="cursor: pointer"
-                     ng-click="selectElementToAdd($index)">
-                  <div ng-class="{clickable:ed.type}">{{ed.shortPath}}</div>
+            <div class="col-md-4">
+              <div>
+
+                <div ng-show="selectedQNode.data.level == 'group'">
+                  <div class="banner">Group details</div>
+                  <table class="table table-bordered">
+                    <tr><td>Name</td><td>{{selectedQNode.text}}</td></tr>
+                  </table>
+
+                  <br/>
+                </div>
+
+                <div ng-show="selectedQNode.data.level == 'element'">
+                  <div class="banner">Selected element details</div>
+
+                  <table class="table table-bordered">
+                    <tr><td>Path</td><td>{{selectedQNode.data.ed.path | dropFirstInPath}}</td></tr>
+                    <tr><td>Title</td><td>{{selectedQNode.data.ed.title }}</td></tr>
+                    <tr><td>Description</td><td>{{selectedQNode.data.ed.description }}</td></tr>
+                    <tr><td>Data type</td><td>{{selectedQNode.data.ed.type[0] }}</td></tr>
+                    <tr><td>Control type</td><td>{{selectedQNode.data.controlType }}</td></tr>
+                    <tr><td>Cardinality</td><td>{{selectedQNode.data.ed.mult }}</td></tr>
+                  </table>
+
+                  <div class="clickable" ng-click="removeElement()">Remove this element</div>
+                  <!--
+                            <pre>{{selectedQNode.data | json}}</pre>
+                  -->
+
+                </div>
+
+
+                <div ng-hide="selectedQNode.data.level == 'element'">
+                  <div ng-show="allElementsThisSection">
+                    <div class="banner">Element that can be added</div>
+                    <div ng-repeat="ed in allElementsThisSection"
+                         style="cursor: pointer"
+                         ng-click="selectElementToAdd($index)">
+                      <div ng-class="{clickable:ed.type}">{{ed.shortPath}}</div>
+
+
+                    </div>
+                  </div>
 
 
                 </div>
+
               </div>
+
 
 
             </div>
 
-          </div>
+            <div  class="col-md-5">
 
 
+              <uib-tabset>
+                <uib-tab heading="Form">
+                  <div class="banner">{{selectedSection.text}}</div>
 
-        </div>
+                  <div ng-repeat = 'item in selectedSection.item'>
 
-        <div  class="col-md-5">
-
-
-          <uib-tabset>
-            <uib-tab heading="Form">
-              <div class="banner">{{selectedSection.text}}</div>
-
-              <div ng-repeat = 'item in selectedSection.item'>
-
-                <div class="row">
-                  <div class="col-sm-3 col-md-3">
-                    <div ng-show="item.level == 'group'">
-                      <strong>{{item.text}}</strong>
-                    </div>
-                    <div ng-hide="item.level == 'group'">
-                      {{item.text}}
-                    </div>
+                    <div class="row">
+                      <div class="col-sm-3 col-md-3">
+                        <div ng-show="item.level == 'group'">
+                          <strong>{{item.text}}</strong>
+                        </div>
+                        <div ng-hide="item.level == 'group'">
+                          {{item.text}}
+                        </div>
 
 
 
 
-                  </div>
-                  <div class="col-sm-6 col-md-6">
-                    <div style="padding-left: 15px" ng-switch="item.level">
-                      <!--
-                                      <div ng-switch-when="group">
-                                        group: {{item.text}}
-                                      </div>
-                      -->
-                      <div ng-switch-when="element">
-                        <div style="padding-top: 8px">
-                          <rendersingleitem item="item"></rendersingleitem>
+                      </div>
+                      <div class="col-sm-6 col-md-6">
+                        <div style="padding-left: 15px" ng-switch="item.level">
+                          <!--
+                                          <div ng-switch-when="group">
+                                            group: {{item.text}}
+                                          </div>
+                          -->
+                          <div ng-switch-when="element">
+                            <div style="padding-top: 8px">
+                              <rendersingleitem item="item"></rendersingleitem>
+                            </div>
+
+                          </div>
+
+
                         </div>
 
                       </div>
-
-
                     </div>
 
-                  </div>
-                </div>
+                    <div ng-repeat = 'groupItem in item.item'>
+                      <div class="row">
+                        <div class="col-sm-3 col-md-3">
+                          {{groupItem.text}}
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                          <div  style="padding-top: 8px">
+                            <rendersingleitem item="groupItem"></rendersingleitem>
+                          </div>
 
-                <div ng-repeat = 'groupItem in item.item'>
-                  <div class="row">
-                    <div class="col-sm-3 col-md-3">
-                      {{groupItem.text}}
-                    </div>
-                    <div class="col-sm-6 col-md-6">
-                      <div  style="padding-top: 8px">
-                        <rendersingleitem item="groupItem"></rendersingleitem>
+                        </div>
                       </div>
 
                     </div>
+
                   </div>
 
-                </div>
+                </uib-tab>
+                <uib-tab  heading="Q">
+                  <pre>{{Qresource | json}}</pre>
 
-              </div>
-
-            </uib-tab>
-            <uib-tab  heading="Q">
-              <pre>{{Qresource | json}}</pre>
-
-            </uib-tab>
-          </uib-tabset>
+                </uib-tab>
+              </uib-tabset>
 
 
 
-        </div>
-      </div>
+            </div>
+          </div>
+
+
+        </uib-tab>
+      </uib-tabset>
+
 
     </div>
+
   </div>
 
 

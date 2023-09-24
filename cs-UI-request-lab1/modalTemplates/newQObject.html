@@ -10,7 +10,9 @@
 
 
             <div class="col-md-4 col-sm-4">
-                <button class="btn btn-primary pull-right" ng-click="create()">Create</button>
+                <button class="btn btn-primary pull-right"
+                        ng-show="input.name && input.selectedComp"
+                        ng-click="create()">Create</button>
 
                 <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
 
