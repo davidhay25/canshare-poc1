@@ -22,7 +22,10 @@ function setup(app) {
     app.put("/dashboard/Questionnaire",async function(req,res){
         let Q = req.body
 
+
         let qry = `${serverBase}Questionnaire/${Q.id}`
+
+        console.log(qry)
 
         try {
             let config = {headers:{'cache-control':'no-cache'}}

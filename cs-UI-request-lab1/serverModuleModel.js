@@ -59,7 +59,7 @@ async function setup(app) {
         //retrieve the DG
 
         const colDG = database.collection("dg");
-        const query = {active:true} // active: { $lt: 15 } };
+        const query = {} // {active:true} // active: { $lt: 15 } };
         try {
             const cursor = await colDG.find(query).toArray()
             let arDG = []
@@ -250,6 +250,13 @@ async function setup(app) {
         }
     })
 
+
+    //make a copy of all documents
+    async function backupCopy(json) {
+
+
+    }
+
     //create / update a single QuestionnaireObject (QO). In theory the name param is not needed, but cleaner
     app.put('/model/QObject/:name', async function(req,res) {
         let name = req.params.name
@@ -257,6 +264,9 @@ async function setup(app) {
         qo.updated = true           //so we know it was updated
         const query = {name:name}
         try {
+            let backup = {type:'qo',date: new Date(), data:qo}
+            await database.collection("backup").insertOne(backup)
+
             const cursor = await database.collection("qobject").replaceOne(query,qo,{upsert:true})
             res.json(qo)
         } catch(ex) {

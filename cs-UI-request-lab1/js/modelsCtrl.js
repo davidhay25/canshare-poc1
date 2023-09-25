@@ -63,8 +63,8 @@ angular.module("pocApp")
             $scope.ui.tabQ = 2;
             $scope.ui.tabTerminology = 3;
 
-            //$scope.input.mainTabActive = $scope.ui.tabDG
-            $scope.input.mainTabActive = $scope.ui.tabQ
+            $scope.input.mainTabActive = $scope.ui.tabDG
+            //$scope.input.mainTabActive = $scope.ui.tabQ
 
             //used in DG & Comp so when a type is a FHIR DT, we can create a link to the spec
             $scope.fhirDataTypes = modelsSvc.fhirDataTypes()
@@ -475,6 +475,12 @@ angular.module("pocApp")
 
             }
             sortDG()
+/*
+            $scope.sortDG = function () {
+                console.log('sort')
+                sortDG()
+            }
+*/
             //same as for DG's - a step towards separate objects for DG & comp
             $scope.hashAllCompositions = $localStorage.world.compositions
             //make the term summary. These are the override elements in the models

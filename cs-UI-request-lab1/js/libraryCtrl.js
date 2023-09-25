@@ -150,11 +150,12 @@ angular.module("pocApp")
 
                             //replace each one. Leaves any that aren't in the library
                             arDG.forEach(function (dg) {
+                                console.log(dg.name)
                                 allDG[dg.name] = dg
 
                             })
-
-                            alert("Local DataGroups have been updated. Any local ones not in the library are untouched.")
+                            //$scope.sortDG()        //in modelCtrl
+                            alert("Local DataGroups have been updated. Any local ones not in the library are untouched. Reload the page to see any changes.")
                             $scope.$close(true)
 
                         },

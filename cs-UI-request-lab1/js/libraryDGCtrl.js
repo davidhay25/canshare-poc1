@@ -56,7 +56,11 @@ angular.module("pocApp")
 
                 }, function (err) {
                     $scope.notInLibrary = true
-                    alert(angular.toJson(err.data))
+                    //alert(err.status)
+                    if (err.status !== 404) {
+                        alert(angular.toJson(err.data))
+                    }
+
                 }
             )
 

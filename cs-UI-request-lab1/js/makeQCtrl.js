@@ -32,7 +32,38 @@ angular.module("pocApp")
             $scope.checkout = function () {
                 $scope.currentQObject.status = "checked-out"
                 $scope.currentQObject.user = $scope.user.email
+                $scope.canEdit = false
                 updateLibrary()
+            }
+
+            //send the current Q to the POC environment
+            $scope.pushToPOC = function () {
+                let Q = $scope.Qresource        //the actual Q resource
+                Q.id = `builder-${$scope.currentQObject.name}`
+
+                Q.name = $scope.currentQObject.name
+                Q.title = $scope.currentQObject.name
+
+                //set the context to 'request'
+                let ctxString = 'request'
+                let ctx = {code:{system:"http://terminology.hl7.org/CodeSystem/usage-context-type",code:"focus"}}
+                ctx.valueCodeableConcept = {coding:[{system:"http://canshare.co.nz/fhir/CodeSystem/questionnaire-type",code:ctxString}],text:ctxString}
+                Q.useContext = [ctx]
+
+
+                console.log(Q)
+//return
+                //directly to hapi server ATM
+                let qry = `http://poc.canshare.co.nz:8080/fhir/Questionnaire/${Q.id}`
+                $http.put(qry,Q).then(
+                    function (data) {
+                        alert("The form has been copied onto the POC Forms server, and is available for use")
+                    }, function (err) {
+                        alert(angular.toJson(err))
+                    }
+                )
+
+
             }
 
 
@@ -52,43 +83,6 @@ angular.module("pocApp")
            // $localStorage.allQObject = $localStorage.allQObject || {}
            // $scope.allQObject = $localStorage.allQObject
 
-
-            $scope.qlibraryInteraction = function (QObject) {
-
-                alert("Library integration here")
-
-                return
-
-                $uibModal.open({
-                    templateUrl: 'modalTemplates/libraryQ.html',
-                    backdrop: 'static',
-                    size : 'lg',
-                    controller: 'libraryQCtrl',
-
-                    resolve: {
-                        QObject: function () {
-                            return QObject
-                        }
-                    }
-
-                }).result.then(function (ed) {
-                    //copy the units to the current item
-                    //need to update the .diff in the selected model
-                    /*
-                                        //todo - what is this code doing???
-                                        let p = $filter('lastInPath')(ed.path)
-                                        for (const ed1 of $scope.selectedModel.diff) {
-                                            if (ed1.path == p) {
-                                                ed1.units = ed.units
-                                                //ed.valueSet = vsUrl
-                                                break
-                                            }
-                                        }
-
-                                        */
-                })
-
-            }
 
             //update the library with the current QObject
             updateLibrary = function () {
@@ -148,7 +142,7 @@ angular.module("pocApp")
                 })
 
 
-                // $scope.initQ($scope.allQObject[QObject.meta.name])
+
                 drawtree($scope.treeData)
             }
 
@@ -198,9 +192,7 @@ angular.module("pocApp")
                     QObject.status = "checked-out"
                     QObject.user = $scope.user.email       //user must exist or this function not called
 
-                    //populate the default content (empty sections)
-                    $scope.currentQObject = QObject
-                   // $scope.allQObject[$scope.currentQObject.meta.name] = $scope.currentQObject
+                    //$scope.currentQObject = QObject
 
                     //save the QO to the library.
                     $http.put(`/model/QObject/${QObject.name}`,QObject).then(
@@ -212,8 +204,13 @@ angular.module("pocApp")
                         }
                     )
 
+                    //$scope.selectQObject()
                     //inialise the screen with the selected cmposition
-                    $scope.initQ($scope.currentQObject)
+                    $scope.initQ(QObject)
+                    $scope.selectQObject(QObject)
+
+                    drawtree($scope.treeData)
+
 
                 })
 
@@ -280,7 +277,7 @@ angular.module("pocApp")
                 $scope.allElementsThisSection.forEach(function (ed) {
 
                     //for now, only select the individual item, but leave the code there to select
-                    //all eds on the path. Need to decide how to manage 'referemced' DG's - possibly as a Group at the same level
+                    //all eds on the path. Need to decide how to manage 'referenced' DG's - possibly as a Group at the same level
                     
                     if (ed.type && ed.path == path) {
                        // if (ed.type && ed.path.startsWith(path)) {    //ed without a type are the section.DGName elements
@@ -358,12 +355,6 @@ angular.module("pocApp")
             //initialize a new QObject
             $scope.initQ = function (QObject) {
 
-
-
-
-
-                //console.log(comp)
-
                 //get the composition and construct the complete list of elements
                 $scope.selectedComp = $localStorage.world.compositions[QObject.compName]
                 //$scope.selectedComp = QObject.meta.compName
@@ -378,7 +369,6 @@ angular.module("pocApp")
                 $scope.treeData.push(root)
                 $scope.selectedComp.sections.forEach(function (sect) {
                     let sectionData = {level:'section',name:sect.name}
-
                     let sectionNode = {id:sect.name,text:sect.name,parent:'root',data:sectionData}
                     sectionNode.icon = `icons/icon-q-group.png`  //the default icon
 
@@ -386,17 +376,12 @@ angular.module("pocApp")
                 })
 
                 QObject.content = $scope.treeData
-                drawtree($scope.treeData)
+               // drawtree($scope.treeData)
 
             }
 
 
-/*
-            $timeout(function () {
-                $scope.initQ($scope.world.compositions['PathRequest'])
 
-            },500)
-*/
             function drawtree(treeData) {
                 //noyt completely sure this is the best place to update the local
                 //$localStorage.allQObject[$scope.currentQObject.name].content = treeData

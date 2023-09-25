@@ -1,47 +1,6 @@
 <div>
 
-  <div>
 
-    <div ng-show = "false" class="row">
-      <div class="col-md-3">
-
-      </div>
-      <div class="col-md-9">
-        <button class="btn btn-danger">Publish to POC</button>
-      </div>
-    </div>
-
-    <br/>
-    <div ng-show="false" class="row">
-      <div class="col-md-3">
-
-        <select class="form-control" ng-model="local.selectedComp"
-                ng-change="initQ(local.selectedComp)"
-                ng-options="v.title for (k,v) in world.compositions">
-
-        </select>
-
-        <uib-tabset ng-show="false">
-          <uib-tab heading="New Q">
-            <select class="form-control" ng-model="local.selectedComp"
-                    ng-change="initQ(local.selectedComp)"
-                    ng-options="v.title for (k,v) in world.compositions">
-
-            </select>
-          </uib-tab>
-          <uib-tab heading="Existing Q">
-            <em>Existing Q's that have been defined for Compositions</em>
-          </uib-tab>
-        </uib-tabset>
-
-
-      </div>
-      <div class="col-md-9">
-
-      </div>
-    </div>
-
-  </div>
 
 
   <div class="row">
@@ -68,12 +27,12 @@
       <div class="modelInfo" ng-show="currentQObject">
 
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div>{{currentQObject.name}}</div>
             <div>{{currentQObject.compName}}</div>
             <div>{{currentQObject.description}}</div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div>{{currentQObject.status}} <span ng-show="currentQObject.status == 'checked-out'"> to {{currentQObject.user}}</span> </div>
 
 
@@ -86,14 +45,12 @@
             </div>
 
           </div>
+          <div class="col-md-4">
+            <div class="btn btn-danger pull-right" ng-click="pushToPOC()">Push to POC</div>
+          </div>
         </div>
-
-
-
-
       </div>
 
-      <div class="pull-right" ng-click="qlibraryInteraction(currentQObject)">Compare to library</div>
 
       <uib-tabset>
         <uib-tab heading="Editor tree">
