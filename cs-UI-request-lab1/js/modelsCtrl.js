@@ -6,7 +6,7 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc) {
 
 
-            $scope.version = "0.4.2"
+            $scope.version = "0.4.3"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -154,6 +154,14 @@ angular.module("pocApp")
                         //a composition was passed in. Update (or add to) the $scope.hashAllCompositions
                         $scope.hashAllCompositions[vo.comp.name] = vo.comp
                        // alert("The composition has been added")
+
+                    }
+
+                    if (vo && vo.dg) {
+                        //A DG was selected
+                        $scope.hashAllDG[vo.dg.name] = vo.dg
+                        sortDG()
+                        alert("DG has been downloaded. Please refresh the browser.")
 
                     }
 

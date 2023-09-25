@@ -139,6 +139,14 @@ angular.module("pocApp")
 
             }
 
+            $scope.downloadDG = function(dg) {
+                //set the comp property of the vo and exit. The caller (modelsCtrl.js) will update
+                $scope.$close({dg:dg})
+
+            }
+
+
+
             $scope.refreshFromRepo = function () {
                 if (confirm('Are you sure you wish to refresh your local DGs from the Library')) {
                     let qry = '/model/allDG'

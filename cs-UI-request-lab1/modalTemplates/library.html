@@ -94,6 +94,10 @@
           <div class="col-md-5">
             <div ng-show="input.selectedItem">
 
+              <div class="clickable pull-right"
+                   ng-show = "input.selectedItem.library"
+                   ng-click="downloadDG(input.selectedItem.library )">Download</div>
+
               <uib-tabset>
                 <uib-tab heading="Local">
                   <div class="myScroll">
