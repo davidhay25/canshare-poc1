@@ -8,6 +8,37 @@ angular.module("pocApp")
            // $scope.tumourStream = ['breast','gyne','lung','gi']
 
 
+            $scope.selectDGForSection = function () {
+                //re-using the 'change type' dialog developed for DG
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/changeType.html',
+                    //backdrop: 'static',
+                    size : 'xlg',
+                    controller: 'changeTypeCtrl',
+
+                    resolve: {
+                        ed: function () {
+                            return null
+                        },
+                        hashAllDG: function () {
+                            return $scope.hashAllDG
+                        }
+                    }
+
+                }).result.then(function (vo) {
+
+                    if (vo.class == 'dg') {
+                        $scope.input.newCompType = vo.value
+                    } else {
+                        alert("A DG is expected!")
+                    }
+
+
+                    console.log(vo)
+                })
+
+                }
+
             //Open the library interaction screen that is specific to compositions
             $scope.libraryInteraction = function (comp) {
 

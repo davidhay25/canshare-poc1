@@ -228,6 +228,7 @@
             <div ng-hide ="selectedCompositionNode.data.ed.mult == '0..0'  ||
               selectedCompositionNode.data.ed.zElement || selectedCompositionNode.data.ed.kind == 'root'">
               <button class="btn-link btn pull-right"
+                ng-hide = "selectedCompositionNode.data.ed.kind == 'section'"
                       ng-click="removeElement(selectedCompositionNode.data.ed)">Remove this element</button>
             </div>
 
@@ -240,7 +241,7 @@
 
                 <div ng-show ="selectedCompositionNode.data.ed.kind == 'dg'">
                   <button class="btn-link btn pull-right"
-                          ng-click="termSelectDG({DGName:selectedCompositionNode.data.ed.name})">Display DT in DT tab</button>
+                          ng-click="termSelectDG({DGName:selectedCompositionNode.data.ed.name})">Display DG in DG tab</button>
                 </div>
 
 
@@ -257,10 +258,15 @@
                           uib-typeahead="item.name for item in arDG | filter:$viewValue | limitTo:8" class="form-control">
 
 -->
+
+
+                   <div class="clickable" ng-click="selectDGForSection()">Select DG</div>
+                   <div>Type: {{input.newCompType.name}}</div>
+<!--
                    <select class="form-control" ng-model="input.newCompType"
                            ng-options = "k for (k,v) in world.dataGroups">
                    </select>
-
+-->
                    <br/>
 
                    <div>

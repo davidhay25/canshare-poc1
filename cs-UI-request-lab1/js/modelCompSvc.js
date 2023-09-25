@@ -112,13 +112,17 @@ angular.module("pocApp")
                     } else {
                         //this is a 'leaf'
                         comp.sections.forEach(function (section) {
+
                             //let pathRoot = `${comp.name}.section-${section.name}`   //section root is model name + section name
                             let pathRoot = `${comp.name}.${section.name}`   //section root is model name + section name
                             hashAllElements[pathRoot] = {ed:section}
                             //each item is assumed to be a DG - think about others (Z & override) later
                             section.items.forEach(function (item) {
                                //{name: title: type: mult:}
+
                                 processSectionItem(item,pathRoot)
+
+
                             })
 
                             //let DG = types[section.name]
@@ -148,12 +152,9 @@ angular.module("pocApp")
                 Object.keys(hashAllElements).forEach(function (key) {
                     let item = hashAllElements[key]         // {ed: sectionItem: }
                     delete item.ed.diff //don't think the diff is needed here...
-                    //ed.fullPath = key
                     let clone = angular.copy(item)        //don't want to update the actual model
                     clone.ed.path = key
 
-
-                    //delete clone.ed.diff    //don't think the diff is needed here...
                     ar.push(clone)
                 })
 

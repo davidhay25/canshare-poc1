@@ -332,7 +332,11 @@ angular.module("pocApp")
                     dg.diff.forEach(function (ed) {
                         //let path = ed.path
                         if (ed.path.startsWith(pathToDelete) && ed.path !== pathToDelete) { //don't want it matching on itself!
-                            canDelete = false
+                            if (ed.mult !== '0..0') {
+                                //if the child is deleted, then it's safe to delete this one...
+                                canDelete = false
+                            }
+
                         }
                     })
 

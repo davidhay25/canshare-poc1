@@ -1,15 +1,26 @@
 angular.module("pocApp")
     .controller('changeTypeCtrl',
         function ($scope,ed,hashAllDG,modelsSvc,$uibModal) {
-            $scope.ed = ed
-            $scope.input = {}
 
+            $scope.input = {}
             $scope.input.class = "dg"   //show the DataGroups as the default to select
+
+            $scope.ed = ed
+            let currentType  // = "Patient"
+            if (ed) {
+                currentType = ed.type[0]
+            }
+
+
+
+
+
+
 
             let fhirBase = "http://hl7.org/fhir/R4B/datatypes.html"
 
 
-            let currentType = ed.type[0]
+
 
             $scope.fhirTypes = modelsSvc.fhirDataTypes()
 
