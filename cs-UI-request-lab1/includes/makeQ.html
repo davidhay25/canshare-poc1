@@ -48,25 +48,48 @@
     <div ng-class="leftPanel">
 
       <div class="list-group">
-        <div ng-class="{'list-group-item':true,listItemSelected:currentQObject.meta.name == k}"
+        <div ng-class="{'list-group-item':true,listItemSelected:currentQObject.name == k}"
              style="cursor: pointer"
-             ng-repeat = "(k,v) in allQObject"
+
+             ng-repeat = "(k,v) in hashLibraryQO"
+
              ng-click = "selectQObject(v)">
-          {{v.meta.name}}
-          <div><em>{{v.meta.compName}}</em></div>
+          {{v.name}}
+          <div><em>{{v.compName}}</em></div>
         </div>
       </div>
 
 
 
-      <button class="btn btn-link" ng-click="newQObject()">New Q</button>
+      <button class="btn btn-link" ng-show="user" ng-click="newQObject()">New Q</button>
     </div>
     <div ng-class="rightPanel">
 
-      <div class="modelInfo">
-        <div class="pull-right">{{currentQObject.meta.compName}}</div>
-        <div>{{currentQObject.meta.name}}</div>
-        <div>{{currentQObject.meta.description}}</div>
+      <div class="modelInfo" ng-show="currentQObject">
+
+        <div class="row">
+          <div class="col-md-6">
+            <div>{{currentQObject.name}}</div>
+            <div>{{currentQObject.compName}}</div>
+            <div>{{currentQObject.description}}</div>
+          </div>
+          <div class="col-md-6">
+            <div>{{currentQObject.status}} <span ng-show="currentQObject.status == 'checked-out'"> to {{currentQObject.user}}</span> </div>
+
+
+            <div ng-show = "currentQObject.status == 'checked-out' && currentQObject.user == user.email">
+              <div class="btn btn-link" ng-click="checkin()">Check in</div>
+            </div>
+
+            <div ng-hide = "currentQObject.status == 'checked-out' || ! user">
+              <div class="btn btn-link" ng-click="checkout()">Check out</div>
+            </div>
+
+          </div>
+        </div>
+
+
+
 
       </div>
 
@@ -81,14 +104,14 @@
               <div id="qtree"></div>
 
               <br/>
-              <div ng-show="allowAddGroup" class="clickable" ng-click="addGroup(selectedQNode)">
+              <div ng-show="allowAddGroup && canEdit" class="clickable" ng-click="addGroup(selectedQNode)">
                 Add Group
               </div>
             </div>
 
 
             <div class="col-md-4">
-              <div>
+              <div ng-show="canEdit">
 
                 <div ng-show="selectedQNode.data.level == 'group'">
                   <div class="banner">Group details</div>
@@ -99,24 +122,6 @@
                   <br/>
                 </div>
 
-                <div ng-show="selectedQNode.data.level == 'element'">
-                  <div class="banner">Selected element details</div>
-
-                  <table class="table table-bordered">
-                    <tr><td>Path</td><td>{{selectedQNode.data.ed.path | dropFirstInPath}}</td></tr>
-                    <tr><td>Title</td><td>{{selectedQNode.data.ed.title }}</td></tr>
-                    <tr><td>Description</td><td>{{selectedQNode.data.ed.description }}</td></tr>
-                    <tr><td>Data type</td><td>{{selectedQNode.data.ed.type[0] }}</td></tr>
-                    <tr><td>Control type</td><td>{{selectedQNode.data.controlType }}</td></tr>
-                    <tr><td>Cardinality</td><td>{{selectedQNode.data.ed.mult }}</td></tr>
-                  </table>
-
-                  <div class="clickable" ng-click="removeElement()">Remove this element</div>
-                  <!--
-                            <pre>{{selectedQNode.data | json}}</pre>
-                  -->
-
-                </div>
 
 
                 <div ng-hide="selectedQNode.data.level == 'element'">
@@ -136,6 +141,25 @@
 
               </div>
 
+
+              <div ng-show="selectedQNode.data.level == 'element'">
+                <div class="banner">Selected element details</div>
+
+                <table class="table table-bordered">
+                  <tr><td>Path</td><td>{{selectedQNode.data.ed.path | dropFirstInPath}}</td></tr>
+                  <tr><td>Title</td><td>{{selectedQNode.data.ed.title }}</td></tr>
+                  <tr><td>Description</td><td>{{selectedQNode.data.ed.description }}</td></tr>
+                  <tr><td>Data type</td><td>{{selectedQNode.data.ed.type[0] }}</td></tr>
+                  <tr><td>Control type</td><td>{{selectedQNode.data.controlType }}</td></tr>
+                  <tr><td>Cardinality</td><td>{{selectedQNode.data.ed.mult }}</td></tr>
+                </table>
+
+                <div class="clickable" ng-show="canEdit" ng-click="removeElement()">Remove this element</div>
+                <!--
+                          <pre>{{selectedQNode.data | json}}</pre>
+                -->
+
+              </div>
 
 
             </div>

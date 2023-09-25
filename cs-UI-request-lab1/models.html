@@ -57,7 +57,7 @@
     <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
 
     <script>
-        angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage','ngSanitize']).config(function($locationProvider) {
+        angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage','ngSanitize',"firebase"]).config(function($locationProvider) {
             $locationProvider.html5Mode(true);
             $locationProvider.hashPrefix('!');
         });
@@ -80,6 +80,8 @@
 
     <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
     <script src="js/libs/jstree.min.js"></script>
+
+    <script src="js/loginCtrl.js"></script>
 
     <script src="js/modelsCtrl.js"></script>
     <script src="js/modelsSvc.js"></script>
@@ -134,6 +136,25 @@
     <script src="js/modelsDemoSvc.js"></script>
     <script src="js/models/ObservationModels.js"></script>
 
+    <script src="js/libs/firebase.js"></script>
+    <script src="js/libs/angularfire.min.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDG1ToLHycsMUX0CfX0OZVSRUUpFQeKE9o",
+            authDomain: "canshare-730e6.firebaseapp.com",
+            projectId: "canshare-730e6",
+            storageBucket: "canshare-730e6.appspot.com",
+            messagingSenderId: "12147821347",
+            appId: "1:12147821347:web:5963d577cb050259475a96"
+        };
+        if (firebase) {
+            console.log('init firebase')
+            firebase.initializeApp(firebaseConfig);
+
+        }
+    </script>
+
 </head>
 <body style="padding: 8px;padding-top: 80px" >
 <div ng-app="topApp" ng-controller="modelsCtrl" class="container-fluid" ng-cloak>
@@ -182,10 +203,33 @@
                 </div>
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="navbar-text" >
                     <div class="pull-right">Version: {{version}}</div>
                 </div>
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <div class="navbar-text " ng-hide="user">
+                    <span style="font-size:1.2em; cursor: pointer" uib-popover="Click to log in"
+                          popover-placement="left"
+                          popover-trigger="'mouseenter'">
+                        <div ng-click="login()">
+                            <i class="glyphicon glyphicon-log-in"></i>
+                        </div>
+                    </span>
+                </div>
+
+                <div class="navbar-text"  ng-show="user">
+                    <span style="font-size:1.2em;  cursor: pointer" uib-popover="{{user.email}}"
+                          popover-placement="left"
+                          popover-trigger="'mouseenter'">
+                        <div ng-click="logout()">
+                            <i class="glyphicon glyphicon-log-out"></i>
+                        </div>
+                    </span>
+                </div>
+
             </div>
 
             <div class="col-md-1">

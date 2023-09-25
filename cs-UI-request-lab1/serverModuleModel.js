@@ -207,7 +207,7 @@ async function setup(app) {
     // ============== questionnnaire objects - not Q resources
 
 
-    //get all active datagroups
+    //get all active datagroups. For now, return the whiole thing - if size becomes an issue, then just return the meta element
     app.get('/model/allQObject', async function(req,res) {
         //retrieve the QO
 
@@ -215,13 +215,14 @@ async function setup(app) {
         const query =  {}// {active:true} // active: { $lt: 15 } };
         try {
             const cursor = await colQO.find(query).toArray()
-            let arQO = []
+            let hashQO = {}
             cursor.forEach(function (doc) {
                 delete doc['_id']
-                arQO.push(doc)
+                hashQO[doc.name] = doc
+
             })
 
-            res.json(arQO)
+            res.json(hashQO)
         } catch(ex) {
             console.log(ex)
             res.status(500).json(ex.message)

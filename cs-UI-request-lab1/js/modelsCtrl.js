@@ -77,6 +77,52 @@ angular.module("pocApp")
             $scope.hxDGLoad = []        //a history of DG's that were loaded by termSelectDGItem
 
 
+
+
+            //--------- login stuff
+            //called whenever the auth state changes - eg login/out, initial load, create user etc.
+            firebase.auth().onAuthStateChanged(function(user) {
+                console.log('auth state change')
+                if (user) {
+                    console.log('logged in')
+                    $scope.user = {email:user.email,displayName : user.displayName}
+                    console.log($scope.user)
+                    //$scope.loadAllQ()
+                    $scope.$digest()
+                } else {
+                    delete $scope.user
+
+                    //$scope.loadAllQ()
+                    $scope.$digest()
+                }
+
+
+
+            });
+
+            $scope.login=function(){
+                $uibModal.open({
+                    backdrop: 'static',      //means can't close by clicking on the backdrop.
+                    keyboard: false,       //same as above.
+                    templateUrl: 'modalTemplates/login.html',
+                    controller: 'loginCtrl'
+                })
+            };
+
+            $scope.logout=function(){
+                firebase.auth().signOut().then(function() {
+                    delete $scope.user;
+                    alert('You have been logged out')
+                    //modalService.showModal({}, {bodyText: 'You have been logged out'})
+
+                }, function(error) {
+                    alert('Sorry, there was an error logging out - please try again')
+                    //modalService.showModal({}, {bodyText: 'Sorry, there was an error logging out - please try again'})
+                });
+
+            };
+
+
             //all the questionnaire objects (not actual Q)
             $scope.allQObject = $localStorage.allQObject
 
