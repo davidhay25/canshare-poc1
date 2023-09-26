@@ -144,7 +144,7 @@ angular.module("pocApp")
                                 ed.type.forEach(function (typ) {
                                    // console.log(typ)
                                     hashReferences[typ] = hashReferences[typ] || []
-                                    hashReferences[typ].push({name:DG.name,kind:DG.kind,path:ed.path,mode:'uses'})
+                                    hashReferences[typ].push({name:DG.name,kind:DG.kind,path:ed.path,mode:'uses',mult:ed.mult})
                                 })
                             }
                         })
@@ -160,7 +160,7 @@ angular.module("pocApp")
                                     if (item.type) {
                                         item.type.forEach(function (typ) {
                                             hashReferences[typ] = hashReferences[typ] || []
-                                            hashReferences[typ].push({name:comp.name,kind:comp.kind,path:item.name})
+                                            hashReferences[typ].push({name:comp.name,kind:comp.kind,path:item.name,mult:item.mult})
                                         })
                                     }
 

@@ -236,7 +236,7 @@ angular.module("pocApp")
                 if (DG) {
                     Object.keys($scope.tags).forEach(function (tagName) {
                         $scope.tags[tagName].forEach(function (dg) {
-                            if (dg.name == DG.name) {
+                            if (dg && dg.name == DG.name) {
                                 arTags.push(tagName)
                             }
                         })
@@ -353,19 +353,27 @@ angular.module("pocApp")
 
                         //go through each of the DG names against this tag...
                         arDGName.forEach(function (dgName) {
-                            // ... and add if not already there
-                            if ($scope.tags[tagName]) {
-                                let arDG = $scope.tags[tagName]         //this is an array of DG
-                                let ar1 = arDG.filter(dg => dg.name == dgName)
 
-                                if (ar1.length == 0) {
-                                    $scope.tags[tagName].push($scope.hashAllDG[dgName])
+                            //need to check that the local tagged DG actually exists in the local collection
+                            if ($scope.hashAllDG[dgName]) {
+                                // ... and add if not already there
+                                if ($scope.tags[tagName]) {
+                                    let arDG = $scope.tags[tagName]         //this is an array of DG
+                                    let ar1 = arDG.filter(dg => dg.name == dgName)
+
+                                    if (ar1.length == 0) {
+                                        $scope.tags[tagName].push($scope.hashAllDG[dgName])
+                                    }
+
+                                } else {
+                                    $scope.tags[tagName] = [$scope.hashAllDG[dgName]]
+                                    $scope.tagNames.push(tagName)
                                 }
-
-                            } else {
-                                $scope.tags[tagName] = [$scope.hashAllDG[dgName]]
-                                $scope.tagNames.push(tagName)
                             }
+
+
+
+
 
                         })
                     })

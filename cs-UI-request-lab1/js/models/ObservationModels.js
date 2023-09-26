@@ -33,6 +33,7 @@ angular.module("pocApp")
                     description:"The specimen on which this observation was made."})
 
                 dgObservation.diff.push({path:'dar',title:'Data absent reason',type:['CodeableConcept'],mult:"0..1",
+
                     description:"The reason why an observation is not available"})
 
                 dgObservation.diff.push({path:'interpretation',title:'Interpretation',type:['CodeableConcept'],mult:"0..1",
@@ -478,7 +479,7 @@ angular.module("pocApp")
                 //=============  grading
 
                 //DG grading
-                let dgGrading = {kind:"dg",name:'Grading',title:"Grading",diff:[],
+                let dgGrading = {kind:"dg",parent:"Observation",name:'Grading',title:"Grading",diff:[],
                     tags:[{system:'bespoke', code: 'main'},
                         {system:'bespoke', code: 'working'},
                         {system:'dgcategory', code: 'grading'}],
@@ -491,36 +492,55 @@ angular.module("pocApp")
                 dgGrading.diff.push({path:'parameter',title:'Parameter',type:['Observation'],mult:'0..*',
                     description:"A grading parameter (ie criteria) that is used together to calculate the combined grade."})
 
-/*
-                dgGrading.diff.push({path:'date',title:'Date',type:['date'],mult:'0..1'})
-                dgGrading.diff.push({path:'criteria',title:'Criteria',type:['Group'],mult:'0..1'})
-                dgGrading.diff.push({path:'criteria.general',title:'General criteria',type:['Observation'],
-                    mult:'0..*'})
+                dgGrading.diff.push({path:'parameter.valueCodeableConcept',title:'Coded value',type:['CodeableConcept'],mult:'0..1',
+                    description:""})
+                dgGrading.diff.push({path:'parameter.valueRatio',title:'Ratio',type:['Ratio'],mult:'0..1',
+                    description:""})
+                dgGrading.diff.push({path:'parameter.valueInteger',title:'Ratio',type:['Ratio'],mult:'0..1',
+                    description:""})
+                dgGrading.diff.push({path:'parameter.valueString',title:'Ratio',type:['Ratio'],mult:'0..1',
+                    description:""})
 
-                */
 
-                dgGrading.diff.push({path:'grade',title:'Grade',type:['CodeableConcept'],mult:'1..1',
+                /*
+                                dgGrading.diff.push({path:'date',title:'Date',type:['date'],mult:'0..1'})
+                                dgGrading.diff.push({path:'criteria',title:'Criteria',type:['Group'],mult:'0..1'})
+                                dgGrading.diff.push({path:'criteria.general',title:'General criteria',type:['Observation'],
+                                    mult:'0..*'})
+
+                                */
+
+                dgGrading.diff.push({path:'grade',title:'Grade',type:['CodeableConcept'],mult:'0..1',
                     description:"The grade of the cancer based on the given grading system."})
 
-                dgGrading.diff.push({path:'gradeQualifier',title:'Grade qualifier',type:['CodeableConcept'],mult:'0..1',
-                    description:"An indication of whether the grade represents the minimum (at least) grade based on a limited sample (e.g. biopsy)."})
+                dgGrading.diff.push({path:'gradeOther',title:'Grade (other)',type:['string'],mult:'0..1',
+                    description:"The free text grade associated with the other coding system."})
 
-                dgGrading.diff.push({path:'comments',title:'Free text comments about the grading.',type:['string'],mult:'0..1'})
+                dgGrading.diff.push({path:'notGradableReason',title:'Reason not gradable',type:['string'],mult:'0..1',
+                    description: "The free text reason that the tumour is not gradable."})
+                hashDataGroups[dgGrading.name] = dgGrading
+
+
+              //  dgGrading.diff.push({path:'gradeQualifier',title:'Grade qualifier',type:['CodeableConcept'],mult:'0..1',
+              //      description:"An indication of whether the grade represents the minimum (at least) grade based on a limited sample (e.g. biopsy)."})
+
+                dgGrading.diff.push({path:'comments',title:'Comments',type:['string'],mult:'0..1',
+                    "description":"Free text comments about the grading."})
                 hashDataGroups[dgGrading.name] = dgGrading
 
 
                 //sarcoma grading
-                let dgGradingSarcoma = {kind:"dg",parent:'Grading', name:'GradingSarcoma',title:"Sarcoma grading",diff:[],
+                let dgGradingFNCLCC = {kind:"dg",parent:'Grading', name:'GradingFNCLCC',title:"FNCLCC grading",diff:[],
                     tags:[{system:'bespoke', code: 'main'},{system:'dgcategory', code: 'grading'}],
                     profile: "StructureDefinition-SarcomaGrading.html",
                     description:"The grading of a sarcoma using the French Federation of Cancer Centers sarcoma grading system (FNCLCC = Fédération Nationale des Centres de Lutte contre le Cancer). Reference: FNCLCC grading"}
 
-                dgGradingSarcoma.diff.push({path:'system',title:'System',type:['CodeableConcept'],mult:'1..1',
+                dgGradingFNCLCC.diff.push({path:'system',title:'System',type:['CodeableConcept'],mult:'1..1',
                     fixedCoding: {code:"426757001",display:"FNCLCC sarcoma grading system",FQN:"French Federation of Cancer Centers Sarcoma Group grading system (staging scale)"},
                     description:"The system (including version) used to grade the cancer."})
 
 
-                dgGradingSarcoma.diff.push({path:'grade',title:'Grade',type:['CodeableConcept'],mult:'1..1',
+                dgGradingFNCLCC.diff.push({path:'grade',title:'Grade',type:['CodeableConcept'],mult:'0..1',
                     options:[
                         {pt:"FNCLCC grade 1"},
                         {pt:"FNCLCC grade 2"},
@@ -530,7 +550,7 @@ angular.module("pocApp")
 
 
                 //we need to slice the parameter. So the 'parent' element becomes a group, and the slices are nested below it
-                dgGradingSarcoma.diff.push({path:'parameter',title:'Parameter',
+                dgGradingFNCLCC.diff.push({path:'parameter',title:'Parameter',
                     type:['Group'],mult:'0..*',
                     originalType : ["Observation"],     //this is so that the element can be further sliced in the UI
                     description:"This is a sliced element to specify the possible parameter observations"})
@@ -538,14 +558,14 @@ angular.module("pocApp")
 
                 //now the slice for tumour differentiation
 
-                dgGradingSarcoma.diff.push({path:'parameter.slice:tumourDiff',title:'Tumour differentiation',
+                dgGradingFNCLCC.diff.push({path:'parameter.slice:tumourDiff',title:'Tumour differentiation',
                     type:['Observation'],mult:'1..1'})
 
-                dgGradingSarcoma.diff.push({path:'parameter.slice:tumourDiff.code',title:'Code',
+                dgGradingFNCLCC.diff.push({path:'parameter.slice:tumourDiff.code',title:'Code',
                     fixedCoding : {display:'tumour differentiation code'},
                     type:['CodeableConcept'],mult:'0..1'})
 
-                dgGradingSarcoma.diff.push({path:'parameter.slice:tumourDiff.interpretation',title:'Interpretation',type:['CodeableConcept'],mult:"1..1",
+                dgGradingFNCLCC.diff.push({path:'parameter.slice:tumourDiff.interpretation',title:'Interpretation',type:['CodeableConcept'],mult:"1..1",
                     options:[
                         {pt:"FNCLCC tumour differentiation score 1"},
                         {pt:"FNCLCC tumour differentiation score 2"},
@@ -556,14 +576,14 @@ angular.module("pocApp")
 
 
                 //now the slice for mitotic count
-                dgGradingSarcoma.diff.push({path:'parameter.slice:mitoticCount',title:'Mitotic count',
+                dgGradingFNCLCC.diff.push({path:'parameter.slice:mitoticCount',title:'Mitotic count',
                     type:['Observation'],mult:'1..1'})
 
-                dgGradingSarcoma.diff.push({path:'parameter.slice:mitoticCount.code',title:'Code',
+                dgGradingFNCLCC.diff.push({path:'parameter.slice:mitoticCount.code',title:'Code',
                     fixedCoding : {display:'mitotic count code'},
                     type:['CodeableConcept'],mult:'0..1'})
 
-                dgGradingSarcoma.diff.push({path:'parameter.slice:mitoticCount.interpretation',title:'Interpretation',type:['CodeableConcept'],mult:"1..1",
+                dgGradingFNCLCC.diff.push({path:'parameter.slice:mitoticCount.interpretation',title:'Interpretation',type:['CodeableConcept'],mult:"1..1",
                     options:[
                         {pt:"FNCLCC sarcoma mitotic count score 1"},
                         {pt:"FNCLCC sarcoma mitotic count score 2"},
@@ -573,16 +593,16 @@ angular.module("pocApp")
 
 
                 //now the slice for necrosis percentage
-                dgGradingSarcoma.diff.push({path:'parameter.slice:necrosisPercentage',title:'Necrosis percentage',
+                dgGradingFNCLCC.diff.push({path:'parameter.slice:necrosisPercentage',title:'Necrosis percentage',
                     type:['Observation'],mult:'1..1'})
-                dgGradingSarcoma.diff.push({path:'parameter.slice:necrosisPercentage.code',title:'Code',
+                dgGradingFNCLCC.diff.push({path:'parameter.slice:necrosisPercentage.code',title:'Code',
                     fixedCoding : {display:'necrosis percentage code'},
                     type:['CodeableConcept'],mult:'1..1'})
 
 
 
 
-                hashDataGroups[dgGradingSarcoma.name] = dgGradingSarcoma
+                hashDataGroups[dgGradingFNCLCC.name] = dgGradingFNCLCC
 
 /*
  this stuff was in ancillary study

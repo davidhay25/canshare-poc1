@@ -2,7 +2,7 @@
 //todo add direct lint to SS from DT
 angular.module("pocApp")
 
-    .service('modelsDemoSvc', function(modelsObservationSvc) {
+    .service('modelsDemoSvc', function(modelsObservationSvc,modelsStagingSvc) {
 
             return {
 
@@ -21,7 +21,7 @@ angular.module("pocApp")
                     let hashVS = {}         //VS by name (not url)
 
                     modelsObservationSvc.getModels(hashDataGroups)      //Observations and children
-
+                    modelsStagingSvc.getModels(hashDataGroups)      //Staging and children. Must be after Observations
                     //---------- DataGroups
 
                     //testing parent
@@ -105,16 +105,7 @@ angular.module("pocApp")
 
                     hashDataGroups[dgComponent.name] = dgComponent
 
-                    //DG staging
-                    let dgStaging = {kind:"dg",name:'Staging',title:"Staging",diff:[],
-                        description:"Staging information used to describe the prognosis of the specific disease at a given time in the patient's cancer journey."}
-                    dgStaging.diff.push({path:'system',title:'System',type:['CodeableConcept'],mult:'0..1'})
-                    dgStaging.diff.push({path:'date',title:'Date',type:['date'],mult:'0..1'})
-                    dgStaging.diff.push({path:'timing',title:'Timing',type:['CodeableConcept'],mult:'0..1'})
-                    dgStaging.diff.push({path:'component',title:'Component',type:['Component'],mult:'0..*'})
-                    dgStaging.diff.push({path:'stage',title:'Stage',type:['CodeableConcept'],mult:'0..1'})
-                    dgStaging.diff.push({path:'additionalDetails',title:'Additional details',type:['string'],mult:'0..1'})
-                    hashDataGroups[dgStaging.name] = dgStaging
+
 
 
 
@@ -174,8 +165,8 @@ angular.module("pocApp")
                         description:'Clockface orientation from the landmark'})
                     dgBodySite.diff.push({path:'distance',title:'Distance',type:['Quantity'],mult:'0..1',
                         description:'The distance from the given landmark'})
-                    dgBodySite.diff.push({path:'description',title:'Description',type:['string'],mult:'0..1',
-                        description:'Text description of the body site'})
+                    dgBodySite.diff.push({path:'description',title:'Comments',type:['string'],mult:'0..1',
+                        description:'Free text comments describing the body site'})
 
 
 

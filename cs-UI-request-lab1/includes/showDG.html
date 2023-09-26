@@ -765,9 +765,9 @@
 
 <hr/>
 
-      <strong>DataGroups that reference this one</strong>
+      <strong>DataGroups and Compositions that reference this one</strong>
       <table class="table table-bordered">
-        <tr><th>Name</th><th>Path</th><th>Kind</th></tr>
+        <tr><th>Name</th><th>Path</th><th>Kind</th><th>Card.</th><th>Mode</th></tr>
         <tr ng-repeat="item in xref[selectedModel.name] track by $index">
           <td>
             <div class="clickable" ng-click="selectModelFromList(item.name,item.kind)">
@@ -778,6 +778,8 @@
           </td>
           <td>{{item.path}}</td>
           <td>{{item.kind}}</td>
+          <td>{{item.mult}}</td>
+          <td>{{item.mode}}</td>
         </tr>
       </table>
 

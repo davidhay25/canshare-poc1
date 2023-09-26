@@ -111,6 +111,11 @@ angular.module("pocApp")
                         //tmp processComp(types[comp.parent])     //the parent property is the name of the parent
                     } else {
                         //this is a 'leaf'
+
+
+                        //todo - check for removed sections in th eoverride
+
+
                         comp.sections.forEach(function (section) {
 
                             //let pathRoot = `${comp.name}.section-${section.name}`   //section root is model name + section name
@@ -139,13 +144,7 @@ angular.module("pocApp")
                     Object.keys(comp.override).forEach(function (path) {
                         hashAllElements[path] = {ed:comp.override[path]}
                     })
-                    /*
-                    comp.override.forEach(function (ov) {
-                        console.log(ov)
-                        hashAllElements[ov.path] = ov
 
-                    })
-                    */
                 }
 
                 let ar = []
