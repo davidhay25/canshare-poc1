@@ -54,9 +54,21 @@
           <br/>
           <div class="myScroll">
             <div id="compositionTree"></div>
+
+            <br/>
+            <div><em>Legend:</em></div>
+            <div><strong style="margin-left: 8px">Bold</strong> elements are required</div>
+            <div><span style="color: blue; margin-left: 8px">Blue</span>  elements have a fixed value</div>
+            <div style=" margin-left: 8px">A trailing <strong>*</strong> indicates multiples are supported.</div>
           </div>
 
+
+
+
         </div>
+
+
+
         <div class="col-md-7">
 
 
@@ -150,6 +162,22 @@
                   </div>
                 </div>
 
+
+
+                <div class="row">
+                  <div class="col-md-3">
+                    Fixed value
+                  </div>
+                  <div class="col-md-9">
+                    {{selectedCompositionNode.data.ed.fixedCoding}}
+                    {{selectedCompositionNode.data.ed.fixedString}}
+                    {{selectedCompositionNode.data.ed.fixedDecimal}}
+                  </div>
+                </div>
+
+
+
+
                 <div class="row"  ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
                   <div class="col-md-3">
                     Options List
@@ -192,7 +220,8 @@
                  <div class="col-md-9">
                    {{selectedCompositionNode.data.ed.slice.name}}
                  </div>
-               </div>
+                </div>
+
               </div>
 
               <div class="row" ng-show = "selectedCompositionNode.data.ed.zElement">
@@ -244,29 +273,17 @@
                           ng-click="termSelectDG({DGName:selectedCompositionNode.data.ed.name})">Display DG in DG tab</button>
                 </div>
 
-
-
                <div ng-show="selectedCompositionNode.data.ed.kind == 'section'">
                  <br/><br/>
                  <strong>Add new DG to section</strong>
 
                <div class="row">
                  <div class="col-md-4">
-<!--
-                   <input type="text" ng-model="input.newCompType"
-                          placeholder="DG name"
-                          uib-typeahead="item.name for item in arDG | filter:$viewValue | limitTo:8" class="form-control">
-
--->
 
 
                    <div class="clickable" ng-click="selectDGForSection()">Select DG</div>
                    <div>Type: {{input.newCompType.name}}</div>
-<!--
-                   <select class="form-control" ng-model="input.newCompType"
-                           ng-options = "k for (k,v) in world.dataGroups">
-                   </select>
--->
+
                    <br/>
 
                    <div>
@@ -312,11 +329,17 @@
             <uib-tab heading = "Json">
               <pre>{{selectedCompositionNode.data | json}}</pre>
             </uib-tab>
+
           </uib-tabset>
 
         </div>
       </div>
+
+
     </uib-tab>
+
+
+
 
     <uib-tab heading="Table">
       <div class="tableFixHead">

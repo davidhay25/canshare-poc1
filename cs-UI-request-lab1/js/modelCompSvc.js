@@ -1,6 +1,6 @@
 angular.module("pocApp")
 
-    .service('modelCompSvc', function($q,$http) {
+    .service('modelCompSvc', function($q,$http,modelsSvc,$filter) {
 
         let config = {}
 
@@ -8,7 +8,9 @@ angular.module("pocApp")
         return {
 
 
-            makeFullList: function (comp,inTypes) {
+            makeFullList: function (inComp,inTypes,inHashAllDG) {
+                let comp = angular.copy(inComp)         //as we will be modifying the composition
+                let hashAllDG = angular.copy(inHashAllDG)
                 //generate a full list of elements. Like DG but need to accomodate sections
                 //section name is in the path...
                 //assume that composition hierarcy is only 2 levels - ie a comp can have a parent, but the parent cannot
@@ -32,6 +34,7 @@ angular.module("pocApp")
                 //processes a single DG, adding child elements (recursively) to the hash
                 function processDG(DG,pathRoot) {
 
+                    console.log("ProcessDG:" + DG.name)
                     if (DG.parent) {
                         //todo
                         let parentModel = types[DG.parent]
@@ -61,6 +64,7 @@ angular.module("pocApp")
 
                 //process a single section item. Create and add the section to the hash, then call processDG to get the child elements of the DG
                 function processSectionItem(sectionItem,pathRoot) {
+                    console.log("ProcessSectionItem:"+sectionItem.name)
                     //extract all the elements in the DG,
                     let localPath = sectionItem.name         //the path in the section. Often the DG name
                     let type = sectionItem.type[0]   //one type only
@@ -75,6 +79,38 @@ angular.module("pocApp")
                         let childPathRoot
                         //let childPathRoot = `${pathRoot}.${model.name}`
 
+                        childPathRoot = `${pathRoot}.${localPath}`
+                        hashAllElements[childPathRoot] = {ed:model,host:sectionItem}
+
+
+                        let vo = modelsSvc.getFullListOfElements(model,types,hashAllDG)
+                        let allElementsThisDG = modelsSvc.makeOrderedFullList(vo.allElements)     //orders the list and removes group original children
+
+                        //let allElementsThisDG = vo.allElements      //array of {ed: host: } ed path includes model name
+                        allElementsThisDG.forEach(function (item) {
+                            let ed = item.ed
+                            ed.kind = 'element'
+
+                            let shortPath = $filter('dropFirstInPath')(ed.path)
+
+                            let p
+                            if (ed.type) { p = ed.type[0]}
+                            console.log(shortPath,ed.path,ed.mult,p)
+
+                            let path = `${childPathRoot}.${shortPath}`
+                            hashAllElements[path] = {ed:ed}
+
+                        })
+
+
+
+
+console.log(vo.allElements)
+                        // - temp, checking out using the DG expansion    processDG(model,childPathRoot)
+
+
+
+                        /* not using a slice directly any more
                         //if there's a slice, then add the slice name to the path..
                         if (sectionItem.slice) {
                             //childPathRoot += '-' + DG.slice.name
@@ -94,8 +130,9 @@ angular.module("pocApp")
                             hashAllElements[childPathRoot] = {ed:model,host:sectionItem}
                         }
 
+                        */
 
-                        processDG(model,childPathRoot)
+
 
                     } else {
                         console.log('missing name: ',model)
@@ -106,11 +143,7 @@ angular.module("pocApp")
 
                 //note the assumptions of a single level hierarchy - a parent cannot have another parent
                 function processComp(comp) {
-                    if (comp.parent) {
-                        //this composition has a parent, so process that first
-                        //tmp processComp(types[comp.parent])     //the parent property is the name of the parent
-                    } else {
-                        //this is a 'leaf'
+
 
 
                         //todo - check for removed sections in th eoverride
@@ -134,7 +167,7 @@ angular.module("pocApp")
 
 
                         })
-                    }
+
                 }
 
                 processComp(comp)

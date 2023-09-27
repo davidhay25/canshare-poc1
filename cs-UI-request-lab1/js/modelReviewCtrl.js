@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('modelReviewCtrl',
-        function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$timeout,$uibModal) {
+        function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$timeout,$uibModal,$filter) {
 
             $scope.input = {}
 
@@ -17,6 +17,7 @@ angular.module("pocApp")
             $scope.hashAllCompositions = $localStorage.world.compositions
 
 
+            $scope.hashAllDG = $localStorage.world.dataGroups
 
             let vo1 = modelsSvc.validateModel($localStorage.world)
             $scope.errors = vo1.errors
@@ -175,7 +176,7 @@ angular.module("pocApp")
                 console.log(comp)
 
 
-                let vo = modelCompSvc.makeFullList(comp,$scope.input.types)
+                let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
                 $scope.allCompElements = vo.allElements
                 $scope.hashCompElements = vo.hashAllElements
 

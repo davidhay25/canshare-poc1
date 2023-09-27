@@ -14,7 +14,7 @@
       <div class="col-md-2 col-sm-2">
         <button class="btn btn-primary pull-right"
                 ng-show="(input.class=='dg' && selectedDG) || (input.class=='dt' && selectedDT)"
-                ng-click="select()">Change</button>
+                ng-click="select()">Select</button>
         <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
 
 
@@ -30,7 +30,7 @@
         <div><em>{{ed.description}}</em></div>
       </div>
       <div class="col-md-4">
-        <div class="pull-right">
+        <div class="pull-right" ng-show="ed.type[0]">
           Current type: <strong>{{ed.type[0]}}</strong>
         </div>
       </div>
@@ -47,8 +47,6 @@
     </div>
 
     <div class="row" ng-show="input.class == 'dg'">
-
-
 
       <div class="col-md-4">
 

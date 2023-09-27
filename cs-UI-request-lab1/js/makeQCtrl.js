@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('makeQCtrl',
-        function ($scope,modelCompSvc,$timeout,$uibModal,$localStorage,$uibModal,$http) {
+        function ($scope,modelCompSvc,$timeout,$uibModal,$localStorage,$uibModal,$http,modelsSvc) {
 
             //don't use 'input' as we need $scope.input.types
             $scope.local = {}
@@ -126,8 +126,12 @@ angular.module("pocApp")
                 $scope.selectedComp = $localStorage.world.compositions[QObject.compName]
 
                 //get all the elements for this composition
-                let vo = modelCompSvc.makeFullList($scope.selectedComp,$scope.input.types) //input.types created on the parent scope
-                $scope.allCompElements = vo.allElements
+                let vo = modelCompSvc.makeFullList($scope.selectedComp,$scope.input.types,$scope.hashAllDG) //input.types created on the parent scope
+
+                $scope.allCompElements = modelsSvc.makeOrderedFullList(vo.allElements)     //orders the list and removes group original children
+
+
+                //$scope.allCompElements = vo.allElements
 
                 //needs global scope...
                 $scope.treeData = $scope.currentQObject.content
@@ -358,7 +362,7 @@ angular.module("pocApp")
                 //get the composition and construct the complete list of elements
                 $scope.selectedComp = $localStorage.world.compositions[QObject.compName]
                 //$scope.selectedComp = QObject.meta.compName
-                let vo = modelCompSvc.makeFullList($scope.selectedComp,$scope.input.types) //input.types created on the parent scope
+                let vo = modelCompSvc.makeFullList($scope.selectedComp,$scope.input.types,$scope.hashAllDG) //input.types created on the parent scope
 
 
                 $scope.allCompElements = vo.allElements     //an array

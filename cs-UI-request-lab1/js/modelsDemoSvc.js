@@ -243,7 +243,7 @@ angular.module("pocApp")
                     dgCancerAssessment.diff.push({path:'additionalDetails',title:'Additional details',type:['string'],mult:'0..1',
                         description:'Additional details about this cancer assessment.'})
 
-                    hashDataGroups[dgCancerAssessment.name] = dgCancerAssessment
+                   // no longer used hashDataGroups[dgCancerAssessment.name] = dgCancerAssessment
 
 
 
@@ -545,12 +545,7 @@ angular.module("pocApp")
                         ],
                         description:"The interpretation"})
 
-
-
                     hashDataGroups[dgObservationMC_FNCLCC.name] = dgObservationMC_FNCLCC
-
-
-
 
                     //DataGroup for patient
                     let dgPatient = {kind:"dg",name:'Patient',title:"Patient",diff:[],description:"Name, identifiers, and demographic details about the patient"}
@@ -637,9 +632,6 @@ angular.module("pocApp")
 
                     dgRegimen.diff.push({path:'course-number',title:'Course number type',type:['integer'],mult:"0..1",
                         description:"The course number (sequential number) for this regimen"})
-
-
-
 
 
                     dgRegimen.diff.push({path:'tnm',title:'TNM staging',type:['TNM'],mult:"0..1",

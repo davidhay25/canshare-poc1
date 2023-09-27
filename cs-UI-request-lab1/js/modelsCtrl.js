@@ -63,7 +63,7 @@ angular.module("pocApp")
             $scope.ui.tabQ = 2;
             $scope.ui.tabTerminology = 3;
 
-            $scope.input.mainTabActive = $scope.ui.tabDG
+            //$scope.input.mainTabActive = $scope.ui.tabDG
             //$scope.input.mainTabActive = $scope.ui.tabQ
 
             //used in DG & Comp so when a type is a FHIR DT, we can create a link to the spec
@@ -1168,7 +1168,10 @@ angular.module("pocApp")
                 clearB4Select()
                 $scope.selectedModel = comp
 
-                let vo = modelCompSvc.makeFullList(comp,$scope.input.types)
+                let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
+
+                console.log(vo)
+
                 $scope.allCompElements = vo.allElements
                 $scope.hashCompElements = vo.hashAllElements
 
@@ -1244,23 +1247,6 @@ angular.module("pocApp")
                 $scope.refreshFullList(dg)
 
 
-
-                //warning! this implementation direclty updates fullElementb list
-                //$scope.dgQ = modelsSvc.makeQforDG($scope.fullElementList)
-
-/*
-                let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.input.showFullModel)
-                $scope.fullElementList = vo.allElements
-                $scope.graphData = vo.graphData
-
-                $scope.dgFshLM = igSvc.makeFshForDG(dg,vo.allElements)
-
-                makeGraph()
-
-                let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
-                makeDGTree(treeData)
-*/
-              //  $scope.testQ = QutilitiesSvc.makeItemFromDG(vo.allElements,$scope.hashAllDG)
 
             }
 

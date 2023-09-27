@@ -327,7 +327,7 @@ angular.module("pocApp")
                 return bundle
             },
 
-            makeQforDG : function (fullElementList) {
+            makeQforDGDEP : function (fullElementList) {
                 //make the items object a Q for a DG
                 //todo - use by Composition Q eventually
 
@@ -414,7 +414,7 @@ angular.module("pocApp")
 
             },
 
-            makeQfromModel : function(model, types) {
+            makeQfromModelDEP : function(model, types) {
                 //make a Q that represents a model
                 //all the top level elements on the model are a section
                 //if an element below that has childre it is a group
@@ -667,7 +667,7 @@ angular.module("pocApp")
                 processNode(arLines,hash[rootPath],"")
 
                 //There's a particular issue in that slicing changes the datatype for the 'parent' element to Group
-                //but parents of that element may still perist (they get added as the parents are processed first
+                //but parents of that element may still persist (they get added as the parents are processed first
                 //so create a list of all elements with a type of Group. Then, from the originalType we can create
                 // a list of elements that came directly from the type and remove them (or set mult = 0..0)
                 //only do this if the element was sliced (originalType present).
@@ -687,12 +687,8 @@ angular.module("pocApp")
                                 if (pathToTest.startsWith(prefix) && pathToTest.indexOf('slice:') == -1) {
                                     item.ed.mult = "0..0"
                                 }
-
                             })
                         }
-
-
-
                     }
 
                 })
