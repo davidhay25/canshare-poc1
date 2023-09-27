@@ -58,7 +58,10 @@
 
             <div class="col-md-3">
 
-              <div id="qtree"></div>
+              <div id="qtree">
+
+
+              </div>
 
               <br/>
               <div ng-show="allowAddGroup && canEdit" class="clickable" ng-click="addGroup(selectedQNode)">
@@ -68,35 +71,45 @@
 
 
             <div class="col-md-4">
+
+              <div ng-show="selectedQNode.data.level == 'group'">
+                <div class="banner">Group details</div>
+                <table class="table table-bordered">
+                  <tr><td>Name</td><td>{{selectedQNode.text}}</td></tr>
+                </table>
+
+                <br/>
+              </div>
+
               <div ng-show="canEdit">
 
-                <div ng-show="selectedQNode.data.level == 'group'">
-                  <div class="banner">Group details</div>
-                  <table class="table table-bordered">
-                    <tr><td>Name</td><td>{{selectedQNode.text}}</td></tr>
-                  </table>
-
-                  <br/>
-                </div>
-
-
-
                 <div ng-hide="selectedQNode.data.level == 'element'">
-                  <div ng-show="allElementsThisSection">
-                    <div class="banner">Element that can be added</div>
-                    <div ng-repeat="ed in allElementsThisSection"
-                         style="cursor: pointer"
-                         ng-click="selectElementToAdd($index)">
-                      <div ng-class="{clickable:ed.type}">{{ed.shortPath}}</div>
+
+                  <uib-tabset>
+                    <uib-tab heading="List">
+                      <div ng-show="allElementsThisSection">
+                        <div class="banner">Element that can be added</div>
+                        <div ng-repeat="ed in allElementsThisSection"
+                             style="cursor: pointer"
+                             ng-click="selectElementToAdd($index)">
+                          <div ng-class="{clickable:ed.type}">{{ed.shortPath}}</div>
 
 
-                    </div>
-                  </div>
+                        </div>
+                      </div>
+                    </uib-tab>
+                    <uib-tab heading="Tree">
+
+                    </uib-tab>
+                  </uib-tabset>
+
+
 
 
                 </div>
 
               </div>
+
 
 
               <div ng-show="selectedQNode.data.level == 'element'">
