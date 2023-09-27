@@ -74,7 +74,7 @@ angular.module("pocApp")
             $scope.compUi.tree = 0
             $scope.input.compTabActive = $scope.compUi.tree
 
-            $scope.hxDGLoad = []        //a history of DG's that were loaded by termSelectDGItem
+            $scope.hxDGLoad = []        //a history of DG's that were loaded by termSelectDGItem. Used for the 'back' function
 
 
 

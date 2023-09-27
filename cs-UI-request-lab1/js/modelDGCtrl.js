@@ -293,6 +293,8 @@ angular.module("pocApp")
                 
             }
 
+
+
             $scope.getControlType = function (ed) {
                 if (ed) {
                     let controlType = "input"
