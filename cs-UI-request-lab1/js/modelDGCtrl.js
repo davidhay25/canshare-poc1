@@ -96,14 +96,16 @@ angular.module("pocApp")
                     //if there isn't a category on the DG, is there one on any of their parents
                     let clone = angular.copy(DG)
                     while (clone.parent && ! categoryTag.code) {
-                        categoryTag = findCategoryTag($scope.hashAllDG[clone.parent])
-                        //if (categoryTag.code) {
-                        //    categoryTag.source = clone.name
-                       // }
-                        clone = angular.copy($scope.hashAllDG[clone.parent])
-                        if (! clone) {
-                            console.log('>>>', clone.parent)
+                        if ($scope.hashAllDG[clone.parent]) { //possible for the parent to not be downloaded from the library
+                            categoryTag = findCategoryTag($scope.hashAllDG[clone.parent])
+                            clone = angular.copy($scope.hashAllDG[clone.parent])
+                            if (! clone) {
+                                console.log('>>>', clone.parent)
+                            }
                         }
+
+
+
                     }
                 }
 

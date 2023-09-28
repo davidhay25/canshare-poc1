@@ -78,6 +78,7 @@
         </div>
 
       </div>
+      <div class="clickable" ng-click="deleteDG(selectedModel.name)">Delete</div>
     </div>
 
 
@@ -145,30 +146,6 @@
             </div>
 
 
-            <!--
-                       <input type = "text" class="form-control"
-                              placeholder="New tag "
-                              ng-blur="updateTag(selectedModel.tags)" ng-model="selectedModel.tags"/>
-
-
-
-
-
-                       <div class="row">
-
-                         <div class="col-md-5">
-                           <input type = "text" class="form-control"
-                                  placeholder="New tag "
-                                  ng-blur="updateTag(selectedModel.tags)" ng-model="selectedModel.tags"/>
-                         </div>
-                         <div class="col-md-7">
-                           {{selectedModel.tags}}
-                         </div>
-                       </div>
-                       -->
-
-
-
 
           </td>
         </tr>
@@ -188,19 +165,7 @@
   <div class = "clickable pull-right">
 
     <button class="btn-link btn pull-right" ng-click="dglibraryInteraction(selectedModel)">Compare to library</button>
-<!--
-    <i class="glyphicon glyphicon-cloud-upload pull-right clickable myIcon"
-       uib-popover="Upload this DG to the server"
-       popover-placement="left"
-       popover-trigger="'mouseenter'"
-       ng-click="serverInteraction('up',selectedModel)"></i>
 
-    <i class="glyphicon glyphicon-download-alt pull-right clickable myIcon"
-       uib-popover="Download this DG from the server"
-       popover-placement="left"
-       popover-trigger="'mouseenter'"
-       ng-click="serverInteraction('down',selectedModel)"></i>
-    -->
 
   </div>
 

@@ -53,7 +53,7 @@ angular.module("pocApp")
                             hashCategory[category].push(clone)
                             hashDG[clone.parent] = category
                         }
-                        clone = angular.copy(hashAllDG[clone.parent])
+                        clone = angular.copy(hashAllDG[clone.parent]) || {} //to allow for where the parent has not been downloaded
 
                     }
                 })
@@ -215,7 +215,9 @@ angular.module("pocApp")
             },
 
             makeDgDownload: function (allDG) {
-                //create a download of the DG
+                //create a download of all the DG
+console.log(allDG)
+
             },
 
             makeUpdateList: function (allDG,xref) {

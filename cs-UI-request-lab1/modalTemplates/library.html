@@ -68,28 +68,31 @@
 
         <div class="row">
              <div class="col-md-7">
-               <table class="table table-bordered table-condensed">
-                 <tr><th>Title</th><th>Local count</th><th>Library count</th><th>Note</th></tr>
-                 <tr ng-repeat="item in summary"
-                    ng-class="{listItemSelected:item == input.selectedItem,dtDifferent:item.local.diff.length !== item.library.diff.length}">
-                   <td>
-                     <div class="clickable" ng-click="input.selectedItem = item">{{item.title}}</div>
-                   </td>
-                   <td>{{item.local.diff.length}}
-                     <!--
-                     <div class="clickableDotted"
-                          uib-popover-html="getPopoverHtml(item.local)"
-                          popover-placement="right"
-                          popover-trigger="'mouseenter'">
-                       {{item.local.diff.length}}
-                     </div>
-                     -->
+               <div class="myScroll">
+                 <table class="table table-bordered table-condensed">
+                   <tr><th>Title</th><th>Local count</th><th>Library count</th><th>Note</th></tr>
+                   <tr ng-repeat="item in summary"
+                       ng-class="{listItemSelected:item == input.selectedItem,dtDifferent:item.local.diff.length !== item.library.diff.length}">
+                     <td>
+                       <div class="clickable" ng-click="input.selectedItem = item">{{item.title}}</div>
+                     </td>
+                     <td>{{item.local.diff.length}}
+                       <!--
+                       <div class="clickableDotted"
+                            uib-popover-html="getPopoverHtml(item.local)"
+                            popover-placement="right"
+                            popover-trigger="'mouseenter'">
+                         {{item.local.diff.length}}
+                       </div>
+                       -->
 
-                   </td>
-                   <td>{{item.library.diff.length}}</td>
-                   <td>{{item.note}}</td>
-                 </tr>
-               </table>
+                     </td>
+                     <td>{{item.library.diff.length}}</td>
+                     <td>{{item.note}}</td>
+                   </tr>
+                 </table>
+               </div>
+
              </div>
           <div class="col-md-5">
             <div ng-show="input.selectedItem">

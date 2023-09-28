@@ -63,7 +63,12 @@ angular.module("pocApp")
             $scope.ui.tabQ = 2;
             $scope.ui.tabTerminology = 3;
 
-            //$scope.input.mainTabActive = $scope.ui.tabDG
+            //remember the initial opening tab
+            $localStorage.initialModelTab = $localStorage.initialModelTab || $scope.ui.tabComp
+            $scope.input.mainTabActive = $localStorage.initialModelTab
+            $scope.setInitialTab = function (inx) {
+                $localStorage.initialModelTab = inx
+            }
             //$scope.input.mainTabActive = $scope.ui.tabQ
 
             //used in DG & Comp so when a type is a FHIR DT, we can create a link to the spec
@@ -136,7 +141,7 @@ angular.module("pocApp")
                 }
             }
 
-            $scope.deleteDG = function (dg) {
+            $scope.deleteDGDEP = function (dg) {
                 if (dg) {
                     if (confirm("Are you sure you wish to remove this DG from the local store? If uploaded to the library, it will still be there")) {
                         delete $scope.hashAllDG[dg.name]
@@ -251,6 +256,11 @@ angular.module("pocApp")
 
             //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
             $scope.hashAllDG = $localStorage.world.dataGroups
+
+
+            $scope.downloadDG = function () {
+
+            }
 
             //return a string list of the tags for this DG
             //todo this could be optimized...
@@ -419,6 +429,8 @@ angular.module("pocApp")
                     let vo2 = modelDGSvc.makeTreeViewOfCategories(hashCategories)
                     showCategoryDGTree(vo2.treeData)
 
+                    modelDGSvc.makeDgDownload($scope.hashAllDG)
+
                 },500)
 
 
@@ -575,10 +587,11 @@ angular.module("pocApp")
                     let fullMsg = `Cannot delete this DG. ${arRejectMessage.join(' ')}`
                     alert(fullMsg)
                 } else {
-                    if (confirm("Are you sure you wish to delete this DG? It cannot be recovered")) {
+                    if (confirm("Are you sure you wish to remove this DG from the local store? If uploaded to the library, it will still be there\"")) {
                         delete $scope.hashAllDG[dgName]
                         makeAllDTList()
                         $scope.refreshUpdates()
+                        alert("The DG has been removed. It is advisable to refresh the page.")
                     }
                 }
 
