@@ -124,7 +124,7 @@ angular.module("pocApp")
                     description:"A reference to a code defined by a terminology system determined as a result of making the observation"})
 
 
-                hashDataGroups[dgObservationCMCategory.name] = dgObservationCMCategory
+             //   hashDataGroups[dgObservationCMCategory.name] = dgObservationCMCategory
 
                 //CN category
                 let dgObservationCNCategory = {kind:"dg",parent:"Observation",name:'ObservationCNCategory',
@@ -141,7 +141,7 @@ angular.module("pocApp")
                     description:"A reference to a code defined by a terminology system determined as a result of making the observation"})
 
 
-                hashDataGroups[dgObservationCNCategory.name] = dgObservationCNCategory
+            //    hashDataGroups[dgObservationCNCategory.name] = dgObservationCNCategory
 
                 //CT category
                 let dgObservationCTCategory = {kind:"dg",parent:"Observation",name:'ObservationCTCategory',
@@ -158,7 +158,7 @@ angular.module("pocApp")
                     description:"A reference to a code defined by a terminology system determined as a result of making the observation"})
 
 
-                hashDataGroups[dgObservationCTCategory.name] = dgObservationCTCategory
+          //      hashDataGroups[dgObservationCTCategory.name] = dgObservationCTCategory
 
 
                 //Ki67ProliferationIndex
@@ -227,7 +227,7 @@ angular.module("pocApp")
                     description:"A reference to a code defined by a terminology system determined as a result of making the observation"})
 
 
-                hashDataGroups[dgObservationPMCategory.name] = dgObservationPMCategory
+             //   hashDataGroups[dgObservationPMCategory.name] = dgObservationPMCategory
 
 
                 //CN category
@@ -249,7 +249,7 @@ angular.module("pocApp")
                     description:"A reference to a code defined by a terminology system determined as a result of making the observation"})
 
 
-                hashDataGroups[dgObservationPNCategory.name] = dgObservationPNCategory
+             //   hashDataGroups[dgObservationPNCategory.name] = dgObservationPNCategory
 
                 //PT category
                 let dgObservationPTCategory = {kind:"dg",parent:"Observation",name:'ObservationPTCategory',
@@ -271,7 +271,7 @@ angular.module("pocApp")
                     description:"A reference to a code defined by a terminology system determined as a result of making the observation"})
 
 
-                hashDataGroups[dgObservationPTCategory.name] = dgObservationPTCategory
+            //    hashDataGroups[dgObservationPTCategory.name] = dgObservationPTCategory
 
 
                 //Tumour differentiation

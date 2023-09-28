@@ -6,7 +6,7 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc) {
 
 
-            $scope.version = "0.4.3"
+            $scope.version = "0.4.4"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -122,6 +122,29 @@ angular.module("pocApp")
 
             };
 
+            $scope.resetAll = function () {
+                if (confirm("This will remove all DGs and refresh Core. Are you sure")) {
+                    $localStorage.world = modelsDemoSvc.getDemo()
+                    alert("Reset complete. Please refresh the browser.")
+                }
+            }
+
+            $scope.clearLocal = function () {
+                if (confirm("This will remove all DGs and create an empty environment. Are you sure")) {
+                    $localStorage.world = {compositions:{},dataGroups: {},valueSets:{}}
+                    alert("Reset complete. Please refresh the browser.")
+                }
+            }
+
+            $scope.deleteDG = function (dg) {
+                if (dg) {
+                    if (confirm("Are you sure you wish to remove this DG from the local store? If uploaded to the library, it will still be there")) {
+                        delete $scope.hashAllDG[dg.name]
+                        alert("DG has been removed from the local store. Please refresh the browser.")
+                    }
+                }
+
+            }
 
             //all the questionnaire objects (not actual Q)
             $scope.allQObject = $localStorage.allQObject
@@ -1221,32 +1244,25 @@ angular.module("pocApp")
 
             //only used for DG now
             $scope.selectModel = function (dg) {
-                clearB4Select()
-                $scope.selectedModel = dg
+                if (dg) {
+                    clearB4Select()
+                    $scope.selectedModel = dg
 
-                $scope.refreshUpdates()
-
-
-                //create the list of override elements
-                $scope.overrides = []
-                //$scope.directElements = {}    //elements directly on the DG. These can have fixed values
-                $scope.selectedModel.diff.forEach(function (ed) {
-                    //if there's a dot in the ed path, then it refers to an element in a child...
-                    if (ed.path.indexOf('.') > -1 ) {
-                        $scope.overrides.push(ed)
-                    }
-                })
-
-                //these are for the renderer from forms - todo to be deprecated
-                //$scope.Qobject = modelsSvc.makeQfromModel(dg,$scope.input.types)
-                //$scope.QR = {}
+                    $scope.refreshUpdates()
 
 
+                    //create the list of override elements
+                    $scope.overrides = []
+                    //$scope.directElements = {}    //elements directly on the DG. These can have fixed values
+                    $scope.selectedModel.diff.forEach(function (ed) {
+                        //if there's a dot in the ed path, then it refers to an element in a child...
+                        if (ed.path.indexOf('.') > -1 ) {
+                            $scope.overrides.push(ed)
+                        }
+                    })
 
-
-                $scope.refreshFullList(dg)
-
-
+                    $scope.refreshFullList(dg)
+                }
 
             }
 

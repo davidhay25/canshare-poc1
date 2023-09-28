@@ -123,6 +123,9 @@ async function setup(app) {
 
         try {
 
+            let backup = {type:'hashDG',date: new Date(), data:hashAllDG}
+            await database.collection("backup").insertOne(backup)
+
             //hash is keyed on dg.name
             for (const key of Object.keys(hashAllDG)) {
                 //console.log(key)

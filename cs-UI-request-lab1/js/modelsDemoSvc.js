@@ -59,7 +59,7 @@ angular.module("pocApp")
 
 
 
-                    hashDataGroups[dgParent.name] = dgParent
+                   // hashDataGroups[dgParent.name] = dgParent
 
                     let dgChild = {kind:"dg",name:'a-Child',parent:"a-Parent",title:"Child DG",diff:[],
                         description:"Host for testing inheritance"}
@@ -75,7 +75,7 @@ angular.module("pocApp")
                     dgChild.diff.push({path:'item2',title:'Item2 override',type:['CodeableConcept'],
                         description:"item2 ov",mult:'0..1',fixedCoding:{code:'aaa'}})
 
-                    hashDataGroups[dgChild.name] = dgChild
+                 //   hashDataGroups[dgChild.name] = dgChild
 
 
                     let dgGrandChild = {kind:"dg",name:'a-GrandChild',parent:"a-Child",title:"GrandChild DG",diff:[],
@@ -84,7 +84,7 @@ angular.module("pocApp")
                     dgGrandChild.diff.push({path:'item5',title:'Item5',type:['string'],
                         description:"item5",mult:'0..1'})
 
-                    hashDataGroups[dgGrandChild.name] = dgGrandChild
+               //     hashDataGroups[dgGrandChild.name] = dgGrandChild
                     
 
 
@@ -103,24 +103,13 @@ angular.module("pocApp")
                     dgComponent.diff.push({path:'interpretation',title:'Interpretation',type:['CodeableConcept'],mult:'0..1'})
 
 
-                    hashDataGroups[dgComponent.name] = dgComponent
+                //    hashDataGroups[dgComponent.name] = dgComponent
 
 
 
 
 
-/*
-                    //DG Blood pressure - just an example
-                    let dgBP = {kind:"dg",name:'Bloodpressure',title:"Blood pressure",diff:[]}
-                    dgBP.diff.push({path:'systolic',title:'Systolic pressure',type:['Component'],mult:'1..1'})
-                    dgBP.diff.push({path:'systolic.code',title:'Code',type:['CodeableConcept'],mult:'1..1',
-                        fixedCoding:{code:'8480-6'}})
 
-                    dgBP.diff.push({path:'diastolic',title:'Diastolic pressure',type:['Component'],mult:'1..1'})
-                    dgBP.diff.push({path:'diastolic.code',title:'Code',type:['CodeableConcept'],mult:'1..1',
-                        fixedCoding:{code:'8462-4'}})
-                    // hashDataGroups[dgBP.name] = dgBP
-*/
 
                     //DG prognostic scoring
                     let dgPrognosticScore = {kind:"dg",name:'PrognosticScore',title:"Prognostic score",diff:[]}
@@ -133,7 +122,7 @@ angular.module("pocApp")
 
                     dgPrognosticScore.diff.push({path:'additionalDetails',title:'Additional details',type:['string'],mult:'0..1'})
 
-                    hashDataGroups[dgPrognosticScore.name] = dgPrognosticScore
+                   // hashDataGroups[dgPrognosticScore.name] = dgPrognosticScore
 
                     //DG assessment
                     let dgAssess = {kind:"dg",name:'Assessment',title:"Assessment",diff:[]}
@@ -275,7 +264,7 @@ angular.module("pocApp")
                         description:'Obs code'})
 
 
-                    hashDataGroups[dgCancerAssessmentSarcoma.name] = dgCancerAssessmentSarcoma
+                 //   hashDataGroups[dgCancerAssessmentSarcoma.name] = dgCancerAssessmentSarcoma
 
 
                     //------
@@ -381,7 +370,7 @@ angular.module("pocApp")
 
 
 
-                    hashDataGroups[dgCycle.name] = dgCycle
+           //         hashDataGroups[dgCycle.name] = dgCycle
 
                     //DG history
                     let dgHistory = {kind:"dg",name:'ClinicalHistory',title:"Clinical history",diff:[],
@@ -484,7 +473,7 @@ angular.module("pocApp")
                     dgMedicationAdministration.diff.push({path:'period',title:'Period',type:['Period'],mult:"1..1",
                         description:"The period over which the drug was admnistered"})
 
-                    hashDataGroups[dgMedicationAdministration.name] = dgMedicationAdministration
+             //       hashDataGroups[dgMedicationAdministration.name] = dgMedicationAdministration
 /*
                     //DG Observation
                     let dgObservation = {kind:"dg",name:'Observation',title:"Observation",diff:[],
@@ -545,7 +534,7 @@ angular.module("pocApp")
                         ],
                         description:"The interpretation"})
 
-                    hashDataGroups[dgObservationMC_FNCLCC.name] = dgObservationMC_FNCLCC
+                //    hashDataGroups[dgObservationMC_FNCLCC.name] = dgObservationMC_FNCLCC
 
                     //DataGroup for patient
                     let dgPatient = {kind:"dg",name:'Patient',title:"Patient",diff:[],description:"Name, identifiers, and demographic details about the patient"}
@@ -641,7 +630,7 @@ angular.module("pocApp")
                         description:"A cycle of treatment."})
 
 
-                    hashDataGroups[dgRegimen.name] = dgRegimen
+               //     hashDataGroups[dgRegimen.name] = dgRegimen
 
                     //DG generic specimen
                     let dgSpecimen = {kind:"dg",name:'Specimen',title:"Specimen",diff:[],
@@ -680,7 +669,8 @@ angular.module("pocApp")
                         description:"The involvement of regional lymph ncdes as defined for each cancer site, including absence or presence of cancer, number of positive regional nodes, involvement of specific regional nodal groups, size of nodal metastasis or extension etc "})
                     dgTnmStaging.diff.push({path:'mstage',title:'M stage',type:['CodeableConcept'],mult:"0..1",
                         description:"The absence or presence of distant metastases in site and/or organs outside the local tumour area and regional nodes as defined for each cancer site"})
-                    hashDataGroups[dgTnmStaging.name] = dgTnmStaging
+
+                  //  hashDataGroups[dgTnmStaging.name] = dgTnmStaging
 
                     //Clinical TNM
                     let dgCTnmStaging = {kind:"dg",name:'cTNM',parent:"TNM",title:"Clinical TNM staging",diff:[],
@@ -690,7 +680,7 @@ angular.module("pocApp")
                             code:[{code:"384625004"}],
                             description:"The size and/or contiguous extension of the primary tumour"}
                     )
-                    hashDataGroups[dgCTnmStaging.name] = dgCTnmStaging
+                //    hashDataGroups[dgCTnmStaging.name] = dgCTnmStaging
 
                     //dgSpecimen.diff.push({path:'collection.date',title:'When collected',type:['dateTime']})
 
@@ -717,7 +707,7 @@ angular.module("pocApp")
                         description:"Description of marker at the given position using the given technique",
                         type:['CodeableConcept']})
 
-                    hashDataGroups[dgSpecimenResection.name] = dgSpecimenResection
+              //      hashDataGroups[dgSpecimenResection.name] = dgSpecimenResection
 
 
 
@@ -758,7 +748,7 @@ angular.module("pocApp")
                     dgColonOperation.diff.push({path:'ureter.stents',title:'Were stents employed',type:['CodeableConcept'],
                         description:""})
 
-                    hashDataGroups[dgColonOperation.name] = dgColonOperation
+               //     hashDataGroups[dgColonOperation.name] = dgColonOperation
 
                     //------------- ValueSets
                     let vsAllBodySite = {kind:"vs",name:'all-bodysite',title:'All body sites',url:'',concepts :[]}
@@ -797,7 +787,7 @@ angular.module("pocApp")
                         items:[{name:'regimen',title:"Regimens",type:['Regimen'],mult:'0..*'}]}
                     actNowSummary.sections.push(an3)
 
-                    hashCompositions[actNowSummary.name] = actNowSummary
+                    // hashCompositions[actNowSummary.name] = actNowSummary
 
 
                     //------- Base composition for Path request

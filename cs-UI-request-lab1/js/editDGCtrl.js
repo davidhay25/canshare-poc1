@@ -31,7 +31,7 @@ angular.module("pocApp")
             if (! isNew) {
                 $scope.input.newModelName = model.name
                 $scope.input.newModelTitle = model.title
-                $scope.input.newModelTitle = model.description
+                $scope.input.newModelDescription = model.description
                 if (model.parent) {
                     $scope.input.newModelParent = model.parent
                 }
@@ -310,13 +310,16 @@ angular.module("pocApp")
             //check if this path has been used in the DG
             $scope.checkDuplicatePath = function(path) {
                 $scope.isDuplicatePath = false
-                $scope.allElements.forEach(function (element) {
-                    //element.ed.path = full path
-                    let ar = element.ed.path.split('.')
-                    if (ar[ar.length-1] == path) {
-                        $scope.isDuplicatePath = true
-                    }
-                })
+                if ($scope.allElements) {
+                    $scope.allElements.forEach(function (element) {
+                        //element.ed.path = full path
+                        let ar = element.ed.path.split('.')
+                        if (ar[ar.length-1] == path) {
+                            $scope.isDuplicatePath = true
+                        }
+                    })
+                }
+
             }
 
             //called when a new element is being added. This is linked to the element name
