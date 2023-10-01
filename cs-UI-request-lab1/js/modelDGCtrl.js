@@ -157,14 +157,43 @@ angular.module("pocApp")
                 })
                 
             }
+
+            //get the possible options for a datatype
+            $scope.getControlOptionsDEP = function (ed) {
+                switch (ed.type[0]) {
+                    case "string" :
+                        return ["text-box","multi-line"]
+                        break
+                    case "CodeableConcept" :
+                        return ["drop-down","autocomplete","lookup"]
+                        break
+                }
+
+            }
+
+            $scope.setOtherAllowedStatus = function (ed,allowed) {
+                console.log(allowed)
+
+
+                //need to update the underlying model
+                let path = $filter("dropFirstInPath")(ed.path)
+                for (const ed1 of $scope.selectedModel.diff) {
+                    if (ed1.path == path) {
+                        ed1.otherAllowed = allowed
+                    }
+                }
+
+            }
             
             //is this element able to be sliced
             $scope.canSlice = function (ed) {
                 if (ed && ed.mult) {
+                    //must be multiple
                     if (ed.mult.indexOf('..*')  == -1 ) {
                         return false
                     }
 
+                    //Must be a diff with entries - ie a DG not a DT
                     let type = ed.type[0]
                     let dg = $scope.hashAllDG[type]
                     if (dg && dg.diff.length > 0) {
@@ -175,10 +204,6 @@ angular.module("pocApp")
                         return true
                     }
                 }
-
-
-
-
 
             }
 
@@ -194,12 +219,22 @@ angular.module("pocApp")
                         return
                     }
 
-
                     let clone = angular.copy(ed)  //copy to insert
                     let basePath = $filter('dropFirstInPath')(ed.path)
                     let newPath = `${basePath}.slice:${sliceName}`
+
+                    //make sure this isn't a duplicate path
+                    for (const ed1 of $scope.selectedModel.diff) {
+                        if (ed1.path == newPath) {
+                            alert("This slice name has been used before. Try again.")
+                            return
+                            break
+                        }
+                    }
+
+
                     clone.path = newPath
-                    clone.title = `Slice ${sliceName} from ${basePath}`
+                    clone.title = sliceName //`Slice ${sliceName} from ${basePath}`
                     clone.mult = "0..1"         //set to single, optional
 
                     //if the ed has already been sliced, then originalType saves what it was before setting to group
@@ -259,7 +294,7 @@ angular.module("pocApp")
 
             }
 
-            $scope.displayDGDialog = function (ed) {
+            $scope.displayDGDialogDEP = function (ed) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/dgDialog.html',
                     backdrop: 'static',
@@ -296,8 +331,18 @@ angular.module("pocApp")
             }
 
 
+            $scope.setControlType = function(ed,value) {
+                let path = $filter("dropFirstInPath")(ed.path)
+                for (const ed1 of  $scope.selectedModel.diff) {
+                    if (ed1.path == path) {
+                        ed1.controlType = value
+                        $scope.selectedNode.data.ed.controlType = value  //so the Json is updated
+                        break
+                    }
+                }
+            }
 
-            $scope.getControlType = function (ed) {
+            $scope.getControlTypeDEP = function (ed) {
                 if (ed) {
                     let controlType = "input"
                     if (ed.options) {
@@ -320,7 +365,7 @@ angular.module("pocApp")
 
             }
 
-            //delete the selected item. If the item exists in the DG then it can be removed (or possibly set the mult to 0..0)
+            //delete the selected item. If the item exists in the DG then it can be removed. Don't set the mult to 0..0 as this prevents a new element with that path
             //if not (ie it's inherited) then create an override element
             $scope.deleteDGItem = function (item) {
                 let ar = item.path.split(".")       //this i sthe full path - with prepended dg name
@@ -373,7 +418,9 @@ angular.module("pocApp")
 
                 if (inx > -1) {
                     //set the mult to 0..0
-                    $scope.selectedModel.diff[inx].mult = '0..0'
+                    //$scope.selectedModel.diff[inx].mult = '0..0'
+
+                    $scope.selectedModel.diff.splice(inx,1)
 
                     //$scope.selectedModel.diff.splice(inx,1)
                 } else {

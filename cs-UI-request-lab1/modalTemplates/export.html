@@ -1,0 +1,89 @@
+
+<div>
+
+    <div class="modal-header">
+
+        <div class="row">
+            <div class="col-md-8 col-sm-8">
+                <h3 class="modal-title">Import / Export</h3>
+            </div>
+
+
+            <div class="col-md-4 col-sm-4">
+                <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
+            </div>
+
+
+        </div>
+
+    </div>
+    <div class="modal-body">
+
+        <uib-tabset>
+            <uib-tab heading="Export">
+                <div class="row">
+                    <div class="col-md-6">
+                        <a class="btn btn-link" download="{{downloadLinkJsonName}}"
+                           href="{{downloadLinkJson}}" title="{{downloadLinkJsonName}}" >
+                            Download Json to computer
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        Export all the DataGroups to a JSON file on this computer. This can subsequently be imported into the app using
+                        the next option.
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <a class="btn btn-link" download="{{downloadLinkTSVName}}"
+                           href="{{downTSVLinkJson}}" title="{{downloadLinkTSVName}}" >
+                            Download TSV to computer
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        Export all the DataGroups to a TSV file on this computer.
+
+                        Used for importing into a spreadshseet.
+                    </div>
+                </div>
+
+            </uib-tab>
+            <uib-tab heading="Import">
+                <div class="row"  ng-hide="uploadedDG">
+                    <div class="col-md-6 col-sm-6">
+                        <div ng-hide="uploadedDG">
+                            <input type="file" id="fileUploadFileRef" accept="application/json" />
+                            <button class="btn btn-link" ng-click="uploadJson()">Upload Json file</button>
+                        </div>
+
+
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        Upload a Json file containing DataGroups from the computer, and import them into
+                        the app. The file must have been created using the export option in the other tab.
+                    </div>
+                </div>
+
+                <table class="table table-condensed table-bordered">
+                    <tr ng-repeat="(k,v) in uploadedDG">
+                        <td>{{k}}</td>
+                    </tr>
+                </table>
+
+                <div><button ng-show="uploadedDG" class="btn-link btn pull-right" ng-click="import()">Import DataGroups</button> </div>
+
+
+            </uib-tab>
+        </uib-tabset>
+
+
+
+    </div>
+
+
+    <div class="modal-header">
+
+        Options to export and import DataGroups and Compositions
+    </div>
+</div>

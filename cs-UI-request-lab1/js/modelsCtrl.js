@@ -6,7 +6,7 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc) {
 
 
-            $scope.version = "0.4.4"
+            $scope.version = "0.4.5"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -258,7 +258,32 @@ angular.module("pocApp")
             $scope.hashAllDG = $localStorage.world.dataGroups
 
 
-            $scope.downloadDG = function () {
+            $scope.export = function () {
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/export.html',
+                    backdrop: 'static',
+                    //size : 'lg',
+                    controller: 'exportCtrl',
+
+                    resolve: {
+                        hashAllDG: function () {
+                            return $scope.hashAllDG
+                        }
+                    }
+
+                }).result.then(function (vo) {
+                    if (vo.dgs) {
+                        //a hash of dg
+                        Object.keys(vo.dgs).forEach(function (key) {
+                            let dg = vo.dgs[key]
+                            $scope.hashAllDG[dg.name] = dg
+                        })
+
+                    }
+
+
+                })
 
             }
 
@@ -1341,11 +1366,23 @@ angular.module("pocApp")
 
                             'themes': {name: 'proton', responsive: true}}}
                 ).on('changed.jstree', function (e, data) {
-                    //seems to be the node selection event...
+                    // the node selection event...
 
                     if (data.node) {
+
                         $scope.selectedNode = data.node;
 
+                        //determine the possible control types (in the Q) for this element
+                        delete $scope.qControlOptions
+                        switch ($scope.selectedNode.data.ed.type[0]) {
+                            case "string" :
+                                $scope.qControlOptions =  ["text-box","multi-line"]
+                                break
+                            case "CodeableConcept" :
+                                $scope.qControlOptions =  ["drop-down","autocomplete","lookup"]
+                                break
+                        }
+                        $scope.input.controlType = $scope.selectedNode.data.ed.controlType
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...
@@ -1354,10 +1391,6 @@ angular.module("pocApp")
                     $(this).jstree("open_node",id);
                     //$(this).jstree("open_all");  //open all nodes
 
-
-
-                    //console.log($("#dgTree").jstree(true).get_json('#', { 'flat': true }))
-                    //console.log($("#dgTree").jstree(true).get_json('#'))
 
                     $scope.$digest();
                 });

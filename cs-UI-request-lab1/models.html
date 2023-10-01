@@ -63,6 +63,10 @@
         });
         angular.module("pocApp").constant("moment", moment);
 
+        angular.module("pocApp").config(['$compileProvider', function ($compileProvider) {
+            $compileProvider.aHrefSanitizationWhitelist(/^\s*(http|https?|ftp|mailto|blob):/);
+        }]);
+
         angular.module("formsApp",[])
         angular.module('topApp', ['pocApp', 'formsApp'])
 
@@ -107,7 +111,7 @@
     <script src="js/viewVSCtrl.js"></script>
     <script src="js/showParameters.js"></script>
     <script src="js/editDGItemCtrl.js"></script>
-
+    <script src="js/exportCtrl.js"></script>
     <script src="js/QutilitiesSvc.js"></script>
     <script src="js/igSvc.js"></script>
     <script src="js/setUnitsCtrl.js"></script>
@@ -255,7 +259,7 @@
         <button class="pull-right btn-link btn" ng-click="resetAll()">Reset all</button>
         <button class="pull-right btn-link btn" ng-click="clearLocal()">Clear local</button>
 
-        <button class="pull-right btn-link btn" ng-click="downloadDG()">TSV</button>
+        <button class="pull-right btn-link btn" ng-click="export()">Import / Export</button>
 
 
         <a class="btn pull-right" target="_blank" href="https://docs.google.com/spreadsheets/d/1XU7Jc0BbC5nXgmTu-qVLS-WwJjKO9GLXgjVHVk2WRL0/edit#gid=0">Spreadsheet</a>

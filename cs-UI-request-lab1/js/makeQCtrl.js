@@ -71,21 +71,9 @@ angular.module("pocApp")
             //is specific to the currently selected Q
             let hashElementsUsed = {}
 
-            //list of Q on this browser. Interact with the library to save / download (like comp & DG)
-            //maybe a simpler checkout/in
-
-
-
-
-            //The list is the internal Q object - not the FHIR resource (as the Q can be build from that object)
-            //$scope.listQObjects = $localStorage || []
-
-           // $localStorage.allQObject = $localStorage.allQObject || {}
-           // $scope.allQObject = $localStorage.allQObject
-
 
             //update the library with the current QObject
-            updateLibrary = function () {
+            let updateLibrary = function () {
                 $http.put(`/model/QObject/${$scope.currentQObject.name}`,$scope.currentQObject).then(
                     function () {
                         console.log('save')
@@ -105,6 +93,8 @@ angular.module("pocApp")
             $scope.selectQObject = function (QObject) {
                 $scope.currentQObject = QObject
                 $scope.canEdit = false;
+
+
 
 
                 delete $scope.allElementsThisSection
@@ -135,6 +125,11 @@ angular.module("pocApp")
 
                 //needs global scope...
                 $scope.treeData = $scope.currentQObject.content
+
+                if (!$scope.treeData) {
+                    alert("The contents of this Q could not be found. It should be deleted.")
+                    return
+                }
 
                 //set the hashElementsUsed for this Q
                 hashElementsUsed = {}
@@ -289,6 +284,16 @@ angular.module("pocApp")
                         //the controlHint values are drawn from the Q extension at https://hl7.org/fhir/R4B/valueset-questionnaire-item-control.html
 
                         hashElementsUsed[ed.path] = true
+
+                        let type = ed.type[0]
+                        let model = $scope.hashAllDG[type]
+                        if (model && model.diff && model.diff.length > 0) {
+                            //This is a DG. Add all the child elements (ie those that start with this path)
+                            //if one of the child elements is also a DG then add a group, and add the elents to that group
+                            //if a group is nested, then it is still added directly to the 'section' - ie they are not nested but flattened
+                            alert("This is a DG")
+
+                        }
 
 
                         let controlHint = "string"            //this can be any value - it will be an extension in the Q - https://hl7.org/fhir/R4B/extension-questionnaire-itemcontrol.html

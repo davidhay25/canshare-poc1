@@ -95,11 +95,11 @@ angular.module("pocApp")
                     description:"Mitotic count observation"}
 
                 dgObservationECOG.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'423740007',display:"ECOG performance status",FQN:"Eastern Cooperative Oncology Group performance status (observable entity)"},
+                    fixedCoding:{code:'423740007',display:"ECOG performance status",FSN:"Eastern Cooperative Oncology Group performance status (observable entity)"},
                     description:"ECOG performance status"})
 
                 dgObservationECOG.diff.push({path:'method',title:'Method',type:['CodeableConcept'],mult:"0..1",
-                    fixedCoding:{code:'273437007',display:"ECOG scale for physical assessment",FQN:"Eastern Cooperative Oncology Group scale for physical assessment (assessment scale)"},
+                    fixedCoding:{code:'273437007',display:"ECOG scale for physical assessment",FSN:"Eastern Cooperative Oncology Group scale for physical assessment (assessment scale)"},
                     valueSet:"https://nzhts.digital.health.nz/fhir/ValueSet/canshare-ecog-status",
                     description:"ECOG scale for physical assessment"})
 
@@ -115,7 +115,7 @@ angular.module("pocApp")
                     description:"CM Category"}
 
                 dgObservationCMCategory.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'399387003',display:"cM category",FQN:"cM category (observable entity)"},
+                    fixedCoding:{code:'399387003',display:"cM category",FSN:"cM category (observable entity)"},
                     description:"cM category"})
 
 
@@ -132,7 +132,7 @@ angular.module("pocApp")
                     description:"CN Category"}
 
                 dgObservationCNCategory.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'399534004',display:"cN category",FQN:"cN category (observable entity)"},
+                    fixedCoding:{code:'399534004',display:"cN category",FSN:"cN category (observable entity)"},
                     description:"cN category"})
 
 
@@ -149,7 +149,7 @@ angular.module("pocApp")
                     description:"CT Category"}
 
                 dgObservationCTCategory.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'399504009',display:"cT category",FQN:"cT category (observable entity)"},
+                    fixedCoding:{code:'399504009',display:"cT category",FSN:"cT category (observable entity)"},
                     description:"cT category"})
 
 
@@ -167,7 +167,7 @@ angular.module("pocApp")
                     description:"Ki67 Proliferation Index"}
 
                 dgObservationKi67Prol.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'1255078008',display:"Ki-67 proliferation index",FQN:"Percent of cell nuclei positive for proliferation marker protein Ki-67 in primary malignant neoplasm by immunohistochemistry (observable entity)"},
+                    fixedCoding:{code:'1255078008',display:"Ki-67 proliferation index",FSN:"Percent of cell nuclei positive for proliferation marker protein Ki-67 in primary malignant neoplasm by immunohistochemistry (observable entity)"},
                     description:"Ki67 Proliferation Index"})
 
                 dgObservationKi67Prol.diff.push({path:'valueQuantity',title:'Quantity value',type:['Quantity'],mult:"0..1",
@@ -182,7 +182,7 @@ angular.module("pocApp")
                     description:"Necrosis"}
 
                 dgObservationNecrosis.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'405921002',display:"Necrosis",FQN:"Percentage of neoplasm involved by necrosis (observable entity)"},
+                    fixedCoding:{code:'405921002',display:"Necrosis",FSN:"Percentage of neoplasm involved by necrosis (observable entity)"},
                     description:"Necrosis"})
 
                 //take out method
@@ -213,7 +213,7 @@ angular.module("pocApp")
                     description:"PM Category"}
 
                 dgObservationPMCategory.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'371497001',display:"pM category",FQN:"pM category (observable entity)"},
+                    fixedCoding:{code:'371497001',display:"pM category",FSN:"pM category (observable entity)"},
                     description:"pM category"})
 
                 dgObservationPMCategory.diff.push({path:'method',title:'Method',type:['CodeableConcept'],mult:"0..1",
@@ -236,7 +236,7 @@ angular.module("pocApp")
                     description:"PN Category"}
 
                 dgObservationPNCategory.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'371494008',display:"pN category",FQN:"pN category (observable entity)"},
+                    fixedCoding:{code:'371494008',display:"pN category",FSN:"pN category (observable entity)"},
                     description:"pN category"})
 
                 dgObservationPNCategory.diff.push({path:'method',title:'Method',type:['CodeableConcept'],mult:"0..1",
@@ -257,7 +257,7 @@ angular.module("pocApp")
                     description:"PT Category"}
 
                 dgObservationPTCategory.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'384625004',display:"pT category",FQN:"pT category (observable entity)"},
+                    fixedCoding:{code:'384625004',display:"pT category",FSN:"pT category (observable entity)"},
                     description:"cT category"})
 
                 dgObservationPTCategory.diff.push({path:'method',title:'Method',type:['CodeableConcept'],mult:"0..1",
@@ -280,11 +280,11 @@ angular.module("pocApp")
                     description:"Tumour differentiation"}
 
                 dgObservationTumourDiff.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'0000',display:"Tumour differentiation",FQN:"Tumour differentiation (observable entity)"},
+                    fixedCoding:{code:'0000',display:"Tumour differentiation",FSN:"Tumour differentiation (observable entity)"},
                     description:"Code of Tumour differentiation"})
 
                 dgObservationTumourDiff.diff.push({path:'dar',title:'Data absent reason',type:['CodeableConcept'],mult:"0..1",
-                    fixedCoding:{code:'1156316003',display:"Cannot be assessed",FQN:"Cannot be determined (qualifier value)"},
+                    fixedCoding:{code:'1156316003',display:"Cannot be assessed",FSN:"Cannot be determined (qualifier value)"},
                     description:"The reason why an observation is not available"})
 
                 dgObservationTumourDiff.diff.push({path:'valueQuantity',title:'Quantity value',type:['Quantity'],mult:"0..1",
@@ -345,7 +345,7 @@ angular.module("pocApp")
                     description:"ERTumourStatus"}
 
                 dgObservationER.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'445028008',display:"ER tumour status",FQN:"Presence of estrogen receptor in neoplasm (observable entity)"},
+                    fixedCoding:{code:'445028008',display:"ER tumour status",FSN:"Presence of estrogen receptor in neoplasm (observable entity)"},
                     description:"cT category"})
 
                 dgObservationER.diff.push({path:'method',title:'Method',type:['CodeableConcept'],mult:"1..1",
@@ -364,7 +364,7 @@ angular.module("pocApp")
                     description:"PRTumourStatus"}
 
                 dgObservationPR.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'445029000',display:"PR tumour status",FQN:"Presence of progesterone receptor in neoplasm (observable entity)"},
+                    fixedCoding:{code:'445029000',display:"PR tumour status",FSN:"Presence of progesterone receptor in neoplasm (observable entity)"},
                     description:"PR status"})
 
                 dgObservationPR.diff.push({path:'method',title:'Method',type:['CodeableConcept'],mult:"1..1",
@@ -382,7 +382,7 @@ angular.module("pocApp")
                     description:"HER2 tumour status"}
 
                 dgObservationHER2.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'261811000210109',display:"HER2 protein tumour status",FQN:"Presence of receptor tyrosine kinase erbB-2 in primary malignant neoplasm (observable entity)"},
+                    fixedCoding:{code:'261811000210109',display:"HER2 protein tumour status",FSN:"Presence of receptor tyrosine kinase erbB-2 in primary malignant neoplasm (observable entity)"},
                     description:"HER2 status"})
 
                 dgObservationHER2.diff.push({path:'method',title:'Method',type:['CodeableConcept'],mult:"1..1",
@@ -402,11 +402,11 @@ angular.module("pocApp")
                     description:"Immunohistochemistry"}
 
                 dgImmunoHistoChem.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'< 1234806008',display:"Observation using immunohistochemistry",FQN:"Observation using immunohistochemistry (observable entity)"},
+                    fixedCoding:{code:'< 1234806008',display:"Observation using immunohistochemistry",FSN:"Observation using immunohistochemistry (observable entity)"},
                     description:"Code of Observation using immunohistochemistry. Any descendant allowed"})
 
                 dgImmunoHistoChem.diff.push({path:'method',title:'Method',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'117617002',display:"Immunohistochemistry procedure",FQN:"Immunohistochemistry procedure (procedure)"},
+                    fixedCoding:{code:'117617002',display:"Immunohistochemistry procedure",FSN:"Immunohistochemistry procedure (procedure)"},
                     description:"Fixed method code"})
 /*
                 dgImmunoHistoChem.diff.push({path:'failureReason',title:'Failure reason',type:['CodeableConcept'],mult:"1..1",
@@ -445,7 +445,7 @@ angular.module("pocApp")
                     description:"Cytogenic procedure"}
 /*
                 dgCytogenic.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'< 1234806008',display:"Observation using immunohistochemistry",FQN:"Observation using immunohistochemistry (observable entity)"},
+                    fixedCoding:{code:'< 1234806008',display:"Observation using immunohistochemistry",FSN:"Observation using immunohistochemistry (observable entity)"},
                     description:"Code of Observation using immunohistochemistry. Any descendant allowed"})
 */
                 dgCytogenic.diff.push({path:'method',title:'Method',type:['CodeableConcept'],mult:"1..1",
@@ -464,11 +464,11 @@ angular.module("pocApp")
                     description:"MolecularGenetic procedure"}
 
                 dgMolecularGenetic.diff.push({path:'code',title:'Code',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'20889005',display:"Genetic marker",FQN:"Genetic marker, function (observable entity)"},
+                    fixedCoding:{code:'20889005',display:"Genetic marker",FSN:"Genetic marker, function (observable entity)"},
                     description:"Code of genetic marker"})
 
                 dgMolecularGenetic.diff.push({path:'method',title:'Method',type:['CodeableConcept'],mult:"1..1",
-                    fixedCoding:{code:'405825005',display:"Molecular genetic test",FQN:"Molecular genetic test (procedure)"},
+                    fixedCoding:{code:'405825005',display:"Molecular genetic test",FSN:"Molecular genetic test (procedure)"},
 
                     description:"Fixed method"})
 
@@ -536,7 +536,7 @@ angular.module("pocApp")
                     description:"The grading of a sarcoma using the French Federation of Cancer Centers sarcoma grading system (FNCLCC = Fédération Nationale des Centres de Lutte contre le Cancer). Reference: FNCLCC grading"}
 
                 dgGradingFNCLCC.diff.push({path:'system',title:'System',type:['CodeableConcept'],mult:'1..1',
-                    fixedCoding: {code:"426757001",display:"FNCLCC sarcoma grading system",FQN:"French Federation of Cancer Centers Sarcoma Group grading system (staging scale)"},
+                    fixedCoding: {code:"426757001",display:"FNCLCC sarcoma grading system",FSN:"French Federation of Cancer Centers Sarcoma Group grading system (staging scale)"},
                     description:"The system (including version) used to grade the cancer."})
 
 

@@ -25,7 +25,10 @@ async function listDatabasesDEP(client){
 
 async function setup(app) {
     console.log("Setting up connection to mongodb in serverModuleModel")
-    const uri = "mongodb://127.0.0.1:27017";
+
+    //const uri = "mongodb+srv://canshare:meUQP7RjdaVVTMuS@cluster0.okom61e.mongodb.net/?retryWrites=true&w=majority"
+
+    const uri = "mongodb://127.0.0.1:27017"  //local machine
     const client = new MongoClient(uri);
     database = client.db("canShare")
     await client.connect()

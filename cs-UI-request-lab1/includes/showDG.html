@@ -177,7 +177,7 @@
       <br/>
       <div class="row">
         <div class="col-md-6">
-          <div class="pull-right clickable" ng-click="expandDTTree()">Expand all ({{fullElementList.length}})</div>
+          <div class="pull-right clickable" ng-click="expandDTTree()">Expand all ({{fullElementList.length -1}})</div>
           <div id="dgTree"></div>
 
           <div>
@@ -259,20 +259,35 @@
 
                       {{type}}&nbsp;
 
+                      <div ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
+                        <checkbox
+                                ng-change = "setOtherAllowedStatus(selectedNode.data.ed,selectedNode.data.ed.otherAllowed)"
+                                ng-model="selectedNode.data.ed.otherAllowed"></checkbox>
+                         'Other' value allowed
+
+
+                      </div>
+
                     </div>
                     </td></tr>
 
-                  <tr ng-show = "selectedNode.data.ed.path !== selectedModel.name && selectedNode.data.ed.type[0] !== 'Group'">
+                  <tr ng-show = "selectedNode.data.ed.path !== selectedModel.name && selectedNode.data.ed.type[0] !== 'Group'" && qControlOptions>
                     <td>Input control</td>
                     <td>
                       <div class="row">
                         <div class="col-md-8">
+
+                          <span ng-repeat = "opt in qControlOptions">
+                            <input type="radio"
+                                   ng-change="setControlType(selectedNode.data.ed,opt)"
+                                   ng-model="input.controlType" value="{{opt}}"> {{opt}}
+                          </span>
                         </div>
                         <div class="col-md-4">
                         </div>
                       </div>
 
-
+<!--
                       <div class="row">
                         <div class="col-md-12">
                           <div ng-switch="getControlType(selectedNode.data.ed)">
@@ -302,7 +317,7 @@
 
                         </div>
                       </div>
-
+-->
 
                     </td>
 

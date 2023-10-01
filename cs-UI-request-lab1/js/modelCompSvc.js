@@ -73,7 +73,7 @@ angular.module("pocApp")
                     //let type = DG.name   //one type only
                     let model = types[type]    //this could be a FHIR DT or a DG. A DG will have a name, a DT will not
 
-                    if (model.name) {
+                    if (model && model.name) {
                         //This is a DG. todo need to think about DG inheritance
 
                         let childPathRoot
@@ -137,6 +137,8 @@ console.log(vo.allElements)
                     } else {
                         console.log('missing name: ',model)
                         //this is a Z element - ie a FHIR DT directly attached to the section
+                        // or a missing DG
+                        alert(`Missing type: ${type} (may be a z element - will be fixing if so`)
                     }
 
                 }
