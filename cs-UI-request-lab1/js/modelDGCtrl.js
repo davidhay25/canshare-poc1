@@ -331,12 +331,12 @@ angular.module("pocApp")
             }
 
 
-            $scope.setControlType = function(ed,value) {
+            $scope.setControlHint = function(ed,value) {
                 let path = $filter("dropFirstInPath")(ed.path)
                 for (const ed1 of  $scope.selectedModel.diff) {
                     if (ed1.path == path) {
-                        ed1.controlType = value
-                        $scope.selectedNode.data.ed.controlType = value  //so the Json is updated
+                        ed1.controlHint = value
+                        $scope.selectedNode.data.ed.controlHint = value  //so the Json is updated
                         break
                     }
                 }

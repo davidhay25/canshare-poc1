@@ -47,10 +47,12 @@ angular.module("pocApp")
                             let type = ed.type[0]
                             let model = types[type]
                             if (model && model.name) {
+                                model.kind = 'dg'  //<<<<<<<<< todo added oct2 - not sure of implications
                                 //console.log(types[type])
                                 let childPath = `${pathRoot}.${model.name}`
                                 hashAllElements[childPath] = {ed:model,host:ed}
                                 processDG(model,childPath)
+
                             } else {
                                 //this is a FHIR DT
                                 let path = `${pathRoot}.${ed.path}`
@@ -80,6 +82,7 @@ angular.module("pocApp")
                         //let childPathRoot = `${pathRoot}.${model.name}`
 
                         childPathRoot = `${pathRoot}.${localPath}`
+                        model.kind = "dg"   //<<<<<<<<< oct 2
                         hashAllElements[childPathRoot] = {ed:model,host:sectionItem}
 
 
@@ -94,8 +97,8 @@ angular.module("pocApp")
 
                             if (inx > 0) {          //ignoring the first one
                                 let ed = item.ed
-                                ed.kind = 'element'
-
+                                //ed.kind = 'element'
+                                ed.kind = ed.kind || 'element'  //<<< aded oct 2
                                 let shortPath = $filter('dropFirstInPath')(ed.path)
 
                                 let p

@@ -132,6 +132,11 @@
 
             <div ng-switch-when="choice">
 
+                <div ng-show="cell.displayHint == 'lookup'">
+
+                    A lookup dialog from the TS
+                </div>
+
                 <div ng-show = "cell.item.answerOption">
 
                     <div ng-show="cell.displayHint == 'radio-button' || cell.displayHint == 'radio'">
@@ -148,12 +153,6 @@
 
                     </div>
 
-                    <!--
-                    <div ng-show="cell.displayHint == 'lookup' ">
-
-
-                    </div>
-                    -->
 
                     <!-- Choice as checkboxes - https://www.npmjs.com/package/angular-bootstrap-checkbox -->
 
@@ -212,7 +211,7 @@
 
 
                 <!-- currently if there is an answerValueSet, the answerOptions is populated...-->
-            <div ng-show = "false && cell.item.answerValueSet">
+                <div ng-show = "false && cell.item.answerValueSet">
 
                 <div class="row">
                     <div class="col-md-10">

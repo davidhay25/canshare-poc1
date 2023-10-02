@@ -7,6 +7,148 @@ angular.module("pocApp")
 
         return {
 
+
+            makeQ: function(treeObject) {
+                Q = {resourceType:"Questionnaire",status:"draft"}
+
+                function addChild(parent,node) {
+                    let data = node.data
+
+                    let item = {text:node.text}
+
+                    //if the node is a section or group, then the type must also be 'group. Only 'element' types can be different
+
+                    if (node.data.level == 'element') {
+                        item.type = data.controlType    //the 'official' type for the item
+
+                        //Add the hint instruction
+                        if (data.controlType !== data.controlHint)  {
+                            console.log(item.text,data.controlType,data.controlHint)
+                            //the hint is the extension that gives more options to the renderer
+                            item.extension = item.extension || []
+                            let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+                            ext.valueCodeableConcept = {coding:[{code:data.controlHint,system:"http://hl7.org/fhir/questionnaire-item-control"}]}
+                            item.extension.push(ext)
+                        }
+
+                        switch (data.controlHint) {
+                            case 'drop-down' :
+                                //populate the answerOption. For now, get it from 'options, but later:
+                                //todo - expand from valueSet if present
+                                item.answerOption = []
+
+                                if (data.ed.options) {
+                                    for (const option of data.ed.options) {
+                                        item.answerOption.push({valueCoding:{display:option.pt}})
+                                    }
+                                }
+
+
+
+                                break
+                        }
+
+
+
+                    } else {
+                        item.type = 'group'
+                        //console.log(data.cols)
+                        //are there multi columns set
+                        if (data.cols) {
+                            item.extension = item.extension || []
+                            let ext = {url:"http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"}
+                            ext.valueInteger = data.cols
+                            item.extension.push(ext)
+                        }
+                    }
+
+                    item.linkId = node.id
+                    parent.item = parent.item || []
+                    parent.item.push(item)
+
+                    if (node.children && node.children.length > 0) {
+                        node.children.forEach(function (childNode) {
+
+                            addChild(item,childNode)
+                        })
+                    }
+
+                }
+
+
+                treeObject[0].children.forEach(function (section) {
+                    //only add a section if it has children
+                    if (section.children && section.children.length > 0) {
+                        addChild(Q,section)
+                    }
+
+                })
+
+                //console.log(Q)
+                return Q
+
+
+        },
+
+
+
+            moveDown : function (node,treeData) {
+                //move up within the parent
+                let parent = node.parent
+                let bottomThisParent = -1  //the topmost item that has this parent
+                let pos = -1 //position of this node
+                treeData.forEach(function (item,inx) {
+                    if (item.id == node.id) {
+                        pos = inx
+                    }
+                    if (item.parent == node.parent) {
+                        bottomThisParent = inx
+                    }
+
+                })
+
+                if (bottomThisParent > pos) {
+
+                    let nodeToMove = treeData.splice(pos,1)[0]
+                    let amountToMove = 1
+
+                    if (node.data.level == 'group') {
+                        amountToMove = bottomThisParent - pos+1
+                    }
+
+                    treeData.splice(pos+amountToMove,0,nodeToMove)
+                }
+
+            },
+            moveUp : function (node,treeData) {
+                //move up within the parent
+                let parent = node.parent
+                let topThisParent = -1  //the topmost item that has this parent
+                let pos = -1 //position of this node
+                treeData.forEach(function (item,inx) {
+                    if (item.id == node.id) {
+                        pos = inx
+                    }
+                    if (item.parent == node.parent && topThisParent == -1) {
+                        topThisParent = inx
+                    }
+
+                })
+
+                if (topThisParent < pos) {
+
+                    let nodeToMove = treeData.splice(pos,1)[0]
+                    let amountToMove = 1
+                    //A group needs to be moved above any children of the group above
+                    if (node.data.level == 'group') {
+                        amountToMove = pos-topThisParent+1
+                    }
+
+                    treeData.splice(pos-amountToMove,0,nodeToMove)
+                }
+
+            },
+
             isADG : function (ed, hashAllDG) {
                 let isADG = false
                 if (ed.kind == 'dg') {
@@ -33,6 +175,7 @@ angular.module("pocApp")
                     controlType = "choice"
                 }
 
+
                 if (ed.type) {
                     switch (ed.type[0]) {
                         case 'dateTime' :
@@ -45,6 +188,10 @@ angular.module("pocApp")
                                 controlType = "choice"
                             }
                     }
+                }
+
+                if (ed.controlHint) {
+                    controlHint = ed.controlHint
                 }
 
 

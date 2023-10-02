@@ -65,9 +65,26 @@
               <div id="qtree"></div>
 
               <br/>
-              <div ng-show="allowAddGroup && canEdit" class="clickable" ng-click="addGroup(selectedQNode)">
-                Add Group
+
+              <div ng-show="canEdit">
+                <span class="clickable" ng-show="selectedQNode" ng-click="moveUp()">
+                    <i class="glyphicon glyphicon-arrow-up"></i>
+                </span>
+
+                <span class="clickable" ng-show="selectedQNode" ng-click="moveDown()">
+                  <i class="glyphicon glyphicon-arrow-down"></i>
+                </span>
+
+                <span ng-show="allowAddGroup" class="clickable" ng-click="addGroup(selectedQNode)">
+                  Add Group
+                </span>
               </div>
+
+
+
+
+
+
             </div>
 
 
@@ -77,6 +94,11 @@
                 <div class="banner">Group details</div>
                 <table class="table table-bordered">
                   <tr><td>Name</td><td>{{selectedQNode.text}}</td></tr>
+                  <tr><td>Columns</td>
+                    <td><input class="form-control" type="number"
+                               ng-blur="updateCols(selectedQNode.data.cols)"
+                               ng-model="selectedQNode.data.cols"/></td>
+                  </tr>
                 </table>
 
                 <br/>
@@ -88,20 +110,13 @@
 
 
                       <div ng-show="allElementsThisSection">
-                        <div class="banner">Element that can be added</div>
+                        <div class="banner">Elements that can be added</div>
                         <div ng-repeat="ed in allElementsThisSection"
                              style="cursor: pointer"
                              ng-click="selectElementToAdd($index)">
                           <div ng-class="{clickable:ed.type,isDG:ed.kind=='dg'}">{{ed.shortPath}}</div>
-
-
                         </div>
                       </div>
-
-
-
-
-
                 </div>
 
               </div>
@@ -121,6 +136,8 @@
                 </table>
 
                 <div class="clickable" ng-show="canEdit" ng-click="removeElement()">Remove this element</div>
+
+
                 <!--
                           <pre>{{selectedQNode.data | json}}</pre>
                 -->
@@ -133,6 +150,8 @@
             <div  class="col-md-5">
 
 
+              <div class="btn-link btn pull-right" ng-click="previewQ()">Preview form</div>
+
               <uib-tabset>
                 <uib-tab heading="Form">
                   <div class="banner">{{selectedSection.text}}</div>
@@ -140,7 +159,7 @@
                   <div ng-repeat = 'item in selectedSection.item'>
 
                     <div class="row">
-                      <div class="col-sm-3 col-md-3">
+                      <div class="col-sm-6 col-md-6">
                         <div ng-show="item.level == 'group'">
                           <strong>{{item.text}}</strong>
                         </div>
@@ -174,7 +193,7 @@
 
                     <div ng-repeat = 'groupItem in item.item'>
                       <div class="row">
-                        <div class="col-sm-3 col-md-3">
+                        <div class="col-sm-6 col-md-6">
                           {{groupItem.text}}
                         </div>
                         <div class="col-sm-6 col-md-6">
@@ -202,6 +221,23 @@
           </div>
 
 
+        </uib-tab>
+
+        <uib-tab heading="All elements">
+          <pre>{{allCompElements | json}}</pre>
+        </uib-tab>
+        <uib-tab heading="Tree data">
+          <table class="table">
+            <tr><th>Id</th><th>Parent</th><th>Text</th><th>Level</th><th>Name</th></tr>
+            <tr ng-repeat="item in treeData">
+              <td>{{item.id}}</td>
+              <td>{{item.parent}}</td>
+              <td>{{item.text}}</td>
+              <td>{{item.data.level}}</td>
+              <td>{{item.data.name}}</td>
+            </tr>
+          </table>
+          <pre>{{treeData | json}}</pre>
         </uib-tab>
       </uib-tabset>
 

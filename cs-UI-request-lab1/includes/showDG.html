@@ -279,8 +279,8 @@
 
                           <span ng-repeat = "opt in qControlOptions">
                             <input type="radio"
-                                   ng-change="setControlType(selectedNode.data.ed,opt)"
-                                   ng-model="input.controlType" value="{{opt}}"> {{opt}}
+                                   ng-change="setControlHint(selectedNode.data.ed,opt)"
+                                   ng-model="input.controlHint" value="{{opt}}"> {{opt}}
                           </span>
                         </div>
                         <div class="col-md-4">

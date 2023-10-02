@@ -66,6 +66,27 @@ angular.module("pocApp")
 
             }
 
+            $scope.previewQ = function () {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/previewQ.html',
+                    //backdrop: 'static',
+                    size : 'lg',
+                    controller: function ($scope,Q) {
+                        $scope.input = {}
+                        $scope.Q = Q
+                        $scope.QR = {}
+
+                        console.log(Q)
+
+                    },
+
+                    resolve: {
+                        Q: function () {
+                            return $scope.Qresource
+                        }
+                    }
+                })
+            }
 
             //a hash of all elements that have been added to the Q. Used to avoid duplicate entries
             //is specific to the currently selected Q
@@ -90,6 +111,19 @@ angular.module("pocApp")
 
             }
 
+
+            //update the treedata with the number of cols to display
+            $scope.updateCols = function(cnt) {
+                for (const item of $scope.treeData) {
+                    if (item.id == $scope.selectedQNode.id) {
+                        item.data.cols = cnt
+                        break
+                    }
+                }
+                drawtree($scope.treeData)
+
+
+            }
 
             //when a QO is selected, it is the object from the library that is returned.
             //we want to save a copy in the browser cache so it can be edited
@@ -282,7 +316,6 @@ angular.module("pocApp")
                     //note that some elements aren't actually ed's - the section, and the DG off the section are in there as well
                     
                     if (ed.path == path) {
-                       // if (ed.type && ed.path.startsWith(path)) {    //ed without a type are the section.DGName elements
                         //this element is to be added
                         //the controlHint values are drawn from the Q extension at https://hl7.org/fhir/R4B/valueset-questionnaire-item-control.html
 
@@ -313,39 +346,24 @@ angular.module("pocApp")
                             //get the control hint and type for the Q generation
                             let voControl = makeQSvc.getControlDetails(ed)
 
-                            /*
-                            let controlHint = "string"            //this can be any value - it will be an extension in the Q - https://hl7.org/fhir/R4B/extension-questionnaire-itemcontrol.html
-                            let controlType = "string"          //this has to be one of the defined type values
-
-                            if (ed.options && ed.options.length > 0) {
-                                controlHint = "drop-down"
-                                controlType = "choice"
-                            }
-
-                            switch (ed.type[0]) {
-                                case 'dateTime' :
-                                    controlHint = "dateTime"
-                                    controlType = "dateTime"
-                                    break
-                                case 'CodeableConcept' :
-                                    if (ed.valueSet) {
-                                        controlHint = "lookup"
-                                        controlType = "choice"
-                                    }
-                            }
-
-*/
                             let node = {id:ed.path,
                                 text:ed.title,
                                 parent:parentId,
                                 data:{ed:ed,level:'element',controlType:voControl.controlType,controlHint:voControl.controlHint}}
 
-                            $scope.treeData.push(node)
+                            //locate where to insert the node. We want all children of a nod in the same place
+                            //to make moving easier
+                            let pos = -1
+                            $scope.treeData.forEach(function (node1,inx) {
+                                if (node1.parent == node.parent ) {pos = inx}
+                            })
+                            if (pos > -1) {
+                                $scope.treeData.splice(pos,0,node)
+                            } else {
+                                $scope.treeData.push(node)
+                            }
+
                         }
-
-
-
-
 
                     } else {
                         //This is not in the same path, or has no type
@@ -362,6 +380,19 @@ angular.module("pocApp")
 
                 updateLibrary()
 
+                drawtree($scope.treeData)
+            }
+
+
+            $scope.moveUp = function () {
+
+
+                makeQSvc.moveUp($scope.selectedQNode,$scope.treeData)
+                drawtree($scope.treeData)
+            }
+
+            $scope.moveDown = function (node) {
+                makeQSvc.moveDown($scope.selectedQNode,$scope.treeData)
                 drawtree($scope.treeData)
             }
 
@@ -393,7 +424,10 @@ angular.module("pocApp")
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG) //input.types created on the parent scope
                 $scope.allCompElements = vo.allElements     //an array
 
-                //console.log(vo.allElements)
+                console.log(vo.allElements)
+                vo.allElements.forEach(function (item) {
+                    console.log(item.ed.path, item.ed.kind)
+                })
 
             }
 
@@ -526,7 +560,9 @@ angular.module("pocApp")
 
                 })
                     .bind("loaded.jstree", function (event, data) {
+
                    // $(this).jstree("open_all");
+                        $(this).jstree("open_node","root");
 
                     if ($scope.selectedQNode) {
                         $(this).jstree("select_node",$scope.selectedQNode.id);
@@ -549,7 +585,7 @@ angular.module("pocApp")
                     $scope.$digest()
                 })
                     .bind("dblclick.jstree", function (event) {
-                        $scope.selectedNode = $(event.target).closest("li");
+                        $scope.selectedQNode = $(event.target).closest("li");
                        // var data = node.data("jstree");
 
                         $scope.removeElement()
@@ -587,13 +623,13 @@ console.log(drop)
                     addChild(obj,child)
                 })
 
-                $scope.Qresource = makeQ(treeObject)
+                $scope.Qresource = makeQSvc.makeQ(treeObject)
 
                 return obj
             }
 
             //construct the Questionnaire resource
-            function makeQ(treeObject) {
+            function makeQDEP(treeObject) {
                 Q = {resourceType:"Questionnaire",status:"draft"}
 
                 function addChild(parent,node) {
@@ -605,7 +641,9 @@ console.log(drop)
 
                     if (node.data.level == 'element') {
                         item.type = data.controlType    //the 'official' type for the item
+
                         if (data.controlType !== data.controlHint)  {
+                            console.log(item.text,data.controlType,data.controlHint)
                             //the hint is the extension that gives more options to the renderer
                             item.extension = item.extension || []
                             let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
@@ -615,6 +653,18 @@ console.log(drop)
                         }
                     } else {
                         item.type = 'group'
+                        console.log(data.cols)
+                        if (data.cols) {
+                            item.extension = item.extension || []
+                            let ext = {url:"http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"}
+                            ext.valueInteger = data.cols
+                            item.extension.push(ext)
+
+
+                        }
+
+
+
                     }
 
                     item.linkId = node.id

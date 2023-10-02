@@ -375,8 +375,10 @@ angular.module("pocApp")
                     //DG history
                     let dgHistory = {kind:"dg",name:'ClinicalHistory',title:"Clinical history",diff:[],
                         description:"A record of previous diagnoses, findings, and procedure performed that are relevant to a patient's current state of health"}
+
                     dgHistory.diff.push({path:'coMorbidity',title:'Co-morbidities',type:['Condition'],mult:'0..*',
                         description:"The simultaneous presence of two or more medical conditions in a patient"})
+
                     dgHistory.diff.push({path:'menopausalStatus',title:'Menopausal status',type:['CodeableConcept'],mult:'0..*',
                         description:"Indicate whether the (female) patient is pre or post menopausal"})
 
@@ -394,6 +396,7 @@ angular.module("pocApp")
                     //DG familymember history
                     let dgFMH = {kind:"dg",name:'Fmh',title:"Family member history",diff:[],
                         description:"Significant health conditions for a person related to the patient relevant in the context of care for the patient"}
+
                     dgFMH.diff.push({path:'code',title:'Condition code',type:['CodeableConcept'],mult:'0..*',
                         description:"The conditions that the related person had"})
                     dgFMH.diff.push({path:'relation',title:'Relationship',type:['Condition'],mult:'0..*',
