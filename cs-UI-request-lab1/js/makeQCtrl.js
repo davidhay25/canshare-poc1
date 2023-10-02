@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('makeQCtrl',
-        function ($scope,modelCompSvc,$timeout,$uibModal,$localStorage,$uibModal,$http,modelsSvc) {
+        function ($scope,modelCompSvc,$timeout,$localStorage,$uibModal,$http,modelsSvc,makeQSvc) {
 
             //don't use 'input' as we need $scope.input.types
             $scope.local = {}
@@ -74,6 +74,9 @@ angular.module("pocApp")
 
             //update the library with the current QObject
             let updateLibrary = function () {
+
+                return  ////temp while developing
+
                 $http.put(`/model/QObject/${$scope.currentQObject.name}`,$scope.currentQObject).then(
                     function () {
                         console.log('save')
@@ -116,12 +119,11 @@ angular.module("pocApp")
                 $scope.selectedComp = $localStorage.world.compositions[QObject.compName]
 
                 //get all the elements for this composition
-                let vo = modelCompSvc.makeFullList($scope.selectedComp,$scope.input.types,$scope.hashAllDG) //input.types created on the parent scope
+                getAllCompElements($scope.selectedComp)
 
-                $scope.allCompElements = modelsSvc.makeOrderedFullList(vo.allElements)     //orders the list and removes group original children
+                //console.log($scope.allCompElements)
 
 
-                //$scope.allCompElements = vo.allElements
 
                 //needs global scope...
                 $scope.treeData = $scope.currentQObject.content
@@ -139,7 +141,6 @@ angular.module("pocApp")
                         hashElementsUsed[ed.path] = true
                     }
                 })
-
 
 
                 drawtree($scope.treeData)
@@ -273,50 +274,77 @@ angular.module("pocApp")
                 let ar = []
                 let parentId = $scope.selectedQNode.id  //Where to insert the element. This is either a section or a group
 
+
                 $scope.allElementsThisSection.forEach(function (ed) {
 
-                    //for now, only select the individual item, but leave the code there to select
+
                     //all eds on the path. Need to decide how to manage 'referenced' DG's - possibly as a Group at the same level
+                    //note that some elements aren't actually ed's - the section, and the DG off the section are in there as well
                     
-                    if (ed.type && ed.path == path) {
+                    if (ed.path == path) {
                        // if (ed.type && ed.path.startsWith(path)) {    //ed without a type are the section.DGName elements
                         //this element is to be added
                         //the controlHint values are drawn from the Q extension at https://hl7.org/fhir/R4B/valueset-questionnaire-item-control.html
 
-                        hashElementsUsed[ed.path] = true
+                        hashElementsUsed[ed.path] = true    //mark this element as having been selected
 
-                        let type = ed.type[0]
-                        let model = $scope.hashAllDG[type]
-                        if (model && model.diff && model.diff.length > 0) {
+
+                        if (makeQSvc.isADG(ed,$scope.hashAllDG)) {
                             //This is a DG. Add all the child elements (ie those that start with this path)
                             //if one of the child elements is also a DG then add a group, and add the elents to that group
                             //if a group is nested, then it is still added directly to the 'section' - ie they are not nested but flattened
-                            alert("This is a DG")
+                            console.log("This is a DG")
 
+                            let vo = makeQSvc.getAllChildNodes (parentId,ed,$scope.hashAllDG,$scope.allElementsThisSection)
+                            console.log(vo)
+
+                            vo.arNodes.forEach(function (node) {
+                                hashElementsUsed[node.id] = true    //mark this element as having been selected. The node id is the path
+                                $scope.treeData.push(node)
+
+                            })
+
+                        } else {
+                            //so it's not a DG. But could still be the section entry. If there's a type, then it's an element
+                            if (ed.type) {
+
+                            }
+
+                            //get the control hint and type for the Q generation
+                            let voControl = makeQSvc.getControlDetails(ed)
+
+                            /*
+                            let controlHint = "string"            //this can be any value - it will be an extension in the Q - https://hl7.org/fhir/R4B/extension-questionnaire-itemcontrol.html
+                            let controlType = "string"          //this has to be one of the defined type values
+
+                            if (ed.options && ed.options.length > 0) {
+                                controlHint = "drop-down"
+                                controlType = "choice"
+                            }
+
+                            switch (ed.type[0]) {
+                                case 'dateTime' :
+                                    controlHint = "dateTime"
+                                    controlType = "dateTime"
+                                    break
+                                case 'CodeableConcept' :
+                                    if (ed.valueSet) {
+                                        controlHint = "lookup"
+                                        controlType = "choice"
+                                    }
+                            }
+
+*/
+                            let node = {id:ed.path,
+                                text:ed.title,
+                                parent:parentId,
+                                data:{ed:ed,level:'element',controlType:voControl.controlType,controlHint:voControl.controlHint}}
+
+                            $scope.treeData.push(node)
                         }
 
 
-                        let controlHint = "string"            //this can be any value - it will be an extension in the Q - https://hl7.org/fhir/R4B/extension-questionnaire-itemcontrol.html
-                        let controlType = "string"          //this has to be one of the defined type values
 
-                        if (ed.options && ed.options.length > 0) {
-                            controlHint = "drop-down"
-                            controlType = "choice"
-                        }
-                        switch (ed.type[0]) {
-                            case 'dateTime' :
-                                controlHint = "dateTime"
-                                controlType = "dateTime"
-                                break
-                            case 'CodeableConcept' :
-                                if (ed.valueSet) {
-                                    controlHint = "lookup"
-                                    controlType = "choice"
-                                }
-                        }
-
-                        let node = {id:ed.path,text:ed.title,parent:parentId,data:{ed:ed,level:'element',controlType:controlType,controlHint:controlHint}}
-                        $scope.treeData.push(node)
 
 
                     } else {
@@ -331,6 +359,7 @@ angular.module("pocApp")
                 $scope.allElementsThisSection = ar      //replace the allElements list
 
                 $scope.currentQObject.content = $scope.treeData
+
                 updateLibrary()
 
                 drawtree($scope.treeData)
@@ -360,6 +389,13 @@ angular.module("pocApp")
 
             }
 
+            function getAllCompElements(comp) {
+                let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG) //input.types created on the parent scope
+                $scope.allCompElements = vo.allElements     //an array
+
+                //console.log(vo.allElements)
+
+            }
 
             //initialize a new QObject
             $scope.initQ = function (QObject) {
@@ -367,10 +403,10 @@ angular.module("pocApp")
                 //get the composition and construct the complete list of elements
                 $scope.selectedComp = $localStorage.world.compositions[QObject.compName]
                 //$scope.selectedComp = QObject.meta.compName
-                let vo = modelCompSvc.makeFullList($scope.selectedComp,$scope.input.types,$scope.hashAllDG) //input.types created on the parent scope
+
+                getAllCompElements($scope.selectedComp)
 
 
-                $scope.allCompElements = vo.allElements     //an array
 
                 //create initial tree with empty sections
                 $scope.treeData = []
@@ -391,14 +427,43 @@ angular.module("pocApp")
 
 
 
+
+            //dnd not working atm. Have left code in there for now, but could be removed...
             function drawtree(treeData) {
-                //noyt completely sure this is the best place to update the local
-                //$localStorage.allQObject[$scope.currentQObject.name].content = treeData
+
                 $('#qtree').jstree('destroy');
 
                 $scope.qTree = $('#qtree').jstree(
-                    {'core': {'multiple': false, 'data': treeData,
-                            'themes': {name: 'proton', responsive: true}}}
+                    {'core': {'multiple': false,
+                            'data': treeData,
+                            'check_callback' : function(operation, node, node_parent, node_position, more) {
+                        console.log(more.ref)
+                                return true
+                            },
+                            'themes': {name: 'proton', responsive: true},
+
+                            plugins:['dnd'],
+                            dnd: {
+                                'is_draggable' : function(nodes,e) {
+                                    //don't allow groups to be dragged
+                                    return true
+                                    /*
+                                    delete $scope.dndSource
+                                    let node = nodes[0]
+                                    if (node.data && node.data.item && node.data.item.type == 'group') {
+                                        return false
+                                    } else {
+                                        $scope.dndSource = node.data.item
+                                        return true
+                                    }
+                                    */
+
+                                }
+                            }
+                        }
+                    }
+
+
                 ).on('changed.jstree', function (e, data) {
 
                     if (data.node) {
@@ -434,14 +499,17 @@ angular.module("pocApp")
 
                         //set the list of possible elements for this section / group
                         function setElementList(prefix) {
+
                             $scope.allCompElements.forEach(function (item) {
                                 let ed = angular.copy(item.ed)
                                 if (ed.path.startsWith(prefix)) {
+                                    console.log(ed)
                                     //Don't add an ed already added
                                     if (! hashElementsUsed[ed.path]) {
                                         let ar = ed.path.split('.')
-                                        ar.splice(0,2)
+                                        ar.splice(0,2)  //remove the dg name and section
                                         ed.shortPath = ar.join('.')
+
                                         $scope.allElementsThisSection.push(ed)
                                     }
 
@@ -452,13 +520,17 @@ angular.module("pocApp")
 
                     }
 
+
+
                     $scope.$digest();
 
-                }).bind("loaded.jstree", function (event, data) {
-                    $(this).jstree("open_all");
+                })
+                    .bind("loaded.jstree", function (event, data) {
+                   // $(this).jstree("open_all");
 
                     if ($scope.selectedQNode) {
                         $(this).jstree("select_node",$scope.selectedQNode.id);
+                        $(this).jstree("open_node",$scope.selectedQNode.id);
                     }
 
                     let v = $(this).jstree(true).get_json('#', { 'flat': false })
@@ -475,10 +547,24 @@ angular.module("pocApp")
                     }
 
                     $scope.$digest()
-                });
+                })
+                    .bind("dblclick.jstree", function (event) {
+                        $scope.selectedNode = $(event.target).closest("li");
+                       // var data = node.data("jstree");
+
+                        $scope.removeElement()
+                      //  alert('dbl')
+                    });
 
             }
 
+
+            $(document).on('dnd_stop.vakata', function (e, data) {
+console.log(drop)
+                if ($scope.dndSource && $scope.dndTarget) {
+
+                }
+            })
             //create a hierarchical object representing the tree. This is used for the rendering,
             //and can also be converted into the Q. Uses the internal representation from the tree
             function makeObject(treeObject) {
@@ -516,7 +602,7 @@ angular.module("pocApp")
                     let item = {text:node.text}
 
                     //if the node is a section or group, then the type must also be 'group. Only 'element' types can be different
-//console.log(node.data.level)
+
                     if (node.data.level == 'element') {
                         item.type = data.controlType    //the 'official' type for the item
                         if (data.controlType !== data.controlHint)  {

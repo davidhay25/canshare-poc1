@@ -1,6 +1,10 @@
 <div>
 
-
+  <style>
+    .isDG {
+      font-weight: bold;
+    }
+  </style>
 
 
   <div class="row">
@@ -58,10 +62,7 @@
 
             <div class="col-md-3">
 
-              <div id="qtree">
-
-
-              </div>
+              <div id="qtree"></div>
 
               <br/>
               <div ng-show="allowAddGroup && canEdit" class="clickable" ng-click="addGroup(selectedQNode)">
@@ -85,23 +86,18 @@
 
                 <div ng-hide="selectedQNode.data.level == 'element'">
 
-                  <uib-tabset>
-                    <uib-tab heading="List">
+
                       <div ng-show="allElementsThisSection">
                         <div class="banner">Element that can be added</div>
                         <div ng-repeat="ed in allElementsThisSection"
                              style="cursor: pointer"
                              ng-click="selectElementToAdd($index)">
-                          <div ng-class="{clickable:ed.type}">{{ed.shortPath}}</div>
+                          <div ng-class="{clickable:ed.type,isDG:ed.kind=='dg'}">{{ed.shortPath}}</div>
 
 
                         </div>
                       </div>
-                    </uib-tab>
-                    <uib-tab heading="Tree">
 
-                    </uib-tab>
-                  </uib-tabset>
 
 
 
