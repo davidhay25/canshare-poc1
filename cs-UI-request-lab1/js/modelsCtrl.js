@@ -6,7 +6,7 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc) {
 
 
-            $scope.version = "0.4.5"
+            $scope.version = "0.4.6"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -1376,13 +1376,14 @@ angular.module("pocApp")
                         delete $scope.qControlOptions
                         switch ($scope.selectedNode.data.ed.type[0]) {
                             case "string" :
-                                $scope.qControlOptions =  ["text-box","multi-line"]
+                                $scope.qControlOptions =  ["string","text"]
                                 break
                             case "CodeableConcept" :
                                 $scope.qControlOptions =  ["drop-down","autocomplete","lookup"]
                                 break
                         }
-                        $scope.input.controlType = $scope.selectedNode.data.ed.controlType
+
+                        $scope.input.controlHint = $scope.selectedNode.data.ed.controlHint
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...

@@ -8,6 +8,7 @@ angular.module("pocApp")
         return {
 
             makeQ: function(treeObject) {
+                //construct a Questionnaire resource
                 Q = {resourceType:"Questionnaire",status:"draft"}
 
                 function addChild(parent,node) {
@@ -29,6 +30,8 @@ angular.module("pocApp")
                             ext.valueCodeableConcept = {coding:[{code:data.controlHint,system:"http://hl7.org/fhir/questionnaire-item-control"}]}
                             item.extension.push(ext)
                         }
+
+                        //let voControl = that.getControlDetails(ed1)
 
                         switch (data.controlHint) {
                             case 'drop-down' :
@@ -208,15 +211,21 @@ angular.module("pocApp")
 
                 if (ed.type) {
                     switch (ed.type[0]) {
+                        case 'string' :
+                            controlType = "string"      //default to single text box
+                            if (ed.controlHint == 'text') {
+                                controlType = "text"
+                            }
+                            break
                         case 'dateTime' :
                             controlHint = "dateTime"
                             controlType = "dateTime"
                             break
                         case 'CodeableConcept' :
-                            if (ed.valueSet) {
-                                controlHint = "lookup"
+                          //  if (ed.valueSet) {
+                                controlHint = "drop-down"
                                 controlType = "choice"
-                            }
+                         //   }
                     }
                 }
 
