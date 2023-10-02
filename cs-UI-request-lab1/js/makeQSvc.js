@@ -31,7 +31,7 @@ angular.module("pocApp")
                             item.extension.push(ext)
                         }
 
-                        //let voControl = that.getControlDetails(ed1)
+
 
                         switch (data.controlHint) {
                             case 'drop-down' :

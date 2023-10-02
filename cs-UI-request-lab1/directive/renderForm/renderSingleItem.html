@@ -137,6 +137,14 @@
                     A lookup dialog from the TS
                 </div>
 
+                <div ng-show="cell.displayHint == 'autocomplete'">
+
+                    <input type="text"  ng-change="makeQR(cell.item.linkId)"
+                           ng-focus="onFocus(cell)"
+                           placeholder="Will be an autocomplete"
+                           ng-model="input.form[cell.item.linkId]" class="form-control"/>
+                </div>
+
                 <div ng-show = "cell.item.answerOption">
 
                     <div ng-show="cell.displayHint == 'radio-button' || cell.displayHint == 'radio'">
