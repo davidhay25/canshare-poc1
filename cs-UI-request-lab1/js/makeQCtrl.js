@@ -440,8 +440,6 @@ angular.module("pocApp")
 
                 getAllCompElements($scope.selectedComp)
 
-
-
                 //create initial tree with empty sections
                 $scope.treeData = []
                 let root = {id:"root",text: "root",parent:'#',data:{level:'root'}}

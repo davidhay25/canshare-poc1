@@ -14,10 +14,18 @@
         </div>
 
         <div ng-switch-when="drop-down">
+<!--
             <select class="form-control" ng-model="local.form[item.ed.path]"
                     ng-options = "option.pt for option in item.ed.options">
-
             </select>
+
+            -->
+
+            <select class="form-control" ng-model="local.form[item.ed.path]"
+                    ng-options = "option.valueCoding.display for option in item.ddOptions">
+            </select>
+
+
 
         </div>
 

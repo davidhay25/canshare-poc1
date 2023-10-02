@@ -1,12 +1,11 @@
 angular.module("pocApp")
 
-    .service('makeQSvc', function() {
+    .service('makeQSvc', function($http) {
 
         let config = {}
 
 
         return {
-
 
             makeQ: function(treeObject) {
                 Q = {resourceType:"Questionnaire",status:"draft"}
@@ -37,11 +36,42 @@ angular.module("pocApp")
                                 //todo - expand from valueSet if present
                                 item.answerOption = []
 
-                                if (data.ed.options) {
-                                    for (const option of data.ed.options) {
-                                        item.answerOption.push({valueCoding:{display:option.pt}})
+                                if (data.ed.valueSet) {
+                                    //if there's a valueSet, then tru to expand it
+                                    let qry = `ValueSet/$expand?url=${data.ed.valueSet}&_summary=false`
+                                    let encodedQry = encodeURIComponent(qry)
+
+                                    $http.get(`nzhts?qry=${encodedQry}`).then(
+                                        function (data) {
+                                            let expandedVS = data.data
+                                            for (const concept of expandedVS.expansion.contains) {
+                                                item.answerOption.push(
+                                                    {valueCoding:{system:concept.system, code:concept.code, display:concept.display}})
+                                            }
+                                            console.log(data.data)
+
+
+
+
+                                        }, function (err) {
+                                            item.answerOption.push({valueCoding:{display:"VS not found"}})
+                                            console.log(`There was no ValueSet with the url:${url}`)
+                                        }
+                                    )
+
+
+                                } else {
+                                    if (data.ed.options) {
+                                        for (const option of data.ed.options) {
+                                            item.answerOption.push({valueCoding:{display:option.pt}})
+                                        }
                                     }
+
                                 }
+
+
+
+
 
 
 
