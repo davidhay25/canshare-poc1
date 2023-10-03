@@ -1264,11 +1264,17 @@ angular.module("pocApp")
                 $scope.relationshipsSummary = vo.relationshipsSummary   //all the relationships - parent and reference - for this type
 
                 //sort the elements list to better display slicing
-
-             //   $scope.fullElementList = vo.allElements
-
                 $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
 
+                //create the list of potential enableWhen sources
+                $scope.ewSources = []
+                $scope.fullElementList.forEach(function (item) {
+                    if (item.ed.type && item.ed.type[0] == 'CodeableConcept') {
+                        let t = {ed:item.ed,shortPath: $filter('dropFirstInPath')(item.ed.path)}
+                        $scope.ewSources.push(t)
+                    }
+                })
+//console.log($scope.ewSources)
 
                // console.log(modelsSvc.makeOrderedFullList(vo.allElements))
 
@@ -1287,7 +1293,6 @@ angular.module("pocApp")
                     $scope.selectedModel = dg
 
                     $scope.refreshUpdates()
-
 
                     //create the list of override elements
                     $scope.overrides = []

@@ -7,6 +7,10 @@ angular.module("pocApp")
 
         return {
 
+            expandEdValues : function (ed) {
+                //return the list of possible options 
+            },
+
             makeTreeViewOfCategories: function(hashCategories) {
                 let treeData = []
                 let root = {id:"root",text: "Categories",parent:'#',data:{}}

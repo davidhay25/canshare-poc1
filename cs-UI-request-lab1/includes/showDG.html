@@ -456,18 +456,29 @@
 
               </uib-tab>
 
-              <uib-tab ng-show="false">
+              <uib-tab>
 
-                <uib-tab-heading>VS Dependencies <span class="badge">{{selectedNode.data.ed.dependVS.length || 0}}</span> </uib-tab-heading>
+                <uib-tab-heading>Enable when <span class="badge">{{selectedNode.data.ed.enableWhen.length || 0}}</span> </uib-tab-heading>
                 <br/>
+                <em>In development</em>
                 <table class="table table-bordered">
-                  <tr><th>Source</th><th>Value</th><th>Url</th></tr>
-                  <tr ng-repeat="dep in selectedNode.data.ed.dependVS">
+                  <tr><th>Source</th><th>Operator</th><th>Value</th></tr>
+                  <tr ng-repeat="dep in selectedNode.data.ed.enableWhen">
                     <td>{{dep.source}}</td>
+                    <td>{{dep.operator}}</td>
                     <td>{{dep.value}}</td>
-                    <td>{{dep.url}}</td>
                   </tr>
                 </table>
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <select class="form-control" ng-model="input.ewSource"
+                            ng-options="element.shortPath for element in ewSources">
+
+                    </select>
+                  </div>
+                </div>
+
               </uib-tab>
 
 

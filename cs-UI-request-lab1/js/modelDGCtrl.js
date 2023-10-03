@@ -9,6 +9,18 @@ angular.module("pocApp")
             fixedValueText.string = "What is the fixed string"
             fixedValueText.decimal = "What is the fixed decimal"
 
+
+            //add an enableWhen within the scope of the current DG. Assume (for now) that the trigger is a coded value
+            $scope.addEnableWhen = function(path,value) {
+                for (const ed of $scope.selectedModel.diff) {
+                    if (ed.path == path) {
+                        ed.enableWhen = ed.enableWhen || []
+                        let ew = {source:path,operator:"=",value:value}
+                        ed.enableWhen.push(ew)
+                    }
+                }
+            }
+
             $scope.changeDGType = function (ed) {
                 //create a reusable 'type selection dialog' - will be potentially be widely used
                 //needs to be hierarchy aware
@@ -63,9 +75,6 @@ angular.module("pocApp")
 
                     if (!found) {
                         //the element was not found in the diff, so needs to be added to it as an override
-                        //let ar = ed.path.split('.')
-                       // ar.splice(0,1)
-                       // ed.path = ar.join('.')
 
                         ed.path = $filter('dropFirstInPath')(ed.path)
                         ed.type = [newType]
