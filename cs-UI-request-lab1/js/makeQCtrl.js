@@ -535,7 +535,7 @@ angular.module("pocApp")
                             $scope.allCompElements.forEach(function (item) {
                                 let ed = angular.copy(item.ed)
                                 if (ed.path.startsWith(prefix)) {
-                                    console.log(ed)
+                                    //console.log(ed)
                                     //Don't add an ed already added
                                     if (! hashElementsUsed[ed.path]) {
                                         let ar = ed.path.split('.')

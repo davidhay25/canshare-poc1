@@ -87,11 +87,11 @@ angular.module("pocApp")
             //--------- login stuff
             //called whenever the auth state changes - eg login/out, initial load, create user etc.
             firebase.auth().onAuthStateChanged(function(user) {
-                console.log('auth state change')
+               // console.log('auth state change')
                 if (user) {
-                    console.log('logged in')
+                  //  console.log('logged in')
                     $scope.user = {email:user.email,displayName : user.displayName}
-                    console.log($scope.user)
+                  //  console.log($scope.user)
                     //$scope.loadAllQ()
                     $scope.$digest()
                 } else {
@@ -1231,7 +1231,7 @@ angular.module("pocApp")
 
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
 
-                console.log(vo)
+                //console.log(vo)
 
                 $scope.allCompElements = vo.allElements
                 $scope.hashCompElements = vo.hashAllElements

@@ -259,18 +259,8 @@ angular.module("pocApp")
                     if (ed1.path.startsWith(path)) {
                         console.log(ed1.path)
 
-                        //let controlType = "string"
-                        //let controlHint = "string"
 
                         let voControl = that.getControlDetails(ed1)
-
-
-
-                        //is this a DG? if so, then we'll add to a group
-                       // let type = ed1.type[0]
-
-
-                      //  let dg = hashAllDG[type]
 
                         if (that.isADG(ed1,hashAllDG)) {
                             //yes, it is a dg. We need to add a group and set the internalParentId to that element
