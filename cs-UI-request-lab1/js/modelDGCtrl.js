@@ -11,15 +11,39 @@ angular.module("pocApp")
 
 
             //add an enableWhen within the scope of the current DG. Assume (for now) that the trigger is a coded value
-            $scope.addEnableWhen = function(path,value) {
+            //value is assumed to be a Coding
+            $scope.addEnableWhen = function(item,value) {
+
+                let sourcePath = item.shortPath       //this is the path of the source
+                let targetPath = $filter('dropFirstInPath')($scope.selectedNode.data.ed.path)
+
+
+                console.log(sourcePath,targetPath,value)
+
                 for (const ed of $scope.selectedModel.diff) {
-                    if (ed.path == path) {
+                    if (ed.path == targetPath) {
                         ed.enableWhen = ed.enableWhen || []
-                        let ew = {source:path,operator:"=",value:value}
+                        let ew = {source:sourcePath,operator:"=",value:value}
                         ed.enableWhen.push(ew)
                     }
                 }
             }
+
+            //When adding a new EW and the source has been selected. The possible values of that source need to be determined.
+            $scope.ewSourceSelected = function (source) {
+                console.log(source)
+                delete $scope.ewSourceValues
+                modelDGSvc.expandEdValues(source.ed).then(
+                    function (ar) {
+                        $scope.ewSourceValues = ar
+                     },
+                    function () {
+
+                    }
+                )
+            }
+
+            
 
             $scope.changeDGType = function (ed) {
                 //create a reusable 'type selection dialog' - will be potentially be widely used

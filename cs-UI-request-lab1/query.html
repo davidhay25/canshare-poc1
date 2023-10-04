@@ -123,6 +123,132 @@
 
     <uib-tabset>
 
+        <uib-tab >
+            <uib-tab-heading>CanShare ValueSets <span class="badge">{{allVSItem.length}}</span> </uib-tab-heading>
+            <br/>
+            <em>This tab will make queries against the New Zealand National Terminology server</em>
+            <div ng-show="showLoadingMessage">Loading ValueSets, please wait...</div>
+            <br/>
+            <div class="row">
+                <div class="col-md-3">
+                    <input placeholder="Filter" type="text" class="form-control" ng-model="input.filterlist"/>
+                    <br/>
+                    <div class="myScroll">
+                        <div class="list-group">
+                            <div ng-class="{'list-group-item':true,listItemSelected:selectedItem==item}"
+                                 ng-show="showVS(item)"
+                                 style="cursor: pointer" ng-repeat="item in allVSItem" ng-click="selectVSItem(item)">
+                                {{item.display}}
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-9" ng-show="selectedVS">
+                    <br/>
+
+                    <div class="banner"> {{selectedVS.description}}</div>
+                    <br/>
+                    <uib-tabset>
+                        <uib-tab heading="Json">
+                            <br/>
+                            Query: {{termServerQuery}}
+                            <br/>  <br/>
+
+                            <pre>{{selectedVS | json}}</pre>
+                        </uib-tab>
+                        <uib-tab heading="Expand">
+                            <br/>
+                            <div class="row">
+                                <div class="col-md-1">
+                                    Language
+                                </div>
+                                <div class="col-md-3">
+                                    <select ng-model="input.selectedLanguage" class="form-control"
+                                            ng-options = "item.display for item in languages"></select>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" ng-model="input.filter" placeholder="Filter text"/>
+                                </div>
+                                <div class="col-md-3">
+                                    <div ng-show="expandedVS.expansion.contains">{{expandedVS.expansion.contains.length}} concepts</div>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <button class="btn btn-primary pull-right" ng-click="expandVSInTS(selectedVS)">Expand</button>
+                                </div>
+                            </div>
+                            <br/>
+                            <div ng-show="expandQry">Query: {{expandQry}}</div>
+                            <br/>
+
+
+
+                            <uib-tabset ng-show="expandedVS">
+                                <uib-tab heading="Concepts">
+                                    <table class="table table-bordered table-condensed">
+                                        <tr><th>Display</th><th>Code</th><th>System</th></tr>
+                                        <tr ng-repeat="concept in expandedVS.expansion.contains">
+                                            <td>{{concept.display}}</td>
+                                            <td>
+                                                <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
+                                            <td>{{concept.system}}</td>
+                                        </tr>
+                                    </table>
+                                </uib-tab>
+                                <uib-tab heading="Json">
+                                    <pre>{{expandedVS | json}}</pre>
+                                </uib-tab>
+                            </uib-tabset>
+
+
+
+
+
+
+                        </uib-tab>
+                        <uib-tab heading="Forms where used">
+                            <br/>
+
+
+                            <button class="btn btn-link pull-right" ng-click="refreshVsQList(selectedVS.url)">Refresh</button>
+
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="list-group">
+                                        <div class="list-group-item"
+                                             ng-click="selectQfromVSList(v.Q)"
+                                             style="cursor: pointer"
+                                             ng-repeat="(k,v) in qUsingVS">
+                                            {{v.Q.title || v.Q.name}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <uib-tabset ng-show="selectedQ">
+                                        <uib-tab heading="Form">
+                                            <renderform  q="selectedQ" qr="dummyQR" form="dummyFormData"></renderform>
+                                        </uib-tab>
+                                        <uib-tab heading="Json">
+                                            <pre>{{selectedQ | json}}</pre>
+                                        </uib-tab>
+                                    </uib-tabset>
+
+                                </div>
+                            </div>
+
+
+                        </uib-tab>
+                    </uib-tabset>
+
+                </div>
+            </div>
+
+
+        </uib-tab>
+
         <uib-tab  heading="ConceptMap">
             <!-- This accesses, displays and uses Concept maps on the server. The CMs are created by a script from the spreadsheet.-->
 
@@ -539,133 +665,6 @@
         </uib-tab>
 
 
-
-
-        <uib-tab >
-            <uib-tab-heading>CanShare ValueSets <span class="badge">{{allVSItem.length}}</span> </uib-tab-heading>
-            <br/>
-            <em>This tab will make queries against the New Zealand National Terminology server</em>
-            <div ng-show="showLoadingMessage">Loading ValueSets, please wait...</div>
-            <br/>
-            <div class="row">
-                <div class="col-md-3">
-                    <input placeholder="Filter" type="text" class="form-control" ng-model="input.filterlist"/>
-                    <br/>
-                    <div class="myScroll">
-                        <div class="list-group">
-                            <div ng-class="{'list-group-item':true,listItemSelected:selectedItem==item}"
-                                 ng-show="showVS(item)"
-                                 style="cursor: pointer" ng-repeat="item in allVSItem" ng-click="selectVSItem(item)">
-                                {{item.display}}
-
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="col-md-9" ng-show="selectedVS">
-                    <br/>
-
-                    <div class="banner"> {{selectedVS.description}}</div>
-                    <br/>
-                    <uib-tabset>
-                        <uib-tab heading="Json">
-                            <br/>
-                            Query: {{termServerQuery}}
-                            <br/>  <br/>
-
-                            <pre>{{selectedVS | json}}</pre>
-                        </uib-tab>
-                        <uib-tab heading="Expand">
-                            <br/>
-                            <div class="row">
-                                <div class="col-md-1">
-                                    Language
-                                </div>
-                                <div class="col-md-3">
-                                    <select ng-model="input.selectedLanguage" class="form-control"
-                                            ng-options = "item.display for item in languages"></select>
-                                </div>
-                                <div class="col-md-3">
-                                    <input type="text" class="form-control" ng-model="input.filter" placeholder="Filter text"/>
-                                </div>
-                                <div class="col-md-3">
-                                    <div ng-show="expandedVS.expansion.contains">{{expandedVS.expansion.contains.length}} concepts</div>
-                                </div>
-
-                                <div class="col-md-2">
-                                    <button class="btn btn-primary pull-right" ng-click="expandVSInTS(selectedVS)">Expand</button>
-                                </div>
-                            </div>
-                            <br/>
-                            <div ng-show="expandQry">Query: {{expandQry}}</div>
-                            <br/>
-
-
-
-                            <uib-tabset ng-show="expandedVS">
-                                <uib-tab heading="Concepts">
-                                    <table class="table table-bordered table-condensed">
-                                        <tr><th>Display</th><th>Code</th><th>System</th></tr>
-                                        <tr ng-repeat="concept in expandedVS.expansion.contains">
-                                            <td>{{concept.display}}</td>
-                                            <td>
-                                                <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
-                                            <td>{{concept.system}}</td>
-                                        </tr>
-                                    </table>
-                                </uib-tab>
-                                <uib-tab heading="Json">
-                                    <pre>{{expandedVS | json}}</pre>
-                                </uib-tab>
-                            </uib-tabset>
-
-
-
-
-
-
-                        </uib-tab>
-                        <uib-tab heading="Forms where used">
-                            <br/>
-
-
-                            <button class="btn btn-link pull-right" ng-click="refreshVsQList(selectedVS.url)">Refresh</button>
-
-
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="list-group">
-                                        <div class="list-group-item"
-                                             ng-click="selectQfromVSList(v.Q)"
-                                             style="cursor: pointer"
-                                             ng-repeat="(k,v) in qUsingVS">
-                                            {{v.Q.title || v.Q.name}}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-9">
-                                    <uib-tabset ng-show="selectedQ">
-                                        <uib-tab heading="Form">
-                                            <renderform  q="selectedQ" qr="dummyQR" form="dummyFormData"></renderform>
-                                        </uib-tab>
-                                        <uib-tab heading="Json">
-                                            <pre>{{selectedQ | json}}</pre>
-                                        </uib-tab>
-                                    </uib-tabset>
-
-                                </div>
-                            </div>
-
-
-                        </uib-tab>
-                    </uib-tabset>
-
-                </div>
-            </div>
-
-
-        </uib-tab>
 
 
         <uib-tab heading="NZHTS analysis">

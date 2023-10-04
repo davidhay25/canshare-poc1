@@ -259,7 +259,6 @@ angular.module("pocApp")
                     if (ed1.path.startsWith(path)) {
                         console.log(ed1.path)
 
-
                         let voControl = that.getControlDetails(ed1)
 
                         if (that.isADG(ed1,hashAllDG)) {

@@ -471,12 +471,26 @@
                 </table>
 
                 <div class="row">
-                  <div class="col-md-6">
+                  <div class="col-md-5">
                     <select class="form-control" ng-model="input.ewSource"
+                            ng-change = "ewSourceSelected(input.ewSource)"
                             ng-options="element.shortPath for element in ewSources">
 
                     </select>
                   </div>
+
+                  <div class="col-md-5">
+                    <select class="form-control" ng-model="input.ewSourceValue"
+                            ng-options="concept.display for concept in ewSourceValues">
+
+                    </select>
+                  </div>
+                  <div class="col-md-2">
+                    <button class="btn-link btn"
+                            ng-show="input.ewSourceValue"
+                            ng-click="addEnableWhen(input.ewSource,input.ewSourceValue)">Add</button>
+                  </div>
+
                 </div>
 
               </uib-tab>

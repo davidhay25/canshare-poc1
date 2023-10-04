@@ -1,6 +1,6 @@
 angular.module("pocApp")
 
-    .service('modelDGSvc', function() {
+    .service('modelDGSvc', function($http,$q) {
 
         let config = {}
 
@@ -8,7 +8,37 @@ angular.module("pocApp")
         return {
 
             expandEdValues : function (ed) {
-                //return the list of possible options 
+                let deferred = $q.defer()
+                //return the list of possible options for en ed. There are 2 sources:
+                //the 'options' array or the valueSet.
+                if (ed.valueSet) {
+                    //if there's a valueSet, then tru to expand it
+                    let qry = `ValueSet/$expand?url=${ed.valueSet}&_summary=false`
+                    let encodedQry = encodeURIComponent(qry)
+
+                    $http.get(`nzhts?qry=${encodedQry}`).then(
+                        function (data) {
+                            let expandedVS = data.data
+                            let ar = []
+                            for (const concept of expandedVS.expansion.contains) {
+                                ar.push(concept)
+
+                            }
+                            console.log(data.data)
+                            deferred.resolve(ar)
+
+                        }, function (err) {
+
+                            console.error(`There was no ValueSet with the url:${ed.valueSet}`)
+                        }
+                    )
+                } else {
+                    //there's no valueSet - are there any options?
+
+
+                }
+
+                return deferred.promise
             },
 
             makeTreeViewOfCategories: function(hashCategories) {
