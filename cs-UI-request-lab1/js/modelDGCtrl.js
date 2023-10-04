@@ -35,6 +35,25 @@ angular.module("pocApp")
 
             }
 
+            $scope.removeEnableWhen = function (inx) {
+
+                let path = $filter('dropFirstInPath')($scope.selectedNode.data.ed.path)
+
+                for (const ed of $scope.selectedModel.diff) {
+                    if (ed.path == path) {
+                        if (ed.enableWhen && ed.enableWhen.length > inx) {
+                            ed.enableWhen.splice(inx,1)
+                            //in modelsCtrl
+                            $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:path})
+
+                        }
+
+                    }
+                }
+
+
+            }
+
             //When adding a new EW and the source has been selected. The possible values of that source need to be determined.
             $scope.ewSourceSelected = function (source) {
                 console.log(source)
