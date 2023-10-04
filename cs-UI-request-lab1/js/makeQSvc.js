@@ -14,7 +14,19 @@ angular.module("pocApp")
                 function addChild(parent,node) {
                     let data = node.data
 
-                    let item = {text:node.text}
+                    let item = {text:node.text}     //this is the Q item element
+                    item.linkId = node.id
+
+                    if (data.ed && data.ed.enableWhen) {
+                        console.log(data.ed,'has ew')
+                        item.enableWhen = []
+                        data.ed.enableWhen.forEach(function (ew) {
+                            let qEW = {operator:ew.operator,answerCoding:ew.value}
+                            qEW.question = `${parent.linkId}.${ew.source}` //linkId of source is relative to the parent (DG)
+                            item.enableWhen.push(qEW)
+                        })
+
+                    }
 
                     //if the node is a section or group, then the type must also be 'group. Only 'element' types can be different
 
@@ -36,10 +48,15 @@ angular.module("pocApp")
                         switch (data.controlHint) {
                             case 'drop-down' :
                                 //populate the answerOption. For now, get it from 'options, but later:
-                                //todo - expand from valueSet if present
                                 item.answerOption = []
 
-                                if (data.ed.valueSet) {
+
+                                //do the options first...
+                                if (data.ed.options) {
+                                    for (const option of data.ed.options) {
+                                        item.answerOption.push({valueCoding:{code:option.code,display:option.display}})
+                                    }
+                                } else if (data.ed.valueSet) {
                                     //if there's a valueSet, then tru to expand it
                                     let qry = `ValueSet/$expand?url=${data.ed.valueSet}&_summary=false`
                                     let encodedQry = encodeURIComponent(qry)
@@ -58,17 +75,10 @@ angular.module("pocApp")
 
                                         }, function (err) {
                                             item.answerOption.push({valueCoding:{display:"VS not found"}})
-                                            console.log(`There was no ValueSet with the url:${url}`)
+                                            console.log(`There was no ValueSet with the url:${data.ed.valueSet}`)
                                         }
                                     )
 
-
-                                } else {
-                                    if (data.ed.options) {
-                                        for (const option of data.ed.options) {
-                                            item.answerOption.push({valueCoding:{display:option.pt}})
-                                        }
-                                    }
 
                                 }
 
@@ -95,7 +105,7 @@ angular.module("pocApp")
                         }
                     }
 
-                    item.linkId = node.id
+                    //item.linkId = node.id
                     parent.item = parent.item || []
                     parent.item.push(item)
 

@@ -27,20 +27,39 @@ angular.module("pocApp")
                         ed.enableWhen.push(ew)
                     }
                 }
+
+                delete $scope.input.ewSourceValue
+                delete $scope.input.ewSource
+                //in modelsCtrl
+                $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:targetPath})
+
             }
 
             //When adding a new EW and the source has been selected. The possible values of that source need to be determined.
             $scope.ewSourceSelected = function (source) {
                 console.log(source)
                 delete $scope.ewSourceValues
-                modelDGSvc.expandEdValues(source.ed).then(
-                    function (ar) {
-                        $scope.ewSourceValues = ar
-                     },
-                    function () {
+                if (source) {
 
+                    //get the ed from the current model as it may have been updated
+                    let sourcePath = $filter('dropFirstInPath')(source.ed.path)
+
+                    let sourceEd =  $scope.selectedModel.diff.filter(ed => ed.path == sourcePath)
+                    if (sourceEd.length == 1) {
+                        modelDGSvc.expandEdValues(sourceEd[0]).then(
+                            function (ar) {
+                                $scope.ewSourceValues = ar
+                            },
+                            function (err) {
+                                console.log(err)
+                            }
+                        )
                     }
-                )
+
+
+
+                }
+
             }
 
             

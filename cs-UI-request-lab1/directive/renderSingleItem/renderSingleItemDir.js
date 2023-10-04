@@ -43,7 +43,7 @@ angular.module('formsApp')
 
                             }, function (err) {
                                 $scope.item.ddOptions.push({valueCoding: {display: "VS not found"}})
-                                console.log(`There was no ValueSet with the url:${url}`)
+                                console.log(`There was no ValueSet with the url:${$scope.item.ed.valueSet}`)
                             }
                         )
                     } else if ($scope.item.ed.options) {

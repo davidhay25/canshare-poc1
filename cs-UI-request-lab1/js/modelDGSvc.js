@@ -11,7 +11,18 @@ angular.module("pocApp")
                 let deferred = $q.defer()
                 //return the list of possible options for en ed. There are 2 sources:
                 //the 'options' array or the valueSet.
-                if (ed.valueSet) {
+
+                if (ed.options) {
+                    let ar = []
+                    ed.options.forEach(function (opt) {
+                        //assume text (.pt) only for now
+                        //if there's no system, then the Q render will only check code. todo: need to add system
+                        ar.push({code:opt.pt,display:opt.pt})
+
+                    })
+                    deferred.resolve(ar)
+
+                } else if (ed.valueSet) {
                     //if there's a valueSet, then tru to expand it
                     let qry = `ValueSet/$expand?url=${ed.valueSet}&_summary=false`
                     let encodedQry = encodeURIComponent(qry)
@@ -32,12 +43,7 @@ angular.module("pocApp")
                             console.error(`There was no ValueSet with the url:${ed.valueSet}`)
                         }
                     )
-                } else {
-                    //there's no valueSet - are there any options?
-
-
                 }
-
                 return deferred.promise
             },
 

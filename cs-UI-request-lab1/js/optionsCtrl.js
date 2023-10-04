@@ -14,6 +14,8 @@ angular.module("pocApp")
                 lines.forEach(function (lne) {
                     let option = {}
                     option.pt = lne
+                    option.code = lne
+                    option.display = lne
                     $scope.ed.options.push(option)
 
                 })
