@@ -35,7 +35,7 @@ angular.module("pocApp")
                                 ar.push(concept)
 
                             }
-                            console.log(data.data)
+                           // console.log(data.data)
                             deferred.resolve(ar)
 
                         }, function (err) {
@@ -249,14 +249,14 @@ angular.module("pocApp")
             updateChanges : function (DG,change,scope) {
                 DG.changes = DG.changes || []
                 DG.changes.push(change)
-                console.log('emitting')
+               // console.log('emitting')
                 scope.$emit("dgUpdated",{})
 
             },
 
             makeDgDownload: function (allDG) {
                 //create a download of all the DG
-console.log(allDG)
+//console.log(allDG)
 
             },
 
@@ -265,7 +265,7 @@ console.log(allDG)
                 //let report = {newDG:[],newElement:[],changedElement:[]}
                 let report = []
 
-                console.log(xref)
+              //  console.log(xref)
 
                 Object.keys(allDG).forEach(function (key) {
                     let dg = allDG[key]

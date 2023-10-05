@@ -261,9 +261,15 @@
 
             <div ng-hide ="selectedCompositionNode.data.ed.mult == '0..0'  ||
               selectedCompositionNode.data.ed.zElement || selectedCompositionNode.data.ed.kind == 'root'">
+
               <button class="btn-link btn pull-right"
                 ng-hide = "selectedCompositionNode.data.ed.kind == 'section'"
                       ng-click="removeElement(selectedCompositionNode.data.ed)">Remove this element</button>
+
+              <button class="btn-link btn pull-right"
+                      ng-show = "selectedCompositionNode.data.ed.kind == 'element'"
+                      ng-click="editOverride(selectedCompositionNode.data.ed)">Edit </button>
+
             </div>
 
 

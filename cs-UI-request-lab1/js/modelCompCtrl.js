@@ -8,6 +8,37 @@ angular.module("pocApp")
            // $scope.tumourStream = ['breast','gyne','lung','gi']
 
 
+            //Add or edit an override
+            $scope.editOverride = function (ed) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/editDGItem.html',
+                    backdrop: 'static',
+                    size : 'lg',
+                    controller: 'editDGItemCtrl',
+
+                    resolve: {
+                        item: function () {
+                            return {ed:ed}
+                        },
+                        allTypes : function () {
+                            return $scope.allTypes
+                        },
+                        fullElementList : function () {
+                            return $scope.fullElementList
+                        },
+                    hashAllDG : function () {
+                        return $scope.hashAllDG
+                    }
+                    }
+
+                }).result.then(function (ed) {
+                    let path = ed.path
+                    $scope.selectedModel.override = $scope.selectedModel.override || {}
+                    $scope.selectedModel.override[path] = ed
+                })
+
+            }
+
             $scope.selectDGForSection = function () {
                 //re-using the 'change type' dialog developed for DG
                 $uibModal.open({
@@ -32,8 +63,6 @@ angular.module("pocApp")
                     } else {
                         alert("A DG is expected!")
                     }
-
-
                     console.log(vo)
                 })
 

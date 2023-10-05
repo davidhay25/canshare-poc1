@@ -38,9 +38,16 @@
           <tr>
             <td>Type</td>
             <td>
-              <!-- <select ng-disabled="! isNew" ng-model="input.type" class="form-control"-->
-              <select  ng-disabled="! isNew" ng-model="input.type" class="form-control"
-                      ng-options="typ for typ in allTypes"></select>
+              <div class="row">
+                <div class="col-md-10">
+                  <select  ng-disabled="! isNew" ng-model="input.type" class="form-control"
+                           ng-options="typ for typ in allTypes"></select>
+
+                </div>
+                <div class="col-md-2">
+                  <button class="btn btn-link" ng-click="changeType()">Change</button>
+                </div>
+              </div>
 
                </td>
           </tr>

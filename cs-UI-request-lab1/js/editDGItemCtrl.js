@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('editDGItemCtrl',
-        function ($scope,$filter,item,allTypes,fullElementList) {
+        function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal) {
             $scope.item = item
             $scope.allTypes = allTypes
             $scope.input = {}
@@ -38,6 +38,31 @@ angular.module("pocApp")
             }
 
 
+            $scope.changeType = function (){
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/changeType.html',
+                    //backdrop: 'static',
+                    size : 'xlg',
+                    controller: 'changeTypeCtrl',
+
+                    resolve: {
+                        ed: function () {
+                            if (item && item.ed) {
+                                return item.ed
+                            } else {
+                                return {}
+                            }
+
+                        },
+                        hashAllDG: function () {
+                            return hashAllDG
+                        }
+                    }
+
+                }).result.then(function (vo) {
+
+                })
+            }
 
             $scope.setTitle = function (title) {
                 $scope.input.title = $scope.input.title || title

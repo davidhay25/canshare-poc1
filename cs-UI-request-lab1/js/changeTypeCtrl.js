@@ -7,20 +7,11 @@ angular.module("pocApp")
 
             $scope.ed = ed
             let currentType  // = "Patient"
-            if (ed) {
+            if (ed && ed.type) {
                 currentType = ed.type[0]
             }
 
-
-
-
-
-
-
             let fhirBase = "http://hl7.org/fhir/R4B/datatypes.html"
-
-
-
 
             $scope.fhirTypes = modelsSvc.fhirDataTypes()
 
@@ -30,9 +21,7 @@ angular.module("pocApp")
                 $scope.typeUrl = `${fhirBase}#${currentType}`
             }
 
-
-
-
+            
             function sortDG() {
                 $scope.sortedDGList1 = []
 

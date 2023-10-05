@@ -159,6 +159,8 @@ angular.module("pocApp")
                         //checked out to this user
                         $scope.canEdit = true
 
+                    } else {
+                        alert(`Checked out to ${QObject.user}. If this is you, try re-selecting the Q.`)
                     }
                 }
 
@@ -350,6 +352,7 @@ angular.module("pocApp")
                                 $scope.treeData.push(node)
 
                             })
+                           // $scope.selectedQNode = {id:ed.id}
 
                         } else {
                             //so it's not a DG. But could still be the section entry. If there's a type, then it's an element
@@ -437,12 +440,12 @@ angular.module("pocApp")
             function getAllCompElements(comp) {
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG) //input.types created on the parent scope
                 $scope.allCompElements = vo.allElements     //an array
-
+/*
                 console.log(vo.allElements)
                 vo.allElements.forEach(function (item) {
                     console.log(item.ed.path, item.ed.kind)
                 })
-
+*/
             }
 
             //initialize a new QObject
@@ -482,35 +485,23 @@ angular.module("pocApp")
                 $scope.qTree = $('#qtree').jstree(
                     {'core': {'multiple': false,
                             'data': treeData,
-                            'check_callback' : function(operation, node, node_parent, node_position, more) {
-                        console.log(more.ref)
-                                return true
-                            },
-                            'themes': {name: 'proton', responsive: true},
+                            'themes': {name: 'proton', responsive: true}
+                        }
+                    }
+                ).on('select_node.jstree', function (e, data) {
+                    console.log('select_node')
 
-                            plugins:['dnd'],
-                            dnd: {
-                                'is_draggable' : function(nodes,e) {
-                                    //don't allow groups to be dragged
-                                    return true
-                                    /*
-                                    delete $scope.dndSource
-                                    let node = nodes[0]
-                                    if (node.data && node.data.item && node.data.item.type == 'group') {
-                                        return false
-                                    } else {
-                                        $scope.dndSource = node.data.item
-                                        return true
-                                    }
-                                    */
+                    let v = $(this).jstree(true).get_json('#', { 'flat': false })
+                    $scope.Q = makeObject(v) //not a complete Q, but compatible
 
-                                }
+                    if ($scope.sectionNameFromTree) {
+                        for (const sect of $scope.Q.item) {
+                            if (sect.text == $scope.sectionNameFromTree) {
+                                $scope.selectedSection = sect
+                                break
                             }
                         }
                     }
-
-
-                ).on('changed.jstree', function (e, data) {
 
                     if (data.node) {
                         //This is a list of all elements from the comp available to add to the Q section
@@ -568,18 +559,23 @@ angular.module("pocApp")
 
 
 
+
                     $scope.$digest();
 
                 })
                     .bind("loaded.jstree", function (event, data) {
-
-                   // $(this).jstree("open_all");
+                        console.log('loaded')
                         $(this).jstree("open_node","root");
-
-                    if ($scope.selectedQNode) {
-                        $(this).jstree("select_node",$scope.selectedQNode.id);
-                        $(this).jstree("open_node",$scope.selectedQNode.id);
-                    }
+                        if ($scope.selectedQNode) {
+                            $(this).jstree("select_node",$scope.selectedQNode.id);
+                            $(this).jstree("open_node",$scope.selectedQNode.id);
+                            console.log('node populated: ' + $scope.selectedQNode.id)
+                           // $(this).jstree("open_node",$scope.selectedQNode.id);
+                        }
+                    })
+/*
+                    .bind("select_node.jstree", function (event, data) {
+                        console.log('select_node')
 
                     let v = $(this).jstree(true).get_json('#', { 'flat': false })
 
@@ -596,23 +592,11 @@ angular.module("pocApp")
 
                     $scope.$digest()
                 })
-                    .bind("dblclick.jstree", function (event) {
-                        $scope.selectedQNode = $(event.target).closest("li");
-                       // var data = node.data("jstree");
-
-                        $scope.removeElement()
-                      //  alert('dbl')
-                    });
+                    */
 
             }
 
 
-            $(document).on('dnd_stop.vakata', function (e, data) {
-console.log(drop)
-                if ($scope.dndSource && $scope.dndTarget) {
-
-                }
-            })
             //create a hierarchical object representing the tree. This is used for the rendering,
             //and can also be converted into the Q. Uses the internal representation from the tree
             function makeObject(treeObject) {

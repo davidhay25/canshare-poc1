@@ -6,7 +6,7 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc) {
 
 
-            $scope.version = "0.4.6"
+            $scope.version = "0.4.7"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -692,6 +692,9 @@ angular.module("pocApp")
                         },
                         fullElementList : function () {
                             return $scope.fullElementList
+                        },
+                        hashAllDG : function () {
+                            return $scope.hashAllDG
                         }
                     }
 
@@ -785,7 +788,6 @@ angular.module("pocApp")
                             ed.path = ar.join('.')
                             $scope.selectedModel.diff.push(ed)
                         }
-
                     }
 
 

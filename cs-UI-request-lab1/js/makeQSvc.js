@@ -35,7 +35,7 @@ angular.module("pocApp")
 
                         //Add the hint instruction
                         if (data.controlType !== data.controlHint)  {
-                            console.log(item.text,data.controlType,data.controlHint)
+                            //console.log(item.text,data.controlType,data.controlHint)
                             //the hint is the extension that gives more options to the renderer
                             item.extension = item.extension || []
                             let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
@@ -276,7 +276,7 @@ angular.module("pocApp")
                     //note that the path is the full path (including DG name)
 
                     if (ed1.path.startsWith(path)) {
-                        console.log(ed1.path)
+                        //console.log(ed1.path)
 
                         let voControl = that.getControlDetails(ed1)
 
