@@ -16,6 +16,7 @@ angular.module("pocApp")
                 $scope.input.title = item.ed.title
                 $scope.input.mapping = item.ed.mapping
                 $scope.input.valueSet = item.ed.valueSet
+                $scope.input.sourceReference = item.ed.sourceReference
                 $scope.input.path =  $filter('dropFirstInPath')(item.ed.path)
                 for (typ of allTypes) {
                     if (item.ed.type[0] == typ) {
@@ -24,13 +25,7 @@ angular.module("pocApp")
                 }
 
                 $scope.input.mult = item.ed.mult
-                /*
-                for (var m of $scope.mult) {
-                    if (item.ed.mult == m) {
-                        $scope.input.mult = m
-                    }
-                }
-                */
+
             } else {
                 $scope.input.mult = "0..1"// $scope.mult[1]      //default to 0..1
 
@@ -97,6 +92,7 @@ angular.module("pocApp")
                     ed.title = $scope.input.title
                     ed.mult = $scope.input.mult
                     ed.valueSet = $scope.input.valueSet
+                    ed.sourceReference = $scope.input.sourceReference
 
                     $scope.$close(ed)
 
@@ -106,6 +102,7 @@ angular.module("pocApp")
                     item.ed.title = $scope.input.title
                     item.ed.mult = $scope.input.mult
                     item.ed.valueSet = $scope.input.valueSet
+                    item.ed.sourceReference = $scope.input.sourceReference
                     $scope.$close(item.ed)
                 }
 

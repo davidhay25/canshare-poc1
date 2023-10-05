@@ -89,17 +89,31 @@
                         removed or altered if needed.
                     </div>
                 </div>
+                <br/>
+                <div class="row">
+                    <div class="col-md-2">
+                        Source reference
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text"
+                               ng-change="setModelAttribute('sourceReference',input.sourceReference)"
+                               class = "form-control" ng-model="input.sourceReference"/>
+                    </div>
+                    <div class="col-md-7">
+                        The source of the information that defined the contents of this Data Group.
+                    </div>
+                </div>
+                <br/>
 
                 <div class="row">
                     <div class="col-md-2">
                         Description
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-10">
                         <textarea class="form-control" ng-model="input.newModelDescription"
                                   ng-change="setModelAttribute('description',input.newModelDescription)" ></textarea>
                     </div>
-                    <div class="col-md-7">
-                    </div>
+
                 </div>
 
 
@@ -288,11 +302,14 @@
                         <td>{{element.ed.mult}}</td>
                         <td>
                             {{element.ed.fixedCoding}}
+                            <!--
                             <div ng-show = "element.ed.type[0] == 'CodeableConcept'
                                 && (! element.ed.fixedCoding)
                                 && (element.sourceModelName !== model.name)">
+
                                 <span class="clickable" ng-click="setFixedCode(element)">Set value</span>
                             </div>
+                            -->
                         </td>
                         <td>{{element.sourceModelName}}</td>
 

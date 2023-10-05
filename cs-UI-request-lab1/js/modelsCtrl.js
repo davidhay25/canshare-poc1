@@ -612,7 +612,7 @@ angular.module("pocApp")
                     let fullMsg = `Cannot delete this DG. ${arRejectMessage.join(' ')}`
                     alert(fullMsg)
                 } else {
-                    if (confirm("Are you sure you wish to remove this DG from the local store? If uploaded to the library, it will still be there\"")) {
+                    if (confirm("Are you sure you wish to remove this DG from the local store? If uploaded to the library, it will still be there.")) {
                         delete $scope.hashAllDG[dgName]
                         makeAllDTList()
                         $scope.refreshUpdates()
@@ -757,6 +757,9 @@ angular.module("pocApp")
                         if (ed.valueSet !== originalED.valueSet) {
                             changes += "ValueSet changed."
                         }
+                        if (ed.sourceReference !== originalED.sourceReference) {
+                            changes += "Source reference changed."
+                        }
 
                         let found = false
                         //let changes = []    //this is the list of changes
@@ -769,6 +772,7 @@ angular.module("pocApp")
                                 ed1.description = ed.description
                                 ed1.mult = ed.mult
                                 ed1.valueSet = ed.valueSet
+                                ed1.sourceReference = ed.sourceReference
                                 break
                             }
                         }
@@ -1379,13 +1383,16 @@ angular.module("pocApp")
 
                         //determine the possible control types (in the Q) for this element
                         delete $scope.qControlOptions
-                        switch ($scope.selectedNode.data.ed.type[0]) {
-                            case "string" :
-                                $scope.qControlOptions =  ["string","text"]
-                                break
-                            case "CodeableConcept" :
-                                $scope.qControlOptions =  ["drop-down","autocomplete","lookup"]
-                                break
+                        if ($scope.selectedNode.data.ed && $scope.selectedNode.data.ed.type) {
+                            switch ($scope.selectedNode.data.ed.type[0]) {
+                                case "string" :
+                                    $scope.qControlOptions =  ["string","text"]
+                                    break
+                                case "CodeableConcept" :
+                                    $scope.qControlOptions =  ["drop-down","autocomplete","lookup"]
+                                    break
+                            }
+
                         }
 
                         $scope.input.controlHint = $scope.selectedNode.data.ed.controlHint

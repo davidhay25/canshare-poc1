@@ -19,7 +19,12 @@
 
         <strong>{{selectedModel.title}} </strong> ({{selectedModel.name}})
         <div><em>{{selectedModel.description}}</em></div>
-        <br/><br/>
+        <div>
+          <div ng-show="selectedModel.sourceReference">
+            <strong>Source reference</strong>: {{selectedModel.sourceReference}}
+          </div>
+        </div>
+        <br/>
         <div>
           <button class="btn btn-link" ng-click="deleteComposition(selectedModel)">Remove from local store</button>
         </div>
@@ -451,6 +456,13 @@
                   {{tag}}
                 </div>
               </td>
+            </tr>
+
+            <tr>
+              <td>Source reference</td>
+
+              <td><input type="text" class="form-control" ng-model="selectedModel.sourceReference" />  </td>
+
             </tr>
 
 

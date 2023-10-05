@@ -92,20 +92,34 @@ angular.module("pocApp")
             //is specific to the currently selected Q
             let hashElementsUsed = {}
 
+            function saveToLibrary() {
+                $scope.currentQObject.content = $scope.treeData
+
+                $http.put(`/model/QObject/${$scope.currentQObject.name}`,$scope.currentQObject).then(
+                    function () {
+                        console.log('save')
+
+                    },
+                    function () {
+                        alert("There was an error updating the Library")
+                    }
+                )
+            }
+
+            $scope.save = function () {
+                if (confirm("Do you wish to save this Questionnaire in the Library")) {
+                    saveToLibrary()
+                    alert("Q has been saved in the Library")
+                }
+
+            }
 
             //update the library with the current QObject
             let updateLibrary = function () {
 
                 return  ////temp while developing
 
-                $http.put(`/model/QObject/${$scope.currentQObject.name}`,$scope.currentQObject).then(
-                    function () {
-                        console.log('save')
-                    },
-                    function () {
-                        alert("There was an error updating the Library")
-                    }
-                )
+                saveToLibrary()
 
                 $scope.currentQObject.content = $scope.treeData
 
@@ -622,6 +636,9 @@ console.log(drop)
                 })
 
                 $scope.Qresource = makeQSvc.makeQ(treeObject)
+
+                $scope.downloadQLinkJson = window.URL.createObjectURL(new Blob([angular.toJson($scope.Qresource,true)],{type:"application/json"}))
+                $scope.downloadQLinkJsonName = `Q-${$scope.currentQObject.name}.json`
 
                 return obj
             }

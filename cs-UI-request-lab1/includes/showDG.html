@@ -19,8 +19,13 @@
 
   <div class="modelInfo row">
     <div class="col-md-6">
-      <strong>{{selectedModel.title}} </strong> ({{selectedModel.name}}): <em>{{selectedModel.description}}</em>
-      <br/><br/>
+      <strong>{{selectedModel.title}} </strong> ({{selectedModel.name}}) <em>{{selectedModel.description}}</em>
+      <div>
+        <div ng-show="selectedModel.sourceReference">
+          <strong>Source reference</strong>: {{selectedModel.sourceReference}}
+        </div>
+      </div>
+      <br/>
       <div>
 
         <div class="row">
@@ -210,7 +215,7 @@
             </div>
           </div>
 
-            <uib-tabset>
+            <uib-tabset ng-hide="selectedNode.data.ed.kind == 'root'">
               <uib-tab heading="Details">
                 <table class="table table-bordered table-condensed">
 
@@ -287,38 +292,6 @@
                         </div>
                       </div>
 
-<!--
-                      <div class="row">
-                        <div class="col-md-12">
-                          <div ng-switch="getControlType(selectedNode.data.ed)">
-
-                            <div ng-switch-when= "dropdown">
-                              <select class="form-control" ng-model="input.dropdownControl"
-                                      ng-options="item.pt for item in selectedNode.data.ed.options">
-                                <option value="" disabled selected hidden>Please choose option</option>
-                              </select>
-                            </div>
-
-                            <div ng-switch-when= "input">
-                              <input type="text" class="form-control"
-                                     placeholder="Enter text value"
-                                     ng-model="input.textControl">
-                            </div>
-
-                            <div ng-switch-when= "dg">
-                              This is a DataGroup. Click <span ng-click="displayDGDialog(selectedNode.data.ed)"
-                                                               class="clickable">here</span> for a sample dialog.
-                            </div>
-
-
-                          </div>
-                        </div>
-                        <div class="col-md-0">
-
-                        </div>
-                      </div>
--->
-
                     </td>
 
 
@@ -357,32 +330,6 @@
                       {{selectedNode.data.ed.mapping}}
                     </td>
                   </tr>
-
-
-<!-- don't delete until we have dependencies sorted, But don't call it mapping - that's for the FHIR maping
-                  <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
-                    <td>Mappings</td>
-                    <td>
-
-                      <div ng-repeat="code in selectedNode.data.ed.code">
-                        <div ng-repeat="target in conceptMap[code.code].targets">
-                          <div>{{target.display}} (<span class="clickable" ng-click="viewVS()">{{target.code}}</span> )</div>
-                          <table class="table table-bordered">
-                            <tr ng-repeat="dep in target.dependsOn">
-                              <td>{{dep.property}}</td>
-                              <td>{{dep.display}}</td>
-                              <td>{{dep.value}}</td>
-                            </tr>
-                          </table>
-                        </div>
-                      </div>
-
-
-
-                    </td>
-
-                  </tr>
-                  -->
 
 
                   <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
@@ -448,6 +395,15 @@
                     </td>
                   </tr>
 
+                  <tr>
+                    <td>Source reference</td>
+                    <td>
+                      <i class="glyphicon glyphicon-edit pull-right clickable"
+                         ng-click="editDGItem(selectedNode.data)"></i>
+                      {{selectedNode.data.ed.sourceReference}}
+                    </td>
+                  </tr>
+
 
                 </table>
 
@@ -504,7 +460,9 @@
               </uib-tab>
             </uib-tabset>
 
-            <button class="btn-link btn  pull-right" ng-click="deleteDGItem(selectedNode.data.ed)">Delete this item ({{selectedNode.data.ed.title}})</button>
+            <button class="btn-link btn  pull-right"
+                    ng-hide="selectedNode.data.ed.kind == 'root'"
+                    ng-click="deleteDGItem(selectedNode.data.ed)">Delete this item ({{selectedNode.data.ed.title}})</button>
 
 
 

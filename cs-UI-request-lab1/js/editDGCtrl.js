@@ -31,6 +31,7 @@ angular.module("pocApp")
             if (! isNew) {
                 $scope.input.newModelName = model.name
                 $scope.input.newModelTitle = model.title
+                $scope.input.sourceReference = model.sourceReference
                 $scope.input.newModelDescription = model.description
                 if (model.parent) {
                     $scope.input.newModelParent = model.parent
@@ -56,54 +57,6 @@ angular.module("pocApp")
             $scope.input.cards = ["0..1","1..1","0..*",'1..*']
             $scope.input.card = $scope.input.cards[0]
 
-            //set the override code. Like comp overrides, this sets an element with the appropriate
-            //path in the DG. todo checked nested DT paths...
-            //todo generalize to change other attrobutes - like title & mutiplicity
-            $scope.setFixedCodeDEP = function (element) {
-                let code = prompt("Enter the code")
-                if (code) {
-                    let path = element.ed.path
-                    let ar = path.split('.')
-                    let nameInOriginal = ar[ar.length-1]
-                    ar.splice(0,1)
-                    let pathInThisEd = ar.join('.')
-                    let pathInTarget
-                    if (ar.length == 1) {
-                        //if the pathlength is 1, then we're overriding an element on the root of the target model
-                        pathInTarget = ar[0]
-                    } else {
-                        //otherwise we're overriding a nested path in the target (under a group node)
-                        ar.splice(0,1)
-                        pathInTarget = ar.join('.')  //we assume that the first 2 elements in the path are the type name, and name of this element
-                    }
-
-                    let sourceModel = hashTypes[element.sourceModelName]
-                    if (sourceModel) {
-                        //locate the original ed from the source
-                        sourceModel.diff.forEach(function (ed) {
-                            if (ed.path == pathInTarget) {
-                                //if (ed.path == nameInOriginal) {
-                                //this is the ed that is to be overriden. So a copy (with an updated path
-                                //is saved in this DT
-                                let newEd = angular.copy(ed)
-                                newEd.fixedCoding = {code:code}
-                                newEd.status = 'new'
-                                newEd.path = pathInThisEd
-                                $scope.model.diff.push(newEd)
-
-                                $scope.model.changes = $scope.model.changes || []
-                                msg = `Fix value to ${code}`
-                                $scope.model.changes.push({edPath: path, msg:msg})
-
-                            }
-                        })
-                        getFullElementList()
-
-                    } else {
-                        alert(`Model: ${element.sourceModelName} not found.` )
-                    }
-                }
-            }
 
             $scope.tabSelected = function (tab) {
                 $scope.selectedTab = tab
@@ -194,7 +147,7 @@ angular.module("pocApp")
             }
 
             //select element from base model list (so can edit the elements defined by the model)
-            $scope.selectElementFromList = function (element) {
+            $scope.selectElementFromListDEP = function (element) {
                 $scope.selectedElementFromList = element
                 delete $scope.edit.code
                 delete $scope.edit.title
@@ -210,7 +163,7 @@ angular.module("pocApp")
                 }
             }
 
-            $scope.updateElementFromList = function () {
+            $scope.updateElementFromListDEP = function () {
 
 
 
@@ -337,6 +290,7 @@ angular.module("pocApp")
                 //$scope.model.status = 'changed'
                 element.path = $scope.input.path
                 element.title = $scope.input.title
+                //element.sourceReference = $scope.input.sourceReference
                 element.type = [$scope.input.type]
                 element.description = $scope.input.description
 
@@ -396,6 +350,7 @@ angular.module("pocApp")
                     if ($scope.isUnique) {
                         $scope.model.status = 'new'
                         $scope.model.diff = $scope.model.diff || []
+
                         $scope.$close($scope.model)
                     } else {
                         alert("The name is not valid - likely a duplicate")

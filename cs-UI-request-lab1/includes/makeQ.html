@@ -58,6 +58,7 @@
       </div>
 
 
+      <div class="pull-right"><button ng-show="currentQObject" class="btn btn-link" ng-click="save()">Save</button></div>
       <uib-tabset>
         <uib-tab heading="Editor tree">
           <div class="row">
@@ -134,7 +135,22 @@
                   <tr><td>Description</td><td>{{selectedQNode.data.ed.description }}</td></tr>
                   <tr><td>Data type</td><td>{{selectedQNode.data.ed.type[0] }}</td></tr>
                   <tr><td>Control type</td><td>{{selectedQNode.data.controlType }}</td></tr>
+                  <tr><td>Control hint</td><td>{{selectedQNode.data.controlHint }}</td></tr>
                   <tr><td>Cardinality</td><td>{{selectedQNode.data.ed.mult }}</td></tr>
+                  <tr ng-show="selectedQNode.data.ed.otherAllowed"><td>Other allowed</td><td>Is enabled</td></tr>
+
+                  <tr ng-show="selectedQNode.data.ed.enableWhen.length > 0">
+                    <td>Conditional</td>
+                    <td>
+                      <table class="table">
+                        <tr ng-repeat = "ew in selectedQNode.data.ed.enableWhen">
+                          <td>{{ew.source}}</td>
+                          <td>{{ew.operator}}</td>
+                          <td>{{ew.value.display}}</td>
+                        </tr>
+                      </table>
+
+                  </tr>
                 </table>
 
                 <div class="clickable" ng-show="canEdit" ng-click="removeElement()">Remove this element</div>
@@ -212,6 +228,13 @@
 
                 </uib-tab>
                 <uib-tab  heading="Q">
+                  <div>
+                    <a class="btn btn-link pull-right" download="{{downloadQLinkJsonName}}"
+                       href="{{downloadQLinkJson}}" title="{{downloadQLinkJsonName}}" >
+                      Download Questionnaire resource
+                    </a>
+                  </div>
+                  <div class="clearfix"/>
                   <pre>{{Qresource | json}}</pre>
 
                 </uib-tab>

@@ -109,6 +109,15 @@ angular.module("pocApp")
                     parent.item = parent.item || []
                     parent.item.push(item)
 
+                    //If 'other allowed' is set, then add a text box
+                    if (data.ed && data.ed.otherAllowed) {
+                        let itemOther = {text:`${node.text} (Other)`}     //this is the Q item element
+                        itemOther.linkId = `${node.id}.other`
+                        itemOther.type = 'string'
+                        parent.item.push(itemOther)
+                    }
+
+
                     if (node.children && node.children.length > 0) {
                         node.children.forEach(function (childNode) {
 
