@@ -83,7 +83,7 @@ angular.module("pocApp")
 
             
 
-            $scope.changeDGType = function (ed) {
+            $scope.changeDGTypeDEP = function (ed) {
                 //create a reusable 'type selection dialog' - will be potentially be widely used
                 //needs to be hierarchy aware
 

@@ -247,20 +247,28 @@
                   <tr><td>Type</td>
                     <td><div ng-repeat="type in selectedNode.data.ed.type">
 
+                      <i class="glyphicon glyphicon-edit pull-right clickable"
+                         ng-click="editDGItem(selectedNode.data)"></i>
+
+
                       <div ng-show="fhirDataTypes.indexOf(type) > -1" class="pull-right">
-                        <a target = "_blank" ng-href="{{fhirRoot}}datatypes.html#{{type}}">Details in spec</a>
+                        <a style="padding-right: 12px" target = "_blank" ng-href="{{fhirRoot}}datatypes.html#{{type}}">Details in spec </a>
                       </div>
 
 
                       <div ng-hide="fhirDataTypes.indexOf(type) > -1" class="pull-right clickable"
+                           style="padding-right: 12px"
                            ng-click="termSelectDG({DGName:type},selectedModel.name)">
                         Load
                       </div>
 
+                      <!--
                       <div class="pull-right clickable"
                            ng-click="changeDGType(selectedNode.data.ed)">
                         Change&nbsp;
                       </div>
+                      -->
+
 
                       {{type}}&nbsp;
 
@@ -280,16 +288,23 @@
                     <td>Input control</td>
                     <td>
                       <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-12">
+
+                          <i class="glyphicon glyphicon-edit pull-right clickable"
+                             ng-click="editDGItem(selectedNode.data)"></i>
+
+
+                          {{selectedNode.data.ed.controlHint}}
 
                           <span ng-repeat = "opt in qControlOptions">
                             <input type="radio"
                                    ng-change="setControlHint(selectedNode.data.ed,opt)"
                                    ng-model="input.controlHint" value="{{opt}}"> {{opt}}
                           </span>
+
+
                         </div>
-                        <div class="col-md-4">
-                        </div>
+
                       </div>
 
                     </td>

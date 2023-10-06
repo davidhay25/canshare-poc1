@@ -228,7 +228,7 @@ angular.module("pocApp")
                 $scope.selectCompTreePath(path)
             }
 
-            $scope.changeValueSet = function (ed) {
+            $scope.changeValueSetDEP = function (ed) {
                 let vsUrl = prompt("Enter the ValueSet url")
                 if (vsUrl) {
                     let newEd = angular.copy(ed)

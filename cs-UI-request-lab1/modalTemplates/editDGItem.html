@@ -40,8 +40,12 @@
             <td>
               <div class="row">
                 <div class="col-md-10">
+                  <input type="text" class="form-control" disabled = "disabled" ng-model="input.selectedType"/>
+
+                  <!--
                   <select  ng-disabled="! isNew" ng-model="input.type" class="form-control"
                            ng-options="typ for typ in allTypes"></select>
+                  -->
 
                 </div>
                 <div class="col-md-2">
@@ -74,18 +78,11 @@
 
               </div>
 
-<!--
-
-              <select ng-model="input.mult" class="form-control"
-                      ng-options="opt for opt in mult">
-
-              </select>
--->
 
             </td>
           </tr>
 
-          <tr ng-show="input.type == 'CodeableConcept'">
+          <tr ng-show="input.selectedType == 'CodeableConcept'">
             <td>ValueSet</td>
 
             <td>
@@ -105,10 +102,32 @@
 
 
           <tr>
+            <td>Control Hint</td>
+            <td>
+              <span ng-repeat = "opt in qControlOptions">
+                  <input type="radio"
+                         ng-change="setControlHint(selectedNode.data.ed,opt)"
+                         ng-model="input.controlHint" value="{{opt}}"> {{opt}}
+                </span>
+
+            </td>
+          </tr>
+
+          <tr>
+            <td>Fixed value</td>
+            <td>
+              {{fixedValue}}
+
+            </td>
+          </tr>
+
+
+
+
+          <tr>
             <td>Source reference</td>
             <td><input type="text" class="form-control" ng-model="input.sourceReference"/> </td>
           </tr>
-
 
         </table>
 

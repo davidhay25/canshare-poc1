@@ -18,6 +18,13 @@ angular.module("pocApp")
                 $scope.input.valueSet = item.ed.valueSet
                 $scope.input.sourceReference = item.ed.sourceReference
                 $scope.input.path =  $filter('dropFirstInPath')(item.ed.path)
+                $scope.input.controlHint =  item.ed.controlHint
+
+                $scope.input.selectedType = item.ed.type[0]
+                setControlOptions($scope.input.selectedType)
+
+                $scope.fixedValue = item.ed.fixedCoding
+
                 for (typ of allTypes) {
                     if (item.ed.type[0] == typ) {
                         $scope.input.type = typ
@@ -60,6 +67,13 @@ angular.module("pocApp")
                     }
 
                 }).result.then(function (vo) {
+                    if (vo.class == 'dg') {
+                        $scope.input.selectedType = vo.value.name
+                    } else {
+                        $scope.input.selectedType = vo.value
+                    }
+
+                    setControlOptions($scope.input.selectedType)
 
                 })
             }
@@ -69,6 +83,42 @@ angular.module("pocApp")
 
 
             }
+
+            function setControlOptions(type) {
+
+                switch (type) {
+                    case "string" :
+                        $scope.qControlOptions =  ["string","text"]
+                        break
+                    case "CodeableConcept" :
+                        $scope.qControlOptions =  ["drop-down","autocomplete","lookup"]
+                        break
+                }
+
+
+            }
+
+            function setFixedValue(type) {
+
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/fixValues.html',
+                    backdrop: 'static',
+                    //size : 'lg',
+                    controller: 'fixValuesCtrl',
+
+                    resolve: {
+                        type: function () {
+                            return type
+                        }
+                    }
+
+                }).result.then(function (vo) {
+                    console.log(vo)
+                })
+            }
+
+
 
             $scope.save = function() {
                 //let ar1 = $scope.input.path.split('.')
@@ -110,19 +160,27 @@ angular.module("pocApp")
                     }
 
                     let ed = {}
-                    ed.type = [$scope.input.type]
+                    //ed.type = [$scope.input.type]
+                    ed.type = [$scope.input.selectedType]
                     ed.path = `new.${$scope.input.path}`        //the 'new.' is stripped off, as the full path is passed in for editing existing
                     ed.description = $scope.input.description
                     ed.mapping = $scope.input.mapping
                     ed.title = $scope.input.title
                     ed.mult = $scope.input.mult
                     ed.valueSet = $scope.input.valueSet
+                    if ($scope.input.controlHint) {
+                        ed.controlHint = $scope.input.controlHint
+                    }
                     ed.sourceReference = $scope.input.sourceReference
 
                     $scope.$close(ed)
 
                 } else {
+                    item.ed.type = [$scope.input.selectedType]
                     item.ed.mapping = $scope.input.mapping
+                    if ($scope.input.controlHint) {
+                        item.ed.controlHint = $scope.input.controlHint
+                    }
                     item.ed.description = $scope.input.description
                     item.ed.title = $scope.input.title
                     item.ed.mult = $scope.input.mult
@@ -134,23 +192,7 @@ angular.module("pocApp")
 
 
 
-/*
-                if ($scope.isNew) {
-                    let ed = {}
-                    ed.type = [$scope.input.type]
-                    ed.path = `new.${$scope.input.path}`        //the 'new.' is stripped off, as the full path is passed in for editing existing
-                    ed.description = $scope.input.description
-                    ed.title = $scope.input.title
-                    ed.mult = $scope.input.mult
 
-                } else {
-                    item.ed.description = $scope.input.description
-                    item.ed.title = $scope.input.title
-                    item.ed.mult = $scope.input.mult
-                    $scope.$close(item.ed)
-                }
-
-                */
 
             }
         }

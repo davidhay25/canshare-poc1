@@ -154,14 +154,16 @@
                       <button ng-show="selectedCompositionNode.data.ed.valueSet"
                             ng-click="viewVS(selectedCompositionNode.data.ed.valueSet)"
                             class="btn-link btn">View VS</button>
-
+<!--
                       <button ng-show="selectedCompositionNode.data.ed.valueSet"
                               ng-click = "changeValueSet(selectedCompositionNode.data.ed)"
                               class="btn-link btn">Change VS</button>
 
+
                       <button ng-hide="selectedCompositionNode.data.ed.valueSet"
                               ng-click = "changeValueSet(selectedCompositionNode.data.ed)"
                               class="btn-link btn">Set VS</button>
+                      -->
 
                     </div>
                   </div>
@@ -181,8 +183,6 @@
                 </div>
 
 
-
-
                 <div class="row"  ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
                   <div class="col-md-3">
                     Options List
@@ -195,7 +195,7 @@
                     <div ng-hide="selectedCompositionNode.data.ed.options">
                       There are no options defined
                     </div>
-                    <div><em>Options are used to build ValueSets</em></div>
+
 
 
                       <button
@@ -218,6 +218,16 @@
                   </div>
                 </div>
 
+                <div class="row">
+                  <div class="col-md-3">
+                    Control Hint
+                  </div>
+                  <div class="col-md-9">
+                    {{selectedCompositionNode.data.ed.controlHint}}
+                  </div>
+                </div>
+
+                <!--
                <div class="row" ng-show="selectedCompositionNode.data.ed.slice">
                  <div class="col-md-3">
                    Slice Info
@@ -226,6 +236,7 @@
                    {{selectedCompositionNode.data.ed.slice.name}}
                  </div>
                 </div>
+                -->
 
               </div>
 

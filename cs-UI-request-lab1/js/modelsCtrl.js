@@ -10,6 +10,8 @@ angular.module("pocApp")
             $scope.input = {}
             $scope.input.showFullModel = true
 
+           text.x = "y"
+
             //record access
             $http.post("model/access",{})
 
@@ -741,6 +743,9 @@ angular.module("pocApp")
                         //or whether it is an inherited element, in which case an override element is added...
                         displayPath = $filter('dropFirstInPath')(ed.path)
 
+                        if (ed.type[0] !== originalED.type[0]) {
+                            changes += "Type changed. "
+                        }
 
                         if (ed.description !== originalED.description) {
                             changes += "Description changed. "
@@ -770,12 +775,15 @@ angular.module("pocApp")
                         for (const ed1 of $scope.selectedModel.diff) {
                             if (ed1.path == displayPath) {
                                 found = true
+                                //can't just replace from ed as not all elements can be altered
+                                ed1.type = ed.type
                                 ed1.title = ed.title
                                 ed1.mapping = ed.mapping
                                 ed1.description = ed.description
                                 ed1.mult = ed.mult
                                 ed1.valueSet = ed.valueSet
                                 ed1.sourceReference = ed.sourceReference
+                                ed1.controlHint = ed.controlHint
                                 break
                             }
                         }
@@ -1382,7 +1390,7 @@ angular.module("pocApp")
                     if (data.node) {
 
                         $scope.selectedNode = data.node;
-
+/*
                         //determine the possible control types (in the Q) for this element
                         delete $scope.qControlOptions
                         if ($scope.selectedNode.data.ed && $scope.selectedNode.data.ed.type) {
@@ -1398,6 +1406,8 @@ angular.module("pocApp")
                         }
 
                         $scope.input.controlHint = $scope.selectedNode.data.ed.controlHint
+
+                        */
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...

@@ -56,8 +56,10 @@
     <link rel="stylesheet" type="text/css" href="css/common.css"/>
     <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
 
+
+
     <script>
-        angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage','ngSanitize',"firebase"]).config(function($locationProvider) {
+        let app = angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage','ngSanitize',"firebase"]).config(function($locationProvider) {
             $locationProvider.html5Mode(true);
             $locationProvider.hashPrefix('!');
         });
@@ -70,8 +72,26 @@
         angular.module("formsApp",[])
         angular.module('topApp', ['pocApp', 'formsApp'])
 
-    </script>
+        //https://www.tutorialsteacher.com/angularjs/angularjs-exception-handling
+        app.config(function ($provide) {
 
+            $provide.decorator('$exceptionHandler', function ($delegate) {
+
+                return function (exception, cause) {
+                  //  $delegate(exception, cause);
+//console.log(cause)
+                    //console.log(exception.stack)
+                    //$http.post("model/access",{})
+
+                   // logErrorsToBackend(exception, cause);
+
+                    alert(`error: ${exception.stack}`);
+                };
+            });
+        });
+
+
+    </script>
 
 
 
@@ -405,6 +425,7 @@
                         </uib-tab>
 
                         <uib-tab heading = "Inheritance">
+                            <div class="pull-right clickable " ng-click="newModel('dg')">New</div>
                             <em> A tree view of DG by inheritance</em>
                             <div class="myScroll">
                                 <div id="allDGTree"></div>
