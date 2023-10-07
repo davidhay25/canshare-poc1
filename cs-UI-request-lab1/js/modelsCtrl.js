@@ -10,7 +10,7 @@ angular.module("pocApp")
             $scope.input = {}
             $scope.input.showFullModel = true
 
-           text.x = "y"
+           //text.x = "y"
 
             //record access
             $http.post("model/access",{})
@@ -173,7 +173,10 @@ angular.module("pocApp")
                             return $scope.hashAllCompositions
                         },
                         allQObject : function () {
-                            $scope.allQObject
+                            return $scope.allQObject
+                        },
+                        user : function () {
+                            return $scope.user
                         }
                     }
 
@@ -1164,6 +1167,11 @@ angular.module("pocApp")
                     if (newModel) {
                         //if a model is returned, then it is a new one and needs to be added to the world
 
+                        if ($scope.user) {
+                            newModel.author = $scope.user.email
+                        }
+
+
                         $localStorage.world.dataGroups[newModel.name] = newModel
                         $scope.hashAllDG = $localStorage.world.dataGroups
                         sortDG()
@@ -1298,6 +1306,7 @@ angular.module("pocApp")
 
                 let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
                 makeDGTree(treeData)
+
             }
 
             //only used for DG now
@@ -1305,6 +1314,13 @@ angular.module("pocApp")
                 if (dg) {
                     clearB4Select()
                     $scope.selectedModel = dg
+
+                    let url = `/model/DG/${dg.name}/history/count`
+                    $http.get(url).then(
+                        function (data) {
+                            $scope.historyCount = data.data
+                        }
+                    )
 
                     $scope.refreshUpdates()
 

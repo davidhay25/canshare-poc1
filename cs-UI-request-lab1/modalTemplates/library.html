@@ -200,36 +200,67 @@
 
       <uib-tab heading="DataGroups sync" >
 
-        <br/>
-        <div class="row">
-          <div class="col-md-4">
-            <button class="btn btn-danger" ng-click="refreshFromRepo()">Refresh local store
-              <i class="glyphicon glyphicon-arrow-down"></i>
-            </button>
-          </div>
-          <div class="col-md-8">
-            Will <strong>download the latest copies</strong> of all the DataGroups from the Library. This includes
-            both core and custom (user created) DGs. This will replace any local copies with the one from the library. eg
-            if you have changed a core DG locally, that change will be lost. If you have local custom DGs that haven't yet
-            been saved in the Library, they will still be there
+        <div ng-show="syncOutcome">
+          <br/>
 
+          <div ng-show = "syncOutcomeSummary.changed > 0">
           </div>
-        </div>
-        <br/>
-        <div class="row">
-          <div class="col-md-4">
-            <button class="btn btn-danger" ng-click="updateRepo()">Update Library  <i class="glyphicon glyphicon-arrow-up"></i></button>
-          </div>
-          <div class="col-md-8">
-            Will <strong>upload all the DataGroups</strong> to the Library from any local copies you may have. This includes
-            both core and custom (user created) DGs. Your local store will not be affected, but the library will be updated
-            with any changes you may have made to any DataGroup.
 
+          <div ng-show = "syncOutcomeSummary.changed > 0">
+            {{syncOutcomeSummary.total}} resources were uploaded, {{syncOutcomeSummary.changed}} were different to the Library version and were updated.
+            <br/>
+
+            The following resources were updated:
+            <table class="table table-bordered">
+              <tr ng-repeat="item in syncOutcomeSummary.details">
+                <td>{{item.name}}</td>
+              </tr>
+            </table>
           </div>
+
+
+
+
+
         </div>
-        <br/>
-        <em>These options to synchronise ALL DataGroups between the library and the local browser store. If you just want to
-          upload / download a single DataGroup theres a 'Compare to Library' link on the tree details page of each DataGroup.</em>
+        <div ng-hide="syncOutcome">
+          <br/>
+          <div class="row">
+            <div class="col-md-4">
+              <button class="btn btn-danger" ng-click="refreshFromRepo()">Refresh local store
+                <i class="glyphicon glyphicon-arrow-down"></i>
+              </button>
+            </div>
+            <div class="col-md-8">
+              Will <strong>download the latest copies</strong> of all the DataGroups from the Library. This includes
+              both core and custom (user created) DGs. This will replace any local copies with the one from the library. eg
+              if you have changed a core DG locally, that change will be lost. If you have local custom DGs that haven't yet
+              been saved in the Library, they will still be there
+
+            </div>
+          </div>
+          <br/>
+          <div class="row" ng-show="user">
+            <div class="col-md-4">
+              <button class="btn btn-danger" ng-click="updateRepo()">Update Library  <i class="glyphicon glyphicon-arrow-up"></i></button>
+            </div>
+            <div class="col-md-8">
+              Will <strong>upload all the DataGroups</strong> to the Library from any local copies you may have. This includes
+              both core and custom (user created) DGs. Your local store will not be affected, but the library will be updated
+              with any changes you may have made to any DataGroup.
+
+            </div>
+          </div>
+          <div ng-hide="user">
+            Only logged in users can update the Library
+          </div>
+          <br/>
+          <em>These options to synchronise ALL DataGroups between the library and the local browser store. If you just want to
+            upload / download a single DataGroup theres a 'Compare to Library' link on the tree details page of each DataGroup.</em>
+
+
+        </div>
+
       </uib-tab>
 
       <uib-tab heading="Questionnaires">

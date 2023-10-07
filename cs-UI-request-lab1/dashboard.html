@@ -527,7 +527,49 @@
 
             </div>
         </uib-tab>
-        <uib-tab heading = "Log">
+        <uib-tab heading = "Telemetry">
+            <br/>
+
+            <div>
+
+                <div class="row">
+                    <div class="col-md-7">
+                        <strong>Log Entries</strong>
+                        <table class="table-bordered table table-condensed">
+                            <tr ng-repeat = "log in logs">
+                                <td>{{log.date | date:'yyyy-MMM-dd'}}</td>
+                                <td>{{log.module}}</td>
+                                <td>{{log.type}}</td>
+                                <td>{{log.msg | limitTo : 150}}</td>
+                            </tr>
+                        </table>
+
+
+                    </div>
+                    <div class="col-md-5">
+
+
+
+
+                    </div>
+                </div>
+
+                <!--
+                        display from log (mongo)
+
+                        each CS submission has
+                            bundle submitted (use viewBundle dir.)
+                            bundle generated
+                            processing outcome
+                            validation reslult
+                -->
+
+            </div>
+
+
+        </uib-tab>
+
+        <uib-tab ng-show="false" heading = "Log">
             <br/>
 
             <div>
@@ -545,6 +587,8 @@
 
                     </div>
                     <div class="col-md-10">
+
+
                         <uib-tabset ng-show="input.selectedLog">
                             <br/>
                             <uib-tab heading="Bundle">
@@ -582,6 +626,7 @@
 
 
         </uib-tab>
+
     </uib-tabset>
 
 

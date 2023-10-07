@@ -1,0 +1,86 @@
+
+<div>
+  <!--<div ng-controller="newResourceCtrl">-->
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-10 col-sm-10">
+        <h3 class="modal-title">
+          History of {{name}}
+        </h3>
+      </div>
+
+
+      <div class="col-md-2 col-sm-2">
+
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-body">
+
+    <div class="row">
+      <div class="col-md-3">
+
+        <div class="myScroll">
+
+        <div class="list-group">
+          <div ng-class="{'list-group-item':true,listItemSelected:item == selectedItem}" ng-repeat="item in hx"
+               style="cursor: pointer"
+            ng-click="selectItem(item)">
+            {{item.user}}
+            <div>{{item.date | date : 'medium'}} </div>
+          </div>
+        </div>
+        </div>
+
+
+      </div>
+      <div class="col-md-9" ng-show="selectedItem">
+        <div class="row">
+          <div class="col-md-5">
+            {{selectedItem.user}}
+          </div>
+          <div class="col-md-5">
+            {{selectedItem.date | date : 'medium'}} ({{selectedItem.date | ageSeconds}})
+          </div>
+          <div class="col-md-2">
+            {{selectedItem.content.diff.length}} items
+          </div>
+        </div>
+
+        <div>
+          Parent: {{selectedItem.content.parent}}
+        </div>
+        <br/>
+        <uib-tabset>
+          <uib-tab heading="Table">
+            <table class="table-condensed table table-bordered">
+              <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th></tr>
+              <tr ng-repeat="ed in selectedItem.content.diff">
+                <td>{{ed.path}}</td>
+                <td>{{ed.title}}</td>
+                <td>{{ed.description}}</td>
+                <td>{{ed.type[0]}}</td>
+              </tr>
+            </table>
+            <em>Only shows items directly defined in the DG - Not expanding parent or references</em>
+          </uib-tab>
+          <uib-tab heading="Json">
+            <pre>{{selectedItem | json}}</pre>
+          </uib-tab>
+        </uib-tabset>
+
+
+
+
+    </div>
+
+
+  </div>
+    <pre>{{hx | json}}</pre>
+  <div class="modal-header">
+
+  </div>
+</div>

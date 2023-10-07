@@ -168,6 +168,68 @@ angular.module("pocApp")
             }
         })
 
+        .filter('ageSeconds',function(){
+
+            return function(da,inBrackets){
+            if (da) {
+                var diff = moment().diff(moment(da),'seconds');
+                var disp = "";
+                if (diff < 60) {
+                    disp = diff + " secs";
+                } else if (diff < 60*60) {
+                    var m = Math.floor( diff/60);
+                    if (m == 1) {
+                        disp =  " 1 minute";
+                    } else {
+                        disp = m + " minutes";
+                    }
+
+
+                } else if (diff < 60*60*24){
+                    var d = Math.floor( diff/(60*60));
+                    if (d ==1 ) {
+                        disp =  "1 hour";
+                    } else {
+                        disp = d + " hours";
+                    }
+
+
+                    //todo logic for better age
+                } else if (diff < 60*60*24*30){
+                    var d = Math.floor( diff/(60*60*24));
+                    if (d == 1){
+                        disp = '1 day';
+                    } else {
+                        disp = d + " days";
+                    }
+
+                    //todo logic for better age
+
+                } else {
+                    var w = Math.floor( diff/(60*60*24*7));
+                    if (w == 1) {
+                        disp = "1 week";
+                    } else {
+                        disp = w + " weeks";
+                    }
+
+
+                    //todo logic for better age
+                }
+
+
+                if (inBrackets) {
+                    return "(" + disp+")";
+                } else {
+                    return disp;
+                }
+
+            } else {
+                return '';
+            }
+
+        }})
+
         .filter('prettyDate',function(){
             return function(da){
                 if (da) {

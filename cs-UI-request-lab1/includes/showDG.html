@@ -29,7 +29,7 @@
       <div>
 
         <div class="row">
-          <div class="col-md-5">
+          <div class="col-md-6">
             <div ng-show="selectedModel.parent">
               <strong>Parents</strong>
 
@@ -45,7 +45,7 @@
 
           </div>
 
-          <div class="col-md-5">
+          <div class="col-md-6">
             <strong>Direct children</strong> ({{relationshipsSummary.children.length}})
             <span ng-show="relationshipsSummary.children.length > 0"
                     class="clickable" ng-click="input.showDGChildren = ! input.showDGChildren">
@@ -61,34 +61,76 @@
             </div>
           </div>
 
+          <!--
 
-          <div class="col-md-2">
+                   <div class="col-md-2">
 
 
-            <div ng-show="selectedModel.profile">
-              <a ng-href="{{igBase}}{{selectedModel.profile}}" target="_blank">Profile</a>
-            </div>
+                     <div ng-show="selectedModel.profile">
+                       <a ng-href="{{igBase}}{{selectedModel.profile}}" target="_blank">Profile</a>
+                     </div>
 
-            <div ng-show="selectedModel.ss">
-              <a ng-href="{{selectedModel.ss}}" target="_blank">SpreadSheet</a>
-            </div>
+
+                     <div ng-show="selectedModel.ss">
+                       <a ng-href="{{selectedModel.ss}}" target="_blank">SpreadSheet</a>
+                     </div>
 
 
 
 
           </div>
-
+ -->
 
 
         </div>
 
       </div>
-      <div class="clickable" ng-click="deleteDG(selectedModel.name)">Delete</div>
+
+      <br/>
+
+      <!--
+      <br/>
+      <div class="row">
+        <div class="col-md-6">
+          <div ng-show="user.email">
+            <div ng-hide="selectedModel.checkedOut" class="clickable" ng-click="checkOut()">Check out</div>
+            <div ng-show="selectedModel.checkedOut" class="clickable" ng-click="checkIn()">Check in</div>
+          </div>
+
+
+        </div>
+        <div class="col-md-6">
+          <div class="clickable" ng-click="deleteDG(selectedModel.name)">Delete</div>
+        </div>
+      </div>
+      -->
+
+
     </div>
 
 
     <div class="col-md-6">
+
+      <button class="btn btn-link" ng-click="showHistory()">History ({{historyCount}})</button>
+      <button class="btn btn-link" ng-click="deleteDG(selectedModel.name)">Delete</button>
+
+      <div class="pull-right">
+        <div ng-show="user.email">
+
+          <button class="btn btn-success"
+                  ng-hide="selectedModel.checkedOut" class="clickable" ng-click="checkOut()">Check out</button>
+
+          <button class="btn btn-warning"
+                  ng-show="selectedModel.checkedOut && selectedModel.checkedOut == user.email"  ng-click="checkIn()">Check in</button>
+
+          <div ng-show = "selectedModel.checkedOut && selectedModel.checkedOut !== user.email">
+            <strong>Checked out to {{selectedModel.checkedOut}}</strong>
+          </div>
+        </div>
+      </div>
+
       <table class="table table-condensed" style="margin-top: 8px">
+        <!--
         <tr>
           <td style="width: 25%">FHIR resource</td>
           <td><a target = "_blank" ng-href="{{fhirRoot}}{{selectedModel.fhirResource}}">{{selectedModel.fhirResource}}</a></td>
@@ -99,9 +141,10 @@
           <td>
             {{getCategory(selectedModel).code}}
 
-          <!-- <em>The group from the summary picture.</em> -->
+
           </td>
         </tr>
+        -->
         <tr><td>Tags</td>
           <td>
 

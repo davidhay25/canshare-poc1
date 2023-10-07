@@ -21,7 +21,7 @@ angular.module("pocApp")
                 $scope.typeUrl = `${fhirBase}#${currentType}`
             }
 
-            
+
             function sortDG() {
                 $scope.sortedDGList1 = []
 

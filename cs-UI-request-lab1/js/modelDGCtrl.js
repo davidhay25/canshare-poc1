@@ -1,7 +1,7 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('modelDGCtrl',
-        function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc,$timeout) {
+        function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc,$timeout,librarySvc) {
 
         //todo - is this still being used?
             let fixedValueText = {}
@@ -9,6 +9,36 @@ angular.module("pocApp")
             fixedValueText.string = "What is the fixed string"
             fixedValueText.decimal = "What is the fixed decimal"
 
+
+
+            //check out the current DH
+            $scope.checkOut = function () {
+                librarySvc.checkOut($scope.selectedModel,$scope.user)
+            }
+
+            $scope.checkIn = function () {
+                librarySvc.checkIn($scope.selectedModel,$scope.user)
+               // delete $scope.selectedModel.checkedOut
+            }
+
+            $scope.showHistory = function () {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/history.html',
+                    //backdrop: 'static',
+                    size : 'lg',
+                    controller: 'historyCtrl',
+
+                    resolve: {
+                        name: function () {
+                            return $scope.selectedModel.name
+                        },
+                        category: function () {
+                            return "dg"
+                        }
+                    }
+
+                })
+            }
 
             //add an enableWhen within the scope of the current DG. Assume (for now) that the trigger is a coded value
             //value is assumed to be a Coding

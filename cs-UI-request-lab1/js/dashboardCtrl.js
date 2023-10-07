@@ -379,7 +379,8 @@ angular.module("pocApp")
 
             function getLogs() {
                 let module = 'request'      //todo - support other modules
-                $http.get(`/logs/${module}`).then(
+                $http.get(`/telemetry`).then(
+                    // $http.get(`/logs/${module}`).then(
                     function (data) {
                         $scope.logs = data.data
                     }, function(err) {

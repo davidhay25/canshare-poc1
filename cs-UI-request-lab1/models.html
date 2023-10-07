@@ -80,12 +80,23 @@
                 return function (exception, cause) {
                   //  $delegate(exception, cause);
 //console.log(cause)
-                    //console.log(exception.stack)
+                    console.log("Untrapped exception",exception.stack)
                     //$http.post("model/access",{})
 
                    // logErrorsToBackend(exception, cause);
 
-                    alert(`error: ${exception.stack}`);
+                    let obj = {type:'err',module:'model',msg:exception.stack}
+                    $.ajax({
+                        type: "POST",
+                        url: "/telemetry",
+                        contentType: "application/json",
+                        data: JSON.stringify(obj)
+                    });
+
+                    let msg = "There was an unexpected error. Details have been saved to the server, " +
+                        "but your last action may have failed. You should restart the browser and check."
+
+                    alert(msg);
                 };
             });
         });
@@ -148,6 +159,8 @@
     <script src="js/changeTypeCtrl.js"></script>
     <script src="js/makeQCtrl.js"></script>
     <script src="js/makeQSvc.js"></script>
+    <script src="js/librarySvc.js"></script>
+    <script src="js/historyCtrl.js"></script>
     <script src="directive/renderForm/renderFormSvc.js"></script>
     <script src="directive/renderForm/renderFormDir.js"></script>
     <script src="directive/renderSingleItem/renderSingleItemDir.js"></script>

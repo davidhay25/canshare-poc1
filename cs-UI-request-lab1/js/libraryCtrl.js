@@ -1,9 +1,10 @@
 //seversync is actually the main library interface
 angular.module("pocApp")
     .controller('libraryCtrl',
-        function ($scope,$http,allDG,allComp,$sce,allQObject) {
+        function ($scope,$http,allDG,allComp,$sce,allQObject,user) {
 
             $scope.input = {}
+            $scope.user = user
             //$scope.input.mainTabActive = 1
 
             $scope.localDGCount = Object.keys(allDG).length
@@ -179,11 +180,29 @@ angular.module("pocApp")
             $scope.updateRepo = function () {
                 if (confirm('Are you sure you wish to update the Library')) {
                     let qry = "/model/DG"
-                    $http.post(qry,allDG).then(
+
+                    let vo = {hashAllDG:allDG}
+                    vo.user = user
+
+                    $http.post(qry,vo).then(
                         function (data) {
                             console.log(data)
-                            alert("All local DataGroups have been uploaded to the Library")
-                            $scope.$close()
+                            $scope.syncOutcome = data.data
+
+                            //create a summary object
+                            $scope.syncOutcomeSummary = {details:[],changed:0}
+                            $scope.syncOutcomeSummary.total = $scope.syncOutcome.length
+
+                            $scope.syncOutcome.forEach(function (item) {
+                                if (item.saved) {
+                                    $scope.syncOutcomeSummary.details.push(item)
+                                    $scope.syncOutcomeSummary.changed ++
+                                }
+                            })
+
+
+                            //alert("All local DataGroups have been uploaded to the Library")
+                            //$scope.$close()
                         },
                         function (err) {
                             console.log(err)
