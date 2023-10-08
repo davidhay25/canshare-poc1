@@ -120,6 +120,9 @@
           <button class="btn btn-success"
                   ng-hide="selectedModel.checkedOut" class="clickable" ng-click="checkOut()">Check out</button>
 
+          <button class="btn btn-danger"
+                  ng-show="selectedModel.checkedOut && selectedModel.checkedOut == user.email"  ng-click="revert()">Revert</button>
+
           <button class="btn btn-warning"
                   ng-show="selectedModel.checkedOut && selectedModel.checkedOut == user.email"  ng-click="checkIn()">Check in</button>
 
@@ -229,7 +232,7 @@
           <div id="dgTree"></div>
 
           <div>
-          <button class="btn btn-link pull-right"
+          <button class="btn btn-link pull-right" ng-show="canEdit(selectedModel)"
                   ng-click="editDGItem()">Add new element <span ng-show="selectedNode">to {{selectedNode.data.ed.path}}</span></button>
           </div>
           <br/><br/>
@@ -252,7 +255,7 @@
 -->
               <button class="btn btn-link pull-right"
 
-                      ng-show="canSlice(selectedNode.data.ed)"
+                      ng-show="canSlice(selectedNode.data.ed) && canEdit(selectedModel)"
 
                       ng-click="slice(selectedNode.data.ed)">Slice</button>
             </div>
@@ -277,12 +280,14 @@
                   <tr><td style="width : 20%">Title</td>
                     <td>
                     <i class="glyphicon glyphicon-edit pull-right clickable"
+                       ng-show="canEdit(selectedModel)"
                        ng-click="editDGItem(selectedNode.data)"></i>
                    {{selectedNode.data.ed.title}}</td>
                   </tr>
 
                   <tr><td>Description</td><td>
                     <i class="glyphicon glyphicon-edit pull-right clickable"
+                       ng-show="canEdit(selectedModel)"
                        ng-click="editDGItem(selectedNode.data)"></i>
                     {{selectedNode.data.ed.description}}
                   </td></tr>
@@ -291,6 +296,7 @@
                     <td><div ng-repeat="type in selectedNode.data.ed.type">
 
                       <i class="glyphicon glyphicon-edit pull-right clickable"
+                         ng-show="canEdit(selectedModel)"
                          ng-click="editDGItem(selectedNode.data)"></i>
 
 
@@ -315,7 +321,7 @@
 
                       {{type}}&nbsp;
 
-                      <div ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
+                      <div ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept' && canEdit(selectedModel)">
                         <checkbox
                                 ng-change = "setOtherAllowedStatus(selectedNode.data.ed,selectedNode.data.ed.otherAllowed)"
                                 ng-model="selectedNode.data.ed.otherAllowed"></checkbox>
@@ -334,6 +340,7 @@
                         <div class="col-md-12">
 
                           <i class="glyphicon glyphicon-edit pull-right clickable"
+                             ng-show="canEdit(selectedModel)"
                              ng-click="editDGItem(selectedNode.data)"></i>
 
 
@@ -359,6 +366,7 @@
 
                   <tr><td>Cardinality</td><td>
                     <i class="glyphicon glyphicon-edit pull-right clickable"
+                       ng-show="canEdit(selectedModel)"
                        ng-click="editDGItem(selectedNode.data)"></i>
                     {{selectedNode.data.ed.mult}}
                   </td></tr>
@@ -368,6 +376,7 @@
                     <td>
 
                       <i class="glyphicon glyphicon-edit pull-right clickable"
+                         ng-show="canEdit(selectedModel)"
                          ng-click="editDGItem(selectedNode.data)"></i>
 
                       <div>{{selectedNode.data.ed.valueSet}}</div>
@@ -384,6 +393,7 @@
                     <td>Mapping notes</td>
                     <td>
                       <i class="glyphicon glyphicon-edit pull-right clickable"
+                         ng-show="canEdit(selectedModel)"
                          ng-click="editDGItem(selectedNode.data)"></i>
                       {{selectedNode.data.ed.mapping}}
                     </td>
@@ -457,6 +467,7 @@
                     <td>Source reference</td>
                     <td>
                       <i class="glyphicon glyphicon-edit pull-right clickable"
+                         ng-show="canEdit(selectedModel)"
                          ng-click="editDGItem(selectedNode.data)"></i>
                       {{selectedNode.data.ed.sourceReference}}
                     </td>

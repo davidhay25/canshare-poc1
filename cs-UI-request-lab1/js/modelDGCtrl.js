@@ -18,7 +18,23 @@ angular.module("pocApp")
 
             $scope.checkIn = function () {
                 librarySvc.checkIn($scope.selectedModel,$scope.user)
-               // delete $scope.selectedModel.checkedOut
+
+            }
+
+            $scope.revert = function () {
+                if (confirm("Are you sure you wish to revert and lose any changes you have made?")) {
+                    librarySvc.revert($scope.selectedModel, $scope.user).then(
+                        function (data) {
+                            $scope.hashAllDG[$scope.selectedModel.name] = data
+                            $scope.$emit('updateDGList',{name:$scope.selectedModel.name})
+
+                            alert("Check out has been cancelled, and the Library version of this DG downloaded.")
+                        }, function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+                }
+
             }
 
             $scope.showHistory = function () {

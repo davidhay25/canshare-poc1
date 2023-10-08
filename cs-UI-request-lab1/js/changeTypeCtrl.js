@@ -3,7 +3,7 @@ angular.module("pocApp")
         function ($scope,ed,hashAllDG,modelsSvc,$uibModal) {
 
             $scope.input = {}
-            $scope.input.class = "dg"   //show the DataGroups as the default to select
+            $scope.input.class = "dt"   //show the DataGroups as the default to select
 
             $scope.ed = ed
             let currentType  // = "Patient"

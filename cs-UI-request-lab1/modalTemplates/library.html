@@ -200,19 +200,33 @@
 
       <uib-tab heading="DataGroups sync" >
 
-        <div ng-show="syncOutcome">
+        <div ng-show="syncOutcomeDownloadSummary">
           <br/>
+          <strong>Summary of download from Library</strong>
 
-          <div ng-show = "syncOutcomeSummary.changed > 0">
+          <table class="table table-bordered">
+            <tr ng-repeat="item in syncOutcomeDownloadSummary.details">
+              <td>{{item.msg}}</td>
+            </tr>
+          </table>
+
+        </div>
+
+        <div ng-show="syncOutcomeUpload">
+          <br/>
+          <strong>Summary of upload to Library</strong>
+
+          <div ng-show = "syncOutcomeUploadSummary.changed == 0">
+            Nothing was uploaded. Your local store exactly matches the Library.
           </div>
 
-          <div ng-show = "syncOutcomeSummary.changed > 0">
-            {{syncOutcomeSummary.total}} resources were uploaded, {{syncOutcomeSummary.changed}} were different to the Library version and were updated.
+          <div ng-show = "syncOutcomeUploadSummary.changed > 0">
+            {{syncOutcomeUploadSummary.total}} resources were uploaded, {{syncOutcomeUploadSummary.changed}} were different to the Library version and were updated.
             <br/>
 
             The following resources were updated:
             <table class="table table-bordered">
-              <tr ng-repeat="item in syncOutcomeSummary.details">
+              <tr ng-repeat="item in syncOutcomeUploadSummary.details">
                 <td>{{item.name}}</td>
               </tr>
             </table>
@@ -223,7 +237,9 @@
 
 
         </div>
-        <div ng-hide="syncOutcome">
+
+
+        <div ng-hide="syncOutcomeUpload || syncOutcomeDownloadSummary">
           <br/>
           <div class="row">
             <div class="col-md-4">

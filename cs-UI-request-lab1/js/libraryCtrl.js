@@ -103,7 +103,6 @@ angular.module("pocApp")
                         item.library = libraryHash[key]
                         delete libraryHash[key]      //any left in the hash at the end are new on the library
 
-
                     } else {
                         item.note = "Not in Library"
                         //the library  doesn't have this DG
@@ -127,7 +126,7 @@ angular.module("pocApp")
                         }
                     })
                 } catch (ex) {
-                    console.log("Issue sorting DG - likey a missing title",ex)
+                    console.log("Issue sorting DG - likley a missing title",ex)
                 }
 
 
@@ -156,16 +155,33 @@ angular.module("pocApp")
                             //console.log(data)
 
                             let arDG = data.data
+                            $scope.syncOutcomeDownloadSummary = {details:[],changed:0}
 
                             //replace each one. Leaves any that aren't in the library
                             arDG.forEach(function (dg) {
-                                console.log(dg.name)
-                                allDG[dg.name] = dg
+                                if (dg.kind == 'dg') {      //shouldn't need to check, but there's rubbish in the library ATM
+                                    let existingDG = allDG[dg.name]
+                                    if (existingDG) {
+                                        if (angular.toJson(dg) !== angular.toJson(existingDG)) {
+                                            //the DG exists on the local systemn and is different
+                                            //is the existing one checked out by the current user
+                                            if (user && existingDG.checkedOut == user.email) {
+                                                //this is checked out to the current user. Don't download
+                                                $scope.syncOutcomeDownloadSummary.details.push({msg : `${dg.name} not updated as it is checked out to the current user`})
+                                            } else {
+                                                //either no user, or the DG is not checked out to them
+                                                allDG[dg.name] = dg
+                                                $scope.syncOutcomeDownloadSummary.details.push({msg : `${dg.name} updated`})
+                                            }
+                                        }
+                                    } else {
+                                        //this is a new DG
+                                        allDG[dg.name] = dg
+                                        $scope.syncOutcomeDownloadSummary.details.push({msg : `${dg.name} added`})
+                                    }
+                                }
 
                             })
-                            //$scope.sortDG()        //in modelCtrl
-                            alert("Local DataGroups have been updated. Any local ones not in the library are untouched. Reload the page to see any changes.")
-                            $scope.$close(true)
 
                         },
                         function (err) {
@@ -187,16 +203,16 @@ angular.module("pocApp")
                     $http.post(qry,vo).then(
                         function (data) {
                             console.log(data)
-                            $scope.syncOutcome = data.data
+                            $scope.syncOutcomeUpload = data.data
 
                             //create a summary object
-                            $scope.syncOutcomeSummary = {details:[],changed:0}
-                            $scope.syncOutcomeSummary.total = $scope.syncOutcome.length
+                            $scope.syncOutcomeUploadSummary = {details:[],changed:0}
+                            $scope.syncOutcomeUploadSummary.total = $scope.syncOutcomeUpload.length
 
-                            $scope.syncOutcome.forEach(function (item) {
+                            $scope.syncOutcomeUpload.forEach(function (item) {
                                 if (item.saved) {
-                                    $scope.syncOutcomeSummary.details.push(item)
-                                    $scope.syncOutcomeSummary.changed ++
+                                    $scope.syncOutcomeUploadSummary.details.push(item)
+                                    $scope.syncOutcomeUploadSummary.changed ++
                                 }
                             })
 

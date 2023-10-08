@@ -3,7 +3,7 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,
-                  $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc) {
+                  $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc,librarySvc) {
 
 
             $scope.version = "0.4.7"
@@ -11,6 +11,17 @@ angular.module("pocApp")
             $scope.input.showFullModel = true
 
            //text.x = "y"
+
+            $scope.$on('updateDGList',function(ev,vo) {
+                console.log(vo)
+                sortDG()    //update the sorted list of DG
+                if (vo.name) {
+                    $scope.selectModel($scope.hashAllDG[vo.name] )
+                }
+
+            })
+
+
 
             //record access
             $http.post("model/access",{})
@@ -83,8 +94,28 @@ angular.module("pocApp")
 
             $scope.hxDGLoad = []        //a history of DG's that were loaded by termSelectDGItem. Used for the 'back' function
 
+            $scope.canEdit = function (model) {
 
+                if ($scope.user && model && model.checkedOut == $scope.user.email) {
+                    return true
+                }
 
+            }
+
+            $scope.revertDEP = function () {
+                if (confirm("Are you sure you wish to revert and lose any changes you have made?")) {
+                    librarySvc.revert($scope.selectedModel, $scope.user).then(
+                        function (data) {
+                            $scope.hashAllDG[$scope.selectedModel.name] = data
+                            alert("Check out has been cancelled, and the Library version of this DG downloaded. You may need to reload the page to see the changes.")
+                        }, function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+                }
+
+                // delete $scope.selectedModel.checkedOut
+            }
 
             //--------- login stuff
             //called whenever the auth state changes - eg login/out, initial load, create user etc.
@@ -120,11 +151,10 @@ angular.module("pocApp")
                 firebase.auth().signOut().then(function() {
                     delete $scope.user;
                     alert('You have been logged out')
-                    //modalService.showModal({}, {bodyText: 'You have been logged out'})
+
 
                 }, function(error) {
                     alert('Sorry, there was an error logging out - please try again')
-                    //modalService.showModal({}, {bodyText: 'Sorry, there was an error logging out - please try again'})
                 });
 
             };
@@ -198,7 +228,7 @@ angular.module("pocApp")
 
                     }
 
-
+                    $scope.$emit('updateDGList',{name:$scope.selectedModel.name})
 
                     // //rebuild fullList and re-draw the tree
                     //alert("The local copies have been updated. You should re-load the page to see the changes. ")
@@ -261,6 +291,16 @@ angular.module("pocApp")
 
             //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
             $scope.hashAllDG = $localStorage.world.dataGroups
+
+            console.log($scope.hashAllDG)
+
+            //If there's a DG with no diff, all sorts of bad stuff happens. Shouldn't occur, but if it does its a pain
+            //this at least prevents the app form crashing, so remedial action can be taken
+            Object.keys($scope.hashAllDG).forEach(function (key) {
+                $scope.hashAllDG[key].diff = $scope.hashAllDG[key].diff || []
+            })
+
+            //
 
 
             $scope.export = function () {
@@ -556,12 +596,9 @@ angular.module("pocApp")
 
             }
             sortDG()
-/*
-            $scope.sortDG = function () {
-                console.log('sort')
-                sortDG()
-            }
-*/
+
+
+
             //same as for DG's - a step towards separate objects for DG & comp
             $scope.hashAllCompositions = $localStorage.world.compositions
             //make the term summary. These are the override elements in the models
@@ -879,7 +916,6 @@ angular.module("pocApp")
                 $scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
                 $scope.compTermSummary = modelTermSvc.makeCompOverrideSummary($scope.hashAllCompositions).list
                 $scope.hashVsSummary = modelTermSvc.makeValueSetSummary($scope.hashAllDG,$scope.hashAllCompositions).hashVS
-
             }
 
             $scope.updateTermSummary()
@@ -1169,6 +1205,10 @@ angular.module("pocApp")
 
                         if ($scope.user) {
                             newModel.author = $scope.user.email
+
+                            librarySvc.checkOut(newModel,$scope.user)
+
+
                         }
 
 

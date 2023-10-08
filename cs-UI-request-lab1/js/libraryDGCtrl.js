@@ -65,6 +65,7 @@ angular.module("pocApp")
             )
 
             $scope.download = function() {
+                alert('disabled')
                 //need to update the DG in the allDG hash.
 
 
@@ -85,6 +86,9 @@ angular.module("pocApp")
                 }
 
             $scope.upload = function () {
+                alert("disabled")
+                return
+
                 let qry = `/model/DG/${DG.name}`
                 $http.put(qry,DG).then(
                     function (data) {

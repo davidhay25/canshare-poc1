@@ -11,6 +11,8 @@
 *
 * */
 
+const axios = require("axios");
+
 // https://www.mongodb.com/developer/languages/javascript/node-connect-mongodb/
 
 let MongoClient = require('mongodb').MongoClient;
@@ -24,11 +26,18 @@ async function listDatabasesDEP(client){
 }
 
 //save a DG in the history.
-async function saveHistory(DG,userEmail) {
+async function saveHistory(DG,userEmail,comment) {
     let vo = {date: new Date(), type:'dg',name:DG.name,user:userEmail,content:DG}
+    if (comment) {
+        vo.comment = comment
+    }
     //console.log('pre hx')
     await database.collection("history").insertOne(vo)
     //console.log('post hx')
+}
+
+function sendErrorNotification(data) {
+    axios.post("https://maker.ifttt.com/trigger/poc_error/json/with/key/dUZYc-uqt_dac43pA5twl4",data)
 }
 
 //return true if the 2 models are different
@@ -86,6 +95,7 @@ async function setup(app) {
 
         try {
             await database.collection("telemetry").insertOne(doc)
+            sendErrorNotification(doc)
             res.json(doc)
         } catch (ex) {
             console.log(ex)
@@ -97,8 +107,9 @@ async function setup(app) {
 
     app.get('/telemetry', async function(req,res) {
         let query = {}
+        const options = {sort: { date : -1 }}
         try {
-            const cursor = await database.collection("telemetry").find(query).toArray()
+            const cursor = await database.collection("telemetry").find(query,options).toArray()
             res.json(cursor)
         } catch(ex) {
             console.log(ex)
@@ -109,7 +120,7 @@ async function setup(app) {
     })
 
 
-    //======== datagroups
+    //======== datagroups  =========================
 
     //get all active datagroups
     app.get('/model/allDG', async function(req,res) {
@@ -134,25 +145,54 @@ async function setup(app) {
     })
 
 
+    //get the count of history items for a DG
     app.get('/model/DG/:name/history/count', async function(req,res) {
         let name = req.params.name
-        //console.log('hx')
 
         const query = {name:name,type:'dg'}
-        const options = {sort: { date : -1 }}
         try {
-            const cursor = await database.collection("history").find(query,options).toArray()
+            const cursor = await database.collection("history").find(query).toArray()
             res.json(cursor.length)
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+        }
+    })
+
+
+    //undo a checkout on a DG
+    app.put('/model/DG/:name/revert', async function(req,res) {
+        let name = req.params.name
+        const query = {name:name}
+        try {
+            //strategy is to get the library copy, then update it in a second call as the replaceOne doesn't return the updated doc
+            const cursor = await database.collection("dg").find(query).toArray()
+            if (cursor.length == 1) {
+
+                let dg = cursor[0]
+                delete dg['_id']
+                delete dg.checkedOut
+                //update the DG
+                await database.collection("dg").replaceOne(query,dg,{upsert:true})
+
+                //update the history
+                await saveHistory(dg,"unknown User","Reverting a checkout")
+
+                res.json(dg)
+            } else {
+                res.status(404).json({msg:`There were ${cursor.length} occurrences of the DG ${name}`})
+            }
         } catch(ex) {
             console.log(ex)
             res.status(500).json(ex.message)
 
         }
+
     })
 
     app.get('/model/DG/:name/history', async function(req,res) {
         let name = req.params.name
-        //console.log('hx')
+
 
         const query = {name:name,type:'dg'}
         const options = {sort: { date : -1 }}
@@ -168,6 +208,8 @@ async function setup(app) {
         }
     })
 
+
+
     //get a single DG by name
     app.get('/model/DG/:name', async function(req,res) {
         let name = req.params.name
@@ -179,13 +221,20 @@ async function setup(app) {
                 delete comp['_id']
                 res.json(comp)
             } else {
-                res.status(404).json({msg:'DG not found, or there are multiple with the same name'})
+                if (cursor.length == 0) {
+                    res.status(404).json({msg:'DG not found'})
+                } else {
+                    res.status(500).json({msg:`There were ${cursor.length} DGs with this name. This shouldn't happen.`})
+                }
+
             }
         } catch(ex) {
             console.log(ex)
             res.status(500).json(ex.message)
 
         }
+
+
     })
 
     //create / update a single DG. In theory the name param is not needed, but cleaner
