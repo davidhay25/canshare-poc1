@@ -88,21 +88,32 @@ angular.module("pocApp")
 
             $scope.checkName = function (name) {
 
-                $scope.model.name = name  //we can use the 'isUnique' to know if the model can be added
-                let ar = $scope.input.types.filter(type => type == name)
-                console.log(ar.length)
+                if (name) {
+                    if (name.indexOf(" ") > -1) {
+                        alert("Name cannot contain spaces")
+                        $scope.input.newModelName = $scope.input.newModelName.replace(/\s/g, "");
+                        return
+                    }
 
-                $scope.isUnique = (ar.length == 0) //temp
-
-                //check on the library. Is this going to be a performance hit?
-                if ($scope.isUnique) {
-                    modelsSvc.isUniqueNameOnLibrary(name,'comp').then(
+                    $scope.model.name = name  //we can use the 'isUnique' to know if the model can be added
+                    /*
+                                    let ar = $scope.input.types.filter(type => type == name)
+                                    console.log(ar.length)
+                                    $scope.isUnique = (ar.length == 0) //temp
+                    */
+                    //check on the library. Is this going to be a performance hit?
+                    //  if ($scope.isUnique) {
+                    modelsSvc.isUniqueNameOnLibrary(name,'dg').then(
                         function () {
                             //name is unique
+                            $scope.isUnique = true
                         }, function (err) {
                             $scope.isUnique = false
                         }
                     )
+                    // }
+
+
                 }
 
 

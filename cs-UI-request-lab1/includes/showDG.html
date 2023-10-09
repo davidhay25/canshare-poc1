@@ -485,7 +485,7 @@
 
                 <uib-tab-heading>Enable when <span class="badge">{{selectedNode.data.ed.enableWhen.length || 0}}</span> </uib-tab-heading>
                 <br/>
-                <em>In development</em>
+
                 <table class="table table-bordered">
                   <tr><th>Source</th><th>Operator</th><th>Value</th></tr>
                   <tr ng-repeat="dep in selectedNode.data.ed.enableWhen">
@@ -493,11 +493,12 @@
                     <td>{{dep.operator}}</td>
                     <td>{{dep.value}}</td>
                     <td> <i style="color: red" class="glyphicon glyphicon-remove clickable"
+                            ng-show = "canEdit(selectedModel)"
                             ng-click="removeEnableWhen($index)"></i></td>
                   </tr>
                 </table>
 
-                <div class="row">
+                <div class="row" ng-show="canEdit(selectedModel)">
                   <div class="col-md-5">
                     <select class="form-control" ng-model="input.ewSource"
                             ng-change = "ewSourceSelected(input.ewSource)"
@@ -530,7 +531,7 @@
             </uib-tabset>
 
             <button class="btn-link btn  pull-right"
-                    ng-hide="selectedNode.data.ed.kind == 'root'"
+                    ng-hide="selectedNode.data.ed.kind == 'root' || ! canEdit(selectedModel)"
                     ng-click="deleteDGItem(selectedNode.data.ed)">Delete this item ({{selectedNode.data.ed.title}})</button>
 
 
@@ -863,7 +864,8 @@
           <div class="tableFixHead">
             <table class="table-bordered table">
               <thead>
-              <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Fixed value</th><th>Source</th><th>Edit</th></tr>
+              <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Fixed value</th><th>Source</th>
+                <th ng-show="canEdit(selectedModel)">Edit</th></tr>
               </thead>
               <tbody>
               <!---     <tr ng-repeat="element in fullElementList">-->
@@ -912,8 +914,9 @@
                 <td>{{element.ed.fixedCoding}}</td>
                 <td>{{element.sourceModelName}}</td>
 
-                <td>
+                <td ng-show="canEdit(selectedModel)">
                   <i class="glyphicon glyphicon-edit pull-right clickable"
+
                      ng-click="editDGItem(element)"></i>
                 </td>
 

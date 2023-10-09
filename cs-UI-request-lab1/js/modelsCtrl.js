@@ -102,20 +102,7 @@ angular.module("pocApp")
 
             }
 
-            $scope.revertDEP = function () {
-                if (confirm("Are you sure you wish to revert and lose any changes you have made?")) {
-                    librarySvc.revert($scope.selectedModel, $scope.user).then(
-                        function (data) {
-                            $scope.hashAllDG[$scope.selectedModel.name] = data
-                            alert("Check out has been cancelled, and the Library version of this DG downloaded. You may need to reload the page to see the changes.")
-                        }, function (err) {
-                            alert(angular.toJson(err.data))
-                        }
-                    )
-                }
 
-                // delete $scope.selectedModel.checkedOut
-            }
 
             //--------- login stuff
             //called whenever the auth state changes - eg login/out, initial load, create user etc.
@@ -160,8 +147,9 @@ angular.module("pocApp")
             };
 
             $scope.resetAll = function () {
-                if (confirm("This will remove all DGs and refresh Core. Are you sure")) {
+                if (confirm("This will remove all DGs and refresh the example resources. Are you sure?")) {
                     $localStorage.world = modelsDemoSvc.getDemo()
+
                     alert("Reset complete. Please refresh the browser.")
                 }
             }
@@ -169,19 +157,13 @@ angular.module("pocApp")
             $scope.clearLocal = function () {
                 if (confirm("This will remove all DGs and create an empty environment. Are you sure")) {
                     $localStorage.world = {compositions:{},dataGroups: {},valueSets:{}}
+
+
                     alert("Reset complete. Please refresh the browser.")
                 }
             }
 
-            $scope.deleteDGDEP = function (dg) {
-                if (dg) {
-                    if (confirm("Are you sure you wish to remove this DG from the local store? If uploaded to the library, it will still be there")) {
-                        delete $scope.hashAllDG[dg.name]
-                        alert("DG has been removed from the local store. Please refresh the browser.")
-                    }
-                }
 
-            }
 
             //all the questionnaire objects (not actual Q)
             $scope.allQObject = $localStorage.allQObject
@@ -1170,7 +1152,7 @@ angular.module("pocApp")
 
 
                 }
-                //$scope.editComposition(newComp,true)
+
             }
 
 
@@ -1207,7 +1189,6 @@ angular.module("pocApp")
                             newModel.author = $scope.user.email
 
                             librarySvc.checkOut(newModel,$scope.user)
-
 
                         }
 

@@ -25,6 +25,7 @@ angular.module("pocApp")
                 if (confirm("Are you sure you wish to revert and lose any changes you have made?")) {
                     librarySvc.revert($scope.selectedModel, $scope.user).then(
                         function (data) {
+                            //returns the model from the library
                             $scope.hashAllDG[$scope.selectedModel.name] = data
                             $scope.$emit('updateDGList',{name:$scope.selectedModel.name})
 
