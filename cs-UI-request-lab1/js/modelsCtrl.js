@@ -1315,6 +1315,8 @@ angular.module("pocApp")
             $scope.refreshFullList = function (dg) {
 
 
+                //determine all the elements in this DG by recursing up the inheritance hierarchy
+                //and 'across' elements that are referenced DGs. Note that a referenced DG may have its own hierarchy
                 let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
 
 
@@ -1358,7 +1360,8 @@ angular.module("pocApp")
                         }
                     )
 
-                    $scope.refreshUpdates()
+
+                    $scope.refreshUpdates()     //update the xref and the list of all updates
 
                     //create the list of override elements
                     $scope.overrides = []
@@ -1370,7 +1373,7 @@ angular.module("pocApp")
                         }
                     })
 
-                    $scope.refreshFullList(dg)
+                    $scope.refreshFullList(dg)      //the complete list of elements for this DG
                 }
 
             }

@@ -11,7 +11,7 @@ angular.module("pocApp")
                 let deferred = $q.defer()
                 //check that the name is unique for the modelType (comp, dt) Case sensitive.
                 //just check the library
-                //todo
+
 
                 let url = `/model/DG/${name}`
                 if (modelType == 'comp') {
@@ -33,8 +33,6 @@ angular.module("pocApp")
 
                     }
                 )
-
-
 
                 return deferred.promise
 
@@ -59,12 +57,10 @@ angular.module("pocApp")
                     else if ( typeof value === 'number' ) {
                         bytes += 8;
                     }
-                    else if
-                    (
+                    else if (
                         typeof value === 'object'
                         && objectList.indexOf( value ) === -1
-                    )
-                    {
+                    ) {
                         objectList.push( value );
 
                         for( var i in value ) {
@@ -76,7 +72,7 @@ angular.module("pocApp")
             },
 
 
-            getConceptMapHash : function () {
+            getConceptMapHashDEP : function () {
                 let idOfConceptMap = "canshare-tnm-vs"
                 let deferred = $q.defer()
 
@@ -124,10 +120,9 @@ angular.module("pocApp")
 
                     let currentModelParent = model.parent
 
+                    //record all the parents of this DG, traversing up the hierarchy
                     while (model && model.parent) {
                        // console.log(`Examining ${DG.name}: ${model.parent} is the parent of ${model.name}`)
-
-
                         model = hashDG[model.parent]
                         if (model) {
                             hashReferences[model.name] = hashReferences[model.name] || []
@@ -135,7 +130,6 @@ angular.module("pocApp")
                         } else {
                             alert(`The DG ${key} has a parent of ${currentModelParent} which is not a DG`)
                         }
-
                     }
 
                     if (DG.diff) {
@@ -151,6 +145,7 @@ angular.module("pocApp")
                     }
                 })
 
+                //DGs referenced by Compositions
                 Object.keys(hashComp).forEach(function (key) {
                     let comp = hashComp[key]
                     if (comp.sections) {
@@ -406,9 +401,6 @@ angular.module("pocApp")
                     
                 })
 
-                
-
-
                 return rootItem
 
 
@@ -615,6 +607,7 @@ angular.module("pocApp")
             makeOrderedFullList : function (elements) {
                 //generate a list of elements for a given DG (based on the allElements array) that follows the slicing order
                 //elements is the complete list of elements, including those derived from parents referenced eds
+                //   (from modelsSvc.getFullListOfElements)
 
                 //first construct an object that represents the hierarchy (rather than a flat list of elements).
                 let dgName = elements[0].ed.path
@@ -693,9 +686,6 @@ angular.module("pocApp")
 
                 })
 
-
-
-
                 return arLines
 
 
@@ -703,13 +693,13 @@ angular.module("pocApp")
             },
 
             getFullListOfElements(inModel,inTypes,hashAllDG) {
-                //console.trace()
+
                 //create a complete list of elements for a DG (Compositions have a separate function)
 
                 //processing the DG hierarchy is destructive (the parent element is removed after processing
                 //to avoid infinite recursion
                 let types = angular.copy(inTypes)
-                //ensure the types has the FHIR dts as well
+                //ensure the types hash has the FHIR dts as well
                 let fdt = this.fhirDataTypes()
                 fdt.forEach(function (dt) {
                     types[dt] = dt
@@ -737,7 +727,7 @@ angular.module("pocApp")
                 let edRoot = {ed:{path:model.name,title:model.title,description:model.description}}
                 allElements.push(edRoot)
 
-                extractElements(model,model.name)
+                extractElements(model,model.name)   //the guts of the function
 
                 let nodes = new vis.DataSet(arNodes)
                 let edges = new vis.DataSet(arEdges);
@@ -783,7 +773,6 @@ angular.module("pocApp")
 
                     if (pos > -1) {
                         //replace the existing path
-
                         allElements.splice(pos,1,itemToInsert)
                     } else {
                         allElements.push(itemToInsert)          //this is what was working - just at the end
@@ -809,6 +798,8 @@ angular.module("pocApp")
 
                 //process a single element at the root of the DG
                 function extractElements(model,pathRoot) {
+
+                    console.log(pathRoot,model.name)
 
                     //add to nodes list
 
@@ -837,7 +828,8 @@ angular.module("pocApp")
 
                             //to prevent infinite recursion
                             let parent = model.parent
-                            delete model.parent
+
+                            // temp! delete model.parent
 
                             //create the 'parent' link  todo - graph needs to add parent
                             let edge = {id: 'e' + arEdges.length +1,
@@ -865,18 +857,15 @@ angular.module("pocApp")
                                     //a fhir datatype will not have a diff...
                                     let childDefinition = types[type]
 
-
                                     if (childDefinition.diff ) {
-                                        //if there is a diff element in the type, then it can be expanded
+                                        //if there is a diff element in the type, then it is a DG that can be expanded
 
                                         let relativePath =  $filter('dropFirstInPath')(`${pathRoot}.${ed.path}`)
 
-                                        //let fullPath =   `${pathRoot}.${ed.path}`
                                         relationshipsSummary.references.push({path:relativePath,type:childDefinition.name})
 
-                                        //avoid duplicates. where one DG refers to Observation multiple times, each results in Observation -> HCP
+                                        //avoid duplicates. eg where one DG refers to Observation multiple times, each results in Observation -> HCP
                                         let refHash = `${model.name}-${childDefinition.name}-${ed.path}`
-
                                         //only add an edge for a given source / target / path once
                                         if (! hashEdges[refHash]) {
                                             hashEdges[refHash] = true
