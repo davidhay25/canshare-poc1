@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('editDGCtrl',
-        function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc) {
+        function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc,parent) {
             $scope.model=model
             $scope.input = {}
             $scope.edit = {}
@@ -17,13 +17,29 @@ angular.module("pocApp")
                 }
             })
 
+            //leave at the top as called when creating a new DG with a parent
+            $scope.setModelAttribute = function(attribute,value) {
+                $scope.model[attribute] = value
+
+                if (attribute == 'parent') {
+                    //if changing the parent, then re-generate the expanded model
+                    getFullElementList()
+
+
+                }
+
+            }
 
 
             //get the full list of elements for a DG, following any inheritance chain..
             function getFullElementList() {
-                let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
-                console.log(vo)
-                $scope.allElements = vo.allElements
+                if ($scope.model.name) {    //if creating a new child (with a parent) the name may not be there - or if the parent is set before the name
+                    let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
+                    $scope.allElements = vo.allElements
+                }
+
+                //console.log(vo)
+
 
             }
 
@@ -39,6 +55,20 @@ angular.module("pocApp")
 
                 getFullElementList()
               
+            } else {
+                if (parent) {
+                    //$scope.input.newModelParent = model.parent
+                    //if there's a parent passed in for a new DG, then set the parent dropdown
+
+                    for (name of $scope.input.possibleParents) {
+                        if (name == parent.name) {
+                            $scope.input.newModelParent = name
+                            $scope.setModelAttribute('parent',name)
+                            break
+                        }
+                    }
+
+                }
             }
 
             //start with the DGs...
@@ -62,18 +92,7 @@ angular.module("pocApp")
                 $scope.selectedTab = tab
             }
 
-            $scope.setModelAttribute = function(attribute,value) {
-                $scope.model[attribute] = value
 
-                if (attribute == 'parent') {
-                    //if changing the parent, then re-generate the expanded model
-                    getFullElementList()
-
-                   
-                }
-
-            }
-            
             $scope.checkItemName = function () {
                 
             }
@@ -84,6 +103,18 @@ angular.module("pocApp")
                 if (ar.length > 2) {
                     return true
                 }
+            }
+
+            //called for name onBlur to expand the DG if there is a parent.
+            //mainly needed when a DG child is created and there's a parent before a name
+            $scope.checkExpand = function () {
+
+                $scope.model.name = $scope.input.newModelName
+                getFullElementList()
+
+
+
+
             }
 
             $scope.checkName = function (name) {
@@ -229,7 +260,7 @@ angular.module("pocApp")
             }
 
 
-            $scope.applyOverride = function (element,vsUrl) {
+            $scope.applyOverrideDEP = function (element,vsUrl) {
                 let newElement = angular.copy(element)
                 let ar = element.path.split('.')
                 ar.splice(0,1)
@@ -245,7 +276,7 @@ angular.module("pocApp")
 
             }
 
-            $scope.removeOverride = function (element) {
+            $scope.removeOverrideDEP = function (element) {
                 if (confirm("Are you sure you wish to remove this Override, returning the definition to the original")) {
                     let ar = element.path.split('.')
                     ar.splice(0,1)

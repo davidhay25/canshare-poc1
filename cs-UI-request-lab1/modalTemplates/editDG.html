@@ -47,6 +47,7 @@
                     <div class="col-md-3">
                         <input type="text"
                                ng-change="checkName(input.newModelName)"
+                               ng-blur = "checkExpand()"
                                class = "form-control" ng-model="input.newModelName"/>
 
                         <div style="color: green" ng-show="isNew && isUnique">Name is unique</div>

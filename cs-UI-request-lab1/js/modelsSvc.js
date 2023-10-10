@@ -693,20 +693,10 @@ angular.module("pocApp")
             },
 
             getFullListOfElements(inModel,inTypes,hashAllDG) {
-<<<<<<< HEAD
-
-=======
-                let trace = true
-
-                if (trace) {
-                    console.log(`get full list:${inModel.name}`)
-                }
-                //console.trace()
->>>>>>> c201a1209b4ef0fc3a4fcd134f3dfd4f64e125f6
                 //create a complete list of elements for a DG (Compositions have a separate function)
 
                 //processing the DG hierarchy is destructive (the parent element is removed after processing
-                //to avoid infinite recursion
+                //to avoid infinite recursion - update: not any more.
                 let types = angular.copy(inTypes)
                 //ensure the types hash has the FHIR dts as well
                 let fdt = this.fhirDataTypes()
@@ -717,7 +707,6 @@ angular.module("pocApp")
                 let relationshipsSummary = {parents:[],references:[],children:[]}       //all the relationships for this DG (reference 1 level only)
 
                 let model = angular.copy(inModel)
-
                 let topModel = angular.copy(model)
                 let allElements = []
                 let errors = []
@@ -824,9 +813,6 @@ angular.module("pocApp")
 
                     //do parents first.
                     if (model.parent ) {
-                        if (trace) {
-                            console.log(`extractElement:parent:${model.parent}`)
-                        }
 
                         if (types[model.parent]) {
                             //this is called whenever there is a DG to be expanded
@@ -862,9 +848,7 @@ angular.module("pocApp")
 
                     if (model.diff) {
                         model.diff.forEach(function (ed) {
-                            if (trace) {
-                                console.log(`model.diff:${ed.path}`)
-                            }
+
                             if (ed.type && ed.type.length > 0) {
                                 let type = ed.type[0]   //only look at the first code
                                 if (types[type]) {

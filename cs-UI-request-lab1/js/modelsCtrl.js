@@ -1111,11 +1111,10 @@ angular.module("pocApp")
             }
 
 
-
-            //create a new model
-            $scope.newModel = function(kind) {
-                let newModel = {kind:kind}
-                $scope.editModel(newModel,true)
+            //create a new model. If parent is set, then a new model automatically has that model as the parent
+            $scope.newModel = function(kind,parent) {
+                let newModel = {kind:kind,diff:[]}
+                $scope.editModel(newModel,true,parent)
             }
 
 
@@ -1172,7 +1171,7 @@ angular.module("pocApp")
 
 
             //edit an existing model (DG)
-            $scope.editModel = function (model,isNew) {
+            $scope.editModel = function (model,isNew, parent) {
 
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editDG.html',
@@ -1193,7 +1192,12 @@ angular.module("pocApp")
                         },
                         isNew: function () {
                             return isNew
+                        },
+
+                        parent: function () {
+                            return parent
                         }
+
                     }
 
                 }).result.then(function (newModel) {

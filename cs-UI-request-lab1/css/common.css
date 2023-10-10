@@ -41,6 +41,15 @@
 
 }
 
+.spacer {
+    padding-left: 8px;
+}
+.myScrollSmall {
+    height: 400px;
+    overflow-y: scroll;
+
+}
+
 .tableFixHead {
     overflow-y: auto;
     height: 800px;

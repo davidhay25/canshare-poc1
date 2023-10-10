@@ -17,6 +17,7 @@ angular.module("pocApp")
             }
 
             $scope.checkIn = function () {
+                //if (confirm("Are you sure you wish to check th"))
                 librarySvc.checkIn($scope.selectedModel,$scope.user)
 
             }

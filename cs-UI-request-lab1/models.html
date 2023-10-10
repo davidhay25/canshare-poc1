@@ -367,6 +367,31 @@
 
                     <uib-tabset>
 
+                        <uib-tab heading = "Inheritance">
+                            <div>
+                                <div class="pull-right clickable spacer"
+
+                                     ng-show = "canEdit(selectedModel)"  ng-click="editModel(selectedModel)">Edit</div>
+
+
+                                <div class="pull-right clickable spacer" ng-show = "user.email"  ng-click="newModel('dg')">New</div>
+
+
+                                <div class="pull-right clickable spacer" ng-show = "user.email"  ng-click="newModel('dg',selectedModel)">New child</div>
+
+                            </div>
+
+                            <div class="clearfix"></div>
+
+
+
+
+                            <div class="myScrollSmall">
+                                <div id="allDGTree"></div>
+                            </div>
+
+                        </uib-tab>
+
 
                         <uib-tab heading="All">
                             <div style="padding: 8px">
@@ -437,14 +462,6 @@
 
                         </uib-tab>
 
-                        <uib-tab heading = "Inheritance">
-                            <div class="pull-right clickable "  ng-show = "user.email"  ng-click="newModel('dg')">New</div>
-                            <em> A tree view of DG by inheritance</em>
-                            <div class="myScroll">
-                                <div id="allDGTree"></div>
-                            </div>
-
-                        </uib-tab>
 
                         <uib-tab heading = "Category">
                             <em>Matching what's in the image</em>
