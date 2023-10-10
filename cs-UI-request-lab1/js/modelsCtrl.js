@@ -6,7 +6,7 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc,librarySvc) {
 
 
-            $scope.version = "0.4.7"
+            $scope.version = "0.4.8"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -15,7 +15,7 @@ angular.module("pocApp")
             $scope.$on('updateDGList',function(ev,vo) {
                 console.log(vo)
                 sortDG()    //update the sorted list of DG
-                if (vo.name) {
+                if (vo && vo.name) {
                     $scope.selectModel($scope.hashAllDG[vo.name] )
                 }
 
@@ -194,11 +194,9 @@ angular.module("pocApp")
 
                 }).result.then(function (vo) {
 
-
                     if (vo && vo.comp) {
                         //a composition was passed in. Update (or add to) the $scope.hashAllCompositions
                         $scope.hashAllCompositions[vo.comp.name] = vo.comp
-                       // alert("The composition has been added")
 
                     }
 
@@ -207,10 +205,15 @@ angular.module("pocApp")
                         $scope.hashAllDG[vo.dg.name] = vo.dg
                         sortDG()
                         alert("DG has been downloaded. Please refresh the browser.")
-
                     }
 
-                    $scope.$emit('updateDGList',{name:$scope.selectedModel.name})
+                    //cause a refresh. May or may not be a model selected
+                    if ($scope.selectedModel) {
+                        $scope.$emit('updateDGList',{name:$scope.selectedModel.name})
+                    } else {
+                        $scope.$emit('updateDGList',{})
+                    }
+
 
                     // //rebuild fullList and re-draw the tree
                     //alert("The local copies have been updated. You should re-load the page to see the changes. ")
@@ -296,19 +299,31 @@ angular.module("pocApp")
                     resolve: {
                         hashAllDG: function () {
                             return $scope.hashAllDG
+                        },
+                        hashAllCompositions: function () {
+                            return $scope.hashAllCompositions
                         }
                     }
 
                 }).result.then(function (vo) {
-                    if (vo.dgs) {
+                    if (vo.dg) {
                         //a hash of dg
-                        Object.keys(vo.dgs).forEach(function (key) {
-                            let dg = vo.dgs[key]
+                        Object.keys(vo.dg).forEach(function (key) {
+                            let dg = vo.dg[key]
                             $scope.hashAllDG[dg.name] = dg
                         })
 
                     }
+                    if (vo.comp) {
+                        //a hash of dg
+                        Object.keys(vo.comp).forEach(function (key) {
+                            let comp = vo.comp[key]
+                            $scope.hashAllCompositions[comp.name] = comp
+                        })
 
+                    }
+
+                    alert("File has been imported. Please reload the page.")
 
                 })
 

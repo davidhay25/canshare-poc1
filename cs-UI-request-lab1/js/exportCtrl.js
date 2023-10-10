@@ -1,14 +1,16 @@
 angular.module("pocApp")
     .controller('exportCtrl',
-        function ($scope,hashAllDG) {
+        function ($scope,hashAllDG,hashAllCompositions) {
 
             //create the json & TSV download
 
-            $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([angular.toJson(hashAllDG,true) ],{type:"application/json"}))
+            let obj = {dg:hashAllDG,comp:hashAllCompositions}
+
+            $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([angular.toJson(obj,true) ],{type:"application/json"}))
             $scope.downloadLinkJsonName = `allDataGroups.json`
 
             $scope.import = function () {
-                $scope.$close({dgs:$scope.uploadedDG})
+                $scope.$close({dg:$scope.uploadedDG,comp: $scope.uploadedComp})
             }
 
             $scope.uploadJson = function() {
@@ -21,13 +23,35 @@ angular.module("pocApp")
                 }
 
                 let fileObject = fileList[0]  //is a complex object
-                //console.log(fileList)
 
                 let r = new FileReader();
 
+                //called when the upload completes
                 r.onloadend = function (e) {
                     let data = e.target.result;
-                    $scope.uploadedDG = angular.fromJson(data)
+
+
+                    let obj = angular.fromJson(data)
+                  //  let allDG = obj
+                 //   let allComp;
+
+                    //allows for both versions of the export facility
+                    //
+                    $scope.uploadedDG = obj //this was the first version
+
+                    if (obj.dg) {
+                        //allDG = obj.dg
+                        $scope.uploadedDG = obj.dg
+
+                    }
+
+                    if (obj.comp) {
+                        $scope.uploadedComp = obj.comp
+                       // allComp = obj.comp
+                    }
+
+                    $scope.uploadComplete = true
+                   // $scope.uploadedDG = angular.fromJson(allDG)
                     $scope.$digest()
 
                     console.log(data,$scope.uploadedDG)

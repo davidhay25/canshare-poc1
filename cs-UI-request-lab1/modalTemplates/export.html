@@ -10,6 +10,7 @@
 
 
             <div class="col-md-4 col-sm-4">
+                <button ng-show="uploadComplete" class="btn-primary btn pull-right" ng-click="import()">Import</button> </div>
                 <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
             </div>
 
@@ -45,12 +46,14 @@
                         Export all the DataGroups to a TSV file on this computer.
 
                         Used for importing into a spreadshseet.
+
+                        Not yet enabled.
                     </div>
                 </div>
 
             </uib-tab>
             <uib-tab heading="Import">
-                <div class="row"  ng-hide="uploadedDG">
+                <div class="row" ng-hide="uploadComplete">
                     <div class="col-md-6 col-sm-6">
                         <div ng-hide="uploadedDG">
                             <input type="file" id="fileUploadFileRef" accept="application/json" />
@@ -65,13 +68,42 @@
                     </div>
                 </div>
 
+
+
+                <div class="row" ng-show="uploadedDG">
+                    <div class="col-md-6">
+                        <strong>DataGroups</strong>
+                        <div class="myScroll">
+                            <table class="table table-condensed table-bordered">
+                                <tr ng-repeat="(k,v) in uploadedDG">
+                                    <td>{{k}}</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6" ng-show="uploadedComp">
+                        <strong>Compositions</strong>
+                        <div class="myScroll">
+                            <table class="table table-condensed table-bordered">
+                                <tr ng-repeat="(k,v) in uploadedComp">
+                                    <td>{{k}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!--
                 <table class="table table-condensed table-bordered">
                     <tr ng-repeat="(k,v) in uploadedDG">
                         <td>{{k}}</td>
                     </tr>
                 </table>
+                -->
 
-                <div><button ng-show="uploadedDG" class="btn-link btn pull-right" ng-click="import()">Import DataGroups</button> </div>
+                <div><button ng-show="uploadComplete" class="btn-link btn pull-right" ng-click="import()">Import DataGroups and Compositions</button> </div>
 
 
             </uib-tab>

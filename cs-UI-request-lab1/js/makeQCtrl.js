@@ -168,6 +168,11 @@ angular.module("pocApp")
                 //inialise the screen with the selected cmposition
                 $scope.selectedComp = $localStorage.world.compositions[QObject.compName]
 
+                if (! $scope.selectedComp) {
+                    alert(`This Questionnaire is based on the Composition: ${QObject.compName} which needs to be downloaded from the Library` )
+                    return
+                }
+
                 //get all the elements for this composition
                 getAllCompElements($scope.selectedComp)
 

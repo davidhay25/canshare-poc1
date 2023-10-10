@@ -67,6 +67,18 @@
             </table>
             <em>Only shows items directly defined in the DG - Not expanding parent or references</em>
           </uib-tab>
+          <uib-tab heading="Diff">
+            <table class="table-condensed table table-bordered">
+              <tr><th>Path</th><th>Current</th><th>Selected</th></tr>
+              <tr ng-repeat="diff in diffItems">
+                <td>{{diff.path}}</td>
+                <td>{{diff.current.title}}</td>
+                <td>{{diff.selected.title}}</td>
+              </tr>
+            </table>
+
+
+          </uib-tab>
           <uib-tab heading="Json">
             <pre>{{selectedItem | json}}</pre>
           </uib-tab>
@@ -82,5 +94,11 @@
     <pre>{{hx | json}}</pre>
   <div class="modal-header">
 
+  </div>
+</div>
+
+  <div class="modal-header">
+    <em>These displays show only the elements directly defined in the DG - they are not
+    expanded from parent or references</em>
   </div>
 </div>

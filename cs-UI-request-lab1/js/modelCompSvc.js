@@ -9,6 +9,7 @@ angular.module("pocApp")
 
 
             makeFullList: function (inComp,inTypes,inHashAllDG) {
+
                 let comp = angular.copy(inComp)         //as we will be modifying the composition
                 let hashAllDG = angular.copy(inHashAllDG)
                 //generate a full list of elements. Like DG but need to accomodate sections

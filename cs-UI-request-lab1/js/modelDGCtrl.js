@@ -51,6 +51,9 @@ angular.module("pocApp")
                         },
                         category: function () {
                             return "dg"
+                        },
+                        currentModel : function () {
+                            return $scope.selectedModel
                         }
                     }
 
