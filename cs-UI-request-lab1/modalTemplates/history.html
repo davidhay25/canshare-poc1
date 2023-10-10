@@ -31,6 +31,7 @@
             ng-click="selectItem(item)">
             {{item.user}}
             <div>{{item.date | date : 'medium'}} </div>
+            <div><em>{{item.comment}}</em></div>
           </div>
         </div>
         </div>
@@ -68,6 +69,7 @@
             <em>Only shows items directly defined in the DG - Not expanding parent or references</em>
           </uib-tab>
           <uib-tab heading="Diff">
+            <em>Not yet complete</em>
             <table class="table-condensed table table-bordered">
               <tr><th>Path</th><th>Current</th><th>Selected</th></tr>
               <tr ng-repeat="diff in diffItems">
@@ -91,7 +93,7 @@
 
 
   </div>
-    <pre>{{hx | json}}</pre>
+
   <div class="modal-header">
 
   </div>

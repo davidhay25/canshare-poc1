@@ -109,6 +109,10 @@
 
                 </uib-tab>
                 <uib-tab heading="Library">
+
+                  <button class="btn btn-link pull-right" ng-click="deleteDG(input.selectedItem.library)">Delete in library</button>
+                  <div class="clearfix"/>
+
                   <div class="myScroll">
                     <pre>{{input.selectedItem.library | json}}</pre>
                   </div>

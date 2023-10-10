@@ -8,7 +8,8 @@ angular.module("pocApp")
                 //abandon local changes and release the checkout
                 let url = `/model/DG/${model.name}/revert`
 
-                $http.put(url,model).then(      //the model isn't used by the revert function
+                let config = {headers:{'x-user-email': user.email}}
+                $http.put(url,model,config).then(      //the model isn't used by the revert function
                     function (data) {
                         deferred.resolve(data.data)
 
@@ -24,6 +25,7 @@ angular.module("pocApp")
             checkOut : function (model,user) {
                 //check out a model. check server first
                 let url = `/model/DG/${model.name}`  //todo check type of model -
+
 
                 $http.get(url,model).then(
                     function (data) {
@@ -49,7 +51,8 @@ angular.module("pocApp")
                 )
 
                 function performCheckout(model) {
-                    $http.put(url,model).then(
+                    let config = {headers:{'x-user-email': user.email}}
+                    $http.put(url,model,config).then(
                         function (data) {
                             alert("Resource has been checked out")
                         },
@@ -62,11 +65,12 @@ angular.module("pocApp")
 
 
             },
-            checkIn : function (model) {
+            checkIn : function (model,user) {
                 //check out a model. todo ? check server first
                 delete model.checkedOut
                 let url = `/model/DG/${model.name}`  //todo check type of model -
-                $http.put(url,model).then(
+                let config = {headers:{'x-user-email': user.email}}
+                $http.put(url,model,config).then(
                     function (data) {
                         alert("Resource has been checked in")
                     },
