@@ -127,7 +127,7 @@ async function setup(app) {
         //retrieve the DG
 
         const colDG = database.collection("dg");
-        const query = {} // {active:true} // active: { $lt: 15 } };
+        const query = {active:true} // active: { $lt: 15 } };
         try {
             const cursor = await colDG.find(query).toArray()
             let arDG = []
@@ -159,10 +159,36 @@ async function setup(app) {
         }
     })
 
+    //delete a resource
+    app.put('/model/DG/:name/delete', async function(req,res) {
+        let dg = req.body
+        dg.active = false
+
+        let userEmail = req.headers['x-user-email'] || "unknown User"
+        let query = {name:req.params.name}
+        let update = {$set:{active:false}}
+        try {
+            await database.collection("dg").updateOne(query,update,{upsert:false})
+
+            //update the history
+            await saveHistory(dg,userEmail ,"deleting a document")
+
+            res.json()
+
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+        }
+
+
+
+    })
 
     //undo a checkout on a DG
     app.put('/model/DG/:name/revert', async function(req,res) {
         let name = req.params.name
+        let userEmail = req.headers['x-user-email']
+
         const query = {name:name}
         try {
             //strategy is to get the library copy, then update it in a second call as the replaceOne doesn't return the updated doc
@@ -176,7 +202,7 @@ async function setup(app) {
                 await database.collection("dg").replaceOne(query,dg,{upsert:true})
 
                 //update the history
-                await saveHistory(dg,"unknown User","Reverting a checkout")
+                await saveHistory(dg,userEmail || "unknown User","Reverting a checkout")
 
                 res.json(dg)
             } else {
@@ -185,11 +211,11 @@ async function setup(app) {
         } catch(ex) {
             console.log(ex)
             res.status(500).json(ex.message)
-
         }
 
     })
 
+    //get the history of a resource
     app.get('/model/DG/:name/history', async function(req,res) {
         let name = req.params.name
 
@@ -209,10 +235,10 @@ async function setup(app) {
     })
 
 
-
     //get a single DG by name
     app.get('/model/DG/:name', async function(req,res) {
         let name = req.params.name
+
         const query = {name:name}
         try {
             const cursor = await database.collection("dg").find(query).toArray()
@@ -241,12 +267,14 @@ async function setup(app) {
     app.put('/model/DG/:name', async function(req,res) {
         let name = req.params.name
         let dg = req.body
-        dg.updated = true           //so we know it was updated
+        dg.active = true
+
+        let userEmail = req.headers['x-user-email']
+
         const query = {name:name}
         try {
             const cursor = await database.collection("dg").replaceOne(query,dg,{upsert:true})
-
-            await saveHistory(dg,"unknown User")
+            await saveHistory(dg,userEmail || "unknown User")
 
             res.json(dg)
         } catch(ex) {

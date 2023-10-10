@@ -693,7 +693,16 @@ angular.module("pocApp")
             },
 
             getFullListOfElements(inModel,inTypes,hashAllDG) {
+<<<<<<< HEAD
 
+=======
+                let trace = true
+
+                if (trace) {
+                    console.log(`get full list:${inModel.name}`)
+                }
+                //console.trace()
+>>>>>>> c201a1209b4ef0fc3a4fcd134f3dfd4f64e125f6
                 //create a complete list of elements for a DG (Compositions have a separate function)
 
                 //processing the DG hierarchy is destructive (the parent element is removed after processing
@@ -815,6 +824,10 @@ angular.module("pocApp")
 
                     //do parents first.
                     if (model.parent ) {
+                        if (trace) {
+                            console.log(`extractElement:parent:${model.parent}`)
+                        }
+
                         if (types[model.parent]) {
                             //this is called whenever there is a DG to be expanded
                             if (pathRoot.split('.').length == 1) {
@@ -824,7 +837,6 @@ angular.module("pocApp")
                                 //this must be a DG referenced by an element within the DG (or one of its ancestors)
                                 relationshipsSummary.references.push({path:pathRoot,type:model.name})
                             }
-
 
                             //to prevent infinite recursion
                             let parent = model.parent
@@ -850,6 +862,9 @@ angular.module("pocApp")
 
                     if (model.diff) {
                         model.diff.forEach(function (ed) {
+                            if (trace) {
+                                console.log(`model.diff:${ed.path}`)
+                            }
                             if (ed.type && ed.type.length > 0) {
                                 let type = ed.type[0]   //only look at the first code
                                 if (types[type]) {
@@ -880,7 +895,6 @@ angular.module("pocApp")
                                                 arrows : {to:true}}
                                             arEdges.push(edge)
                                         }
-
 
 
                                         //console.log('expanding child: ' + childDefinition.name)

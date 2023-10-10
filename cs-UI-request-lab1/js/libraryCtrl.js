@@ -145,6 +145,24 @@ angular.module("pocApp")
 
             }
 
+            //delete a library item
+            $scope.deleteDG = function (dg) {
+                if (confirm("Are you sure you wish to remove this from the library. It will mark it as inactive")) {
+
+                    let url = `/model/DG/${dg.name}/delete`
+                    let config = {headers:{'x-user-email': user.email}}
+
+                    $http.put(url,dg,config).then(
+                        function (data) {
+                            alert("Resource has marked as inactive in the Library")
+                        },
+                        function (err) {
+                            alert(angular.toJson(err))
+                        }
+                    )
+
+                }
+            }
 
 
             $scope.refreshFromRepo = function () {
