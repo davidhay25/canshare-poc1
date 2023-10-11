@@ -110,6 +110,8 @@ angular.module("pocApp")
             $scope.checkExpand = function () {
 
                 $scope.model.name = $scope.input.newModelName
+                $scope.model.title = $scope.model.title || $scope.model.name
+                $scope.input.newModelTitle = $scope.model.title
                 getFullElementList()
 
 

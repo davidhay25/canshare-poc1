@@ -40,7 +40,10 @@
             <td>
               <div class="row">
                 <div class="col-md-10">
-                  <input type="text" class="form-control" disabled = "disabled" ng-model="input.selectedType"/>
+                  <input type="text" ng-model="input.selectedType"
+                         typeahead-editable = "false"
+                         uib-typeahead="type for type in allTypes | filter:$viewValue"
+                         class="form-control" />
 
                   <!--
                   <select  ng-disabled="! isNew" ng-model="input.type" class="form-control"
@@ -49,7 +52,7 @@
 
                 </div>
                 <div class="col-md-2">
-                  <button class="btn btn-link" ng-click="changeType()">Change</button>
+                  <button class="btn btn-link" ng-click="changeType()">Dialog</button>
                 </div>
               </div>
 

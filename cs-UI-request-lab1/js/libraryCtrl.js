@@ -1,7 +1,7 @@
 //seversync is actually the main library interface
 angular.module("pocApp")
     .controller('libraryCtrl',
-        function ($scope,$http,allDG,allComp,$sce,allQObject,user) {
+        function ($scope,$http,allDG,allComp,$sce,allQObject,user,librarySvc) {
 
             $scope.input = {}
             $scope.user = user
@@ -40,6 +40,8 @@ angular.module("pocApp")
                 }, function (err) {
                     alert(angular.toJson(err.data))
                 })
+
+
 
 
             //get all the QO
@@ -101,6 +103,7 @@ angular.module("pocApp")
                     let item = {name:key,title:localDG.title,local:localDG}
                     if (libraryHash[key]) {
                         item.library = libraryHash[key]
+                        //item.checkedOut =
                         delete libraryHash[key]      //any left in the hash at the end are new on the library
 
                     } else {
@@ -243,6 +246,23 @@ angular.module("pocApp")
                         }
                     )
                 }
+            }
+
+            $scope.checkin = function (model) {
+
+                if (model.checkedOut == user.email) {
+                    if ( confirm("Are you sure you want to check this in to the Library")) {
+                        librarySvc.checkIn (model,user,function(){
+                            makeDGSummary(allDG,$scope.libraryDG)
+                        })
+
+                    }
+                } else {
+                    alert("Sorry, only the user who has checked out the resource can check it back in")
+                }
+
+
+
             }
 
         })

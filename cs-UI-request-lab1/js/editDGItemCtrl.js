@@ -121,6 +121,11 @@ angular.module("pocApp")
 
 
             $scope.save = function() {
+
+                if (allTypes.indexOf($scope.input.selectedType) == -1) {
+                    alert("Invalid type")
+                    return
+                }
                 //let ar1 = $scope.input.path.split('.')
                 //let trimmedPath = ar1.splice(0,1).join('.')
                 if ($scope.isNew) {

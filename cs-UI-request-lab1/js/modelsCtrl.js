@@ -174,7 +174,7 @@ angular.module("pocApp")
                 $uibModal.open({
                     templateUrl: 'modalTemplates/library.html',
                     backdrop: 'static',
-                    size : 'lg',
+                    size : 'xlg',
                     controller: 'libraryCtrl',
 
                     resolve: {
@@ -535,7 +535,9 @@ angular.module("pocApp")
                         let dg = data.node.data.dg
 
                         //use the dg out of $scope.hashAllDG - not the copy in the tree data
-                        $scope.selectModel($scope.hashAllDG[dg.name])
+                        if ($scope.hashAllDG[dg.name]) {
+                            $scope.selectModel($scope.hashAllDG[dg.name])
+                        }
 
                     }
 
@@ -543,6 +545,13 @@ angular.module("pocApp")
                 }).bind("loaded.jstree", function (event, data) {
                     let id = treeData[0].id
                     $(this).jstree("open_node",id);
+
+                    if ($scope.selectedModel) {
+                        $(this).jstree("open_node",$scope.selectedModel.name);
+                        $(this).jstree("select_node",$scope.selectedModel.name);
+                    }
+
+
                     $scope.$digest();
                 });
             }
@@ -567,6 +576,21 @@ angular.module("pocApp")
                 }).bind("loaded.jstree", function (event, data) {
                     let id = treeData[0].id
                     $(this).jstree("open_node",id);
+
+
+
+                    /*.bind("loaded.jstree", function (event, data) {
+                        console.log('loaded')
+                        $(this).jstree("open_node","root");
+                        if ($scope.selectedQNode) {
+                            $(this).jstree("select_node",$scope.selectedQNode.id);
+                            $(this).jstree("open_node",$scope.selectedQNode.id);
+                            console.log('node populated: ' + $scope.selectedQNode.id)
+                           // $(this).jstree("open_node",$scope.selectedQNode.id);
+                        }
+                    })*/
+
+
                     $scope.$digest();
                 });
             }

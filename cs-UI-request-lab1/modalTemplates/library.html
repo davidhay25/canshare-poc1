@@ -62,7 +62,6 @@
       <uib-tab heading="DataGroups list" >
         <br/>
 
-
         <div>Library DG count: {{libraryDGCount}}</div>
         <div>Local DG count: {{localDGCount}}</div>
 
@@ -70,25 +69,23 @@
              <div class="col-md-7">
                <div class="myScroll">
                  <table class="table table-bordered table-condensed">
-                   <tr><th>Title</th><th>Local count</th><th>Library count</th><th>Note</th></tr>
+                   <tr><th>Title</th><th>Local count</th><th>Library count</th><th>Checked out</th></tr>
                    <tr ng-repeat="item in summary"
                        ng-class="{listItemSelected:item == input.selectedItem,dtDifferent:item.local.diff.length !== item.library.diff.length}">
                      <td>
                        <div class="clickable" ng-click="input.selectedItem = item">{{item.title}}</div>
                      </td>
                      <td>{{item.local.diff.length}}
-                       <!--
-                       <div class="clickableDotted"
-                            uib-popover-html="getPopoverHtml(item.local)"
-                            popover-placement="right"
-                            popover-trigger="'mouseenter'">
-                         {{item.local.diff.length}}
-                       </div>
-                       -->
+
 
                      </td>
                      <td>{{item.library.diff.length}}</td>
-                     <td>{{item.note}}</td>
+                     <td>
+                     <div class="clickable" ng-click="checkin(item.library)">
+
+                               {{item.library.checkedOut}}
+                     </div>
+                     </td>
                    </tr>
                  </table>
                </div>

@@ -3,6 +3,14 @@ angular.module("pocApp")
     .service('librarySvc', function($q,$http) {
 
         return {
+            getAllCheckedOut : function(hashAllDG,user){
+                //get all the checked out models - regardless of user
+                
+                Object.keys(hashAllDG).forEach(function (dg) {
+                    
+                })
+                
+            },
             revert : function (model,user) {
                 let deferred = $q.defer()
                 //abandon local changes and release the checkout
@@ -54,7 +62,7 @@ angular.module("pocApp")
                     let config = {headers:{'x-user-email': user.email}}
                     $http.put(url,model,config).then(
                         function (data) {
-                            alert("Resource has been checked out")
+                          //  alert("Resource has been checked out")
                         },
                         function (err) {
                             alert(angular.toJson(err))
@@ -65,14 +73,17 @@ angular.module("pocApp")
 
 
             },
-            checkIn : function (model,user) {
+            checkIn : function (model,user,vo) {
                 //check out a model. todo ? check server first
                 delete model.checkedOut
                 let url = `/model/DG/${model.name}`  //todo check type of model -
                 let config = {headers:{'x-user-email': user.email}}
                 $http.put(url,model,config).then(
                     function (data) {
-                        alert("Resource has been checked in")
+                      //  alert("Resource has been checked in")
+                        if (vo) {
+                            vo()
+                        }
                     },
                     function (err) {
                         alert(angular.toJson(err))
