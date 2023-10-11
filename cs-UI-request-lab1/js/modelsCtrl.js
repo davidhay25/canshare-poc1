@@ -857,6 +857,8 @@ angular.module("pocApp")
                             ed.path = ar.join('.')
                             $scope.selectedModel.diff.push(ed)
                         }
+
+                        $scope.updateTermSummary()
                     }
 
 
@@ -938,7 +940,7 @@ angular.module("pocApp")
                 $scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
                 $scope.compTermSummary = modelTermSvc.makeCompOverrideSummary($scope.hashAllCompositions).list
                 $scope.hashVsSummary = modelTermSvc.makeValueSetSummary($scope.hashAllDG,$scope.hashAllCompositions).hashVS
-
+                $scope.notesSummary = modelTermSvc.makeNotesSummary($scope.hashAllDG,$scope.hashAllCompositions)
             }
 
             $scope.updateTermSummary()

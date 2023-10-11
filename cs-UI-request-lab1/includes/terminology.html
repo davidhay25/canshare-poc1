@@ -5,11 +5,17 @@
 
   <uib-tabset>
 
-    <uib-tab heading="ValueSets">
+    <uib-tab heading="ValueSets & Options">
+      <div class="pull-right"> All ValueSets and where they are used. Also lists Options.
+      </div>
+
+
+
+      <div class="clearfix"></div>
       <div class="tableFixHead">
         <table class="table table-bordered">
           <thead>
-          <tr><th>Url</th><th>Where defined</th></tr>
+          <tr><th>Url</th><th>Where used</th></tr>
           </thead>
           <tbody>
           <tr ng-repeat="(k,v) in hashVsSummary">
@@ -89,7 +95,7 @@
       </div>
     </uib-tab>
     <uib-tab heading = "Compositions">
-      <div class="pull-right"> Composition overrides. These are (or should be) generally Terminology.</div>
+      <div class="pull-right"> Composition overrides. Often (but not always) Terminology.</div>
 
 
       <table class="table table-bordered">
@@ -122,13 +128,24 @@
       <div class="pull-right">Notes across all resources
       </div>
 
+      <div class="clearfix"/>
+
       <div class="tableFixHead">
         <table class="table table-bordered">
           <thead>
           <tr><th>Name</th><th>Type</th><th>Path</th><th>Note</th></tr>
           </thead>
           <tbody>
-          <tr ng-repeat="(k,v) in notesSummary">
+          <tr ng-repeat="item in notesSummary">
+            <td>
+              <span class="clickable" ng-click="termSelectDG(item)">{{item.hiddenDGName}}</span>
+            </td>
+            <td>{{item.type}}</td>
+            <td>
+              <span class="clickable" ng-click="termSelectDGItem(item)">{{item.path}}</span>
+
+            </td>
+            <td>{{item.notes}}</td>
           </tr>
           </tbody>
         </table>

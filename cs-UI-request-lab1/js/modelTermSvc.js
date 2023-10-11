@@ -7,8 +7,19 @@ angular.module("pocApp")
 
             return {
                 makeNotesSummary: function (hashDG,hashComp) {
-                    //All the notes fields
-                    let hashNotes = {}
+                    //All the notes fields from the current resources. currently just DG
+                    let lstNotes = []
+                    Object.keys(hashDG).forEach(function (key) {
+                        let dg = hashDG[key]
+                        if (dg.diff) {
+                            dg.diff.forEach(function (ed) {
+                                if (ed.notes) {
+                                    lstNotes.push({hiddenDGName:dg.name,type:'dg',path:ed.path,notes:ed.notes})
+                                }
+                            })
+                        }
+                    })
+                   return lstNotes
 
                 },
                 makeValueSetSummary : function (hashDG,hashComp) {
