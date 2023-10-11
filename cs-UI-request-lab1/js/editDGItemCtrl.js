@@ -14,7 +14,7 @@ angular.module("pocApp")
             if (item && item.ed) {
                 $scope.input.description = item.ed.description
                 $scope.input.title = item.ed.title
-                $scope.input.mapping = item.ed.mapping
+                $scope.input.notes = item.ed.notes
                 $scope.input.valueSet = item.ed.valueSet
                 $scope.input.sourceReference = item.ed.sourceReference
                 $scope.input.path =  $filter('dropFirstInPath')(item.ed.path)
@@ -169,7 +169,7 @@ angular.module("pocApp")
                     ed.type = [$scope.input.selectedType]
                     ed.path = `new.${$scope.input.path}`        //the 'new.' is stripped off, as the full path is passed in for editing existing
                     ed.description = $scope.input.description
-                    ed.mapping = $scope.input.mapping
+                    ed.notes = $scope.input.notes
                     ed.title = $scope.input.title
                     ed.mult = $scope.input.mult
                     ed.valueSet = $scope.input.valueSet
@@ -182,7 +182,7 @@ angular.module("pocApp")
 
                 } else {
                     item.ed.type = [$scope.input.selectedType]
-                    item.ed.mapping = $scope.input.mapping
+                    item.ed.notes = $scope.input.notes
                     if ($scope.input.controlHint) {
                         item.ed.controlHint = $scope.input.controlHint
                     }

@@ -118,6 +118,25 @@
 
     </uib-tab>
 
+    <uib-tab heading="Notes">
+      <div class="pull-right">Notes across all resources
+      </div>
+
+      <div class="tableFixHead">
+        <table class="table table-bordered">
+          <thead>
+          <tr><th>Name</th><th>Type</th><th>Path</th><th>Note</th></tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="(k,v) in notesSummary">
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </uib-tab>
+
+
+
   </uib-tabset>
 
 

@@ -1,3 +1,4 @@
+//more general reports than just terminology
 angular.module("pocApp")
 
     .service('modelTermSvc', function() {
@@ -5,6 +6,11 @@ angular.module("pocApp")
 
 
             return {
+                makeNotesSummary: function (hashDG,hashComp) {
+                    //All the notes fields
+                    let hashNotes = {}
+
+                },
                 makeValueSetSummary : function (hashDG,hashComp) {
                     //make a summary of valuesets from DG & comp
                     let hashVS = {}

@@ -6,7 +6,7 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc,librarySvc) {
 
 
-            $scope.version = "0.4.8"
+            $scope.version = "0.4.9"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -815,8 +815,8 @@ angular.module("pocApp")
                             changes += "Title changed. "
                         }
 
-                        if (ed.mapping !== originalED.mapping) {
-                            changes += "Mapping notes changed. "
+                        if (ed.notes !== originalED.notes) {
+                            changes += "Notes changed. "
                         }
 
                         if (ed.mult !== originalED.mult) {
@@ -839,7 +839,7 @@ angular.module("pocApp")
                                 //can't just replace from ed as not all elements can be altered
                                 ed1.type = ed.type
                                 ed1.title = ed.title
-                                ed1.mapping = ed.mapping
+                                ed1.notes = ed.notes
                                 ed1.description = ed.description
                                 ed1.mult = ed.mult
                                 ed1.valueSet = ed.valueSet
@@ -933,10 +933,12 @@ angular.module("pocApp")
 
             }
 
+            //update
             $scope.updateTermSummary = function () {
                 $scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
                 $scope.compTermSummary = modelTermSvc.makeCompOverrideSummary($scope.hashAllCompositions).list
                 $scope.hashVsSummary = modelTermSvc.makeValueSetSummary($scope.hashAllDG,$scope.hashAllCompositions).hashVS
+
             }
 
             $scope.updateTermSummary()
