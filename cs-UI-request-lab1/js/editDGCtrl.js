@@ -16,6 +16,52 @@ angular.module("pocApp")
                     $scope.input.possibleParents.push(key)
                 }
             })
+            
+            $scope.import = function (data) {
+                $scope.model.diff == $scope.model.diff || []
+                let ar = data.split(/\r?\n/)
+                ar.forEach(function (row) {
+                    let arData = row.split(/\t/)
+                    let ed = {}
+                    ed.path = arData[0]
+                    ed.title = arData[3]
+                    ed.description = arData[8]
+                    ed.mult = arData[9]
+                    let type = arData[10] || 'string'
+
+                    switch (type) {
+                        case "Codeable" :
+                            type = "CodeableConcept"
+                            break
+
+                    }
+                    ed.type = [type]
+
+                    if (arData[11]) {
+                        ed.valueSet = arData[11]
+                    }
+
+                    //options (S)
+                    if (arData[18]) {
+                        let ar = arData[18].split(',')
+                        ed.options = []
+                        ar.forEach(function (opt) {
+                            let opt1 = opt.replace(/["]/g, '')
+                            ed.options.push({pt:opt1})
+                        })
+                    }
+
+                    //fixed value (T)
+                    if (arData[19]) {
+                        let ar = arData[19].split('|')
+                        ed.fixedCoding = {code:ar[0],display:ar[1]}
+
+                    }
+                    console.log(ed)
+                    $scope.model.diff.push(ed)
+
+                })
+            }
 
             //leave at the top as called when creating a new DG with a parent
             $scope.setModelAttribute = function(attribute,value) {

@@ -797,7 +797,7 @@ angular.module("pocApp")
                 //process a single element at the root of the DG
                 function extractElements(model,pathRoot) {
 
-                    console.log(pathRoot,model.name)
+                    //console.log(pathRoot,model.name)
 
                     //add to nodes list
 

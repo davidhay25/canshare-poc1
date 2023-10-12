@@ -535,7 +535,7 @@ angular.module("pocApp")
                         let dg = data.node.data.dg
 
                         //use the dg out of $scope.hashAllDG - not the copy in the tree data
-                        if ($scope.hashAllDG[dg.name]) {
+                        if (dg && $scope.hashAllDG[dg.name]) {
                             $scope.selectModel($scope.hashAllDG[dg.name])
                         }
 

@@ -426,6 +426,17 @@
 
 
             </uib-tab>
+
+            <uib-tab heading="Import">
+                <button class="btn btn-link pull-right" ng-click="import(input.import)">Import</button>
+
+                <br/>
+
+                <textarea rows="10" ng-model="input.import" class="form-control"></textarea>
+
+
+            </uib-tab>
+
             <uib-tab heading="Json">
                 <pre>{{model | json}}</pre>
             </uib-tab>

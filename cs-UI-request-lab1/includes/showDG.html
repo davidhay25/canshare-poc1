@@ -261,6 +261,21 @@
             </div>
           </div>
 
+
+            <div ng-show = "selectedNode.data.ed.kind == 'root'">
+              <table class="table table-bordered table-condensed">
+                <tr><td>Name</td><td>{{selectedModel.name}}</td></tr>
+                <tr><td>Description</td><td>{{selectedModel.description}}</td></tr>
+                <tr ng-show="selectedModel.sourceReference"><td>Source reference</td><td>{{selectedModel.sourceReference}}</td></tr>
+                <tr ng-show="selectedModel.checkedOut"><td>Checked out to</td>
+                  <td>{{selectedModel.checkedOut}}</td></tr>
+              </table>
+
+
+
+
+            </div>
+
             <uib-tabset ng-hide="selectedNode.data.ed.kind == 'root'">
               <uib-tab heading="Details">
                 <table class="table table-bordered table-condensed">
