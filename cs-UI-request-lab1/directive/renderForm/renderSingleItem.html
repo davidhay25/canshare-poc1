@@ -194,7 +194,7 @@
                                 <select class="form-control" ng-model="input.form[cell.item.linkId]"
                                         ng-change="makeQR(cell.item.linkId)"
                                         ng-focus="onFocus(cell)"
-                                        ng-options = "concept.valueCoding.display for concept in cell.item.answerOption">
+                                        ng-options = "concept.valueCoding.code for concept in cell.item.answerOption">
 
                                     <option value="" disabled selected>{{cell.meta.placeholder}}</option>
 

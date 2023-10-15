@@ -103,14 +103,24 @@
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row" ng-show="selectedCompositionNode.data.ed.parent">
                 <div class="col-md-3">
-                  Kind
+                  Parent
                 </div>
                 <div class="col-md-9">
-                  {{selectedCompositionNode.data.ed.kind}}
+                  {{selectedCompositionNode.data.ed.parent}}
                 </div>
               </div>
+
+
+                <div class="row">
+                  <div class="col-md-3">
+                    Kind
+                  </div>
+                  <div class="col-md-9">
+                    {{selectedCompositionNode.data.ed.kind}}
+                  </div>
+                </div>
 
                 <div class="row" >
                   <div class="col-md-3">
@@ -131,6 +141,8 @@
                     {{selectedCompositionNode.data.ed.description}}
                   </div>
                 </div>
+
+
 
                 <div class="row"  ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
                   <div class="col-md-3">

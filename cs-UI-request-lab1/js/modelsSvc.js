@@ -1,6 +1,6 @@
 angular.module("pocApp")
 
-    .service('modelsSvc', function($q,$filter,$http) {
+    .service('modelsSvc', function($q,$filter,$http,makeQSvc) {
         let cache = {}
 
         this.fhir = {}
@@ -541,6 +541,20 @@ angular.module("pocApp")
 
                     console.log(ed)
                     node.data.level = ed.kind       //Questionnaire uses 'level'
+
+
+                    let voControl = makeQSvc.getControlDetails(ed)
+                    node.data.controlType = voControl.controlType
+                    node.data.controlHint = voControl.controlHint
+
+                    /*
+                    let node = {id:ed.path,
+                        text:ed.title,
+                        parent:parentId,
+                        data:{ed:ed,level:'element',controlType:voControl.controlType,controlHint:voControl.controlHint}}
+
+
+                    */
 
                     node.icon = `icons/icon_primitive.png`  //the default icon
 
