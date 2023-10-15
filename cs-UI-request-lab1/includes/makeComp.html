@@ -1,0 +1,119 @@
+<div>
+
+  <div class="row">
+    <div class="col-md-3">
+      <div class="banner">Sections</div>
+      <div class="list-group">
+        <div ng-class="{'list-group-item':true,listItemSelected:section == selectedSection}"
+             style="cursor: pointer"
+             ng-click="selectSection(section)"
+             ng-repeat="section in selectedModel.sections">
+          {{section.title}}
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="col-md-10">
+          <input type="text" placeholder="Section name"
+                 class="form-control" ng-model="local.sectionName"/>
+          <div>
+            <input type="text" placeholder="Title"
+                   class="form-control" ng-model="local.sectionTitle"/>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <button ng-show="local.sectionName"
+                  class="btn-link btn" ng-click="addSection(local.sectionName,local.sectionTitle)">Add</button>
+        </div>
+      </div>
+
+
+    </div>
+    <div class="col-md-4" ng-show="selectedSection">
+      <div class="banner">DGs in section</div>
+
+
+      <div class="list-group">
+        <div ng-class="{'list-group-item':true,listItemSelected:item == selectedItem}"
+             ng-click="selectItem(item)"
+             style="cursor: pointer"
+             ng-repeat="item in selectedSection.items">
+          <i class="glyphicon glyphicon-remove pull-right clickable"
+            ng-click="removeDG($index)"></i>
+          {{item.title}}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-10">
+          {{selectedNewDG.name}}
+          <div><em> {{selectedNewDG.description}}</em></div>
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-link"
+                  ng-show="selectedSection && selectedNewDG"
+                  ng-click="addSectionItem(selectedNewDG)">Add</button>
+        </div>
+
+        <table class="table table-bordered table-condensed">
+          <tr ng-repeat="item in fullElementListPossible">
+            <td>{{item.ed.title || item.ed.path}}</td>
+            <td>{{item.ed.description}}</td>
+          </tr>
+
+        </table>
+
+      </div>
+
+    </div>
+    <div class="col-md-5" ng-show="selectedSection">
+      <div class="banner">Add DG to section</div>
+      <uib-tabset>
+
+        <uib-tab heading="Details">
+          <br/>
+
+
+          <table class="table table-bordered table-condensed">
+            <tr ng-repeat="item in fullElementList">
+              <td>{{item.ed.title || item.ed.path}}</td>
+              <td>{{item.ed.description}}</td>
+            </tr>
+
+          </table>
+
+
+
+        </uib-tab>
+
+
+        <uib-tab heading="DG library Tree">
+          <!--
+          <div class="clickable" ng-click="setup()">refresh</div>
+-->
+          <div id="dgSelectTree"></div>
+
+
+
+        </uib-tab>
+
+        <uib-tab ng-show="false" heading="DG library List">
+
+         <div class="list-group">
+           <div class="list-group-item"
+                ng-click = "addSectionItem(v)"
+                ng-repeat = "(k,v) in hashAllDG">
+             {{k}}
+           </div>
+         </div>
+
+        </uib-tab>
+
+
+      </uib-tabset>
+
+    </div>
+  </div>
+
+</div>

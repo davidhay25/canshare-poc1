@@ -220,6 +220,7 @@ angular.module("pocApp")
                                 vo.name = $scope.input.name
                                 vo.description = $scope.input.description
                                 vo.comp = $scope.input.selectedComp
+                                vo.populate = $scope.input.populate
                                 $scope.$close(vo)
                             }
 
@@ -259,9 +260,20 @@ angular.module("pocApp")
                         }
                     )
 
+                    $scope.selectedComp = $localStorage.world.compositions[QObject.compName]
+                    //$scope.selectedComp = QObject.meta.compName
+
+                    getAllCompElements($scope.selectedComp) //populates $scope.allCompElements
+
                     //$scope.selectQObject()
-                    //inialise the screen with the selected cmposition
-                    $scope.initQ(QObject)
+                    //initialise the screen with the selected composition
+                    if (vo.populate) {
+                        let treeData = makeQSvc.makeCompleteTree($scope.selectedComp,$scope.hashAllDG)
+                    } else {
+                        $scope.initQ(QObject)
+                    }
+
+
                     $scope.selectQObject(QObject)
 
                     drawtree($scope.treeData)
@@ -445,6 +457,7 @@ angular.module("pocApp")
             function getAllCompElements(comp) {
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG) //input.types created on the parent scope
                 $scope.allCompElements = vo.allElements     //an array
+
 /*
                 console.log(vo.allElements)
                 vo.allElements.forEach(function (item) {
@@ -457,10 +470,10 @@ angular.module("pocApp")
             $scope.initQ = function (QObject) {
 
                 //get the composition and construct the complete list of elements
-                $scope.selectedComp = $localStorage.world.compositions[QObject.compName]
+              //tmp  $scope.selectedComp = $localStorage.world.compositions[QObject.compName]
                 //$scope.selectedComp = QObject.meta.compName
 
-                getAllCompElements($scope.selectedComp)
+              //tmp  getAllCompElements($scope.selectedComp)
 
                 //create initial tree with empty sections
                 $scope.treeData = []
@@ -613,7 +626,6 @@ angular.module("pocApp")
                     parent.item.push(item)
 
                     if (node.children && node.children.length > 0) {
-
                         node.children.forEach(function (childNode) {
                             addChild(item,childNode)
                         })

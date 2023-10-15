@@ -535,13 +535,16 @@ angular.module("pocApp")
                     }
 
                     text = text || ed.title || leafPath
-                    //text =  text || leafPath
+
 
                     let node = {id:id,text:text,parent:parent,data:{ed:ed,host:host}}
 
+                    console.log(ed)
+                    node.data.level = ed.kind       //Questionnaire uses 'level'
+
                     node.icon = `icons/icon_primitive.png`  //the default icon
 
-                    //console.log(ed.kind)
+
                     if (ed.kind) {
 
                         //let iconFile = `icons/${treeIcons[ed.kind]}`

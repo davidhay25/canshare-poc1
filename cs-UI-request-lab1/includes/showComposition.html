@@ -49,6 +49,13 @@
   <uib-tabset active="input.compTabActive" >
 
 
+    <uib-tab heading = "Sections">
+      <br/>
+      <div ng-controller="makeCompCtrl">
+        <ng-include src ="'includes/makeComp.html'"></ng-include>
+
+      </div>
+    </uib-tab>
 
 
     <uib-tab heading="Tree">
@@ -105,9 +112,7 @@
                 </div>
               </div>
 
-              <div ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
-
-                <div class="row">
+                <div class="row" >
                   <div class="col-md-3">
                     Title
                   </div>
@@ -115,6 +120,8 @@
                     {{selectedCompositionNode.data.ed.title}}
                   </div>
                 </div>
+
+              <div ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
 
                 <div class="row">
                   <div class="col-md-3">
@@ -125,7 +132,7 @@
                   </div>
                 </div>
 
-                <div class="row">
+                <div class="row"  ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
                   <div class="col-md-3">
                     Type
                   </div>
@@ -171,7 +178,7 @@
 
 
 
-                <div class="row">
+                <div class="row"  ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
                   <div class="col-md-3">
                     Fixed value
                   </div>
@@ -218,7 +225,7 @@
                   </div>
                 </div>
 
-                <div class="row">
+                <div class="row" ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
                   <div class="col-md-3">
                     Control Hint
                   </div>
@@ -361,13 +368,22 @@
     </uib-tab>
 
 
-
-
     <uib-tab heading="Table">
+
+      <div class="row">
+
+        <a class="btn btn-link pull-right" download="{{downloadLinkCompTsvName}}"
+           href="{{downloadLinkCompTsv}}" title="{{downloadLinkCompTsvName}}" >
+          Download
+        </a>
+
+
+      </div>
+
       <div class="tableFixHead">
       <table class="table table-bordered">
         <thead>
-        <tr><th>Path</th><th>Title</th><th>Kind</th><th>Description</th><th>Type</th><th>Slice</th><th>Card.</th></tr>
+        <tr><th>Path</th><th>Title</th><th>Kind</th><th>Description</th><th>Type</th><th>Card.</th></tr>
         </thead>
         <tbody>
         <tr
@@ -383,12 +399,7 @@
           <td>{{item.ed.kind}}</td>
           <td>{{item.ed.description}}</td>
           <td>{{item.ed.type[0]}}</td>
-          <td>
-            <div ng-show = "ed.slice">
-              {{item.ed.slice.path}}
-              <div><em>code={{ed.slice.code}}</em></div>
-            </div>
-          </td>
+
           <td>
 
 
@@ -404,6 +415,9 @@
       </div>
     </uib-tab>
 
+    <uib-tab heading="Form">
+      generate default Q from composition, then render in here using directive
+    </uib-tab>
 
     <uib-tab heading="Graph">
       Graph of all DG linked back to Composition
@@ -495,7 +509,16 @@
 
 
 
-    <uib-tab heading="allCompElements">
+    <uib-tab heading="Form">
+
+      <button class="btn-link btn pull-right" ng-click="previewQ()">Preview</button>
+
+      <renderform q="fullQ" qr="{}"></renderform>
+
+    </uib-tab>
+
+
+    <uib-tab ng-show="false" heading="allCompElements">
       <pre>{{hashCompElements | json}}</pre>
     </uib-tab>
 

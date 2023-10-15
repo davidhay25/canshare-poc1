@@ -7,6 +7,33 @@ angular.module("pocApp")
 
         return {
 
+            makeQFromTree : function (treeObject) {
+                //Given a tree array representing a comp, construct a Q resource
+                let that = this
+
+                let obj = {}
+
+                function addChild(parent,node) {
+                    let item = {text:node.text,ed:node.data.ed,level:node.data.level,controlHint:node.data.controlHint,controlType:node.data.controlType}
+                    parent.item = parent.item || []
+                    parent.item.push(item)
+
+                    if (node.children && node.children.length > 0) {
+                        node.children.forEach(function (childNode) {
+                            addChild(item,childNode)
+                        })
+                    }
+                }
+
+                treeObject[0].children.forEach(function (child) {
+                    addChild(obj,child)
+                })
+
+                return that.makeQ(treeObject)
+
+
+            },
+
             makeQ: function(treeObject) {
                 //construct a Questionnaire resource
                 Q = {resourceType:"Questionnaire",status:"draft"}
@@ -97,6 +124,10 @@ angular.module("pocApp")
                         item.type = 'group'
                         //console.log(data.cols)
                         //are there multi columns set
+
+                        //default to 2 columns
+                        data.cols = data.cols || 2
+
                         if (data.cols) {
                             item.extension = item.extension || []
                             let ext = {url:"http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"}

@@ -258,6 +258,9 @@ angular.module("pocApp")
                     resolve: {
                         DG: function () {
                             return DG
+                        },
+                        user : function () {
+                            return $scope.user
                         }
                     }
 

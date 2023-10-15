@@ -1,8 +1,28 @@
 // The controller for the DG 'compare to library'
 angular.module("pocApp")
     .controller('libraryDGCtrl',
-        function ($scope,$http,DG) {
+        function ($scope,$http,DG,user) {
            // $scope.direction = direction
+
+            //determine if the dg can be sent to - or loaded from - the library
+            //if it's checked out to the current user, then no download
+            //if it's checked out to someone else, then it can be downloaded, not uploaded
+            //if it's not checked out to anyone, it can be downloaded
+            //if there is no user, then neither upload nor download
+            $scope.canUpload = false
+            $scope.canDownload = false
+
+            if (user)  {
+                if (DG.checkedOut == user.email ) {
+                    //checked out to current user
+                    $scope.canUpload = true
+                } else  {
+                    //checked out to someone else or no-one
+                    $scope.canDownload = true
+                }
+            }
+
+
             $scope.DG = DG
             //download the current DG
             let qry = `/model/DG/${DG.name}`

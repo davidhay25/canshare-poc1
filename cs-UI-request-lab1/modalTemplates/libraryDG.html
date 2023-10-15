@@ -25,8 +25,12 @@
     <div class="row">
       <div class="col-md-4">
         <div class="banner">Local copy of DG</div>
-        <button  style="width: 100%" class="btn btn-primary" ng-click="upload()"><strong>Upload</strong> to Library</button>
-        <br/><br/>
+        <div style="height: 50px">
+          <button ng-show = "canUpload" style="width: 100%" class="btn btn-primary" ng-click="upload()">
+            <strong>Upload</strong> to Library</button>
+        </div>
+
+
 
         <uib-tabset>
           <uib-tab heading="Elements">
@@ -49,8 +53,10 @@
 
         <div ng-hide="notInLibrary">
         <div class="banner">Library copy of DG</div>
-        <button style="width: 100%" class="btn btn-success" ng-click="download()"><strong>Download</strong> into Local copy</button>
-        <br/><br/>
+        <div style="height: 50px">
+          <button ng-show = "canDownload" style="width: 100%" class="btn btn-success" ng-click="download()">
+          <strong>Download</strong> into Local copy</button>
+        </div>
 
 
         <uib-tabset>

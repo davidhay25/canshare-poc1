@@ -7,6 +7,30 @@ angular.module("pocApp")
             $scope.compositionKind = ['request','report','general']
            // $scope.tumourStream = ['breast','gyne','lung','gi']
 
+            //preview r
+            $scope.previewQ = function () {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/previewQ.html',
+                    //backdrop: 'static',
+                    size : 'lg',
+                    controller: function ($scope,Q) {
+                        $scope.input = {}
+                        $scope.Q = Q
+                        $scope.QR = {}
+
+                        $scope.downloadQLinkJson = window.URL.createObjectURL(new Blob([angular.toJson(Q,true)],{type:"application/json"}))
+                        $scope.downloadQLinkJsonName = `Q-${Q.name}.json`
+
+                        console.log(Q)
+                    },
+
+                    resolve: {
+                        Q: function () {
+                            return $scope.fullQ
+                        }
+                    }
+                })
+            }
 
             //Add or edit an override
             $scope.editOverride = function (ed) {

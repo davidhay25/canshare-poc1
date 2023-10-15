@@ -2,7 +2,7 @@
 
 angular.module("pocApp")
     .controller('modelsCtrl',
-        function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,
+        function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc,librarySvc) {
 
 
@@ -488,7 +488,6 @@ angular.module("pocApp")
 
                     //--------- build the tree with all DG
                     let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
-
                     showAllDGTree(vo1.treeData)
 
                     //--- make the category hash for the category tree display of DG
@@ -1321,22 +1320,25 @@ angular.module("pocApp")
 
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
 
-                //console.log(vo)
-
                 $scope.allCompElements = vo.allElements
                 $scope.hashCompElements = vo.hashAllElements
 
+                let download = modelCompSvc.makeDownload(vo.allElements)
+
+                //$scope.downloadLinkCompTsv = window.URL.createObjectURL(new Blob([angular.toJson(download,true) ],{type:"text/tsv"}))
+                $scope.downloadLinkCompTsv = window.URL.createObjectURL(new Blob([download ],{type:"text/tsv"}))
+                $scope.downloadLinkCompTsvName = `comp-${comp.name}.tsv`
 
                 let rootNodeId = $scope.allCompElements[0].path
                 let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
-                $scope.treeData = treeData      //used in the Q builder
+                //temp - not sure this is correct$scope.treeData = treeData      //used in the Q builder
 
 
                 makeCompTree(treeData,rootNodeId)
 
+
                 igSvc.makeFshForComp(comp,$scope.allCompElements,$scope.hashCompElements)
 
-                //$scope.compQ = QutilitiesSvc.makeQfromComposition(comp,vo.hashAllElements)
 
 
             }
@@ -1532,10 +1534,14 @@ angular.module("pocApp")
                 }).bind("loaded.jstree", function (event, data) {
                     let id = treeData[0].id
                     $(this).jstree("open_node",id);
+                    let treeObject = $(this).jstree(true).get_json('#', { 'flat': false })
+                    $scope.fullQ =  makeQSvc.makeQFromTree(treeObject)
+                    console.log($scope.fullQ)
                     $scope.$digest();
                 });
 
             }
+
 
 
 
