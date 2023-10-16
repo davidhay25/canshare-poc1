@@ -36,7 +36,9 @@ angular.module("pocApp")
 
             makeQ: function(treeObject) {
                 //construct a Questionnaire resource
-                Q = {resourceType:"Questionnaire",status:"draft"}
+                //treeObject comes from the jstree control - it's actually an array
+                let qName = treeObject[0].id
+                Q = {resourceType:"Questionnaire",status:"draft",name:name}
 
                 function addChild(parent,node) {
                     let data = node.data

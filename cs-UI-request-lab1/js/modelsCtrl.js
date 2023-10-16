@@ -3,10 +3,10 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
-                  $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,QutilitiesSvc,igSvc,librarySvc) {
+                  $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc) {
 
 
-            $scope.version = "0.4.9"
+            $scope.version = "0.4.10"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -1479,24 +1479,6 @@ angular.module("pocApp")
                     if (data.node) {
 
                         $scope.selectedNode = data.node;
-/*
-                        //determine the possible control types (in the Q) for this element
-                        delete $scope.qControlOptions
-                        if ($scope.selectedNode.data.ed && $scope.selectedNode.data.ed.type) {
-                            switch ($scope.selectedNode.data.ed.type[0]) {
-                                case "string" :
-                                    $scope.qControlOptions =  ["string","text"]
-                                    break
-                                case "CodeableConcept" :
-                                    $scope.qControlOptions =  ["drop-down","autocomplete","lookup"]
-                                    break
-                            }
-
-                        }
-
-                        $scope.input.controlHint = $scope.selectedNode.data.ed.controlHint
-
-                        */
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...

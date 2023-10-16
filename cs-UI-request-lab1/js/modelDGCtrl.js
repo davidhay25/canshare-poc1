@@ -283,18 +283,7 @@ angular.module("pocApp")
                 
             }
 
-            //get the possible options for a datatype
-            $scope.getControlOptionsDEP = function (ed) {
-                switch (ed.type[0]) {
-                    case "string" :
-                        return ["text-box","multi-line"]
-                        break
-                    case "CodeableConcept" :
-                        return ["drop-down","autocomplete","lookup"]
-                        break
-                }
 
-            }
 
             $scope.setOtherAllowedStatus = function (ed,allowed) {
                 console.log(allowed)
@@ -467,28 +456,7 @@ angular.module("pocApp")
                 }
             }
 
-            $scope.getControlTypeDEP = function (ed) {
-                if (ed) {
-                    let controlType = "input"
-                    if (ed.options) {
-                        controlType = 'dropdown'
-                    }
 
-                    //the root element has no type
-                    if (ed.type) {
-                        let type = ed.type[0]
-                        if ($scope.hashAllDG[type] && $scope.hashAllDG[type].diff) {
-                            controlType = "dg"
-                        }
-                    }
-
-
-                    //console.log(controlType)
-                    return controlType
-                }
-
-
-            }
 
             //delete the selected item. If the item exists in the DG then it can be removed. Don't set the mult to 0..0 as this prevents a new element with that path
             //if not (ie it's inherited) then create an override element
@@ -635,7 +603,7 @@ angular.module("pocApp")
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editOptionsList.html',
                     backdrop: 'static',
-                    //size : 'lg',
+
                     controller: 'optionsCtrl',
 
                     resolve: {

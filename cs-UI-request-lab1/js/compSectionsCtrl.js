@@ -1,5 +1,5 @@
 angular.module("pocApp")
-    .controller('makeCompCtrl',
+    .controller('compSectionsCtrl',
         function ($scope,$http,$q,$timeout,modelDGSvc,modelsSvc) {
 
             $scope.local = {}   //so as not to mask the input from the parent
@@ -10,9 +10,50 @@ angular.module("pocApp")
             }
 
 
+
+            $scope.moveSectionUp = function(inx) {
+                if (inx > 0) {
+                    let sectToMove = $scope.selectedModel.sections[inx]
+                    let sect = $scope.selectedModel.sections.splice(inx,1)[0]
+                    $scope.selectedModel.sections.splice(inx-1,0,sect)
+                }
+            }
+
+            $scope.moveSectionDown = function(inx) {
+                if (inx < $scope.selectedModel.sections.length -1) {
+                    let sectToMove = $scope.selectedModel.sections[inx]
+                    let sect = $scope.selectedModel.sections.splice(inx,1)[0]
+                    $scope.selectedModel.sections.splice(inx+1,0,sect)
+                }
+            }
+            
+            $scope.removeSection = function (inx) {
+                //$scope.selectedModel.sections = $scope.selectedModel.sections || []
+                let sect = $scope.selectedModel.sections[inx]
+                if (sect.items.length > 0) {
+                    alert("You must remove the DGs first.")
+                    return
+                }
+                $scope.selectedModel.sections.splice(inx,1)
+            }
+
+
+
+            $scope.showDG = function () {
+                $scope.termSelectDG({DGName:$scope.selectedItem.type[0]})
+            }
+
+            $scope.moveDGDown = function(inx) {
+
+                if (inx < $scope.selectedSection.items.length -1) {
+                    //let itemToMove = $scope.selectedSection.items[inx]
+                    let item = $scope.selectedSection.items.splice(inx,1)[0]
+                    $scope.selectedSection.items.splice(inx+1,0,item)
+                }
+            }
+
             $scope.removeDG = function (inx) {
                 $scope.selectedSection.items.splice(inx,1)
-
             }
 
             $scope.setup = function () {
@@ -28,6 +69,7 @@ angular.module("pocApp")
                 clear()
                 delete $scope.fullElementListPossible
                 delete $scope.selectedNewDG
+                delete $scope.fullElementList
                 $scope.selectedSection = section
 
             }
@@ -60,8 +102,28 @@ angular.module("pocApp")
             $scope.addSectionItem = function (dg) {
                 if ($scope.selectedSection) {
                     $scope.selectedSection.items = $scope.selectedSection.items || []
-                    let item = {name:dg.name,title:dg.name,mult:'0..1'}
+
+                    //the name must be unique
+                    let name = dg.name
+
+
+                    let ctr = 0
+                    //count the number of times (if any) that this path appears
+                    $scope.selectedSection.items.forEach(function (item) {
+                        console.log(item)
+                        if (item.name.startsWith(name)) {
+                            ctr++
+                        }
+                    })
+
+                    if (ctr > 0) {
+                        name = name + ctr
+                    }
+
+                    let item = {name:name,title:dg.name,mult:'0..1'}
                     item.type = [dg.name]
+
+
                     $scope.selectedSection.items.push(item)
                 }
 

@@ -1,16 +1,31 @@
 <div>
 
   <div class="row">
-    <div class="col-md-3">
+    <div class="col-md-4">
       <div class="banner">Sections</div>
       <div class="list-group">
         <div ng-class="{'list-group-item':true,listItemSelected:section == selectedSection}"
              style="cursor: pointer"
              ng-click="selectSection(section)"
+
              ng-repeat="section in selectedModel.sections">
-          {{section.title}}
+
+              <span class="clickable pull-right" ng-click="removeSection($index)">
+                <i class="glyphicon glyphicon-remove"></i>
+              </span>
+
+              <span class="clickable pull-right" ng-click="moveSectionUp($index)">
+                    <i class="glyphicon glyphicon-arrow-up"></i>
+                </span>
+                <span class="clickable pull-right" ng-click="moveSectionDown($index)">
+                    <i class="glyphicon glyphicon-arrow-down"></i>
+                </span>
+
+          {{section.title || section.name}}
         </div>
       </div>
+
+
 
 
       <div class="row">
@@ -39,11 +54,18 @@
              ng-click="selectItem(item)"
              style="cursor: pointer"
              ng-repeat="item in selectedSection.items">
+
           <i class="glyphicon glyphicon-remove pull-right clickable"
             ng-click="removeDG($index)"></i>
+
+              <span class="clickable pull-right" ng-click="moveDGDown($index)">
+                    <i class="glyphicon glyphicon-arrow-down"></i>
+                </span>
+
           {{item.title}}
         </div>
       </div>
+      <hr/>
 
       <div class="row">
         <div class="col-md-10">
@@ -67,13 +89,15 @@
       </div>
 
     </div>
-    <div class="col-md-5" ng-show="selectedSection">
+    <div class="col-md-4" ng-show="selectedSection">
       <div class="banner">Add DG to section</div>
       <uib-tabset>
 
         <uib-tab heading="Details">
-          <br/>
 
+          <div ng-show="selectedItem">
+            <button class="btn-link btn pull-right" ng-click="showDG()">Load {{selectedItem.type[0]}} DataGroup</button>
+          </div>
 
           <table class="table table-bordered table-condensed">
             <tr ng-repeat="item in fullElementList">

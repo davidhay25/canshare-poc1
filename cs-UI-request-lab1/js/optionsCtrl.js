@@ -20,7 +20,6 @@ angular.module("pocApp")
 
                 })
                 $scope.input.dirty = true
-                //console.log(ar)
             }
 
 
@@ -33,7 +32,8 @@ angular.module("pocApp")
                     console.log(ar)
                     let option = {}
                     option.code = ar[0]
-                    option.pt = ar[1]
+                    option.pt = ar[1]       //set the pt (preferred term) and the display the same. Not sure if we should be using pt anyway...
+                    option.display = ar[1]
                     $scope.ed.options.push(option)
 
                 })
