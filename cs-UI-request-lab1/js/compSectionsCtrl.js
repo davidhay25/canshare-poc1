@@ -16,7 +16,9 @@ angular.module("pocApp")
                     let sectToMove = $scope.selectedModel.sections[inx]
                     let sect = $scope.selectedModel.sections.splice(inx,1)[0]
                     $scope.selectedModel.sections.splice(inx-1,0,sect)
+                    $scope.selectComposition($scope.selectedModel)  //in modelCtrl
                 }
+
             }
 
             $scope.moveSectionDown = function(inx) {
@@ -24,6 +26,7 @@ angular.module("pocApp")
                     let sectToMove = $scope.selectedModel.sections[inx]
                     let sect = $scope.selectedModel.sections.splice(inx,1)[0]
                     $scope.selectedModel.sections.splice(inx+1,0,sect)
+                    $scope.selectComposition($scope.selectedModel)  //in modelCtrl
                 }
             }
             
@@ -35,6 +38,7 @@ angular.module("pocApp")
                     return
                 }
                 $scope.selectedModel.sections.splice(inx,1)
+                $scope.selectComposition($scope.selectedModel)  //in modelCtrl
             }
 
 
@@ -48,6 +52,7 @@ angular.module("pocApp")
                     //let itemToMove = $scope.selectedSection.items[inx]
                     let item = $scope.selectedSection.items.splice(inx,1)[0]
                     $scope.selectedSection.items.splice(inx+1,0,item)
+                    $scope.selectComposition($scope.selectedModel)  //in modelCtrl
                 }
             }
 
@@ -57,6 +62,7 @@ angular.module("pocApp")
 
                     let dg = $scope.selectedSection.items.splice(inx,1)[0]
                     $scope.selectedSection.items.splice(inx-1,0,dg)
+                    $scope.selectComposition($scope.selectedModel)  //in modelCtrl
 
                    // let item = $scope.selectedSection.items.splice(inx,1)[0]
                    // $scope.selectedSection.items.splice(inx+1,0,item)
@@ -66,6 +72,7 @@ angular.module("pocApp")
 
             $scope.removeDG = function (inx) {
                 $scope.selectedSection.items.splice(inx,1)
+                $scope.selectComposition($scope.selectedModel)  //in modelCtrl
             }
 
             $scope.setup = function () {
@@ -108,6 +115,7 @@ angular.module("pocApp")
                 $scope.selectedModel.sections.push({kind:'section',name:name,title:title,mult:'0..1',items:[]})
                 delete $scope.local.sectionName
                 delete $scope.local.sectionTitle
+                $scope.selectComposition($scope.selectedModel)  //in modelCtrl
 
             }
 
@@ -137,6 +145,7 @@ angular.module("pocApp")
 
 
                     $scope.selectedSection.items.push(item)
+                    $scope.selectComposition($scope.selectedModel)  //in modelCtrl
                 }
 
                 delete $scope.fullElementListPossible
@@ -164,6 +173,8 @@ angular.module("pocApp")
                             let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
                             //sort the elements list to better display slicing
                             $scope.fullElementListPossible = modelsSvc.makeOrderedFullList(vo.allElements)
+
+
 
                         }
                         $scope.$digest()

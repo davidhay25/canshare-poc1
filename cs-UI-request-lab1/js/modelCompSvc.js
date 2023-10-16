@@ -11,9 +11,10 @@ angular.module("pocApp")
                 let lst = []
 
                 lstElements.forEach(function (item) {
-                    let lne = `${item.ed.path}\t${item.ed.title}`
+                    let lne = `${item.ed.path},${item.ed.title}`
                     if (item.ed.type) {
-                        lne += "\t" + item.ed.type[0]
+                        //lne += "\t" + item.ed.type[0]
+                        lne += "," + item.ed.type[0]
                     }
                     lne += "\r\n"
                     //console.log(lne)

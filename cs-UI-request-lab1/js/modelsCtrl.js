@@ -6,7 +6,7 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc) {
 
 
-            $scope.version = "0.4.10"
+            $scope.version = "0.4.11"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -1339,10 +1339,11 @@ angular.module("pocApp")
                 $scope.hashCompElements = vo.hashAllElements
 
                 let download = modelCompSvc.makeDownload(vo.allElements)
+                console.log(download)
 
                 //$scope.downloadLinkCompTsv = window.URL.createObjectURL(new Blob([angular.toJson(download,true) ],{type:"text/tsv"}))
-                $scope.downloadLinkCompTsv = window.URL.createObjectURL(new Blob([download ],{type:"text/tsv"}))
-                $scope.downloadLinkCompTsvName = `comp-${comp.name}.tsv`
+                $scope.downloadLinkCompTsv = window.URL.createObjectURL(new Blob([download ],{type:"text/csv"}))
+                $scope.downloadLinkCompTsvName = `comp-${comp.name}.csv`
 
                 let rootNodeId = $scope.allCompElements[0].path
                 let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)

@@ -380,17 +380,11 @@
 
     </uib-tab>
 
-    <uib-tab heading = "Sections">
-      <br/>
-      <div ng-controller="compSectionsCtrl">
-        <ng-include src ="'includes/compSections.html'"></ng-include>
-
-      </div>
-    </uib-tab>
 
     <uib-tab heading="Table">
 
       <div class="row">
+        <em>This will become the HISO download</em>
 
         <a class="btn btn-link pull-right" download="{{downloadLinkCompTsvName}}"
            href="{{downloadLinkCompTsv}}" title="{{downloadLinkCompTsvName}}" >
@@ -401,37 +395,46 @@
       </div>
 
       <div class="tableFixHead">
-      <table class="table table-bordered">
-        <thead>
-        <tr><th>Path</th><th>Title</th><th>Kind</th><th>Description</th><th>Type</th><th>Card.</th></tr>
-        </thead>
-        <tbody>
-        <tr
-                ng-style="{ 'background-color': getRowColour(item.ed) }"
-                ng-repeat="item in allCompElements track by $index">
-          <td>
-            <div ng-style="{ 'padding-left': (item.ed.path | pathindent) }">
-              {{item.ed.path | lastInPath}}
-            </div>
+        <table class="table table-bordered">
+          <thead>
+          <tr><th>Path</th><th>Title</th><th>Kind</th><th>Description</th><th>Type</th><th>Card.</th></tr>
+          </thead>
+          <tbody>
+          <tr
+                  ng-style="{ 'background-color': getRowColour(item.ed) }"
+                  ng-repeat="item in allCompElements track by $index">
+            <td>
+              <div ng-style="{ 'padding-left': (item.ed.path | pathindent) }">
+                {{item.ed.path | lastInPath}}
+              </div>
 
             </td>
-          <td>{{item.ed.title}}</td>
-          <td>{{item.ed.kind}}</td>
-          <td>{{item.ed.description}}</td>
-          <td>{{item.ed.type[0]}}</td>
+            <td>{{item.ed.title}}</td>
+            <td>{{item.ed.kind}}</td>
+            <td>{{item.ed.description}}</td>
+            <td>{{item.ed.type[0]}}</td>
 
-          <td>
+            <td>
 
 
-            <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
+              <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
 
-            <div ng-show = "item.host">{{item.host.mult}}</div>
-            <div ng-hide = "item.host">{{item.ed.mult}}</div>
+              <div ng-show = "item.host">{{item.host.mult}}</div>
+              <div ng-hide = "item.host">{{item.ed.mult}}</div>
 
-          </td>
-        </tr>
-        </tbody>
-      </table>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </uib-tab>
+
+
+    <uib-tab heading = "Sections">
+      <br/>
+      <div ng-controller="compSectionsCtrl">
+        <ng-include src ="'includes/compSections.html'"></ng-include>
+
       </div>
     </uib-tab>
 

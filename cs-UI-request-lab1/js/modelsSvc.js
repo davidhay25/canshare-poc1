@@ -543,7 +543,7 @@ angular.module("pocApp")
 
                     let node = {id:id,text:text,parent:parent,data:{ed:ed,host:host}}
 
-                    console.log(ed)
+                    //console.log(ed)
                     node.data.level = ed.kind       //Questionnaire uses 'level'
 
 
