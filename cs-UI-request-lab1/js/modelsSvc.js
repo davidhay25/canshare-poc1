@@ -646,7 +646,7 @@ angular.module("pocApp")
                         ar.pop()
                         let parentPath = ar.join('.')
                         if (!hash[parentPath]) {
-                            alert(`The paths in DG ${dgName} have become corrupted. The path ${parentPath} could not be found. You'll need to reset.`)
+                            alert(`The paths in DG ${dgName} have become corrupted. The path ${parentPath} could not be found. You'll need to reload.`)
                         } else {
                             hash[parentPath].children.push(hash[path])
                         }

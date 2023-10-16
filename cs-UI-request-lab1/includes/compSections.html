@@ -86,7 +86,7 @@
         </div>
 
         <table class="table table-bordered table-condensed">
-          <tr ng-repeat="item in fullElementListPossible">
+          <tr ng-repeat="item in fullElementListPossible" ng-hide="item.ed.mult == '0..0'">
             <td>{{item.ed.title || item.ed.path}}</td>
             <td>{{item.ed.description}}</td>
           </tr>
