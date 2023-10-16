@@ -124,7 +124,6 @@ angular.module("pocApp")
                                 hashAllElements[path] = {ed:ed}
                             }
 
-
                         })
 
 
@@ -163,7 +162,7 @@ angular.module("pocApp")
                         console.log('missing name: ',model)
                         //this is a Z element - ie a FHIR DT directly attached to the section
                         // or a missing DG
-                        alert(`Missing type: ${type} (may be a z element - will be fixing if so`)
+                        alert(`Missing type: ${type} (may be a z element - will need fixing if so)`)
                     }
 
                 }

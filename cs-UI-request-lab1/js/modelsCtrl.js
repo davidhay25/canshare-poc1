@@ -163,6 +163,21 @@ angular.module("pocApp")
                 }
             }
 
+            $scope.getSortedDGListDEP = function () {
+                let ar = []
+                Object.keys($scope.hashAllDG).forEach(function (key) {
+                    ar.push($scope.hashAllDG[key])
+                })
+                ar.sort(function (a,b) {
+                    if (a.name.toLowerCase() > b.name.toLowerCase()) {
+                        return true
+                    } else {
+                        return false
+                    }
+                })
+                console.log(ar)
+                return ar
+            }
 
 
             //all the questionnaire objects (not actual Q)

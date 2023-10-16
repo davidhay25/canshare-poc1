@@ -44,13 +44,25 @@ angular.module("pocApp")
             }
 
             $scope.moveDGDown = function(inx) {
-
                 if (inx < $scope.selectedSection.items.length -1) {
                     //let itemToMove = $scope.selectedSection.items[inx]
                     let item = $scope.selectedSection.items.splice(inx,1)[0]
                     $scope.selectedSection.items.splice(inx+1,0,item)
                 }
             }
+
+            $scope.moveDGUp = function(inx) {
+                if (inx >0) {
+                    //let itemToMove = $scope.selectedSection.items[inx]
+
+                    let dg = $scope.selectedSection.items.splice(inx,1)[0]
+                    $scope.selectedSection.items.splice(inx-1,0,dg)
+
+                   // let item = $scope.selectedSection.items.splice(inx,1)[0]
+                   // $scope.selectedSection.items.splice(inx+1,0,item)
+                }
+            }
+
 
             $scope.removeDG = function (inx) {
                 $scope.selectedSection.items.splice(inx,1)

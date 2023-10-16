@@ -16,6 +16,9 @@ angular.module("pocApp")
                     $scope.input.possibleParents.push(key)
                 }
             })
+            $scope.input.possibleParents.sort()
+
+
             
             $scope.import = function (data) {
                 $scope.model.diff == $scope.model.diff || []

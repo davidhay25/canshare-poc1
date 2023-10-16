@@ -14,12 +14,13 @@
                 <i class="glyphicon glyphicon-remove"></i>
               </span>
 
-              <span class="clickable pull-right" ng-click="moveSectionUp($index)">
+              <span ng-hide="$index==0" class="clickable pull-right" ng-click="moveSectionUp($index)">
                     <i class="glyphicon glyphicon-arrow-up"></i>
-                </span>
-                <span class="clickable pull-right" ng-click="moveSectionDown($index)">
-                    <i class="glyphicon glyphicon-arrow-down"></i>
-                </span>
+              </span>
+
+              <span ng-hide="$index == selectedModel.sections.length-1" class="clickable pull-right" ng-click="moveSectionDown($index)">
+                  <i class="glyphicon glyphicon-arrow-down"></i>
+              </span>
 
           {{section.title || section.name}}
         </div>
@@ -55,12 +56,18 @@
              style="cursor: pointer"
              ng-repeat="item in selectedSection.items">
 
-          <i class="glyphicon glyphicon-remove pull-right clickable"
-            ng-click="removeDG($index)"></i>
+            <i class="glyphicon glyphicon-remove pull-right clickable"
+              ng-click="removeDG($index)"></i>
 
-              <span class="clickable pull-right" ng-click="moveDGDown($index)">
-                    <i class="glyphicon glyphicon-arrow-down"></i>
-                </span>
+            <span ng-hide="$index==0" class="clickable pull-right" ng-click="moveDGUp($index)">
+                    <i class="glyphicon glyphicon-arrow-up"></i>
+            </span>
+
+            <span ng-hide="$index==selectedSection.items.length -1" class="clickable pull-right" ng-click="moveDGDown($index)">
+                  <i class="glyphicon glyphicon-arrow-down"></i>
+            </span>
+
+
 
           {{item.title}}
         </div>
@@ -107,8 +114,6 @@
 
           </table>
 
-
-
         </uib-tab>
 
 
@@ -116,7 +121,10 @@
           <!--
           <div class="clickable" ng-click="setup()">refresh</div>
 -->
-          <div id="dgSelectTree"></div>
+          <div class="myScroll">
+            <div id="dgSelectTree"></div>
+          </div>
+
 
 
 

@@ -502,12 +502,15 @@
                         <div class="tableFixHead">
                             <table class="table table-condensed table-bordered">
                                 <thead>
-                            <tr><th>Name</th><th>Title</th><th>Description & Referenced by</th><th>mCODE group</th><th># elements</th></tr>
+                            <tr><th>Title</th><th>Name</th><th>Description & Referenced by</th><th># elements</th></tr>
                                 </thead>
                                 <tbody>
-                            <tr ng-repeat="(k,v) in world.dataGroups">
-                                <td><div class="clickable" ng-click="selectModelFromList(k,v.kind)">{{v.name}}</div></td>
-                                <td>{{v.title}}</td>
+
+                         <!--   <tr ng-repeat="(k,v) in world.dataGroups"> -->
+                                <tr ng-repeat="v in sortedDGList">
+                                    <td>{{v.title}}</td>
+                                <td><div class="clickable" ng-click="selectModelFromList(v.name,v.kind)">{{v.name}}</div></td>
+
                                 <td>{{v.description}}
 
                                     <div>
@@ -520,9 +523,7 @@
                                     </div>
 
                                 </td>
-                                <td>
-                                    <a ng-href="{{mCodeGroupPage[v.mcodegroup]}}" target="_blank">{{v.mcodegroup}}</a>
-                                </td>
+
                                 <td>{{v.diff.length}}</td>
                             </tr>
                                 </tbody>

@@ -124,12 +124,16 @@ angular.module("pocApp")
                     while (model && model.parent) {
                        // console.log(`Examining ${DG.name}: ${model.parent} is the parent of ${model.name}`)
                         model = hashDG[model.parent]
+
                         if (model) {
                             hashReferences[model.name] = hashReferences[model.name] || []
                             hashReferences[model.name].push({name:DG.name,kind:model.kind,mode:'parent'})
+                            currentModelParent = model.parent
                         } else {
-                            alert(`The DG ${key} has a parent of ${currentModelParent} which is not a DG`)
+                            console.log(`The DG ${key} has a parent or grandParent of ${currentModelParent} which is not a DG`)
+                            //console.log(`The DG ${key} has a parent of ${model.parent} which is not a DG`)
                         }
+
                     }
 
                     if (DG.diff) {

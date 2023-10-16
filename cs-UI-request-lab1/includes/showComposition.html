@@ -112,6 +112,17 @@
                   </div>
                 </div>
 
+                <div class="row">
+                  <div class="col-md-3">
+                    Type
+                  </div>
+                  <div class="col-md-9">
+                    <div class="clickable" ng-click="termSelectDG({DGName:selectedCompositionNode.data.ed.name})  ">
+                      {{selectedCompositionNode.data.ed.name}}
+                    </div>
+                  </div>
+                </div>
+
                 <div class="row" >
                   <div class="col-md-3">
                     Title
@@ -425,7 +436,11 @@
     </uib-tab>
 
     <uib-tab heading="Form">
-      generate default Q from composition, then render in here using directive
+
+      <button class="btn-link btn pull-right" ng-click="previewQ()">Preview</button>
+
+      <renderform q="fullQ" qr="{}"></renderform>
+
     </uib-tab>
 
     <uib-tab heading="Graph">
@@ -518,13 +533,7 @@
 
 
 
-    <uib-tab heading="Form">
 
-      <button class="btn-link btn pull-right" ng-click="previewQ()">Preview</button>
-
-      <renderform q="fullQ" qr="{}"></renderform>
-
-    </uib-tab>
 
 
     <uib-tab ng-show="false" heading="allCompElements">
