@@ -171,6 +171,8 @@ angular.module("pocApp")
                             //get the ful elementList for this DG. Will be displayed below the section items
 
                             let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
+
+
                             //sort the elements list to better display slicing
                             $scope.fullElementListPossible = modelsSvc.makeOrderedFullList(vo.allElements)
 

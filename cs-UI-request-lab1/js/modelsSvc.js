@@ -604,12 +604,7 @@ angular.module("pocApp")
 
                     }
 
-                    /*
-                    if (ed.mult && ed.mult.indexOf('1..') > -1) {
-                        //node['a_attr'] = { "style": "color : red" }
-                        node['a_attr'] = { "style": "font-weight:bold" }
-                    }
-*/
+
 
                     if (ed.mult && ed.mult == '0..0') {
                         //don't add removed elements
@@ -619,7 +614,7 @@ angular.module("pocApp")
 
                 }
 
-                //console.log(treeData)
+
                 return treeData
 
 
