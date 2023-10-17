@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('compSectionsCtrl',
-        function ($scope,$http,$q,$timeout,modelDGSvc,modelsSvc) {
+        function ($scope,$http,$q,$timeout,modelDGSvc,modelsSvc,modelCompSvc) {
 
             $scope.local = {}   //so as not to mask the input from the parent
 
@@ -13,32 +13,32 @@ angular.module("pocApp")
 
             $scope.moveSectionUp = function(inx) {
                 if (inx > 0) {
-                    let sectToMove = $scope.selectedModel.sections[inx]
-                    let sect = $scope.selectedModel.sections.splice(inx,1)[0]
-                    $scope.selectedModel.sections.splice(inx-1,0,sect)
-                    $scope.selectComposition($scope.selectedModel)  //in modelCtrl
+                    let sectToMove = $scope.selectedComposition.sections[inx]
+                    let sect = $scope.selectedComposition.sections.splice(inx,1)[0]
+                    $scope.selectedComposition.sections.splice(inx-1,0,sect)
+                    $scope.selectComposition($scope.selectedComposition)  //in modelCtrl
                 }
 
             }
 
             $scope.moveSectionDown = function(inx) {
-                if (inx < $scope.selectedModel.sections.length -1) {
-                    let sectToMove = $scope.selectedModel.sections[inx]
-                    let sect = $scope.selectedModel.sections.splice(inx,1)[0]
-                    $scope.selectedModel.sections.splice(inx+1,0,sect)
-                    $scope.selectComposition($scope.selectedModel)  //in modelCtrl
+                if (inx < $scope.selectedComposition.sections.length -1) {
+                    let sectToMove = $scope.selectedComposition.sections[inx]
+                    let sect = $scope.selectedComposition.sections.splice(inx,1)[0]
+                    $scope.selectedComposition.sections.splice(inx+1,0,sect)
+                    $scope.selectComposition($scope.selectedComposition)  //in modelCtrl
                 }
             }
             
             $scope.removeSection = function (inx) {
-                //$scope.selectedModel.sections = $scope.selectedModel.sections || []
-                let sect = $scope.selectedModel.sections[inx]
+                //$scope.selectedComposition.sections = $scope.selectedComposition.sections || []
+                let sect = $scope.selectedComposition.sections[inx]
                 if (sect.items.length > 0) {
                     alert("You must remove the DGs first.")
                     return
                 }
-                $scope.selectedModel.sections.splice(inx,1)
-                $scope.selectComposition($scope.selectedModel)  //in modelCtrl
+                $scope.selectedComposition.sections.splice(inx,1)
+                $scope.selectComposition($scope.selectedComposition)  //in modelCtrl
             }
 
 
@@ -52,7 +52,7 @@ angular.module("pocApp")
                     //let itemToMove = $scope.selectedSection.items[inx]
                     let item = $scope.selectedSection.items.splice(inx,1)[0]
                     $scope.selectedSection.items.splice(inx+1,0,item)
-                    $scope.selectComposition($scope.selectedModel)  //in modelCtrl
+                    $scope.selectComposition($scope.selectedComposition)  //in modelCtrl
                 }
             }
 
@@ -62,7 +62,7 @@ angular.module("pocApp")
 
                     let dg = $scope.selectedSection.items.splice(inx,1)[0]
                     $scope.selectedSection.items.splice(inx-1,0,dg)
-                    $scope.selectComposition($scope.selectedModel)  //in modelCtrl
+                    $scope.selectComposition($scope.selectedComposition)  //in modelCtrl
 
                    // let item = $scope.selectedSection.items.splice(inx,1)[0]
                    // $scope.selectedSection.items.splice(inx+1,0,item)
@@ -72,7 +72,7 @@ angular.module("pocApp")
 
             $scope.removeDG = function (inx) {
                 $scope.selectedSection.items.splice(inx,1)
-                $scope.selectComposition($scope.selectedModel)  //in modelCtrl
+                $scope.selectComposition($scope.selectedComposition)  //in modelCtrl
             }
 
             $scope.setup = function () {
@@ -88,7 +88,7 @@ angular.module("pocApp")
                 clear()
                 delete $scope.fullElementListPossible
                 delete $scope.selectedNewDG
-                delete $scope.fullElementList
+                delete $scope.filteredElementList
                 $scope.selectedSection = section
 
             }
@@ -103,7 +103,9 @@ angular.module("pocApp")
                 let dg = $scope.hashAllDG[type]         //from parent scope
 
                 let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
-                $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
+                let lst = modelsSvc.makeOrderedFullList(vo.allElements)
+
+                $scope.filteredElementList = modelCompSvc.filterList(lst)
 
 
 
@@ -111,11 +113,11 @@ angular.module("pocApp")
 
             $scope.addSection = function (name,title) {
                 title = title || name
-                $scope.selectedModel.sections = $scope.selectedModel.sections || []
-                $scope.selectedModel.sections.push({kind:'section',name:name,title:title,mult:'0..1',items:[]})
+                $scope.selectedComposition.sections = $scope.selectedComposition.sections || []
+                $scope.selectedComposition.sections.push({kind:'section',name:name,title:title,mult:'0..1',items:[]})
                 delete $scope.local.sectionName
                 delete $scope.local.sectionTitle
-                $scope.selectComposition($scope.selectedModel)  //in modelCtrl
+                $scope.selectComposition($scope.selectedComposition)  //in modelCtrl
 
             }
 
@@ -145,7 +147,7 @@ angular.module("pocApp")
 
 
                     $scope.selectedSection.items.push(item)
-                    $scope.selectComposition($scope.selectedModel)  //in modelCtrl
+                    $scope.selectComposition($scope.selectedComposition)  //in modelCtrl
                 }
 
                 delete $scope.fullElementListPossible
@@ -174,7 +176,10 @@ angular.module("pocApp")
 
 
                             //sort the elements list to better display slicing
-                            $scope.fullElementListPossible = modelsSvc.makeOrderedFullList(vo.allElements)
+                            let lst = modelsSvc.makeOrderedFullList(vo.allElements)
+                            //and filter the list, removing 0..0
+
+                            $scope.fullElementListPossible = modelCompSvc.filterList(lst)
 
 
 
@@ -190,9 +195,9 @@ angular.module("pocApp")
                     let id = treeData[0].id
                     $(this).jstree("open_node",id);
 
-                    if ($scope.selectedModel) {
-                        $(this).jstree("open_node",$scope.selectedModel.name);
-                        $(this).jstree("select_node",$scope.selectedModel.name);
+                    if ($scope.selectedComposition) {
+                        $(this).jstree("open_node",$scope.selectedComposition.name);
+                        $(this).jstree("select_node",$scope.selectedComposition.name);
                     }
 
 

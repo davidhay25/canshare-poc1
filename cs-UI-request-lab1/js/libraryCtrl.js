@@ -250,7 +250,7 @@ angular.module("pocApp")
 
             $scope.checkin = function (model) {
 
-                if (model.checkedOut == user.email) {
+                if (user && model.checkedOut == user.email) {
                     if ( confirm("Are you sure you want to check this in to the Library")) {
                         librarySvc.checkIn (model,user,function(){
                             makeDGSummary(allDG,$scope.libraryDG)

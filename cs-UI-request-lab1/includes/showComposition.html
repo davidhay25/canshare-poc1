@@ -12,27 +12,27 @@
 
   </style>
 
-  <div ng-show="selectedModel">
+  <div ng-show="selectedComposition">
 
   <div class="modelInfo row">
     <div class="col-md-7">
 
-        <strong>{{selectedModel.title}} </strong> ({{selectedModel.name}})
-        <div><em>{{selectedModel.description}}</em></div>
+        <strong>{{selectedComposition.title}} </strong> ({{selectedComposition.name}})
+        <div><em>{{selectedComposition.description}}</em></div>
         <div>
-          <div ng-show="selectedModel.sourceReference">
-            <strong>Source reference</strong>: {{selectedModel.sourceReference}}
+          <div ng-show="selectedComposition.sourceReference">
+            <strong>Source reference</strong>: {{selectedComposition.sourceReference}}
           </div>
         </div>
         <br/>
         <div>
-          <button class="btn btn-link" ng-click="deleteComposition(selectedModel)">Remove from local store</button>
+          <button class="btn btn-link" ng-click="deleteComposition(selectedComposition)">Remove from local store</button>
         </div>
     </div>
     <div class="col-md-5">
       <table class="table-condensed table table-bordered">
-        <tr><td>Tumour stream</td><td>{{selectedModel.meta.tumourStream}}</td></tr>
-        <tr><td>Category</td><td>{{selectedModel.meta.category}}</td></tr>
+        <tr><td>Tumour stream</td><td>{{selectedComposition.meta.tumourStream}}</td></tr>
+        <tr><td>Category</td><td>{{selectedComposition.meta.category}}</td></tr>
 
         <tr><td></td><td><em>Set these in the Metadata tab</em></td></tr>
       </table>
@@ -43,7 +43,7 @@
 
   <div class = "clickable pull-right">
 
-    <button class="btn-link btn pull-right" ng-click="libraryInteraction(selectedModel)">Compare to library</button>
+    <button class="btn-link btn pull-right" ng-click="libraryInteraction(selectedComposition)">Compare to library</button>
   </div>
 
   <uib-tabset active="input.compTabActive" >
@@ -285,7 +285,7 @@
                 <div class="col-md-4">
                   <button class="btn-link btn"
                           ng-show="input.newSectionTitle"
-                          ng-click="addSection(selectedModel,input.newSectionTitle)">Add new section</button>
+                          ng-click="addSection(selectedComposition,input.newSectionTitle)">Add new section</button>
                 </div>
               </div>
             </div>
@@ -457,7 +457,7 @@
 
       <table class="table table-bordered">
         <tr><th>Path</th><th>Title</th><th>ValueSet</th><th>Card.</th><th>Z</th><th></th></tr>
-        <tr ng-repeat="ed in selectedModel.override track by $index">
+        <tr ng-repeat="ed in selectedComposition.override track by $index">
           <td>
 
             <div class="clickable" ng-click="selectCompTreePath(ed.path)">{{ed.path}}</div>
@@ -478,21 +478,21 @@
           <table class="table">
             <tr>
               <td>Name</td>
-              <td>{{selectedModel.name}}</td>
+              <td>{{selectedComposition.name}}</td>
             </tr>
             <tr>
               <td>Title</td>
-              <td><input type="text" class="form-control" ng-model="selectedModel.title" />  </td>
+              <td><input type="text" class="form-control" ng-model="selectedComposition.title" />  </td>
             </tr>
             <tr>
               <td>Description</td>
-              <td><textarea class="form-control" ng-model="selectedModel.description" ></textarea> </td>
+              <td><textarea class="form-control" ng-model="selectedComposition.description" ></textarea> </td>
             </tr>
             <tr>
               <td>Category</td>
               <td><input type="text" class="form-control"
                          ng-blur="updateMetaValues()"
-                         ng-model="selectedModel.meta.category" />  </td>
+                         ng-model="selectedComposition.meta.category" />  </td>
             </tr>
 
           </table>
@@ -504,13 +504,13 @@
               <td>Tumour stream</td>
               <td><input type="text" class="form-control"
                          ng-blur="updateMetaValues()"
-                         ng-model="selectedModel.meta.tumourStream" /> </td>
+                         ng-model="selectedComposition.meta.tumourStream" /> </td>
             </tr>
 
             <tr>
               <td>Tags</td>
               <td>
-                <div ng-repeat="tag in selectedModel.meta.tags">
+                <div ng-repeat="tag in selectedComposition.meta.tags">
                   {{tag}}
                 </div>
               </td>
@@ -519,7 +519,7 @@
             <tr>
               <td>Source reference</td>
 
-              <td><input type="text" class="form-control" ng-model="selectedModel.sourceReference" />  </td>
+              <td><input type="text" class="form-control" ng-model="selectedComposition.sourceReference" />  </td>
 
             </tr>
 
@@ -548,7 +548,7 @@
     </uib-tab>
 
     <uib-tab heading = "Json">
-      <pre>{{selectedModel | json}}</pre>
+      <pre>{{selectedComposition | json}}</pre>
     </uib-tab>
   </uib-tabset>
 

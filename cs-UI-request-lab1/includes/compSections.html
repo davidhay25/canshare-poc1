@@ -8,7 +8,7 @@
              style="cursor: pointer"
              ng-click="selectSection(section)"
 
-             ng-repeat="section in selectedModel.sections">
+             ng-repeat="section in selectedComposition.sections">
 
               <span class="clickable pull-right" ng-click="removeSection($index)">
                 <i class="glyphicon glyphicon-remove"></i>
@@ -18,7 +18,7 @@
                     <i class="glyphicon glyphicon-arrow-up"></i>
               </span>
 
-              <span ng-hide="$index == selectedModel.sections.length-1" class="clickable pull-right" ng-click="moveSectionDown($index)">
+              <span ng-hide="$index == selectedComposition.sections.length-1" class="clickable pull-right" ng-click="moveSectionDown($index)">
                   <i class="glyphicon glyphicon-arrow-down"></i>
               </span>
 
@@ -108,7 +108,7 @@
           </div>
 
           <table class="table table-bordered table-condensed">
-            <tr ng-repeat="item in fullElementList">
+            <tr ng-repeat="item in filteredElementList">
               <td>{{item.ed.title || item.ed.path}}</td>
               <td>{{item.ed.description}}</td>
             </tr>

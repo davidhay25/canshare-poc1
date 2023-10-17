@@ -7,6 +7,42 @@ angular.module("pocApp")
 
         return {
 
+            filterList : function(lst) {
+                //return a list removing all elements with a mult of 0..0 or a parent with that mult
+                //lst is array of {ed:}
+                let filteredList = []
+                let lstExclude = []
+                //create a list of all paths that are 0..0  They, and their children, will be excluded
+                //let hashExclude = {}
+                lst.forEach(function (item) {
+                    if (item.ed.mult == '0..0') {
+                        //hashExclude[item.ed.path] = true
+                        lstExclude.push(item.ed.path)
+                    }
+                })
+
+                //now construct the filtered list
+                lst.forEach(function (item) {
+                    let path = item.ed.path
+                    let include = true
+                    for (const excl of lstExclude) {
+                        if (path.startsWith(excl) || path == excl){
+                            include = false
+                            break
+                        }
+
+                    }
+                    if (include) {
+                        filteredList.push(item)
+                    }
+
+                })
+
+
+                return filteredList
+
+            },
+
             makeDownload : function (lstElements) {
                 let lst = []
 
@@ -24,6 +60,12 @@ angular.module("pocApp")
             },
 
             makeFullList: function (inComp,inTypes,inHashAllDG) {
+
+                //shouldn't happen
+                if (!inComp) {
+                    console.error("Called mekeFullList with empty comp")
+                    return
+                }
 
                 let comp = angular.copy(inComp)         //as we will be modifying the composition
                 let hashAllDG = angular.copy(inHashAllDG)

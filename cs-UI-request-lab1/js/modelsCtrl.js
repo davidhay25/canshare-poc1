@@ -230,9 +230,6 @@ angular.module("pocApp")
                     }
 
 
-                    // //rebuild fullList and re-draw the tree
-                    //alert("The local copies have been updated. You should re-load the page to see the changes. ")
-                     //$scope.refreshFullList($scope.selectedModel)
                 })
             }
 
@@ -381,7 +378,7 @@ angular.module("pocApp")
                     $scope.tagNames.push(tagName)
                 }
 
-                //$scope.selectModel($scope.selectedModel)
+
                 delete $scope.input.newBespokeTag
             }
 
@@ -1094,11 +1091,7 @@ angular.module("pocApp")
 
             //---------- functions to edit a model from the tree
 
-            //set the multiplicity of the element to 0..0
-            $scope.removeElementDEP = function (element) {
-                element.mult = "0..0"
-                modelsSvc.updateOrAddElement($scope.selectedModel,element)
-            }
+
 
 
             //allow the user to set the VS for a given element
@@ -1138,8 +1131,7 @@ angular.module("pocApp")
                     delete $scope.input.showDGList
                 }
 
-                //$scope.selectedModel = $scope.world.dataGroups[name]
-                //$scope.selectModel($scope.selectedModel)
+
 
             }
 
@@ -1204,7 +1196,7 @@ angular.module("pocApp")
                             if (isUnique) {
                                 let newComp = {kind:'comp', name:name, title:name, sections:[]}
                                 $localStorage.world.compositions[newComp.name] = newComp
-                                //$scope.selectedModel = newComp
+
                                 $scope.selectComposition(newComp)
                             } else {
                                 alert("Sorry, that name has already been used locally.")
@@ -1344,7 +1336,8 @@ angular.module("pocApp")
 
             $scope.selectComposition = function(comp){
                 clearB4Select()
-                $scope.selectedModel = comp
+                //$scope.selectedModel = comp
+                $scope.selectedComposition = comp
 
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
 
@@ -1352,7 +1345,7 @@ angular.module("pocApp")
                 $scope.hashCompElements = vo.hashAllElements
 
                 let download = modelCompSvc.makeDownload(vo.allElements)
-                console.log(download)
+               // console.log(download)
 
                 //$scope.downloadLinkCompTsv = window.URL.createObjectURL(new Blob([angular.toJson(download,true) ],{type:"text/tsv"}))
                 $scope.downloadLinkCompTsv = window.URL.createObjectURL(new Blob([download ],{type:"text/csv"}))
