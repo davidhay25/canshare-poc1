@@ -495,25 +495,35 @@ angular.module("pocApp")
                 }
 
                 //----------build the graph of all DT
-                let vo = modelDGSvc.makeFullGraph($scope.hashAllDG)
+
+
 
                 //todo - should move the js to the bottom of the page so it's loaded before the script runs...!
                 $timeout(function () {
 
+                    let vo
+                    try {
+                        vo = modelDGSvc.makeFullGraph($scope.hashAllDG)
+
+                        makeGraphAllDG(vo.graphData)
+
+                        //--------- build the tree with all DG
+                        let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
+                        showAllDGTree(vo1.treeData)
+
+                        //--- make the category hash for the category tree display of DG
+                        let hashCategories = modelDGSvc.analyseCategories($scope.hashAllDG)
+                        let vo2 = modelDGSvc.makeTreeViewOfCategories(hashCategories)
+                        showCategoryDGTree(vo2.treeData)
+
+                        modelDGSvc.makeDgDownload($scope.hashAllDG)
 
 
-                    makeGraphAllDG(vo.graphData)
+                    } catch (ex) {
+                        alert("There was an error creating the graph of all DT")
+                    }
 
-                    //--------- build the tree with all DG
-                    let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
-                    showAllDGTree(vo1.treeData)
 
-                    //--- make the category hash for the category tree display of DG
-                    let hashCategories = modelDGSvc.analyseCategories($scope.hashAllDG)
-                    let vo2 = modelDGSvc.makeTreeViewOfCategories(hashCategories)
-                    showCategoryDGTree(vo2.treeData)
-
-                    modelDGSvc.makeDgDownload($scope.hashAllDG)
 
                 },500)
 

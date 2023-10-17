@@ -154,6 +154,8 @@ angular.module("pocApp")
             makeFullGraph : function(in_hashAllDG,) {
                 //create a single graph with all DGs. include hierarchy and references
 
+                let hashIdNodesCreated = {}
+
                 let hashAllDG = angular.copy(in_hashAllDG)
                 let arNodes = []
                 let arEdges = []
@@ -171,19 +173,15 @@ angular.module("pocApp")
 
 
                     //create the node
-                    let node = {id: DG.name, label: DG.name,shape: 'box'}
-                    node.data = {dg:DG}
-                    arNodes.push(node)
-/*
-                    //add a reference to the root for all nodes
-                    let edge = {id: 'root-' +arEdges.length +1,
-                        from: DG.name,
-                        //to: model.parent,
-                        to: "root",
+                    //If there are multiple nodes with the same id, vis will crash
+                    if (! hashIdNodesCreated[DG.name]) {
+                        hashIdNodesCreated[DG.name] = true
+                        let node = {id: DG.name, label: DG.name,shape: 'box'}
+                        node.data = {dg:DG}
+                        arNodes.push(node)
+                    }
 
-                        label: '',arrows : {to:true}}
-                    arEdges.push(edge)
-*/
+
 
                     //add the defauls parent if needed
                     if (! DG.parent) {
