@@ -599,7 +599,7 @@ angular.module("pocApp")
                 })
             }
 
-            $scope.editDGOptionsList = function (ed) {
+            $scope.editDGOptionsList = function (ed,readOnly) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editOptionsList.html',
                     backdrop: 'static',
@@ -611,7 +611,8 @@ angular.module("pocApp")
                             return ed
                         },
                         readOnly : function () {
-                            return false
+
+                            return readOnly
                         }
                     }
 

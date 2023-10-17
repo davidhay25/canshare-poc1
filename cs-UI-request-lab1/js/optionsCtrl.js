@@ -7,6 +7,16 @@ angular.module("pocApp")
             $scope.ed = ed
             $scope.readOnly = readOnly
 
+            //there are already options - add them to the textarea so it can be edited
+            if (ed.options) {
+                let txt = ""
+                ed.options.forEach(function (opt) {
+                    txt += opt.display + "\n"
+                })
+                $scope.input.optionsList = txt
+            }
+
+
             $scope.parseList = function (txt) {
                 $scope.ed.options = []
                 console.log(txt)

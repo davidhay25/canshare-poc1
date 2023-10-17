@@ -6,7 +6,7 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc) {
 
 
-            $scope.version = "0.4.12"
+            $scope.version = "0.4.13"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -500,7 +500,8 @@ angular.module("pocApp")
                 //todo - should move the js to the bottom of the page so it's loaded before the script runs...!
                 $timeout(function () {
 
-                    return // <<<<<<
+
+
                     makeGraphAllDG(vo.graphData)
 
                     //--------- build the tree with all DG
@@ -1592,26 +1593,7 @@ angular.module("pocApp")
                         let node = $scope.allGraphData.nodes.get(nodeId);
                         $scope.selectedNodeFromFull = node.data
                         $scope.$digest()
-                        /*
-                        delete $scope.selectedModelFromGraph
-                        delete $scope.selectedModelFromGraphFull
-                        let nodeId = obj.nodes[0];  //get the first node
 
-                        let node = $scope.graphData.nodes.get(nodeId);
-
-                        if (node.data && node.data.model) {
-                            $scope.selectedModelFromGraph = node.data.model;
-
-                            //now get the full list of elements for this DT. Used in the graph details view
-                            let dg = $scope.hashAllDG[node.data.model.name]
-                            let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
-
-                            $scope.selectedModelFromGraphFull = vo.allElements
-
-
-                            $scope.$digest()
-                        }
-                        */
                     })
                 }
 

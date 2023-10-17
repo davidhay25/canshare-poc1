@@ -432,9 +432,19 @@
                       <div><em>Options are used to define or build ValueSets</em></div>
 
 
-                      <button
-                              ng-click = "editDGOptionsList(selectedNode.data.ed)"
-                              class="btn-link btn">View / Edit list</button>
+                      <div ng-show="canEdit(selectedModel)">
+                        <button
+                                ng-click = "editDGOptionsList(selectedNode.data.ed,false)"
+                                class="btn-link btn">View / Edit list</button>
+                      </div>
+
+                      <div ng-hide="canEdit(selectedModel)">
+                        <button
+                                ng-click = "editDGOptionsList(selectedNode.data.ed,true)"
+                                class="btn-link btn">View list</button>
+                      </div>
+
+
 
 
                     </td>
@@ -469,15 +479,24 @@
                           set on {{getSourceModelName(selectedNode.data.ed)}}
                         </span>
 
-                        <span ng-hide="getSourceModelName(selectedNode.data.ed) !== selectedModel.name"
-                              class="clickable"
-                              ng-click="clearFixedValue(selectedNode.data.ed)">Clear fixed value</span>
+                        <div ng-show="canEdit(selectedModel)">
+                           <span ng-hide="getSourceModelName(selectedNode.data.ed) !== selectedModel.name"
+                                 class="clickable"
+                                 ng-click="clearFixedValue(selectedNode.data.ed)">Clear fixed value</span>
+                        </div>
+
+
+
                       </span>
 
 
+                      <div ng-show="canEdit(selectedModel)">
+                        <div class="clickable"  ng-hide="selectedNode.data.ed.fixedCoding"
+                             ng-click="setFixedValue(selectedNode.data.ed)">Set fixed value
+                        </div>
+                      </div>
 
-                      <div class="clickable"  ng-hide="selectedNode.data.ed.fixedCoding"
-                           ng-click="setFixedValue(selectedNode.data.ed)">Set fixed value</div>
+
 
                     </td>
                   </tr>
