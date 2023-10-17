@@ -6,7 +6,7 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc) {
 
 
-            $scope.version = "0.4.11"
+            $scope.version = "0.4.12"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -499,6 +499,8 @@ angular.module("pocApp")
 
                 //todo - should move the js to the bottom of the page so it's loaded before the script runs...!
                 $timeout(function () {
+
+                    return // <<<<<<
                     makeGraphAllDG(vo.graphData)
 
                     //--------- build the tree with all DG
