@@ -543,9 +543,7 @@ angular.module("pocApp")
 
                     let node = {id:id,text:text,parent:parent,data:{ed:ed,host:host}}
 
-                    //console.log(ed)
                     node.data.level = ed.kind       //Questionnaire uses 'level'
-
 
                     let voControl = makeQSvc.getControlDetails(ed)
 
@@ -553,6 +551,8 @@ angular.module("pocApp")
                     node.data.ed.controlHint = voControl.controlHint
 
                     node.icon = `icons/icon_primitive.png`  //the default icon
+
+                    let arStyle = []         //the style element to add to the node['a_attr']
 
 
                     if (ed.kind) {
@@ -562,12 +562,16 @@ angular.module("pocApp")
                             node.icon = `icons/${treeIcons[ed.kind]}`
                         }
 
+                        //todo - don't think we're using this...
                         switch (ed.kind) {
                             case 'slice' :
                                 node['a_attr'] = { "style": "color : purple" }
                                 break
                         }
+
                     }
+
+                    //todo ??? does a DG have z elements ???
                     if (ed.zElement) {
                         node.icon = `icons/icon-q-open-choice.png`
                     }
@@ -576,17 +580,26 @@ angular.module("pocApp")
                         node.icon = "icons/icon_datatype.gif"
                     }
 
-
+                    //fixed values are blue
                     if (ed.fixedCoding || ed.fixedString) {
+                        arStyle.push("color : blue")
                         node['a_attr'] = { "style": "color : blue" }
                     }
+
+                    //this element was defined on a parent. This will superceed the fixed value
+                    if (ed.sourceModelName && ed.sourceModelName !== rootEd.path) {
+                        arStyle.push("color : lightgrey")
+                    }
+
 
                     //required
 
                     if (ed.mult) {
                         //required bolding
                         if (ed.mult.indexOf('1..') > -1) {
-                            //node['a_attr'] = { "style": "color : red" }
+                            //need to add to any existing stype
+                            //let existingStyle = node['a_attr'] || ""
+                            arStyle.push("font-weight:bold")
                             node['a_attr'] = { "style": "font-weight:bold" }
                         }
                         //multiple
@@ -594,6 +607,17 @@ angular.module("pocApp")
                             node.text += " *"
                         }
 
+                    }
+
+                    //construct the style element for the 'a'
+                    if (arStyle.length > 0) {
+                        let style = ""
+                        arStyle.forEach(function (s) {
+                            style += s + ";"
+
+                        })
+                        node['a_attr'] = { "style": style}
+                        console.log(ed.path,style)
                     }
 
 

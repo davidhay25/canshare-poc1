@@ -6,7 +6,7 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc) {
 
 
-            $scope.version = "0.4.13"
+            $scope.version = "0.4.15"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -1406,9 +1406,6 @@ angular.module("pocApp")
                         $scope.ewSources.push(t)
                     }
                 })
-//console.log($scope.ewSources)
-
-               // console.log(modelsSvc.makeOrderedFullList(vo.allElements))
 
                 $scope.dgFshLM = igSvc.makeFshForDG(dg,vo.allElements)
 
@@ -1425,13 +1422,13 @@ angular.module("pocApp")
                     clearB4Select()
                     $scope.selectedModel = dg
 
+                    //get the count of the  versions
                     let url = `/model/DG/${dg.name}/history/count`
                     $http.get(url).then(
                         function (data) {
                             $scope.historyCount = data.data
                         }
                     )
-
 
                     $scope.refreshUpdates()     //update the xref and the list of all updates
 
