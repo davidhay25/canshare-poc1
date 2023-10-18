@@ -548,17 +548,9 @@ angular.module("pocApp")
 
 
                     let voControl = makeQSvc.getControlDetails(ed)
-                    node.data.controlType = voControl.controlType
-                    node.data.controlHint = voControl.controlHint
 
-                    /*
-                    let node = {id:ed.path,
-                        text:ed.title,
-                        parent:parentId,
-                        data:{ed:ed,level:'element',controlType:voControl.controlType,controlHint:voControl.controlHint}}
-
-
-                    */
+                    node.data.ed.controlType = voControl.controlType
+                    node.data.ed.controlHint = voControl.controlHint
 
                     node.icon = `icons/icon_primitive.png`  //the default icon
 

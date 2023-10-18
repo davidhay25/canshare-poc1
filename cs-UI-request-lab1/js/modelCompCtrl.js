@@ -57,9 +57,39 @@ angular.module("pocApp")
 
                 }).result.then(function (ed) {
                     let path = ed.path
-                    $scope.selectedModel.override = $scope.selectedModel.override || {}
-                    $scope.selectedModel.override[path] = ed
+                    $scope.selectedComposition.override = $scope.selectedComposition.override || {}
+                    $scope.selectedComposition.override[path] = ed
+
+                    $scope.selectComposition($scope.selectedComposition)    //in modelsCtrl
+
+                    //select the element in the Composition tree. Need to wait for the tree to be built...
+                    $timeout(function () {
+                        $("#compositionTree").jstree("select_node",  path);
+                    },500)
+
+
+
                 })
+
+            }
+
+            //removing a Z element. It will be in the composition
+            $scope.removeZElement = function (ed) {
+                console.log(ed,$scope.selectedComposition.override)
+
+                if ($scope.selectedComposition.override) {
+                    delete $scope.selectedComposition.override[ed.path]
+                    //select the element in the Composition tree. Need to wait for the tree to be built...
+                    $timeout(function () {
+                        $scope.selectComposition($scope.selectedComposition)    //in modelsCtrl
+                        let ar = ed.path.split('.')
+                        ar.pop()
+                        let parentPath = ar.join('.')
+                        console.log(parentPath)
+                        $("#compositionTree").jstree("select_node",  parentPath);
+                        $("#compositionTree").jstree("open_node",  parentPath);
+                    },500)
+                }
 
             }
 
@@ -165,9 +195,9 @@ angular.module("pocApp")
                     //$scope.selectedCompositionNode.data.ed.options = updatedEd.options
                     //return
 
-                    $scope.selectedModel.override = $scope.selectedModel.override || {}
-                    $scope.selectedModel.override[ed.path] = updatedEd
-                    $scope.selectComposition($scope.selectedModel)  //in parent
+                    $scope.selectedComposition.override = $scope.selectedComposition.override || {}
+                    $scope.selectedComposition.override[ed.path] = updatedEd
+                    $scope.selectComposition($scope.selectedComposition)  //in parent
                     $scope.selectCompTreePath(ed.path)
 
                 })
@@ -230,25 +260,25 @@ angular.module("pocApp")
                     ed.type = [vo.type]
                     ed.path = `${parentEd.path}.${vo.name}`
                     ed.zElement = true
-                    $scope.selectedModel.override = $scope.selectedModel.override || {}
-                    $scope.selectedModel.override[ed.path] = ed
+                    $scope.selectedComposition.override = $scope.selectedComposition.override || {}
+                    $scope.selectedComposition.override[ed.path] = ed
                     //delete $scope.selectedCompositionNode
-                    $scope.selectComposition($scope.selectedModel)  //in parent
+                    $scope.selectComposition($scope.selectedComposition)  //in parent
                     $scope.selectCompTreePath(ed.path)
 
                 })
             }
         
             $scope.getOverridesCount = function () {
-                if ($scope.selectedModel && $scope.selectedModel.override) {
-                    return Object.keys($scope.selectedModel.override).length
+                if ($scope.selectedComposition && $scope.selectedComposition.override) {
+                    return Object.keys($scope.selectedComposition.override).length
                 }
 
             }
         
             $scope.revertOverride = function (path) {
-                delete $scope.selectedModel.override[path]
-                $scope.selectComposition($scope.selectedModel)  //in parent
+                delete $scope.selectedComposition.override[path]
+                $scope.selectComposition($scope.selectedComposition)  //in parent
                 $scope.selectCompTreePath(path)
             }
 
@@ -260,10 +290,10 @@ angular.module("pocApp")
 
                     newEd.valueSet = vsUrl
                     newEd.oldValueSet = oldVS
-                    $scope.selectedModel.override = $scope.selectedModel.override || {}
-                    $scope.selectedModel.override[newEd.path] = newEd
+                    $scope.selectedComposition.override = $scope.selectedComposition.override || {}
+                    $scope.selectedComposition.override[newEd.path] = newEd
                     //delete $scope.selectedCompositionNode
-                    $scope.selectComposition($scope.selectedModel)  //in parent
+                    $scope.selectComposition($scope.selectedComposition)  //in parent
                     $scope.selectCompTreePath(ed.path)
                 }
             }
@@ -272,10 +302,10 @@ angular.module("pocApp")
 
                 let newEd = angular.copy(ed)
                 newEd.mult = "0..0"
-                $scope.selectedModel.override = $scope.selectedModel.override || {}
-                $scope.selectedModel.override[newEd.path] = newEd
+                $scope.selectedComposition.override = $scope.selectedComposition.override || {}
+                $scope.selectedComposition.override[newEd.path] = newEd
                 //delete $scope.selectedCompositionNode
-                $scope.selectComposition($scope.selectedModel)  //in parent
+                $scope.selectComposition($scope.selectedComposition)  //in parent
 
                 //display the section
                 let ar = ed.path.split('.')
@@ -317,7 +347,7 @@ angular.module("pocApp")
                 sectionItem.mult = "0..1"
 
                 //need to operate on the selected model so it is updated
-                $scope.selectedModel.sections.forEach(function (sect) {
+                $scope.selectedComposition.sections.forEach(function (sect) {
                     //console.log(sect)
                     if (sect.name == section.name) {
                         sect.items.push(sectionItem)
@@ -325,7 +355,7 @@ angular.module("pocApp")
                 })
 
                 delete $scope.selectedCompositionNode
-                $scope.selectComposition($scope.selectedModel)  //in parent
+                $scope.selectComposition($scope.selectedComposition)  //in parent
 
                 delete $scope.input.newCompName
                 delete $scope.input.newCompTitle
@@ -342,7 +372,7 @@ angular.module("pocApp")
                 comp.sections = comp.sections || []
                 comp.sections.push(section)
                 delete $scope.input.newSectionTitle
-                $scope.selectComposition($scope.selectedModel)  //in parent
+                $scope.selectComposition($scope.selectedComposition)  //in parent
                 let id = `${comp.name}.${name}`
                 $scope.selectCompTreePath(id)
             }

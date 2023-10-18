@@ -43,8 +43,10 @@ angular.module("pocApp")
 
 
 
-            $scope.showDG = function () {
-                $scope.termSelectDG({DGName:$scope.selectedItem.type[0]})
+            $scope.showDG = function (type) {
+
+                $scope.termSelectDG({DGName:type})
+                //$scope.termSelectDG({DGName:$scope.selectedItem.type[0]})
             }
 
             $scope.moveDGDown = function(inx) {
@@ -105,7 +107,7 @@ angular.module("pocApp")
                 let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
                 let lst = modelsSvc.makeOrderedFullList(vo.allElements)
 
-                $scope.filteredElementList = modelCompSvc.filterList(lst)
+                $scope.filteredElementList = modelCompSvc.filterList(lst,true)
 
 
 
@@ -127,8 +129,6 @@ angular.module("pocApp")
 
                     //the name must be unique
                     let name = dg.name
-
-
                     let ctr = 0
                     //count the number of times (if any) that this path appears
                     $scope.selectedSection.items.forEach(function (item) {
@@ -137,13 +137,13 @@ angular.module("pocApp")
                             ctr++
                         }
                     })
-
                     if (ctr > 0) {
                         name = name + ctr
                     }
 
                     let item = {name:name,title:dg.name,mult:'0..1'}
                     item.type = [dg.name]
+
 
 
                     $scope.selectedSection.items.push(item)
@@ -177,12 +177,9 @@ angular.module("pocApp")
 
                             //sort the elements list to better display slicing
                             let lst = modelsSvc.makeOrderedFullList(vo.allElements)
-                            //and filter the list, removing 0..0
 
-                            $scope.fullElementListPossible = modelCompSvc.filterList(lst)
-
-
-
+                            //and filter the list, removing 0..0 as well as the first element which is the DG root
+                            $scope.fullElementListPossible = modelCompSvc.filterList(lst,true)
 
 
                         }

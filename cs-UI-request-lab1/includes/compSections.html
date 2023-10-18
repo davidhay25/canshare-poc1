@@ -76,7 +76,7 @@
 
       <div class="row">
         <div class="col-md-10">
-          {{selectedNewDG.name}}
+          <strong>{{selectedNewDG.name}}</strong>
           <div><em> {{selectedNewDG.description}}</em></div>
         </div>
         <div class="col-md-2">
@@ -84,7 +84,8 @@
                   ng-show="selectedSection && selectedNewDG"
                   ng-click="addSectionItem(selectedNewDG)">Add</button>
         </div>
-
+        <br/>
+        <em ng-show="selectedNewDG">Elements:</em>
         <table class="table table-bordered table-condensed">
           <tr ng-repeat="item in fullElementListPossible" ng-hide="item.ed.mult == '0..0'">
             <td>{{item.ed.title || item.ed.path}}</td>
@@ -104,7 +105,7 @@
         <uib-tab heading="Details">
 
           <div ng-show="selectedItem">
-            <button class="btn-link btn pull-right" ng-click="showDG()">Load {{selectedItem.type[0]}} DataGroup</button>
+            <button class="btn-link btn pull-right" ng-click="showDG(selectedItem.type[0])">Load {{selectedItem.type[0]}} DataGroup</button>
           </div>
 
           <table class="table table-bordered table-condensed">
@@ -122,6 +123,11 @@
           <!--
           <div class="clickable" ng-click="setup()">refresh</div>
 -->
+          <div ng-show="selectedNewDG">
+            <button class="btn-link btn pull-right" ng-click="showDG(selectedNewDG.name)">Load {{selectedNewDG.name}} DataGroup</button>
+            <div class="clearfix"></div>
+          </div>
+
           <div class="myScroll">
             <div id="dgSelectTree"></div>
           </div>

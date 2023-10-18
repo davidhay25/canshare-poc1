@@ -64,26 +64,14 @@
             <div style=" margin-left: 8px">A trailing <strong>*</strong> indicates multiples are supported.</div>
           </div>
 
-
-
-
         </div>
-
 
 
         <div class="col-md-7">
 
-
           <uib-tabset>
-
             <uib-tab heading = "Details">
-
-
-
               <div ng-show="selectedCompositionNode">
-
-
-
               <div class="row">
                 <div class="col-md-3">
                   Path
@@ -143,8 +131,6 @@
                   </div>
                 </div>
 
-
-
                 <div class="row"  ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
                   <div class="col-md-3">
                     Type
@@ -156,10 +142,6 @@
                       </div>
                       {{type}}
                     </div>
-
-
-
-
 
                   </div>
                 </div>
@@ -240,10 +222,28 @@
 
                 <div class="row" ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
                   <div class="col-md-3">
+                    Control Type
+                  </div>
+                  <div class="col-md-9">
+                    {{selectedCompositionNode.data.ed.controlType}}
+                  </div>
+                </div>
+
+                <div class="row" ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
+                  <div class="col-md-3">
                     Control Hint
                   </div>
                   <div class="col-md-9">
                     {{selectedCompositionNode.data.ed.controlHint}}
+                  </div>
+                </div>
+
+                <div class="row" ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
+                  <div class="col-md-3">
+                    Notes
+                  </div>
+                  <div class="col-md-9">
+                    {{selectedCompositionNode.data.ed.notes}}
                   </div>
                 </div>
 
@@ -302,6 +302,13 @@
                       ng-click="editOverride(selectedCompositionNode.data.ed)">Edit </button>
 
             </div>
+
+                <div ng-show="selectedCompositionNode.data.ed.zElement">
+                  <button ng-click="removeZElement(selectedCompositionNode.data.ed)" class="btn btn-link pull-right">Remove this element</button>
+
+                </div>
+
+
 
 
               <div ng-show ="selectedCompositionNode.data.ed.kind == 'dg' || selectedCompositionNode.data.ed.kind == 'section'">

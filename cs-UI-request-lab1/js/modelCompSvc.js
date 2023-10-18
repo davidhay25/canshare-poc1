@@ -7,9 +7,10 @@ angular.module("pocApp")
 
         return {
 
-            filterList : function(lst) {
+            filterList : function(lst,removeFirst) {
                 //return a list removing all elements with a mult of 0..0 or a parent with that mult
                 //lst is array of {ed:}
+                //if removeFirst is true, then remove the foirst element as this is the DG root ele,ment
                 let filteredList = []
                 let lstExclude = []
                 //create a list of all paths that are 0..0  They, and their children, will be excluded
@@ -38,6 +39,9 @@ angular.module("pocApp")
 
                 })
 
+                if (removeFirst) {
+                    filteredList.splice(0,1)
+                }
 
                 return filteredList
 
@@ -77,7 +81,6 @@ angular.module("pocApp")
                 //processing the DG hierarchy is destructive (the parent element is removed after processing
                 //to avoid infinite recursion
                 let types = angular.copy(inTypes)
-
 
                 let allElements = []
 

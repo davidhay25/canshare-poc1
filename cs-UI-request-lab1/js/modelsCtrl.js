@@ -931,12 +931,9 @@ angular.module("pocApp")
 
             }
 
-            //when a specific DG path is selected in the term summary
-            //used by updates list as well = hence moved to main controller
-            //item = {hiddenDGName:, path:}  (path doesn't have leading gg name
-
-
-
+            //when a specific DG path is selected in the term summary - ie
+            //used by updates list as well -- and others -  hence moved to main controller
+            //item = {hiddenDGName:, path:}  (path doesn't have leading dg name
             $scope.termSelectDGItem = function (item) {
                 // console.log(item)
 
@@ -951,13 +948,32 @@ angular.module("pocApp")
                 //selct the element in the DG tree. Need to wait for the tree to be built...
                 $timeout(function () {
                     let fullPath = `${item.hiddenDGName}.${item.path}`
-
                     $("#dgTree").jstree("select_node",  fullPath);
                 },500)
-
-
-
             }
+
+
+            //select a composition item - eg after an edit
+            $scope.termSelectCompositionItemDEP = function (item) {
+                // {path }
+                // console.log(item)
+
+                //set the tab to the DG tab
+                $scope.input.mainTabActive = $scope.ui.tabComp
+
+                //locate the DG with this name and set it active. This will select it in the DG tab
+                //Note that elements use a 'hidden' property to set the DG name
+
+                $scope.selectedModel = $scope.hashAllDG[item.hiddenDGName]
+                $scope.selectModel($scope.selectedModel)
+
+                //selct the element in the DG tree. Need to wait for the tree to be built...
+                $timeout(function () {
+                    let fullPath = `${item.hiddenDGName}.${item.path}`
+                    $("#dgTree").jstree("select_node",  fullPath);
+                },500)
+            }
+
 
             //update
             $scope.updateTermSummary = function () {
@@ -1540,7 +1556,7 @@ angular.module("pocApp")
                     $(this).jstree("open_node",id);
                     let treeObject = $(this).jstree(true).get_json('#', { 'flat': false })
                     $scope.fullQ =  makeQSvc.makeQFromTree(treeObject)
-                    console.log($scope.fullQ)
+                    //console.log($scope.fullQ)
                     $scope.$digest();
                 });
 
