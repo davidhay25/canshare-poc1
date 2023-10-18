@@ -18,16 +18,19 @@ angular.module("pocApp")
             }
 
             //get all the DG
-            let qry = `/model/allDG`
-            $http.get(qry).then(
-                function (data) {
-                    $scope.libraryDG = data.data
-                    $scope.libraryDGCount = $scope.libraryDG.length
-                    //console.log($scope.libraryDG)
-                    makeDGSummary(allDG,$scope.libraryDG)
-                }, function (err) {
-                    alert(angular.toJson(err.data))
-                })
+            $scope.refreshDGSummary = function () {
+                let qry = `/model/allDG`
+                $http.get(qry).then(
+                    function (data) {
+                        $scope.libraryDG = data.data
+                        $scope.libraryDGCount = $scope.libraryDG.length
+                        //console.log($scope.libraryDG)
+                        makeDGSummary(allDG,$scope.libraryDG)
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    })
+            }
+            $scope.refreshDGSummary()
 
             //get all the compositions
             let qryComp = `/model/allCompositions`
@@ -150,13 +153,21 @@ angular.module("pocApp")
 
             //delete a library item
             $scope.deleteDG = function (dg) {
-                if (confirm("Are you sure you wish to remove this from the library. It will mark it as inactive")) {
+
+                if (dg.checkedOut) {
+                    alert(`DG is checked out to ${dg.checkedOut} and must be checked in by them prior to deletion`)
+                    return
+                }
+
+                if (confirm(`Are you sure you wish to remove the ${dg.title} DG from the library. It will mark it as inactive`)) {
 
                     let url = `/model/DG/${dg.name}/delete`
                     let config = {headers:{'x-user-email': user.email}}
 
                     $http.put(url,dg,config).then(
                         function (data) {
+                            $scope.refreshDGSummary()
+
                             alert("Resource has marked as inactive in the Library")
                         },
                         function (err) {
@@ -165,11 +176,13 @@ angular.module("pocApp")
                     )
 
                 }
+
+
             }
 
 
             $scope.refreshFromRepo = function () {
-                if (confirm('Are you sure you wish to refresh your local DGs from the Library')) {
+                if (confirm(`Are you sure you wish to refresh your local DGs from the Library`)) {
                     let qry = '/model/allDG'
                     $http.get(qry).then(
                         function (data) {

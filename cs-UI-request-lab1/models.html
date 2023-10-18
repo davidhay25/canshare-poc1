@@ -424,7 +424,8 @@
                                          ng-show="showDG(v,input.dgFilter)"
                                          ng-repeat="v in sortedDGList">
 
-                                        <i class="glyphicon glyphicon-edit pull-right clickable"
+                                        <i ng-show="canEdit(v)"
+                                                class="glyphicon glyphicon-edit pull-right clickable"
                                            ng-click="editModel(v)"></i>
 
                                         {{v.title}}
