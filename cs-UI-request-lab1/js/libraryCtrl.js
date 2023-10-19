@@ -227,11 +227,14 @@ angular.module("pocApp")
             }
 
             //update all the DG on the server...
-            $scope.updateRepo = function () {
+            $scope.updateRepoDEP = function () {
                 if (confirm('Are you sure you wish to update the Library')) {
                     let qry = "/model/DG"
 
+                    //construct a has
+
                     let vo = {hashAllDG:allDG}
+
                     vo.user = user
 
                     $http.post(qry,vo).then(

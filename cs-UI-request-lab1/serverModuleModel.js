@@ -360,9 +360,6 @@ async function setup(app) {
                             //exists in the library, but not checked out. So can save.
                             let libraryDG = findCursor[0]
 
-
-
-
                             if (isDifferent(dg,libraryDG)) {
                                 const query = {name: dg.name}
                                 await database.collection("dg").replaceOne(query, dg, {upsert: true})

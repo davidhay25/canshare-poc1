@@ -13,7 +13,16 @@ angular.module("pocApp")
 
             //check out the current DH
             $scope.checkOut = function () {
-                librarySvc.checkOut($scope.selectedModel,$scope.user)
+
+                librarySvc.checkOut($scope.selectedModel,$scope.user,function (dg) {
+                    //returns the DG downloaded from the library
+                    if (dg) {
+                        $scope.hashAllDG[dg.name] = dg
+                        $scope.selectModel(dg)      //in modelsCtrl
+                    }
+
+
+                })
             }
 
             $scope.checkIn = function () {

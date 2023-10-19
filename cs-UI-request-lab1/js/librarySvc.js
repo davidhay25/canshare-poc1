@@ -30,7 +30,7 @@ angular.module("pocApp")
                 return deferred.promise
 
             },
-            checkOut : function (model,user) {
+            checkOut : function (model,user,vo) {
                 //check out a model. check server first
                 let url = `/model/DG/${model.name}`  //todo check type of model -
 
@@ -38,9 +38,13 @@ angular.module("pocApp")
                 $http.get(url,model).then(
                     function (data) {
                         let libraryDG = data.data
+
+                        //see if what's in the
+
+
                         if (! libraryDG.checkedOut) {
-                            model.checkedOut = user.email
-                            performCheckout(model)
+                            libraryDG.checkedOut = user.email
+                            performCheckout(libraryDG)
 
                         } else {
                             alert(`Sorry, this resource is checked out to ${libraryDG.checkedOut}`)
@@ -63,9 +67,13 @@ angular.module("pocApp")
                     $http.put(url,model,config).then(
                         function (data) {
                           //  alert("Resource has been checked out")
+                            if (vo) {
+                                vo(model)
+                            }
                         },
                         function (err) {
                             alert(angular.toJson(err))
+
                         }
                     )
                 }

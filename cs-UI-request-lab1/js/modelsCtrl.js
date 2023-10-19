@@ -6,11 +6,10 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc) {
 
 
-            $scope.version = "0.4.15"
+            $scope.version = "0.4.16"
             $scope.input = {}
             $scope.input.showFullModel = true
 
-           //text.x = "y"
 
             $scope.$on('updateDGList',function(ev,vo) {
                 console.log(vo)

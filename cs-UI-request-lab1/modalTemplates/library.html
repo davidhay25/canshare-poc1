@@ -1,6 +1,6 @@
 
 <div>
-  <!--<div ng-controller="newResourceCtrl">-->
+
 
   <style>
     .dtDifferent {
@@ -221,7 +221,7 @@
           <strong>Summary of upload to Library</strong>
 
           <div ng-show = "syncOutcomeUploadSummary.changed == 0">
-            Nothing was uploaded. Your local store exactly matches the Library.
+            Nothing was uploaded. The DGs in your local store exactly matches the Library copies. (There may be library DG's not in your local store though).
           </div>
 
           <div ng-show = "syncOutcomeUploadSummary.changed > 0">
@@ -260,7 +260,8 @@
             </div>
           </div>
           <br/>
-          <div class="row" ng-show="user">
+
+          <div class="row" ng-show="false && user">
             <div class="col-md-4">
               <button class="btn btn-danger" ng-click="updateRepo()">Update Library  <i class="glyphicon glyphicon-arrow-up"></i></button>
             </div>
@@ -271,9 +272,8 @@
 
             </div>
           </div>
-          <div ng-hide="user">
-            Only logged in users can update the Library
-          </div>
+
+         
           <br/>
           <em>These options to synchronise ALL DataGroups between the library and the local browser store. If you just want to
             upload / download a single DataGroup theres a 'Compare to Library' link on the tree details page of each DataGroup.</em>
