@@ -588,7 +588,7 @@ angular.module("pocApp")
 
                     //this element was defined on a parent. This will superceed the fixed value
                     if (ed.sourceModelName && ed.sourceModelName !== rootEd.path) {
-                        arStyle.push("color : lightgrey")
+                        arStyle.push("color : #999999")
                     }
 
 
@@ -725,6 +725,10 @@ angular.module("pocApp")
             },
 
             getFullListOfElements(inModel,inTypes,hashAllDG) {
+                if (! inModel) {
+                    return
+                }
+                console.log(`Processing ${inModel.name}`)
                 //create a complete list of elements for a DG (Compositions have a separate function)
 
                 //processing the DG hierarchy is destructive (the parent element is removed after processing
@@ -757,7 +761,15 @@ angular.module("pocApp")
                 let edRoot = {ed:{path:model.name,title:model.title,description:model.description}}
                 allElements.push(edRoot)
 
-                extractElements(model,model.name)   //the guts of the function
+
+                try {
+                    extractElements(model,model.name)   //the guts of the function
+                } catch (ex) {
+                    alert(`Unable to inflate DG: ${model.name}. Error: ${angular.toJson(ex)}` )
+                    return {allElements: [],graphData:{},relationshipsSummary:relationshipsSummary}
+
+                }
+
 
                 let nodes = new vis.DataSet(arNodes)
                 let edges = new vis.DataSet(arEdges);
@@ -830,6 +842,8 @@ angular.module("pocApp")
                 function extractElements(model,pathRoot) {
 
                     //console.log(pathRoot,model.name)
+
+
 
                     //add to nodes list
 

@@ -6,7 +6,7 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc) {
 
 
-            $scope.version = "0.4.16"
+            $scope.version = "0.4.17"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -108,10 +108,7 @@ angular.module("pocApp")
             firebase.auth().onAuthStateChanged(function(user) {
                // console.log('auth state change')
                 if (user) {
-                  //  console.log('logged in')
                     $scope.user = {email:user.email,displayName : user.displayName}
-                  //  console.log($scope.user)
-                    //$scope.loadAllQ()
                     $scope.$digest()
                 } else {
                     delete $scope.user
@@ -156,26 +153,8 @@ angular.module("pocApp")
             $scope.clearLocal = function () {
                 if (confirm("This will remove all DGs and create an empty environment. Are you sure")) {
                     $localStorage.world = {compositions:{},dataGroups: {},valueSets:{}}
-
-
                     alert("Reset complete. Please refresh the browser.")
                 }
-            }
-
-            $scope.getSortedDGListDEP = function () {
-                let ar = []
-                Object.keys($scope.hashAllDG).forEach(function (key) {
-                    ar.push($scope.hashAllDG[key])
-                })
-                ar.sort(function (a,b) {
-                    if (a.name.toLowerCase() > b.name.toLowerCase()) {
-                        return true
-                    } else {
-                        return false
-                    }
-                })
-                console.log(ar)
-                return ar
             }
 
 
@@ -242,15 +221,7 @@ angular.module("pocApp")
                 }
             }
 
-/* $scope.toggleLeftPanel = function(){
-                if ($scope.leftPanel == 'col-md-3') {
-                    $scope.leftPanel = 'hidden'
-                    $scope.rightPanel = 'col-md-12'
-                } else {
-                    $scope.leftPanel = 'col-md-3'
-                    $scope.rightPanel = 'col-md-9'
-                }
-            }*/
+
 
             //whether the current user can edit. Will set up the back end logic later
             $scope.input.canEdit = true
@@ -290,8 +261,8 @@ angular.module("pocApp")
 
             console.log($scope.hashAllDG)
 
-            //If there's a DG with no diff, all sorts of bad stuff happens. Shouldn't occur, but if it does its a pain
-            //this at least prevents the app form crashing, so remedial action can be taken
+            //If there's a DG with no diff, all sorts of bad stuff happens. Shouldn't occur, but if it does it's a pain
+            //this at least prevents the app from crashing, so remedial action can be taken
             Object.keys($scope.hashAllDG).forEach(function (key) {
                 $scope.hashAllDG[key].diff = $scope.hashAllDG[key].diff || []
             })
@@ -673,7 +644,7 @@ angular.module("pocApp")
 
             }
 
-            //can only delete user defined DGs
+            //remove a DG from the local store
             $scope.deleteDG = function (dgName) {
                 //if this DG is a parent of another, or references by another it cannot be removed
                 let arRejectMessage = []
@@ -715,42 +686,6 @@ angular.module("pocApp")
             }
 
 
-
-            //delete the selected item. If the item exists in the DG then it can be removed (or possibly set the mult to 0..0)
-            //if not (ie it's inherited) then create an override element
-            $scope.deleteDGItemDEP = function (item) {
-                let pathToDelete =  $filter('dropFirstInPath')(item.path)
-
-
-
-                let inx = -1
-                let ctr = -1
-                //let changes = []    //this is the list of changes
-                //is the path in the DG diff?
-                for (const ed1 of $scope.selectedModel.diff) {
-                    ctr ++
-                    if (ed1.path == pathToDelete) {
-                        inx = ctr
-                        break
-                    }
-                }
-
-                if (inx > -1) {
-                    $scope.selectedModel.diff.splice(inx,1)
-                } else {
-                    //The attribute that was edited (eg edscription) is inherited
-                    //Need to create an 'override' element and add to the DG
-
-
-                    //let ar = ed.path.split('.')
-                    //ar.splice(0,1)
-                    //set the minimum required elements..
-                    let ed = {path:pathToDelete,mult:"0..0",type:['string']}
-                    //ed.path = ar.join('.')
-                    $scope.selectedModel.diff.push(ed)
-                }
-
-            }
 
 
             //edits some of the attributes of a single ED
@@ -952,30 +887,11 @@ angular.module("pocApp")
             }
 
 
-            //select a composition item - eg after an edit
-            $scope.termSelectCompositionItemDEP = function (item) {
-                // {path }
-                // console.log(item)
-
-                //set the tab to the DG tab
-                $scope.input.mainTabActive = $scope.ui.tabComp
-
-                //locate the DG with this name and set it active. This will select it in the DG tab
-                //Note that elements use a 'hidden' property to set the DG name
-
-                $scope.selectedModel = $scope.hashAllDG[item.hiddenDGName]
-                $scope.selectModel($scope.selectedModel)
-
-                //selct the element in the DG tree. Need to wait for the tree to be built...
-                $timeout(function () {
-                    let fullPath = `${item.hiddenDGName}.${item.path}`
-                    $("#dgTree").jstree("select_node",  fullPath);
-                },500)
-            }
 
 
             //update
             $scope.updateTermSummary = function () {
+                console.log('Updating term summary')
                 $scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
                 $scope.compTermSummary = modelTermSvc.makeCompOverrideSummary($scope.hashAllCompositions).list
                 $scope.hashVsSummary = modelTermSvc.makeValueSetSummary($scope.hashAllDG,$scope.hashAllCompositions).hashVS
