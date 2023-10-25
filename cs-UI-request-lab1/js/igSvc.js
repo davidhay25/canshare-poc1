@@ -85,7 +85,10 @@ angular.module("pocApp")
                     }
                 }
 
-                processNode(arLines,hash[rootPath],"")
+                if (hash[rootPath]) {
+                    processNode(arLines,hash[rootPath],"")
+                }
+
 
                 return arLines.join('\n')
 

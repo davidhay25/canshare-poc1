@@ -5,10 +5,46 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc) {
 
-
             $scope.version = "0.4.17"
             $scope.input = {}
             $scope.input.showFullModel = true
+
+            /*
+            //temp!!!
+            console.log('test')
+            console.log($localStorage.world)
+            delete $localStorage.world
+            alert("test")
+*/
+
+
+            //load the models from the local store. Need to check that the inheritance
+            //chain is corrected - this is a DAG after all, and circular dependencies can crash the browser (I know, they shouldn't)
+            if (! $localStorage.world) {
+                $localStorage.world = modelsDemoSvc.getDemo()
+            }
+
+            $scope.world = $localStorage.world
+
+            let size = modelsSvc.getSizeOfObject($scope.world)
+            console.log(`Size of world: ${size/1000} K`)
+
+            //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
+            $scope.hashAllDG = $localStorage.world.dataGroups
+
+            console.log($scope.hashAllDG)
+
+            modelDGSvc.checkAllDG($scope.hashAllDG)
+
+
+            //If there's a DG with no diff, all sorts of bad stuff happens. Shouldn't occur, but if it does it's a pain
+            //this at least prevents the app from crashing, so remedial action can be taken
+            Object.keys($scope.hashAllDG).forEach(function (key) {
+                $scope.hashAllDG[key].diff = $scope.hashAllDG[key].diff || []
+            })
+
+            //
+
 
 
             $scope.$on('updateDGList',function(ev,vo) {
@@ -19,6 +55,7 @@ angular.module("pocApp")
                 }
 
             })
+
 
 
 
@@ -149,7 +186,7 @@ angular.module("pocApp")
                     alert("Reset complete. Please refresh the browser.")
                 }
             }
-
+            //$scope.resetAll()
             $scope.clearLocal = function () {
                 if (confirm("This will remove all DGs and create an empty environment. Are you sure")) {
                     $localStorage.world = {compositions:{},dataGroups: {},valueSets:{}}
@@ -236,15 +273,8 @@ angular.module("pocApp")
 
 
 
-            if (! $localStorage.world) {
-                $localStorage.world = modelsDemoSvc.getDemo()
-            }
 
-            $scope.world = $localStorage.world
 
-            let size = modelsSvc.getSizeOfObject($scope.world)
-
-            console.log(`Size of world: ${size/1000} K`)
 
 /* - leave until we figure out dependencies
             //download the Concept map and generate the hash that lists conditional refsets by code
@@ -256,18 +286,6 @@ angular.module("pocApp")
             )
 */
 
-            //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
-            $scope.hashAllDG = $localStorage.world.dataGroups
-
-            console.log($scope.hashAllDG)
-
-            //If there's a DG with no diff, all sorts of bad stuff happens. Shouldn't occur, but if it does it's a pain
-            //this at least prevents the app from crashing, so remedial action can be taken
-            Object.keys($scope.hashAllDG).forEach(function (key) {
-                $scope.hashAllDG[key].diff = $scope.hashAllDG[key].diff || []
-            })
-
-            //
 
 
             $scope.export = function () {
@@ -393,6 +411,7 @@ angular.module("pocApp")
             //create a list of all DT + fhir types
             //also assemble a list of bespoke tage (ie tags where the system is 'bespoke'
             makeAllDTList = function() {
+
                 $scope.tags = {} //a hash keyed on tag code containing an array of DG with that tag
 
                 $scope.tagNames = []        //use an array for the list filtered by tag. This is a string list of codes where system == bespoke
@@ -468,6 +487,7 @@ angular.module("pocApp")
                 //todo - should move the js to the bottom of the page so it's loaded before the script runs...!
                 $timeout(function () {
 
+
                     let vo
                     try {
                         vo = modelDGSvc.makeFullGraph($scope.hashAllDG)
@@ -492,6 +512,7 @@ angular.module("pocApp")
 
 
 
+
                 },500)
 
 
@@ -500,7 +521,7 @@ angular.module("pocApp")
             }
             makeAllDTList()         //initial invokation on load
 
-            //console.log($scope.tags)
+
 
             //when a tag is update in the UI - save a copy in the browser cache
             $scope.updateTag = function (tags) {
@@ -892,10 +913,12 @@ angular.module("pocApp")
             //update
             $scope.updateTermSummary = function () {
                 console.log('Updating term summary')
+
                 $scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
                 $scope.compTermSummary = modelTermSvc.makeCompOverrideSummary($scope.hashAllCompositions).list
                 $scope.hashVsSummary = modelTermSvc.makeValueSetSummary($scope.hashAllDG,$scope.hashAllCompositions).hashVS
                 $scope.notesSummary = modelTermSvc.makeNotesSummary($scope.hashAllDG,$scope.hashAllCompositions)
+
             }
 
             $scope.updateTermSummary()
@@ -950,6 +973,8 @@ angular.module("pocApp")
 
             $scope.refreshUpdates = function(){
                 //xref is cross references between models/types
+
+               // return //temp
                 $scope.xref = modelsSvc.getReferencedModels($scope.hashAllDG,$scope.hashAllCompositions)
 
                 //updates to DG made over the ones in the code

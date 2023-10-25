@@ -111,7 +111,6 @@ angular.module("pocApp")
                 //hashReferences is keyed by A DG. It contains a list of all other DG's that reference it - including parental
                 let hashReferences = {}
 
-
                 //DG's
                 Object.keys(hashDG).forEach(function (key) {
                     let DG = hashDG[key]
@@ -617,7 +616,7 @@ angular.module("pocApp")
 
                         })
                         node['a_attr'] = { "style": style}
-                        console.log(ed.path,style)
+                       // console.log(ed.path,style)
                     }
 
 
@@ -637,6 +636,9 @@ angular.module("pocApp")
             },
 
             makeOrderedFullList : function (elements) {
+                if (! elements || elements.length == 0) {
+                    return []
+                }
                 //generate a list of elements for a given DG (based on the allElements array) that follows the slicing order
                 //elements is the complete list of elements, including those derived from parents referenced eds
                 //   (from modelsSvc.getFullListOfElements)
@@ -724,11 +726,23 @@ angular.module("pocApp")
 
             },
 
+
+
+            getFullListOfElementsNEW(inModel,inTypes,hashAllDG) {
+                //this is a test function working on the SO issue
+
+
+            },
+
+
+
+
+
             getFullListOfElements(inModel,inTypes,hashAllDG) {
                 if (! inModel) {
                     return
                 }
-                console.log(`Processing ${inModel.name}`)
+               // console.log(`Processing ${inModel.name}`)
                 //create a complete list of elements for a DG (Compositions have a separate function)
 
                 //processing the DG hierarchy is destructive (the parent element is removed after processing
@@ -761,10 +775,14 @@ angular.module("pocApp")
                 let edRoot = {ed:{path:model.name,title:model.title,description:model.description}}
                 allElements.push(edRoot)
 
+                //a hash of all parents examined as the DG is inflated.
+                //If a DG is processed more than once, the process terminates with an error - this could be recursive
+                let hashParents = {}
 
                 try {
                     extractElements(model,model.name)   //the guts of the function
                 } catch (ex) {
+                    console.log(ex)
                     alert(`Unable to inflate DG: ${model.name}. Error: ${angular.toJson(ex)}` )
                     return {allElements: [],graphData:{},relationshipsSummary:relationshipsSummary}
 
@@ -841,9 +859,7 @@ angular.module("pocApp")
                 //process a single element at the root of the DG
                 function extractElements(model,pathRoot) {
 
-                    //console.log(pathRoot,model.name)
-
-
+                   // console.log(pathRoot,model.name)
 
                     //add to nodes list
 
@@ -860,6 +876,18 @@ angular.module("pocApp")
                     //do parents first.
                     if (model.parent ) {
 
+/*
+
+                        if (hashParents[model.parent]) {
+                            //oops - we've seen this DG before! It's an error
+                            alert (`Processing ${inModel.name} and the parent ${model.parent} has appeared more than once. This is an error`)
+                            return
+                        } else {
+                            console.log(model.parent)
+                            hashParents[model.parent] = true
+                        }
+*/
+
                         if (types[model.parent]) {
                             //this is called whenever there is a DG to be expanded
                             if (pathRoot.split('.').length == 1) {
@@ -871,7 +899,7 @@ angular.module("pocApp")
                             }
 
                             //to prevent infinite recursion
-                            let parent = model.parent
+                            let parentName = model.parent
 
                             // temp! delete model.parent
 
@@ -879,13 +907,15 @@ angular.module("pocApp")
                             let edge = {id: 'e' + arEdges.length +1,
                                 from: model.name,
                                 //to: model.parent,
-                                to: parent,
+                                to: parentName,
                                 color: 'red',
                                 width: 4,
                                 label: 'specializes',arrows : {to:true}}
                             arEdges.push(edge)
 
-                            extractElements(types[parent],pathRoot)
+                            extractElements(types[parentName],pathRoot)
+
+
                         } else {
                             errors.push(`missing type name ${model.parent}`)
                             console.log(`missing type name ${model.parent}`)
@@ -930,10 +960,12 @@ angular.module("pocApp")
                                         //console.log('expanding child: ' + childDefinition.name)
                                         let clone = angular.copy(ed)
                                         clone.path = pathRoot + "." + ed.path
-                                        // function addToList(ed,host,sourceModel) {
+
+                                        //add to the list of elements
                                         addToList(clone,ed,model) //model will be the source
 
                                         extractElements(childDefinition,pathRoot + "." + ed.path)
+
                                     } else {
                                         //list add the ed to the list
                                         //this is a fhir dt

@@ -7,6 +7,78 @@ angular.module("pocApp")
 
         return {
 
+            checkAllDG : function (hashAllDG) {
+                //check DG for invalid construction that can crash the browser
+                let that = this
+                Object.keys(hashAllDG).forEach(function (key) {
+                    let dg = hashAllDG[key]
+
+                    if (that.hasDuplicatedParent(dg,hashAllDG)){
+                        //oops - there's a loop!
+                        delete dg.parent
+                        alert(`The DG: ${key} has a duplicated parent in the inheritance chain. The parent has been removed.`)
+                    }
+
+                })
+
+
+            },
+
+            hasDuplicatedParent : function(dg,hashAllDG) {
+                //is there a repeated parent in the inheritance chain (will crash the browser
+                console.log('===>',dg.name)
+                let hashParent = {}
+                let model =  angular.copy(dg)
+                while (model) {
+                    if (model.parent) {
+                        if (hashParent[model.parent]) {
+                            alert(`The DG ${model.parent} is already a parent in this chain. It cannot appear more than once`)
+                            return false
+                        } else {
+                            hashParent[model.parent] = true
+                            model = hashAllDG[model.parent]
+                        }
+                    } else {
+                        model = null
+                    }
+                }
+
+                /*
+
+                if (dg.parent) {
+                    let parentDG = hashAllDG[dg.parent]
+
+                    while (parentDG) {
+                        console.log('parent',parentDG.name)
+
+                        if (hashParent[parentDG.name]) {
+                            console.log(`The DG ${parentDG.name} is already a parent in the chain for ${dg.name}. It cannot appear more than once`)
+
+                            return true
+                        } else {
+                            hashParent[parentDG.parent] = true
+                        }
+
+                        if (parentDG.parent) {
+                            parentDG = hashAllDG[parentDG.parent]
+                            console.log('ettting parent to ',parentDG)
+                        } else {
+                            delete parentDG
+                        }
+
+
+
+
+                    }
+                }
+
+*/
+
+                return false
+
+            },
+
+
             expandEdValues : function (ed) {
                 let deferred = $q.defer()
                 //return the list of possible options for en ed. There are 2 sources:

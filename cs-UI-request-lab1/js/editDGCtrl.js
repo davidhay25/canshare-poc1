@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('editDGCtrl',
-        function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc,parent) {
+        function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc,parent,modelDGSvc) {
             $scope.model=model
             $scope.input = {}
             $scope.edit = {}
@@ -13,7 +13,18 @@ angular.module("pocApp")
             $scope.input.possibleParents = []
             Object.keys(hashTypes).forEach(function (key) {
                 if (hashTypes[key].kind == 'dg') {      //should only be DG
-                    $scope.input.possibleParents.push(key)
+
+                    if (isNew) {
+                        $scope.input.possibleParents.push(key)
+                    } else {
+                        if (model && key !== model.name) {
+                            //can't be a parent to itself
+                            $scope.input.possibleParents.push(key)
+                        }
+                    }
+
+
+
                 }
             })
             $scope.input.possibleParents.sort()
@@ -66,18 +77,80 @@ angular.module("pocApp")
                 })
             }
 
+            //check that there isn't a circular loop. Each DG should only once in the hierarchy
+            function checkParentalHierarchy(parentName) {
+                let hashParent = {}
+
+                let model = $scope.allTypes[parentName]
+
+                return ! modelDGSvc.hasDuplicatedParent(model,hashTypes)
+
+               // if (model)
+/*
+                while (model) {
+                    if (model.parent) {
+                        if (hashParent[model.parent]) {
+                            alert(`The DG ${model.parent} is already a parent in this chain. It cannot appear more than once`)
+                            return false
+                        } else {
+                            hashParent[model.parent] = true
+
+                        }
+                    } else {
+                        model = null
+                    }
+                }
+
+                return true
+*/
+
+            }
             //leave at the top as called when creating a new DG with a parent
             $scope.setModelAttribute = function(attribute,value) {
                 $scope.model[attribute] = value
 
                 if (attribute == 'parent') {
+
                     //if changing the parent, then re-generate the expanded model
-                    getFullElementList()
+
+                    //check that there isn't a circular loop by checking that a given DG only
+                    //occurs once in the chain
+
+
+                    if (checkParentalHierarchy(value)) {
+                        getFullElementList()
+                    } else {
+                        //turn off the parent
+                        delete $scope.model.parent
+                        delete $scope.input.newModelParent
+
+                    }
+
 
 
                 }
 
             }
+
+            //start with the DGs...
+            //create the list of DG's that can be added as child elements. Don't include this one...
+            if (isNew) {
+                $scope.input.types = Object.keys(hashTypes) //an array for the new type dropdown
+            } else {
+                $scope.input.types = []
+                let ar = Object.keys(hashTypes)
+                ar.forEach(function(type) {
+                    if (type !== model.name) {
+                        $scope.input.types.push(type)
+                    }
+                })
+            }
+
+
+
+            $scope.input.types.sort()
+            //now add the FHIR datatypes
+            $scope.input.types = modelsSvc.fhirDataTypes().concat($scope.input.types) //.concat(modelsSvc.fhirDataTypes())
 
 
             //get the full list of elements for a DG, following any inheritance chain..
@@ -94,6 +167,10 @@ angular.module("pocApp")
 
             //if not new, set the UI names & parent
             if (! isNew) {
+
+                //remove this model type from the list of possible models
+
+
                 $scope.input.newModelName = model.name
                 $scope.input.newModelTitle = model.title
                 $scope.input.sourceReference = model.sourceReference
@@ -120,12 +197,6 @@ angular.module("pocApp")
                 }
             }
 
-            //start with the DGs...
-            $scope.input.types = Object.keys(hashTypes) //an array for the new type dropdown
-            $scope.input.types.sort()
-
-            //now add the FHIR datatypes
-            $scope.input.types = modelsSvc.fhirDataTypes().concat($scope.input.types) //.concat(modelsSvc.fhirDataTypes())
 
 
 

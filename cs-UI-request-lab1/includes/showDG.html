@@ -298,8 +298,6 @@
                       {{selectedNode.data.ed.sourceModelName}}
                       <!-- {{getSourceModelName(selectedNode.data.ed)}}-->
 
-
-
                     </td>
                   </tr>
 
@@ -1061,6 +1059,21 @@
     <uib-tab ng-show="false" heading="Json">
       <em>All the elements in a 'flattened' list (like a StructureDefinition).</em>
       <pre>{{fullElementList | json}}</pre>
+    </uib-tab>
+
+
+    <uib-tab heading="DG Diff">
+      <em>The element definitions in the .diff element. ie directly defined in the DG. The Json has the complete model.</em>
+      <br/><br/>
+      <table class="table-condensed table table-bordered">
+        <tr ng-repeat="ed in selectedModel.diff">
+          <td>{{ed.path}}</td>
+          <td>{{ed.title}}</td>
+          <td>{{ed.description}}</td>
+          <td>{{ed.mult}}</td>
+          <td>{{ed.type[0]}}</td>
+        </tr>
+      </table>
     </uib-tab>
 
     <uib-tab heading="Json">
