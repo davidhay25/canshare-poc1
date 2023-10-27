@@ -1,7 +1,7 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('modelDGCtrl',
-        function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc,$timeout,librarySvc) {
+        function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc,$timeout,librarySvc,makeQSvc) {
 
         //todo - is this still being used?
             let fixedValueText = {}
@@ -10,8 +10,50 @@ angular.module("pocApp")
             fixedValueText.decimal = "What is the fixed decimal"
 
 
+            $scope.hideInQ = function (edIn) {
+                let path = $filter('dropFirstInPath')(edIn.path)
 
-            //check out the current DH
+                let found = false
+                for (const ed of $scope.selectedModel.diff) {
+                    if (ed.path == path) {
+                        ed.hideInQ = ! ed.hideInQ
+
+                        $scope.selectedNode.data.ed.hideInQ = ed.hideInQ    //for the display
+                        found = true
+/*
+                        //update the full element list so the Q reflects the change
+                        for (const item of $scope.fullElementList) {
+                            if ( $filter("dropFirstInPath")(item.ed.path) == ed.path) {
+                                item.ed = ed
+                                break
+                            }
+                        }
+                        */
+
+
+                       // $scope.dgQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
+                        //console.log($scope.dgQ)
+                        break
+                    }
+                }
+
+                //create an override element
+                if (! found) {
+                   // let ar = ed.path.split('.')
+                  //  ar.splice(0,1)
+                  //  ed.path = ar.join('.')
+                    edIn.hideInQ = ! edIn.hideInQ
+                    edIn.path = path
+                    $scope.selectedModel.diff.push(edIn)
+                }
+
+                $scope.refreshFullList($scope.selectedModel)
+                $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:path})
+
+
+            }
+
+            //check out the current DG
             $scope.checkOut = function () {
 
                 librarySvc.checkOut($scope.selectedModel,$scope.user,function (dg) {

@@ -5,17 +5,10 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc) {
 
-            $scope.version = "0.4.17"
+            $scope.version = "0.4.18"
             $scope.input = {}
             $scope.input.showFullModel = true
 
-            /*
-            //temp!!!
-            console.log('test')
-            console.log($localStorage.world)
-            delete $localStorage.world
-            alert("test")
-*/
 
 
             //load the models from the local store. Need to check that the inheritance
@@ -34,6 +27,7 @@ angular.module("pocApp")
 
             console.log($scope.hashAllDG)
 
+            //look for DG errors like repeating parents in the hierarchy tree
             modelDGSvc.checkAllDG($scope.hashAllDG)
 
 
@@ -47,9 +41,21 @@ angular.module("pocApp")
 
 
 
+            //a handler that will re-draw the list and tree views of the DGs.
+
             $scope.$on('updateDGList',function(ev,vo) {
                 console.log(vo)
                 sortDG()    //update the sorted list of DG
+
+
+                //--------- build the tree with all DG
+               // if ($scope.hashAllDG) {
+                    let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
+                    showAllDGTree(vo1.treeData)
+               // }
+
+
+
                 if (vo && vo.name) {
                     $scope.selectModel($scope.hashAllDG[vo.name] )
                 }
@@ -190,7 +196,11 @@ angular.module("pocApp")
             $scope.clearLocal = function () {
                 if (confirm("This will remove all DGs and create an empty environment. Are you sure")) {
                     $localStorage.world = {compositions:{},dataGroups: {},valueSets:{}}
-                    alert("Reset complete. Please refresh the browser.")
+                    $scope.hashAllDG = {}
+                    $scope.hashAllCompositions = {}
+
+                    alert("Reset complete.")
+                    $scope.$emit('updateDGList',{})
                 }
             }
 
@@ -323,7 +333,8 @@ angular.module("pocApp")
 
                     }
 
-                    alert("File has been imported. Please reload the page.")
+                    alert("File has been imported. Please refresh the browser.")
+                    $scope.$emit('updateDGList',{})
 
                 })
 
@@ -612,6 +623,10 @@ angular.module("pocApp")
 
             //make a sorted list for the UI
             function sortDG() {
+                if (!$scope.hashAllDG) { //happens after clear local
+                    return
+                }
+
                 $scope.sortedDGList = []
                 Object.keys($scope.hashAllDG).forEach(function(key){
                     $scope.sortedDGList.push($scope.hashAllDG[key])
@@ -1027,10 +1042,11 @@ angular.module("pocApp")
                     if (DG.name && DG.name.toLowerCase().indexOf(filter.toLowerCase()) > -1) {
                         show = true
                     }
+                    /*
                     if (DG.description && DG.description.toLowerCase().indexOf(filter.toLowerCase()) > -1) {
                         show = true
                     }
-
+*/
                     return show
 
                 } else {
@@ -1351,6 +1367,9 @@ angular.module("pocApp")
 
                 makeGraph()
 
+                //a Q representation of the DG
+                $scope.dgQ = makeQSvc.makeQFromDG(vo.allElements,$scope.hashAllDG)
+
                 let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
                 makeDGTree(treeData)
 
@@ -1382,7 +1401,7 @@ angular.module("pocApp")
                         }
                     })
 
-                    $scope.refreshFullList(dg)      //the complete list of elements for this DG
+                    $scope.refreshFullList(dg)      //the complete list of elements for this DG + graph & Q
                 }
 
             }
@@ -1492,7 +1511,9 @@ angular.module("pocApp")
                     let id = treeData[0].id
                     $(this).jstree("open_node",id);
                     let treeObject = $(this).jstree(true).get_json('#', { 'flat': false })
+
                     $scope.fullQ =  makeQSvc.makeQFromTree(treeObject)
+
                     //console.log($scope.fullQ)
                     $scope.$digest();
                 });

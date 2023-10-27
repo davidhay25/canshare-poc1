@@ -190,10 +190,16 @@ angular.module("pocApp")
             },
 
             makeTreeViewOfDG : function(hashAllDG) {
+                if (! hashAllDG) {
+                    //return an empty tree
+                    let root = {id:"root",text: "DataGroups tree",parent:'#',data:{}}
+                    let treeData = [(root)]
+                    return {treeData:treeData}
+                }
                 //create a treeview ordered by parent
                 //add the root
                 let treeData = []
-                let root = {id:"root",text: "DataGroup",parent:'#',data:{}}
+                let root = {id:"root",text: "DataGroups tree",parent:'#',data:{}}
                 treeData.push(root)
 
                 //make sorted list

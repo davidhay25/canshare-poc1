@@ -23,6 +23,9 @@ angular.module("pocApp")
 
                     },
                     function (err) {
+                        if (err.status == 404) {
+
+                        }
                        deferred.reject(err)
                     }
                 )
@@ -52,7 +55,7 @@ angular.module("pocApp")
                     },
                     function (err) {
                         if (err.status == '404') {
-                            //This is a new resource
+                            //This is a new resource and not yet on the library
                             model.checkedOut = user.email
                             performCheckout(model)
                         } else {

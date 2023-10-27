@@ -179,9 +179,6 @@ async function setup(app) {
             console.log(ex)
             res.status(500).json(ex.message)
         }
-
-
-
     })
 
     //undo a checkout on a DG

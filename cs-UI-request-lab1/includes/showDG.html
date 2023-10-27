@@ -248,11 +248,19 @@
 
           <div class="row">
             <div class="col-md-4">
+              <!--
+              <button class="btn-link btn" ng-click="hideinQ(selectedNode.data.ed)">
+                Hide in Q
+              </button>
+              -->
             </div>
             <div class="col-md-8">
 <!--
               <button class="btn-link btn  pull-right" ng-click="deleteDGItem(selectedNode.data.ed)">Delete this item ({{selectedNode.data.ed.title}})</button>
 -->
+
+
+
               <button class="btn btn-link pull-right"
 
                       ng-show="canSlice(selectedNode.data.ed) && canEdit(selectedModel)"
@@ -281,7 +289,20 @@
                 <table class="table table-bordered table-condensed">
 
                   <tr ng-show = "selectedNode.data.ed.path !== selectedModel.name">
-                    <td style="width : 20%">Path</td><td>{{selectedNode.data.ed.path | dropFirstInPath}}</td>
+                    <td style="width : 20%">Path</td>
+                    <td>
+                      {{selectedNode.data.ed.path | dropFirstInPath}}
+
+                      <span class="pull-right clickable" ng-click="hideInQ(selectedNode.data.ed)">
+                        <span ng-show="selectedNode.data.ed.hideInQ">Not shown in Q</span>
+                        <span ng-hide="selectedNode.data.ed.hideInQ">Appears in Q</span>
+                      </span>
+                      <!--
+                      <span class="pull-right" ng-show="selectedNode.data.ed.hideInQ">
+                        <strong ng-click="hideInQ(selectedNode.data.ed)">Not shown in Q</strong></span>
+
+                      -->
+                    </td>
                   </tr>
 
                   <tr>
@@ -465,7 +486,16 @@
                   <tr ng-show="isFixedType(selectedNode.data.ed)">
                     <td>Fixed value</td>
 
-                    <td> {{selectedNode.data.ed.fixedCoding}}
+                    <td>
+
+                      {{selectedNode.data.ed.fixedCoding}}
+
+                      <div ng-show="selectedNode.data.ed.fixedCoding">
+                        {{selectedNode.data.ed.fixedCoding.code}} | {{selectedNode.data.ed.fixedCoding.display}}
+                      </div>
+
+
+
                       {{selectedNode.data.ed.fixedString}}
                       {{selectedNode.data.ed.fixedDecimal}}
 
@@ -566,11 +596,31 @@
               </uib-tab>
             </uib-tabset>
 
+
+            <div ng-hide="selectedNode.data.ed.kind == 'root' || ! canEdit(selectedModel)">
+              {{selectedNode.data.ed.title}}
+              <button class="btn-link btn" ng-click="hideInQ(selectedNode.data.ed)">
+                Hide in Q
+              </button>
+
+              <button class="btn-link btn" ng-click="deleteDGItem(selectedNode.data.ed)">
+                Delete this item
+              </button>
+
+            </div>
+
+            <!--
+
+            <button class="btn-link btn"
+                    ng-hide="selectedNode.data.ed.kind == 'root' || ! canEdit(selectedModel)"
+                    ng-click="hideinQ(selectedNode.data.ed)">Hide in Q ({{selectedNode.data.ed.title}})</button>
+
+
             <button class="btn-link btn  pull-right"
                     ng-hide="selectedNode.data.ed.kind == 'root' || ! canEdit(selectedModel)"
                     ng-click="deleteDGItem(selectedNode.data.ed)">Delete this item ({{selectedNode.data.ed.title}})</button>
 
-
+-->
 
           </div>
 
@@ -1059,6 +1109,35 @@
     <uib-tab ng-show="false" heading="Json">
       <em>All the elements in a 'flattened' list (like a StructureDefinition).</em>
       <pre>{{fullElementList | json}}</pre>
+    </uib-tab>
+
+    <uib-tab heading="Form">
+
+      <renderform q="dgQ" qr="{}"></renderform>
+      <!--
+      <div class="row">
+        <div class="col-md-9">
+          <renderform q="dgQ" qr="{}"></renderform>
+        </div>
+        <div class="col-md-3">
+          <strong>Hide in Q</strong>
+          <br/>
+          <ul class="list-unstyled">
+            <li ng-repeat="item in fullElementList">
+              {{item.ed.title}}
+            </li>
+          </ul>
+
+        </div>
+      </div>
+      -->
+
+
+
+
+
+
+
     </uib-tab>
 
 

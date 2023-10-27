@@ -47,7 +47,10 @@ angular.module("pocApp")
                     if (ar.length > 1) {
                         ar.pop()
                         let parentPath = ar.join('.')
-                        hash[parentPath].children.push(hash[path])
+                        if (hash[parentPath] && hash[parentPath].children) {
+                            hash[parentPath].children.push(hash[path])
+                        }
+
                     } else {
                         rootPath = ar[0]
                     }

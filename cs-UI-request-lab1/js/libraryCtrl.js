@@ -1,7 +1,7 @@
 //seversync is actually the main library interface
 angular.module("pocApp")
     .controller('libraryCtrl',
-        function ($scope,$http,allDG,allComp,$sce,allQObject,user,librarySvc) {
+        function ($scope,$rootScope,$http,allDG,allComp,$sce,allQObject,user,librarySvc,$timeout) {
 
             $scope.input = {}
             $scope.user = user
@@ -132,7 +132,7 @@ angular.module("pocApp")
                         }
                     })
                 } catch (ex) {
-                    console.log("Issue sorting DG - likley a missing title",ex)
+                    console.log("Issue sorting DG - likely a missing title",ex)
                 }
 
 
@@ -159,16 +159,22 @@ angular.module("pocApp")
                     return
                 }
 
-                if (confirm(`Are you sure you wish to remove the ${dg.title} DG from the library. It will mark it as inactive`)) {
+                if (confirm(`Are you sure you wish to remove the ${dg.title} DG from the library AND the local store. It will mark it as inactive in the library, and remove it from the local store. `)) {
 
                     let url = `/model/DG/${dg.name}/delete`
                     let config = {headers:{'x-user-email': user.email}}
 
                     $http.put(url,dg,config).then(
                         function (data) {
-                            $scope.refreshDGSummary()
+                            delete allDG[dg.name]       //remove locally
+                            $timeout(function(){
+                                $rootScope.$broadcast('updateDGList',{})
+                            },500)
 
-                            alert("Resource has marked as inactive in the Library")
+                            $scope.refreshDGSummary()  //load all DG from the library and update the local display
+
+                            alert("Resource has marked as inactive in the Library, and deleted locally.")
+
                         },
                         function (err) {
                             alert(angular.toJson(err))
@@ -182,7 +188,11 @@ angular.module("pocApp")
 
 
             $scope.refreshFromRepo = function () {
-                if (confirm(`Are you sure you wish to refresh your local DGs from the Library`)) {
+                if (! user) {   //shouldn't happen...
+                    alert("No user!")
+                    return
+                }
+                if (confirm(`Are you sure you wish to refresh your local DGs from the Library.`)) {
                     let qry = '/model/allDG'
                     $http.get(qry).then(
                         function (data) {
@@ -190,7 +200,21 @@ angular.module("pocApp")
 
                             let arDG = data.data
                             $scope.syncOutcomeDownloadSummary = {details:[],changed:0}
+/*
+                            //make a copy so we know what was replaced and what is new
+                            let existingDGCopy = angular.copy(allDG)
 
+                            //delete all DG's that are not checked out to the current user
+                            let ar = Object.keys(allDG)
+                            ar.forEach(function (key) {
+                                let dg = allDG[key]
+                                if (! dg.checkedOut || (dg.checkedOut !== user.email)) {
+                                    delete allDG[key]
+                                }
+                            })
+                            //allDG = {}
+
+*/
                             //replace each one. Leaves any that aren't in the library
                             arDG.forEach(function (dg) {
                                 if (dg.kind == 'dg') {      //shouldn't need to check, but there's rubbish in the library ATM
@@ -269,6 +293,10 @@ angular.module("pocApp")
                 if (user && model.checkedOut == user.email) {
                     if ( confirm("Are you sure you want to check this in to the Library")) {
                         librarySvc.checkIn (model,user,function(){
+                            let dg = allDG[model.name]
+                            if (dg) {
+                                delete dg.checkedOut
+                            }
                             makeDGSummary(allDG,$scope.libraryDG)
                         })
 

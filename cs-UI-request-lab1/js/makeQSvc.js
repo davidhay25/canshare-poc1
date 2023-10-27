@@ -1,11 +1,90 @@
 angular.module("pocApp")
 
-    .service('makeQSvc', function($http) {
+    .service('makeQSvc', function($http,$filter) {
 
         let config = {}
 
 
         return {
+
+            makeQFromDG : function (lstElements,hashAllDG) {
+                //generate a Q based on the list of elements
+                //todo create a copy of the lstElements, then delete mult=0.0 and hideInQ (element & DG)
+                console.log(lstElements)
+
+                let basePathsToHide = []    //a list of all paths where hideInQ is set. Any elements starting with this path are also set
+
+                lstElements.forEach(function (thing) {
+                    console.log(thing.ed)
+                    if (thing.ed.hideInQ || (thing.ed.mult == '0..0')) {
+                        basePathsToHide.push(thing.ed.path)  //the full path
+                    }
+                })
+
+
+                let lstQElements = []
+                lstElements.forEach(function (thing,ctr) {
+                    if (ctr > 0) {
+                        let ed = thing.ed
+                        let okToAdd = true
+                        if (ed.mult == '0..0') {okToAdd = false}
+                        if (okToAdd) {
+                            for (const pth of basePathsToHide) {
+                                if (ed.path.startsWith(pth)) {
+                                    okToAdd = false
+                                    break
+                                }
+                            }
+                        }
+
+                        if (okToAdd) {
+                            lstQElements.push(ed)
+                        }
+                    }
+
+                })
+
+                let Q = {resourceType:"Questionnaire",item:[]}
+                let section = {text:lstElements[0].ed.path,item:[]}
+                Q.item.push(section)
+/*
+                let group = {text:"",type:'group',item:[]}
+                let ext = {'url':'http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count'}
+                ext.valueInteger = "2"
+                group.extension = [ext]
+                section.item.push(group)
+                */
+
+                //let currentPathRoot
+                let group = makeGroup({title:'Root of DG'})
+
+                lstQElements.forEach(function (ed) {
+
+                    let path = ed.path
+
+                    let type = ed.type[0]
+                    if (hashAllDG[type]) {
+                        console.log('new group',ed)
+                        group = makeGroup(ed)
+                    } else {
+                        let item = {text:ed.title,linkId:ed.path,type:'string'}
+                        group.item.push(item)
+                    }
+
+                })
+                console.log(Q)
+                return Q
+
+                function makeGroup(ed) {
+                    let group = {text:ed.title,type:'group',item:[]}
+                    let ext = {'url':'http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count'}
+                    ext.valueInteger = "2"
+                    group.extension = [ext]
+                    section.item.push(group)
+                    return group
+                }
+
+            },
 
             makeQFromTree : function (treeObject) {
                 //Given a tree array representing a comp, construct a Q resource

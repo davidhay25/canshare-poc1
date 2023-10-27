@@ -60,7 +60,7 @@ angular.module("pocApp")
                 //perform the read...
                 r.readAsText(fileObject);
             }
-
+/*
 
             //this will be for the TSV download
             Object.keys(hashAllDG).forEach(function (key) {
@@ -68,7 +68,7 @@ angular.module("pocApp")
 
 
             })
-
+*/
 
 
         }

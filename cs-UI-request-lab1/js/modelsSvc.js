@@ -562,11 +562,14 @@ angular.module("pocApp")
                         }
 
                         //todo - don't think we're using this...
+                        /*
                         switch (ed.kind) {
                             case 'slice' :
                                 node['a_attr'] = { "style": "color : purple" }
                                 break
                         }
+
+                        */
 
                     }
 
@@ -582,7 +585,7 @@ angular.module("pocApp")
                     //fixed values are blue
                     if (ed.fixedCoding || ed.fixedString) {
                         arStyle.push("color : blue")
-                        node['a_attr'] = { "style": "color : blue" }
+                       // node['a_attr'] = { "style": "color : blue" }
                     }
 
                     //this element was defined on a parent. This will superceed the fixed value
@@ -599,7 +602,7 @@ angular.module("pocApp")
                             //need to add to any existing stype
                             //let existingStyle = node['a_attr'] || ""
                             arStyle.push("font-weight:bold")
-                            node['a_attr'] = { "style": "font-weight:bold" }
+                           // node['a_attr'] = { "style": "font-weight:bold" }
                         }
                         //multiple
                         if (ed.mult.indexOf('..*') > -1) {
@@ -607,6 +610,11 @@ angular.module("pocApp")
                         }
 
                     }
+                    if (ed.hideInQ) {
+                        arStyle.push("text-decoration: line-through")
+                    }
+
+
 
                     //construct the style element for the 'a'
                     if (arStyle.length > 0) {
