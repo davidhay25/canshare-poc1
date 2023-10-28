@@ -27,12 +27,30 @@
       </a>
     </div>
 
-    <renderform q="Q" qr="QR"></renderform>
+    <uib-tabset>
+      <uib-tab heading="Form">
+        <renderform q="Q" qr="QR"></renderform>
 
-    <qrdisplay qr="QR" q="Q"></qrdisplay>
+        <qrdisplay qr="QR" q="Q"></qrdisplay>
+      </uib-tab>
+
+
+      <uib-tab heading="Tree">
+        <div id="qTree"></div>
+      </uib-tab>
+
+      <uib-tab heading="Json">
+      <pre>{{Q | json}}</pre>
+      </uib-tab>
+    </uib-tabset>
+
+
 
   </div>
   <div class="modal-header">
+    <ul ng-repeat="issue in issues">
+      {{issue}}
+    </ul>
 
   </div>
 </div>

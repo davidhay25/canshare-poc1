@@ -26,7 +26,7 @@ angular.module("pocApp")
 
             hasDuplicatedParent : function(dg,hashAllDG) {
                 //is there a repeated parent in the inheritance chain (will crash the browser
-                console.log('===>',dg.name)
+                //console.log('===>',dg.name)
                 let hashParent = {}
                 let model =  angular.copy(dg)
                 while (model) {

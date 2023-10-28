@@ -45,7 +45,9 @@ angular.module("pocApp")
                         //see if what's in the
 
 
-                        if (! libraryDG.checkedOut) {
+                        //it's possible that the library has the DG checked out but
+                        //the local copy doesn't reflect that (eg imported DG directly)
+                        if (! libraryDG.checkedOut || libraryDG.checkedOut == user.email) {
                             libraryDG.checkedOut = user.email
                             performCheckout(libraryDG)
 

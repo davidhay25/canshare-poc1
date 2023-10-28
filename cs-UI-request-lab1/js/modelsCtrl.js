@@ -205,6 +205,20 @@ angular.module("pocApp")
             }
 
 
+            $scope.previewQ = function (Q) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/previewQ.html',
+                    //backdrop: 'static',
+                    size : 'lg',
+                    controller: 'previewQCtrl',
+                    resolve: {
+                        Q: function () {
+                            return Q
+                        }
+                    }
+                })
+            }
+
             //all the questionnaire objects (not actual Q)
             $scope.allQObject = $localStorage.allQObject
 
@@ -1333,6 +1347,16 @@ angular.module("pocApp")
 
                 igSvc.makeFshForComp(comp,$scope.allCompElements,$scope.hashCompElements)
 
+                $scope.fullQ =  makeQSvc.makeQfromSections($scope.selectedComposition,
+                    $scope.input.types,$scope.hashAllDG,modelsSvc)
+
+
+
+
+                console.log($scope.fullQ)
+
+               // console.log(makeQSvc.makeTreeFromQ($scope.fullQ))
+                //makeQfromSections
 
 
             }
@@ -1368,7 +1392,10 @@ angular.module("pocApp")
                 makeGraph()
 
                 //a Q representation of the DG
-                $scope.dgQ = makeQSvc.makeQFromDG(vo.allElements,$scope.hashAllDG)
+                let voQ = makeQSvc.makeQFromDG(vo.allElements,$scope.hashAllDG)
+                $scope.dgQ = voQ.Q
+
+
 
                 let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
                 makeDGTree(treeData)
@@ -1512,7 +1539,10 @@ angular.module("pocApp")
                     $(this).jstree("open_node",id);
                     let treeObject = $(this).jstree(true).get_json('#', { 'flat': false })
 
-                    $scope.fullQ =  makeQSvc.makeQFromTree(treeObject)
+                    //$scope.fullQ =  makeQSvc.makeQFromTree(treeObject)
+
+                   // $scope.fullQ =  makeQSvc.makeQfromSections()
+
 
                     //console.log($scope.fullQ)
                     $scope.$digest();

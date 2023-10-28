@@ -10,7 +10,15 @@ angular.module("pocApp")
             fixedValueText.decimal = "What is the fixed decimal"
 
 
+
+
             $scope.hideInQ = function (edIn) {
+
+                if (! $scope.user || $scope.selectedModel.checkedOut !== $scope.user.email) {
+                    alert("You must check out the DG to make changes")
+                    return
+                }
+
                 let path = $filter('dropFirstInPath')(edIn.path)
 
                 let found = false
