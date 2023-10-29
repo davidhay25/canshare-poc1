@@ -194,7 +194,6 @@ function setup(app) {
             //need to re-urlencode the |
             qry = qry.split('|').join("%7c")
 
-
             //todo - check expiry and refresh if needed
             console.log(qry)
 
@@ -219,7 +218,8 @@ function setup(app) {
 
                 })
             } else {
-                res.status(ex.response.status).json({msg:"Unable to get Access Token."})
+
+                res.status(500).json({msg:"Unable to get Access Token."})
             }
         } else {
             res.status(400).json({msg:"Must have urlencoded qry query"})

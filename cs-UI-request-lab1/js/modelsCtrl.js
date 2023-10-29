@@ -1347,8 +1347,13 @@ angular.module("pocApp")
 
                 igSvc.makeFshForComp(comp,$scope.allCompElements,$scope.hashCompElements)
 
-                $scope.fullQ =  makeQSvc.makeQfromSections($scope.selectedComposition,
-                    $scope.input.types,$scope.hashAllDG,modelsSvc)
+                //Q is derived from the tree representation - as that sets the overall structure
+                //so updated when the tree refreshes...
+
+                //$scope.fullQ =  makeQSvc.makeQfromCompList(comp,$scope.allCompElements)
+
+              //  $scope.fullQ =  makeQSvc.makeQfromSections($scope.selectedComposition,
+               //     $scope.input.types,$scope.hashAllDG,modelsSvc)
 
 
 
@@ -1539,8 +1544,8 @@ angular.module("pocApp")
                     $(this).jstree("open_node",id);
                     let treeObject = $(this).jstree(true).get_json('#', { 'flat': false })
 
-                    //$scope.fullQ =  makeQSvc.makeQFromTree(treeObject)
-
+                    $scope.fullQ =  makeQSvc.makeQFromTree(treeObject)
+console.log($scope.fullQ)
                    // $scope.fullQ =  makeQSvc.makeQfromSections()
 
 

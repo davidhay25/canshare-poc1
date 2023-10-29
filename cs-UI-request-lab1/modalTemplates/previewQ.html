@@ -6,7 +6,7 @@
     <div class="row">
       <div class="col-md-8 col-sm-8">
         <h3 class="modal-title">
-          Preview Questionnaire
+          Examine Questionnaire
         </h3>
       </div>
 
@@ -27,7 +27,31 @@
       </a>
     </div>
 
+
+
     <uib-tabset>
+
+      <uib-tab heading="Tree">
+
+        <div class="row">
+          <div class="col-md-6">
+            <div id="qTree"></div>
+          </div>
+          <div class="col-md-6">
+            <div ng-show="selectedNode.data">
+              <strong >Selected Q Item</strong>
+              <pre>{{selectedNode.data | json}}</pre>
+            </div>
+
+          </div>
+        </div>
+
+
+
+
+
+      </uib-tab>
+
       <uib-tab heading="Form">
         <renderform q="Q" qr="QR"></renderform>
 
@@ -35,9 +59,7 @@
       </uib-tab>
 
 
-      <uib-tab heading="Tree">
-        <div id="qTree"></div>
-      </uib-tab>
+
 
       <uib-tab heading="Json">
       <pre>{{Q | json}}</pre>

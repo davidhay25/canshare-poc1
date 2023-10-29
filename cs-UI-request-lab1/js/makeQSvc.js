@@ -14,6 +14,7 @@ angular.module("pocApp")
 
                 function processItem(item,parent) {
                     let node = {id:item.linkId,text:item.text,parent:parent}
+                    node.data = item
                     if (hashLinkId[item.linkId]) {
                         issues.push(`linkId: ${item.linkId} is duplicated`)
                     } else {
@@ -38,8 +39,80 @@ angular.module("pocApp")
 
 
             },
+            //todo pass in hashAllElements
 
-            makeQfromSections : function (comp,allTypes,hashAllDG,modelsSvc) {
+            makeQfromCompListDEP : function (comp,allElements) {
+
+
+                let result = {};
+
+                for (const pathWithValue of allElements) {
+                    const pathComponents = pathWithValue.ed.path.split('.');
+                    const value = pathWithValue.ed;
+                    let currentLevel = result;
+
+                    for (const component of pathComponents) {
+                        if (!currentLevel[component]) {
+                            currentLevel[component] = {};
+                        }
+                        currentLevel = currentLevel[component];
+                    }
+
+                    currentLevel._value = value;
+                }
+                console.log(result)
+
+                return
+
+                allElements.forEach(function (item) {
+                    console.log(item.ed.path, item.ed.type)
+                    let ar = item.ed.split('.')
+                    switch (ar.length) {
+                        case 1 :
+                            compName = ar[0]
+                            break
+                        case 2 :
+                            //the start of a new section
+                            isNewSection = trur
+                            sectionName = ar[1]
+                            break
+                        case 3 :
+                            isNewDT = true
+                            dtName = ar[2]
+                            break
+                        default :
+                            sectionName = ar[1]
+                            dtName = ar[2]
+
+
+                    }
+
+
+                })
+
+            },
+
+            makeQfromSectionsDEP : function (hashAllElements, comp,allTypes,hashAllDG,modelsSvc) {
+
+                //todo - not allowing composition level constraints
+                //have to work from hashAllElements - created after all the constraints are applied
+                //can infer the section name from the second path segment (first is type name)
+
+                // >>> don't need DG rendering of Q - do it directly against the hash
+
+                //pass 1 - parse the hash and assemble the list of sections and maybe datatypes from path segment 3 (note z elements)
+
+                //pass 2 - iterate through the sections & DGs and assemble the Q
+
+
+
+                //create a funcrion to return the controlType/hint stuff - Qbuilder does this I think
+
+                //there will be 'hideInQ' element to look at - will need to hide all that start with path - like DG
+
+
+
+
                 const that = this
                 let mainQ = {resourceType:"Questionnaire",item:[]}
 
@@ -52,7 +125,10 @@ angular.module("pocApp")
 
 
                         let dgName = sectionItem.type[0]
+
                         let dg = hashAllDG[dgName]
+
+
                         if (dg) {
                             // hydrate the DG into a list of elements
                             let vo = modelsSvc.getFullListOfElements(dg,allTypes,hashAllDG)
@@ -106,7 +182,6 @@ angular.module("pocApp")
 
                 let dgName = lstElements[0].ed.path
 
-
                 //construct a list of paths to hide
                 let basePathsToHide = []    //a list of all paths where hideInQ is set. Any elements starting with this path are also set
                 lstElements.forEach(function (thing) {
@@ -143,10 +218,9 @@ angular.module("pocApp")
                 let Q = {resourceType:"Questionnaire",item:[]}
 
 
-                //there's a single section (item) for the DG (This is not the same as the composiiton section)
+                //there's a single section (item) for the DG (This is not the same as the composition section)
                 let section = {text:lstElements[0].ed.path,linkId:`${dgName}-section`,item:[]}
                 Q.item.push(section)
-
 
                 //let currentPathRoot
                 let topGroup = makeGroup({title:'',path:dgName})
@@ -192,40 +266,93 @@ angular.module("pocApp")
                 return {Q:Q,section:section}
 
                 function makeGroup(ed) {
-                    let group = {text:ed.title,type:'group',item:[]}
+                    let group = {text:ed.title,linkId: ed.path,type:'group',item:[]}
                     let ext = {'url':'http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count'}
                     ext.valueInteger = "2"
                     group.extension = [ext]
-                    group.linkId = ed.path
+                    //group.linkId = ed.path
                     section.item.push(group)
                     return group
                 }
 
             },
 
+
             makeQFromTree : function (treeObject) {
-                //Given a tree array representing a comp, construct a Q resource
+                //Given a tree array representing a composition, construct a Q resource
                 let that = this
+
+                console.log(treeObject)
+                let qName = treeObject[0].id
+                Q = {resourceType:"Questionnaire",status:"draft",name:qName,item:[]}
+
+                let section = {text:"section",linkId:qName,item:[]}
+                //Q.item.push(section)
+                //section.item =  section.item || []
+
 
                 let obj = {}
 
-                function addChild(parent,node) {
-                    let item = {text:node.text,ed:node.data.ed,level:node.data.level,controlHint:node.data.controlHint,controlType:node.data.controlType}
-                    parent.item = parent.item || []
-                    parent.item.push(item)
+                //parent is what the item will be added to (a section of a group
+                //node is the node from the tree - multi level
+                // section is the current section. Used when adding a new group
+                function addChild(parent,node,section) {
+                    //level is
+                    //let item = {text:node.text,ed:node.data.ed,level:node.data.level,controlHint:node.data.controlHint,controlType:node.data.controlType}
+
+                    let canAdd = true
+                    //if the id / path length is 2, then this is representing a section from the tree
+                    let ar = node.id.split('.')
+                    if (ar.length == 2) {
+                        //this is a section definition. Create a new section and add to the Q root
+                        section = {text:node.text,linkId:node.id,item:[]}
+                        Q.item.push(section)
+                        canAdd = false
+                    } else if (ar.length == 3) {
+                        //this is the DG name attached to the section
+                        //we've got the children enumerated - we want to enumerate them but not add this one
+                        canAdd = false
+                    }
+
+
+                    if (canAdd) {
+                        let item = {text:node.text,linkId:node.id,type:'string'}
+                        //todo - get correct type. This is just a placeholder
+                        if (node.children && node.children.length > 0) {
+                            item.type = 'group'
+                        }
+
+                        parent.item = parent.item || []
+                        parent.item.push(item)
+                    }
+
 
                     if (node.children && node.children.length > 0) {
+
+                        //create a new group item and add to the current section
+                        let group = {text:`group-${node.text}`,type:'group',linkId:`group-${node.id}` ,item:[],extension:[]}
+
+                        let ext = {url:"http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"}
+                        ext.valueInteger = 2
+                        group.extension.push(ext)
+
+                        section.item =  section.item || []
+                        section.item.push(group)
+                        //pass the group in as the parent
                         node.children.forEach(function (childNode) {
-                            addChild(item,childNode)
+                            //addChild(item,childNode)
+                            addChild(group,childNode,section)
                         })
+
                     }
                 }
 
-                treeObject[0].children.forEach(function (child) {
-                    addChild(obj,child)
+                //there's only a single child whoch returns the top level
+                treeObject[0].children.forEach(function (node) {
+                    addChild(section,node,section)
                 })
 
-                return that.makeQ(treeObject)
+                return Q //that.makeQ(treeObject)
 
 
             },
