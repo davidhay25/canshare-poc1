@@ -294,8 +294,12 @@
                <a class="btn pull-right" target="_blank" href="https://build.fhir.org/ig/HL7/fhir-mCODE-ig/">mCODE</a>
 
               <button class="pull-right btn-link btn" ng-click="resetWorld()">Reset</button>
+
+              <button class="pull-right btn-link btn" ng-click="resetAll()">Reset all</button>
+
                 -->
-        <button class="pull-right btn-link btn" ng-click="resetAll()">Reset all</button>
+
+
         <button class="pull-right btn-link btn" ng-click="clearLocal()">Clear local</button>
 
         <button class="pull-right btn-link btn" ng-click="export()">Import / Export</button>
@@ -568,7 +572,7 @@
 
         </uib-tab>
 
-        <uib-tab heading="Q builder"  select="setInitialTab(2)">
+        <uib-tab ng-show="false" heading="Q builder"  select="setInitialTab(2)">
             <div ng-controller="makeQCtrl">
                 <ng-include src="'/includes/makeQ.html'"></ng-include>
             </div>
@@ -578,7 +582,7 @@
             <ng-include src="'/includes/terminology.html'"></ng-include>
         </uib-tab>
 
-        <uib-tab>
+        <uib-tab ng-show="false" >
             <uib-tab-heading>DG updates <span class="badge">{{dgUpdates.length}}</span> </uib-tab-heading>
             <span class="pull-right">
                 <span class="clickable" ng-click="refreshUpdates()">Refresh</span>
@@ -593,7 +597,7 @@
 
         </uib-tab>
 
-        <uib-tab>
+        <uib-tab ng-show="errors.length > 0">
             <uib-tab-heading>
                 Errors <span class="badge">{{errors.length}}</span>
             </uib-tab-heading>

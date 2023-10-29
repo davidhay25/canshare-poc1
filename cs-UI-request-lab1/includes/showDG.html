@@ -240,6 +240,16 @@
           <div><strong style="margin-left: 8px">Bold</strong> elements are required</div>
           <div><span style="color: blue; margin-left: 8px">Blue</span>  elements have a fixed value</div>
           <div style=" margin-left: 8px">A trailing <strong>*</strong> indicates element can repeat.</div>
+          <div style=" margin-left: 8px"><span style="text-decoration: line-through">Strike-through</span> indicates the element does not appear in a Q</div>
+          <div style=" margin-left: 8px">
+            <span style="text-decoration-line: underline;text-decoration-style: dotted">
+              Dotted underline</span> indicates the element is subject to conditional show in the Q</div>
+
+
+
+
+
+
         </div>
         <div class="col-md-6">
 
@@ -549,7 +559,7 @@
 
               <uib-tab>
 
-                <uib-tab-heading>Enable when <span class="badge">{{selectedNode.data.ed.enableWhen.length || 0}}</span> </uib-tab-heading>
+                <uib-tab-heading>Conditional show <span class="badge">{{selectedNode.data.ed.enableWhen.length || 0}}</span> </uib-tab-heading>
                 <br/>
 
                 <table class="table table-bordered">
@@ -591,7 +601,7 @@
 
 
 
-              <uib-tab heading="Json">
+              <uib-tab heading="Element Json">
                 <pre ng-show="selectedNode">{{selectedNode.data.ed | json}}</pre>
               </uib-tab>
             </uib-tabset>
@@ -803,7 +813,7 @@
 
 
             </uib-tab>
-            <uib-tab heading="Json">
+            <uib-tab heading="DG Json">
               <pre>{{selectedModelFromGraph | json}}</pre>
             </uib-tab>
           </uib-tabset>
@@ -1116,7 +1126,7 @@
       <button class="btn-link btn pull-right" ng-click="previewQ(dgQ)">Examine Q</button>
 
 
-      <renderform q="dgQ" qr="{}"></renderform>
+      <renderform q="dgQ" qr="{}" form="{}"></renderform>
       <!--
       <div class="row">
         <div class="col-md-9">
@@ -1159,7 +1169,7 @@
       </table>
     </uib-tab>
 
-    <uib-tab heading="Json">
+    <uib-tab heading="DG Json">
       <em>The definition for this model (not expanded)</em>
       <span class="pull-right">
        <i class="glyphicon glyphicon-paperclip pull-right clickable"

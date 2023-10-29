@@ -5,6 +5,138 @@ angular.module("pocApp")
         let config = {}
 
 
+        //given an ed, return the control type and hine
+        function getControlDetails(ed) {
+            //return the control type & hint based on the ed
+
+            let controlHint = "string"            //this can be any value - it will be an extension in the Q - https://hl7.org/fhir/R4B/extension-questionnaire-itemcontrol.html
+            let controlType = "string"          //this has to be one of the defined type values
+
+            if (ed.options && ed.options.length > 0) {
+                controlHint = "drop-down"
+                controlType = "choice"
+            }
+
+
+            if (ed.type) {
+                switch (ed.type[0]) {
+                    case 'string' :
+                        controlType = "string"      //default to single text box
+                        if (ed.controlHint == 'text') {
+                            controlType = "text"
+                        }
+                        break
+                    case 'dateTime' :
+                        controlHint = "dateTime"
+                        controlType = "dateTime"
+                        break
+                    case 'CodeableConcept' :
+                        //  if (ed.valueSet) {
+                        controlHint = "drop-down"
+                        controlType = "choice"
+                    //   }
+                }
+            }
+
+            if (ed.controlHint) {
+                controlHint = ed.controlHint
+            }
+
+
+            return {controlType:controlType,controlHint:controlHint}
+
+        }
+
+        //Add the 'enable when' to the Q
+        //updates the item object directly
+        //When used by the Composition, we add a prefix which is {compname}.{section name}. (note the trailing dot)
+        function addEnableWhen(ed,item,pathPrefix) {
+            pathPrefix = pathPrefix || ""
+            if (ed && ed.enableWhen) {
+                console.log(ed,'has ew')
+                item.enableWhen = []
+                ed.enableWhen.forEach(function (ew) {
+                    let qEW = {operator:ew.operator,answerCoding:ew.value}
+
+                    //need to determine the path to the question. For now, assume that
+                    //qEW.question = `${parent.linkId}.${ew.source}` //linkId of source is relative to the parent (DG)
+                    qEW.question = `${pathPrefix}${ew.source}` //linkId of source is relative to the parent (DG)
+
+                    item.enableWhen.push(qEW)
+                })
+            }
+           // return item
+        }
+
+        //set the control type (and hint extension) for the item
+        //updates the item object directly
+        //ed has controlType and controlHint
+        function setControlType(ed,item) {
+
+            let vo = getControlDetails(ed) //get the control details from the ed
+
+            item.type = vo.controlType    //the 'official' type for the item
+
+            //Add the hint instruction
+            if (vo.controlType !== vo.controlHint)  {
+                //console.log(item.text,data.controlType,data.controlHint)
+                //the hint is the extension that gives more options to the renderer
+                item.extension = item.extension || []
+                let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+                ext.valueCodeableConcept = {coding:[{code:vo.controlHint,system:"http://hl7.org/fhir/questionnaire-item-control"}]}
+                item.extension.push(ext)
+            }
+
+
+
+            switch (vo.controlHint) {
+                case 'drop-down' :
+                    //populate the answerOption. Get it from 'options' if set, otherwise the vs
+                    item.answerOption = []
+
+
+                    //do the options first...
+                    if (ed.options) {
+                        for (const option of ed.options) {
+                            item.answerOption.push({valueCoding:{code:option.code,display:option.display}})
+                        }
+                    } else if (ed.valueSet) {
+                        //if there's a valueSet, then tru to expand it
+                        let qry = `ValueSet/$expand?url=${ed.valueSet}&_summary=false`
+                        let encodedQry = encodeURIComponent(qry)
+
+                        $http.get(`nzhts?qry=${encodedQry}`).then(
+                            function (data) {
+                                let expandedVS = data.data
+                                for (const concept of expandedVS.expansion.contains) {
+                                    item.answerOption.push(
+                                        {valueCoding:{system:concept.system, code:concept.code, display:concept.display}})
+                                }
+                                console.log(data.data)
+
+
+                            }, function (err) {
+                                item.answerOption.push({valueCoding:{display:"VS not found"}})
+                                console.log(`There was no ValueSet with the url:${ed.valueSet}`)
+                            }
+                        )
+
+
+                    }
+
+
+
+
+
+
+
+                    break
+            }
+
+
+        }
+
+
         return {
             makeTreeFromQ : function (Q) {
                 //pass in a Q and return a tree array
@@ -175,8 +307,9 @@ angular.module("pocApp")
 
             },
 
+            //this is used by the DG form creation
             makeQFromDG : function (lstElements,hashAllDG) {
-                //generate a Q based on the list of elements
+                //generate a Q based on the list of elements that represents a DG
                 //todo create a copy of the lstElements, then delete mult=0.0 and hideInQ (element & DG)
                 //console.log(lstElements)
 
@@ -250,11 +383,15 @@ angular.module("pocApp")
                                 group = makeGroup(groupEd)       //create a new group for the elements following the referenced DG
 
                                 processingDGPath = null
-
                             }
 
                         }
                         let item = {text:ed.title,linkId:ed.path,type:'string'}
+
+                        addEnableWhen(ed,item)  //If there are any contitionals
+                        setControlType(ed,item)  //set the control type to use
+
+//console.log(ed,item.type)
                         group.item.push(item)
                     }
 
@@ -278,6 +415,7 @@ angular.module("pocApp")
             },
 
 
+            //this is used by the composition
             makeQFromTree : function (treeObject) {
                 //Given a tree array representing a composition, construct a Q resource
                 let that = this
@@ -322,6 +460,15 @@ angular.module("pocApp")
                             item.type = 'group'
                         }
 
+
+                        //the path prexis is the path to the DG in the composition - {compname}.{section name}.
+                        //this is the first 2 segments in the node id (which is the full path)
+                        let ar = node.id.split('.')
+
+                        let pathPrefix = `${ar[0]}.${ar[1]}.`
+                        addEnableWhen(node.data.ed,item,pathPrefix)  //If there are any contitionals
+                        setControlType(node.data.ed,item)  //set the control type to use
+
                         parent.item = parent.item || []
                         parent.item.push(item)
                     }
@@ -358,7 +505,7 @@ angular.module("pocApp")
             },
 
             makeQ: function(treeObject) {
-                //construct a Questionnaire resource
+                //construct a Questionnaire resource - called by the makeQ controller - will be deprecated probably
                 //treeObject comes from the jstree control - it's actually an array
                 let qName = treeObject[0].id
                 Q = {resourceType:"Questionnaire",status:"draft",name:qName,item:[]}

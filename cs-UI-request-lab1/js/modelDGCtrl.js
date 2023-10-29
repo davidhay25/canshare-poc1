@@ -124,7 +124,8 @@ angular.module("pocApp")
             //value is assumed to be a Coding
             $scope.addEnableWhen = function(item,value) {
 
-                let sourcePath = item.shortPath       //this is the path of the source
+                //let sourcePath = item.shortPath       //this is the path of the source
+                let sourcePath = item.ed.path       //not completely sure how these should work ATM
                 let targetPath = $filter('dropFirstInPath')($scope.selectedNode.data.ed.path)
 
 

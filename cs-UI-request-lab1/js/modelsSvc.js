@@ -506,7 +506,7 @@ angular.module("pocApp")
 
 
             makeTreeFromElementList : function(arElements){
-                //construct a tree assuming that arElements is in path order
+                //construct a DG tree assuming that arElements is in path order
                 let that = this
                 let rootEd = arElements[0].ed
                 rootEd.kind = 'root'
@@ -610,10 +610,15 @@ angular.module("pocApp")
                         }
 
                     }
+
                     if (ed.hideInQ) {
                         arStyle.push("text-decoration: line-through")
                     }
 
+                    if (ed.enableWhen && ed.enableWhen.length > 0) {
+                        arStyle.push("text-decoration-line: underline")
+                        arStyle.push("text-decoration-style: dotted")
+                    }
 
 
                     //construct the style element for the 'a'
