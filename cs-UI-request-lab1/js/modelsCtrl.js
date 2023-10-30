@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc) {
 
-            $scope.version = "0.4.18"
+            $scope.version = "0.5.0"
             $scope.input = {}
             $scope.input.showFullModel = true
 
