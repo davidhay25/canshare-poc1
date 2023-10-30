@@ -26,7 +26,7 @@
         </div>
       </div>
 
-
+      <h5>New section</h5>
 
 
       <div class="row">
@@ -45,12 +45,6 @@
       </div>
 
 
-      <div class="row">
-        <div class="col-md-6">
-          Add Conditionals here. path and value for the section to be displayed using Q.enableWhen
-        can be any element in the composition tree
-        </div>
-      </div>
 
     </div>
     <div class="col-md-4" ng-show="selectedSection">
@@ -161,5 +155,75 @@
 
     </div>
   </div>
+
+
+  <div ng-show="selectedSection">
+    <h5>Conditionals</h5>
+
+    <strong>Existing conditionals this section</strong>
+    <table class="table-bordered table">
+      <tr><th>Source Section</th><th>DataGroup</th><th>Element</th><th>Value</th></tr>
+      <tr ng-repeat="ew in selectedComposition.enableWhen"
+        ng-show="ew.targetSection == selectedSection.name">
+        <td>{{ew.sourceSection}}</td>
+        <td>{{ew.dg}}</td>
+        <td>{{ew.ed}}</td>
+        <td>{{ew.value}}</td>
+      </tr>
+    </table>
+    <em>Each row represents a source condition that must be true for the section to appear
+    in a Form. There can be multiple - if any match then the section is shown.</em>
+
+    <br/><br/>
+    <strong>New conditional</strong>
+    <div class="row" >
+      <div class="col-md-3">
+        Section where the source is
+
+        <select class="form-control" ng-model="local.ewSection" ng-change="getDGsForSection(local.ewSection)"
+                ng-options = "section.title for section in local.ewSections"></select>
+      </div>
+
+      <div class="col-md-3">
+        DG that has the source element
+        <select class="form-control" ng-model="local.ewDG" ng-change="getCodedElementsForDG(local.ewDG)"
+                ng-options = "dg.title for dg in local.ewDGs"></select>
+
+      </div>
+
+      <div class="col-md-3">
+        Coded element in DG
+        <select class="form-control" ng-model="local.ewED" ng-change="getValuesForED(local.ewED)"
+                ng-options = "element.title for element in local.ewEDs"></select>
+
+      </div>
+
+      <div class="col-md-2">
+        Possible values
+        <select class="form-control" ng-model="local.ewValue"
+                ng-options = "concept.display for concept in local.ewValues"></select>
+
+      </div>
+
+      <div class="col-md-1">
+        <br/>
+        <i style="color: green" class="glyphicon glyphicon-ok clickable"
+           ng-show="local.ewSection && local.ewDG && local.ewED && local.ewValue"
+           ng-click="addEW(local.ewSection,local.ewDG,local.ewED,local.ewValue)"></i>
+      </div>
+
+
+    </div>
+    <br/>
+    <em>Will only allow the source (what has to be true for the section to be shown) to be a coded
+    item (ie CodeableConcept) and the source of possible values is currently only from options - not yet the ValueSet.</em>
+    <!--
+    <pre>{{selectedSection.enableWhen | json}}</pre>
+    <pre>{{selectedSection | json}}</pre>
+-->
+
+  </div>
+
+
 
 </div>

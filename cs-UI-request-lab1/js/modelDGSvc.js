@@ -43,36 +43,6 @@ angular.module("pocApp")
                     }
                 }
 
-                /*
-
-                if (dg.parent) {
-                    let parentDG = hashAllDG[dg.parent]
-
-                    while (parentDG) {
-                        console.log('parent',parentDG.name)
-
-                        if (hashParent[parentDG.name]) {
-                            console.log(`The DG ${parentDG.name} is already a parent in the chain for ${dg.name}. It cannot appear more than once`)
-
-                            return true
-                        } else {
-                            hashParent[parentDG.parent] = true
-                        }
-
-                        if (parentDG.parent) {
-                            parentDG = hashAllDG[parentDG.parent]
-                            console.log('ettting parent to ',parentDG)
-                        } else {
-                            delete parentDG
-                        }
-
-
-
-
-                    }
-                }
-
-*/
 
                 return false
 
@@ -84,7 +54,9 @@ angular.module("pocApp")
                 //return the list of possible options for en ed. There are 2 sources:
                 //the 'options' array or the valueSet.
 
-                if (ed.options) {
+
+
+                if (ed && ed.options) {
                     let ar = []
                     ed.options.forEach(function (opt) {
                         //assume text (.pt) only for now
@@ -94,8 +66,8 @@ angular.module("pocApp")
                     })
                     deferred.resolve(ar)
 
-                } else if (ed.valueSet) {
-                    //if there's a valueSet, then tru to expand it
+                } else if (ed && ed.valueSet) {
+                    //if there's a valueSet, then try to expand it
                     let qry = `ValueSet/$expand?url=${ed.valueSet}&_summary=false`
                     let encodedQry = encodeURIComponent(qry)
 

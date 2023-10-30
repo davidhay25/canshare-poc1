@@ -1544,8 +1544,8 @@ angular.module("pocApp")
                     $(this).jstree("open_node",id);
                     let treeObject = $(this).jstree(true).get_json('#', { 'flat': false })
 
-                    $scope.fullQ =  makeQSvc.makeQFromTree(treeObject)
-console.log($scope.fullQ)
+                    $scope.fullQ =  makeQSvc.makeQFromTree(treeObject,$scope.selectedComposition)
+//console.log($scope.fullQ)
                    // $scope.fullQ =  makeQSvc.makeQfromSections()
 
 

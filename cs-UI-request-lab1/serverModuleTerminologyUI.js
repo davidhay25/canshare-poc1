@@ -187,6 +187,10 @@ function setup(app) {
     app.get('/nzhts',async function(req,res){
         console.log(req.query.qry)
 
+        res.json({expansion:{contains:[]}})
+        return
+        //disabling wth term server down...
+
         //let qry = req.query.query || `https://authoring.nzhts.digital.health.nz/fhir/ValueSet/$expand?url=https://nzhts.digital.health.nz/fhir/ValueSet/canshare-data-absent-reason`
         if (req.query.qry) {
             let qry = nzhtsconfig.serverBase +  decodeURIComponent(req.query.qry)
@@ -238,6 +242,11 @@ function setup(app) {
     //used for $translate
     app.post('/nzhts',async function(req,res){
         console.log(req.body)
+
+        res.json({})
+        return
+        //disabling wth term server down...
+
       //  res.json()
 
      //   return

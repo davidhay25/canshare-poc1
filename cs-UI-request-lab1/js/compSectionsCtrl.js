@@ -9,6 +9,81 @@ angular.module("pocApp")
                 delete $scope.selectedItem
             }
 
+            //============== Enable when functions ==========
+
+            //get the possible sections where a source can be found. It cannot be the same as the section to hide/show
+            //called when a section is selected
+            $scope.getEwSections = function (selectedSection) {
+                $scope.local.ewSections =  []
+                $scope.selectedComposition.sections.forEach(function (section) {
+                    if (section.name !== selectedSection.name) {
+                        $scope.local.ewSections.push(section)
+                    }
+                })
+            }
+
+            //use building the conditional. The available sections
+            $scope.getDGsForSection = function (section) {
+                $scope.local.ewDGs = []         //datagroups in section
+                $scope.local.ewEDs = []            //EDs in selected DG
+                $scope.local.ewValues = []          //actual values for the selected DG
+                if (section.items) {
+                    section.items.forEach(function (item) {
+                        let dg = $scope.hashAllDG[item.type[0]]
+                        $scope.local.ewDGs.push(dg)
+                    })
+                }
+
+            }
+
+            //use building the conditional. The available coded elements in the given dg
+            $scope.getCodedElementsForDG = function(dg) {
+                $scope.local.ewEDs = []
+                $scope.local.ewValues = []          //actual values for the selected DG
+
+
+
+
+                if (dg) {//get the expanded / inflated DG
+                    let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
+                    console.log(vo)
+
+                    vo.allElements.forEach(function (item) {
+                        if (item.ed.type && item.ed.type[0] == 'CodeableConcept') {
+                            $scope.local.ewEDs.push(item.ed)
+                        }
+
+                    })
+                }
+            }
+
+            //return the possible values (options for now - VS to follow - like DG conditionals
+            $scope.getValuesForED = function (ed) {
+                $scope.local.ewValues = []          //actual values for the selected DG
+                modelDGSvc.expandEdValues(ed).then(
+                    function(lstCoding) {
+                        console.log(lstCoding)
+                        $scope.local.ewValues = lstCoding
+                    },
+                    function(err){
+                        console.log(err)
+                    }
+                )
+
+            }
+
+            //add the EW to the list of EW's
+            //todo some smarts
+            $scope.addEW = function (section,dg,ed,value) {
+
+                let ew = {targetSection:$scope.selectedSection.name, sourceSection:section.name,dg:dg.name,ed:ed.path,value:value}
+                console.log(ew)
+
+                $scope.selectedComposition.enableWhen = $scope.selectedSection.enableWhen || []
+                $scope.selectedComposition.enableWhen.push(ew)
+            }
+
+            //-------------
 
 
             $scope.moveSectionUp = function(inx) {
@@ -92,6 +167,10 @@ angular.module("pocApp")
                 delete $scope.selectedNewDG
                 delete $scope.filteredElementList
                 $scope.selectedSection = section
+
+                //get the list of sections that can be part of 'enableWhen' conditionals
+                $scope.getEwSections($scope.selectedSection)
+
 
             }
 

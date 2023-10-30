@@ -416,9 +416,18 @@ angular.module("pocApp")
 
 
             //this is used by the composition
-            makeQFromTree : function (treeObject) {
+            makeQFromTree : function (treeObject,comp) {
                 //Given a tree array representing a composition, construct a Q resource
                 let that = this
+
+                let hashSectionEW = {}      //any enableWhen for this section
+                if (comp && comp.enableWhen) {
+                    comp.enableWhen.forEach(function (ew) {
+                        hashSectionEW[ew.targetSection] = hashSectionEW[ew.targetSection] || []
+                        hashSectionEW[ew.targetSection].push(ew)
+                    })
+                }
+
 
                 console.log(treeObject)
                 let qName = treeObject[0].id
@@ -435,15 +444,36 @@ angular.module("pocApp")
                 //node is the node from the tree - multi level
                 // section is the current section. Used when adding a new group
                 function addChild(parent,node,section) {
-                    //level is
-                    //let item = {text:node.text,ed:node.data.ed,level:node.data.level,controlHint:node.data.controlHint,controlType:node.data.controlType}
 
                     let canAdd = true
                     //if the id / path length is 2, then this is representing a section from the tree
                     let ar = node.id.split('.')
                     if (ar.length == 2) {
                         //this is a section definition. Create a new section and add to the Q root
+                        let sectionName = ar[1]     //the second segment
                         section = {text:node.text,linkId:node.id,item:[]}
+
+                        //are there any conditionals (enableWhen) to add
+
+                        if (hashSectionEW[sectionName]) {
+                            section.enableWhen = section.enableWhen || []
+                            hashSectionEW[sectionName].forEach(function (vo) {
+                               // let vo = hashSectionEW[sectionName]
+                                let ew = {}
+                                ew.question = `${ar[0]}.${vo.sourceSection}.${vo.ed}`
+                                ew.operator = "="
+                                ew.answerCoding = vo.value
+                                section.enableWhen.push(ew)
+                            })
+
+                           console.log(section.enableWhen)
+
+                        }
+
+
+                        //let ew = {targetSection:$scope.selectedSection.name, sourceSection:section.name,dg:dg.name,ed:ed.path,value:value}
+                        //
+
                         Q.item.push(section)
                         canAdd = false
                     } else if (ar.length == 3) {
