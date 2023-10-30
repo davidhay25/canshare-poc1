@@ -187,8 +187,7 @@ function setup(app) {
     app.get('/nzhts',async function(req,res){
         console.log(req.query.qry)
 
-        res.json({expansion:{contains:[]}})
-        return
+
         //disabling wth term server down...
 
         //let qry = req.query.query || `https://authoring.nzhts.digital.health.nz/fhir/ValueSet/$expand?url=https://nzhts.digital.health.nz/fhir/ValueSet/canshare-data-absent-reason`
