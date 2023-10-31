@@ -294,7 +294,7 @@ angular.module("pocApp")
                     //return a list of subsetted canshare valuesets
                     let deferred = $q.defer()
 
-                    let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c`
+                    let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&status=active`
 console.log(qry)
                     let encodedQry = encodeURIComponent(qry)
 
