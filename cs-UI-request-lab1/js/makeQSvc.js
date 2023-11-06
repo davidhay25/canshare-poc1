@@ -417,9 +417,12 @@ angular.module("pocApp")
 
             //this is used by the composition
             makeQFromTree : function (treeObject,comp) {
-                //Given a tree array representing a composition, construct a Q resource
+                //Given a tree array representing a composition (from jstree), construct a Q resource
                 let that = this
 
+                let pathsToHide = []    //a list of paths that should not appear in the Q. It is assembled dynamically
+
+                //get the EnableWhens defined on the Composition for the sections
                 let hashSectionEW = {}      //any enableWhen for this section
                 if (comp && comp.enableWhen) {
                     comp.enableWhen.forEach(function (ew) {
@@ -434,9 +437,6 @@ angular.module("pocApp")
                 Q = {resourceType:"Questionnaire",status:"draft",name:qName,item:[]}
 
                 let section = {text:"section",linkId:qName,item:[]}
-                //Q.item.push(section)
-                //section.item =  section.item || []
-
 
                 let obj = {}
 
@@ -447,6 +447,9 @@ angular.module("pocApp")
 
                     let canAdd = true
                     //if the id / path length is 2, then this is representing a section from the tree
+                    //the node id structure is {comp name}.{section name}.{dg name}...
+                    //todo - need to think about z elements
+
                     let ar = node.id.split('.')
                     if (ar.length == 2) {
                         //this is a section definition. Create a new section and add to the Q root
@@ -454,7 +457,6 @@ angular.module("pocApp")
                         section = {text:node.text,linkId:node.id,item:[]}
 
                         //are there any conditionals (enableWhen) to add
-
                         if (hashSectionEW[sectionName]) {
                             section.enableWhen = section.enableWhen || []
                             hashSectionEW[sectionName].forEach(function (vo) {
@@ -470,17 +472,36 @@ angular.module("pocApp")
 
                         }
 
-
-                        //let ew = {targetSection:$scope.selectedSection.name, sourceSection:section.name,dg:dg.name,ed:ed.path,value:value}
-                        //
-
                         Q.item.push(section)
-                        canAdd = false
+                        canAdd = false          //because it's already beed added
                     } else if (ar.length == 3) {
                         //this is the DG name attached to the section
                         //we've got the children enumerated - we want to enumerate them but not add this one
                         canAdd = false
                     }
+
+                    //so, we've determined that this element can be added. is the 'hideInQ' set
+                    //for it (or for any of the ancestors.
+                    if (canAdd) {
+                       if (node.data.ed.hideInQ) {
+                           //if this is set to hide, then set canAdd false, and add the
+                           //path to the list of 'pathsToHide'
+                           pathsToHide.push(node.data.ed.path)
+                           canAdd = false
+                       } else {
+                           //check that the path of this element is not in the pathsToHide list
+                           for (const path of pathsToHide) {
+                               if (node.data.ed.path.startsWith(path)) {
+                                   canAdd = false
+                                   break
+                               }
+                           }
+                       }
+
+
+
+                    }
+
 
 
                     if (canAdd) {

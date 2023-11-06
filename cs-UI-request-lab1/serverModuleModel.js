@@ -159,7 +159,7 @@ async function setup(app) {
         }
     })
 
-    //delete a resource
+    //delete a resource - todo  - why not use delete verb??
     app.put('/model/DG/:name/delete', async function(req,res) {
         let dg = req.body
         dg.active = false
@@ -267,6 +267,11 @@ async function setup(app) {
         dg.active = true
 
         let userEmail = req.headers['x-user-email']
+
+        if (! userEmail) {
+            res.status(400).json({msg:'must be a logged in user'})
+            return
+        }
 
         const query = {name:name}
         try {

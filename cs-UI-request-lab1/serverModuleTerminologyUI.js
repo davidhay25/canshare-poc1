@@ -184,6 +184,49 @@ function setup(app) {
 
     })
 
+
+    //make an ECL query
+
+    app.get('/nzhts/ecl',async function(req,res){
+        console.log(req.query)
+
+        let encodedEcl =encodeURIComponent(req.query.qry)
+
+        let qry = `${nzhtsconfig.serverBase}ValueSet/$expand?url=http://snomed.info/sct?fhir_vs=ecl/${encodedEcl}`
+
+        qry += "&displayLanguage=en-x-sctlang-23162100-0210105"
+
+        console.log(qry)
+
+        let token = await getNZHTSAccessToken()
+        if (token) {
+
+            var decoded = jwt_decode(token);
+            // let timeToExpire = decoded.exp * 1000 - Date.now()       //exp is in seconds
+            // console.log(timeToExpire / (1000 * 60 *60 ));
+
+            let config = {headers:{authorization:'Bearer ' + token}}
+            config['content-type'] = "application/fhir+json"
+
+            axios.get(qry,config).then(function(data) {
+                res.json(data.data)
+            }).catch(function(ex) {
+                if (ex.response) {
+                    res.status(ex.response.status).json(ex.response.data)
+                } else {
+                    res.status(500).json(ex)
+                }
+
+            })
+        } else {
+
+            res.status(500).json({msg:"Unable to get Access Token."})
+        }
+
+    })
+
+
+
     app.get('/nzhts',async function(req,res){
         console.log(req.query.qry)
 
@@ -242,8 +285,8 @@ function setup(app) {
     app.post('/nzhts',async function(req,res){
         console.log(req.body)
 
-        res.json({})
-        return
+       // res.json({})
+        //return
         //disabling wth term server down...
 
       //  res.json()

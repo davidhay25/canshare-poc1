@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>Update ValueSet</title>
+
+    <script src="js/libs/jquery-1.9.0.min.js"></script>
+    <script src="js/libs/angular.min1-5.js"></script>
+    <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+    <script src="js/libs/moment.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+
+    <script>
+        angular.module("pocApp",['ui.bootstrap','ui.checkbox',"firebase"]).config(function($locationProvider) {
+            $locationProvider.html5Mode(true);
+            $locationProvider.hashPrefix('!');
+        });
+        angular.module("pocApp").constant("moment", moment);
+
+        angular.module("formsApp",[])
+        angular.module('topApp', ['pocApp', 'formsApp'])
+
+    </script>
+
+    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
+    <script src="js/updateVSCtrl.js"></script>
+    <script src="js/querySvc.js"></script>
+    <script src="js/showParameters.js"></script>
+    <script src="js/loginCtrl.js"></script>
+    <!--
+
+    <script src="js/questionnaireSvc.js"></script>
+
+    <script src="js/dashboardCtrl.js"></script>
+    <script src="js/dashboardSvc.js"></script>
+
+    <script src="directive/viewBundle/viewBundleDir.js"></script>
+    <script src="directive/viewBundle/viewBundleSvc.js"></script>
+    <script src="js/libs/vis.min.js"></script>
+
+    <script src="directive/renderForm/renderFormDir.js"></script>
+    <script src="directive/renderForm/renderFormSvc.js"></script>
+
+    <script src="directive/renderForm/renderFormAsTreeDir.js"></script>
+
+
+    <script src="directive/showQTree/showQTreeDir.html"></script>
+
+    <script src="directive/showQTree/showQTreeDir.js"></script>
+
+    <script src="directive/QRDisplay/QRDisplayDir.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
+    <script src="js/libs/jstree.min.js"></script>
+
+-->
+
+    <script src="js/libs/firebase.js"></script>
+    <script src="js/libs/angularfire.min.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDG1ToLHycsMUX0CfX0OZVSRUUpFQeKE9o",
+            authDomain: "canshare-730e6.firebaseapp.com",
+            projectId: "canshare-730e6",
+            storageBucket: "canshare-730e6.appspot.com",
+            messagingSenderId: "12147821347",
+            appId: "1:12147821347:web:5963d577cb050259475a96"
+        };
+        if (firebase) {
+            console.log('init firebase')
+            firebase.initializeApp(firebaseConfig);
+
+        }
+    </script>
+
+</head>
+<body style="padding: 8px;padding-top: 80px">
+<div ng-app="topApp" ng-controller="updateCtrl" class="container-fluid">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+        <div class="container-fluid">
+            <div class="col-md-6">
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            Update ValueSet
+                        </a>
+                    </span>
+
+            </div>
+
+            <div class="col-md-2">
+                <div class="navbar-text">
+                    Admin only
+                    <span class="badge">{{allVSItem.length}}</span>
+                </div>
+
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <form class="navbar-form navbar-left">
+                    <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+
+                </form>
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <div class="navbar-text " ng-hide="user">
+                    <span style="font-size:1.2em; cursor: pointer" uib-popover="Click to log in"
+                          popover-placement="left"
+                          popover-trigger="'mouseenter'">
+                        <div ng-click="login()">
+                            <i class="glyphicon glyphicon-log-in"></i>
+                        </div>
+                    </span>
+                </div>
+
+                <div class="navbar-text"  ng-show="user">
+                    <span style="font-size:1.2em;  cursor: pointer" uib-popover="{{user.email}}"
+                          popover-placement="left"
+                          popover-trigger="'mouseenter'">
+                        <div ng-click="logout()">
+                            <i class="glyphicon glyphicon-log-out"></i>
+                        </div>
+                    </span>
+                </div>
+
+            </div>
+
+
+
+            <div class="col-md-2">
+                <a href="https://teaho.govt.nz/" target="_blank">
+                    <img width="150" height="auto" class="pull-right"
+                         style="padding: 3px"
+                         src="images/TAK-logo-midgreen.png"/>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="row">
+        <div class="col-md-3">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <button class="btn-link btn pull-right" ng-click="createNew()">New</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <input placeholder="Filter" type="text" class="form-control" ng-model="input.filterlist"/>
+                    <br/>
+                    <div class="myScroll">
+                        <div class="list-group">
+                            <div ng-class="{'list-group-item':true,listItemSelected:selectedItem==item}"
+                                 ng-show="showVS(item)"
+                                 style="cursor: pointer" ng-repeat="item in allVSItem" ng-click="selectVSItem(item)">
+                                {{item.display}}
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+
+        </div>
+
+
+        <div ng-show="selectedVS" class="col-md-9">
+            <div class="alert-info alert" ng-hide="user">
+                Update and Create operations on the publishing Server can only be done by
+                logged in users
+            </div>
+            <div>
+                <button ng-show = "user && user.email && canSave()" class="btn btn-danger pull-right">
+                    <span ng-show="isNew">Save new VS</span>
+                    <span ng-hide="isNew">Update</span>
+                </button>
+            </div>
+            <uib-tabset>
+                <uib-tab heading="Json">
+                    <pre>{{selectedVS | json}}</pre>
+                </uib-tab>
+                <uib-tab heading="Expand">
+                    <br/>
+                    <div class="row">
+                        <div class="col-md-1">
+                            Language
+                        </div>
+                        <div class="col-md-3">
+                            <select ng-model="input.selectedLanguage" class="form-control"
+                                    ng-options = "item.display for item in languages"></select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" ng-model="input.filter" placeholder="Filter text"/>
+                        </div>
+                        <div class="col-md-3">
+                            <div ng-show="expandedVS.expansion.contains">{{expandedVS.expansion.contains.length}} concepts</div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <button class="btn btn-primary pull-right" ng-click="expandVSInTS(selectedVS)">Expand</button>
+                        </div>
+                    </div>
+                    <br/>
+                    <div ng-show="expandQry">Query: {{expandQry}}</div>
+                    <br/>
+
+
+
+                    <uib-tabset ng-show="expandedVS">
+                        <uib-tab heading="Concepts">
+                            <table class="table table-bordered table-condensed">
+                                <tr><th>Display</th><th>Code</th><th>System</th></tr>
+                                <tr ng-repeat="concept in expandedVS.expansion.contains">
+                                    <td>{{concept.display}}</td>
+                                    <td>
+                                        <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
+                                    <td>{{concept.system}}</td>
+                                </tr>
+                            </table>
+                        </uib-tab>
+                        <uib-tab heading="Json">
+                            <pre>{{expandedVS | json}}</pre>
+                        </uib-tab>
+                    </uib-tabset>
+
+
+
+
+
+
+                </uib-tab>
+                <uib-tab heading="Form">
+                    <table class="table">
+                        <tr>
+                            <td>Id</td>
+                            <td>
+                                <input type="text"
+                                       ng-disabled="! isNew"
+                                       ng-change = makeVS()
+                                       class="form-control" ng-model="input.id"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Title</td>
+                            <td>
+                                <input type="text" class="form-control" ng-change = makeVS() ng-model="input.title"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Description</td>
+                            <td>
+                                <textarea class="form-control" ng-change = makeVS() ng-model="input.description"></textarea>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>ECL</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <textarea class="form-control" ng-change = makeVS() ng-model="input.ecl"></textarea>
+
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-link" ng-click="testECL(input.ecl)">Test ECL</button>
+                                    </div>
+                                </div>
+
+                            </td>
+                        </tr>
+
+
+                    </table>
+
+                    <div ng-show="textEclVS">
+                        <strong>ECL result</strong>
+                        <table class="table table-bordered table-condensed">
+                            <tr><th>Display</th><th>Code</th><th>System</th></tr>
+                            <tr ng-repeat="concept in textEclVS.expansion.contains">
+                                <td>{{concept.display}}</td>
+                                <td>
+                                    <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
+                                <td>{{concept.system}}</td>
+                            </tr>
+                        </table>
+
+                    </div>
+
+
+                </uib-tab>
+
+
+            </uib-tabset>
+
+
+
+        </div>
+    </div>
+
+
+
+
+
+
+</div>
+</body>

@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc) {
 
-            $scope.version = "0.5.0"
+            $scope.version = "0.5.1"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -592,6 +592,8 @@ angular.module("pocApp")
                     }
 
 
+
+
                     $scope.$digest();
                 });
             }
@@ -897,6 +899,9 @@ angular.module("pocApp")
                 //locate the DG with this name and set it active. This will select it in the DG tab
                 $scope.selectedModel = $scope.hashAllDG[item.DGName]
                 $scope.selectModel($scope.selectedModel)
+
+
+                //$scope.selectModel
 
                 if (previous) {
                     $scope.hxDGLoad.push(previous)  //for the 'back' function
@@ -1422,6 +1427,15 @@ angular.module("pocApp")
                     )
 
                     $scope.refreshUpdates()     //update the xref and the list of all updates
+
+                    //update the hierarchical tree
+
+                    //let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
+                    //showAllDGTree(vo1.treeData)
+
+
+                    //$('#allDGTree').jstree("open_node",$scope.selectedModel.name);
+                    //$('#allDGTree').jstree("select_node",$scope.selectedModel.name);
 
                     //create the list of override elements
                     $scope.overrides = []

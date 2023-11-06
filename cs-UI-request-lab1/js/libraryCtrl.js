@@ -297,7 +297,11 @@ angular.module("pocApp")
                             if (dg) {
                                 delete dg.checkedOut
                             }
-                            makeDGSummary(allDG,$scope.libraryDG)
+
+                            $scope.refreshDGSummary()
+
+                            //makeDGSummary(allDG,$scope.libraryDG)
+
                         })
 
                     }
