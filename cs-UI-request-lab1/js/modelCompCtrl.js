@@ -1,10 +1,59 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('modelCompositionCtrl',
-        function ($scope,$uibModal,$timeout) {
+        function ($scope,$uibModal,$timeout,librarySvc) {
 
 
             $scope.compositionKind = ['request','report','general']
+
+            $scope.canEditComp = function (comp) {
+                if ($scope.user && $scope.user.email) {
+                    if (comp && comp.checkedOut === $scope.user.email) {
+                        return true
+                    }
+                }
+            }
+
+            $scope.revert = function () {
+                if (confirm("Are you sure you wish to revert this Composition? Any changes will be lost.")){
+
+                    librarySvc.revert($scope.selectedComposition, $scope.user).then(
+                        function (data) {
+                            //returns the model from the library
+                            $scope.hashAllCompositions[$scope.selectedComposition.name] = data
+                            $scope.selectComposition(data)
+                            //$scope.$emit('updateDGList',{name:$scope.selectedModel.name})
+
+                            alert("Check out has been cancelled, and the Library version of this Composition downloaded.")
+                        }, function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+
+
+                }
+            }
+
+
+            $scope.checkIn = function () {
+                librarySvc.checkIn($scope.selectedComposition,$scope.user)
+
+            }
+
+
+            //retrieve the latest copy of this Comp from the library and mark as checked out to the current user
+            $scope.checkOut = function () {
+                //alert('checkOut')
+
+
+                librarySvc.checkOut($scope.selectedComposition,$scope.user,function(comp){
+                    console.log(comp)
+                    $scope.hashAllCompositions[comp.name] = comp
+                    $scope.selectComposition(comp)
+
+                })
+
+            }
 
 
 

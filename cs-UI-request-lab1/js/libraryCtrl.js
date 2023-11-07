@@ -67,7 +67,7 @@ angular.module("pocApp")
                     libraryHash[comp.name] = comp
                 })
 
-                $scope.summaryComp = []        //the summary array
+                $scope.summaryComp = []        //the summary compositions array
 
                 Object.keys(allComp).forEach(function (key) {
                     let localComp = allComp[key]
@@ -81,7 +81,7 @@ angular.module("pocApp")
                     $scope.summaryComp.push(item)
                 })
 
-                //Any DG left in the serverHash are new on the server
+                //Any Comp left in the serverHash are new on the server
                 Object.keys(libraryHash).forEach(function (key) {
                     let libraryComp = libraryHash[key]
                     let item = {name:key, title:libraryComp.title, library:libraryComp,note:"Library only"}

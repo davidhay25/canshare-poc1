@@ -6,8 +6,8 @@ const axios = require('axios')
 
 let fs = require('fs')
 let fileName = "./allDataGroups-nov7.json"
-//let serverUrl = "http://poc.canshare.co.nz"         //the server is listening on post 80
-let serverUrl = "http://localhost:9500"
+let serverUrl = "http://poc.canshare.co.nz"         //the server is listening on post 80
+//let serverUrl = "http://localhost:9500"
 let dgs = fs.readFileSync(fileName).toString()
 
 //console.log(dgs)

@@ -288,7 +288,8 @@ async function setup(app) {
 
     //receive a hash of DG (the hashAllDG) and update the server.
     //start with a simple update for now - get fancier later
-    app.post('/model/DG', async function(req,res) {
+
+    app.post('/model/DG/DEP', async function(req,res) {
 
 
         let vo = req.body  //{user: hashAllDG: }
@@ -391,9 +392,9 @@ async function setup(app) {
         }
     })
 
-    // ============ compositions
+    // ============ compositions ========================
 
-    //get all active compositions
+    //get all active compositions - used by the library
     app.get('/model/allCompositions', async function(req,res) {
         const query = {}  // bring them all back ATM{active:true} // active: { $lt: 15 } };
         try {
@@ -410,6 +411,44 @@ async function setup(app) {
 
         }
     })
+
+
+    //undo a checkout on a Composition
+    app.put('/model/comp/:name/revert', async function(req,res) {
+        let name = req.params.name
+        let userEmail = req.headers['x-user-email']
+
+        if (! userEmail) {
+            res.status(400).json({msg:'must be a logged in user'})
+            return
+        }
+
+        const query = {name:name}
+        try {
+            //strategy is to get the library copy, then update it in a second call as the replaceOne doesn't return the updated doc
+            const cursor = await database.collection("comp").find(query).toArray()
+            if (cursor.length == 1) {
+
+                let comp = cursor[0]
+                delete comp['_id']
+                delete comp.checkedOut
+                //update the Composition
+                await database.collection("comp").replaceOne(query,comp,{upsert:true})
+
+                //update the history
+                await saveHistory(comp,userEmail || "unknown User","Reverting a checkout composition")
+
+                res.json(comp)
+            } else {
+                res.status(404).json({msg:`There were ${cursor.length} occurrences of the Composition ${name}`})
+            }
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+        }
+
+    })
+
 
     //get a single composition by name
     app.get('/model/comp/:name', async function(req,res) {
@@ -433,6 +472,14 @@ async function setup(app) {
 
     //create / update a single composition. In theory the name param is not needed, but cleaner
     app.put('/model/comp/:name', async function(req,res) {
+
+        let userEmail = req.headers['x-user-email']
+
+        if (! userEmail) {
+            res.status(400).json({msg:'must be a logged in user'})
+            return
+        }
+
         let name = req.params.name
         let comp = req.body
         delete comp['_id']
@@ -440,6 +487,7 @@ async function setup(app) {
         const query = {name:name}
         try {
             const cursor = await database.collection("comp").replaceOne(query,comp,{upsert:true})
+            await saveHistory(comp,userEmail || "unknown User")
             res.json(comp)
         } catch(ex) {
             console.log(ex)

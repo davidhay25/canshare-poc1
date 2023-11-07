@@ -10,26 +10,32 @@
 
              ng-repeat="section in selectedComposition.sections">
 
-              <span class="clickable pull-right" ng-click="removeSection($index)">
-                <i class="glyphicon glyphicon-remove"></i>
-              </span>
+              <div ng-show = "canEditComp(selectedComposition)">
 
-              <span ng-hide="$index==0" class="clickable pull-right" ng-click="moveSectionUp($index)">
-                    <i class="glyphicon glyphicon-arrow-up"></i>
-              </span>
+                <span class="clickable pull-right" ng-click="removeSection($index)">
+                  <i class="glyphicon glyphicon-remove"></i>
+                </span>
 
-              <span ng-hide="$index == selectedComposition.sections.length-1" class="clickable pull-right" ng-click="moveSectionDown($index)">
-                  <i class="glyphicon glyphicon-arrow-down"></i>
-              </span>
+                <span ng-hide="$index==0" class="clickable pull-right" ng-click="moveSectionUp($index)">
+                      <i class="glyphicon glyphicon-arrow-up"></i>
+                </span>
+
+                <span ng-hide="$index == selectedComposition.sections.length-1" class="clickable pull-right" ng-click="moveSectionDown($index)">
+                    <i class="glyphicon glyphicon-arrow-down"></i>
+                </span>
+              </div>
 
           {{section.title || section.name}}
         </div>
       </div>
 
-      <h5>New section</h5>
+
+      <div ng-show = "canEditComp(selectedComposition)">
+
+        <h5>New section</h5>
 
 
-      <div class="row">
+        <div class="row">
         <div class="col-md-10">
           <input type="text" placeholder="Section name"
                  class="form-control" ng-model="local.sectionName"/>
@@ -44,7 +50,7 @@
         </div>
       </div>
 
-
+      </div>
 
     </div>
     <div class="col-md-4" ng-show="selectedSection">
@@ -57,18 +63,19 @@
              style="cursor: pointer"
              ng-repeat="item in selectedSection.items">
 
-            <i class="glyphicon glyphicon-remove pull-right clickable"
-              ng-click="removeDG($index)"></i>
+          <div ng-show = "canEditComp(selectedComposition)">
+              <i class="glyphicon glyphicon-remove pull-right clickable"
+                ng-click="removeDG($index)"></i>
 
-            <span ng-hide="$index==0" class="clickable pull-right" ng-click="moveDGUp($index)">
-                    <i class="glyphicon glyphicon-arrow-up"></i>
-            </span>
+              <span ng-hide="$index==0" class="clickable pull-right" ng-click="moveDGUp($index)">
+                      <i class="glyphicon glyphicon-arrow-up"></i>
+              </span>
 
-            <span ng-hide="$index==selectedSection.items.length -1" class="clickable pull-right" ng-click="moveDGDown($index)">
-                  <i class="glyphicon glyphicon-arrow-down"></i>
-            </span>
+              <span ng-hide="$index==selectedSection.items.length -1" class="clickable pull-right" ng-click="moveDGDown($index)">
+                    <i class="glyphicon glyphicon-arrow-down"></i>
+              </span>
 
-
+          </div>
 
           {{item.title}}
         </div>
@@ -120,7 +127,7 @@
         </uib-tab>
 
 
-        <uib-tab heading="DG library Tree">
+        <uib-tab ng-show = "canEditComp(selectedComposition)" heading="DG library Tree">
           <!--
           <div class="clickable" ng-click="setup()">refresh</div>
 -->
@@ -158,6 +165,8 @@
 
 
   <div ng-show="selectedSection">
+
+
     <h5>Conditionals</h5>
 
     <strong>Existing conditionals this section</strong>
@@ -174,49 +183,55 @@
     <em>Each row represents a source condition that must be true for the section to appear
     in a Form. There can be multiple - if any match then the section is shown.</em>
 
-    <br/><br/>
-    <strong>New conditional</strong>
-    <div class="row" >
-      <div class="col-md-3">
-        Section where the source is
 
-        <select class="form-control" ng-model="local.ewSection" ng-change="getDGsForSection(local.ewSection)"
-                ng-options = "section.title for section in local.ewSections"></select>
+
+    <div ng-show = "canEditComp(selectedComposition)">
+      <br/><br/>
+      <strong>New conditional</strong>
+      <div class="row" >
+        <div class="col-md-3">
+          Section where the source is
+
+          <select class="form-control" ng-model="local.ewSection" ng-change="getDGsForSection(local.ewSection)"
+                  ng-options = "section.title for section in local.ewSections"></select>
+        </div>
+
+        <div class="col-md-3">
+          DG that has the source element
+          <select class="form-control" ng-model="local.ewDG" ng-change="getCodedElementsForDG(local.ewDG)"
+                  ng-options = "dg.title for dg in local.ewDGs"></select>
+
+        </div>
+
+        <div class="col-md-3">
+          Coded element in DG
+          <select class="form-control" ng-model="local.ewED" ng-change="getValuesForED(local.ewED)"
+                  ng-options = "element.title for element in local.ewEDs"></select>
+
+        </div>
+
+        <div class="col-md-2">
+          Possible values
+          <select class="form-control" ng-model="local.ewValue"
+                  ng-options = "concept.display for concept in local.ewValues"></select>
+
+        </div>
+
+        <div class="col-md-1">
+          <br/>
+          <i style="color: green" class="glyphicon glyphicon-ok clickable"
+             ng-show="local.ewSection && local.ewDG && local.ewED && local.ewValue"
+             ng-click="addEW(local.ewSection,local.ewDG,local.ewED,local.ewValue)"></i>
+        </div>
+
+
       </div>
-
-      <div class="col-md-3">
-        DG that has the source element
-        <select class="form-control" ng-model="local.ewDG" ng-change="getCodedElementsForDG(local.ewDG)"
-                ng-options = "dg.title for dg in local.ewDGs"></select>
-
-      </div>
-
-      <div class="col-md-3">
-        Coded element in DG
-        <select class="form-control" ng-model="local.ewED" ng-change="getValuesForED(local.ewED)"
-                ng-options = "element.title for element in local.ewEDs"></select>
-
-      </div>
-
-      <div class="col-md-2">
-        Possible values
-        <select class="form-control" ng-model="local.ewValue"
-                ng-options = "concept.display for concept in local.ewValues"></select>
-
-      </div>
-
-      <div class="col-md-1">
-        <br/>
-        <i style="color: green" class="glyphicon glyphicon-ok clickable"
-           ng-show="local.ewSection && local.ewDG && local.ewED && local.ewValue"
-           ng-click="addEW(local.ewSection,local.ewDG,local.ewED,local.ewValue)"></i>
-      </div>
-
-
+      <br/>
+      <em>Will only allow the source (what has to be true for the section to be shown) to be a coded
+      item (ie CodeableConcept) and the source of possible values is currently only from options - not yet the ValueSet.</em>
     </div>
-    <br/>
-    <em>Will only allow the source (what has to be true for the section to be shown) to be a coded
-    item (ie CodeableConcept) and the source of possible values is currently only from options - not yet the ValueSet.</em>
+
+
     <!--
     <pre>{{selectedSection.enableWhen | json}}</pre>
     <pre>{{selectedSection | json}}</pre>

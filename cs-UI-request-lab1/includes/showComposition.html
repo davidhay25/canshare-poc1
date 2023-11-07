@@ -26,10 +26,36 @@
         </div>
         <br/>
         <div>
-          <button class="btn btn-link" ng-click="deleteComposition(selectedComposition)">Remove from local store</button>
+          <button class="btn btn-link"
+                  ng-hide = "selectedComposition.checkedOut == user.email"
+                  ng-click="deleteComposition(selectedComposition)">Remove from local store.</button>
         </div>
     </div>
     <div class="col-md-5">
+
+
+      <div class="pull-right">
+        <div ng-show="user.email">
+
+          <button class="btn btn-success"
+                  ng-hide="selectedComposition.checkedOut" class="clickable" ng-click="checkOut()">Check out</button>
+
+          <button class="btn btn-danger"
+                  ng-show="selectedComposition.checkedOut && selectedComposition.checkedOut == user.email"
+                  ng-click="revert()">Revert</button>
+
+          <button class="btn btn-warning"
+                  ng-show="selectedComposition.checkedOut && selectedComposition.checkedOut == user.email"
+                  ng-click="checkIn()">Check in</button>
+
+          <div ng-show = "selectedComposition.checkedOut && selectedComposition.checkedOut !== user.email">
+            <strong>Checked out to {{selectedComposition.checkedOut}}</strong>
+          </div>
+        </div>
+      </div>
+
+
+
       <table class="table-condensed table table-bordered">
         <tr><td>Tumour stream</td><td>{{selectedComposition.meta.tumourStream}}</td></tr>
         <tr><td>Category</td><td>{{selectedComposition.meta.category}}</td></tr>
@@ -312,6 +338,8 @@
               </div>
 
 
+                <div ng-show = "canEditComp(selectedComposition)">
+
             <!-- If the root is selected, we can add a new section-->
             <div ng-show="selectedCompositionNode.id.indexOf('.') == -1">
               <br/>
@@ -331,6 +359,10 @@
               </div>
             </div>
 
+
+
+
+
             <div ng-hide ="selectedCompositionNode.data.ed.mult == '0..0'  ||
               selectedCompositionNode.data.ed.zElement || selectedCompositionNode.data.ed.kind == 'root'">
 
@@ -344,25 +376,15 @@
 
             </div>
 
-                <div ng-show="selectedCompositionNode.data.ed.zElement">
-                  <button ng-click="removeZElement(selectedCompositionNode.data.ed)" class="btn btn-link pull-right">Remove this element</button>
-
-                </div>
-
-
-
+            <div ng-show="selectedCompositionNode.data.ed.zElement">
+              <button ng-click="removeZElement(selectedCompositionNode.data.ed)" class="btn btn-link pull-right">Remove this element</button>
+            </div>
 
               <div ng-show ="selectedCompositionNode.data.ed.kind == 'dg' || selectedCompositionNode.data.ed.kind == 'section'">
                 <button class="btn-link btn pull-right"
                         ng-click="addZElement(selectedCompositionNode.data.ed)">Add Z element</button>
               </div>
 
-<!--
-                <div ng-show ="selectedCompositionNode.data.ed.kind == 'dg'">
-                  <button class="btn-link btn pull-right"
-                          ng-click="termSelectDG({DGName:selectedCompositionNode.data.ed.name})">Display DG in DG tab</button>
-                </div>
-                -->
 
                <div ng-show="selectedCompositionNode.data.ed.kind == 'section'">
                  <br/><br/>
@@ -408,6 +430,8 @@
 
                  </div>
                </div>
+            </div>
+
             </div>
 
               </div>
@@ -592,15 +616,18 @@
             </tr>
             <tr>
               <td>Title</td>
-              <td><input type="text" class="form-control" ng-model="selectedComposition.title" />  </td>
+              <td><input ng-disabled = "! canEditComp(selectedComposition)"
+                      type="text" class="form-control" ng-model="selectedComposition.title" />  </td>
             </tr>
             <tr>
               <td>Description</td>
-              <td><textarea class="form-control" ng-model="selectedComposition.description" ></textarea> </td>
+              <td><textarea ng-disabled = "! canEditComp(selectedComposition)"
+                            class="form-control" ng-model="selectedComposition.description" ></textarea> </td>
             </tr>
             <tr>
               <td>Category</td>
-              <td><input type="text" class="form-control"
+              <td><input ng-disabled = "! canEditComp(selectedComposition)"
+                         type="text" class="form-control"
                          ng-blur="updateMetaValues()"
                          ng-model="selectedComposition.meta.category" />  </td>
             </tr>
@@ -612,7 +639,8 @@
 
             <tr>
               <td>Tumour stream</td>
-              <td><input type="text" class="form-control"
+              <td><input ng-disabled = "! canEditComp(selectedComposition)"
+                         type="text" class="form-control"
                          ng-blur="updateMetaValues()"
                          ng-model="selectedComposition.meta.tumourStream" /> </td>
             </tr>
@@ -629,7 +657,8 @@
             <tr>
               <td>Source reference</td>
 
-              <td><input type="text" class="form-control" ng-model="selectedComposition.sourceReference" />  </td>
+              <td><input ng-disabled = "! canEditComp(selectedComposition)"
+                         type="text" class="form-control" ng-model="selectedComposition.sourceReference" />  </td>
 
             </tr>
 

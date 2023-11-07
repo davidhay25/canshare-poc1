@@ -706,7 +706,9 @@ angular.module("pocApp")
 
             //set the fixed value for a CC - creates / update override element
             //todo may be able to use this code for comp as well
-            $scope.setFixedValue = function(ed) {
+            //use for both default and fixed
+            //kind is 'fixed' or 'default'
+            $scope.setFixedValue = function(ed,kind,current) {
 
                 //figure out the type from the ed
                 let type = 'coding'         //the default
@@ -729,6 +731,10 @@ angular.module("pocApp")
                     resolve: {
                         type: function () {
                             return type
+                        }, kind: function () {
+                            return kind
+                        }, current: function () {
+                            return current
                         }
                     }
 
@@ -740,6 +746,9 @@ angular.module("pocApp")
                     switch (type) {
                         case "coding":
                             elName = "fixedCoding"
+                            if (kind == "default") {
+                                elName = "defaultCoding"
+                            }
                             break
                     }
 
@@ -754,11 +763,13 @@ angular.module("pocApp")
                     for (const ed of $scope.selectedModel.diff) {
                         if (ed.path == path) {
                             ed[elName] = elValue
-
+/*
                             modelDGSvc.updateChanges($scope.selectedModel,
                                 {edPath:ed.path,
                                     msg:`Set fixed ${type} to ${angular.toJson(elValue)}`},
                                 $scope)
+
+                            */
 
                             found = true
                             break
@@ -774,28 +785,27 @@ angular.module("pocApp")
 
                         overrideEd.path = path
                         $scope.selectedModel.diff.push(overrideEd)
-
+/*
                         modelDGSvc.updateChanges($scope.selectedModel,
                             {edPath:ed.path,
                                 msg:`Set fixed ${type} to ${angular.toJson(elValue)}`},
                             $scope)
 
+                        */
+
                     }
 
                     ed[elName] = elValue   //for the display
-                    //ed.fixedCoding = {code:value}        //for the display
 
 
                     //rebuild the full element list for the table
                     let vo1 = modelsSvc.getFullListOfElements($scope.selectedModel,$scope.input.types,$scope.input.showFullModel)
                     $scope.fullElementList = vo1.allElements
 
-
-
-
                 })
 
-return
+//return
+                /*
 
                 let value = prompt(`${fixedValueText[type]} for ${ed.path}`)
 
@@ -866,6 +876,8 @@ return
                     let vo = modelsSvc.getFullListOfElements($scope.selectedModel,$scope.input.types,$scope.input.showFullModel)
                     $scope.fullElementList = vo.allElements
                 }
+
+                */
             }
 
             //remove the fixed element, but leave the (likely override) in place

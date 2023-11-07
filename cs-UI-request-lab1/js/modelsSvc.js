@@ -15,7 +15,7 @@ angular.module("pocApp")
 
                 let url = `/model/DG/${name}`
                 if (modelType == 'comp') {
-                    `/model/comp/${name}`
+                    url = `/model/comp/${name}`
                 }
 
                 $http.get(url).then(

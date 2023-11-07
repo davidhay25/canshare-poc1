@@ -1,14 +1,24 @@
 angular.module("pocApp")
     .controller('fixValuesCtrl',
-        function ($scope,type,$http) {
+        function ($scope,type,$http,kind,current) {
+            //'type' is the datatype
+            //'kind' is 'fixed' or 'default'
+            //'current' is the current value (of type 'type') - if any
             $scope.type = type
+            $scope.kind = kind
 
             $scope.input = {}
             $scope.input.system = "http://snomed.info/sct"
-
-           // $scope.input.code = "1229901006"
-
-
+            if (current) {
+                //there is a current value that is being edited
+                switch (type) {
+                    case 'coding' :
+                        $scope.input.code = current.code
+                        $scope.input.display = current.display
+                        $scope.input.fsn = current.fsn
+                        break
+                }
+            }
 
             //lookup from the TS
             $scope.lookupFSN = function () {

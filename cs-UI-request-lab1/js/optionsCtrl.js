@@ -39,11 +39,15 @@ angular.module("pocApp")
                 let lines = txt.split('\n')
                 lines.forEach(function (lne) {
                     let ar = lne.split('\t')
-                    console.log(ar)
+                    //console.log(ar)
                     let option = {}
                     option.code = ar[0]
                     option.pt = ar[1]       //set the pt (preferred term) and the display the same. Not sure if we should be using pt anyway...
                     option.display = ar[1]
+                    if (ar.length > 2) {
+                        option.fsn = ar[2]
+                    }
+
                     $scope.ed.options.push(option)
 
                 })

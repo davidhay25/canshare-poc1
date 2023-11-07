@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc) {
 
-            $scope.version = "0.5.1"
+            $scope.version = "0.5.2"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -38,6 +38,8 @@ angular.module("pocApp")
             })
 
             //
+
+
 
 
 
@@ -1181,12 +1183,22 @@ angular.module("pocApp")
 
                     modelsSvc.isUniqueNameOnLibrary(name,'comp').then(
                         function () {
-                            //name is unique
+                            //name is unique - ie the comp was not found on the server
+                            //todo why check locally as well?
                             let isUnique =  ! $scope.hashAllCompositions[name]
 
                             if (isUnique) {
                                 let newComp = {kind:'comp', name:name, title:name, sections:[]}
-                                $localStorage.world.compositions[newComp.name] = newComp
+                                newComp.checkedOut = $scope.user.email
+
+                                //save a copy to the Library (a we do with DGs)
+                                librarySvc.checkOut(newComp,$scope.user)
+                                //let qry = `/model/comp/${newComp.name}`
+
+
+                                $scope.hashAllCompositions[newComp.name] = newComp
+
+                                //$localStorage.world.compositions[newComp.name] = newComp
 
                                 $scope.selectComposition(newComp)
                             } else {

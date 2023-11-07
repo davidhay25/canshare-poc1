@@ -34,7 +34,9 @@
           <tr ng-repeat="item in summaryComp">
             <td>
               {{item.title}}
-              <div class="clickable" ng-show="item.library" ng-click="downloadComp(item.library)">Download</div>
+              <div class="clickable"
+                   ng-show="item.library && ! item.local"
+                   ng-click="downloadComp(item.library)">Download</div>
             </td>
             <td>
               <ul class="list-unstyled">

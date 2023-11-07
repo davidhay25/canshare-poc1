@@ -524,21 +524,57 @@
                                  ng-click="clearFixedValue(selectedNode.data.ed)">Clear fixed value</span>
                         </div>
 
+                      </span>
 
+                      <div ng-show="canEdit(selectedModel)">
+                        <div class="clickable"
+                             ng-click="setFixedValue(selectedNode.data.ed,'fixed',selectedNode.data.ed.fixedCoding)">Set/edit fixed value
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr ng-show="isFixedType(selectedNode.data.ed)">
+                    <td>Default value</td>
+
+                    <td>
+
+
+                      <div ng-show="selectedNode.data.ed.defaultCoding">
+                        {{selectedNode.data.ed.defaultCoding.code}} | {{selectedNode.data.ed.defaultCoding.display}} | {{selectedNode.data.ed.defaultCoding.system}}
+                      </div>
+
+                      <!--
+                                            {{selectedNode.data.ed.fixedCoding}}
+
+                      {{selectedNode.data.ed.fixedString}}
+                      {{selectedNode.data.ed.fixedDecimal}}
+-->
+
+                      <span ng-show="selectedNode.data.ed.defaultCoding"
+                            class=" pull-right">
+
+
+                        <span ng-show="getSourceModelName(selectedNode.data.ed) !== selectedModel.name">
+                          set on {{getSourceModelName(selectedNode.data.ed)}}
+                        </span>
+
+                        <div ng-show="canEdit(selectedModel)">
+                           <span ng-hide="getSourceModelName(selectedNode.data.ed) !== selectedModel.name"
+                                 class="clickable"
+                                 ng-click="clearFixedValue(selectedNode.data.ed,'default')">Clear default value</span>
+                        </div>
 
                       </span>
 
-
                       <div ng-show="canEdit(selectedModel)">
-                        <div class="clickable"  ng-hide="selectedNode.data.ed.fixedCoding"
-                             ng-click="setFixedValue(selectedNode.data.ed)">Set fixed value
+                        <div class="clickable"
+                             ng-click="setFixedValue(selectedNode.data.ed,'default',selectedNode.data.ed.defaultCoding)">Set/edit default value
                         </div>
                       </div>
-
-
-
                     </td>
                   </tr>
+
 
                   <tr>
                     <td>Source reference</td>
