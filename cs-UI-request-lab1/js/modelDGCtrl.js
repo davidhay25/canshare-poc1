@@ -601,7 +601,8 @@ angular.module("pocApp")
             $scope.isFixedType = function (ed) {
                 if (ed && ed.type) {
                     let type = ed.type[0]       //only look at the first
-                    if (type == 'CodeableConcept' || type == 'decimal' || type == 'string') {
+                    if (type == 'CodeableConcept' || type == 'Quantity' || type == 'Ratio') {
+                        //if (type == 'CodeableConcept' || type == 'decimal' || type == 'string') {
                         return true
                     }
                 }
@@ -663,15 +664,12 @@ angular.module("pocApp")
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editOptionsList.html',
                     backdrop: 'static',
-
                     controller: 'optionsCtrl',
-
                     resolve: {
                         ed: function () {
                             return ed
                         },
                         readOnly : function () {
-
                             return readOnly
                         }
                     }
@@ -679,26 +677,32 @@ angular.module("pocApp")
                 }).result.then(function (updatedEd) {
                     //need to update the .diff in the selected model
 
+                    let found = false
                     let p = $filter('lastInPath')(ed.path)
                     for (const ed1 of $scope.selectedModel.diff) {
                         if (ed1.path == p) {
                             ed1.options = updatedEd.options
+                            found = true
+                            //alert('found')
                             break
                         }
                     }
-/*
-                    //todo - why twice ???
-                    for (const ed1 of $scope.selectedModel.diff) {
-                        if (ed1.name == ed.name) {
-                            ed1.options = updatedEd.options  //this is the model ($localstorage)
-                            break
-                        }
+
+                    if (! found) {
+                        //Need to create an 'override' element and add to the DG
+
+                        //remove the type name
+                        updatedEd.path = $filter('dropFirstInPath')(updatedEd.path)
+                        $scope.selectedModel.diff.push(updatedEd)
+                        //alert('diff added')
                     }
-*/
+
+                    /*
                     modelDGSvc.updateChanges($scope.selectedModel,
                         {edPath:p,
                             msg:`Update options list`},
                         $scope)
+                    */
 
 
                 })
@@ -708,17 +712,37 @@ angular.module("pocApp")
             //todo may be able to use this code for comp as well
             //use for both default and fixed
             //kind is 'fixed' or 'default'
-            $scope.setFixedValue = function(ed,kind,current) {
+            $scope.setFixedValue = function(ed,kind) {
 
                 //figure out the type from the ed
-                let type = 'coding'         //the default
+                let type // = 'Coding'         //the default
+                let current
+
                 switch (ed.type[0]) {
-                    case "string" :
-                        type = 'string'
+                    case "CodeableConcept" :
+                        type = 'Coding'
+                        current = ed.fixedCoding
+                        if (kind == 'default') {
+                            current = ed.defaultCoding
+                        }
+
                         break
-                    case "decimal" :
-                        type = 'decimal'
+                    case "Quantity" :
+                        type = "Quantity"
+                        current = ed.fixedQuantity
+                        if (kind == 'default') {
+                            current = ed.defaultQuantity
+                        }
+
                         break
+                    case "Ratio" :
+                        type = 'Ratio'
+                        current = ed.fixedRatio
+                        if (kind == 'default') {
+                            current = ed.defaultRatio
+                        }
+                        break
+
                 }
 
 
@@ -744,19 +768,33 @@ angular.module("pocApp")
                     let elName
 
                     switch (type) {
-                        case "coding":
+                        case "Coding":
                             elName = "fixedCoding"
                             if (kind == "default") {
                                 elName = "defaultCoding"
                             }
                             break
+                        case "Quantity":
+                            elName = "fixedQuantity"
+                            if (kind == "default") {
+                                elName = "defaultQuantity"
+                            }
+                            break
+                        case "Ratio":
+                            elName = "fixedRatio"
+                            if (kind == "default") {
+                                elName = "defaultRatio"
+                            }
+                            break
+
                     }
 
 
+                    let path = $filter('dropFirstInPath')(ed.path)
 
-                    let ar = ed.path.split('.')  //need to remove the first part of the path
-                    ar.splice(0,1)
-                    let path = ar.join('.')
+                   // let ar = ed.path.split('.')  //need to remove the first part of the path
+                   // ar.splice(0,1)
+                   // let path = ar.join('.')
 
                     //remove the fixedCode from any existing element with this path
                     let found = false
@@ -880,24 +918,34 @@ angular.module("pocApp")
                 */
             }
 
-            //remove the fixed element, but leave the (likely override) in place
+            //remove the fixed or default element, but leave the (likely override) in place
             //as there may have been other parts in that element that were overriden - like multiplicity
-            $scope.clearFixedValue = function(ed) {
-                let ar = ed.path.split('.')  //need to remove the first part of the path
-                ar.splice(0,1)
-                let path = ar.join('.')
+            $scope.clearFixedValue = function(ed,kind) {
+
+                //let elementName = 'fixedCoding'
+
+               // let ar = ed.path.split('.')  //need to remove the first part of the path
+                //ar.splice(0,1)
+                //let path = ar.join('.')
+
+                let path = $filter('dropFirstInPath')(ed.path)
+
 
                 let found
                 for (const ed1 of $scope.selectedModel.diff) {
                     if (ed1.path == path) {
                         found = true
-
+/*
                         modelDGSvc.updateChanges($scope.selectedModel,
                             {edPath:ed1.path, msg:`clear fixed value`},$scope)
 
-
+*/
+                        //This will clear all fixed (or default) elements - though there should only be 1
                         Object.keys(ed).forEach(function (key) {
-                            if (key.substring(0,5) == 'fixed') {
+
+
+                            //if (key.substring(0,5) == 'fixed') {
+                            if (key.substring(0,kind.length) == kind) {
                                 delete ed[key]
                                 delete ed1[key]
                             }

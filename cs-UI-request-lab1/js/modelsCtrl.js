@@ -742,7 +742,7 @@ angular.module("pocApp")
 
 
 
-            //edits some of the attributes of a single ED
+            //edits some of the attributes of a single ED.
             $scope.editDGItem = function (item) {
                 let originalED = {}
                 let isNew = true
@@ -815,7 +815,7 @@ angular.module("pocApp")
                         //If an edit, then need to see if the item is directly defined on the DG (which will be updated),
                         //or whether it is an inherited element, in which case an override element is added...
                         displayPath = $filter('dropFirstInPath')(ed.path)
-
+/*
                         if (ed.type[0] !== originalED.type[0]) {
                             changes += "Type changed. "
                         }
@@ -841,7 +841,7 @@ angular.module("pocApp")
                         if (ed.sourceReference !== originalED.sourceReference) {
                             changes += "Source reference changed."
                         }
-
+*/
                         let found = false
                         //let changes = []    //this is the list of changes
                         //is the path in the DG diff?
@@ -864,21 +864,23 @@ angular.module("pocApp")
                         if (! found) {
                             //The attribute that was edited (eg edscription) is inherited
                             //Need to create an 'override' element and add to the DG
-                            let ar = ed.path.split('.')
-                            ar.splice(0,1)
-                            ed.path = ar.join('.')
+                            ed.path = $filter('dropFirstInPath')(ed.path)
+
+                            //let ar = ed.path.split('.')
+                            //ar.splice(0,1)
+                            //ed.path = ar.join('.')
                             $scope.selectedModel.diff.push(ed)
                         }
 
                         $scope.updateTermSummary()
                     }
-
+/*
 
                     //record that changes were made
                     modelDGSvc.updateChanges($scope.selectedModel,
                         {edPath:ed.path,
                             msg:changes},$scope)
-
+*/
                     //rebuild fullList and re-draw the tree
                     $scope.refreshFullList($scope.selectedModel)
 
