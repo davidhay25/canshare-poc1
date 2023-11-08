@@ -10,6 +10,13 @@ angular.module("pocApp")
             fixedValueText.decimal = "What is the fixed decimal"
 
 
+            $scope.deleteDGDiff = function (inx) {
+                if (confirm("Are you sure you wish to remove this Override? It will be removed from all children (unless they have overriden it)")) {
+                    $scope.selectedModel.diff.splice(inx,1)
+                    $scope.refreshFullList($scope.selectedModel)
+                    $scope.termSelectDG({DGName:$scope.selectedModel.name})
+                }
+            }
 
 
             $scope.hideInQ = function (edIn) {

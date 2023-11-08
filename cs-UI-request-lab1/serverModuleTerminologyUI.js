@@ -343,6 +343,59 @@ function setup(app) {
 
     })
 
+
+    //use when updating a ValueSet
+    app.put('/nzhts/ValueSet',async function(req,res){
+
+
+        let vs = req.body
+        //console.log(vs)
+
+
+        if (vs) {
+
+            let qry = `${nzhtsconfig.serverBase}ValueSet/${vs.id}`
+
+            //console.log(qry)
+
+            let token = await getNZHTSAccessToken()
+            if (token) {
+
+                //var decoded = jwt_decode(token);
+                // let timeToExpire = decoded.exp * 1000 - Date.now()       //exp is in seconds
+                // console.log(timeToExpire / (1000 * 60 *60 ));
+
+                let config = {headers:{authorization:'Bearer ' + token}}
+                config['content-type'] = "application/fhir+json"
+
+                axios.put(qry,req.body,config).then(function(data) {
+                    res.json(data.data)
+                }).catch(function(ex) {
+                    if (ex.response) {
+                        console.log("Status code:",ex.response.status)
+                        console.log("err",ex.response.data)
+                        res.status(ex.response.status).json(ex.response.data)
+                    } else {
+                        res.status(500).json(ex)
+                    }
+                })
+            } else {
+                res.status(ex.response.status).json({msg:"Unable to get Access Token."})
+            }
+        } else {
+            res.status(400).json({msg:"Must have urlencoded qry query"})
+
+        }
+
+
+
+
+
+        //res.send(token)
+
+    })
+
+
     //return a list of Q where a particular ValueSet is used
     //todo - this might be useful in the designer
     app.get('/term/findQusingVS',async function (req,res) {

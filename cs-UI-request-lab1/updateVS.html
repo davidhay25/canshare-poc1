@@ -14,6 +14,12 @@
     <link rel="stylesheet" type="text/css" href="css/common.css"/>
     <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
 
+    <style>
+        .retired {
+            background-color: lightsalmon;
+        }
+    </style>
+
     <script>
         angular.module("pocApp",['ui.bootstrap','ui.checkbox',"firebase"]).config(function($locationProvider) {
             $locationProvider.html5Mode(true);
@@ -87,7 +93,7 @@
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
         <div class="container-fluid">
-            <div class="col-md-6">
+            <div class="col-md-5">
                     <span>
                         <a class="navbar-brand" href="#">
                             Update ValueSet
@@ -96,9 +102,9 @@
 
             </div>
 
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <div class="navbar-text">
-                    Admin only
+                    Number of ValueSets:
                     <span class="badge">{{allVSItem.length}}</span>
                 </div>
 
@@ -151,7 +157,12 @@
         <div class="col-md-3">
 
             <div class="row">
-                <div class="col-md-12">
+
+                <div class="col-md-6">
+                    <checkbox ng-model="input.onlyRetired"></checkbox> Only retired
+                </div>
+
+                <div class="col-md-6">
                     <button class="btn-link btn pull-right" ng-click="createNew()">New</button>
                 </div>
             </div>
@@ -162,7 +173,7 @@
                     <br/>
                     <div class="myScroll">
                         <div class="list-group">
-                            <div ng-class="{'list-group-item':true,listItemSelected:selectedItem==item}"
+                            <div ng-class="{'list-group-item':true,listItemSelected:selectedItem==item,retired:item.vs.status == 'retired'}"
                                  ng-show="showVS(item)"
                                  style="cursor: pointer" ng-repeat="item in allVSItem" ng-click="selectVSItem(item)">
                                 {{item.display}}
@@ -170,14 +181,8 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
-
             </div>
-
-
-
-
         </div>
 
 
@@ -188,8 +193,9 @@
             </div>
             <div>
                 <button ng-show = "user && user.email && canSave()" class="btn btn-danger pull-right">
-                    <span ng-show="isNew">Save new VS</span>
-                    <span ng-hide="isNew">Update</span>
+                    <span ng-show="isNew" ng-click="newVS()">Save new VS</span>
+                    <span ng-hide="isNew" ng-click="updateVS(selectedVS)">Update</span>
+
                 </button>
             </div>
             <uib-tabset>
@@ -246,15 +252,25 @@
 
 
                 </uib-tab>
-                <uib-tab heading="Form">
+                <uib-tab heading="Edit Form">
                     <table class="table">
                         <tr>
                             <td>Id</td>
                             <td>
                                 <input type="text"
                                        ng-disabled="! isNew"
-                                       ng-change = makeVS()
+                                       ng-blur = checkNewVS(input.id)
                                        class="form-control" ng-model="input.id"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Status</td>
+                            <td>
+                                <select ng-model="input.status" class="form-control" ng-change = makeVS()>
+                                    <option value="active">Active</option>
+                                    <option value="retired">Retired</option>
+                                </select>
                             </td>
                         </tr>
 
