@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc) {
 
-            $scope.version = "0.5.3"
+            $scope.version = "0.5.4"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -63,7 +63,6 @@ angular.module("pocApp")
                 }
 
             })
-
 
 
 
@@ -1180,8 +1179,9 @@ angular.module("pocApp")
 
             $scope.newComposition = function() {
 
-                let name = prompt("What is the name (no spaces, & must be unique)")
-                if (name) {
+                let title = prompt("What is the name (no spaces, & must be unique)")
+                if (title) {
+                    let name = title.replace(/\s/g, '') //remove any spaces
 
                     modelsSvc.isUniqueNameOnLibrary(name,'comp').then(
                         function () {
@@ -1190,7 +1190,7 @@ angular.module("pocApp")
                             let isUnique =  ! $scope.hashAllCompositions[name]
 
                             if (isUnique) {
-                                let newComp = {kind:'comp', name:name, title:name, sections:[]}
+                                let newComp = {kind:'comp', name:name, title:title, sections:[]}
                                 newComp.checkedOut = $scope.user.email
 
                                 //save a copy to the Library (a we do with DGs)
@@ -1260,7 +1260,6 @@ angular.module("pocApp")
                             newModel.author = $scope.user.email
 
                             librarySvc.checkOut(newModel,$scope.user)
-
                         }
 
 
@@ -1358,6 +1357,7 @@ angular.module("pocApp")
 
                 let rootNodeId = $scope.allCompElements[0].path
                 let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
+
                 //temp - not sure this is correct$scope.treeData = treeData      //used in the Q builder
 
 

@@ -68,7 +68,7 @@
             <div class="col-md-2 col-sm-2">
                     <span>
                         <a class="navbar-brand" href="#">
-                            Query
+                            Query Terminology Server
                         </a>
                     </span>
 
@@ -81,12 +81,6 @@
             </div>
             <div class="col-md-2">
                 <div class="navbar-text">
-                    <!--
-                    <select class="form-control" ng-model="svr" ng-change="selectServer(svr)"
-                            ng-options="svr.display for svr in allServers">
-
-                    </select>
-                    -->
 
 
                 </div>
@@ -94,9 +88,13 @@
 
             <div class="col-md-4">
                 <div class="navbar-text">
-                    <!--
-                    {{selectedServer.url}}
-                    -->
+
+                   <select class="form-control pull-left"
+                           ng-change="changeInstance(input.tsInstance)"
+                           ng-model="input.tsInstance">
+                       <option value="authoring">Authoring Instance</option>
+                       <option value="prod">Production Instance</option>
+                   </select>
                 </div>
             </div>
 
@@ -795,209 +793,10 @@
         </uib-tab>
 
 
-        <uib-tab ng-show="false" heading="ConceptMap">
-            <!-- This was an experimental generate and save routine. To be removed-->
-            <br/>
-            <div>
-                <a href="http://hl7.org/fhir/R4B/conceptmap.html" target="_blank" class="btn-link btn pull-right">ConceptMap in spec</a>
-                <a href="http://hl7.org/fhir/R4B/conceptmap-operation-translate.html" target="_blank" class="btn-link btn pull-right">Translate in spec</a>
-                <a href="https://terminology.hl7.org/SNOMEDCT.html" target="_blank" class="btn-link btn pull-right">SNOMED & FHIR in spec</a>
-                <a href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/view#gid=245875863" target="_blank" class="btn-link btn pull-right">Linda's spreadsheet</a>
-
-            </div>
-
-            <div class="row">
-                <div class="col-md-4">
-
-                    <div class="row">
-                        <div class="col-md-2">
-                            Examples
-                        </div>
-                        <div class="col-md-4">
-                            <select class="form-control" ng-model="selectedExample"
-                                    ng-change="setExample(selectedExample)"
-                                    ng-options = "opt.display for opt in examples">
-
-                            </select>
-                        </div>
-                    </div>
-                    <hr/>
-
-                    <div class="row">
-                        <div class="col-md-2">
-                            Id
-                        </div>
-                        <div class="col-md-4">
-                            <input class="form-control" type="text" ng-model="input.id"/>
-                        </div>
-                        <div class="col-md-6">
-                            The Id of the map
-                        </div>
-                    </div>
-                    <br/>
-                    <div class="row">
-                        <div class="col-md-2">
-                            source
-                        </div>
-                        <div class="col-md-4">
-                            <input class="form-control" type="text" ng-model="input.source"/>
-                        </div>
-                        <div class="col-md-1">
-                            <i class="glyphicon glyphicon-info-sign clickable" ng-click="lookup(input.target)"></i>
-                        </div>
-                        <div class="col-md-5">
-                            The thing to be returned (eg VS)
-                        </div>
-                    </div>
-
-                    <hr/>
-                    <div class="row">
-                        <div class="col-md-2">
-                            Target
-                        </div>
-                        <div class="col-md-4">
-                            <input class="form-control" type="text" ng-model="input.target"/>
-                        </div>
-                        <div class="col-md-1">
-                            <i class="glyphicon glyphicon-info-sign clickable" ng-click="lookup(input.target)"></i>
-                        </div>
-                        <div class="col-md-5">
-                            The thing to be returned (eg VS)
-                        </div>
-                    </div>
-
-                    <hr/>
-                    <div class="row">
-                        <div class="col-md-2">
-                            First dependency
-                        </div>
-                        <div class="col-md-4">
-                            <input class="form-control" type="text" ng-model="input.dep1"/>
-                        </div>
-                        <div class="col-md-1">
-                            <i class="glyphicon glyphicon-info-sign clickable" ng-click="lookup(input.dep1)"></i>
-                        </div>
-                        <div class="col-md-5">
-                            The first dependency eg service
-                        </div>
-                    </div>
-                    <br/>
-                    <div class="row">
-                        <div class="col-md-2">
-                            First property
-                        </div>
-                        <div class="col-md-9">
-                            <input class="form-control" type="text" ng-model="input.prop1"/>
-                            <div>The first dependency property</div>
-                        </div>
-                        <div class="col-md-1">
-                            <i class="glyphicon glyphicon-info-sign clickable" ng-click="lookup(input.prop1)"></i>
-                        </div>
-
-                    </div>
-
-                    <hr/>
-                    <div class="row">
-                        <div class="col-md-2">
-                            Second dependency
-                        </div>
-                        <div class="col-md-4">
-                            <input class="form-control" type="text" ng-model="input.dep2"/>
-
-                        </div>
-                        <div class="col-md-6">
-                            The second dependency eg tumour type
-                        </div>
-                    </div>
-
-                    <br/>
-                    <div class="row">
-                        <div class="col-md-2">
-                            second dep.  property
-                        </div>
-                        <div class="col-md-10">
-                            <input class="form-control" type="text" ng-model="input.prop2"/>
-                            <div>The second dependency property</div>
-                        </div>
-
-                    </div>
-                    <br/>
-
-                    <button class="btn btn-link" ng-click="generateMapAndTranslate()">Generate ConceptMap & example translate call</button>
-                    <div>
-                        <button class="btn btn-link" ng-click="generateMap()">Generate ConceptMap only</button>
-                    </div>
-
-                    <div>
-                        <button class="btn btn-link" ng-click="generateTranslate()">Generate translate call only</button>
-                    </div>
 
 
-
-                </div>
-                <div class="col-md-8">
-
-
-
-                    <div class="row">
-                        <div class="col-md-6">
-
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <button class="btn btn-link" ng-click="downloadMap()">Get current map</button>
-                                </div>
-                                <div class="col-md-6">
-                                    <button ng-show="cm" class="btn btn-link pull-right" ng-click="uploadMap()">Upload</button>
-                                </div>
-                            </div>
-
-
-
-                            <pre ng-show="cm">{{cm | json}}</pre>
-                        </div>
-                        <div class="col-md-6">
-
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                </div>
-                                <div class="col-md-6">
-
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <button class="btn btn-link pull-right" ng-click="executeTranslate()">Execute translate</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <uib-tabset>
-                                <uib-tab heading="Query">
-                                    <pre ng-show="parameters">{{parameters | json}}</pre>
-                                </uib-tab>
-                                <uib-tab heading="Result">
-                                    <pre>{{response | json}}</pre>
-                                </uib-tab>
-                            </uib-tabset>
-
-
-
-
-                        </div>
-                    </div>
-
-
-
-                </div>
-            </div>
-
-        </uib-tab>
-
-
-        <uib-tab heading="General queries">
+        <!-- Hide for the moment. May move to a separate app -->
+        <uib-tab ng-show="false" heading="General queries">
             <br/>
             <em>These are queries against the CanShare FHIR server</em>
             <div class="row">
@@ -1061,159 +860,6 @@
 
 
 
-        </uib-tab>
-
-        <uib-tab ng-show="false" heading="ValueSet explorer">
-            <div class="row">
-                <div class="col-md-3">
-                    <br/>
-                    <label>Type of ValueSet</label>
-                    <div>
-                        <select class="form-control" ng-model="vsType"
-                                ng-disabled="vsCustom.length > 0"
-                                ng-options = "option.display for option in vsTypes">
-                            <option></option>
-
-                        </select>
-                    </div>
-                    <br/>
-                    <label>Tumour type</label>
-                    <div>
-                        <select class="form-control" ng-model="vsTumourType"
-                                ng-disabled="vsCustom.length > 0"
-                                ng-options = "option.display for option in vsTumourTypes">
-                            <option></option>
-                        </select>
-                    </div>
-
-                    <br/>
-                    <label>Custom Search</label>
-                    <input type="text" class="form-control" ng-model="vsCustom"/>
-
-
-
-
-
-                    <br/>
-                    <div>
-                        <button class="btn-primary btn pull-right" ng-click="findVS(vsType,vsTumourType,vsCustom)">Find</button>
-                    </div>
-
-                    <br/> <br/>
-                    <label>Saved queries</label>
-                    <br/> <br/>
-                    <ul class="list-unstyled">
-                        <li ng-repeat="qry in localStorage.vsQuery">
-                            <div class="clickable" ng-click="findVS(null,null,qry)">
-                                {{qry}}
-                            </div>
-
-                        </li>
-                    </ul>
-
-                </div>
-                <div class="col-md-9">
-                    <div ng-show="query" class="rounded-box">Query: {{query}}</div>
-                    <br/>
-
-                    <div ng-show="oo">
-                        <div class="alert alert-danger">
-                            <pre>{{oo | json}}</pre>
-                        </div>
-
-                    </div>
-
-                    <div ng-hide="oo" class="row">
-                        <div class="col-md-3">
-                            <div class="myScroll">
-                                <div class="list-group">
-                                    <div ng-class="{'list-group-item':true,listItemSelected:selectedVS.id == entry.resource.id}"
-                                         ng-click="selectVS(entry.resource)"
-                                         style="cursor: pointer"
-                                         ng-repeat="entry in vsBundle.entry">
-                                        {{entry.resource.title || getLastPartOfUrl(entry.resource.url)}}
-                                    </div>
-                                </div>
-                            </div>
-
-
-                        </div>
-                        <div class="col-md-9" ng-show="selectedVS">
-                            <div class="banner">{{selectedVS.url}}</div>
-                            <uib-tabset>
-                                <uib-tab heading="Json">
-                                    <pre>{{selectedVS | json}}</pre>
-                                </uib-tab>
-                                <uib-tab heading="Expand">
-                                    <br/>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <input type="text" placeholder="Filter text" class="form-control" ng-model="filter"/>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <button class="btn-primary btn" ng-click="expandVS(selectedVS,filter)">Expand</button>
-                                        </div>
-                                    </div>
-                                    <br/>
-                                    <pre ng-show="ooExpand">{{ooExpand | json}}</pre>
-
-                                    <uib-tabset ng-show="vsExpanded">
-                                        <uib-tab heading="List">
-                                            <table class="table table-condensed">
-                                                <tr ng-repeat="concept in vsExpanded.expansion.contains">
-                                                    <td>{{concept.display}}</td>
-                                                    <td>{{concept.code}}</td>
-                                                    <td>{{concept.system}}
-                                                        <div>{{concept.version}}</div>
-                                                    </td>
-
-                                                </tr>
-                                            </table>
-                                        </uib-tab>
-                                        <uib-tab heading="Json">
-                                            <pre >{{vsExpanded.expansion | json}}</pre>
-                                        </uib-tab>
-                                    </uib-tabset>
-
-
-
-
-                                </uib-tab>
-                            </uib-tabset>
-
-
-                        </div>
-
-
-
-                    </div>
-
-                </div>
-            </div>
-        </uib-tab>
-
-        <uib-tab heading="Make ConceptMap">
-            <em>This is just a temp tab</em>
-
-            <div ng-controller="makeCMCtrl">
-                 <textarea class="form-control" ng-model="input.ssCM">
-
-                </textarea>
-                <button class="btn btn-link" ng-click="makeCM(input.ssCM)">Make CM</button>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <pre>{{CM | json}}</pre>
-
-                    </div>
-                    <div class="col-md-6">
-
-
-
-                    </div>
-                </div>
-
-            </div>
         </uib-tab>
 
 

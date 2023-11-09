@@ -1,10 +1,33 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('modelCompositionCtrl',
-        function ($scope,$uibModal,$timeout,librarySvc) {
+        function ($scope,$uibModal,$timeout,librarySvc,modelsSvc) {
 
 
             $scope.compositionKind = ['request','report','general']
+
+            $scope.cloneComp = function (comp) {
+                let title = prompt("What title should the new Composition have? (leave blank to cancel)")
+                let name
+                if (title) {
+                    name = title.replace(/\s/g, '') //remove any spaces
+
+                    modelsSvc.isUniqueNameOnLibrary(name,'comp').then(
+                        function () {
+                            let newComp = angular.copy(comp)
+                            newComp.name = name
+                            newComp.title = title
+                            newComp.checkedOut = $scope.user.email
+                            //save a copy to the Library (as we do with DGs)
+                            librarySvc.checkOut(newComp,$scope.user)
+                            $scope.hashAllCompositions[newComp.name] = newComp
+                            $scope.selectComposition(newComp)
+                        }, function() {
+                            alert(`Sorry, this name (${name}) is not unique`)
+                        }
+                    )
+                }
+            }
 
             $scope.canEditComp = function (comp) {
                 if ($scope.user && $scope.user.email) {
@@ -13,6 +36,8 @@ angular.module("pocApp")
                     }
                 }
             }
+
+
 
             $scope.revert = function () {
                 if (confirm("Are you sure you wish to revert this Composition? Any changes will be lost.")){

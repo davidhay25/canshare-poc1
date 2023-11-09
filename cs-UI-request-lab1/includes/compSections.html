@@ -43,10 +43,15 @@
             <input type="text" placeholder="Title"
                    class="form-control" ng-model="local.sectionTitle"/>
           </div>
+          <div>
+            <input type="text" placeholder="Cardinality (default 0..1)"
+                   class="form-control" ng-model="local.sectionMultiplicity"/>
+          </div>
         </div>
         <div class="col-md-2">
           <button ng-show="local.sectionName"
-                  class="btn-link btn" ng-click="addSection(local.sectionName,local.sectionTitle)">Add</button>
+                  class="btn-link btn"
+                  ng-click="addSection(local.sectionName,local.sectionTitle,local.sectionMultiplicity)">Add</button>
         </div>
       </div>
 
@@ -54,6 +59,35 @@
 
     </div>
     <div class="col-md-4" ng-show="selectedSection">
+
+      <div class="banner">Section details</div>
+
+      <div class="row">
+        <div class="col-md-2"><div style="padding-top: 8px">Name</div></div>
+        <div class="col-md-10">
+          <input type="text" disabled="disabled"
+                 class="form-control" ng-model="selectedSection.name"/>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-2"><div style="padding-top: 8px">Title</div></div>
+        <div class="col-md-10">
+          <input type="text" ng-disabled = "! canEditComp(selectedComposition)"
+                 class="form-control" ng-model="selectedSection.title"/>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-2"><div style="padding-top: 8px">Card.</div></div>
+        <div class="col-md-10">
+          <input type="text" ng-disabled = "! canEditComp(selectedComposition)" class="form-control" ng-model="selectedSection.mult"/>
+        </div>
+      </div>
+
+
+      <br/>
+
       <div class="banner">DGs in section</div>
 
 

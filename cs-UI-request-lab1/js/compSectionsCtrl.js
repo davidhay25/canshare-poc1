@@ -176,7 +176,7 @@ angular.module("pocApp")
 
             //select a section item
             $scope.selectItem = function (item) {
-                //clear()
+
                 delete $scope.fullElementListPossible
                 delete $scope.selectedNewDG
                 $scope.selectedItem = item
@@ -188,18 +188,19 @@ angular.module("pocApp")
 
                 $scope.filteredElementList = modelCompSvc.filterList(lst,true)
 
-
-
             }
 
-            $scope.addSection = function (name,title) {
+            $scope.addSection = function (name,title,mult) {
                 title = title || name
+                mult = mult || '0..1'
+                name = name.replace(/\s/g, '') //remove any spaces
+
+
                 $scope.selectedComposition.sections = $scope.selectedComposition.sections || []
-                $scope.selectedComposition.sections.push({kind:'section',name:name,title:title,mult:'0..1',items:[]})
+                $scope.selectedComposition.sections.push({kind:'section',name:name,title:title,mult:mult,items:[]})
                 delete $scope.local.sectionName
                 delete $scope.local.sectionTitle
                 $scope.selectComposition($scope.selectedComposition)  //in modelCtrl
-
             }
 
             $scope.addSectionItem = function (dg) {
@@ -222,8 +223,6 @@ angular.module("pocApp")
 
                     let item = {name:name,title:dg.name,mult:'0..1'}
                     item.type = [dg.name]
-
-
 
                     $scope.selectedSection.items.push(item)
                     $scope.selectComposition($scope.selectedComposition)  //in modelCtrl

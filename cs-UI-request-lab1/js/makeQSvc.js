@@ -3,6 +3,7 @@ angular.module("pocApp")
     .service('makeQSvc', function($http) {
 
         let config = {}
+        let nzHTSPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/"
 
 
         //given an ed, return the control type and hine
@@ -88,14 +89,49 @@ angular.module("pocApp")
             }
 
 
-
             switch (vo.controlHint) {
                 case 'drop-down' :
                     //populate the answerOption. Get it from 'options' if set, otherwise the vs
                     item.answerOption = []
 
 
-                    //do the options first...
+                    if (ed.valueSet) {
+                        //if there's a valueSet, then tru to expand it
+                        let vsUrl = ed.valueSet
+                        if (vsUrl.indexOf('http') == -1) {
+                            //if there's no preceeding http then assume this is HTS and pre-pend the url
+                            vsUrl = nzHTSPrefix + vsUrl
+                        }
+
+
+
+                        let qry = `ValueSet/$expand?url=${vsUrl}&_summary=false`
+                        let encodedQry = encodeURIComponent(qry)
+
+                        $http.get(`nzhts?qry=${encodedQry}`).then(
+                            function (data) {
+                                let expandedVS = data.data
+                                for (const concept of expandedVS.expansion.contains) {
+                                    item.answerOption.push(
+                                        {valueCoding:{system:concept.system, code:concept.code, display:concept.display}})
+                                }
+                                console.log(data.data)
+
+
+                            }, function (err) {
+                                item.answerOption.push({valueCoding:{display:"VS not found"}})
+                                console.log(`There was no ValueSet with the url:${ed.valueSet}`)
+                            }
+                        )
+
+                    } else if (ed.options){
+                        for (const option of ed.options) {
+                            item.answerOption.push({valueCoding:{code:option.code,display:option.display}})
+                        }
+                    }
+
+/*
+                    //do the ValueSet first...
                     if (ed.options) {
                         for (const option of ed.options) {
                             item.answerOption.push({valueCoding:{code:option.code,display:option.display}})
@@ -123,7 +159,7 @@ angular.module("pocApp")
 
 
                     }
-
+*/
 
 
 
@@ -358,7 +394,7 @@ angular.module("pocApp")
                 //let currentPathRoot
                 let topGroup = makeGroup({title:'',path:dgName})
                 let group = topGroup
-                //let group = section
+
 
                 let processingDGPath = null     //When processing a group, what the path of that group is
                 lstQElements.forEach(function (ed) {

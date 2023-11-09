@@ -1,0 +1,56 @@
+
+<div>
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-8 col-sm-8">
+        <h3 class="modal-title">
+          Name and description
+        </h3>
+      </div>
+
+
+      <div class="col-md-4 col-sm-4">
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+        <button ng-show = "input.name"
+                class="btn btn-primary pull-right" ng-click="save()">Close</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="modal-body">
+
+    <div class="row">
+      <div class="col-sm-3 col-md-3">
+        Title
+      </div>
+      <div class="col-sm-9 col-md-9">
+        <input type="text" ng-change="setName(input.title)" class="form-control" ng-model="input.title" autofocus/>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-3 col-md-3">
+        Name
+      </div>
+      <div class="col-sm-9 col-md-9">
+        <input type="text" class="form-control" ng-model="input.name" autofocus/>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-3 col-md-3">
+        Description
+      </div>
+      <div class="col-sm-9 col-md-9">
+        <input type="text" class="form-control" ng-model="input.description"/>
+      </div>
+    </div>
+
+
+  </div>
+  <div class="modal-header">
+
+  </div>
+</div>

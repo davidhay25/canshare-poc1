@@ -16,6 +16,11 @@
           <strong>Source reference</strong>: {{selectedModel.sourceReference}}
         </div>
       </div>
+
+      <div ng-show="user.email">
+        <div class="clickable" ng-click="cloneDG(selectedModel)">Make a copy</div>
+      </div>
+
       <br/>
       <div>
 
@@ -1199,15 +1204,17 @@
       <em>The element definitions in the .diff element. ie directly defined in the DG. The Json has the complete model.</em>
       <br/><br/>
       <table class="table-condensed table table-bordered">
-        <tr><th>Path</th><th>Title</th><th>Description</th><th>Card.</th><th>Type</th></tr>
+        <tr><th>Path</th><th>Title</th><th>Description</th><th>Card.</th><th>Type</th><th></th></tr>
         <tr ng-repeat="ed in selectedModel.diff">
           <td>{{ed.path}}</td>
           <td>{{ed.title}}</td>
           <td>{{ed.description}}</td>
           <td>{{ed.mult}}</td>
           <td>{{ed.type[0]}}</td>
-          <td><i class="btn btn-link glyphicon glyphicon-remove clickable"
-                 ng-click="deleteDGDiff($index)"></i></td>
+          <td>
+            <i ng-show="canEdit(selectedModel)" class="btn btn-link glyphicon glyphicon-remove clickable"
+                 ng-click="deleteDGDiff($index)"></i>
+          </td>
         </tr>
       </table>
     </uib-tab>

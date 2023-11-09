@@ -6,13 +6,14 @@ angular.module("pocApp")
 
             $scope.input = {}
 
+            $scope.input.tsInstance = "authoring"
+
             $scope.languages = []       //languages that can be used for the expansion
             $scope.languages.push({display:"Default",code:""})
             $scope.languages.push({display:"CanShare",code:"en-x-sctlang-23162100-0210105"})
 
 
             let nzDisplayLanguage = "en-x-sctlang-23162100-0210105"
-
 
             let termServer = "https://r4.ontoserver.csiro.au/fhir/"
             let snomed = "http://snomed.info/sct"
@@ -22,12 +23,7 @@ angular.module("pocApp")
             // =============================================== functions to support ConceptMap work =================
 
             $scope.input.cmOptions = {}         //options by property
-/*
-            $timeout(function () {
-                $scope.lookup ("394593009",snomed)
 
-            },500)
-*/
             $scope.input.excludeHL7 = true
             $scope.input.onlyCanShare = true
             $scope.input.loadComplete = true
@@ -347,22 +343,6 @@ console.log($scope.allTargets)
             }
 
 
-
-
-            $scope.setExampleDEP = function(example) {
-                $scope.input.id = example.id
-                $scope.input.target = example.target
-                $scope.input.source = example.source
-                $scope.input.prop1 = example.prop1
-                $scope.input.dep1 = example.dep1
-
-                $scope.input.prop2 = example.prop2
-                $scope.input.dep2 = example.dep2
-
-                $scope.generateMapAndTranslate()
-
-            }
-
             $scope.selectQfromVSList = function(Q) {
                 $scope.selectedQ = Q
                 $scope.dummyQR = {}
@@ -440,57 +420,10 @@ console.log($scope.allTargets)
 
 
 
-
-
-
-
-
-
-
-            //Generate the example translate parameters
-            $scope.generateTranslateDEP = function() {
-                $scope.parameters = {resourceType:"Parameters", parameter:[]}
-
-                //the conceptmap url
-                $scope.parameters.parameter.push({name:"url",valueUri:`http://canshare.co.nz/fhir/ConceptMap/${$scope.input.id}`})
-
-                //? no code to be translated is needed
-
-                //add the target - what we are looking for. This is in the group.elements.target.code
-                let thingWeWant = {system:"http://snomed.info/sct",code:$scope.input.source}
-                $scope.parameters.parameter.push({name:"coding",valueCoding:thingWeWant})
-
-                //the dependency
-                if ( $scope.input.dep1) {
-                    let depParam1 = {name:"dependency",part :[]}
-                    $scope.parameters.parameter.push(depParam1)
-                    let part1 = {"name":"element","valueUri":$scope.input.prop1}
-                    depParam1.part.push(part1)
-                    let ccValue = {coding:[{system:snomed,code:$scope.input.dep1}]}
-                    let part2 = {"name":"concept","valueCodeableConcept":ccValue}
-                    depParam1.part.push(part2)
-                }
-
-                if ( $scope.input.dep2) {
-                    let depParam2 = {name:"dependency",part :[]}
-                    $scope.parameters.parameter.push(depParam2)
-                    let part1 = {"name":"element","valueUri":$scope.input.prop2}
-                    depParam2.part.push(part1)
-                    let ccValue = {coding:[{system:snomed,code:$scope.input.dep2}]}
-                    let part2 = {"name":"concept","valueCodeableConcept":ccValue}
-                    depParam2.part.push(part2)
-                }
-
-
-            }
-
-
-
             // ========================== end of conceptmap functions ====================
 
             //$scope.allVSItem = []      //this will be list of Valuesets. todo ?retrieve from server
             //$scope.allVSItem.push({display:"Data Absent Reasons",url:"https://nzhts.digital.health.nz/fhir/ValueSet/canshare-data-absent-reason"})
-
 
             $scope.vsAnalysis = function () {
                 let url = "/analyseVS"
@@ -501,7 +434,6 @@ console.log($scope.allTargets)
                     }
                 )
             }
-
 
             $scope.expandFromAnalysisVS = function (url) {
                 delete $scope.expandedVSFromAnalysisVS
@@ -548,13 +480,29 @@ console.log($scope.allTargets)
             $scope.showLoadingMessage = true
 
 
-            querySvc.getValueSets().then(
+            //select a different instance of the Terminology server
+            $scope.changeInstance = function (tsInstance) {
+                delete $scope.allVSItem
+                querySvc.getValueSets(tsInstance).then(
+                    function (ar) {
+                        $scope.allVSItem = ar
+                        //console.log(ar)
+                        delete $scope.showLoadingMessage
+                    }
+                )
+            }
+
+            $scope.changeInstance($scope.input.tsInstance)
+
+            /*
+            querySvc.getValueSets($scope.input.tsInstance).then(
                 function (ar) {
                     $scope.allVSItem = ar
                     //console.log(ar)
                     delete $scope.showLoadingMessage
                 }
             )
+            */
 
 
 
@@ -597,18 +545,16 @@ console.log($scope.allTargets)
                 delete $scope.qUsingVS
                 delete $scope.dummyQR
 
-                //let qry = `ValueSet.item.vs.id`
-                let qry = `ValueSet?url=${item.vs.url}&_summary=false`
-               // qry += "&_summary=false"
 
-                //let qry = `ValueSet/$expand?url=${item.url}&_summary=false`
+                let qry = `ValueSet?url=${item.vs.url}&_summary=false`
+                let config = {headers:{'x-ts-instance':$scope.input.tsInstance}}
 
 
                 console.log(qry)
                 $scope.termServerQuery = qry
                 let encodedQry = encodeURIComponent(qry)
                 $scope.showWaiting = true
-                $http.get(`nzhts?qry=${encodedQry}`).then(
+                $http.get(`nzhts?qry=${encodedQry}`,config).then(
                     function (data) {
                        // $scope.selectedVS = data.data
 

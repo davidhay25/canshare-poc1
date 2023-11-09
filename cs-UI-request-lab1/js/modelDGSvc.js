@@ -182,20 +182,22 @@ angular.module("pocApp")
                 })
 
                 ar.sort(function (a,b) {
-                    if (a.title > b.title) {
+                    let aTitle = a.title || a.name
+                    let bTitle = b.title || b.name
+                    if (aTitle.toLowerCase() > bTitle.toLowerCase()) {
                         return 1
                     } else { return -1}
                 })
 
                 ar.forEach(function (dg) {
-                //Object.keys(hashAllDG).forEach(function (key) {
-                  //  let dg = hashAllDG[key]
                     let text = dg.title || dg.name
                     let parent = dg.parent || "root"
-                   // console.log(text,parent)
                     let node = {id:dg.name,text:text,parent:parent,data:{dg:dg}}
                     treeData.push(node)
                 })
+
+                //sort by
+
 
                 return {treeData:treeData}
 

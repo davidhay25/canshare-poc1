@@ -9,6 +9,49 @@ angular.module("pocApp")
             fixedValueText.string = "What is the fixed string"
             fixedValueText.decimal = "What is the fixed decimal"
 
+            $scope.cloneDG = function (dg) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/getName.html',
+                    //backdrop: 'static',
+                    //size : 'lg',
+                    controller: 'getNameCtrl',
+                    resolve: {
+                        kind: function () {
+                            return "dg"
+                        }
+                    }
+
+                }).result.then(function (vo) {
+                    modelsSvc.isUniqueNameOnLibrary(vo.name,'dg').then(
+                        function () {
+                            let newDG = angular.copy(dg)
+                            newDG.name = vo.name
+                            newDG.title = vo.title
+                            newDG.description = vo.description
+                            newDG.checkedOut = $scope.user.email
+                            newDG.author = $scope.user.email
+
+                            //save a copy to the Library (as we do with DGs). As it's new, it won't be downloaded
+                            librarySvc.checkOut(newDG,$scope.user)
+
+                            $scope.hashAllDG[newDG.name] = newDG
+                            $scope.$emit('updateDGList',newDG.name)
+
+                            //$scope.selectModel(newDG)      //in modelsCtrl
+
+                        }, function() {
+                            alert(`Sorry, this name (${vo.name}) is not unique`)
+                        }
+                    )
+
+
+                })
+
+
+
+
+            }
+
 
             $scope.deleteDGDiff = function (inx) {
                 if (confirm("Are you sure you wish to remove this Override? It will be removed from all children (unless they have overriden it)")) {

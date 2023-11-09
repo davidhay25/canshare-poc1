@@ -290,16 +290,20 @@ angular.module("pocApp")
                     return deferred.promise
                 },
 
-                getValueSets : function () {
+                getValueSets : function (tsInstance) {
                     //return a list of subsetted canshare valuesets
+                    //ts instance is 'authoring' or 'prod' and determines which instance of the TS is used for the query
                     let deferred = $q.defer()
 
-                    let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&status=active&_sort=title`
+                    //let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&status=active&_sort=title`
+
+                    let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&_sort=title`
 
 console.log(qry)
                     let encodedQry = encodeURIComponent(qry)
+                    let config = {headers:{'x-ts-instance':tsInstance}}
 
-                    $http.get(`nzhts?qry=${encodedQry}`).then(
+                    $http.get(`nzhts?qry=${encodedQry}`,config).then(
                         function (data) {
                             let bundle = data.data
                             if (bundle && bundle.entry) {

@@ -30,6 +30,12 @@
                   ng-hide = "selectedComposition.checkedOut == user.email"
                   ng-click="deleteComposition(selectedComposition)">Remove from local store.</button>
         </div>
+      <div>
+        <button class="btn btn-link"
+                ng-show = "user.email"
+                ng-click="cloneComp(selectedComposition)">Make a copy of this Composition</button>
+      </div>
+
     </div>
     <div class="col-md-5">
 
@@ -119,6 +125,15 @@
 
                 <div class="row">
                   <div class="col-md-3">
+                    Kind
+                  </div>
+                  <div class="col-md-9">
+                    {{selectedCompositionNode.data.ed.kind}}
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-3">
                     Appears in Q
                   </div>
                   <div class="col-md-9">
@@ -131,6 +146,10 @@
                   </div>
                 </div>
 
+                <div ng-show = "selectedCompositionNode.data.ed.kind == 'section'">
+                  >>>> section
+                </div>
+
               <div class="row" ng-show="selectedCompositionNode.data.ed.parent">
                 <div class="col-md-3">
                   Parent
@@ -141,14 +160,7 @@
               </div>
 
 
-                <div class="row">
-                  <div class="col-md-3">
-                    Kind
-                  </div>
-                  <div class="col-md-9">
-                    {{selectedCompositionNode.data.ed.kind}}
-                  </div>
-                </div>
+
 
                 <div class="row" ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
                   <div class="col-md-3">
