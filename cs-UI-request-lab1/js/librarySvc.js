@@ -108,6 +108,15 @@ angular.module("pocApp")
                 let config = {headers:{'x-user-email': user.email}}
                 $http.put(url,model,config).then(
                     function (data) {
+
+                        //console.log(angular.toJson(data.data))
+                        //console.log(angular.toJson(model))
+
+                        if (angular.toJson(data.data) !== angular.toJson(model)) {
+                            alert("The resource saved does not match the resource returned. Please contact support")
+                            //console.log()
+                        }
+
                       //  alert("Resource has been checked in")
                         if (vo) {
                             vo()

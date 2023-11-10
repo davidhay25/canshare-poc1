@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc) {
 
-            $scope.version = "0.5.4"
+            $scope.version = "0.5.5"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -20,7 +20,7 @@ angular.module("pocApp")
             $scope.world = $localStorage.world
 
             let size = modelsSvc.getSizeOfObject($scope.world)
-            console.log(`Size of world: ${size/1000} K`)
+            console.log(`Size of world: ${size/1024} K`)
 
             //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
             $scope.hashAllDG = $localStorage.world.dataGroups
