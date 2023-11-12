@@ -6,8 +6,9 @@
     <div class="row">
       <div class="col-md-10 col-sm-10">
         <h3 class="modal-title">
-          History of {{name}}
+          Library history of {{name}}
         </h3>
+        <div><em>These are the versions of this DG that have been sent to the Library</em></div>
       </div>
 
 
@@ -39,6 +40,7 @@
 
       </div>
       <div class="col-md-9" ng-show="selectedItem">
+        <p><em>These are the versions of this DG that have been sent to the Library</em></p>
         <div class="row">
           <div class="col-md-5">
             {{selectedItem.user}}
@@ -56,6 +58,7 @@
         </div>
         <br/>
         <uib-tabset>
+
           <uib-tab heading="Table">
             <table class="table-condensed table table-bordered">
               <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th></tr>
@@ -63,12 +66,14 @@
                 <td>{{ed.path}}</td>
                 <td>{{ed.title}}</td>
                 <td>{{ed.description}}</td>
+
                 <td>{{ed.type[0]}}</td>
               </tr>
             </table>
             <em>Only shows items directly defined in the DG - Not expanding parent or references</em>
           </uib-tab>
-          <uib-tab heading="Diff">
+
+          <uib-tab heading="Difference from current">
             <em>Not yet complete</em>
             <table class="table-condensed table table-bordered">
               <tr><th>Path</th><th>Current</th><th>Selected</th></tr>
@@ -76,6 +81,7 @@
                 <td>{{diff.path}}</td>
                 <td>{{diff.current.title}}</td>
                 <td>{{diff.selected.title}}</td>
+                <td>{{diff.status}}</td>
               </tr>
             </table>
 

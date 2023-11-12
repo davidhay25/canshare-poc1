@@ -3,9 +3,9 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
-                  $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc) {
+                  $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
 
-            $scope.version = "0.5.5"
+            $scope.version = "0.5.7"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -13,14 +13,29 @@ angular.module("pocApp")
 
             //load the models from the local store. Need to check that the inheritance
             //chain is corrected - this is a DAG after all, and circular dependencies can crash the browser (I know, they shouldn't)
+           /* not sure about this
             if (! $localStorage.world) {
                 $localStorage.world = modelsDemoSvc.getDemo()
             }
+            */
 
+            //$localStorage.test = {}
+
+            $localStorage.trace = $localStorage.trace || {on:false,limit:500,contents:[]}
+
+            //$scope.trace = $localStorage.trace //todo: note that updating $localStotage directly didn't seem to update $scope
+
+            $scope.toggleTrace = function () {
+                $localStorage.trace.on = ! $localStorage.trace.on
+            }
+
+            $localStorage.world = $localStorage.world || {}
             $scope.world = $localStorage.world
 
             let size = modelsSvc.getSizeOfObject($scope.world)
             console.log(`Size of world: ${size/1024} K`)
+
+            $scope.localStorage = $localStorage
 
             //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
             $scope.hashAllDG = $localStorage.world.dataGroups
@@ -186,19 +201,12 @@ angular.module("pocApp")
 
             };
 
-            $scope.resetAll = function () {
-                if (confirm("This will remove all DGs and refresh the example resources. Are you sure?")) {
-                    $localStorage.world = modelsDemoSvc.getDemo()
 
-                    alert("Reset complete. Please refresh the browser.")
-                }
-            }
-            //$scope.resetAll()
             $scope.clearLocal = function () {
                 if (confirm("This will remove all DGs and create an empty environment. Are you sure")) {
-                    $localStorage.world = {compositions:{},dataGroups: {},valueSets:{}}
-                    $scope.hashAllDG = {}
-                    $scope.hashAllCompositions = {}
+                    $localStorage.world = {compositions:{},dataGroups: {}}
+                    $scope.hashAllDG = $localStorage.world.dataGroups
+                    $scope.hashAllCompositions = $localStorage.world.compositions
 
                     alert("Reset complete.")
                     $scope.$emit('updateDGList',{})
@@ -222,6 +230,27 @@ angular.module("pocApp")
 
             //all the questionnaire objects (not actual Q)
             $scope.allQObject = $localStorage.allQObject
+
+            $scope.showTrace = function () {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/trace.html',
+                    backdrop: 'static',
+                    size : 'xlg',
+                    controller: 'traceCtrl',
+                    resolve: {
+                        hashAllDG: function () {
+                            return $scope.hashAllDG
+                        },
+                        currentDG: function () {
+                            return $scope.selectedModel
+                        },
+                        user: function () {
+                            return $scope.user
+                        }
+                    }
+
+                })
+            }
 
             //The main library button
             $scope.library = function () {
@@ -286,7 +315,7 @@ angular.module("pocApp")
 
 
             //whether the current user can edit. Will set up the back end logic later
-            $scope.input.canEdit = true
+            //$scope.input.canEdit = true
 
             $scope.mCodeGroupPage = {}
             $scope.mCodeGroupPage.disease = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-disease.html"
@@ -789,7 +818,6 @@ angular.module("pocApp")
 
                             //need to remove the first segment in the path (it will be the DG name)
                             //unless the selectedElement is actually the first element in the tree - the root
-
                             let ar = pathOfCurrentElement.split('.')
                             if (ar.length > 1) {
                                 ar.splice(0,1)
@@ -797,9 +825,7 @@ angular.module("pocApp")
                             } else {
                                 pathOfCurrentElement = ""
                             }
-
                         }
-
 
                         //if a new element, then the string 'new' will have been pre-pended to the path...
                         let ar = ed.path.split('.')
@@ -809,6 +835,7 @@ angular.module("pocApp")
                         ed.path = `${pathOfCurrentElement}${ar.join('.')}`
                         $scope.selectedModel.diff.push(ed)
                         displayPath = ed.path
+                        traceSvc.addAction({action:'newElement',model:$scope.selectedModel,description:ed.path})
 
                     } else {
                         //If an edit, then need to see if the item is directly defined on the DG (which will be updated),
@@ -856,6 +883,9 @@ angular.module("pocApp")
                                 ed1.valueSet = ed.valueSet
                                 ed1.sourceReference = ed.sourceReference
                                 ed1.controlHint = ed.controlHint
+
+                                traceSvc.addAction({action:'editOverride',model:$scope.selectedModel,description:ed.path})
+
                                 break
                             }
                         }
@@ -865,10 +895,9 @@ angular.module("pocApp")
                             //Need to create an 'override' element and add to the DG
                             ed.path = $filter('dropFirstInPath')(ed.path)
 
-                            //let ar = ed.path.split('.')
-                            //ar.splice(0,1)
-                            //ed.path = ar.join('.')
                             $scope.selectedModel.diff.push(ed)
+                            traceSvc.addAction({action:'addOverride',model:$scope.selectedModel,description:ed.path})
+
                         }
 
                         $scope.updateTermSummary()
@@ -1025,33 +1054,6 @@ angular.module("pocApp")
                 $scope.refreshUpdates()
             })
 
-
-            $scope.resetWorld = function () {
-
-                if (confirm("Are you wish to restore the core DT to their original state (This will not remove custom DTs)")) {
-                    //make a copy of the current DTs - this will include any DT created by the user
-                    let temp = angular.copy($scope.hashAllDG)
-
-                    $localStorage.world = modelsDemoSvc.getDemo()    //{dataGroups: compositions: }
-
-                    //Now update the world with any user created DTs. todo - may do this with compositions as well
-                    Object.keys(temp).forEach(function (key) {
-                        let dt = temp[key]
-                        $localStorage.world.dataGroups[key] = $localStorage.world.dataGroups[key] || dt
-                    })
-
-                    $scope.world = $localStorage.world
-                    $scope.hashAllDG = $localStorage.world.dataGroups
-                    $scope.hashAllCompositions = $localStorage.world.compositions
-                    $scope.xref = modelsSvc.getReferencedModels($scope.hashAllDG,$scope.hashAllCompositions)
-
-                    //makeAllDTList() - this mucked up the tags - seemed to remove them from the model...
-                    validateModel()
-                    clearB4Select()
-                    sortDG()
-                }
-
-            }
 
 
 
@@ -1263,8 +1265,12 @@ angular.module("pocApp")
                         }
 
 
-                        $localStorage.world.dataGroups[newModel.name] = newModel
-                        $scope.hashAllDG = $localStorage.world.dataGroups
+                        $scope.hashAllDG[newModel.name] = newModel
+
+                       // $localStorage.world.dataGroups[newModel.name] = newModel
+                       // $scope.hashAllDG = $localStorage.world.dataGroups
+
+
                         sortDG()
 
 
@@ -1429,6 +1435,13 @@ angular.module("pocApp")
             //only used for DG now
             $scope.selectModel = function (dg) {
                 if (dg) {
+                    traceSvc.addAction({action:'select',model:dg})
+
+                    //make sure that $localStorage has been updated
+                    if (angular.toJson(dg) !== angular.toJson($localStorage.world.dataGroups[dg.name])) {
+                        alert("Warning! the Browser copy of the DG doesn't match the copy in memory! You should re-load the page and check it.")
+                    }
+
                     clearB4Select()
                     $scope.selectedModel = dg
 

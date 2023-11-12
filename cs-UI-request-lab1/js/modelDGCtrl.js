@@ -1,7 +1,7 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('modelDGCtrl',
-        function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc,$timeout,librarySvc,makeQSvc) {
+        function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc,$timeout,librarySvc,traceSvc) {
 
         //todo - is this still being used?
             let fixedValueText = {}
@@ -33,6 +33,9 @@ angular.module("pocApp")
 
                             //save a copy to the Library (as we do with DGs). As it's new, it won't be downloaded
                             librarySvc.checkOut(newDG,$scope.user)
+                            traceSvc.addAction({description:`Checkout as part of DG clone ${newDG.name}`,
+                                action:"checkout",
+                                model:newDG})
 
                             $scope.hashAllDG[newDG.name] = newDG
                             $scope.$emit('updateDGList',newDG.name)
@@ -43,20 +46,26 @@ angular.module("pocApp")
                             alert(`Sorry, this name (${vo.name}) is not unique`)
                         }
                     )
-
-
                 })
-
-
-
-
             }
 
 
             $scope.deleteDGDiff = function (inx) {
                 if (confirm("Are you sure you wish to remove this Override? It will be removed from all children (unless they have overriden it)")) {
+                    //traceSvc.addAction({action:'delete element',model:$scope.selectedModel,description:"From diff display"})
+
+                    let pathToDelete = $scope.selectedModel.diff[inx].path
                     $scope.selectedModel.diff.splice(inx,1)
+
+                    traceSvc.addAction({description:pathToDelete,
+                        action:"delete-diff",
+                        model:$scope.selectedModel})
+
+
+
                     $scope.refreshFullList($scope.selectedModel)
+
+
                     $scope.termSelectDG({DGName:$scope.selectedModel.name})
                 }
             }
@@ -78,28 +87,13 @@ angular.module("pocApp")
 
                         $scope.selectedNode.data.ed.hideInQ = ed.hideInQ    //for the display
                         found = true
-/*
-                        //update the full element list so the Q reflects the change
-                        for (const item of $scope.fullElementList) {
-                            if ( $filter("dropFirstInPath")(item.ed.path) == ed.path) {
-                                item.ed = ed
-                                break
-                            }
-                        }
-                        */
 
-
-                       // $scope.dgQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
-                        //console.log($scope.dgQ)
                         break
                     }
                 }
 
                 //create an override element
                 if (! found) {
-                   // let ar = ed.path.split('.')
-                  //  ar.splice(0,1)
-                  //  ed.path = ar.join('.')
                     edIn.hideInQ = ! edIn.hideInQ
                     edIn.path = path
                     $scope.selectedModel.diff.push(edIn)
@@ -114,11 +108,13 @@ angular.module("pocApp")
             //check out the current DG
             $scope.checkOut = function () {
 
+
                 librarySvc.checkOut($scope.selectedModel,$scope.user,function (dg) {
                     //returns the DG downloaded from the library
                     if (dg) {
                         $scope.hashAllDG[dg.name] = dg
                         $scope.selectModel(dg)      //in modelsCtrl
+                        traceSvc.addAction({action:'checkout',model:dg,description:"after"})
                     }
 
 
@@ -127,16 +123,19 @@ angular.module("pocApp")
 
             $scope.checkIn = function () {
                 //if (confirm("Are you sure you wish to check th"))
+                traceSvc.addAction({action:'checkin',model:$scope.selectedModel})
                 librarySvc.checkIn($scope.selectedModel,$scope.user)
 
             }
 
             $scope.revert = function () {
                 if (confirm("Are you sure you wish to revert and lose any changes you have made?")) {
+                    traceSvc.addAction({action:'revert',model:$scope.selectedModel,description:'before'})
                     librarySvc.revert($scope.selectedModel, $scope.user).then(
                         function (data) {
                             //returns the model from the library
                             $scope.hashAllDG[$scope.selectedModel.name] = data
+                            traceSvc.addAction({action:'revert',model:data,description:'after'})
                             $scope.$emit('updateDGList',{name:$scope.selectedModel.name})
 
                             alert("Check out has been cancelled, and the Library version of this DG downloaded.")

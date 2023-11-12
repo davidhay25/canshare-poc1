@@ -1,11 +1,22 @@
 angular.module("pocApp")
 
-    .service('modelDGSvc', function($http,$q) {
+    .service('modelDGSvc', function($http,$q,$localStorage) {
 
         let config = {}
 
 
         return {
+            auditDG : function (hashAllDG) {
+                //compare the DG hash with $localStorage. There could be a bug where localStorage is not being updated
+                Object.keys(hashAllDG).forEach(function (key) {
+                    let dg = hashAllDG[key]
+                    if (angular.toJson(dg) !== $localStorage.world.dataGroups[dg.name]) {
+                        alert(`Warning! the Browser copy of the DG ${dg.name} doesn't match the copy in memory! You should re-load the page and check it.`)
+
+
+                    }
+                })
+            },
 
             checkAllDG : function (hashAllDG) {
                 //check DG for invalid construction that can crash the browser

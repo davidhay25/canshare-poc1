@@ -209,12 +209,17 @@
     </div>
   </div>
 
+  <!--
   <div class = "clickable pull-right">
 
-    <button class="btn-link btn pull-right" ng-click="dglibraryInteraction(selectedModel)">Compare to library</button>
+    <button class="btn-link btn pull-right"
+
+            ng-click="dglibraryInteraction(selectedModel)">Compare to library</button>
 
 
   </div>
+
+  -->
 
   <uib-tabset>
 
@@ -1170,37 +1175,14 @@
 
       <button class="btn-link btn pull-right" ng-click="previewQ(dgQ)">Examine Q</button>
 
-
       <renderform q="dgQ" qr="{}" form="{}"></renderform>
-      <!--
-      <div class="row">
-        <div class="col-md-9">
-          <renderform q="dgQ" qr="{}"></renderform>
-        </div>
-        <div class="col-md-3">
-          <strong>Hide in Q</strong>
-          <br/>
-          <ul class="list-unstyled">
-            <li ng-repeat="item in fullElementList">
-              {{item.ed.title}}
-            </li>
-          </ul>
-
-        </div>
-      </div>
-      -->
-
-
-
-
-
 
 
     </uib-tab>
 
 
     <uib-tab>
-      <uib-tab-heading>DG Diff <span class="badge">{{selectedModel.diff.length}}</span> </uib-tab-heading>
+      <uib-tab-heading>Elements (diff) <span class="badge">{{selectedModel.diff.length}}</span> </uib-tab-heading>
       <em>The element definitions in the .diff element. ie directly defined in the DG. The Json has the complete model.</em>
       <br/><br/>
       <table class="table-condensed table table-bordered">

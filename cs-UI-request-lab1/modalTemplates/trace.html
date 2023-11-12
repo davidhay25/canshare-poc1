@@ -1,0 +1,129 @@
+
+<div>
+  <!--<div ng-controller="newResourceCtrl">-->
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-3">
+        <h3 class="modal-title">
+          Trace
+        </h3>
+      </div>
+
+
+      <div class="col-md-3">
+        <div class="navbar-text">
+          Trace Size: {{traceSize}}K ({{traceHistory.length}})
+          <div>
+            All DG Size: {{AllDGsize}}K ({{AllDGsizeCount}})
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="btn btn-link" ng-click="clearTrace()">Clear trace</div>
+      </div>
+
+      <div class="col-md-2">
+        <!--
+        <div class="btn btn-link" ng-click="saveTrace()">Save trace</div>
+        -->
+      </div>
+
+      <div class="col-md-2 col-sm-2">
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
+
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-body">
+
+    <div class="row">
+      <div class="col-md-6">
+
+        <div>
+
+          <div class="row">
+            <div class="col-md-3">
+              DataGroups filter:
+            </div>
+            <div class="col-md-4">
+
+              <select ng-model = "input.selectedDGName" class="form-control"
+                      ng-change = "setFilter(input.selectedDGName)"
+                      ng-options="type for type in lstType">
+
+              </select>
+
+
+
+
+            </div>
+
+            <div class="col-md-3">
+              <checkbox ng-model="input.hideSelect"></checkbox> Hide select
+            </div>
+
+          </div>
+        </div>
+
+        <div class="myScrollSmall">
+
+          <br/>
+          <table class="table table-bordered table-condensed">
+            <tr><th>Action</th><th>Type</th><th>Title</th><th>Description</th><th>Diff</th></tr>
+            <tr ng-click="selectTraceItem(hx)"
+                style="cursor: pointer"
+                ng-class="{listItemSelected:selectedTraceItem == hx}"
+                ng-show = canShow(hx)
+                ng-repeat="hx in traceHistory">
+              <td>{{hx.action}}</td>
+
+              <td>{{hx.model.kind}}</td>
+              <td>{{hx.model.title}}</td>
+              <td>{{hx.description}}</td>
+              <td>{{hx.model.diff.length}}</td>
+
+            </tr>
+          </table>
+        </div>
+
+      </div>
+      <div class="col-md-6">
+
+        <div>
+          <button ng-show="currentDG.checkedOut == user.email && selectedTraceItem.model.name == currentDG.name"
+                  ng-click="restoreDG(selectedTraceItem.model)"
+                  class="btn btn-danger pull-right">
+            Restore this version
+          </button>
+        </div>
+        <uib-tabset>
+
+          <uib-tab heading="Diff">
+            <table class="table-condensed table table-bordered">
+              <tr><th>Title</th><th>Path</th><th>Card.</th><th>Type</th></tr>
+              <tr ng-repeat="element in selectedTraceItem.model.diff">
+                <td>{{element.title}}</td>
+                <td>{{element.path}}</td>
+                <td>{{element.mult}}</td>
+                <td>{{element.type[0]}}</td>
+
+              </tr>
+            </table>
+
+          </uib-tab>
+          <uib-tab heading="Json">
+            <pre>{{selectedTraceItem.model | json}}</pre>
+          </uib-tab>
+
+        </uib-tabset>
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-header">
+
+  </div>
+</div>

@@ -163,7 +163,8 @@
     <script src="js/historyCtrl.js"></script>
     <script src="js/previewQCtrl.js"></script>
     <script src="js/getNameCtrl.js"></script>
-
+    <script src="js/traceCtrl.js"></script>
+    <script src="js/traceSvc.js"></script>
     <script src="directive/renderForm/renderFormSvc.js"></script>
     <script src="directive/renderForm/renderFormDir.js"></script>
     <script src="directive/renderSingleItem/renderSingleItemDir.js"></script>
@@ -206,7 +207,7 @@
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
         <div class="container-fluid">
-            <div class="col-md-4">
+            <div class="col-md-3">
                     <span>
                         <a class="navbar-brand" href="#">
                             CanShare Logical Modeller workbench
@@ -222,10 +223,6 @@
                 </div>
             </div>
 
-
-
-
-
             <div class="col-md-1 col-sm-1">
                 <form class="navbar-form navbar-left">
                     <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
@@ -234,7 +231,7 @@
             </div>
 
             <div class="col-md-1 col-sm-1">
-                <div class="navbar-text">
+                <div class="navbar-text btn">
                     <a href="https://docs.google.com/document/d/1InT4HDIudFl4gUAF5htUNeLJG2QT8rBnMjB_E1fe78s" target="_blank">Documentation</a>
                 </div>
             </div>
@@ -247,9 +244,25 @@
                 </div>
             </div>
 
+
+
             <div class="col-md-2">
                 <div class="navbar-text" >
-                    <div class="pull-right">Version: {{version}}</div>
+                    <div class="btn" ng-click = "toggleTrace()" class="clickable">
+                        <span ng-show="localStorage.trace.on"><span style="color: red">
+                            <strong>Trace on</strong></span> </span>
+                        <span ng-hide="localStorage.trace.on">Trace off</span>
+                        <span class="badge">{{localStorage.trace.contents.length}}</span>
+                    </div>
+
+
+                </div>
+
+            </div>
+
+            <div class="col-md-1">
+                <div class="navbar-text" >
+                    <div class="pull-right btn">{{version}}</div>
                 </div>
             </div>
 
@@ -265,7 +278,7 @@
                 </div>
 
                 <div class="navbar-text"  ng-show="user">
-                    <span style="font-size:1.2em;  cursor: pointer" uib-popover="{{user.email}}"
+                    <span class="btn" style="font-size:1.2em;  cursor: pointer" uib-popover="{{user.email}}"
                           popover-placement="left"
                           popover-trigger="'mouseenter'">
                         <div ng-click="logout()">
@@ -300,6 +313,7 @@
 
                 -->
 
+        <button class="pull-right btn-link btn" ng-click="showTrace()">Trace</button>
 
         <button class="pull-right btn-link btn" ng-click="clearLocal()">Clear local</button>
 

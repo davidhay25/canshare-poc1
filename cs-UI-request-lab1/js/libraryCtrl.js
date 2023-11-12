@@ -115,7 +115,7 @@ angular.module("pocApp")
                     let item = {name:key,title:localDG.title,local:localDG}
                     if (libraryHash[key]) {
                         item.library = libraryHash[key]
-                        //item.checkedOut =
+
                         delete libraryHash[key]      //any left in the hash at the end are new on the library
 
                     } else {
@@ -301,6 +301,7 @@ angular.module("pocApp")
 
                 if (user && model.checkedOut == user.email) {
                     if ( confirm("Are you sure you want to check this in to the Library")) {
+                        traceSvc.addAction({action:'checkin',model:$scope.selectedModel,description:"From library"})
                         librarySvc.checkIn (model,user,function(){
                             let dg = allDG[model.name]
                             if (dg) {

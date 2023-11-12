@@ -41,6 +41,7 @@ angular.module("pocApp")
                     let diffItem = {}
                     diffItem.path = key
                     diffItem.current = hashCurrent[key]
+                    diffItem.status = 'present'
                     if (hashSelected[key]) {
                         //the selected one has this path
                         diffItem.selected = hashSelected[key]
@@ -55,6 +56,7 @@ angular.module("pocApp")
                 Object.keys(hashSelected).forEach(function (key) {
                     let diffItem = {}
                     diffItem.path = key
+                    diffItem.status = 'deleted'
                     diffItem.selected = hashSelected[key]
                     $scope.diffItems.push(diffItem)
 
