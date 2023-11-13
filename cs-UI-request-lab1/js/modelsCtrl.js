@@ -1442,7 +1442,7 @@ angular.module("pocApp")
                     clearB4Select()
                     $scope.selectedModel = dg
 
-                    //get the count of the  versions
+                    //get the count of the  versions. May not need this.
                     let url = `/model/DG/${dg.name}/history/count`
                     $http.get(url).then(
                         function (data) {
@@ -1450,16 +1450,19 @@ angular.module("pocApp")
                         }
                     )
 
+                    //check the current checkedout state on the library.
+                    //Always update the local version checkedout (not data) with the one from the library
+                    let qry = `/model/DG/${dg.name}`
+                    $http.get(url).then(
+                        function (data) {
+                            let libraryDG = data.data
+                            $scope.selectedModel.checkedOut = libraryDG.checkedOut
+                        }
+                    )
+
+
                     $scope.refreshUpdates()     //update the xref and the list of all updates
 
-                    //update the hierarchical tree
-
-                    //let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
-                    //showAllDGTree(vo1.treeData)
-
-
-                    //$('#allDGTree').jstree("open_node",$scope.selectedModel.name);
-                    //$('#allDGTree').jstree("select_node",$scope.selectedModel.name);
 
                     //create the list of override elements
                     $scope.overrides = []
