@@ -124,9 +124,35 @@ angular.module("pocApp")
                         //the library  doesn't have this DG
                     }
 
+                    //checkout checks
+                    if (item.local && item.local.checkedOut) {
+                        if (! item.library) {
+                            //The local version is checked out, but there is no library version.
+                            item.note = `WARNING: Local is checked out to ${item.local.checkedOut}, but there is no Library version`
+                        } else {
+                            //The local version is checked out, but the library version is either not checked out, or chacked out to someone else
+                            if (item.library.checkedOut !== item.local.checkedOut) {
+                                item.note = `WARNING: Local is checked out to ${item.local.checkedOut}, but Library checkout is ${item.library.checkedOut}`
+                            }
+                        }
+                    }
+
+                    if (item.library && item.library.checkedOut) {
+                        //The DG is checked out in the library, but the local version is checked out to someone else
+                        //There's a local copy with a checkout which is different to the library
+                        if (item.local && item.local.checkedOut && item.local.checkedOut !== item.library.checkedOut) {
+                            item.note = `WARNING: Local is checked out to ${item.local.checkedOut}, but Library checkout is ${item.library.checkedOut}`
+                        }
+                    }
+
+
+
+
+                    /*
                     if (item.library && item.local && item.library.checkedOut !== item.local.checkedOut) {
                         item.note = "WARNING: Local and Library have different checked out emails"
                     }
+                    */
 
 
                     $scope.summary.push(item)
