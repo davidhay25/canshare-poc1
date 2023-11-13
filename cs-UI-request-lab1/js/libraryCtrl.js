@@ -78,6 +78,7 @@ angular.module("pocApp")
                     } else {
                         item.note = "Not in Library"
                     }
+
                     $scope.summaryComp.push(item)
                 })
 
@@ -122,6 +123,12 @@ angular.module("pocApp")
                         item.note = "Not in Library"
                         //the library  doesn't have this DG
                     }
+
+                    if (item.library.checkedOut !== item.local.checkedOut) {
+                        item.note = "WARNING: Local and Library have different checked out emails"
+                    }
+
+
                     $scope.summary.push(item)
                 })
 

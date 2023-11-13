@@ -4,8 +4,15 @@ angular.module("pocApp")
         let cache = {}
 
         this.fhir = {}
+        this.user
 
         return {
+            setUser : function (user) {
+                this.user = user
+            },
+            getuser : function () {
+                return this.user
+            },
 
             isUniqueNameOnLibrary : function (name, modelType) {
                 let deferred = $q.defer()

@@ -38,6 +38,7 @@ angular.module("pocApp")
                                 model:newDG})
 
                             $scope.hashAllDG[newDG.name] = newDG
+                            traceSvc.addAction({action:'clone-model',model:newDG})
                             $scope.$emit('updateDGList',newDG.name)
 
                             //$scope.selectModel(newDG)      //in modelsCtrl
@@ -86,6 +87,7 @@ angular.module("pocApp")
                         ed.hideInQ = ! ed.hideInQ
 
                         $scope.selectedNode.data.ed.hideInQ = ed.hideInQ    //for the display
+                        traceSvc.addAction({action:'set-hideinq',model:$scope.selectedModel,description:`path: ${path} - update diff`})
                         found = true
 
                         break
@@ -97,6 +99,7 @@ angular.module("pocApp")
                     edIn.hideInQ = ! edIn.hideInQ
                     edIn.path = path
                     $scope.selectedModel.diff.push(edIn)
+                    traceSvc.addAction({action:'set-hideinq',model:$scope.selectedModel,description:`path: ${path} - add diff`})
                 }
 
                 $scope.refreshFullList($scope.selectedModel)
@@ -176,15 +179,16 @@ angular.module("pocApp")
                 //let sourcePath = item.shortPath       //this is the path of the source
                 let sourcePath = item.ed.path       //not completely sure how these should work ATM
                 let targetPath = $filter('dropFirstInPath')($scope.selectedNode.data.ed.path)
+                //console.log(sourcePath,targetPath,value)
 
-
-                console.log(sourcePath,targetPath,value)
-
+                //todo - what if there is no diff
                 for (const ed of $scope.selectedModel.diff) {
                     if (ed.path == targetPath) {
                         ed.enableWhen = ed.enableWhen || []
                         let ew = {source:sourcePath,operator:"=",value:value}
                         ed.enableWhen.push(ew)
+                        traceSvc.addAction({action:'add-enablewhen',model:$scope.selectedModel,description:angular.toJson(ew)})
+                        break
                     }
                 }
 
@@ -202,7 +206,9 @@ angular.module("pocApp")
                 for (const ed of $scope.selectedModel.diff) {
                     if (ed.path == path) {
                         if (ed.enableWhen && ed.enableWhen.length > inx) {
-                            ed.enableWhen.splice(inx,1)
+                            let ew = ed.enableWhen.splice(inx,1)
+
+                            traceSvc.addAction({action:'remove-enablewhen',model:$scope.selectedModel,description:angular.toJson(ew[0])})
                             //in modelsCtrl
                             $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:path})
 
@@ -216,7 +222,7 @@ angular.module("pocApp")
 
             //When adding a new EW and the source has been selected. The possible values of that source need to be determined.
             $scope.ewSourceSelected = function (source) {
-                console.log(source)
+                //console.log(source)
                 delete $scope.ewSourceValues
                 if (source) {
 
@@ -242,78 +248,6 @@ angular.module("pocApp")
             }
 
             
-
-            $scope.changeDGTypeDEP = function (ed) {
-                //create a reusable 'type selection dialog' - will be potentially be widely used
-                //needs to be hierarchy aware
-
-                $uibModal.open({
-                    templateUrl: 'modalTemplates/changeType.html',
-                    //backdrop: 'static',
-                    size : 'xlg',
-                    controller: 'changeTypeCtrl',
-
-                    resolve: {
-                        ed: function () {
-                            return ed
-                        },
-                        hashAllDG: function () {
-                            return $scope.hashAllDG
-                        }
-                    }
-
-                }).result.then(function (vo) {
-                    //now we can change the type
-
-                    let shortPath = $filter('dropFirstInPath')(ed.path)     //remove the leading type name
-
-                    let newType
-                    if (vo.class == 'dg') {
-                        newType = vo.value.name
-                    } else {
-                        newType = vo.value
-                    }
-
-                    let found = false           //does the element being edited exist in the diff...
-                    for (var ed1 of $scope.selectedModel.diff) {
-
-                        let pathString = $scope.selectedModel.name + "." + ed1.path
-                        if (ed.path == pathString) {
-                            //this is the one to change
-                            found = true
-                            ed1.type = [newType]
-                           // break don't break as we have to de-activate any child elements. They will be overrides of an existing DG
-
-                        }
-
-                        //if the path in the diff starts with the path being changed, then set the multiplicity to 0..0
-                        //it's an override
-                        if (ed1.path.startsWith( shortPath + ".") ) {
-                            ed1.mult = '0..0'
-                        }
-
-
-                    }
-
-                    if (!found) {
-                        //the element was not found in the diff, so needs to be added to it as an override
-
-                        ed.path = $filter('dropFirstInPath')(ed.path)
-                        ed.type = [newType]
-
-                        $scope.selectedModel.diff.push(ed)
-
-                    }
-
-                    //force the re-draw
-                    $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path: $filter('dropFirstInPath')(ed.path)})
-
-
-                    console.log(vo)
-                })
-
-
-            }
 
             $scope.getCategory = function (DG) {
                 if (!DG) {
@@ -466,7 +400,9 @@ angular.module("pocApp")
                     }
                     clone.slicedFrom = ed.path      //link back to edlement that was sliced . So we know it's a slice, and what of
                     console.log(clone)
+
                     $scope.selectedModel.diff.push(clone)
+                    traceSvc.addAction({action:'add-slice',model:$scope.selectedModel})
 
                     //also need to change the type of the element that was sliced. hmmm.
                     //what happens if sliced twice - original dt lost? ?store original??
@@ -517,41 +453,6 @@ angular.module("pocApp")
 
             }
 
-            $scope.displayDGDialogDEP = function (ed) {
-                $uibModal.open({
-                    templateUrl: 'modalTemplates/dgDialog.html',
-                    backdrop: 'static',
-                    //size : 'lg',
-                    controller: 'modelDGDialogCtrl',
-
-                    resolve: {
-                        ED: function () {
-                            return ed
-                        },
-                        hashAllDG : function () {
-                            return $scope.hashAllDG
-                        },
-                        fullElementList : function () {
-                            return $scope.fullElementList
-                        }
-                    }
-
-                }).result.then(function (ed) {
-                    /*
-                    //copy the units to the current item
-                    //need to update the .diff in the selected model
-                    let p = $filter('lastInPath')(ed.path)
-                    for (const ed1 of $scope.selectedModel.diff) {
-                        if (ed1.path == p) {
-                            ed1.units = ed.units
-                            //ed.valueSet = vsUrl
-                            break
-                        }
-                    }
-                    */
-                })
-                
-            }
 
 
             $scope.setControlHint = function(ed,value) {
@@ -623,7 +524,7 @@ angular.module("pocApp")
                     //$scope.selectedModel.diff[inx].mult = '0..0'
 
                     $scope.selectedModel.diff.splice(inx,1)
-
+                    traceSvc.addAction({action:'delete-element',model:$scope.selectedModel,description:pathToDelete})
                     //$scope.selectedModel.diff.splice(inx,1)
                 } else {
                     //The attribute that was edited (eg edscription) is inherited
@@ -660,12 +561,12 @@ angular.module("pocApp")
             //locate the model where this item was defined
             //todo - this needs a little work
             $scope.getSourceModelName = function (ed) {
-//return "test"
+
                 if (ed) {
                     return ed.sourceModelName
                 }
 
-
+/*
                 //why do this?
                 if (ed) {
                     for (const element of $scope.fullElementList) {
@@ -675,6 +576,7 @@ angular.module("pocApp")
                         }
                     }
                 }
+                */
             }
 
             $scope.expandDTTree = function () {
@@ -703,6 +605,7 @@ angular.module("pocApp")
                         if (ed1.path == p) {
                             ed1.units = ed.units
                             //ed.valueSet = vsUrl
+                            traceSvc.addAction({action:'add-units',model:$scope.selectedModel,description:p})
                             break
                         }
                     }
@@ -731,6 +634,7 @@ angular.module("pocApp")
                     for (const ed1 of $scope.selectedModel.diff) {
                         if (ed1.path == p) {
                             ed1.options = updatedEd.options
+                            traceSvc.addAction({action:'set-options',model:$scope.selectedModel,description:`${p} - edit diff`})
                             found = true
                             //alert('found')
                             break
@@ -743,15 +647,10 @@ angular.module("pocApp")
                         //remove the type name
                         updatedEd.path = $filter('dropFirstInPath')(updatedEd.path)
                         $scope.selectedModel.diff.push(updatedEd)
+                        traceSvc.addAction({action:'delete-element',model:$scope.selectedModel,description:"add diff"})
                         //alert('diff added')
                     }
 
-                    /*
-                    modelDGSvc.updateChanges($scope.selectedModel,
-                        {edPath:p,
-                            msg:`Update options list`},
-                        $scope)
-                    */
 
 
                 })
@@ -850,6 +749,7 @@ angular.module("pocApp")
                     for (const ed of $scope.selectedModel.diff) {
                         if (ed.path == path) {
                             ed[elName] = elValue
+                            traceSvc.addAction({action:'set-fixed',model:$scope.selectedModel,description:`${path} - edit diff`})
 /*
                             modelDGSvc.updateChanges($scope.selectedModel,
                                 {edPath:ed.path,
@@ -872,6 +772,7 @@ angular.module("pocApp")
 
                         overrideEd.path = path
                         $scope.selectedModel.diff.push(overrideEd)
+                        traceSvc.addAction({action:'set-fixed',model:$scope.selectedModel,description:`${path} - add diff`})
 /*
                         modelDGSvc.updateChanges($scope.selectedModel,
                             {edPath:ed.path,
@@ -891,91 +792,12 @@ angular.module("pocApp")
 
                 })
 
-//return
-                /*
 
-                let value = prompt(`${fixedValueText[type]} for ${ed.path}`)
-
-                if (value) {
-                    //set the element name and value based on DataType. default to stirng
-                    let elName = "fixedString"
-                    let elValue = value
-                    switch (type) {
-                        case 'coding' :
-                            //can enter code & display separated by space
-                            let t = value.replace(/\s+/g, ' ').trim()
-                            let ar = t.split(' ')
-                            elName = "fixedCoding"
-                            elValue = {code:ar[0]}
-                            if (ar.length > 1) {
-                                elValue.display = ar[1]
-                            }
-                            break
-                        case 'decimal' :
-                            elName = "fixedDecimal"
-                            elValue = parseFloat(value)
-                            break
-
-                    }
-
-                    let ar = ed.path.split('.')  //need to remove the first part of the path
-                    ar.splice(0,1)
-                    let path = ar.join('.')
-
-                    //remove the fixedCode from any existing element with this path
-                    let found = false
-                    for (const ed of $scope.selectedModel.diff) {
-                        if (ed.path == path) {
-                            ed[elName] = elValue
-
-                            modelDGSvc.updateChanges($scope.selectedModel,
-                                {edPath:ed.path,
-                                    msg:`Set fixed ${type} to ${angular.toJson(elValue)}`},
-                                $scope)
-
-                            found = true
-                            break
-                        }
-                    }
-
-                    if (! found) {
-                        let overrideEd = angular.copy(ed)
-
-                        //overrideEd.fixedCoding = {code:value}
-
-                        overrideEd[elName] = elValue
-
-                        overrideEd.path = path
-                        $scope.selectedModel.diff.push(overrideEd)
-
-                        modelDGSvc.updateChanges($scope.selectedModel,
-                            {edPath:ed.path,
-                                msg:`Set fixed ${type} to ${angular.toJson(elValue)}`},
-                            $scope)
-
-                    }
-
-                    ed[elName] = elValue   //for the display
-                    //ed.fixedCoding = {code:value}        //for the display
-
-
-                    //rebuild the full element list for the table
-                    let vo = modelsSvc.getFullListOfElements($scope.selectedModel,$scope.input.types,$scope.input.showFullModel)
-                    $scope.fullElementList = vo.allElements
-                }
-
-                */
             }
 
             //remove the fixed or default element, but leave the (likely override) in place
             //as there may have been other parts in that element that were overriden - like multiplicity
             $scope.clearFixedValue = function(ed,kind) {
-
-                //let elementName = 'fixedCoding'
-
-               // let ar = ed.path.split('.')  //need to remove the first part of the path
-                //ar.splice(0,1)
-                //let path = ar.join('.')
 
                 let path = $filter('dropFirstInPath')(ed.path)
 
@@ -992,23 +814,16 @@ angular.module("pocApp")
                         //This will clear all fixed (or default) elements - though there should only be 1
                         Object.keys(ed).forEach(function (key) {
 
-
                             //if (key.substring(0,5) == 'fixed') {
                             if (key.substring(0,kind.length) == kind) {
                                 delete ed[key]
                                 delete ed1[key]
+                                traceSvc.addAction({action:'remove-fixed',model:$scope.selectedModel})
                             }
 
                         })
 
-                        /*
-                        delete ed.fixedCoding   //for the display
-                        delete ed1.fixedCoding
-                        delete ed.fixedDecimal   //for the display
-                        delete ed1.fixedDecimal
-                        delete ed.fixedString   //for the display
-                        delete ed1.fixedString
-*/
+
                         break
                     }
                 }
@@ -1028,29 +843,6 @@ angular.module("pocApp")
 
             }
 
-            //change the valueset. This actually changes the model - the composition doesn't (it sets an override)
-            $scope.changeDGValueSetDEP = function (ed) {
-                let vsUrl = prompt("Enter the ValueSet url")
-                if (vsUrl) {
-
-                    let p = $filter('lastInPath')(ed.path)
-                    for (const ed1 of $scope.selectedModel.diff) {
-                        if (ed1.path == p) {
-                            ed1.valueSet = vsUrl        //this is the model ($localstorage)
-                            ed.valueSet = vsUrl         //this is the display
-
-
-                            modelDGSvc.updateChanges($scope.selectedModel,
-                                {edPath:ed.path,
-                                    msg:`Set ValueSet to ${vsUrl}`},
-                                $scope)
-
-                            break
-                        }
-                    }
-
-                }
-            }
 
 
     })

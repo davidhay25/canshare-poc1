@@ -82,6 +82,50 @@ async function setup(app) {
 
     })
 
+    // =========== These are an entry for each change in the model Telemetry is for errors
+    app.post('/trace', async function(req,res) {
+
+        let doc = req.body
+        doc.date = new Date()
+
+        try {
+            await database.collection("trace").insertOne(doc)
+            res.json(doc)
+        } catch (ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+        }
+
+    })
+
+    //retrieve the trace records
+    app.get('/trace', async function(req,res) {
+        let query = {}
+
+        let limit = 200
+        if (req.query.count) {
+            limit = parseInt(req.query.count)
+        }
+
+        const options = {sort: { date : 1 },limit:limit}
+
+        //console.log(options)
+
+        try {
+            const cursor = await database.collection("trace").find(query,options).toArray()
+            res.json(cursor)
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+
+    })
+
+
+
+    //========= telemetry
+
     app.post('/telemetry', async function(req,res) {
         console.log('err',req.body)
         let clientIp = req.headers['x-forwarded-for'] ||

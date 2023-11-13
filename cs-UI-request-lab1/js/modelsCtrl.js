@@ -9,8 +9,6 @@ angular.module("pocApp")
             $scope.input = {}
             $scope.input.showFullModel = true
 
-
-
             //load the models from the local store. Need to check that the inheritance
             //chain is corrected - this is a DAG after all, and circular dependencies can crash the browser (I know, they shouldn't)
            /* not sure about this
@@ -82,7 +80,7 @@ angular.module("pocApp")
 
 
             //record access
-            $http.post("model/access",{})
+            //$http.post("model/access",{})
 
             $scope.igBase = "https://build.fhir.org/ig/davidhay25/canshare-LIM/branches/main/"
 
@@ -117,10 +115,6 @@ angular.module("pocApp")
                 }
             }
 
-
-
-           // $scope.leftPanel = 'col-md-3'
-           // $scope.rightPanel = 'col-md-9'
 
             $scope.leftPanel = 'col-md-3'
             $scope.rightPanel = 'col-md-9'
@@ -168,6 +162,8 @@ angular.module("pocApp")
                // console.log('auth state change')
                 if (user) {
                     $scope.user = {email:user.email,displayName : user.displayName}
+
+                    modelsSvc.setUser($scope.user)
                     $scope.$digest()
                 } else {
                     delete $scope.user
@@ -192,6 +188,7 @@ angular.module("pocApp")
             $scope.logout=function(){
                 firebase.auth().signOut().then(function() {
                     delete $scope.user;
+                    modelsSvc.setUser({})
                     alert('You have been logged out')
 
 
@@ -247,9 +244,17 @@ angular.module("pocApp")
                         user: function () {
                             return $scope.user
                         }
-                    }
+                    }}).result.then(function (hashChanges) {
+
+                        if (hashChanges[$scope.selectedModel.name]) {
+                            //Has the current model been changed? If so, re-select
+                            $scope.selectModel($scope.selectedModel)
+
+                        }
 
                 })
+
+
             }
 
             //The main library button
@@ -403,7 +408,7 @@ angular.module("pocApp")
 
 
             $scope.addTagToDT = function (tagName) {
-
+                traceSvc.addAction({action:'add-tag',model:$scope.selectedModel})
                 $scope.selectedModel.tags = $scope.selectedModel.tags || []
                 $scope.selectedModel.tags.push({system:tagSystem.bespoke.code,code:tagName})
 
@@ -427,7 +432,7 @@ angular.module("pocApp")
 
             //clear the tag from the DG (if it exists) and the $scope.tags
             $scope.removeTagFromDT = function (tagName) {
-
+                traceSvc.addAction({action:'remove-tag',model:$scope.selectedModel})
                 //remove from the DG (if present)
                 let ctr = -1
                 for (const tag of $scope.selectedModel.tags) {
@@ -752,10 +757,14 @@ angular.module("pocApp")
                     alert(fullMsg)
                 } else {
                     if (confirm("Are you sure you wish to remove this DG from the local store? If uploaded to the library, it will still be there.")) {
+
+                        traceSvc.addAction({action:'delete-local',model:$scope.hashAllDG[dgName]})
                         delete $scope.hashAllDG[dgName]
+                        delete $scope.selectedModel
+
                         makeAllDTList()
                         $scope.refreshUpdates()
-                        alert("The DG has been removed. It is advisable to refresh the page.")
+                        //alert("The DG has been removed. It is advisable to refresh the page.")
                     }
                 }
 
@@ -835,7 +844,7 @@ angular.module("pocApp")
                         ed.path = `${pathOfCurrentElement}${ar.join('.')}`
                         $scope.selectedModel.diff.push(ed)
                         displayPath = ed.path
-                        traceSvc.addAction({action:'newElement',model:$scope.selectedModel,description:ed.path})
+                        traceSvc.addAction({action:'new-element',model:$scope.selectedModel,description:ed.path})
 
                     } else {
                         //If an edit, then need to see if the item is directly defined on the DG (which will be updated),
@@ -884,7 +893,7 @@ angular.module("pocApp")
                                 ed1.sourceReference = ed.sourceReference
                                 ed1.controlHint = ed.controlHint
 
-                                traceSvc.addAction({action:'editOverride',model:$scope.selectedModel,description:ed.path})
+                                traceSvc.addAction({action:'edit-override',model:$scope.selectedModel,description:ed.path})
 
                                 break
                             }
@@ -896,7 +905,7 @@ angular.module("pocApp")
                             ed.path = $filter('dropFirstInPath')(ed.path)
 
                             $scope.selectedModel.diff.push(ed)
-                            traceSvc.addAction({action:'addOverride',model:$scope.selectedModel,description:ed.path})
+                            traceSvc.addAction({action:'add-override',model:$scope.selectedModel,description:ed.path})
 
                         }
 
@@ -1066,11 +1075,7 @@ angular.module("pocApp")
                     if (DG.name && DG.name.toLowerCase().indexOf(filter.toLowerCase()) > -1) {
                         show = true
                     }
-                    /*
-                    if (DG.description && DG.description.toLowerCase().indexOf(filter.toLowerCase()) > -1) {
-                        show = true
-                    }
-*/
+
                     return show
 
                 } else {
@@ -1257,6 +1262,7 @@ angular.module("pocApp")
                 }).result.then(function (newModel) {
                     if (newModel) {
                         //if a model is returned, then it is a new one and needs to be added to the world
+                        traceSvc.addAction({action:'new-model',model:$scope.hashAllDG[dgName]})
 
                         if ($scope.user) {
                             newModel.author = $scope.user.email
@@ -1288,6 +1294,7 @@ angular.module("pocApp")
                     } else {
                         //the model may have been updated - select it to refresh the various tabs
                         //note this is the model passed in for editing
+                        traceSvc.addAction({action:'edit-model',model:$scope.hashAllDG[dgName]})
                         $scope.selectModel(model)
                     }
 
@@ -1318,6 +1325,7 @@ angular.module("pocApp")
             }
 
             $scope.addElement = function (name,type) {
+                traceSvc.addAction({action:'add-element',model:$scope.hashAllDG[dgName]})
                 //add a new element to the current model
                 $scope.selectedModel.diff = $scope.selectedModel.diff || []
                 $scope.selectedModel.diff.push({path:name,title:name,type:[type]})
@@ -1371,17 +1379,6 @@ angular.module("pocApp")
 
 
                 igSvc.makeFshForComp(comp,$scope.allCompElements,$scope.hashCompElements)
-
-                //Q is derived from the tree representation - as that sets the overall structure
-                //so updated when the tree refreshes...
-
-                //$scope.fullQ =  makeQSvc.makeQfromCompList(comp,$scope.allCompElements)
-
-              //  $scope.fullQ =  makeQSvc.makeQfromSections($scope.selectedComposition,
-               //     $scope.input.types,$scope.hashAllDG,modelsSvc)
-
-
-
 
                 console.log($scope.fullQ)
 
@@ -1439,7 +1436,7 @@ angular.module("pocApp")
 
                     //make sure that $localStorage has been updated
                     if (angular.toJson(dg) !== angular.toJson($localStorage.world.dataGroups[dg.name])) {
-                        alert("Warning! the Browser copy of the DG doesn't match the copy in memory! You should re-load the page and check it.")
+                        alert(`Warning! the Browser copy of the DG ${dg.name} doesn't match the copy in memory! You should re-load the page and check it. From modelsCtrl:select`)
                     }
 
                     clearB4Select()

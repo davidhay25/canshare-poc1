@@ -27,39 +27,6 @@
   <div class="modal-body">
 
     <uib-tabset active="input.mainTabActive">
-      <uib-tab heading="Compositions">
-
-        <table class="table table-bordered table-condensed">
-          <tr><th>Title</th><th>Local sections</th><th>Library sections</th><th>Note</th></tr>
-          <tr ng-repeat="item in summaryComp">
-            <td>
-              {{item.title}}
-              <div class="clickable"
-                   ng-show="item.library && ! item.local"
-                   ng-click="downloadComp(item.library)">Download</div>
-            </td>
-            <td>
-              <ul class="list-unstyled">
-                <li ng-repeat="section in item.local.sections">
-                  {{section.name}} ({{section.items.length}})
-                </li>
-              </ul>
-
-
-            </td>
-            <td>
-              <ul class="list-unstyled">
-                <li ng-repeat="section in item.library.sections">
-                  {{section.name}} ({{section.items.length}})
-                </li>
-              </ul>
-
-            </td>
-            <td>{{item.note}}</td>
-          </tr>
-        </table>
-
-      </uib-tab>
 
       <uib-tab heading="DataGroups list" >
         <br/>
@@ -84,9 +51,9 @@
                      <td>{{item.library.diff.length}}</td>
                      <td>
                      <div class="clickable" ng-click="checkin(item.local)">
-
                                {{item.library.checkedOut}}
                      </div>
+                       {{item.note}}
                      </td>
                    </tr>
                  </table>
@@ -285,6 +252,39 @@
 
       </uib-tab>
 
+      <uib-tab heading="Compositions">
+
+        <table class="table table-bordered table-condensed">
+          <tr><th>Title</th><th>Local sections</th><th>Library sections</th><th>Note</th></tr>
+          <tr ng-repeat="item in summaryComp">
+            <td>
+              {{item.title}}
+              <div class="clickable"
+                   ng-show="item.library && ! item.local"
+                   ng-click="downloadComp(item.library)">Download</div>
+            </td>
+            <td>
+              <ul class="list-unstyled">
+                <li ng-repeat="section in item.local.sections">
+                  {{section.name}} ({{section.items.length}})
+                </li>
+              </ul>
+
+
+            </td>
+            <td>
+              <ul class="list-unstyled">
+                <li ng-repeat="section in item.library.sections">
+                  {{section.name}} ({{section.items.length}})
+                </li>
+              </ul>
+
+            </td>
+            <td>{{item.note}}</td>
+          </tr>
+        </table>
+
+      </uib-tab>
 
     </uib-tabset>
 

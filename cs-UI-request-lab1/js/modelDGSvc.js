@@ -11,7 +11,7 @@ angular.module("pocApp")
                 Object.keys(hashAllDG).forEach(function (key) {
                     let dg = hashAllDG[key]
                     if (angular.toJson(dg) !== $localStorage.world.dataGroups[dg.name]) {
-                        alert(`Warning! the Browser copy of the DG ${dg.name} doesn't match the copy in memory! You should re-load the page and check it.`)
+                        alert(`Warning! the Browser copy of the DG ${dg.name} doesn't match the copy in memory! You should re-load the page and check it. From modelDGSvc`)
 
 
                     }

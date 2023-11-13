@@ -119,5 +119,106 @@
         </div>
     </nav>
 
+
+
+    <div class="row">
+        <div class="col-md-6">
+
+            <div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        DataGroups filter:
+                    </div>
+                    <div class="col-md-4">
+
+                        <select ng-model = "input.selectedDGName" class="form-control"
+                                ng-change = "setFilter(input.selectedDGName)"
+                                ng-options="type for type in lstType">
+
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <select ng-model = "input.selectedEmail" class="form-control"
+                                ng-change = "setEmailFilter(input.selectedEmail)"
+                                ng-options="k for (k,v) in hashUser">
+                            <option value=""></option>
+
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <checkbox ng-model="input.hideSelect"></checkbox> Hide select
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="myScroll">
+
+                <br/>
+                <table class="table table-bordered table-condensed">
+                    <tr><th>Action</th><th>Type</th><th>Title</th><th>Description</th><th>Diff</th><th>User</th></tr>
+                    <tr ng-click="selectTraceItem(hx)"
+                        style="cursor: pointer"
+                        ng-class="{listItemSelected:selectedTraceItem == hx}"
+                        ng-show = canShow(hx)
+                        ng-repeat="hx in traceHistory">
+                        <td>{{hx.action}}</td>
+                        <td>{{hx.model.kind}}</td>
+                        <td>{{hx.model.title}}</td>
+                        <td>{{hx.description}}</td>
+                        <td>{{hx.model.diff.length}}</td>
+                        <td>{{hx.userEmail}}</td>
+
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+        <div class="col-md-6">
+
+            <div>
+                <button ng-show="currentDG.checkedOut == user.email && selectedTraceItem.model.name == currentDG.name"
+                        ng-click="restoreDG(selectedTraceItem.model)"
+                        class="btn btn-danger pull-right">
+                    Restore this version
+                </button>
+            </div>
+            <uib-tabset>
+
+                <uib-tab heading="Diff">
+                    <div ng-show="selectedTraceItem.model.parent">
+                        <br/>
+                        <div class="banner">
+                            <strong>Parent: </strong>{{selectedTraceItem.model.parent}}
+                            <br/>
+                        </div>
+
+                    </div>
+                    <table class="table-condensed table table-bordered">
+                        <tr><th>Title</th><th>Path</th><th>Card.</th><th>Type</th></tr>
+                        <tr ng-repeat="element in selectedTraceItem.model.diff">
+                            <td>{{element.title}}</td>
+                            <td>{{element.path}}</td>
+                            <td>{{element.mult}}</td>
+                            <td>{{element.type[0]}}</td>
+
+                        </tr>
+                    </table>
+
+                </uib-tab>
+                <uib-tab heading="Json">
+                    <pre>{{selectedTraceItem.model | json}}</pre>
+                </uib-tab>
+
+            </uib-tabset>
+        </div>
+    </div>
+
+
+
 </div>
 </body>

@@ -31,7 +31,7 @@
       </div>
 
       <div class="col-md-2 col-sm-2">
-        <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
+        <button class="btn btn-link pull-right" ng-click="close()">Close</button>
 
       </div>
     </div>
@@ -102,6 +102,14 @@
         <uib-tabset>
 
           <uib-tab heading="Diff">
+            <div ng-show="selectedTraceItem.model.parent">
+              <br/>
+              <div class="banner">
+                <strong>Parent: </strong>{{selectedTraceItem.model.parent}}
+                <br/>
+              </div>
+
+            </div>
             <table class="table-condensed table table-bordered">
               <tr><th>Title</th><th>Path</th><th>Card.</th><th>Type</th></tr>
               <tr ng-repeat="element in selectedTraceItem.model.diff">

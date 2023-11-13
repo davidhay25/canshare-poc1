@@ -5,6 +5,8 @@ angular.module("pocApp")
             $scope.traceHistory = traceSvc.getActions()
             $scope.traceSize = traceSvc.getTraceSize()
 
+            let hashRestorations = {}   //DGs that have been restored
+
             $scope.AllDGsize = parseInt(modelsSvc.getSizeOfObject(hashAllDG)/(1024))
             $scope.AllDGsizeCount = Object.keys(hashAllDG).length
 
@@ -44,7 +46,13 @@ angular.module("pocApp")
                 //have checked that DG is checked out to the current user
                 if (confirm("Are you sure you wish to restore this version, replacing the current one")) {
                     hashAllDG[dg.name] = dg
+
+                    //need to make sure that the checkedOut status remains the same after restoration.
+                    dg.checkedOut = currentDG.checkedOut
                     traceSvc.addAction({action:'restore',model:dg,description:"Restore previous version"})
+                    $scope.traceHistory = traceSvc.getActions()
+
+                    hashRestorations[dg.name] = true
                 }
             }
 
@@ -81,6 +89,10 @@ angular.module("pocApp")
 
             $scope.selectTraceItem = function (item) {
                 $scope.selectedTraceItem = item
+            }
+
+            $scope.close = function () {
+                $scope.$close(hashRestorations)
             }
 
         })

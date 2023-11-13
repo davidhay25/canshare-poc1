@@ -6,6 +6,11 @@ angular.module("pocApp")
             $scope.isDirty = false;
             let nzDisplayLanguage = "en-x-sctlang-23162100-0210105"
             let snomed = "http://snomed.info/sct"
+            let versionEcl = "http://snomed.info/sct/21000210109"      //the version that has the ECL statements
+
+            //http://snomed.info/sct/21000210109
+            let versionPrePub = "http://snomed.info/xsct/21000210109"  //the version that has concepts not yet published
+
 
             //retrieve ValueSets
             getValueSets = function () {
@@ -47,6 +52,23 @@ angular.module("pocApp")
                     delete $scope.showLoadingMessage
                 }
             )
+
+            //add a concept to the
+            $scope.addPPConcept = function () {
+
+                $scope.input.prePubConcepts = $scope.input.prePubConcepts || []
+                let concept = {code:$scope.input.newPPCode,display:$scope.input.newPPDisplay}
+                $scope.input.prePubConcepts.push(concept)
+                delete $scope.input.newPPCode
+                delete $scope.input.newPPDisplay
+                $scope.makeVS()
+            }
+
+            $scope.removePPConcept = function (inx) {
+                $scope.input.prePubConcepts.splice(inx,1)
+                $scope.makeVS()
+
+            }
 
             $scope.checkNewVS = function (id) {
                 let ok = true
@@ -104,10 +126,6 @@ angular.module("pocApp")
             $scope.testECL = function (ecl) {
 
                 let encodedEcl = encodeURIComponent(ecl)
-                //let qry = `ValueSet?fhir_vs=ecl/${encodeURIComponent(ecl)}`
-                //console.log(qry)
-                //let encodedQry = encodeURIComponent(qry)
-                //$http.get(`nzhts/ecl?qry=${encodeURIComponent(ecl)}`).then(
                 $http.get(`nzhts/ecl?qry=${encodedEcl}`).then(
                     function (data) {
                         $scope.textEclVS = data.data
@@ -150,12 +168,37 @@ angular.module("pocApp")
 
             }
 
-            function makeVoFromVS(vs) {
+
+            //parse the contents of the VS into the scope values
+            function parseVS(vs) {
+                delete $scope.parseError
                 $scope.input.status = vs.status
                 $scope.input.id = vs.id
                 $scope.input.title = vs.title
                 $scope.input.description = vs.description
-                $scope.input.ecl = vs.compose.include[0].filter[0].value
+
+                //there are now potentially 2 include statements
+                   //system = http://snomed.info/sct, version = https://snomed.info/sct/21000210109 and a filter
+                if (vs.compose && vs.compose.include) {
+                    vs.compose.include.forEach(function (inc) {
+                        let system = inc.system
+                        let version = inc.version
+                        let identified = false
+                        if (system == snomed && version == versionEcl) {
+                            //this is the main ecl statement
+                            //$scope.input.ecl = vs.compose.include[0].filter[0].value
+                            $scope.input.ecl = inc.filter[0].value
+                        } else if(system == snomed && version == versionPrePub) {
+                            //these are separate concepts
+                            $scope.input.prePubConcepts = inc.concept
+                        } else {
+                            $scope.parseError = true
+                            alert(`Unknown include. system:${system}, version:${version}`)
+                        }
+
+                    })
+                }
+
             }
 
             $scope.selectVSItem = function (item) {
@@ -191,7 +234,7 @@ angular.module("pocApp")
                                 alert("There were ${data.data.entry.length} matching ValueSets. This is very likely an issue with duplicated resources on the terminology server")
                             } else {
                                 $scope.selectedVS = data.data.entry[0].resource
-                                makeVoFromVS($scope.selectedVS)
+                                parseVS($scope.selectedVS)
                                 console.log($scope.selectedVS)
                             }
                         } else {
@@ -212,9 +255,12 @@ angular.module("pocApp")
 
 
             $scope.makeVS = function () {
-                let vo = {id:$scope.input.id,title:$scope.input.title,
+                let vo = {id:$scope.input.id,
+                    title:$scope.input.title,
                     status : $scope.input.status,
-                    description:$scope.input.description,ecl:$scope.input.ecl}
+                    description:$scope.input.description,
+                    prePubConcepts: $scope.input.prePubConcepts,
+                    ecl:$scope.input.ecl}
                 $scope.selectedVS = makeVSFromVo(vo)
                 $scope.isDirty = true
             }
@@ -237,13 +283,40 @@ angular.module("pocApp")
                     function (data) {
                         $scope.expandedVS = data.data
                     }, function (err) {
-
+                        alert(angular.toJson(err.data))
                     }
                 ).finally(
                     function () {
                         $scope.showWaiting = false
                     }
                 )
+
+            }
+
+
+            //The display for a concept code. Used when adding pre-published codes
+            $scope.getDisplay = function (code) {
+
+                let qry = `CodeSystem/$lookup?system=${snomed}&code=${code}`
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        let paramResource = data.data
+                        if (paramResource.parameter) {
+                            for (const param of paramResource.parameter) {
+                                if (param.name == 'display') {
+                                    $scope.input.newPPDisplay = param.valueString
+                                    break
+                                }
+                            }
+                        }
+                    }, function (err) {
+
+                    }
+                ).finally(function(){
+                        $scope.showWaiting = false
+                    })
 
             }
 
@@ -303,11 +376,21 @@ angular.module("pocApp")
                     vs.description = vo.description
                 }
 
-                //let filter = {property:"concept",op:"in",value:vo.refset}
-                let filter = {property:"constraint",op:"=",value:`${vo.ecl}`}
 
-                let include = {system:"http://snomed.info/sct",version:"http://snomed.info/sct/21000210109",filter:[filter]}
+                //This is the main ECL part of the VS
+                let filter = {property:"constraint",op:"=",value:`${vo.ecl}`}
+                let include = {system:snomed,version:versionEcl,filter:[filter]}
                 vs.compose = {include:[include]}
+
+                if (vo.prePubConcepts && vo.prePubConcepts.length > 0) {
+                    //These are concepts directly added to the VS that are in the publishing env. but not the main env.
+                    let ppInclude = {system:snomed,version:versionPrePub,concept:[]}
+                    vo.prePubConcepts.forEach(function (concept) {
+                        ppInclude.concept.push(concept)
+                    })
+                    vs.compose.include.push(ppInclude)
+
+                }
 
                 return vs
             }

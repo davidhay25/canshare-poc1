@@ -1,7 +1,7 @@
 //Trace activities
 angular.module("pocApp")
 
-    .service('traceSvc', function(modelsSvc,$localStorage) {
+    .service('traceSvc', function(modelsSvc,$localStorage,$http) {
      //   $localStorage.trace = $localStorage.trace || {contents:[]}    //actions
 
         return {
@@ -20,20 +20,49 @@ angular.module("pocApp")
                     $localStorage.trace.contents = $localStorage.trace.contents || []
                     $localStorage.trace.contents.push(clone)  //make it a clone so subsequent changes to the model don't effect things
 
+                    //sent to server
+                    let serverCopy = angular.copy(clone)
+                    let user = modelsSvc.getuser()
+                    if (user && user.email) {
+                        serverCopy.userEmail = user.email
+                    }
+                    $http.post('/trace',serverCopy).then(
+                        function () {
+
+                        },function () {
+                            alert('Unable to save the trace record on the server')
+                        }
+                    )
+
+
                     //if over the limit size wise - remove the first one
                     let limit = $localStorage.trace.limit || 500
                     if ($localStorage.trace.contents.length > limit) {
                         $localStorage.trace.contents.splice(0,1)
                     }
-
                 }
 
-                //check that the memory & locatstorage are the same
+                //check that the memory & localstorage are the same
                 if (action.model && action.model.kind == 'dg') {
                     console.log("validate DG")
                     //make sure that $localStorage has been updated
                     if (angular.toJson(action.model) !== angular.toJson($localStorage.world.dataGroups[action.model.name])) {
-                        alert("Warning! the Browser copy of the DG doesn't match the copy in memory! You should re-load the page and check it.")
+
+                        //send a copy to the trace store so it is in the trail
+                        let errorReport = {action:'error',model:action.model,description:"Browser store mismatch with in-memory"}
+                        let user = modelsSvc.getuser()
+                        if (user && user.email) {
+                            errorReport.userEmail = user.email
+                        }
+                        $http.post('/trace',errorReport).then(
+                            function () {
+
+                            },function () {
+                                alert('Unable to save the error trace record on the server')
+                            }
+                        )
+
+                        alert(`Warning! the Browser copy of the DG ${action.model.name} doesn't match the copy in memory! You should re-load the page and check it. From traceSvc.`)
                     }
                 }
 
@@ -47,7 +76,8 @@ angular.module("pocApp")
                  return parseInt(size/1024)
             },
             resetTrace : function () {
-                $localStorage.trace = {}
+                let on = $localStorage.trace.on
+                $localStorage.trace = {on:on,contents:[],limit:500}
 
             }
         }
