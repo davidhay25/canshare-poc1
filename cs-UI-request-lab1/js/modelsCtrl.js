@@ -1453,7 +1453,7 @@ angular.module("pocApp")
                     //check the current checkedout state on the library.
                     //Always update the local version checkedout (not data) with the one from the library
                     let qry = `/model/DG/${dg.name}`
-                    $http.get(url).then(
+                    $http.get(qry).then(
                         function (data) {
                             let libraryDG = data.data
                             $scope.selectedModel.checkedOut = libraryDG.checkedOut
