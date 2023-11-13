@@ -124,7 +124,7 @@ angular.module("pocApp")
                         //the library  doesn't have this DG
                     }
 
-                    if (item.library.checkedOut !== item.local.checkedOut) {
+                    if (item.library && item.local && item.library.checkedOut !== item.local.checkedOut) {
                         item.note = "WARNING: Local and Library have different checked out emails"
                     }
 
