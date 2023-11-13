@@ -124,6 +124,7 @@ angular.module("pocApp")
                         //the library  doesn't have this DG
                     }
 
+                    /* - now always setting local checkout to the library
                     //checkout checks
                     if (item.local && item.local.checkedOut) {
                         if (! item.library) {
@@ -145,7 +146,7 @@ angular.module("pocApp")
                         }
                     }
 
-
+*/
 
 
                     /*
