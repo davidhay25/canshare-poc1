@@ -246,7 +246,7 @@ angular.module("pocApp")
                         }
                     }}).result.then(function (hashChanges) {
 
-                        if (hashChanges[$scope.selectedModel.name]) {
+                        if ($scope.selectedModel && hashChanges[$scope.selectedModel.name]) {
                             //Has the current model been changed? If so, re-select
                             $scope.selectModel($scope.selectedModel)
 
