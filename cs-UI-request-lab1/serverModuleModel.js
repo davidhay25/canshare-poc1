@@ -98,13 +98,20 @@ async function setup(app) {
 
     })
 
+    //db.getCollection("trace").find({date:{"$gte":new Date("2023-11-14")}}).count()
+
     //retrieve the trace records
     app.get('/trace', async function(req,res) {
         let query = {}
 
-        let limit = 200
+        let limit = 500
         if (req.query.count) {
             limit = parseInt(req.query.count)
+        }
+
+        if (req.query.days) {
+            //the number of days to show
+           // query.date = {"$gte"}
         }
 
         const options = {sort: { date : 1 },limit:limit}

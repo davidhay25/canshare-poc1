@@ -116,17 +116,27 @@
             </td>
           </tr>
 
-          <tr>
+          <tr ng-show="isFixedType(input.selectedType)">
             <td>Fixed value</td>
             <td>
 
 
-
-
-              <div ng-show='false' class="clickable pull-right" ng-click="setFixedValue('fixed')">Edit</div>
+              <div class="clickable pull-right" ng-click="setFixedValue('fixed')">Edit</div>
 
 
               {{fixedDisplay}}
+
+            </td>
+          </tr>
+          <tr ng-show="isFixedType(input.selectedType)">
+            <td>Default value</td>
+            <td>
+
+
+              <div class="clickable pull-right" ng-click="setFixedValue('default')">Edit</div>
+
+
+              {{defaultDisplay}}
 
             </td>
           </tr>

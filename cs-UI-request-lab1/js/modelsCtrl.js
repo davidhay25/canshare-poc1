@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
 
-            $scope.version = "0.5.9"
+            $scope.version = "0.5.10"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -844,7 +844,7 @@ angular.module("pocApp")
                         ed.path = `${pathOfCurrentElement}${ar.join('.')}`
                         $scope.selectedModel.diff.push(ed)
                         displayPath = ed.path
-                        traceSvc.addAction({action:'new-element',model:$scope.selectedModel,description:ed.path})
+                        traceSvc.addAction({action:'new-element',model:$scope.selectedModel,path:displayPath})
 
                     } else {
                         //If an edit, then need to see if the item is directly defined on the DG (which will be updated),
@@ -902,7 +902,7 @@ angular.module("pocApp")
                                 ed1.defaultRatio = ed.defaultRatio
 
 
-                                traceSvc.addAction({action:'edit-override',model:$scope.selectedModel,description:displayPath})
+                                traceSvc.addAction({action:'edit-override',model:$scope.selectedModel,path:displayPath})
 
                                 break
                             }
@@ -914,7 +914,7 @@ angular.module("pocApp")
                             ed.path = $filter('dropFirstInPath')(ed.path)
 
                             $scope.selectedModel.diff.push(ed)
-                            traceSvc.addAction({action:'add-override',model:$scope.selectedModel,description:ed.path})
+                            traceSvc.addAction({action:'add-override',model:$scope.selectedModel,path:ed.path})
 
                         }
 

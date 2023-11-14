@@ -111,6 +111,7 @@
         <div class="col-md-7">
 
           <uib-tabset>
+            
             <uib-tab heading = "Details">
               <div ng-show="selectedCompositionNode">
 
@@ -240,9 +241,21 @@
                     Fixed value
                   </div>
                   <div class="col-md-9">
-                    {{selectedCompositionNode.data.ed.fixedCoding}}
-                    {{selectedCompositionNode.data.ed.fixedString}}
-                    {{selectedCompositionNode.data.ed.fixedDecimal}}
+
+                    <div ng-show="selectedCompositionNode.data.ed.fixedRatio">
+                      <div ng-show="selectedCompositionNode.data.ed.fixedRatio.numerator.unit">Numerator unit: {{selectedCompositionNode.data.ed.fixedRatio.numerator.unit}}</div>
+                      <div ng-show="selectedCompositionNode.data.ed.fixedRatio.denominator.unit">Denominator unit: {{selectedCompositionNode.data.ed.fixedRatio.denominator.unit}}</div>
+                      <div ng-show="selectedCompositionNode.data.ed.fixedRatio.denominator.value">Denominator value: {{selectedCompositionNode.data.ed.fixedRatio.denominator.value}}</div>
+                    </div>
+
+                    <div ng-show="selectedCompositionNode.data.ed.fixedQuantity">
+                      Unit: {{selectedCompositionNode.data.ed.fixedQuantity.unit}}
+                    </div>
+
+                    <div ng-show="selectedCompositionNode.data.ed.fixedCoding">
+                      {{selectedCompositionNode.data.ed.fixedCoding.code}} | {{selectedCompositionNode.data.ed.fixedCoding.display}} | {{selectedCompositionNode.data.ed.fixedCoding.system}}
+                    </div>  
+
                   </div>
                 </div>
 
@@ -465,6 +478,84 @@
 
     </uib-tab>
 
+    <uib-tab heading = "MetaData">
+
+      <div class="row">
+        <div class="col-md-6">
+          <table class="table">
+            <tr>
+              <td>Name</td>
+              <td>{{selectedComposition.name}}</td>
+            </tr>
+            <tr>
+              <td>Title</td>
+              <td><input ng-disabled = "! canEditComp(selectedComposition)"
+                         type="text" class="form-control" ng-model="selectedComposition.title" />  </td>
+            </tr>
+            <tr>
+              <td>Description</td>
+              <td><textarea ng-disabled = "! canEditComp(selectedComposition)"
+                            class="form-control" ng-model="selectedComposition.description" ></textarea> </td>
+            </tr>
+            <tr>
+              <td>Category</td>
+              <td><input ng-disabled = "! canEditComp(selectedComposition)"
+                         type="text" class="form-control"
+                         ng-blur="updateMetaValues()"
+                         ng-model="selectedComposition.meta.category" />  </td>
+            </tr>
+
+          </table>
+        </div>
+        <div class="col-md-6">
+          <table class="table">
+
+            <tr>
+              <td>Tumour stream</td>
+              <td><input ng-disabled = "! canEditComp(selectedComposition)"
+                         type="text" class="form-control"
+                         ng-blur="updateMetaValues()"
+                         ng-model="selectedComposition.meta.tumourStream" /> </td>
+            </tr>
+
+            <tr>
+              <td>Tags</td>
+              <td>
+                <div ng-repeat="tag in selectedComposition.meta.tags">
+                  {{tag}}
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>Source reference</td>
+
+              <td><input ng-disabled = "! canEditComp(selectedComposition)"
+                         type="text" class="form-control" ng-model="selectedComposition.sourceReference" />  </td>
+
+            </tr>
+
+
+          </table>
+        </div>
+      </div>
+
+
+
+
+
+    </uib-tab>
+
+
+    <uib-tab heading = "Headings">
+      <br/>
+      <div ng-controller="compSectionsCtrl">
+        <ng-include src ="'includes/compSections.html'"></ng-include>
+
+      </div>
+    </uib-tab>
+
+
 
     <uib-tab heading="Table">
 
@@ -515,13 +606,7 @@
     </uib-tab>
 
 
-    <uib-tab heading = "Sections">
-      <br/>
-      <div ng-controller="compSectionsCtrl">
-        <ng-include src ="'includes/compSections.html'"></ng-include>
 
-      </div>
-    </uib-tab>
 
 
     <uib-tab heading="Conditionals">
@@ -592,7 +677,7 @@
 
     </uib-tab>
 
-    <uib-tab heading="Graph">
+    <uib-tab ng-show = "false" heading="Graph">
       Graph of all DG linked back to Composition
     </uib-tab>
 
@@ -616,76 +701,6 @@
         </tr>
       </table>
     </uib-tab>
-
-    <uib-tab heading = "MetaData">
-
-      <div class="row">
-        <div class="col-md-6">
-          <table class="table">
-            <tr>
-              <td>Name</td>
-              <td>{{selectedComposition.name}}</td>
-            </tr>
-            <tr>
-              <td>Title</td>
-              <td><input ng-disabled = "! canEditComp(selectedComposition)"
-                      type="text" class="form-control" ng-model="selectedComposition.title" />  </td>
-            </tr>
-            <tr>
-              <td>Description</td>
-              <td><textarea ng-disabled = "! canEditComp(selectedComposition)"
-                            class="form-control" ng-model="selectedComposition.description" ></textarea> </td>
-            </tr>
-            <tr>
-              <td>Category</td>
-              <td><input ng-disabled = "! canEditComp(selectedComposition)"
-                         type="text" class="form-control"
-                         ng-blur="updateMetaValues()"
-                         ng-model="selectedComposition.meta.category" />  </td>
-            </tr>
-
-          </table>
-        </div>
-        <div class="col-md-6">
-          <table class="table">
-
-            <tr>
-              <td>Tumour stream</td>
-              <td><input ng-disabled = "! canEditComp(selectedComposition)"
-                         type="text" class="form-control"
-                         ng-blur="updateMetaValues()"
-                         ng-model="selectedComposition.meta.tumourStream" /> </td>
-            </tr>
-
-            <tr>
-              <td>Tags</td>
-              <td>
-                <div ng-repeat="tag in selectedComposition.meta.tags">
-                  {{tag}}
-                </div>
-              </td>
-            </tr>
-
-            <tr>
-              <td>Source reference</td>
-
-              <td><input ng-disabled = "! canEditComp(selectedComposition)"
-                         type="text" class="form-control" ng-model="selectedComposition.sourceReference" />  </td>
-
-            </tr>
-
-
-          </table>
-        </div>
-      </div>
-
-
-
-
-
-    </uib-tab>
-
-
 
 
 

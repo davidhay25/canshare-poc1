@@ -24,6 +24,7 @@ angular.module("pocApp")
                 setControlOptions($scope.input.selectedType)
 
 
+                //displays for fixed
                 if (item.ed.fixedCoding) {
                     $scope.fixedDisplay = `${item.ed.fixedCoding.code} | ${item.ed.fixedCoding.display} | ${item.ed.fixedCoding.system}`
                 }
@@ -35,6 +36,20 @@ angular.module("pocApp")
                 if (item.ed.fixedQuantity) {
                     $scope.fixedDisplay = `Unit: ${item.ed.fixedQuantity.unit}`
                 }
+
+                //displays for default
+                if (item.ed.defaultCoding) {
+                    $scope.defaultDisplay = `${item.ed.defaultCoding.code} | ${item.ed.defaultCoding.display} | ${item.ed.defaultCoding.system}`
+                }
+
+                if (item.ed.defaultRatio) {
+                    $scope.defaultDisplay = `Numerator Unit: ${item.ed.defaultRatio.numerator.unit} Denominator Unit: ${item.ed.defaultRatio.denominator.unit} Denominator value: ${item.ed.defaultRatio.denominator.value}`
+                }
+
+                if (item.ed.defaultQuantity) {
+                    $scope.defaultDisplay = `Unit: ${item.ed.defaultQuantity.unit}`
+                }
+                
 
                 for (const typ of allTypes) {
                     if (item.ed.type[0] == typ) {
@@ -53,6 +68,16 @@ angular.module("pocApp")
                     }
                 }
                 $scope.isNew = true         //allows cancel
+            }
+
+            //retur true if the datatype can have a fixed value
+            $scope.isFixedType = function (type) {
+
+                if (type == 'CodeableConcept' || type == 'Quantity' || type == 'Ratio') {
+                    //if (type == 'CodeableConcept' || type == 'decimal' || type == 'string') {
+                    return true
+                }
+
             }
 
 

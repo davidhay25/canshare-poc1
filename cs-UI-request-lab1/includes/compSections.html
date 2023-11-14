@@ -2,7 +2,8 @@
 
   <div class="row" ng-show="selectedComposition">
     <div class="col-md-4">
-      <div class="banner">Sections</div>
+      <div class="banner">Headings</div>
+      <!-- Note that sections got renamed to 'headings' in the UI - still 'section' in the code-->
       <div class="list-group">
         <div ng-class="{'list-group-item':true,listItemSelected:section == selectedSection}"
              style="cursor: pointer"
@@ -32,7 +33,7 @@
 
       <div ng-show = "canEditComp(selectedComposition)">
 
-        <h5>New section</h5>
+        <h5>New heading</h5>
 
 
         <div class="row">
@@ -60,7 +61,7 @@
     </div>
     <div class="col-md-4" ng-show="selectedSection">
 
-      <div class="banner">Section details</div>
+      <div class="banner">Heading details</div>
 
       <div class="row">
         <div class="col-md-2"><div style="padding-top: 8px">Name</div></div>
@@ -88,7 +89,7 @@
 
       <br/>
 
-      <div class="banner">DGs in section</div>
+      <div class="banner">DGs under this heading</div>
 
 
       <div class="list-group">
@@ -141,7 +142,7 @@
 
     </div>
     <div class="col-md-4" ng-show="selectedSection">
-      <div class="banner">Selected DG details, add DG to section</div>
+      <div class="banner">Selected DG details, add DG to heading</div>
       <uib-tabset>
 
         <uib-tab heading="Details">
@@ -161,18 +162,27 @@
         </uib-tab>
 
 
-        <uib-tab ng-show = "canEditComp(selectedComposition)" heading="DG library Tree">
+        <uib-tab heading="DG library Tree">
           <!--
           <div class="clickable" ng-click="setup()">refresh</div>
 -->
-          <div ng-show="selectedNewDG">
-            <button class="btn-link btn pull-right" ng-click="showDG(selectedNewDG.name)">Load {{selectedNewDG.name}} DataGroup</button>
-            <div class="clearfix"></div>
+
+          <div ng-show="canEditComp(selectedComposition)">
+            <em>The Composition must be checked out for DG tree to be visible</em>
           </div>
 
-          <div class="myScroll">
-            <div id="dgSelectTree"></div>
+          <div ng-show="canEditComp(selectedComposition)">
+            <div ng-show="selectedNewDG">
+              <button class="btn-link btn pull-right" ng-click="showDG(selectedNewDG.name)">Load {{selectedNewDG.name}} DataGroup</button>
+              <div class="clearfix"></div>
+            </div>
+
+            <div class="myScroll">
+              <div id="dgSelectTree"></div>
+            </div>
           </div>
+
+
 
 
 
@@ -203,9 +213,9 @@
 
     <h5>Conditionals</h5>
 
-    <strong>Existing conditionals this section</strong>
+    <strong>Existing conditionals this heading</strong>
     <table class="table-bordered table">
-      <tr><th>Source Section</th><th>DataGroup</th><th>Element</th><th>Value</th></tr>
+      <tr><th>Source heading</th><th>DataGroup</th><th>Element</th><th>Value</th></tr>
       <tr ng-repeat="ew in selectedComposition.enableWhen"
         ng-show="ew.targetSection == selectedSection.name">
         <td>{{ew.sourceSection}}</td>
@@ -214,8 +224,8 @@
         <td>{{ew.value}}</td>
       </tr>
     </table>
-    <em>Each row represents a source condition that must be true for the section to appear
-    in a Form. There can be multiple - if any match then the section is shown.</em>
+    <em>Each row represents a source condition that must be true for the heading contents to appear
+    in a Form. There can be multiple - if any match then the heading is shown.</em>
 
 
 
@@ -224,7 +234,7 @@
       <strong>New conditional</strong>
       <div class="row" >
         <div class="col-md-3">
-          Section where the source is
+          Heading where the source is
 
           <select class="form-control" ng-model="local.ewSection" ng-change="getDGsForSection(local.ewSection)"
                   ng-options = "section.title for section in local.ewSections"></select>
@@ -261,7 +271,7 @@
 
       </div>
       <br/>
-      <em>Will only allow the source (what has to be true for the section to be shown) to be a coded
+      <em>Will only allow the source (what has to be true for the heading to be shown) to be a coded
       item (ie CodeableConcept) and the source of possible values is currently only from options - not yet the ValueSet.</em>
     </div>
 

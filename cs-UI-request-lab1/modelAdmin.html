@@ -122,7 +122,7 @@
 
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-7">
 
             <div>
 
@@ -159,16 +159,19 @@
             <div class="myScroll">
 
                 <br/>
+                <em class="pull-right">Last 500 entries</em>
                 <table class="table table-bordered table-condensed">
-                    <tr><th>Action</th><th>Type</th><th>Title</th><th>Description</th><th>Diff</th><th>User</th></tr>
+                    <tr><th>Date</th><th>Action</th><th>Title</th><th>Path</th><th>Description</th><th>Diff</th><th>User</th></tr>
                     <tr ng-click="selectTraceItem(hx)"
                         style="cursor: pointer"
                         ng-class="{listItemSelected:selectedTraceItem == hx}"
                         ng-show = canShow(hx)
                         ng-repeat="hx in traceHistory">
+                        <td>{{hx.date | date : "MMM dd"}}</td>
                         <td>{{hx.action}}</td>
-                        <td>{{hx.model.kind}}</td>
+
                         <td>{{hx.model.title}}</td>
+                        <td>{{hx.path}}</td>
                         <td>{{hx.description}}</td>
                         <td>{{hx.model.diff.length}}</td>
                         <td>{{hx.userEmail}}</td>
@@ -178,10 +181,10 @@
             </div>
 
         </div>
-        <div class="col-md-6">
+        <div class="col-md-5">
 
             <div>
-                <button ng-show="currentDG.checkedOut == user.email && selectedTraceItem.model.name == currentDG.name"
+                <button ng-show="false && currentDG.checkedOut == user.email && selectedTraceItem.model.name == currentDG.name"
                         ng-click="restoreDG(selectedTraceItem.model)"
                         class="btn btn-danger pull-right">
                     Restore this version

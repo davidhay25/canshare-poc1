@@ -6,6 +6,10 @@ angular.module("pocApp")
             let emailFilter
             $scope.input = {}
 
+            $scope.restoreDG = function () {
+                alert("Not yet enabled")
+            }
+
             function getTrace(count) {
                 count = count || 200
                 let qry = `/trace?count=${count}`

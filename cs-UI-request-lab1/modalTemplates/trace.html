@@ -72,7 +72,7 @@
 
           <br/>
           <table class="table table-bordered table-condensed">
-            <tr><th>Action</th><th>Type</th><th>Title</th><th>Path</th><th>Description</th><th>Diff</th></tr>
+            <tr><th>Action</th><th>Title</th><th>Path</th><th>Description</th><th>Diff</th></tr>
             <tr ng-click="selectTraceItem(hx)"
                 style="cursor: pointer"
                 ng-class="{listItemSelected:selectedTraceItem == hx}"
@@ -80,7 +80,7 @@
                 ng-repeat="hx in traceHistory">
               <td>{{hx.action}}</td>
 
-              <td>{{hx.model.kind}}</td>
+
               <td>{{hx.model.title}}</td>
               <td>{{hx.path}}</td>
               <td>{{hx.description}}</td>
@@ -126,7 +126,9 @@
 
           </uib-tab>
           <uib-tab heading="Json">
-            <pre>{{selectedTraceItem.model | json}}</pre>
+            <div class="myScrollSmall">
+             <pre>{{selectedTraceItem.model | json}}</pre>
+            </div>
           </uib-tab>
 
         </uib-tabset>

@@ -290,6 +290,16 @@
 
             </div>
 
+            <div class="row">
+              <div class="col-md-12">
+
+              </div>
+            </div>
+
+            <i class="glyphicon glyphicon-edit pull-right clickable"
+               ng-show="canEdit(selectedModel)"
+               ng-click="editDGItem(selectedNode.data)"></i>
+
             <uib-tabset ng-hide="selectedNode.data.ed.kind == 'root'">
               <uib-tab heading="Details">
                 <table class="table table-bordered table-condensed">
@@ -502,7 +512,7 @@
                       </div>
 
                       <div ng-show="selectedNode.data.ed.fixedQuantity">
-                        Fixed Quantity unit: {{selectedNode.data.ed.fixedQuantity.unit}}
+                        Unit: {{selectedNode.data.ed.fixedQuantity.unit}}
                       </div>
 
 
@@ -529,12 +539,14 @@
 
                       </span>
 
+                      <!--
                       <div ng-show="canEdit(selectedModel)">
                         <div class="clickable"
                              ng-click="setFixedValue(selectedNode.data.ed,'fixed')">
                           Set/edit fixed value
                         </div>
                       </div>
+                      -->
                     </td>
                   </tr>
 
@@ -548,7 +560,6 @@
                         <div ng-show="selectedNode.data.ed.defaultRatio.denominator.unit">Denominator unit: {{selectedNode.data.ed.defaultRatio.denominator.unit}}</div>
                         <div ng-show="selectedNode.data.ed.defaultRatio.denominator.value">Denominator value: {{selectedNode.data.ed.defaultRatio.denominator.value}}</div>
                       </div>
-                      
 
                       <div ng-show="selectedNode.data.ed.defaultQuantity">
                         Default Quantity unit: {{selectedNode.data.ed.defaultQuantity.unit}}

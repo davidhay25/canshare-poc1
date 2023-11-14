@@ -562,7 +562,7 @@ angular.module("pocApp")
 
             }
 
-            //retur true if the datatype can have a fixed value
+            //retur true if the datatype can have a fixed or default value
             $scope.isFixedType = function (ed) {
                 if (ed && ed.type) {
                     let type = ed.type[0]       //only look at the first
