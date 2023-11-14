@@ -290,15 +290,16 @@
 
             </div>
 
-            <div class="row">
-              <div class="col-md-12">
 
-              </div>
-            </div>
-
+<!--
             <i class="glyphicon glyphicon-edit pull-right clickable"
                ng-show="canEdit(selectedModel)"
                ng-click="editDGItem(selectedNode.data)"></i>
+-->
+            <button class="btn-link btn pull-right"
+                    ng-show="canEdit(selectedModel)"
+                    ng-click="editDGItem(selectedNode.data)">Edit </button>
+
 
             <uib-tabset ng-hide="selectedNode.data.ed.kind == 'root'">
               <uib-tab heading="Details">
@@ -340,26 +341,30 @@
 
                   <tr><td style="width : 20%">Title</td>
                     <td>
+                      <!--
                     <i class="glyphicon glyphicon-edit pull-right clickable"
                        ng-show="canEdit(selectedModel)"
                        ng-click="editDGItem(selectedNode.data)"></i>
+                      -->
                    {{selectedNode.data.ed.title}}</td>
                   </tr>
 
                   <tr><td>Description</td><td>
+                    <!--
                     <i class="glyphicon glyphicon-edit pull-right clickable"
                        ng-show="canEdit(selectedModel)"
                        ng-click="editDGItem(selectedNode.data)"></i>
+                    -->
                     {{selectedNode.data.ed.description}}
                   </td></tr>
 
                   <tr><td>Type</td>
                     <td><div ng-repeat="type in selectedNode.data.ed.type">
-
+<!--
                       <i class="glyphicon glyphicon-edit pull-right clickable"
                          ng-show="canEdit(selectedModel)"
                          ng-click="editDGItem(selectedNode.data)"></i>
-
+-->
 
                       <div ng-show="fhirDataTypes.indexOf(type) > -1" class="pull-right">
                         <a style="padding-right: 12px" target = "_blank" ng-href="{{fhirRoot}}datatypes.html#{{type}}">Details in spec </a>
@@ -392,10 +397,11 @@
                     <td>
                       <div class="row">
                         <div class="col-md-12">
-
+<!--
                           <i class="glyphicon glyphicon-edit pull-right clickable"
                              ng-show="canEdit(selectedModel)"
                              ng-click="editDGItem(selectedNode.data)"></i>
+                          -->
 
 
                           {{selectedNode.data.ed.controlHint}}
@@ -419,19 +425,22 @@
 
 
                   <tr><td>Cardinality</td><td>
+                    <!--
                     <i class="glyphicon glyphicon-edit pull-right clickable"
                        ng-show="canEdit(selectedModel)"
                        ng-click="editDGItem(selectedNode.data)"></i>
+                    -->
                     {{selectedNode.data.ed.mult}}
                   </td></tr>
 
                   <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
                     <td>ValueSet</td>
                     <td>
-
+<!--
                       <i class="glyphicon glyphicon-edit pull-right clickable"
                          ng-show="canEdit(selectedModel)"
                          ng-click="editDGItem(selectedNode.data)"></i>
+                      -->
 
                       <div>{{selectedNode.data.ed.valueSet}}</div>
                       <div>
@@ -446,9 +455,11 @@
                   <tr>
                     <td>Notes</td>
                     <td>
+                      <!--
                       <i class="glyphicon glyphicon-edit pull-right clickable"
                          ng-show="canEdit(selectedModel)"
                          ng-click="editDGItem(selectedNode.data)"></i>
+                      -->
                       {{selectedNode.data.ed.notes}}
                     </td>
                   </tr>
@@ -603,9 +614,11 @@
                   <tr>
                     <td>Source reference</td>
                     <td>
+                      <!--
                       <i class="glyphicon glyphicon-edit pull-right clickable"
                          ng-show="canEdit(selectedModel)"
                          ng-click="editDGItem(selectedNode.data)"></i>
+                      -->
                       {{selectedNode.data.ed.sourceReference}}
                     </td>
                   </tr>
@@ -670,10 +683,11 @@
 
             <div ng-hide="selectedNode.data.ed.kind == 'root' || ! canEdit(selectedModel)">
               {{selectedNode.data.ed.title}}
+              <!--
               <button class="btn-link btn" ng-click="hideInQ(selectedNode.data.ed)">
                 Hide in Q
               </button>
-
+-->
               <button class="btn-link btn" ng-click="deleteDGItem(selectedNode.data.ed)">
                 Delete this item
               </button>
@@ -1076,6 +1090,8 @@
 
                      ng-click="editDGItem(element)"></i>
                 </td>
+
+
 
               </tr>
               </tbody>
