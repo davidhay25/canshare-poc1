@@ -1,7 +1,7 @@
 //seversync is actually the main library interface
 angular.module("pocApp")
     .controller('libraryCtrl',
-        function ($scope,$rootScope,$http,allDG,allComp,$sce,allQObject,user,librarySvc,$timeout) {
+        function ($scope,$rootScope,$http,allDG,allComp,$sce,allQObject,user,librarySvc,$timeout,traceSvc) {
 
             $scope.input = {}
             $scope.user = user
@@ -116,6 +116,9 @@ angular.module("pocApp")
                     let item = {name:key,title:localDG.title,local:localDG}
                     if (libraryHash[key]) {
                         item.library = libraryHash[key]
+
+                        //The library checkedout status is the source of truth. This may not update allDG - but that will be updated when the DG is selected
+                        item.local.checkedOut = item.library.checkedOut
 
                         delete libraryHash[key]      //any left in the hash at the end are new on the library
 
@@ -332,10 +335,9 @@ angular.module("pocApp")
             }
 
             $scope.checkin = function (model) {
-
                 if (user && model.checkedOut == user.email) {
                     if ( confirm("Are you sure you want to check this in to the Library")) {
-                        traceSvc.addAction({action:'checkin',model:$scope.selectedModel,description:"From library"})
+                        traceSvc.addAction({action:'checkin',model:model,description:"From library"})
                         librarySvc.checkIn (model,user,function(){
                             let dg = allDG[model.name]
                             if (dg) {

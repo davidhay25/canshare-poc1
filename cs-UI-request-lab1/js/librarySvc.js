@@ -112,11 +112,15 @@ angular.module("pocApp")
                         //console.log(angular.toJson(data.data))
                         //console.log(angular.toJson(model))
 
+                        //todo - the 'active' property may or moy not be present.
+                        /*
                         if (angular.toJson(data.data) !== angular.toJson(model)) {
-                            alert("The resource saved does not match the resource returned. Please contact support")
-                            //console.log()
-                        }
+                            console.log(data.data)
+                            console.log(model)
+                            alert(`${model.name} The resource saved does not match the resource returned. Please contact support`)
 
+                        }
+*/
                       //  alert("Resource has been checked in")
                         if (vo) {
                             vo()

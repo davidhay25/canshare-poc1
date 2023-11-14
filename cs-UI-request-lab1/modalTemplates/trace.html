@@ -72,7 +72,7 @@
 
           <br/>
           <table class="table table-bordered table-condensed">
-            <tr><th>Action</th><th>Type</th><th>Title</th><th>Description</th><th>Diff</th></tr>
+            <tr><th>Action</th><th>Type</th><th>Title</th><th>Path</th><th>Description</th><th>Diff</th></tr>
             <tr ng-click="selectTraceItem(hx)"
                 style="cursor: pointer"
                 ng-class="{listItemSelected:selectedTraceItem == hx}"
@@ -82,6 +82,7 @@
 
               <td>{{hx.model.kind}}</td>
               <td>{{hx.model.title}}</td>
+              <td>{{hx.path}}</td>
               <td>{{hx.description}}</td>
               <td>{{hx.model.diff.length}}</td>
 
@@ -120,6 +121,8 @@
 
               </tr>
             </table>
+
+            <em>Shows only the elements defined in this DG (diff)</em>
 
           </uib-tab>
           <uib-tab heading="Json">

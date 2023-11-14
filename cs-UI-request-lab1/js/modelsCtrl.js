@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
 
-            $scope.version = "0.5.8"
+            $scope.version = "0.5.9"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -902,7 +902,7 @@ angular.module("pocApp")
                                 ed1.defaultRatio = ed.defaultRatio
 
 
-                                traceSvc.addAction({action:'edit-override',model:$scope.selectedModel,description:ed.path})
+                                traceSvc.addAction({action:'edit-override',model:$scope.selectedModel,description:displayPath})
 
                                 break
                             }
@@ -1275,19 +1275,10 @@ angular.module("pocApp")
 
                         if ($scope.user) {
                             newModel.author = $scope.user.email
-
                             librarySvc.checkOut(newModel,$scope.user)
                         }
-
-
                         $scope.hashAllDG[newModel.name] = newModel
-
-                       // $localStorage.world.dataGroups[newModel.name] = newModel
-                       // $scope.hashAllDG = $localStorage.world.dataGroups
-
-
                         sortDG()
-
 
                         let vo1 = modelsSvc.validateModel($localStorage.world)
                         $scope.errors = vo1.errors
@@ -1333,7 +1324,7 @@ angular.module("pocApp")
                 $scope.selectedModelFromTypeUsage = model
             }
 
-            $scope.addElement = function (name,type) {
+            $scope.addElementDEP = function (name,type) {
                 traceSvc.addAction({action:'add-element',model:$scope.hashAllDG[dgName]})
                 //add a new element to the current model
                 $scope.selectedModel.diff = $scope.selectedModel.diff || []
