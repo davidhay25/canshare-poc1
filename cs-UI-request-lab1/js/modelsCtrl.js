@@ -1303,7 +1303,7 @@ angular.module("pocApp")
                     } else {
                         //the model may have been updated - select it to refresh the various tabs
                         //note this is the model passed in for editing
-                        traceSvc.addAction({action:'edit-model',model:$scope.hashAllDG[dgName]})
+                        traceSvc.addAction({action:'edit-model',model:model})
                         $scope.selectModel(model)
                     }
 
