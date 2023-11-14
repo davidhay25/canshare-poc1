@@ -312,7 +312,8 @@ angular.module("pocApp")
                             }
                         }
                     }, function (err) {
-
+                        delete $scope.input.newPPDisplay
+                        alert("concept not found")
                     }
                 ).finally(function(){
                         $scope.showWaiting = false

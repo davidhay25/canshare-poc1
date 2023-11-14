@@ -304,18 +304,33 @@
                                 <table class="table table-bordered">
                                     <tr><th>Code</th><th>Display</th><th></th></tr>
                                     <tr ng-repeat="concept in input.prePubConcepts">
-                                        <td>{{concept.code}}</td>
+                                        <td>
+                                            {{concept.code}}
+                                        </td>
                                         <td>{{concept.display}}</td>
                                         <td><i style="color: red" class="glyphicon glyphicon-remove clickable"
                                                ng-click="removePPConcept($index)"></i></td>
                                     </tr>
                                     <tr>
-                                        <td><input ng-model="input.newPPCode" type="text" class="form-control"/> </td>
+                                        <td>
+                                            <div class="row">
+                                                <div class="col-md-10">
+                                                    <input ng-model="input.newPPCode" type="text" class="form-control"/>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <i style="color: orange" class="glyphicon glyphicon-question-sign clickable"
+                                                       ng-show="input.newPPCode"
+                                                       ng-click="getDisplay(input.newPPCode)"></i>
+                                                </div>
+                                            </div>
+
+
+
+
+                                        </td>
                                         <td><input ng-model="input.newPPDisplay" type="text" class="form-control"/> </td>
                                         <td>
-                                            <i style="color: orange" class="glyphicon glyphicon-question-sign clickable"
-                                               ng-show="input.newPPCode"
-                                               ng-click="getDisplay(input.newPPCode)"></i>
+
 
                                             <i style="color: green" class="glyphicon glyphicon-ok clickable"
                                                ng-show="input.newPPCode && input.newPPDisplay"

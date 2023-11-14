@@ -46,7 +46,7 @@ angular.module("pocApp")
                 if (action.model && action.model.kind == 'dg') {
                     console.log("validate DG")
                     //make sure that $localStorage has been updated
-                    if (angular.toJson(action.model) !== angular.toJson($localStorage.world.dataGroups[action.model.name])) {
+                    if ($localStorage.world.dataGroups[action.model.name] && angular.toJson(action.model) !== angular.toJson($localStorage.world.dataGroups[action.model.name])) {
 
                         //send a copy to the trace store so it is in the trail
                         let errorReport = {action:'error',model:action.model,description:"Browser store mismatch with in-memory"}

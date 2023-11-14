@@ -119,7 +119,14 @@
           <tr>
             <td>Fixed value</td>
             <td>
-              {{fixedValue}}
+
+
+
+
+              <div class="clickable pull-right" ng-click="setFixedValue('fixed')">Edit</div>
+
+
+              {{fixedDisplay}}
 
             </td>
           </tr>
@@ -138,7 +145,7 @@
 
 
 
-      <uib-tab ng-show = "item.path" heading="Json">
+      <uib-tab heading="Json">
         <pre>{{item | json}}</pre>
       </uib-tab>
 

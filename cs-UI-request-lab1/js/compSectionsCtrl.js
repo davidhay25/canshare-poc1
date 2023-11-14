@@ -141,8 +141,6 @@ angular.module("pocApp")
                     $scope.selectedSection.items.splice(inx-1,0,dg)
                     $scope.selectComposition($scope.selectedComposition)  //in modelCtrl
 
-                   // let item = $scope.selectedSection.items.splice(inx,1)[0]
-                   // $scope.selectedSection.items.splice(inx+1,0,item)
                 }
             }
 
@@ -157,7 +155,6 @@ angular.module("pocApp")
                 $timeout(function () {
                     showDGTree(vo1.treeData)
                 },500)
-
             }
             $scope.setup()
 

@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
 
-            $scope.version = "0.5.7"
+            $scope.version = "0.5.8"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -17,7 +17,7 @@ angular.module("pocApp")
             }
             */
 
-            //$localStorage.test = {}
+
 
             $localStorage.trace = $localStorage.trace || {on:false,limit:500,contents:[]}
 
@@ -893,6 +893,15 @@ angular.module("pocApp")
                                 ed1.sourceReference = ed.sourceReference
                                 ed1.controlHint = ed.controlHint
 
+                                ed1.fixedCoding = ed.fixedCoding
+                                ed1.fixedQuantity = ed.fixedQuantity
+                                ed1.fixedRatio = ed.fixedRatio
+
+                                ed1.defaultCoding = ed.defaultCoding
+                                ed1.defaultQuantity = ed.defaultQuantity
+                                ed1.defaultRatio = ed.defaultRatio
+
+
                                 traceSvc.addAction({action:'edit-override',model:$scope.selectedModel,description:ed.path})
 
                                 break
@@ -1262,7 +1271,7 @@ angular.module("pocApp")
                 }).result.then(function (newModel) {
                     if (newModel) {
                         //if a model is returned, then it is a new one and needs to be added to the world
-                        traceSvc.addAction({action:'new-model',model:$scope.hashAllDG[dgName]})
+                        traceSvc.addAction({action:'new-model',model:newModel})
 
                         if ($scope.user) {
                             newModel.author = $scope.user.email
