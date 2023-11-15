@@ -235,8 +235,8 @@ angular.module("pocApp")
                         }
                     }
 
-                    let ed = makeED()
-                    /*
+                    //let ed = makeED()
+
                     let ed = {}
                     //ed.type = [$scope.input.type]
                     ed.type = [$scope.input.selectedType]
@@ -260,14 +260,14 @@ angular.module("pocApp")
                     }
 
                     ed.options = $scope.options
-*/
+
                     $scope.$close(ed)
 
                 } else {
                     //this is an update
 
-                    item.ed = makeED()
-                    /*
+                    //item.ed = makeED()
+
                     item.ed.type = [$scope.input.selectedType]
                     item.ed.notes = $scope.input.notes
                     if ($scope.input.controlHint) {
@@ -288,7 +288,7 @@ angular.module("pocApp")
                     }
 
                     item.ed.options = $scope.options
-                    */
+
                     $scope.$close(item.ed)
                 }
 
