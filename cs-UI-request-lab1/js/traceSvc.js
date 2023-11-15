@@ -1,7 +1,7 @@
 //Trace activities
 angular.module("pocApp")
 
-    .service('traceSvc', function(modelsSvc,$localStorage,$http) {
+    .service('traceSvc', function(modelsSvc,$localStorage,$http,$timeout) {
      //   $localStorage.trace = $localStorage.trace || {contents:[]}    //actions
 
         return {
@@ -43,33 +43,38 @@ angular.module("pocApp")
                 }
 
                 //check that the memory & localstorage are the same
-                if (action.model && action.model.kind == 'dg') {
-                    console.log("validate DG")
-                    //make sure that $localStorage has been updated
-                    if ($localStorage.world.dataGroups[action.model.name] && angular.toJson(action.model) !== angular.toJson($localStorage.world.dataGroups[action.model.name])) {
+                //wait 500 ms to allow updates to occur...
+                $timeout(function () {
+                    if (action.model && action.model.kind == 'dg') {
+                        console.log("validate DG")
+                        //make sure that $localStorage has been updated
+                        if ($localStorage.world.dataGroups[action.model.name] && angular.toJson(action.model) !== angular.toJson($localStorage.world.dataGroups[action.model.name])) {
 
-                        //send a copy to the trace store so it is in the trail
+                            //send a copy to the trace store so it is in the trail
 
-                        let errorReport = {action:'error',
-                            localStorage: $localStorage.world.dataGroups[action.model.name],
-                            model:action.model,
-                            description:"Browser store mismatch with in-memory"}
+                            let errorReport = {action:'error',
+                                localStorage: $localStorage.world.dataGroups[action.model.name],
+                                model:action.model,
+                                description:"Browser store mismatch with in-memory"}
 
-                        let user = modelsSvc.getuser()
-                        if (user && user.email) {
-                            errorReport.userEmail = user.email
-                        }
-                        $http.post('/trace',errorReport).then(
-                            function () {
-
-                            },function () {
-                                alert('Unable to save the error trace record on the server')
+                            let user = modelsSvc.getuser()
+                            if (user && user.email) {
+                                errorReport.userEmail = user.email
                             }
-                        )
+                            $http.post('/trace',errorReport).then(
+                                function () {
 
-                        alert(`Warning! the Browser copy of the DG ${action.model.name} doesn't match the copy in memory! You should re-load the page and check it. From traceSvc.`)
+                                },function () {
+                                    alert('Unable to save the error trace record on the server')
+                                }
+                            )
+
+                            alert(`Warning! the Browser copy of the DG ${action.model.name} doesn't match the copy in memory! You should re-load the page and check it. From traceSvc.`)
+                        }
                     }
-                }
+
+                },500)
+
 
             },
             getActions : function () {
