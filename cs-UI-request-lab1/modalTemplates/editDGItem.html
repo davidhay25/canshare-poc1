@@ -14,7 +14,7 @@
         <button ng-show="input.path"
                 class="btn btn-primary pull-right" ng-click="save()">Close</button>
 
-        <button ng-show="isNew" class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+        <button  class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
 
 
       </div>
@@ -143,6 +143,10 @@
 
 
 
+          <tr>
+            <td>Hide in Q</td>
+            <td><checkbox ng-model="input.hideInQ"> </td>
+          </tr>
 
           <tr>
             <td>Source reference</td>
@@ -150,6 +154,58 @@
           </tr>
 
         </table>
+
+      </uib-tab>
+
+      <uib-tab ng-show="input.selectedType == 'CodeableConcept'">
+        <uib-tab-heading>Options <span class="badge">{{options.length}}</span> </uib-tab-heading>
+
+        <uib-tabset>
+          <uib-tab heading="Current List">
+            <table class="table table-bordered">
+              <tr><th>Code</th><th>Display</th><th>FSN</th></tr>
+              <tr ng-repeat="row in options">
+                <td>{{row.code}}</td>
+                <td>{{row.display}}</td>
+                <td>{{row.fsn}}</td>
+              </tr>
+            </table>
+
+          </uib-tab>
+
+          <uib-tab heading="Update list (SNOMED)" >
+            <div class="row">
+              <div class="col-sm-1 col-md-1">
+
+              </div>
+              <div class="col-sm-10 col-md-10">
+                <em>Paste in selection from spreadsheet. 3 cols: code, display, FSN.</em>
+                <br/>
+                <textarea class="form-control" rows = "8" ng-model="input.optionsSnomed"></textarea>
+
+                <button class="btn-link btn pull-right" ng-click="parseSnomed(input.optionsSnomed)">Parse SNOMED</button>
+
+              </div>
+            </div>
+          </uib-tab>
+
+          <uib-tab heading="Update list (text)">
+            <div class="row">
+              <div class="col-sm-1 col-md-1">
+
+              </div>
+              <div class="col-sm-10 col-md-10">
+                <em>A simple list of terms</em>
+                <textarea class="form-control"
+                          rows = "8" ng-model="input.optionsText"></textarea>
+
+                <button class="btn-link btn pull-right" ng-click="parseList(input.optionsText)">Parse Text</button>
+              </div>
+            </div>
+          </uib-tab>
+
+        </uib-tabset>
+
 
       </uib-tab>
 

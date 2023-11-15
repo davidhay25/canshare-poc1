@@ -6,9 +6,9 @@ angular.module("pocApp")
             $scope.input = {}
             $scope.fullElementList = fullElementList
 
-            console.log(allTypes)
 
-       //     $scope.mult = ['0..0','0..1','0..*','1..1','1..*']
+
+            $scope.options = []     //a list of options. Will be saved as ed.options
 
             //when an item is passed in for editing
             if (item && item.ed) {
@@ -20,8 +20,16 @@ angular.module("pocApp")
                 $scope.input.path =  $filter('dropFirstInPath')(item.ed.path)
                 $scope.input.controlHint =  item.ed.controlHint
 
+                $scope.input.hideInQ =  item.ed.hideInQ
+
                 $scope.input.selectedType = item.ed.type[0]
                 setControlOptions($scope.input.selectedType)
+
+                //set the options list
+                if (item.ed.options) {
+                    $scope.options = item.ed.options
+                    makeOptionsText()
+                }
 
 
                 //displays for fixed
@@ -116,8 +124,6 @@ angular.module("pocApp")
 
             $scope.setTitle = function (title) {
                 $scope.input.title = $scope.input.title || title
-
-
             }
 
             function setControlOptions(type) {
@@ -134,6 +140,7 @@ angular.module("pocApp")
 
             }
 
+            /*
             function setFixedValue(type) {
 
 
@@ -153,8 +160,37 @@ angular.module("pocApp")
                     console.log(vo)
                 })
             }
+*/
 
+            function makeED () {
+                let ed = {}
 
+                //ed.type = [$scope.input.type]
+                ed.type = [$scope.input.selectedType]
+                ed.path = `new.${$scope.input.path}`        //the 'new.' is stripped off, as the full path is passed in for editing existing
+                ed.description = $scope.input.description
+                ed.notes = $scope.input.notes
+                ed.title = $scope.input.title
+                ed.mult = $scope.input.mult
+                ed.valueSet = $scope.input.valueSet
+                ed.hideInQ = $scope.input.hideInQ
+                if ($scope.input.controlHint) {
+                    ed.controlHint = $scope.input.controlHint
+                }
+                ed.sourceReference = $scope.input.sourceReference
+
+                if ($scope.fixed && $scope.fixed.elName) {
+                    ed[$scope.fixed.elName] = $scope.fixed.value
+                }
+
+                if ($scope.default && $scope.default.elName) {
+                    ed[$scope.default.elName] = $scope.default.value
+                }
+
+                ed.options = $scope.options
+
+                return ed
+            }
 
             $scope.save = function() {
 
@@ -199,6 +235,8 @@ angular.module("pocApp")
                         }
                     }
 
+                    let ed = makeED()
+                    /*
                     let ed = {}
                     //ed.type = [$scope.input.type]
                     ed.type = [$scope.input.selectedType]
@@ -213,10 +251,23 @@ angular.module("pocApp")
                     }
                     ed.sourceReference = $scope.input.sourceReference
 
+                    if ($scope.fixed && $scope.fixed.elName) {
+                        ed[$scope.fixed.elName] = $scope.fixed.value
+                    }
+
+                    if ($scope.default && $scope.default.elName) {
+                        ed[$scope.default.elName] = $scope.default.value
+                    }
+
+                    ed.options = $scope.options
+*/
                     $scope.$close(ed)
 
                 } else {
                     //this is an update
+
+                    item.ed = makeED()
+                    /*
                     item.ed.type = [$scope.input.selectedType]
                     item.ed.notes = $scope.input.notes
                     if ($scope.input.controlHint) {
@@ -229,16 +280,17 @@ angular.module("pocApp")
                     item.ed.sourceReference = $scope.input.sourceReference
 
                     if ($scope.fixed && $scope.fixed.elName) {
-                        item.ed[$scope.fixed.elName] = $scope.fixed.elValue
+                        item.ed[$scope.fixed.elName] = $scope.fixed.value
                     }
 
+                    if ($scope.default && $scope.default.elName) {
+                        item.ed[$scope.default.elName] = $scope.default.value
+                    }
+
+                    item.ed.options = $scope.options
+                    */
                     $scope.$close(item.ed)
                 }
-
-
-
-
-
 
             }
 
@@ -304,44 +356,111 @@ angular.module("pocApp")
                     }
 
                 }).result.then(function (vo) {
-                    //the type of vo is appropriate to the type
+                    //vo is a value the type of vo is appropriate to the type - ie it is the value
+                    //set $scope.fixed{elname,value} or $scope.default{elName,value} for the data
+                    //set $scope.fixedDisplay or $scope.defaultDisplay for the display in the UI
+
                     let elValue = vo
                     let elName
+                    //let displayKey = `${kind}Display`       //fixedDisplay or defaultDisplay
 
                     switch (type) {
                         case "Coding":
-                            elName = "fixedCoding"
                             if (kind == "default") {
-                                elName = "defaultCoding"
+                                $scope.default = {elName:'defaultCoding',value:elValue}
+                                $scope.defaultDisplay = `${elValue.code} | ${elValue.display} | ${elValue.system}`
+                                //elName = "defaultCoding"
                             } else {
+                                $scope.fixed = {elName:'fixedCoding',value:elValue}
                                 $scope.fixedDisplay = `${elValue.code} | ${elValue.display} | ${elValue.system}`
-                            }
-                            break
-                        case "Quantity":
-                            elName = "fixedQuantity"
-                            if (kind == "default") {
-                                elName = "defaultQuantity"
-                            } else {
-                                $scope.fixedDisplay = `Unit: ${elValue.unit}`
+
 
                             }
                             break
-                        case "Ratio":
-                            elName = "fixedRatio"
+                        case "Quantity":
+
                             if (kind == "default") {
-                                elName = "defaultRatio"
+                                $scope.default = {elName:'defaultQuantity',value:elValue}
+                                $scope.defaultDisplay = `Unit: ${elValue.unit}`
                             } else {
+                                $scope.fixed = {elName:'fixedQuantity',value:elValue}
+                                $scope.fixedDisplay = `Unit: ${elValue.unit}`
+                            }
+                            break
+                        case "Ratio":
+
+                            if (kind == "default") {
+                                $scope.default = {elName:'defaultRatio',value:elValue}
+                                $scope.defaultDisplay = `Numerator Unit: ${elValue.numerator.unit} Denominator Unit: ${elValue.denominator.unit} Denominator value: ${elValue.denominator.value}`
+                            } else {
+                                $scope.fixed = {elName:'fixedRatio',value:elValue}
                                 $scope.fixedDisplay = `Numerator Unit: ${elValue.numerator.unit} Denominator Unit: ${elValue.denominator.unit} Denominator value: ${elValue.denominator.value}`
+
+                                //$scope.input[displayKey] = `Numerator Unit: ${elValue.numerator.unit} Denominator Unit: ${elValue.denominator.unit} Denominator value: ${elValue.denominator.value}`
                             }
                             break
 
                     }
 
 
-                    $scope.fixed = {elName:elName,elValue:elValue}  //for the save
+                    //will be default or fixed
+                   //$scope.input[kind] = {elName:elName,elValue:elValue}  //for the save
+
 
                 })
 
+
+            }
+
+
+            //------------ functions for options list ------------
+
+            //Make a text list from the ed.options
+            function makeOptionsText() {
+                let txt = ""
+                $scope.options.forEach(function (opt) {
+                    txt += opt.display + "\n"
+                })
+                $scope.input.optionsText = txt
+            }
+
+
+            //Parse the text list from
+            $scope.parseList = function (txt) {
+                $scope.options = []
+                console.log(txt)
+                let lines = txt.split('\n')
+                lines.forEach(function (lne) {
+                    let option = {}
+                    option.pt = lne
+                    option.code = lne
+                    option.display = lne
+                    $scope.options.push(option)
+
+                })
+                alert("Options have been updated")
+            }
+
+
+            $scope.parseSnomed = function (txt) {
+                $scope.options = []
+
+                let lines = txt.split('\n')
+                lines.forEach(function (lne) {
+                    let ar = lne.split('\t')
+
+                    let option = {}
+                    option.code = ar[0]
+                    option.pt = ar[1]       //set the pt (preferred term) and the display the same. Not sure if we should be using pt anyway...
+                    option.display = ar[1]
+                    if (ar.length > 2) {
+                        option.fsn = ar[2]
+                    }
+
+                    $scope.options.push(option)
+
+                })
+                alert("Options have been updated")
 
             }
 

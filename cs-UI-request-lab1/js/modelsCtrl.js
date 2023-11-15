@@ -850,33 +850,7 @@ angular.module("pocApp")
                         //If an edit, then need to see if the item is directly defined on the DG (which will be updated),
                         //or whether it is an inherited element, in which case an override element is added...
                         displayPath = $filter('dropFirstInPath')(ed.path)
-/*
-                        if (ed.type[0] !== originalED.type[0]) {
-                            changes += "Type changed. "
-                        }
 
-                        if (ed.description !== originalED.description) {
-                            changes += "Description changed. "
-                        }
-                        if (ed.title !== originalED.title) {
-                            changes += "Title changed. "
-                        }
-
-                        if (ed.notes !== originalED.notes) {
-                            changes += "Notes changed. "
-                        }
-
-                        if (ed.mult !== originalED.mult) {
-                            changes += "Cardinality changed."
-                        }
-
-                        if (ed.valueSet !== originalED.valueSet) {
-                            changes += "ValueSet changed."
-                        }
-                        if (ed.sourceReference !== originalED.sourceReference) {
-                            changes += "Source reference changed."
-                        }
-*/
                         let found = false
                         //let changes = []    //this is the list of changes
                         //is the path in the DG diff?
@@ -892,7 +866,7 @@ angular.module("pocApp")
                                 ed1.valueSet = ed.valueSet
                                 ed1.sourceReference = ed.sourceReference
                                 ed1.controlHint = ed.controlHint
-
+                                ed1.hideInQ = ed.hideInQ
                                 ed1.fixedCoding = ed.fixedCoding
                                 ed1.fixedQuantity = ed.fixedQuantity
                                 ed1.fixedRatio = ed.fixedRatio
@@ -900,6 +874,7 @@ angular.module("pocApp")
                                 ed1.defaultCoding = ed.defaultCoding
                                 ed1.defaultQuantity = ed.defaultQuantity
                                 ed1.defaultRatio = ed.defaultRatio
+                                ed1.options = ed.options
 
 
                                 traceSvc.addAction({action:'edit-override',model:$scope.selectedModel,path:displayPath})

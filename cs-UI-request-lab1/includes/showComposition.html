@@ -143,7 +143,7 @@
                       {{selectedCompositionNode.data.ed.kind}}
                     </td>
                   </tr>
-                  <tr>
+                  <tr ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
                     <td>
                       Appears in Q
                     </td>
@@ -236,6 +236,10 @@
                     <td>Options list</td>
                     <td>
                       <div ng-show="selectedCompositionNode.data.ed.options">
+                        <span class="clickable pull-right"
+                              ng-click = "editOptionsList(selectedCompositionNode.data.ed,true)">
+                          View list
+                        </span>
                         There are {{selectedCompositionNode.data.ed.options.length}} options defined
                       </div>
 
@@ -243,9 +247,7 @@
                         There are no options defined
                       </div>
 
-                      <button
-                              ng-click = "editOptionsList(selectedCompositionNode.data.ed)"
-                              class="btn-link btn">View / Edit list</button>
+
                     </td>
                   </tr>
                   <tr ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
@@ -284,7 +286,7 @@
 
                 </table>
 
-                
+
                 <div ng-show = "canEditComp(selectedComposition)">
 
             <!-- If the root is selected, we can add a new section-->

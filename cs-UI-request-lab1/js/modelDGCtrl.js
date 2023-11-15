@@ -637,7 +637,8 @@ angular.module("pocApp")
                             return ed
                         },
                         readOnly : function () {
-                            return readOnly
+                            //return readOnly
+                            return true
                         }
                     }
 
@@ -651,7 +652,7 @@ angular.module("pocApp")
                             ed1.options = updatedEd.options
                             traceSvc.addAction({action:'set-options',model:$scope.selectedModel,path:p,description:`edit diff`})
                             found = true
-                            //alert('found')
+
                             break
                         }
                     }

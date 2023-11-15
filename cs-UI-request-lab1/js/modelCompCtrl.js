@@ -235,18 +235,9 @@ angular.module("pocApp")
                             return ed
                         },
                         readOnly : function () {
-                            return false
+                            return true
                         }
                     }
-
-                }).result.then(function (updatedEd) {
-                    //$scope.selectedCompositionNode.data.ed.options = updatedEd.options
-                    //return
-
-                    $scope.selectedComposition.override = $scope.selectedComposition.override || {}
-                    $scope.selectedComposition.override[ed.path] = updatedEd
-                    $scope.selectComposition($scope.selectedComposition)  //in parent
-                    $scope.selectCompTreePath(ed.path)
 
                 })
             }

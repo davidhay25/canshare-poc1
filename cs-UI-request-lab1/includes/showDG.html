@@ -310,7 +310,9 @@
                     <td>
                       {{selectedNode.data.ed.path | dropFirstInPath}}
 
-                      <span class="pull-right clickable" ng-click="hideInQ(selectedNode.data.ed)">
+
+                      <!--  <span class="pull-right " >-->
+                        <span class="pull-right clickable" ng-click="hideInQ(selectedNode.data.ed)">
                         <span ng-show="selectedNode.data.ed.hideInQ">Not shown in Q</span>
                         <span ng-hide="selectedNode.data.ed.hideInQ">Appears in Q</span>
                       </span>
@@ -469,27 +471,26 @@
                     <td>Options</td>
                     <td>
                       <div ng-show="selectedNode.data.ed.options">
+                        <span
+                                ng-click = "editDGOptionsList(selectedNode.data.ed,true)"
+                                class="clickable pull-right">View list</span>
+
                         There are {{selectedNode.data.ed.options.length}} options defined
                       </div>
 
                       <div ng-hide="selectedNode.data.ed.options">
                         There are no options defined
                       </div>
-                      <div><em>Options are used to define or build ValueSets</em></div>
 
 
+
+                      <!--
                       <div ng-show="canEdit(selectedModel)">
                         <button
                                 ng-click = "editDGOptionsList(selectedNode.data.ed,false)"
                                 class="btn-link btn">View / Edit list</button>
                       </div>
-
-                      <div ng-hide="canEdit(selectedModel)">
-                        <button
-                                ng-click = "editDGOptionsList(selectedNode.data.ed,true)"
-                                class="btn-link btn">View list</button>
-                      </div>
-
+                      -->
 
 
 
@@ -528,7 +529,7 @@
 
 
                       <div ng-show="selectedNode.data.ed.fixedCoding">
-                        {{selectedNode.data.ed.fixedCoding.code}} | {{selectedNode.data.ed.fixedCoding.display}} |
+                        {{selectedNode.data.ed.fixedCoding.code}} | {{selectedNode.data.ed.fixedCoding.display}} | {{selectedNode.data.ed.fixedCoding.system}}
                       </div>
 <!--
                       {{selectedNode.data.ed.fixedString}}
@@ -573,7 +574,7 @@
                       </div>
 
                       <div ng-show="selectedNode.data.ed.defaultQuantity">
-                        Default Quantity unit: {{selectedNode.data.ed.defaultQuantity.unit}}
+                        Unit: {{selectedNode.data.ed.defaultQuantity.unit}}
                       </div>
 
                       <div ng-show="selectedNode.data.ed.defaultCoding">
@@ -601,12 +602,13 @@
                         </div>
 
                       </span>
-
+<!--
                       <div ng-show="canEdit(selectedModel)">
                         <div class="clickable"
                              ng-click="setFixedValue(selectedNode.data.ed,'default',selectedNode.data.ed.defaultCoding)">Set/edit default value
                         </div>
                       </div>
+                      -->
                     </td>
                   </tr>
 
