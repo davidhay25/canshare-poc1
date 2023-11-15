@@ -167,7 +167,10 @@
                         ng-class="{listItemSelected:selectedTraceItem == hx}"
                         ng-show = canShow(hx)
                         ng-repeat="hx in traceHistory">
-                        <td>{{hx.date | date : "MMM dd"}}</td>
+                        <td>
+                            {{hx.date | date : "MMM dd HH:mm:ss"}}
+
+                        </td>
                         <td>{{hx.action}}</td>
 
                         <td>{{hx.model.title}}</td>
@@ -214,7 +217,7 @@
 
                 </uib-tab>
                 <uib-tab heading="Json">
-                    <pre>{{selectedTraceItem.model | json}}</pre>
+                    <pre>{{selectedTraceItem | json}}</pre>
                 </uib-tab>
 
             </uib-tabset>

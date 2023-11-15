@@ -49,7 +49,12 @@ angular.module("pocApp")
                     if ($localStorage.world.dataGroups[action.model.name] && angular.toJson(action.model) !== angular.toJson($localStorage.world.dataGroups[action.model.name])) {
 
                         //send a copy to the trace store so it is in the trail
-                        let errorReport = {action:'error',model:action.model,description:"Browser store mismatch with in-memory"}
+
+                        let errorReport = {action:'error',
+                            localStorage: $localStorage.world.dataGroups[action.model.name],
+                            model:action.model,
+                            description:"Browser store mismatch with in-memory"}
+
                         let user = modelsSvc.getuser()
                         if (user && user.email) {
                             errorReport.userEmail = user.email
