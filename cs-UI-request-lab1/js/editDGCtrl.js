@@ -200,8 +200,8 @@ angular.module("pocApp")
 
 
 
-            $scope.input.valueSets = Object.keys(hashValueSets)
-            $scope.input.valueSets.sort()
+            //$scope.input.valueSets = Object.keys(hashValueSets)
+           // $scope.input.valueSets.sort()
 
 
             $scope.input.cards = ["0..1","1..1","0..*",'1..*']
@@ -457,15 +457,15 @@ angular.module("pocApp")
                 //element.sourceReference = $scope.input.sourceReference
                 element.type = [$scope.input.type]
                 element.description = $scope.input.description
+                /*
+                                if ($scope.input.valueSet) {
+                                    element.valueSet = $scope.input.valueSet
+                                }
 
-                if ($scope.input.valueSet) {
-                    element.valueSet = $scope.input.valueSet
-                }
-/*
-                if ($scope.input.code) {
-                    element.code = [{code:$scope.input.code}]
-                }
-*/
+                                if ($scope.input.code) {
+                                    element.code = [{code:$scope.input.code}]
+                                }
+                */
                 element.mult = $scope.input.card
                 $scope.model.diff = $scope.model.diff || []
                 $scope.model.diff.push(element)

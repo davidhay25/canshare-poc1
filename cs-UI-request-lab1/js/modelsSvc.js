@@ -607,7 +607,7 @@ angular.module("pocApp")
                         //required bolding
                         if (ed.mult.indexOf('1..') > -1) {
                             //need to add to any existing stype
-                            //let existingStyle = node['a_attr'] || ""
+
                             arStyle.push("font-weight:bold")
                            // node['a_attr'] = { "style": "font-weight:bold" }
                         }

@@ -162,12 +162,14 @@ angular.module("pocApp")
             }
 */
 
-            function makeED () {
-                let ed = {}
+
+            //doesn't set the path - as that is different when being used to create a new DG element
+            function editED (ed) {
+                //let ed = {}
 
                 //ed.type = [$scope.input.type]
                 ed.type = [$scope.input.selectedType]
-                ed.path = `new.${$scope.input.path}`        //the 'new.' is stripped off, as the full path is passed in for editing existing
+                //ed.path = `new.${$scope.input.path}`        //the 'new.' is stripped off, as the full path is passed in for editing existing
                 ed.description = $scope.input.description
                 ed.notes = $scope.input.notes
                 ed.title = $scope.input.title
@@ -235,8 +237,10 @@ angular.module("pocApp")
                         }
                     }
 
-                    //let ed = makeED()
-
+                    let ed = {}
+                    ed.path = `new.${$scope.input.path}`        //the 'new.' is stripped off, as the full path is passed in for editing existing
+                    editED(ed)
+/*
                     let ed = {}
                     //ed.type = [$scope.input.type]
                     ed.type = [$scope.input.selectedType]
@@ -260,14 +264,20 @@ angular.module("pocApp")
                     }
 
                     ed.options = $scope.options
+                    */
 
                     $scope.$close(ed)
 
                 } else {
                     //this is an update
 
-                    //item.ed = makeED()
+                    //this actually edits the passed in ed. So an element not updated
+                    //will 'pass through' attributes not editable in this dialog
+                   // item.ed = makeED()
 
+                    editED(item.ed)
+
+/*
                     item.ed.type = [$scope.input.selectedType]
                     item.ed.notes = $scope.input.notes
                     if ($scope.input.controlHint) {
@@ -288,7 +298,7 @@ angular.module("pocApp")
                     }
 
                     item.ed.options = $scope.options
-
+*/
                     $scope.$close(item.ed)
                 }
 

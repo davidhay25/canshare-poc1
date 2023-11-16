@@ -179,11 +179,16 @@ angular.module("pocApp")
                 $scope.selectedItem = item
                 let type = item.type[0]
                 let dg = $scope.hashAllDG[type]         //from parent scope
+                if (! dg) {
 
-                let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
-                let lst = modelsSvc.makeOrderedFullList(vo.allElements)
+                    alert(`The DG name: ${type} could not be found! Has it been deleted?`)
+                } else {
+                    let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
+                    let lst = modelsSvc.makeOrderedFullList(vo.allElements)
+                    $scope.filteredElementList = modelCompSvc.filterList(lst,true)
+                }
 
-                $scope.filteredElementList = modelCompSvc.filterList(lst,true)
+
 
             }
 
@@ -218,7 +223,8 @@ angular.module("pocApp")
                         name = name + ctr
                     }
 
-                    let item = {name:name,title:dg.name,mult:'0..1'}
+                    //let item = {name:name,title:dg.name,mult:'0..1'}
+                    let item = {name:name,title:dg.title,mult:'0..1'}
                     item.type = [dg.name]
 
                     $scope.selectedSection.items.push(item)

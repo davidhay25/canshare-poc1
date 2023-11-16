@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
 
-            $scope.version = "0.5.10"
+            $scope.version = "0.5.12"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -1219,7 +1219,7 @@ angular.module("pocApp")
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editDG.html',
                     backdrop: 'static',
-                    size : 'lg',
+                    size : 'xlg',
                     controller : "editDGCtrl",
 
                     resolve: {

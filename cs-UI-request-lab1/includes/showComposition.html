@@ -80,7 +80,7 @@
 
   <uib-tabset active="input.compTabActive" >
 
-    <uib-tab heading="Tree">
+    <uib-tab  heading="Tree">
 
       <div class="row">
         <div class="col-md-5">
@@ -468,7 +468,7 @@
     </uib-tab>
 
 
-    <uib-tab heading = "Headings">
+    <uib-tab ng-show="canEditComp(selectedComposition)" heading = "Headings">
       <br/>
       <div ng-controller="compSectionsCtrl">
         <ng-include src ="'includes/compSections.html'"></ng-include>
