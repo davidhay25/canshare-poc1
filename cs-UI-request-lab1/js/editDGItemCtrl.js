@@ -9,6 +9,7 @@ angular.module("pocApp")
 
 
             $scope.options = []     //a list of options. Will be saved as ed.options
+            $scope.units = [] //a list of units. Will be saved as ed.units
 
             //when an item is passed in for editing
             if (item && item.ed) {
@@ -31,6 +32,11 @@ angular.module("pocApp")
                     makeOptionsText()
                 }
 
+                //set the options list
+                if (item.ed.units) {
+                    $scope.units = item.ed.units
+
+                }
 
                 //displays for fixed
                 if (item.ed.fixedCoding) {
@@ -181,17 +187,40 @@ angular.module("pocApp")
                 }
                 ed.sourceReference = $scope.input.sourceReference
 
+
                 if ($scope.fixed && $scope.fixed.elName) {
                     ed[$scope.fixed.elName] = $scope.fixed.value
+                } else {
+                    let type = $scope.input.selectedType
+                    if (type == 'CodeableConcept') {type = 'Coding'}
+                    let elName = `fixed${type}`
+                    delete ed[elName]
                 }
 
                 if ($scope.default && $scope.default.elName) {
                     ed[$scope.default.elName] = $scope.default.value
+                } else {
+                    let type = $scope.input.selectedType
+                    if (type == 'CodeableConcept') {type = 'Coding'}
+                    let elName = `default${type}`
+                    delete ed[elName]
                 }
 
                 ed.options = $scope.options
 
                 return ed
+            }
+
+            $scope.clearFixedValue = function (kind) {
+                if (kind == 'default') {
+                    delete $scope.default
+                    delete $scope.defaultDisplay
+
+                } else if (kind == 'fixed') {
+                    delete $scope.fixed
+                    delete $scope.fixedDisplay
+                }
+
             }
 
             $scope.save = function() {
@@ -422,6 +451,18 @@ angular.module("pocApp")
 
             }
 
+
+            // ---------- functions for unit list
+
+            $scope.addUnit = function (unit) {
+                $scope.units = $scope.units || []
+                $scope.units.push(unit)
+                delete $scope.input.unit
+            }
+
+            $scope.deleteUnit = function (inx) {
+                $scope.units.splice(inx,1)
+            }
 
             //------------ functions for options list ------------
 

@@ -599,7 +599,7 @@ angular.module("pocApp")
             }
 
             //set the possiblu units for a Quantity DT
-            $scope.setUnits = function (ed) {
+            $scope.setUnitsDEP = function (ed) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/setUnits.html',
                     backdrop: 'static',
@@ -794,7 +794,7 @@ angular.module("pocApp")
 
             //remove the fixed or default element, but leave the (likely override) in place
             //as there may have been other parts in that element that were overriden - like multiplicity
-            $scope.clearFixedValue = function(ed,kind) {
+            $scope.clearFixedValueDEP = function(ed,kind) {
 
                 let path = $filter('dropFirstInPath')(ed.path)
 

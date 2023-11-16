@@ -280,7 +280,11 @@
               </ul>
 
             </td>
-            <td>{{item.note}}</td>
+            <td>
+              {{item.note}}
+              <div class="clickable" ng-show="item.library" ng-click="deleteComposition(item.library)">Delete in library</div>
+
+            </td>
           </tr>
         </table>
 

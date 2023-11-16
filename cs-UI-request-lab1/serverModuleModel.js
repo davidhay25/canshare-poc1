@@ -210,7 +210,7 @@ async function setup(app) {
         }
     })
 
-    //delete a resource - todo  - why not use delete verb??
+    //delete a DG - todo  - why not use delete verb??
     app.put('/model/DG/:name/delete', async function(req,res) {
         let dg = req.body
         dg.active = false
@@ -447,7 +447,8 @@ async function setup(app) {
 
     //get all active compositions - used by the library
     app.get('/model/allCompositions', async function(req,res) {
-        const query = {}  // bring them all back ATM{active:true} // active: { $lt: 15 } };
+        //using deleted rather than active as there were a number of compositions already before I implemented the delete :(
+        const query = {deleted:{$ne : true}}  // bring them all back ATM{active:true} // active: { $lt: 15 } };
         try {
             const cursor = await database.collection("comp").find(query).toArray()
             let arComp = []
@@ -460,6 +461,33 @@ async function setup(app) {
             console.log(ex)
             res.status(500).json(ex.message)
 
+        }
+    })
+
+    //delete a Composition- not a delete as we
+    app.put('/model/comp/:name/delete', async function(req,res) {
+        let comp = req.body
+        comp.deleted = true
+
+        let userEmail = req.headers['x-user-email'] || "unknown User"
+        if (! userEmail) {
+            res.status(400).json({msg:"No username provided"})
+            return
+        }
+
+        let query = {name:req.params.name}
+        let update = {$set:{active:false}}
+        try {
+            await database.collection("comp").updateOne(query,update,{upsert:false})
+
+            //update the history
+            await saveHistory(comp,userEmail ,"deleting a composition")
+
+            res.json()
+
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
         }
     })
 

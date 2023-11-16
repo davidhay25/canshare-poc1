@@ -122,21 +122,16 @@
             <uib-tab heading = "Details">
               <div ng-show="selectedCompositionNode">
 
-
-
-
-
-
                 <table class="table table-bordered">
                   <tr>
-                    <td>
+                    <td class="detailName">
                       Path
                     </td>
                     <td> {{selectedCompositionNode.data.ed.path}}</td>
                   </tr>
 
                   <tr>
-                    <td>
+                    <td class="detailName">
                       Kind
                     </td>
                     <td>
@@ -144,7 +139,7 @@
                     </td>
                   </tr>
                   <tr ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
-                    <td>
+                    <td class="detailName">
                       Appears in Q
                     </td>
                     <td>
@@ -157,7 +152,7 @@
                     </td>
                   </tr>
                   <tr ng-show="selectedCompositionNode.data.ed.parent">
-                    <td>
+                    <td class="detailName">
                       Parent
                     </td>
                     <td>
@@ -165,7 +160,7 @@
                     </td>
                   </tr>
                   <tr ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
-                    <td>Type</td>
+                    <td class="detailName">Type</td>
                     <td>
                       <div>
                         <span class="clickable" ng-click="termSelectDG({DGName:selectedCompositionNode.data.ed.name})">{{selectedCompositionNode.data.ed.name}}</span>
@@ -175,17 +170,17 @@
                     </td>
                   </tr>
                   <tr>
-                    <td>Title</td>
+                    <td class="detailName">Title</td>
                     <td>
                       {{selectedCompositionNode.data.ed.title}}
                     </td>
                   </tr>
                   <tr ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
-                    <td> Description</td>
+                    <td class="detailName" > Description</td>
                     <td>  {{selectedCompositionNode.data.ed.description}}</td>
                   </tr>
                   <tr ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
-                    <td>ValueSet</td>
+                    <td class="detailName">ValueSet</td>
                     <td>
                       <span><em>{{selectedCompositionNode.data.ed.valueSet}}</em></span>
                       <span class="pull-right">
@@ -196,8 +191,20 @@
                       </span>
                     </td>
                   </tr>
+
+
+                  <tr  ng-show = "selectedCompositionNode.data.ed.type[0] =='Quantity'">
+                    <td class="detailName">Units</td>
+                    <td>
+                       <span ng-repeat="unit in selectedCompositionNode.data.ed.units">
+                        {{unit}}&nbsp;
+                      </span>
+                    </td>
+                  </tr>
+
+
                   <tr  ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
-                    <td>Fixed value</td>
+                    <td class="detailName">Fixed value</td>
                     <td>
                       <div ng-show="selectedCompositionNode.data.ed.fixedRatio">
                         <div ng-show="selectedCompositionNode.data.ed.fixedRatio.numerator.unit">Numerator unit: {{selectedCompositionNode.data.ed.fixedRatio.numerator.unit}}</div>
@@ -215,7 +222,7 @@
                     </td>
                   </tr>
                   <tr ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
-                    <td>Default value</td>
+                    <td class="detailName">Default value</td>
                     <td>
                       <div ng-show="selectedCompositionNode.data.ed.defaultRatio">
                         <div ng-show="selectedCompositionNode.data.ed.defaultRatio.numerator.unit">Numerator unit: {{selectedCompositionNode.data.ed.defaultRatio.numerator.unit}}</div>
@@ -233,7 +240,7 @@
                     </td>
                   </tr>
                   <tr ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
-                    <td>Options list</td>
+                    <td class="detailName">Options list</td>
                     <td>
                       <div ng-show="selectedCompositionNode.data.ed.options">
                         <span class="clickable pull-right"
@@ -251,7 +258,7 @@
                     </td>
                   </tr>
                   <tr ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
-                    <td>Cardinality</td>
+                    <td class="detailName">Cardinality</td>
                     <td>
                       <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
 
@@ -260,7 +267,7 @@
                     </td>
                   </tr>
                   <tr ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
-                    <td>Conditional show</td>
+                    <td class="detailName">Conditional show</td>
                     <td>
                       <div ng-repeat="ew in selectedCompositionNode.data.ed.enableWhen">
                         Shown when {{ew.source}} = {{ew.value}}
@@ -268,15 +275,15 @@
                     </td>
                   </tr>
                   <tr ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
-                    <td>Control type</td>
+                    <td class="detailName">Control type</td>
                     <td>{{selectedCompositionNode.data.ed.controlType}}</td>
                   </tr>
                   <tr ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
-                    <td>Control hint</td>
+                    <td class="detailName">Control hint</td>
                     <td> {{selectedCompositionNode.data.ed.controlHint}}</td>
                   </tr>
                   <tr ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
-                    <td>Notes</td>
+                    <td class="detailName">Notes</td>
                     <td> {{selectedCompositionNode.data.ed.notes}}</td>
                   </tr>
                   <tr ng-show = "selectedCompositionNode.data.ed.zElement">
@@ -623,6 +630,22 @@
       </table>
     </uib-tab>
 
+    <uib-tab>
+      <uib-tab-heading>
+        Notes <span class="badge">{{getNotesCount()}}</span>
+      </uib-tab-heading>
+
+      <table class="table table-bordered">
+        <tr><th>Path</th><th>Note</th></tr>
+        <tr ng-repeat="item in allCompElements"
+          ng-show="item.ed.notes">
+          <td>
+            <div class="clickable" ng-click="selectCompTreePath(item.ed.path)">{{item.ed.path}}</div>
+          </td>
+          <td>{{item.ed.notes}}</td>
+        </tr>
+      </table>
+    </uib-tab>
 
 
 

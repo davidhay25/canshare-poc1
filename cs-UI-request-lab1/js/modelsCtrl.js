@@ -867,6 +867,7 @@ angular.module("pocApp")
                                 ed1.sourceReference = ed.sourceReference
                                 ed1.controlHint = ed.controlHint
                                 ed1.hideInQ = ed.hideInQ
+
                                 ed1.fixedCoding = ed.fixedCoding
                                 ed1.fixedQuantity = ed.fixedQuantity
                                 ed1.fixedRatio = ed.fixedRatio
@@ -874,9 +875,9 @@ angular.module("pocApp")
                                 ed1.defaultCoding = ed.defaultCoding
                                 ed1.defaultQuantity = ed.defaultQuantity
                                 ed1.defaultRatio = ed.defaultRatio
+
                                 ed1.options = ed.options
-
-
+                                ed1.units = ed.units
                                 traceSvc.addAction({action:'edit-override',model:$scope.selectedModel,path:displayPath})
 
                                 break

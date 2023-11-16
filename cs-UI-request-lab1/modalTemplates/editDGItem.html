@@ -120,8 +120,9 @@
             <td>Fixed value</td>
             <td>
 
-
               <div class="clickable pull-right" ng-click="setFixedValue('fixed')">Edit</div>
+              <div style="margin-right: 8px" class="clickable pull-right" ng-click="clearFixedValue('fixed')">Clear</div>
+
 
 
               {{fixedDisplay}}
@@ -132,8 +133,9 @@
             <td>Default value</td>
             <td>
 
-
               <div class="clickable pull-right" ng-click="setFixedValue('default')">Edit</div>
+              <div style="margin-right: 8px" class="clickable pull-right" ng-click="clearFixedValue('default')">Clear</div>
+
 
 
               {{defaultDisplay}}
@@ -209,6 +211,23 @@
 
       </uib-tab>
 
+
+      <uib-tab ng-show="input.selectedType == 'Quantity'">
+        <uib-tab-heading>Units <span class="badge">{{units.length}}</span> </uib-tab-heading>
+
+          <table class="table-bordered">
+            <tr ng-repeat = "unit in units track by $index">
+              <td>{{unit}}</td>
+              <td><i class="glyphicon glyphicon-minus pull-right clickable"
+                     ng-click="deleteUnit($index)"></i></td>
+            </tr>
+            <tr>
+              <td><input type="text" class="form-control" ng-model="input.unit"/> </td>
+              <td><i class="glyphicon glyphicon-plus pull-right clickable"
+                     ng-click="addUnit(input.unit)"></i></td>
+            </tr>
+          </table>
+      </uib-tab>
 
 
       <uib-tab heading="Json">

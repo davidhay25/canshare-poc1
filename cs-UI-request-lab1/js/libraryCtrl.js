@@ -228,10 +228,37 @@ angular.module("pocApp")
                     )
 
                 }
+            }
+
+            $scope.deleteComposition = function (comp) {
+
+                if (comp.checkedOut) {
+                    alert(`Composition is checked out to ${comp.checkedOut} and must be checked in by them prior to deletion`)
+                    return
+                }
+
+                if (confirm(`Are you sure you wish to remove the ${comp.title} Composition from the library AND the local store. It will mark it as inactive in the library, and remove it from the local store. `)) {
+
+                    let url = `/model/comp/${comp.name}/delete`
+                    let config = {headers:{'x-user-email': user.email}}
+
+                    $http.put(url,comp,config).then(
+                        function (data) {
+                            delete allComp[comp.name]       //remove locally
+
+                            alert("Composition has marked as inactive in the Library, and deleted locally.")
+                            $scope.$close()
+
+                        },
+                        function (err) {
+                            alert(angular.toJson(err))
+                        }
+                    )
+
+                }
 
 
             }
-
 
             $scope.refreshFromRepo = function () {
                 if (! user) {   //shouldn't happen...

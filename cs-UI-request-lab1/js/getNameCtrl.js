@@ -2,6 +2,7 @@ angular.module("pocApp")
     .controller('getNameCtrl',
         function ($scope) {
             $scope.input = {}
+
             $scope.setName = function (title) {
                 $scope.input.name = title.replace(/\s/g, '') //remove any spaces
             }

@@ -500,9 +500,10 @@
                   <tr ng-show="selectedNode.data.ed.type[0] == 'Quantity'">
                     <td>Units</td>
                     <td>
+                      <!--
                       <i class="glyphicon glyphicon-edit pull-right clickable"
                          ng-click="setUnits(selectedNode.data.ed)"></i>
-
+-->
 
                       <span ng-repeat="unit in selectedNode.data.ed.units">
                         {{unit}}&nbsp;
@@ -543,11 +544,13 @@
                           set on {{getSourceModelName(selectedNode.data.ed)}}
                         </span>
 
+                        <!--
                         <div ng-show="canEdit(selectedModel)">
                            <span ng-hide="getSourceModelName(selectedNode.data.ed) !== selectedModel.name"
                                  class="clickable"
                                  ng-click="clearFixedValue(selectedNode.data.ed,'fixed')">Clear fixed value</span>
                         </div>
+                        -->
 
                       </span>
 
@@ -595,11 +598,13 @@
                           set on {{getSourceModelName(selectedNode.data.ed)}}
                         </span>
 
+                        <!--
                         <div ng-show="canEdit(selectedModel)">
                            <span ng-hide="getSourceModelName(selectedNode.data.ed) !== selectedModel.name"
                                  class="clickable"
                                  ng-click="clearFixedValue(selectedNode.data.ed,'default')">Clear default value</span>
                         </div>
+                        -->
 
                       </span>
 <!--
