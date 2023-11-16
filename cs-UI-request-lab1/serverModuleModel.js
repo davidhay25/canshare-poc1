@@ -476,7 +476,7 @@ async function setup(app) {
         }
 
         let query = {name:req.params.name}
-        let update = {$set:{active:false}}
+        let update = {$set:{deleted:true}}
         try {
             await database.collection("comp").updateOne(query,update,{upsert:false})
 
