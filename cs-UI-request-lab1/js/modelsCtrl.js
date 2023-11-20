@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
 
-            $scope.version = "0.5.14"
+            $scope.version = "0.5.15"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -1333,6 +1333,8 @@ angular.module("pocApp")
             $scope.selectComposition = function(comp){
                 clearB4Select()
                 //$scope.selectedModel = comp
+                $scope.lstUsedDG = modelCompSvc.allDGsInComp(comp,$scope.hashAllDG).lstUsedDG //hashUsedDG
+
                 $scope.selectedComposition = comp
 
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)

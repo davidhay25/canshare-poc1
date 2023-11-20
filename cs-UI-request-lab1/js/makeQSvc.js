@@ -54,7 +54,7 @@ angular.module("pocApp")
         function addEnableWhen(ed,item,pathPrefix) {
             pathPrefix = pathPrefix || ""
             if (ed && ed.enableWhen) {
-                console.log(ed,'has ew')
+                //console.log(ed,'has ew')
                 item.enableWhen = []
                 ed.enableWhen.forEach(function (ew) {
                     let qEW = {operator:ew.operator,answerCoding:ew.value}
@@ -115,7 +115,7 @@ angular.module("pocApp")
                                     item.answerOption.push(
                                         {valueCoding:{system:concept.system, code:concept.code, display:concept.display}})
                                 }
-                                console.log(data.data)
+                                //console.log(data.data)
 
 
                             }, function (err) {

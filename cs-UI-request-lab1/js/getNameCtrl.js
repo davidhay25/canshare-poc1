@@ -4,7 +4,7 @@ angular.module("pocApp")
             $scope.input = {}
 
             $scope.setName = function (title) {
-                $scope.input.name = title.replace(/\s/g, '') //remove any spaces
+               // $scope.input.name = title.replace(/\s/g, '') //remove any spaces
             }
 
             $scope.save = function () {

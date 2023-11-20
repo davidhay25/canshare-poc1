@@ -82,7 +82,27 @@
       <div class="row">
         <div class="col-md-2"><div style="padding-top: 8px">Card.</div></div>
         <div class="col-md-10">
-          <input type="text" ng-disabled = "! canEditComp(selectedComposition)" class="form-control" ng-model="selectedSection.mult"/>
+          <!--
+          <input type="text" ng-disabled = "! canEditComp(selectedComposition)" class="form-control"
+                 ng-model="selectedSection.mult"/>
+          -->
+
+          <select class="form-control" ng-disabled = "! canEditComp(selectedComposition)"  ng-model="selectedSection.mult">
+            <option value="0..1">0..1</option>
+            <option value="1..1">1..1</option>
+            <option value="0..*">0..*</option>
+            <option value="1..*">1..*</option>
+          </select>
+
+
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-2"><div style="padding-top: 8px">Rules</div></div>
+        <div class="col-md-10">
+          <textarea ng-disabled = "! canEditComp(selectedComposition)"
+                    class="form-control" ng-model="selectedSection.rules"></textarea>
         </div>
       </div>
 

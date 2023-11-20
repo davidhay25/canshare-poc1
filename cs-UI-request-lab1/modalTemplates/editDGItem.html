@@ -172,11 +172,13 @@
         <uib-tabset>
           <uib-tab heading="Current List">
             <table class="table table-bordered">
-              <tr><th>Code</th><th>Display</th><th>FSN</th></tr>
+              <tr><th>Code</th><th>Display</th><th>FSN</th><th></th></tr>
               <tr ng-repeat="row in options">
                 <td>{{row.code}}</td>
                 <td>{{row.display}}</td>
                 <td>{{row.fsn}}</td>
+                <td><i class="glyphicon glyphicon-minus pull-right clickable"
+                       ng-click="deleteOption($index)"></i></td>
               </tr>
             </table>
 

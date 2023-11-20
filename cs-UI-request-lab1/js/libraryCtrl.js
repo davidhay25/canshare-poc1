@@ -95,7 +95,7 @@ angular.module("pocApp")
                 })
 
                 $scope.summaryComp.sort(function (a,b) {
-                    if (a.name.toLowerCase() > b.name.toLowerCase()) {
+                    if (a.title.toLowerCase() > b.title.toLowerCase()) {
                         return 1
                     } else {
                         return -1

@@ -674,6 +674,40 @@
     </uib-tab>
 
 
+    <uib-tab heading="All DG">
+      <br/>
+
+      <table class="table table-bordered">
+        <tr><th>DG name</th><th>Section name: path (title)</th></tr>
+        <tr ng-repeat="item in lstUsedDG">
+          <td>{{item.name}}</td>
+          <td>
+            <div ng-repeat="item in item.paths">
+              {{item.path}} ({{item.title}})
+            </div>
+
+
+          </td>
+        </tr>
+      </table>
+
+
+
+      <!--
+
+      <table class="table table-bordered">
+        <tr ng-repeat="(k,v) in allDGInComp">
+          <td>{{k}}</td>
+          <td>
+            <div ng-repeat="item in v">
+              {{item.title}}: {{item.path}}
+            </div>
+
+          </td>
+        </tr>
+      </table>
+      -->
+    </uib-tab>
 
 
     <uib-tab ng-show="false" heading="allCompElements">

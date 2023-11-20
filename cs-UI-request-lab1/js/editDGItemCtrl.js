@@ -158,6 +158,7 @@ angular.module("pocApp")
                 ed.notes = $scope.input.notes
                 ed.rules = $scope.input.rules
                 ed.title = $scope.input.title
+                ed.units = $scope.units
                 ed.mult = $scope.input.mult
                 ed.valueSet = $scope.input.valueSet
                 ed.hideInQ = $scope.input.hideInQ
@@ -449,6 +450,9 @@ angular.module("pocApp")
                 $scope.input.optionsText = txt
             }
 
+            $scope.deleteOption = function (inx) {
+                $scope.options.splice(inx,1)
+            }
 
             //Parse the text list from
             $scope.parseList = function (txt) {

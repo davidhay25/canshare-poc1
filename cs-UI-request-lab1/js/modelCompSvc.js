@@ -6,6 +6,65 @@ angular.module("pocApp")
 
 
         return {
+            allDGsInComp: function(comp,hashAllDG){
+                //return a list of all DG's used in a given composition
+
+                let hashUsedDG = {}
+
+                //add all the elements that are DG's to the list
+                function processDG(dg,path) {
+                    //let type = dg.type[0]
+                    //hashUsedDG[type] = hashUsedDG[type] || []
+                    //hashUsedDG[type].push({path:item.name})
+                    if (dg.diff) {
+                        dg.diff.forEach(function (ed) {
+                            let type = ed.type[0]
+                            if (hashAllDG[type]) {
+                                //this is a DG. Add it to the list then check recursively
+                                hashUsedDG[type] = hashUsedDG[type] || []
+                                let newPath = `${path}.${dg.name}.${ed.path}`
+                                hashUsedDG[type].push({path:newPath,title:ed.title})
+                                processDG(hashAllDG[type],newPath)
+                            }
+                        })
+                    }
+                }
+
+
+                comp.sections.forEach(function (sect) {
+                    //console.log(sect)
+                    sect.items.forEach(function (item) {
+                        //name, title,type
+                        let type = item.type[0]
+                        if (hashAllDG[type]) {
+                            hashUsedDG[type] = hashUsedDG[type] || []
+                            hashUsedDG[type].push({path:sect.name + ": ",title:sect.title})
+                            //console.log(type)
+                            processDG(hashAllDG[type],sect.name + ": ")
+                        }
+
+                    })
+                })
+
+                let lst = []
+
+                Object.keys(hashUsedDG).forEach(function(key) {
+                    let o = hashUsedDG[key]
+                    let item = {name:key,paths:hashUsedDG[key]}
+                    lst.push(item)
+                })
+
+                lst.sort(function (a,b) {
+                    if (a.name.toLowerCase() > b.name.toLowerCase()) {
+                        return 1
+                    } else {
+                        return -1
+                    }
+                })
+
+                return {hashUsedDG:hashUsedDG,lstUsedDG : lst}
+
+            },
 
             filterList : function(lst,removeFirst) {
                 //return a list removing all elements with a mult of 0..0 or a parent with that mult
