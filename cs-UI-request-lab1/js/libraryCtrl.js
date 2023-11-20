@@ -1,7 +1,7 @@
 //seversync is actually the main library interface
 angular.module("pocApp")
     .controller('libraryCtrl',
-        function ($scope,$rootScope,$http,allDG,allComp,$sce,allQObject,user,librarySvc,$timeout,traceSvc) {
+        function ($scope,$rootScope,$http,allDG,allComp,$sce,allQObject,user,librarySvc,$timeout,traceSvc,$uibModal) {
 
             $scope.input = {}
             $scope.user = user
@@ -18,8 +18,12 @@ angular.module("pocApp")
             }
 
             //get all the DG
-            $scope.refreshDGSummary = function () {
+            $scope.refreshDGSummary = function (includeDeleted) {
                 let qry = `/model/allDG`
+                if (includeDeleted){
+                    qry += "?includeDeleted=true"
+                }
+
                 $http.get(qry).then(
                     function (data) {
                         $scope.libraryDG = data.data
@@ -46,6 +50,7 @@ angular.module("pocApp")
 
 
 
+/*
 
             //get all the QO
             let qryQO = `/model/allQObject`
@@ -58,7 +63,7 @@ angular.module("pocApp")
                 }, function (err) {
                     alert(angular.toJson(err.data))
                 })
-
+*/
 
             function makeCompSummary(allComp,libraryComp) {
                 let libraryHash = {}
@@ -193,6 +198,12 @@ angular.module("pocApp")
 
             $scope.downloadDG = function(dg) {
                 //set the comp property of the vo and exit. The caller (modelsCtrl.js) will update
+                //todo - should the library version be undeleted as well?
+                if (dg.active !== undefined && ! dg.active) {
+                    alert("The DG has been downloaded. It is still deleted in the Library.")
+                    dg.active=true
+                }
+
                 $scope.$close({dg:dg})
 
             }
@@ -323,43 +334,6 @@ angular.module("pocApp")
 
             }
 
-            //update all the DG on the server...
-            $scope.updateRepoDEP = function () {
-                if (confirm('Are you sure you wish to update the Library')) {
-                    let qry = "/model/DG"
-
-                    //construct a has
-
-                    let vo = {hashAllDG:allDG}
-
-                    vo.user = user
-
-                    $http.post(qry,vo).then(
-                        function (data) {
-                            console.log(data)
-                            $scope.syncOutcomeUpload = data.data
-
-                            //create a summary object
-                            $scope.syncOutcomeUploadSummary = {details:[],changed:0}
-                            $scope.syncOutcomeUploadSummary.total = $scope.syncOutcomeUpload.length
-
-                            $scope.syncOutcomeUpload.forEach(function (item) {
-                                if (item.saved) {
-                                    $scope.syncOutcomeUploadSummary.details.push(item)
-                                    $scope.syncOutcomeUploadSummary.changed ++
-                                }
-                            })
-
-
-                            //alert("All local DataGroups have been uploaded to the Library")
-                            //$scope.$close()
-                        },
-                        function (err) {
-                            console.log(err)
-                        }
-                    )
-                }
-            }
 
             $scope.checkin = function (model) {
                 if (user && model.checkedOut == user.email) {
@@ -384,6 +358,28 @@ angular.module("pocApp")
 
 
 
+            }
+
+            $scope.showHistory = function (dg) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/history.html',
+                    //backdrop: 'static',
+                    size : 'lg',
+                    controller: 'historyCtrl',
+
+                    resolve: {
+                        name: function () {
+                            return dg.name
+                        },
+                        category: function () {
+                            return "dg"
+                        },
+                        currentModel : function () {
+                            return dg
+                        }
+                    }
+
+                })
             }
 
         })

@@ -124,7 +124,7 @@
 
                 <table class="table table-bordered">
                   <tr>
-                    <td class="detailName">
+                    <td class="detailName" style="width: 20%">
                       Path
                     </td>
                     <td> {{selectedCompositionNode.data.ed.path}}</td>
@@ -175,7 +175,7 @@
                       {{selectedCompositionNode.data.ed.title}}
                     </td>
                   </tr>
-                  <tr ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
+                  <tr  selectedCompositionNode.data.ed.kind == 'root'">
                     <td class="detailName" > Description</td>
                     <td>  {{selectedCompositionNode.data.ed.description}}</td>
                   </tr>
@@ -257,7 +257,9 @@
 
                     </td>
                   </tr>
-                  <tr ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
+
+
+                  <tr ng-hide = "selectedCompositionNode.data.ed.kind == 'root'">
                     <td class="detailName">Cardinality</td>
                     <td>
                       <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
@@ -282,10 +284,17 @@
                     <td class="detailName">Control hint</td>
                     <td> {{selectedCompositionNode.data.ed.controlHint}}</td>
                   </tr>
+
                   <tr ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
                     <td class="detailName">Notes</td>
                     <td> {{selectedCompositionNode.data.ed.notes}}</td>
                   </tr>
+
+                  <tr ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
+                    <td class="detailName">Rules</td>
+                    <td> {{selectedCompositionNode.data.ed.rules}}</td>
+                  </tr>
+
                   <tr ng-show = "selectedCompositionNode.data.ed.zElement">
                     <td></td>
                     <td><em>This element has been added directly (a 'Z' element)</em></td>
@@ -646,6 +655,24 @@
         </tr>
       </table>
     </uib-tab>
+
+    <uib-tab>
+      <uib-tab-heading>
+        Rules <span class="badge">{{getRulesCount()}}</span>
+      </uib-tab-heading>
+
+      <table class="table table-bordered">
+        <tr><th>Rules</th><th>Note</th></tr>
+        <tr ng-repeat="item in allCompElements"
+            ng-show="item.ed.rules">
+          <td style="width: 40%">
+            <div class="clickable" ng-click="selectCompTreePath(item.ed.path)">{{item.ed.path}}</div>
+          </td>
+          <td>{{item.ed.rules}}</td>
+        </tr>
+      </table>
+    </uib-tab>
+
 
 
 

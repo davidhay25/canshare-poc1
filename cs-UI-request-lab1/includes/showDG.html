@@ -129,21 +129,7 @@
       </div>
 
       <table class="table table-condensed" style="margin-top: 8px">
-        <!--
-        <tr>
-          <td style="width: 25%">FHIR resource</td>
-          <td><a target = "_blank" ng-href="{{fhirRoot}}{{selectedModel.fhirResource}}">{{selectedModel.fhirResource}}</a></td>
-        </tr>
-        <tr>
-          <td>Category</td>
 
-          <td>
-            {{getCategory(selectedModel).code}}
-
-
-          </td>
-        </tr>
-        -->
         <tr><td>Tags</td>
           <td>
 
@@ -306,7 +292,7 @@
                 <table class="table table-bordered table-condensed">
 
                   <tr ng-show = "selectedNode.data.ed.path !== selectedModel.name">
-                    <td style="width : 20%">Path</td>
+                    <td class="detailName" style="width : 20%">Path</td>
                     <td>
                       {{selectedNode.data.ed.path | dropFirstInPath}}
 
@@ -325,7 +311,7 @@
                   </tr>
 
                   <tr>
-                    <td style="width : 20%">Source model</td>
+                    <td class="detailName" style="width : 20%">Source model</td>
                     <td>
 
                       <div ng-hide="selectedNode.data.ed.sourceModelName == selectedModel.name" class="pull-right clickable"
@@ -341,7 +327,7 @@
                     </td>
                   </tr>
 
-                  <tr><td style="width : 20%">Title</td>
+                  <tr><td class="detailName" style="width : 20%">Title</td>
                     <td>
                       <!--
                     <i class="glyphicon glyphicon-edit pull-right clickable"
@@ -351,7 +337,7 @@
                    {{selectedNode.data.ed.title}}</td>
                   </tr>
 
-                  <tr><td>Description</td><td>
+                  <tr><td class="detailName">Description</td><td>
                     <!--
                     <i class="glyphicon glyphicon-edit pull-right clickable"
                        ng-show="canEdit(selectedModel)"
@@ -360,7 +346,7 @@
                     {{selectedNode.data.ed.description}}
                   </td></tr>
 
-                  <tr><td>Type</td>
+                  <tr><td class="detailName">Type</td>
                     <td><div ng-repeat="type in selectedNode.data.ed.type">
 <!--
                       <i class="glyphicon glyphicon-edit pull-right clickable"
@@ -395,7 +381,7 @@
                     </td></tr>
 
                   <tr ng-show = "selectedNode.data.ed.path !== selectedModel.name && selectedNode.data.ed.type[0] !== 'Group'" && qControlOptions>
-                    <td>Input control</td>
+                    <td class="detailName">Input control</td>
                     <td>
                       <div class="row">
                         <div class="col-md-12">
@@ -426,7 +412,7 @@
                   </tr>
 
 
-                  <tr><td>Cardinality</td><td>
+                  <tr><td class="detailName">Cardinality</td><td>
                     <!--
                     <i class="glyphicon glyphicon-edit pull-right clickable"
                        ng-show="canEdit(selectedModel)"
@@ -436,7 +422,7 @@
                   </td></tr>
 
                   <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
-                    <td>ValueSet</td>
+                    <td class="detailName">ValueSet</td>
                     <td>
 <!--
                       <i class="glyphicon glyphicon-edit pull-right clickable"
@@ -455,7 +441,7 @@
                   </tr>
 
                   <tr>
-                    <td>Notes</td>
+                    <td class="detailName">Notes</td>
                     <td>
                       <!--
                       <i class="glyphicon glyphicon-edit pull-right clickable"
@@ -466,9 +452,16 @@
                     </td>
                   </tr>
 
+                  <tr>
+                    <td class="detailName">Rules</td>
+                    <td>
+                      {{selectedNode.data.ed.rules}}
+                    </td>
+                  </tr>
+
 
                   <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
-                    <td>Options</td>
+                    <td class="detailName">Options</td>
                     <td>
                       <div ng-show="selectedNode.data.ed.options">
                         <span
@@ -498,7 +491,7 @@
                   </tr>
 
                   <tr ng-show="selectedNode.data.ed.type[0] == 'Quantity'">
-                    <td>Units</td>
+                    <td class="detailName">Units</td>
                     <td>
                       <!--
                       <i class="glyphicon glyphicon-edit pull-right clickable"
@@ -514,7 +507,7 @@
                   </tr>
 
                   <tr ng-show="isFixedType(selectedNode.data.ed)">
-                    <td>Fixed value</td>
+                    <td class="detailName">Fixed value</td>
 
                     <td>
 
@@ -566,7 +559,7 @@
                   </tr>
 
                   <tr ng-show="isFixedType(selectedNode.data.ed)">
-                    <td>Default value</td>
+                    <td class="detailName">Default value</td>
 
                     <td>
 
@@ -619,7 +612,7 @@
 
 
                   <tr>
-                    <td>Source reference</td>
+                    <td class="detailName">Source reference</td>
                     <td>
                       <!--
                       <i class="glyphicon glyphicon-edit pull-right clickable"
@@ -640,7 +633,9 @@
 
               <uib-tab>
 
-                <uib-tab-heading>Conditional show <span class="badge">{{selectedNode.data.ed.enableWhen.length || 0}}</span> </uib-tab-heading>
+                <uib-tab-heading>Conditional show <span class="badge">
+                  {{selectedNode.data.ed.enableWhen.length || 0}}</span>
+                </uib-tab-heading>
                 <br/>
 
                 <table class="table table-bordered">
@@ -648,7 +643,7 @@
                   <tr ng-repeat="dep in selectedNode.data.ed.enableWhen">
                     <td>{{dep.source}}</td>
                     <td>{{dep.operator}}</td>
-                    <td>{{dep.value}}</td>
+                    <td>{{dep.value.code}} | {{dep.value.display}}</td>
                     <td> <i style="color: red" class="glyphicon glyphicon-remove clickable"
                             ng-show = "canEdit(selectedModel)"
                             ng-click="removeEnableWhen($index)"></i></td>
@@ -656,15 +651,22 @@
                 </table>
 
                 <div class="row" ng-show="canEdit(selectedModel)">
-                  <div class="col-md-5">
+                  <div class="col-md-4">
                     <select class="form-control" ng-model="input.ewSource"
                             ng-change = "ewSourceSelected(input.ewSource)"
-                            ng-options="element.shortPath for element in ewSources">
+                            ng-options="element.ed.path for element in ewSourcesThisElement">
 
                     </select>
                   </div>
 
-                  <div class="col-md-5">
+                  <div class="col-md-2">
+                    <select class="form-control" ng-model="input.ewSourceOp">
+                      <option value="=">=</option>
+                      <option value="!=">!=</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-4">
                     <select class="form-control" ng-model="input.ewSourceValue"
                             ng-options="concept.display for concept in ewSourceValues">
 
@@ -673,7 +675,7 @@
                   <div class="col-md-2">
                     <button class="btn-link btn"
                             ng-show="input.ewSourceValue"
-                            ng-click="addEnableWhen(input.ewSource,input.ewSourceValue)">Add</button>
+                            ng-click="addEnableWhen(input.ewSource,input.ewSourceValue,input.ewSourceOp)">Add</button>
                   </div>
 
                 </div>
@@ -1034,6 +1036,24 @@
 
     </uib-tab>
 
+    <uib-tab heading="Dependencies">
+      <uib-tab-heading>Dependencies <span ng-show="allDependencies.length > 0" class="badge">{{allDependencies.length}}</span> </uib-tab-heading>
+
+
+      <table class="table-bordered table">
+        <tr><th>Target (what to hide)</th><th>Source (what controls it)</th><th>Op</th><th>Value (that will show target)</th></tr>
+        <tr ng-repeat="dep in allDependencies">
+          <td>{{dep.path}}</td>
+          <td>{{dep.ew.source}}</td>
+          <td>{{dep.ew.operator}}</td>
+          <td>{{dep.ew.value.code}} | {{dep.ew.value.display}} |</td>
+        </tr>
+      </table>
+
+      <em>All of the hide / show dependencies in this DG</em>
+
+    </uib-tab>
+
 
     <uib-tab heading="Full element list">
       <em class="pull-right">Expanded. Includes items with a Cardinality of 0..0</em>
@@ -1129,31 +1149,7 @@
 
 
 
-    <uib-tab ng-show = "false" heading="Questionnaire">
-      <uib-tabset>
 
-        <uib-tab heading="Json">
-          <pre>{{dgQ | json}}</pre>
-        </uib-tab>
-
-        <uib-tab heading="Form">
-
-        </uib-tab>
-
-
-      </uib-tabset>
-    </uib-tab>
-
-    <uib-tab ng-show = 'false' heading="Questionnaire">
-      <uib-tabset>
-        <uib-tab heading="Form">
-          <renderform q="Qobject" qr="QR"></renderform>
-        </uib-tab>
-        <uib-tab heading="Json">
-          <pre>{{Qobject | json}}</pre>
-        </uib-tab>
-      </uib-tabset>
-    </uib-tab>
 
 
     <uib-tab ng-show="false && selectedModel.kind == 'comp'" heading="Overrides">

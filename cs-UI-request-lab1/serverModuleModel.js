@@ -114,7 +114,7 @@ async function setup(app) {
            // query.date = {"$gte"}
         }
 
-        const options = {sort: { date : 1 },limit:limit}
+        const options = {sort: { date : -1 },limit:limit}
 
         //console.log(options)
 
@@ -175,10 +175,14 @@ async function setup(app) {
 
     //get all active datagroups
     app.get('/model/allDG', async function(req,res) {
-        //retrieve the DG
-
+        //retrieve all the DG
+        let query = {active:true} // active: { $lt: 15 } };
+        if (req.query.includeDeleted) {
+            query = {}
+        }
+        console.log('query',query)
         const colDG = database.collection("dg");
-        const query = {active:true} // active: { $lt: 15 } };
+
         try {
             const cursor = await colDG.find(query).toArray()
             let arDG = []

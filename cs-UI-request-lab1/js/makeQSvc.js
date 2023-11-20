@@ -177,7 +177,8 @@ angular.module("pocApp")
             makeTreeFromQ : function (Q) {
                 //pass in a Q and return a tree array
                 let treeData = []
-                let issues = []         //any issues found during creation
+                let issues = []         //any issues found during
+                let lstElements = []    //a flat list of elements
                 let hashLinkId = {}     //a hash of linkIds
 
                 function processItem(item,parent) {
@@ -189,6 +190,10 @@ angular.module("pocApp")
                         hashLinkId[item.linkId] = true
                     }
                     treeData.push(node)
+
+                    lstElements.push({linkId:item.linkId,item:item})
+
+
                     if (item.item) {
                         item.item.forEach(function (child) {
                             processItem(child,item.linkId)
@@ -203,7 +208,13 @@ angular.module("pocApp")
                 })
 
                 console.log(treeData)
-                return {treeData:treeData,issues : issues}
+
+                //now
+
+
+
+
+                return {treeData:treeData,issues : issues,lstElements:lstElements}
 
 
             },
@@ -349,6 +360,8 @@ angular.module("pocApp")
                 //todo create a copy of the lstElements, then delete mult=0.0 and hideInQ (element & DG)
                 //console.log(lstElements)
 
+                //let hashEW = {}
+
                 let dgName = lstElements[0].ed.path
 
                 //construct a list of paths to hide
@@ -388,7 +401,9 @@ angular.module("pocApp")
 
 
                 //there's a single section (item) for the DG (This is not the same as the composition section)
-                let section = {text:lstElements[0].ed.path,linkId:`${dgName}-section`,item:[]}
+                let section = {text:lstElements[0].ed.title,linkId:`${dgName}-section`,item:[]}
+                section.definition = lstElements[0].ed.path
+
                 Q.item.push(section)
 
                 //let currentPathRoot
@@ -405,6 +420,9 @@ angular.module("pocApp")
                     if (hashAllDG[type]) {
                         console.log('new group',ed)
                         group = makeGroup(ed)
+
+                        addEnableWhen(ed,group)  //If there are any contitionals
+
                         processingDGPath = path
                     } else {
                         //need to see if we've finished procesing a path
@@ -418,11 +436,14 @@ angular.module("pocApp")
                                 let groupEd = {title:"Group",path:`${ed.title}-group`}
                                 group = makeGroup(groupEd)       //create a new group for the elements following the referenced DG
 
+                                //todo - this doesn't appear to do anything...
+
                                 processingDGPath = null
                             }
 
                         }
                         let item = {text:ed.title,linkId:ed.path,type:'string'}
+                        item.definition = ed.path
 
                         addEnableWhen(ed,item)  //If there are any contitionals
                         setControlType(ed,item)  //set the control type to use
@@ -440,6 +461,7 @@ angular.module("pocApp")
 
                 function makeGroup(ed) {
                     let group = {text:ed.title,linkId: ed.path,type:'group',item:[]}
+                    group.definition = ed.path
                     let ext = {'url':'http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count'}
                     ext.valueInteger = "2"
                     group.extension = [ext]
@@ -447,6 +469,36 @@ angular.module("pocApp")
                     section.item.push(group)
                     return group
                 }
+
+            },
+
+
+            getAllEW : function (Q) {
+                //Create a hash of all the 'EnableWhens' in a Q
+                let hashAllEW = {}
+
+                function getEW(item) {
+                    if (item.enableWhen) {
+                        item.enableWhen.forEach(function (ew) {
+                            hashAllEW[ew.question] = hashAllEW[ew.question] || []
+                            hashAllEW[ew.question].push(ew)
+                        })
+                    }
+
+                    if (item.item) {
+                        item.item.forEach(function (child) {
+                            getEW(child)
+                        })
+                    }
+
+                }
+
+                if (Q.item) {
+                    Q.item.forEach(function (item) {
+                        getEW(item)
+                    })
+                }
+                return hashAllEW
 
             },
 

@@ -16,6 +16,7 @@ angular.module("pocApp")
                 $scope.input.description = item.ed.description
                 $scope.input.title = item.ed.title
                 $scope.input.notes = item.ed.notes
+                $scope.input.rules = item.ed.rules
                 $scope.input.valueSet = item.ed.valueSet
                 $scope.input.sourceReference = item.ed.sourceReference
                 $scope.input.path =  $filter('dropFirstInPath')(item.ed.path)
@@ -146,38 +147,16 @@ angular.module("pocApp")
 
             }
 
-            /*
-            function setFixedValue(type) {
 
-
-                $uibModal.open({
-                    templateUrl: 'modalTemplates/fixValues.html',
-                    backdrop: 'static',
-                    //size : 'lg',
-                    controller: 'fixValuesCtrl',
-
-                    resolve: {
-                        type: function () {
-                            return type
-                        }
-                    }
-
-                }).result.then(function (vo) {
-                    console.log(vo)
-                })
-            }
-*/
 
 
             //doesn't set the path - as that is different when being used to create a new DG element
             function editED (ed) {
-                //let ed = {}
-
-                //ed.type = [$scope.input.type]
                 ed.type = [$scope.input.selectedType]
                 //ed.path = `new.${$scope.input.path}`        //the 'new.' is stripped off, as the full path is passed in for editing existing
                 ed.description = $scope.input.description
                 ed.notes = $scope.input.notes
+                ed.rules = $scope.input.rules
                 ed.title = $scope.input.title
                 ed.mult = $scope.input.mult
                 ed.valueSet = $scope.input.valueSet
@@ -440,11 +419,6 @@ angular.module("pocApp")
                             break
 
                     }
-
-
-                    //will be default or fixed
-                   //$scope.input[kind] = {elName:elName,elValue:elValue}  //for the save
-
 
                 })
 

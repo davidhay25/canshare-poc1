@@ -170,17 +170,19 @@ angular.module("pocApp")
                             return $scope.selectedModel
                         }
                     }
-
                 })
             }
 
             //add an enableWhen within the scope of the current DG. Assume (for now) that the trigger is a coded value
             //value is assumed to be a Coding
-            $scope.addEnableWhen = function(item,value) {
+            $scope.addEnableWhen = function(item,value,op) {
+                //item is the controlling ed - the one whose value will hide/show the currently selected element
 
                 //let sourcePath = item.shortPath       //this is the path of the source
                 let sourcePath = item.ed.path       //not completely sure how these should work ATM
                 let targetPath = $filter('dropFirstInPath')($scope.selectedNode.data.ed.path)
+                let targetED = $scope.selectedNode.data.ed  //this ED - the one that will be shown / hidden
+
                 //console.log(sourcePath,targetPath,value)
 
                 //todo - what if there is no diff
@@ -189,7 +191,7 @@ angular.module("pocApp")
                     if (ed.path == targetPath) {
                         found = true
                         ed.enableWhen = ed.enableWhen || []
-                        let ew = {source:sourcePath,operator:"=",value:value}
+                        let ew = {source:sourcePath,operator:op,value:value}
                         ed.enableWhen.push(ew)
 
                         traceSvc.addAction({action:'add-enablewhen',model:$scope.selectedModel,path:targetPath,description:'edit diff'})
@@ -198,8 +200,9 @@ angular.module("pocApp")
                 }
 
                 if (! found) {
-                    let diffEd = angular.copy(item.ed)
-                    diffEd.enableWhen = ed.enableWhen || []
+                    let diffEd = angular.copy(targetED)     //this is a copy of the 'source' - which will be hidden
+                    diffEd.path = targetPath
+                    diffEd.enableWhen = item.ed.enableWhen || []
                     let ew = {source:sourcePath,operator:"=",value:value}
                     diffEd.enableWhen.push(ew)
                     $scope.selectedModel.diff.push(diffEd)
@@ -239,8 +242,27 @@ angular.module("pocApp")
             $scope.ewSourceSelected = function (source) {
                 //console.log(source)
                 delete $scope.ewSourceValues
+                $scope.input.ewSourceOp = "="       //default to =
+
                 if (source) {
 
+                    //need to get the list of options from the fullElement list
+                    for (const item of $scope.fullElementList) {
+                        console.log(item)
+                        if (item.ed && item.ed.path == source.ed.path) {
+                            modelDGSvc.expandEdValues(item.ed).then(
+                                function (ar) {
+                                    $scope.ewSourceValues = ar
+                                },
+                                function (err) {
+                                    console.log(err)
+                                }
+                            )
+                        }
+                    }
+              //  }
+                    //$scope.fullElementList.forEach(function (item) {
+/*
                     //get the ed from the current model as it may have been updated
                     let sourcePath = $filter('dropFirstInPath')(source.ed.path)
 
@@ -255,6 +277,8 @@ angular.module("pocApp")
                             }
                         )
                     }
+
+                    */
 
 
 

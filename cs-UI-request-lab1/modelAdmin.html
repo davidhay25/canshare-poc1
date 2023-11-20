@@ -159,9 +159,9 @@
             <div class="myScroll">
 
                 <br/>
-                <em class="pull-right">Last 500 entries</em>
+                <em class="pull-right">Last 500 entries. <strong>Date descending order - most recent first. </strong></em>
                 <table class="table table-bordered table-condensed">
-                    <tr><th>Date</th><th>Action</th><th>Title</th><th>Path</th><th>Description</th><th>Diff</th><th>User</th></tr>
+                    <tr><th>Date</th><th>Kind</th><th>Action</th><th>Title</th><th>Path</th><th>Description</th><th>Diff</th><th>User</th></tr>
                     <tr ng-click="selectTraceItem(hx)"
                         style="cursor: pointer"
                         ng-class="{listItemSelected:selectedTraceItem == hx}"
@@ -171,6 +171,7 @@
                             {{hx.date | date : "MMM dd HH:mm:ss"}}
 
                         </td>
+                        <td>{{hx.model.kind}}</td>
                         <td>{{hx.action}}</td>
 
                         <td>{{hx.model.title}}</td>

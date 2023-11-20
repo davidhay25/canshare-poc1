@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
 
-            $scope.version = "0.5.12"
+            $scope.version = "0.5.14"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -211,6 +211,7 @@ angular.module("pocApp")
             }
 
 
+            //show the Q preview. Lots of diagnostic stuff.
             $scope.previewQ = function (Q) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/previewQ.html',
@@ -861,6 +862,7 @@ angular.module("pocApp")
                                 ed1.type = ed.type
                                 ed1.title = ed.title
                                 ed1.notes = ed.notes
+                                ed1.rules = ed.rules
                                 ed1.description = ed.description
                                 ed1.mult = ed.mult
                                 ed1.valueSet = ed.valueSet
@@ -1388,6 +1390,8 @@ angular.module("pocApp")
                         let t = {ed:item.ed,shortPath: $filter('dropFirstInPath')(item.ed.path)}
                         $scope.ewSources.push(t)
                     }
+
+
                 })
 
                 $scope.dgFshLM = igSvc.makeFshForDG(dg,vo.allElements)
@@ -1399,9 +1403,13 @@ angular.module("pocApp")
                 $scope.dgQ = voQ.Q
 
 
-
+                //The DG element tree
                 let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
                 makeDGTree(treeData)
+                
+                //all the dependencies (enableWhen)
+                $scope.allDependencies = modelDGSvc.getAllEW($scope.fullElementList,$scope.selectedModel.name)
+
 
             }
 
@@ -1519,10 +1527,28 @@ angular.module("pocApp")
                 ).on('changed.jstree', function (e, data) {
                     // the node selection event...
 
-                    if (data.node) {
 
+                    if (data.node) {
                         $scope.selectedNode = data.node;
                     }
+
+                    //set up the EnableWhen (conditional show)
+                    delete $scope.ewSourceValues
+                    delete $scope.input.ewSource
+                    delete $scope.input.ewSourceValue
+                    //delete $scope.ewSourceValues
+
+                    $scope.ewSourcesThisElement = []
+                    if ($scope.ewSources) {
+                        $scope.ewSources.forEach(function (item) {
+                            if (item.ed.path !== $scope.selectedNode.data.ed.path) {
+                                $scope.ewSourcesThisElement.push(item)
+                            }
+                        })
+                    }
+
+
+
 
                     $scope.$digest();       //as the event occurred outside of angular...
                 }).bind("loaded.jstree", function (event, data) {

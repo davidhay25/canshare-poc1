@@ -9,12 +9,21 @@ angular.module("pocApp")
             let vo = makeQSvc.makeTreeFromQ(Q)
             let treeData = vo.treeData
             $scope.issues = vo.issues
+            $scope.lstElements = vo.lstElements
 
             console.log(treeData)
 
             $timeout(function () {
                 makeQTree(treeData)
             },500)
+
+            $scope.allEW = makeQSvc.getAllEW(Q)
+
+            $scope.showED = function (definition) {
+                //for now the definition is the path to the ED. This may change (specifically it should be a url)
+
+
+            }
 
 
 
@@ -33,7 +42,6 @@ angular.module("pocApp")
 
                     }
                 })
-
 
                 return lstAlerts
 

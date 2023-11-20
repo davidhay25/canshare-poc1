@@ -3,9 +3,48 @@ angular.module("pocApp")
     .service('modelDGSvc', function($http,$q,$localStorage) {
 
         let config = {}
+        let vsUrlPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/" //the url prefix
 
 
         return {
+            getAllEW : function (lstElements,dgName) {
+                //given the expanded element list - construct a list of all dependencies (enableWhen)
+                let allDependencies = []
+
+                //construct a hash of all elments
+                let hashElements = {}
+                lstElements.forEach(function (item) {
+                    hashElements[item.ed.path] = item.ed
+                })
+
+                //now create the ew list
+                lstElements.forEach(function (item) {
+                    if (item.ed && item.ed.enableWhen) {
+                        //note that the ew here is not the same as in the Q - for example it has 'source' rather than 'question'
+                        item.ed.enableWhen.forEach(function (ew) {
+
+                            //for inherited elements the first segment is always the current dg name
+                            let ar = item.ed.path.split('.')
+                            ar[0] = dgName
+                            let newPath = ar.join('.')
+                            allDependencies.push({path:newPath,ew:ew,ed:hashElements[ew.question]})
+                        })
+                    }
+
+                })
+
+                lstElements.sort(function (a,b) {
+                    if (a.path > b.path) {
+                        return 1
+                    } else {
+                        return -1
+                    }
+                })
+
+
+                return allDependencies
+
+            },
             auditDG : function (hashAllDG) {
                 //compare the DG hash with $localStorage. There could be a bug where localStorage is not being updated
                 Object.keys(hashAllDG).forEach(function (key) {
@@ -63,23 +102,18 @@ angular.module("pocApp")
             expandEdValues : function (ed) {
                 let deferred = $q.defer()
                 //return the list of possible options for en ed. There are 2 sources:
-                //the 'options' array or the valueSet.
+                //the 'options' array or the valueSet. The valueSet has precedence
 
 
-
-                if (ed && ed.options) {
-                    let ar = []
-                    ed.options.forEach(function (opt) {
-                        //assume text (.pt) only for now
-                        //if there's no system, then the Q render will only check code. todo: need to add system
-                        ar.push({code:opt.pt,display:opt.pt})
-
-                    })
-                    deferred.resolve(ar)
-
-                } else if (ed && ed.valueSet) {
+                if (ed && ed.valueSet) {
                     //if there's a valueSet, then try to expand it
-                    let qry = `ValueSet/$expand?url=${ed.valueSet}&_summary=false`
+                    let url = ed.valueSet
+                    //the valueSet might be the full VS or just the name
+                    if (! ed.valueSet.startsWith("http")){
+                        url = `${vsUrlPrefix}${ed.valueSet}`
+                    }
+
+                    let qry = `ValueSet/$expand?url=${url}&_summary=false`
                     let encodedQry = encodeURIComponent(qry)
 
                     $http.get(`nzhts?qry=${encodedQry}`).then(
@@ -90,7 +124,6 @@ angular.module("pocApp")
                                 ar.push(concept)
 
                             }
-                           // console.log(data.data)
                             deferred.resolve(ar)
 
                         }, function (err) {
@@ -98,7 +131,10 @@ angular.module("pocApp")
                             console.error(`There was no ValueSet with the url:${ed.valueSet}`)
                         }
                     )
+                } else if (ed && ed.options) {
+                    deferred.resolve(ed.options)
                 }
+
                 return deferred.promise
             },
 
