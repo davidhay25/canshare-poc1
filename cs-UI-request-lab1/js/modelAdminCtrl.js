@@ -11,9 +11,10 @@ angular.module("pocApp")
             }
 
             $scope.world = $localStorage.world
+            let obj = {comp:$scope.world.compositions,dg:$scope.world.dataGroups}
 
 
-            let obj = angular.copy($scope.world)
+            //let obj = angular.copy($scope.world)
 
             $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([angular.toJson(obj,true) ],{type:"application/json"}))
             $scope.downloadLinkJsonName = `world.json`
