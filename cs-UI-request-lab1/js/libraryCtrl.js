@@ -336,6 +336,11 @@ angular.module("pocApp")
 
 
             $scope.checkin = function (model) {
+                if (! model) {
+                    alert("Library checkin was called on a null model")
+                    return
+                }
+
                 if (user && model.checkedOut == user.email) {
                     if ( confirm("Are you sure you want to check this in to the Library")) {
                         traceSvc.addAction({action:'checkin',model:model,description:"From library"})

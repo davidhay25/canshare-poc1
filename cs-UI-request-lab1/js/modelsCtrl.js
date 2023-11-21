@@ -41,7 +41,12 @@ angular.module("pocApp")
             console.log($scope.hashAllDG)
 
             //look for DG errors like repeating parents in the hierarchy tree
-            modelDGSvc.checkAllDG($scope.hashAllDG)
+            if ($scope.hashAllDG) {
+                modelDGSvc.checkAllDG($scope.hashAllDG)
+            } else {
+                alert("There don't appear to be any local DG's. You'll need to clear local and resync from the Library. Local changes will be lost. Sorry about that.")
+            }
+
 
 
             //If there's a DG with no diff, all sorts of bad stuff happens. Shouldn't occur, but if it does it's a pain
