@@ -748,20 +748,25 @@ angular.module("pocApp")
 
 
 
-            getFullListOfElementsNEW(inModel,inTypes,hashAllDG) {
-                //this is a test function working on the SO issue
 
+
+
+
+            getFullListOfElementsNEW(inModel,inTypes,hashAllDG) {
+                console.trace('getFullListOfElements for '+ inModel.name)
+
+                prompt("msg")
+                return {allElements: [],graphData:{},relationshipsSummary:{}}
 
             },
 
 
-
-
-
             getFullListOfElements(inModel,inTypes,hashAllDG) {
+                console.log('getFullListOfElements for '+ inModel.name)
                 if (! inModel) {
                     return
                 }
+                let iterationCount = 0      //a counter to detect excessive iterations (indicates a circular reference)
                // console.log(`Processing ${inModel.name}`)
                 //create a complete list of elements for a DG (Compositions have a separate function)
 
@@ -780,6 +785,7 @@ angular.module("pocApp")
                 let topModel = angular.copy(model)
                 let allElements = []
                 let errors = []
+                let arLog = []  //a processing log of
 
                 let hashEdges = {}      //a has to track edges between nodes to adoid duplication
 
@@ -802,9 +808,13 @@ angular.module("pocApp")
                 try {
                     extractElements(model,model.name)   //the guts of the function
                 } catch (ex) {
-                    console.log(ex)
-                    alert(`Unable to inflate DG: ${model.name}. Error: ${angular.toJson(ex)}` )
-                    return {allElements: [],graphData:{},relationshipsSummary:relationshipsSummary}
+                    //thrown when the number of iterations is excessive.
+                    //I believe that the DG will actually be correct as it's a hash based on path, but there is something that should be fixed
+                    console.log(arLog)
+                    //alert(`Unable to inflate DG: ${model.name}. Error: ${angular.toJson(ex)}` )
+                    //return {allElements: allElements,graphData:{},relationshipsSummary:relationshipsSummary}
+
+                    //return {allElements: [],graphData:{},relationshipsSummary:relationshipsSummary}
 
                 }
 
@@ -878,6 +888,12 @@ angular.module("pocApp")
 
                 //process a single element at the root of the DG
                 function extractElements(model,pathRoot) {
+                    arLog.push({dg: model.name,path:pathRoot})
+                    iterationCount++
+                    if (iterationCount > 50) {
+                        alert(`Excessive iteration count for DG ${inModel.name}`)
+                        throw new Error(`Excessive iteration count for DG ${inModel.name}`)
+                    }
 
                    // console.log(pathRoot,model.name)
 
@@ -893,8 +909,11 @@ angular.module("pocApp")
 
                     addNodeToList(node)
 
+                    console.log('extractElements ' + model.name)
                     //do parents first.
                     if (model.parent ) {
+
+                        console.log(model.name, model.parent)
 
 /*
 

@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
 
-            $scope.version = "0.5.17"
+            $scope.version = "0.5.18"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -35,8 +35,28 @@ angular.module("pocApp")
 
             $scope.localStorage = $localStorage
 
+            //>>>>>>>> this examines the entire model.
+            function validateModel() {
+                // validate the model. This retruns a hash of all types defined in the model as well as errors
+                let vo1 = modelsSvc.validateModel($localStorage.world)
+                $scope.errors = vo1.errors
+                $scope.input.types = vo1.types      //a hash keyed by name
+                $scope.input.arTypes = Object.keys(vo1.types)       //list of types foe new element dropdown
+
+
+                //a hash by type of all elements that reference it
+                $scope.analysis = modelsSvc.analyseWorld($localStorage.world,$scope.input.types)
+
+            }
+            //temp validateModel()
+            $scope.input.types = $localStorage.world.dataGroups  //<<<< temp
+
+
+
             //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
             $scope.hashAllDG = $localStorage.world.dataGroups
+
+
 
             console.log($scope.hashAllDG)
 
@@ -673,6 +693,8 @@ angular.module("pocApp")
                 });
             }
 
+
+
             //make a sorted list for the UI
             function sortDG() {
                 if (!$scope.hashAllDG) { //happens after clear local
@@ -1284,19 +1306,7 @@ angular.module("pocApp")
 
             }
 
-            function validateModel() {
-                // validate the model. This retruns a hash of all types defined in the model as well as errors
-                let vo1 = modelsSvc.validateModel($localStorage.world)
-                $scope.errors = vo1.errors
-                $scope.input.types = vo1.types      //a hash keyed by name
-                $scope.input.arTypes = Object.keys(vo1.types)       //list of types foe new element dropdown
 
-
-                //a hash by type of all elements that reference it
-                $scope.analysis = modelsSvc.analyseWorld($localStorage.world,$scope.input.types)
-
-            }
-            validateModel()
 
             $scope.selectModelFromTypeUsage = function (model) {
                 $scope.selectedModelFromTypeUsage = model
@@ -1438,11 +1448,17 @@ angular.module("pocApp")
 
                     //check the current checkedout state on the library.
                     //Always update the local version checkedout (not data) with the one from the library
-                    let qry = `/model/DG/${dg.name}`
+                    let name = dg.name
+                    let qry = `/model/DG/${name}`
                     $http.get(qry).then(
                         function (data) {
                             let libraryDG = data.data
                             $scope.selectedModel.checkedOut = libraryDG.checkedOut
+                            if ($scope.hashAllDG[name]) {
+                                $scope.hashAllDG[name].checkedOut = libraryDG.checkedOut
+                            } else {
+                                alert(`DG ${name} not found in the local storage`)
+                            }
                         }
                     )
 

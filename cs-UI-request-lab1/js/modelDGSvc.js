@@ -7,6 +7,12 @@ angular.module("pocApp")
 
 
         return {
+            auditDG : function (dg,hashAllDG) {
+
+
+
+
+            },
             getAllEW : function (lstElements,dgName) {
                 //given the expanded element list - construct a list of all dependencies (enableWhen)
                 let allDependencies = []

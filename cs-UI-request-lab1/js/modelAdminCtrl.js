@@ -10,17 +10,40 @@ angular.module("pocApp")
                 alert("Not yet enabled")
             }
 
-            $scope.world = $localStorage.world
+            function loadWorld() {
+                //the localstorage objects
+                $scope.world = $localStorage.world
+                $scope.arDG = []
+                Object.keys($scope.world.dataGroups).forEach(function (key) {
+                    $scope.arDG.push($scope.world.dataGroups[key])
+                })
+
+                $scope.arDG.sort(function (a,b) {
+                    if (a.name.toLowerCase() > b.name.toLowerCase()) {
+                        return 1
+                    } else {
+                        return -1
+                    }
+                })
+            }
+            loadWorld()
+
+
             let obj = {comp:$scope.world.compositions,dg:$scope.world.dataGroups}
-
-
-            //let obj = angular.copy($scope.world)
-
             $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([angular.toJson(obj,true) ],{type:"application/json"}))
             $scope.downloadLinkJsonName = `world.json`
 
+            $scope.selectDG = function (dg) {
+                $scope.selectedDG = dg
+            }
 
-
+            $scope.deleteDG = function () {
+                if (confirm("Are you sure you wish to remove this DG from local storage? (Any version on the Library is untouched")){
+                    delete $localStorage.world.dataGroups[$scope.selectedDG.name]
+                    delete $scope.selectedDG
+                    loadWorld()
+                }
+            }
 
             function getTrace(count) {
                 count = count || 200
