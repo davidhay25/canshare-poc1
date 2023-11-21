@@ -21,16 +21,23 @@
     </style>
 
     <script>
-        angular.module("pocApp",['ui.bootstrap','ui.checkbox',"firebase"]).config(function($locationProvider) {
+        angular.module("pocApp",['ui.bootstrap','ui.checkbox',"firebase",'ngStorage']).config(function($locationProvider) {
             $locationProvider.html5Mode(true);
             $locationProvider.hashPrefix('!');
         });
+
+        angular.module("pocApp").config(['$compileProvider', function ($compileProvider) {
+            $compileProvider.aHrefSanitizationWhitelist(/^\s*(http|https?|ftp|mailto|blob):/);
+        }]);
+
+
         angular.module("pocApp").constant("moment", moment);
 
         angular.module("formsApp",[])
         angular.module('topApp', ['pocApp', 'formsApp'])
 
     </script>
+    <script src="js/libs/ngStorage.min.js"></script>
 
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/modelAdminCtrl.js"></script>
@@ -120,110 +127,128 @@
     </nav>
 
 
+    <uib-tabset>
+        <uib-tab heading="Log">
 
-    <div class="row">
-        <div class="col-md-7">
+            <div class="row">
+                <div class="col-md-7">
 
-            <div>
+                    <div>
 
-                <div class="row">
-                    <div class="col-md-3">
-                        DataGroups filter:
+                        <div class="row">
+                            <div class="col-md-3">
+                                DataGroups filter:
+                            </div>
+                            <div class="col-md-4">
+
+                                <select ng-model = "input.selectedDGName" class="form-control"
+                                        ng-change = "setFilter(input.selectedDGName)"
+                                        ng-options="type for type in lstType">
+
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <select ng-model = "input.selectedEmail" class="form-control"
+                                        ng-change = "setEmailFilter(input.selectedEmail)"
+                                        ng-options="k for (k,v) in hashUser">
+                                    <option value=""></option>
+
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <checkbox ng-model="input.hideSelect"></checkbox> Hide select
+                            </div>
+
+                        </div>
                     </div>
-                    <div class="col-md-4">
 
-                        <select ng-model = "input.selectedDGName" class="form-control"
-                                ng-change = "setFilter(input.selectedDGName)"
-                                ng-options="type for type in lstType">
+                    <div class="myScroll">
 
-                        </select>
-                    </div>
+                        <br/>
+                        <em class="pull-right">Last 500 entries. <strong>Date descending order - most recent first. </strong></em>
+                        <table class="table table-bordered table-condensed">
+                            <tr><th>Date</th><th>Kind</th><th>Action</th><th>Title</th><th>Path</th><th>Description</th><th>Diff</th><th>User</th></tr>
+                            <tr ng-click="selectTraceItem(hx)"
+                                style="cursor: pointer"
+                                ng-class="{listItemSelected:selectedTraceItem == hx}"
+                                ng-show = canShow(hx)
+                                ng-repeat="hx in traceHistory">
+                                <td>
+                                    {{hx.date | date : "MMM dd HH:mm:ss"}}
 
-                    <div class="col-md-4">
+                                </td>
+                                <td>{{hx.model.kind}}</td>
+                                <td>{{hx.action}}</td>
 
-                        <select ng-model = "input.selectedEmail" class="form-control"
-                                ng-change = "setEmailFilter(input.selectedEmail)"
-                                ng-options="k for (k,v) in hashUser">
-                            <option value=""></option>
+                                <td>{{hx.model.title}}</td>
+                                <td>{{hx.path}}</td>
+                                <td>{{hx.description}}</td>
+                                <td>{{hx.model.diff.length}}</td>
+                                <td>{{hx.userEmail}}</td>
 
-                        </select>
-                    </div>
-
-                    <div class="col-md-3">
-                        <checkbox ng-model="input.hideSelect"></checkbox> Hide select
+                            </tr>
+                        </table>
                     </div>
 
                 </div>
-            </div>
+                <div class="col-md-5">
 
-            <div class="myScroll">
-
-                <br/>
-                <em class="pull-right">Last 500 entries. <strong>Date descending order - most recent first. </strong></em>
-                <table class="table table-bordered table-condensed">
-                    <tr><th>Date</th><th>Kind</th><th>Action</th><th>Title</th><th>Path</th><th>Description</th><th>Diff</th><th>User</th></tr>
-                    <tr ng-click="selectTraceItem(hx)"
-                        style="cursor: pointer"
-                        ng-class="{listItemSelected:selectedTraceItem == hx}"
-                        ng-show = canShow(hx)
-                        ng-repeat="hx in traceHistory">
-                        <td>
-                            {{hx.date | date : "MMM dd HH:mm:ss"}}
-
-                        </td>
-                        <td>{{hx.model.kind}}</td>
-                        <td>{{hx.action}}</td>
-
-                        <td>{{hx.model.title}}</td>
-                        <td>{{hx.path}}</td>
-                        <td>{{hx.description}}</td>
-                        <td>{{hx.model.diff.length}}</td>
-                        <td>{{hx.userEmail}}</td>
-
-                    </tr>
-                </table>
-            </div>
-
-        </div>
-        <div class="col-md-5">
-
-            <div>
-                <button ng-show="false && currentDG.checkedOut == user.email && selectedTraceItem.model.name == currentDG.name"
-                        ng-click="restoreDG(selectedTraceItem.model)"
-                        class="btn btn-danger pull-right">
-                    Restore this version
-                </button>
-            </div>
-            <uib-tabset>
-
-                <uib-tab heading="Diff">
-                    <div ng-show="selectedTraceItem.model.parent">
-                        <br/>
-                        <div class="banner">
-                            <strong>Parent: </strong>{{selectedTraceItem.model.parent}}
-                            <br/>
-                        </div>
-
+                    <div>
+                        <button ng-show="false && currentDG.checkedOut == user.email && selectedTraceItem.model.name == currentDG.name"
+                                ng-click="restoreDG(selectedTraceItem.model)"
+                                class="btn btn-danger pull-right">
+                            Restore this version
+                        </button>
                     </div>
-                    <table class="table-condensed table table-bordered">
-                        <tr><th>Title</th><th>Path</th><th>Card.</th><th>Type</th></tr>
-                        <tr ng-repeat="element in selectedTraceItem.model.diff">
-                            <td>{{element.title}}</td>
-                            <td>{{element.path}}</td>
-                            <td>{{element.mult}}</td>
-                            <td>{{element.type[0]}}</td>
+                    <uib-tabset>
 
-                        </tr>
-                    </table>
+                        <uib-tab heading="Diff">
+                            <div ng-show="selectedTraceItem.model.parent">
+                                <br/>
+                                <div class="banner">
+                                    <strong>Parent: </strong>{{selectedTraceItem.model.parent}}
+                                    <br/>
+                                </div>
 
-                </uib-tab>
-                <uib-tab heading="Json">
-                    <pre>{{selectedTraceItem | json}}</pre>
-                </uib-tab>
+                            </div>
+                            <table class="table-condensed table table-bordered">
+                                <tr><th>Title</th><th>Path</th><th>Card.</th><th>Type</th></tr>
+                                <tr ng-repeat="element in selectedTraceItem.model.diff">
+                                    <td>{{element.title}}</td>
+                                    <td>{{element.path}}</td>
+                                    <td>{{element.mult}}</td>
+                                    <td>{{element.type[0]}}</td>
 
-            </uib-tabset>
-        </div>
-    </div>
+                                </tr>
+                            </table>
+
+                        </uib-tab>
+                        <uib-tab heading="Json">
+                            <pre>{{selectedTraceItem | json}}</pre>
+                        </uib-tab>
+
+                    </uib-tabset>
+                </div>
+            </div>
+
+
+        </uib-tab>
+        <uib-tab heading="Local storage">
+
+            <a class="btn btn-link" download="{{downloadLinkJsonName}}"
+               href="{{downloadLinkJson}}" title="{{downloadLinkJsonName}}" >
+                Download Json to computer
+            </a>
+
+
+            <pre>{{world | json}}</pre>
+
+        </uib-tab>
+    </uib-tabset>
+
 
 
 

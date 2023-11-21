@@ -47,8 +47,6 @@ angular.module("pocApp")
                 alert("There don't appear to be any local DG's. You'll need to clear local and resync from the Library. Local changes will be lost. Sorry about that.")
             }
 
-
-
             //If there's a DG with no diff, all sorts of bad stuff happens. Shouldn't occur, but if it does it's a pain
             //this at least prevents the app from crashing, so remedial action can be taken
             Object.keys($scope.hashAllDG).forEach(function (key) {

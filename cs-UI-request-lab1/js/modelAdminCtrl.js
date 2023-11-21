@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('modelAdminCtrl',
-        function ($scope,$http,$uibModal,$q) {
+        function ($scope,$http,$uibModal,$localStorage,$q) {
 
             let dgFilter
             let emailFilter
@@ -9,6 +9,17 @@ angular.module("pocApp")
             $scope.restoreDG = function () {
                 alert("Not yet enabled")
             }
+
+            $scope.world = $localStorage.world
+
+
+            let obj = angular.copy($scope.world)
+
+            $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([angular.toJson(obj,true) ],{type:"application/json"}))
+            $scope.downloadLinkJsonName = `world.json`
+
+
+
 
             function getTrace(count) {
                 count = count || 200
