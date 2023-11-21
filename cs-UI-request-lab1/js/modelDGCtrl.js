@@ -9,6 +9,10 @@ angular.module("pocApp")
             fixedValueText.string = "What is the fixed string"
             fixedValueText.decimal = "What is the fixed decimal"
 
+            $scope.dependencySourceDisplay = function (ed) {
+                return `${ed.path} (${ed.title})`
+            }
+
             $scope.cloneDG = function (dg) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/getName.html',

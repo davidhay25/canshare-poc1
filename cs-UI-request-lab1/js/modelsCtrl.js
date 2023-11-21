@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
 
-            $scope.version = "0.5.16"
+            $scope.version = "0.5.17"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -51,9 +51,6 @@ angular.module("pocApp")
             })
 
             //
-
-
-
 
 
             //a handler that will re-draw the list and tree views of the DGs.

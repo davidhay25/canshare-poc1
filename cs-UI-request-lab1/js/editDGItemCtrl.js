@@ -1,15 +1,15 @@
 angular.module("pocApp")
     .controller('editDGItemCtrl',
-        function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal) {
+        function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal,$http) {
             $scope.item = item
             $scope.allTypes = allTypes
             $scope.input = {}
             $scope.fullElementList = fullElementList
 
-
-
             $scope.options = []     //a list of options. Will be saved as ed.options
             $scope.units = [] //a list of units. Will be saved as ed.units
+
+            let snomed = "http://snomed.info/sct"
 
             //when an item is passed in for editing
             if (item && item.ed) {
@@ -440,6 +440,72 @@ angular.module("pocApp")
             }
 
             //------------ functions for options list ------------
+
+            $scope.addOption = function () {
+                $scope.options = $scope.options || []
+                $scope.options.push({code:$scope.input.newOptionCode,
+                    display:$scope.input.newOptionDisplay,
+                    fsn:$scope.input.newOptionFSN,
+                    system:snomed})
+                delete $scope.input.newOptionCode
+                delete $scope.input.newOptionDisplay
+                delete $scope.input.newOptionFSN
+            }
+
+            //lookup from the TS
+            $scope.lookupFSN = function (code) {
+
+                let qry = `CodeSystem/$lookup?system=${snomed}&code=${code}`
+
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        console.log(data)
+                        let parameters = data.data
+
+                        for (const param of parameters.parameter) {
+
+                            if (param.name == 'display') {
+                                $scope.input.newOptionDisplay = param.valueString
+                            }
+
+                            if (param.part) {
+                                let parsedPart = {}
+
+                                param.part.forEach(function (part) {
+                                    parsedPart[part.name] = part.valueCoding || part.valueString
+                                })
+
+                                console.log(parsedPart)
+                                // if (parsedPart.name == 'use' && parsedPart.valueCoding) {
+                                if (parsedPart.use && parsedPart.use.code == '900000000000003001') {
+                                    //this is the FSN
+                                    if (parsedPart['value']) {
+                                        $scope.input.newOptionFSN = parsedPart['value']
+                                    }
+
+                                }
+
+
+                            }
+                        }
+
+                        //find the FSN. I really don't like parameters!
+
+
+
+
+                    },function (err) {
+                        alert("This Concept was not found on the National Terminology Server")
+                        console.log(err)
+                    }
+                )
+
+
+                // let concept = {system:$scope.input.system,code:$scope.input.code}
+
+            }
 
             //Make a text list from the ed.options
             function makeOptionsText() {

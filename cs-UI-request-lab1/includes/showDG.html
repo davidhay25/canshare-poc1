@@ -654,7 +654,7 @@
                   <div class="col-md-4">
                     <select class="form-control" ng-model="input.ewSource"
                             ng-change = "ewSourceSelected(input.ewSource)"
-                            ng-options="element.ed.path for element in ewSourcesThisElement">
+                            ng-options="dependencySourceDisplay(element.ed) for element in ewSourcesThisElement">
 
                     </select>
                   </div>
