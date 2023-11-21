@@ -18,13 +18,18 @@ angular.module("pocApp")
                     $scope.arDG.push($scope.world.dataGroups[key])
                 })
 
-                $scope.arDG.sort(function (a,b) {
-                    if (a.name.toLowerCase() > b.name.toLowerCase()) {
-                        return 1
-                    } else {
-                        return -1
-                    }
-                })
+                try {
+                    $scope.arDG.sort(function (a,b) {
+                        if (a.name.toLowerCase() > b.name.toLowerCase()) {
+                            return 1
+                        } else {
+                            return -1
+                        }
+                    })
+                } catch(ex) {
+                    alert(ex.message)
+                }
+
             }
             loadWorld()
 

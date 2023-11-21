@@ -43,12 +43,12 @@ angular.module("pocApp")
                 $scope.input.types = vo1.types      //a hash keyed by name
                 $scope.input.arTypes = Object.keys(vo1.types)       //list of types foe new element dropdown
 
-
                 //a hash by type of all elements that reference it
                 $scope.analysis = modelsSvc.analyseWorld($localStorage.world,$scope.input.types)
 
             }
-            //temp validateModel()
+            //temp validateModel()  //this will have an alert for all circular references - potentially a lot...
+            //todo need a better validation ?
             $scope.input.types = $localStorage.world.dataGroups  //<<<< temp
 
 
@@ -1280,9 +1280,11 @@ angular.module("pocApp")
                         $scope.hashAllDG[newModel.name] = newModel
                         sortDG()
 
-                        let vo1 = modelsSvc.validateModel($localStorage.world)
-                        $scope.errors = vo1.errors
-                        $scope.input.types = vo1.types      //a hash keyed by name
+                       // let vo1 = modelsSvc.validateModel($localStorage.world)
+                       // $scope.errors = vo1.errors
+                       // $scope.input.types = vo1.types      //a hash keyed by name
+
+                        $scope.input.types[newModel.name] = newModel
 
                         //a hash by type of all elements that reference it
                         $scope.analysis = modelsSvc.analyseWorld($localStorage.world,$scope.input.types)
