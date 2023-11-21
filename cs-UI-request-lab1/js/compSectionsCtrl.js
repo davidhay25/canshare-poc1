@@ -154,7 +154,7 @@ angular.module("pocApp")
                 let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
                 $timeout(function () {
                     showDGTree(vo1.treeData)
-                },500)
+                },1000)
             }
             $scope.setup()
 
@@ -237,6 +237,7 @@ angular.module("pocApp")
             }
 
             function showDGTree(treeData) {
+                console.log(`Draw select tree. ${treeData.length} elements.`)
                 $('#dgSelectTree').jstree('destroy');
 
                 $scope.allDGTree = $('#dgSelectTree').jstree(
