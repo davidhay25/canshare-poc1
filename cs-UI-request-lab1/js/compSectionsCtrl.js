@@ -150,11 +150,15 @@ angular.module("pocApp")
                 $scope.selectComposition($scope.selectedComposition)  //in modelCtrl
             }
 
+
             $scope.setup = function () {
                 let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
+                //showDGTree(vo1.treeData)
+
                 $timeout(function () {
                     showDGTree(vo1.treeData)
                 },1000)
+
             }
             $scope.setup()
 

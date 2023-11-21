@@ -47,160 +47,6 @@
         }
     </style>
 
-    <script src="js/libs/jquery-1.9.0.min.js"></script>
-    <script src="js/libs/angular.min1-5.js"></script>
-    <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
-    <script src="js/libs/moment.min.js"></script>
-
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" href="css/common.css"/>
-    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
-
-
-
-    <script>
-        let app = angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage','ngSanitize',"firebase"]).config(function($locationProvider) {
-            $locationProvider.html5Mode(true);
-            $locationProvider.hashPrefix('!');
-        });
-        angular.module("pocApp").constant("moment", moment);
-
-        angular.module("pocApp").config(['$compileProvider', function ($compileProvider) {
-            $compileProvider.aHrefSanitizationWhitelist(/^\s*(http|https?|ftp|mailto|blob):/);
-        }]);
-
-        angular.module("formsApp",[])
-        angular.module('topApp', ['pocApp', 'formsApp'])
-
-        //https://www.tutorialsteacher.com/angularjs/angularjs-exception-handling
-        app.config(function ($provide) {
-
-            $provide.decorator('$exceptionHandler', function ($delegate) {
-
-                return function (exception, cause) {
-                  //  $delegate(exception, cause);
-//console.log(cause)
-                    console.log("Untrapped exception",exception.stack)
-                    //$http.post("model/access",{})
-
-                   // logErrorsToBackend(exception, cause);
-
-                    let obj = {type:'err',module:'model',msg:exception.stack}
-                    $.ajax({
-                        type: "POST",
-                        url: "/telemetry",
-                        contentType: "application/json",
-                        data: JSON.stringify(obj)
-                    });
-
-                    let msg = "There was an unexpected error. Details have been saved to the server, " +
-                        "but your last action may have failed. You should restart the browser and check."
-
-                    alert(msg);
-                };
-            });
-        });
-
-
-    </script>
-
-
-
-    <script src="js/libs/ngStorage.min.js"></script>
-    <script src="js/libs/angular-sanitize.js"></script>
-
-    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
-
-    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
-
-    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
-    <script src="js/libs/jstree.min.js"></script>
-
-    <script src="js/loginCtrl.js"></script>
-
-    <script src="js/modelsCtrl.js"></script>
-    <script src="js/modelsSvc.js"></script>
-
-    <script src="js/modelCompSvc.js"></script>
-
-    <script src="js/libs/vis.min.js"></script>
-
-    <script src="js/filters.js"></script>
-    <script src="js/editDGCtrl.js"></script>
-    <script src="js/editCompositionCtrl.js"></script>
-    <!--
-    <script src="js/editVSCtrl.js"></script>
-        <script src="js/QbuilderCtrl.js"></script>
-
-    -->
-    <script src="js/modelCompCtrl.js"></script>
-    <script src="js/modelDGCtrl.js"></script>
-    <script src="js/modelDGSvc.js"></script>
-    <script src="js/modelTermCtrl.js"></script>
-    <script src="js/modelTermSvc.js"></script>
-    <script src="js/optionsCtrl.js"></script>
-    <script src="js/viewVSCtrl.js"></script>
-    <script src="js/showParameters.js"></script>
-    <script src="js/editDGItemCtrl.js"></script>
-    <script src="js/exportCtrl.js"></script>
-    <script src="js/QutilitiesSvc.js"></script>
-    <script src="js/igSvc.js"></script>
-    <!--
-    <script src="js/setUnitsCtrl.js"></script>
--->
-
-
-    <script src="js/modelDGDialogCtrl.js"></script>
-    <script src="js/modelDGDialogSvc.js"></script>
-    <script src="js/libraryCtrl.js"></script>
-    <script src="js/libraryDGCtrl.js"></script>
-    <script src="js/libraryCompCtrl.js"></script>
-
-    <script src="js/fixValuesCtrl.js"></script>
-    <script src="js/changeTypeCtrl.js"></script>
-    <script src="js/makeQCtrl.js"></script>
-    <script src="js/makeQSvc.js"></script>
-    <script src="js/librarySvc.js"></script>
-    <script src="js/historyCtrl.js"></script>
-    <script src="js/previewQCtrl.js"></script>
-    <script src="js/getNameCtrl.js"></script>
-    <script src="js/traceCtrl.js"></script>
-    <script src="js/traceSvc.js"></script>
-    <script src="directive/renderForm/renderFormSvc.js"></script>
-    <script src="directive/renderForm/renderFormDir.js"></script>
-    <script src="directive/renderSingleItem/renderSingleItemDir.js"></script>
-
-
-
-    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
-
-    <!-- scripts the define the models-->
-    <script src="js/modelsDemoSvc.js"></script>
-    <script src="js/models/ObservationModels.js"></script>
-    <script src="js/models/StagingModels.js"></script>
-
-    <script src="js/compSectionsCtrl.js"></script>
-
-
-    <script src="js/libs/firebase.js"></script>
-    <script src="js/libs/angularfire.min.js"></script>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDG1ToLHycsMUX0CfX0OZVSRUUpFQeKE9o",
-            authDomain: "canshare-730e6.firebaseapp.com",
-            projectId: "canshare-730e6",
-            storageBucket: "canshare-730e6.appspot.com",
-            messagingSenderId: "12147821347",
-            appId: "1:12147821347:web:5963d577cb050259475a96"
-        };
-        if (firebase) {
-            console.log('init firebase')
-            firebase.initializeApp(firebaseConfig);
-
-        }
-    </script>
-
 </head>
 <body style="padding: 8px;padding-top: 80px" >
 <div ng-app="topApp" ng-controller="modelsCtrl" class="container-fluid" ng-cloak>
@@ -782,5 +628,163 @@
     </uib-tabset>
 
 </div>
+
+
+
+<script src="js/libs/jquery-1.9.0.min.js"></script>
+<script src="js/libs/angular.min1-5.js"></script>
+<script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+<script src="js/libs/moment.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+<link rel="stylesheet" type="text/css" href="css/common.css"/>
+<link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+
+
+
+<script>
+    let app = angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage','ngSanitize',"firebase"]).config(function($locationProvider) {
+        $locationProvider.html5Mode(true);
+        $locationProvider.hashPrefix('!');
+    });
+    angular.module("pocApp").constant("moment", moment);
+
+    angular.module("pocApp").config(['$compileProvider', function ($compileProvider) {
+        $compileProvider.aHrefSanitizationWhitelist(/^\s*(http|https?|ftp|mailto|blob):/);
+    }]);
+
+    angular.module("formsApp",[])
+    angular.module('topApp', ['pocApp', 'formsApp'])
+
+    //https://www.tutorialsteacher.com/angularjs/angularjs-exception-handling
+    app.config(function ($provide) {
+
+        $provide.decorator('$exceptionHandler', function ($delegate) {
+
+            return function (exception, cause) {
+                //  $delegate(exception, cause);
+//console.log(cause)
+                console.log("Untrapped exception",exception.stack)
+                //$http.post("model/access",{})
+
+                // logErrorsToBackend(exception, cause);
+
+                let obj = {type:'err',module:'model',msg:exception.stack}
+                $.ajax({
+                    type: "POST",
+                    url: "/telemetry",
+                    contentType: "application/json",
+                    data: JSON.stringify(obj)
+                });
+
+                let msg = "There was an unexpected error. Details have been saved to the server, " +
+                    "but your last action may have failed. You should restart the browser and check."
+
+                alert(msg);
+            };
+        });
+    });
+
+
+</script>
+
+
+
+<script src="js/libs/ngStorage.min.js"></script>
+<script src="js/libs/angular-sanitize.js"></script>
+
+<script src="js/libs/angular-bootstrap-checkbox.js"></script>
+
+<link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+
+<link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
+<script src="js/libs/jstree.min.js"></script>
+
+<script src="js/loginCtrl.js"></script>
+
+<script src="js/modelsCtrl.js"></script>
+<script src="js/modelsSvc.js"></script>
+
+<script src="js/modelCompSvc.js"></script>
+
+<script src="js/libs/vis.min.js"></script>
+
+<script src="js/filters.js"></script>
+<script src="js/editDGCtrl.js"></script>
+<script src="js/editCompositionCtrl.js"></script>
+<!--
+<script src="js/editVSCtrl.js"></script>
+    <script src="js/QbuilderCtrl.js"></script>
+
+-->
+<script src="js/modelCompCtrl.js"></script>
+<script src="js/modelDGCtrl.js"></script>
+<script src="js/modelDGSvc.js"></script>
+<script src="js/modelTermCtrl.js"></script>
+<script src="js/modelTermSvc.js"></script>
+<script src="js/optionsCtrl.js"></script>
+<script src="js/viewVSCtrl.js"></script>
+<script src="js/showParameters.js"></script>
+<script src="js/editDGItemCtrl.js"></script>
+<script src="js/exportCtrl.js"></script>
+<script src="js/QutilitiesSvc.js"></script>
+<script src="js/igSvc.js"></script>
+<!--
+<script src="js/setUnitsCtrl.js"></script>
+-->
+
+
+<script src="js/modelDGDialogCtrl.js"></script>
+<script src="js/modelDGDialogSvc.js"></script>
+<script src="js/libraryCtrl.js"></script>
+<script src="js/libraryDGCtrl.js"></script>
+<script src="js/libraryCompCtrl.js"></script>
+
+<script src="js/fixValuesCtrl.js"></script>
+<script src="js/changeTypeCtrl.js"></script>
+<script src="js/makeQCtrl.js"></script>
+<script src="js/makeQSvc.js"></script>
+<script src="js/librarySvc.js"></script>
+<script src="js/historyCtrl.js"></script>
+<script src="js/previewQCtrl.js"></script>
+<script src="js/getNameCtrl.js"></script>
+<script src="js/traceCtrl.js"></script>
+<script src="js/traceSvc.js"></script>
+<script src="directive/renderForm/renderFormSvc.js"></script>
+<script src="directive/renderForm/renderFormDir.js"></script>
+<script src="directive/renderSingleItem/renderSingleItemDir.js"></script>
+
+
+
+<link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+
+<!-- scripts the define the models-->
+<script src="js/modelsDemoSvc.js"></script>
+<script src="js/models/ObservationModels.js"></script>
+<script src="js/models/StagingModels.js"></script>
+
+<script src="js/compSectionsCtrl.js"></script>
+
+
+<script src="js/libs/firebase.js"></script>
+<script src="js/libs/angularfire.min.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDG1ToLHycsMUX0CfX0OZVSRUUpFQeKE9o",
+        authDomain: "canshare-730e6.firebaseapp.com",
+        projectId: "canshare-730e6",
+        storageBucket: "canshare-730e6.appspot.com",
+        messagingSenderId: "12147821347",
+        appId: "1:12147821347:web:5963d577cb050259475a96"
+    };
+    if (firebase) {
+        console.log('init firebase')
+        firebase.initializeApp(firebaseConfig);
+
+    }
+</script>
+
+
 </body>
 </html>
