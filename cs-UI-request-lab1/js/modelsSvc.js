@@ -806,11 +806,13 @@ angular.module("pocApp")
                 let hashParents = {}
 
                 try {
-                    extractElements(model,model.name)   //the guts of the function
+                    extractElements(model,model.name,'root')   //the guts of the function
+                    arLog.length = 0        //don't return the log contents if all was OK
                 } catch (ex) {
-                    //thrown when the number of iterations is excessive.
+                    //thrown when the number of iterations is excessive (>100 ATM).
                     //I believe that the DG will actually be correct as it's a hash based on path, but there is something that should be fixed
                     console.log(arLog)
+
                     //alert(`Unable to inflate DG: ${model.name}. Error: ${angular.toJson(ex)}` )
                     //return {allElements: allElements,graphData:{},relationshipsSummary:relationshipsSummary}
 
@@ -835,7 +837,7 @@ angular.module("pocApp")
                     }
                 })
 
-                return {allElements: allElements,graphData:graphData,relationshipsSummary:relationshipsSummary}
+                return {allElements: allElements,graphData:graphData,relationshipsSummary:relationshipsSummary,log:arLog}
 
                 // add to list of elements, replacing any with the same path (as it has been overwritten)
                 //todo - what was 'host' for?
@@ -887,11 +889,16 @@ angular.module("pocApp")
                 }
 
                 //process a single element at the root of the DG
-                function extractElements(model,pathRoot) {
-                    arLog.push({dg: model.name,path:pathRoot})
+                function extractElements(model,pathRoot,type) {
+                    arLog.push({dg: model.name,path:pathRoot,type:type})
+                    if (model.name == inModel.name) {
+                        //alert(`Processing ${model.name}, path: ${pathRoot} and it has a reference to ${inModel.name} which is a circular reference! This should be fixed.`)
+                        //return
+                    }
+
                     iterationCount++
-                    if (iterationCount > 50) {
-                        alert(`Excessive iteration count for DG ${inModel.name}`)
+                    if (iterationCount > 100) {
+                        alert(`Excessive iteration count for DG ${inModel.name}. The tree view will be incorrect. The processing steps are shown in an errors tab.`)
                         throw new Error(`Excessive iteration count for DG ${inModel.name}`)
                     }
 
@@ -909,11 +916,11 @@ angular.module("pocApp")
 
                     addNodeToList(node)
 
-                    console.log('extractElements ' + model.name)
+                    //console.log('extractElements ' + model.name)
                     //do parents first.
                     if (model.parent ) {
 
-                        console.log(model.name, model.parent)
+                        //console.log(model.name, model.parent)
 
 /*
 
@@ -952,7 +959,7 @@ angular.module("pocApp")
                                 label: 'specializes',arrows : {to:true}}
                             arEdges.push(edge)
 
-                            extractElements(types[parentName],pathRoot)
+                            extractElements(types[parentName],pathRoot,"parent")
 
 
                         } else {
@@ -1003,7 +1010,7 @@ angular.module("pocApp")
                                         //add to the list of elements
                                         addToList(clone,ed,model) //model will be the source
 
-                                        extractElements(childDefinition,pathRoot + "." + ed.path)
+                                        extractElements(childDefinition,pathRoot + "." + ed.path,"element")
 
                                     } else {
                                         //list add the ed to the list

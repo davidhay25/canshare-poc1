@@ -418,7 +418,7 @@ angular.module("pocApp")
                     //console.log(path)
                     let type = ed.type[0]
                     if (hashAllDG[type]) {
-                        console.log('new group',ed)
+                        //console.log('new group',ed)
                         group = makeGroup(ed)
 
                         addEnableWhen(ed,group)  //If there are any contitionals

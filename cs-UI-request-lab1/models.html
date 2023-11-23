@@ -445,6 +445,27 @@
             <ng-include src="'/includes/terminology.html'"></ng-include>
         </uib-tab>
 
+        <uib-tab heading="Errors" ng-show="errorLog.length > 0">
+            <em>This table shows the steps take by the DG 'inflater' as it creates the complete list of elements
+            for a DG by examining the parents of the DG and the elements that are DGs themselves. The DG name is the
+            DG that is being processed in that step, the path is being created by the inflater as it goes and the type indicates
+                whether it's a parent or an element that is being examined. When there's a cyclic dependency
+                you see the path getting longer and longer with a repeated DG name of some sort. This gives a clue which is
+                the DG that has the cyclic dependency (which may well be different to the one being inflated)..
+            </em>
+           <table class="table-bordered table">
+               <tr><th>DG name</th><th>Path</th><th>Type</th></tr>
+               <tr ng-repeat="log in errorLog">
+                   <td>{{log.dg}}</td>
+                   <td>{{log.path}}</td>
+                   <td>{{log.type}}</td>
+               </tr>
+           </table>
+        </uib-tab>
+
+
+
+
         <uib-tab ng-show="false" >
             <uib-tab-heading>DG updates <span class="badge">{{dgUpdates.length}}</span> </uib-tab-heading>
             <span class="pull-right">

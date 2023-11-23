@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
 
-            $scope.version = "0.5.18"
+            $scope.version = "0.5.19"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -1349,6 +1349,26 @@ angular.module("pocApp")
 
                 $scope.selectedComposition = comp
 
+                //check the current checkedout state on the library.
+                //Always update the local version checkedout (not data) with the one from the library
+                let name = comp.name
+                let qry = `/model/comp/${name}`
+                $http.get(qry).then(
+                    function (data) {
+                        let libraryComp = data.data
+                        $scope.selectedComposition.checkedOut = libraryComp.checkedOut
+
+                        if ($scope.hashAllCompositions[name]) {
+                            $scope.hashAllCompositions[name].checkedOut = libraryDG.checkedOut
+                        } else {
+                            alert(`Composition ${name} not found in the local storage`)
+                        }
+
+                    }
+                )
+
+
+
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
 
                 $scope.allCompElements = vo.allElements
@@ -1386,9 +1406,13 @@ angular.module("pocApp")
             $scope.refreshFullList = function (dg) {
 
 
+                delete $scope.errorLog
                 //determine all the elements in this DG by recursing up the inheritance hierarchy
                 //and 'across' elements that are referenced DGs. Note that a referenced DG may have its own hierarchy
                 let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
+                if (vo.log && vo.log.length > 0) {
+                    $scope.errorLog = vo.log
+                }
 
 
                 $scope.graphData = vo.graphData
