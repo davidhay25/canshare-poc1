@@ -1359,7 +1359,7 @@ angular.module("pocApp")
                         $scope.selectedComposition.checkedOut = libraryComp.checkedOut
 
                         if ($scope.hashAllCompositions[name]) {
-                            $scope.hashAllCompositions[name].checkedOut = libraryDG.checkedOut
+                            $scope.hashAllCompositions[name].checkedOut = libraryComp.checkedOut
                         } else {
                             alert(`Composition ${name} not found in the local storage`)
                         }
