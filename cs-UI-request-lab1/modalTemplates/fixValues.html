@@ -75,6 +75,17 @@
 
         </div>
       </div>
+      <div class="row">
+        <div class="col-md-3">
+          Value
+        </div>
+        <div class="col-md-3">
+          <input type="text" class="form-control" ng-model="input.fixedValue"/>
+        </div>
+        <div class="col-md-3">
+
+        </div>
+      </div>
     </div>
     <div ng-show = "type == 'Coding'">
 
@@ -103,6 +114,9 @@
 
   </div>
   <div class="modal-header">
+    <div ng-show="tsQuery">
+      TS Query: {{tsQuery}}
+    </div>
 
   </div>
 </div>

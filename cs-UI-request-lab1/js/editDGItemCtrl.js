@@ -11,6 +11,19 @@ angular.module("pocApp")
 
             let snomed = "http://snomed.info/sct"
 
+            function makeQuantityDisplay(quantity) {
+                let display = ""
+                if (quantity.unit) {
+                    display += `Unit: ${quantity.unit}  `
+                }
+                if (quantity.value) {
+                    display += `Value: ${quantity.value}`
+                }
+                return display
+
+            }
+
+
             //when an item is passed in for editing
             if (item && item.ed) {
                 $scope.input.description = item.ed.description
@@ -41,28 +54,59 @@ angular.module("pocApp")
 
                 //displays for fixed
                 if (item.ed.fixedCoding) {
+                    $scope.fixed = {elName:'fixedCoding',value:item.ed.fixedCoding}
                     $scope.fixedDisplay = `${item.ed.fixedCoding.code} | ${item.ed.fixedCoding.display} | ${item.ed.fixedCoding.system}`
                 }
 
                 if (item.ed.fixedRatio) {
+                    $scope.fixed = {elName:'fixedRatio',value:item.ed.fixedRatio}
                     $scope.fixedDisplay = `Numerator Unit: ${item.ed.fixedRatio.numerator.unit} Denominator Unit: ${item.ed.fixedRatio.denominator.unit} Denominator value: ${item.ed.fixedRatio.denominator.value}`
                 }
 
                 if (item.ed.fixedQuantity) {
-                    $scope.fixedDisplay = `Unit: ${item.ed.fixedQuantity.unit}`
+                    $scope.fixed = {elName:'fixedQuantity',value:item.ed.fixedQuantity}
+                    $scope.fixedDisplay = makeQuantityDisplay(item.ed.fixedQuantity)
+                    /*
+                    $scope.fixedDisplay = ""
+                    if (item.ed.fixedQuantity.unit) {
+                        $scope.fixedDisplay += `Unit: ${item.ed.fixedQuantity.unit}`
+                    }
+                    if (item.ed.fixedQuantity.value) {
+                        $scope.fixedDisplay += `Value: ${item.ed.fixedQuantity.value}`
+                    }
+                    */
+
+
                 }
 
                 //displays for default
                 if (item.ed.defaultCoding) {
+                    $scope.default = {elName:'defaultCoding',value:item.ed.defaultCoding}
                     $scope.defaultDisplay = `${item.ed.defaultCoding.code} | ${item.ed.defaultCoding.display} | ${item.ed.defaultCoding.system}`
                 }
 
                 if (item.ed.defaultRatio) {
+                    $scope.default = {elName:'defaultRatio',value:item.ed.defaultRatio}
                     $scope.defaultDisplay = `Numerator Unit: ${item.ed.defaultRatio.numerator.unit} Denominator Unit: ${item.ed.defaultRatio.denominator.unit} Denominator value: ${item.ed.defaultRatio.denominator.value}`
                 }
 
                 if (item.ed.defaultQuantity) {
-                    $scope.defaultDisplay = `Unit: ${item.ed.defaultQuantity.unit}`
+                    $scope.default = {elName:'defaultQuantity',value:item.ed.defaultQuantity}
+                    $scope.defaultDisplay = makeQuantityDisplay(item.ed.defaultQuantity)
+/*
+                    $scope.defaultDisplay = ""
+                    if (item.ed.defaultQuantity.unit) {
+                        $scope.defaultDisplay += `Unit: ${item.ed.defaultQuantity.unit}`
+                    }
+                    if (item.ed.defaultQuantity.value) {
+                        $scope.defaultDisplay += `Value: ${item.ed.defaultQuantity.value}`
+                    }
+*/
+
+                    //$scope.defaultDisplay = `Unit: ${item.ed.defaultQuantity.unit}`
+
+
+
                 }
                 
 
@@ -167,6 +211,12 @@ angular.module("pocApp")
                 }
                 ed.sourceReference = $scope.input.sourceReference
 
+
+
+
+
+                //There's a
+                //$scope.fixed.elName is set by the modal - fixedCoding or fixedQuantity etc.
 
                 if ($scope.fixed && $scope.fixed.elName) {
                     ed[$scope.fixed.elName] = $scope.fixed.value
@@ -315,6 +365,7 @@ angular.module("pocApp")
 
 
 
+
             //display the screen to get the fixed or default values
             $scope.setFixedValue = function(kind) {
 
@@ -400,10 +451,13 @@ angular.module("pocApp")
 
                             if (kind == "default") {
                                 $scope.default = {elName:'defaultQuantity',value:elValue}
-                                $scope.defaultDisplay = `Unit: ${elValue.unit}`
+                                $scope.defaultDisplay = makeQuantityDisplay(elValue)
+                                //scope.defaultDisplay = `Unit: ${elValue.unit}`
+
                             } else {
                                 $scope.fixed = {elName:'fixedQuantity',value:elValue}
-                                $scope.fixedDisplay = `Unit: ${elValue.unit}`
+                                $scope.fixedDisplay = makeQuantityDisplay(elValue)
+                                //$scope.fixedDisplay = `Unit: ${elValue.unit}`
                             }
                             break
                         case "Ratio":

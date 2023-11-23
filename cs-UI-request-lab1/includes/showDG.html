@@ -518,7 +518,14 @@
                       </div>
 
                       <div ng-show="selectedNode.data.ed.fixedQuantity">
-                        Unit: {{selectedNode.data.ed.fixedQuantity.unit}}
+                        <span ng-show = "selectedNode.data.ed.fixedQuantity.unit">
+                          Unit: {{selectedNode.data.ed.fixedQuantity.unit}}
+                        </span>
+
+                        <span ng-show = "selectedNode.data.ed.fixedQuantity.value">
+                          Value: {{selectedNode.data.ed.fixedQuantity.value}}
+                        </span>
+
                       </div>
 
 
@@ -570,7 +577,12 @@
                       </div>
 
                       <div ng-show="selectedNode.data.ed.defaultQuantity">
-                        Unit: {{selectedNode.data.ed.defaultQuantity.unit}}
+                        <span ng-show="selectedNode.data.ed.defaultQuantity.unit">
+                          Unit: {{selectedNode.data.ed.defaultQuantity.unit}}
+                        </span>
+                        <span ng-show="selectedNode.data.ed.defaultQuantity.value">
+                          Value: {{selectedNode.data.ed.defaultQuantity.value}}
+                        </span>
                       </div>
 
                       <div ng-show="selectedNode.data.ed.defaultCoding">

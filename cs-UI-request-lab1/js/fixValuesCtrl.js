@@ -19,6 +19,7 @@ angular.module("pocApp")
                         break
                     case 'Quantity' :
                         $scope.input.unit = current.unit
+                        $scope.input.fixedValue = current.value
                         break
                     case 'Ratio' :
                         $scope.input.numeratorUnit = current.numerator.unit
@@ -32,7 +33,13 @@ angular.module("pocApp")
             //lookup from the TS
             $scope.lookupFSN = function () {
 
+                delete $scope.input.display
+                delete $scope.input.fsn
+
+
+
                 let qry = `CodeSystem/$lookup?system=${$scope.input.system}&code=${$scope.input.code}`
+                $scope.tsQuery = qry
 
                 let encodedQry = encodeURIComponent(qry)
                 $scope.showWaiting = true
@@ -96,7 +103,7 @@ angular.module("pocApp")
                         }
                         break
                     case 'Quantity' :
-                        if ($scope.input.unit) {
+                        if ($scope.input.unit || $scope.input.fixedValue) {
                             canSave = true
                         }
                         break
@@ -133,7 +140,7 @@ angular.module("pocApp")
                         }
                         break
                     case "Quantity" :
-                        v = {unit:$scope.input.unit}
+                        v = {unit:$scope.input.unit,value:$scope.input.fixedValue}
                         break
 
                     case "Ratio" :
