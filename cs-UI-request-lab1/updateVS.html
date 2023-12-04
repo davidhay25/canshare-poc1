@@ -35,6 +35,7 @@
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/updateVSCtrl.js"></script>
     <script src="js/querySvc.js"></script>
+    <script src="js/updateVSSvc.js"></script>
     <script src="js/showParameters.js"></script>
     <script src="js/loginCtrl.js"></script>
     <!--
@@ -191,13 +192,24 @@
                 Update and Create operations on the publishing Server can only be done by
                 logged in users
             </div>
+
+            <div class="banner">
+                {{selectedVS.title}}
+            </div>
+
             <div>
+
                 <button ng-show = "user && user.email && canSave()" class="btn btn-danger pull-right">
                     <span ng-show="isNew" ng-click="newVS()">Save new VS</span>
-                    <span ng-hide="isNew" ng-click="updateVS(selectedVS)">Update</span>
-
+                    <span ng-hide="isNew" ng-click="updateVS(selectedVS)">Update VS</span>
                 </button>
+
+                <div style = "padding: 8px " class="pull-right" ng-show="csDirty"><em>Pre-publication CodeSystem will be updated</em></div>
+
             </div>
+
+
+
             <uib-tabset>
                 <uib-tab heading="Json">
                     <pre>{{selectedVS | json}}</pre>
@@ -246,7 +258,7 @@
 
 
                 </uib-tab>
-                <uib-tab heading="Edit Form">
+                <uib-tab heading="Edit ValueSet">
                     <table class="table">
                         <tr>
                             <td>Id</td>
@@ -297,8 +309,58 @@
 
                             </td>
                         </tr>
+
+
+
                         <tr>
-                            <td>Pre pub concepts</td>
+                            <td>Direct concepts</td>
+                            <td>
+
+                                <table class="table table-bordered">
+                                    <tr><th>Code</th><th>Display</th><th></th></tr>
+                                    <tr ng-repeat="concept in input.directConcepts">
+                                        <td>
+                                            {{concept.code}}
+                                        </td>
+                                        <td>{{concept.display}}</td>
+                                        <td><i style="color: red" class="glyphicon glyphicon-remove clickable"
+                                               ng-click="removeDirectConcept($index)"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="row">
+                                                <div class="col-md-10">
+                                                    <input ng-model="input.newDirectCode" type="text" class="form-control"/>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <i style="color: orange" class="glyphicon glyphicon-question-sign clickable"
+                                                       ng-show="input.newDirectCode"
+                                                       ng-click="getDisplay(input.newDirectCode,'newDirectDisplay')"></i>
+                                                </div>
+                                            </div>
+
+                                        </td>
+                                        <td><input ng-model="input.newDirectDisplay" type="text" class="form-control"/> </td>
+                                        <td>
+
+
+                                            <i style="color: green" class="glyphicon glyphicon-ok clickable"
+                                               ng-show="input.newDirectCode && input.newDirectDisplay"
+                                               ng-click="addDirectConcept()"></i>
+
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </td>
+                        </tr>
+
+
+
+
+
+                        <tr>
+                            <td>Pre published concepts</td>
                             <td>
 
                                 <table class="table table-bordered">
@@ -320,7 +382,7 @@
                                                 <div class="col-md-2">
                                                     <i style="color: orange" class="glyphicon glyphicon-question-sign clickable"
                                                        ng-show="input.newPPCode"
-                                                       ng-click="getDisplay(input.newPPCode)"></i>
+                                                       ng-click="getDisplay(input.newPPCode,'newPPDisplay')"></i>
                                                 </div>
                                             </div>
 
@@ -363,6 +425,30 @@
 
                 </uib-tab>
 
+                <uib-tab heading="Pre-published concepts">
+                    <uib-tabset>
+                        <uib-tab heading="Table">
+                            <br/>
+                            <table class="table table-bordered">
+                                <tr><th>Code</th><th>Display</th></tr>
+                                <tr ng-repeat="concept in prepubCS.concept">
+                                    <td>{{concept.code}}</td>
+                                    <td>{{concept.display}}</td>
+
+                                </tr>
+                            </table>
+
+                        </uib-tab>
+                        <uib-tab heading="Json">
+                            <pre>{{prepubCS | json}}</pre>
+
+                        </uib-tab>
+                    </uib-tabset>
+
+
+
+
+                </uib-tab>
 
             </uib-tabset>
 

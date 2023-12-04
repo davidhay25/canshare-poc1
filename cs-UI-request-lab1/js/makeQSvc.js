@@ -111,10 +111,13 @@ angular.module("pocApp")
                         $http.get(`nzhts?qry=${encodedQry}`).then(
                             function (data) {
                                 let expandedVS = data.data
-                                for (const concept of expandedVS.expansion.contains) {
-                                    item.answerOption.push(
-                                        {valueCoding:{system:concept.system, code:concept.code, display:concept.display}})
+                                if (expandedVS.expansion && expandedVS.expansion.contains) {
+                                    for (const concept of expandedVS.expansion.contains) {
+                                        item.answerOption.push(
+                                            {valueCoding:{system:concept.system, code:concept.code, display:concept.display}})
+                                    }
                                 }
+
                                 //console.log(data.data)
 
 

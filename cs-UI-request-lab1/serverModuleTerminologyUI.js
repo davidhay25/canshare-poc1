@@ -44,6 +44,10 @@ async function getNZHTSAccessToken() {
 
 function setup(app) {
 
+    app.get('/token',async function (req,res) {
+        let token = await getNZHTSAccessToken()
+        res.json({token:token,url:"https://authoring.nzhts.digital.health.nz/fhir"})
+    })
 
     //perform a query against the NZHTS.
     //right now, we get a new access token for each call - todo make more efficient
@@ -116,7 +120,7 @@ function setup(app) {
     //make an ECL query
 
     app.get('/nzhts/ecl',async function(req,res){
-        console.log(req.query)
+
 
         let encodedEcl =encodeURIComponent(req.query.qry)
 
@@ -124,7 +128,7 @@ function setup(app) {
 
         qry += "&displayLanguage=en-x-sctlang-23162100-0210105"
 
-        console.log(qry)
+        //console.log(qry)
 
         let token = await getNZHTSAccessToken()
         if (token) {
@@ -152,7 +156,6 @@ function setup(app) {
         }
 
     })
-
 
 
     //queries against the Terminology Server
@@ -216,11 +219,6 @@ function setup(app) {
         }
 
 
-
-
-
-        //res.send(token)
-
     })
 
 
@@ -228,13 +226,6 @@ function setup(app) {
     app.post('/nzhts',async function(req,res){
         console.log(req.body)
 
-       // res.json({})
-        //return
-        //disabling wth term server down...
-
-      //  res.json()
-
-     //   return
 
         //let qry = req.query.query || `https://authoring.nzhts.digital.health.nz/fhir/ValueSet/$expand?url=https://nzhts.digital.health.nz/fhir/ValueSet/canshare-data-absent-reason`
         if (req.body) {
@@ -287,26 +278,49 @@ function setup(app) {
     })
 
 
+    //use when updating a CodeSystem
+    app.put('/nzhts/CodeSystem',async function(req,res){
+
+        let cs = req.body
+
+        if (cs) {
+            let qry = `${nzhtsconfig.serverBase}CodeSystem/${cs.id}`
+
+            let result = await putResource(qry,cs)
+            console.log('>>', result)
+            if (result) {
+                //A result is returned if there is an error
+                res.status(400).json({msg:result})
+                return
+            }
+            res.json()      //no error
+
+        } else {
+            res.status(400).json({msg:"Must have urlencoded qry query"})
+
+        }
+    })
+
+
+
     //use when updating a ValueSet
     app.put('/nzhts/ValueSet',async function(req,res){
 
-
         let vs = req.body
-        //console.log(vs)
-
 
         if (vs) {
-
             let qry = `${nzhtsconfig.serverBase}ValueSet/${vs.id}`
 
-            //console.log(qry)
-
+            let result = await putResource(qry,vs)
+            if (result) {
+                //A result is returned if there is an error
+                res.status(400).json({msg:"Unable to update ValueSet"})
+                return
+            }
+            res.json()      //no error
+            /*
             let token = await getNZHTSAccessToken()
             if (token) {
-
-                //var decoded = jwt_decode(token);
-                // let timeToExpire = decoded.exp * 1000 - Date.now()       //exp is in seconds
-                // console.log(timeToExpire / (1000 * 60 *60 ));
 
                 let config = {headers:{authorization:'Bearer ' + token}}
                 config['content-type'] = "application/fhir+json"
@@ -325,17 +339,13 @@ function setup(app) {
             } else {
                 res.status(ex.response.status).json({msg:"Unable to get Access Token."})
             }
+
+            */
+
         } else {
             res.status(400).json({msg:"Must have urlencoded qry query"})
 
         }
-
-
-
-
-
-        //res.send(token)
-
     })
 
 
@@ -387,6 +397,54 @@ function setup(app) {
             }
         }
     })
+}
+
+//put a single resource. Returns any error
+async function putResource(qry,resource) {
+
+    //let qry = `${nzhtsconfig.serverBase}ValueSet/${vs.id}`
+    let token = await getNZHTSAccessToken()
+    if (token) {
+
+        let config = {headers:{authorization:'Bearer ' + token}}
+        config['content-type'] = "application/fhir+json"
+
+
+        try {
+            let result = await axios.put(qry,resource,config)
+            return
+        } catch (ex) {
+
+            if (ex.response) {
+                console.log("Status code:",ex.response.status)
+                console.log("err",ex.response.data)
+                return ex.response.data
+            } else {
+                return {msg:"Undefined error"}
+            }
+        }
+
+/*
+        let result = await axios.put(qry,resource,config).then(function(data) {
+            return  //return null if no issues
+        }).catch(function(ex) {
+            //console.log('result',result)
+            if (ex.response) {
+                console.log("Status code:",ex.response.status)
+                console.log("err",ex.response.data)
+                 return ex.response.data
+            } else {
+                return "Undefined error"
+            }
+        })
+        */
+
+
+    } else {
+        return "Token not acquired"
+    }
+
+
 }
 
 module.exports = {

@@ -1,16 +1,66 @@
 angular.module("pocApp")
     .controller('updateCtrl',
-        function ($scope,$http,$uibModal,$q) {
+        function ($scope,$http,$uibModal,$q,updateVSSvc) {
 
             $scope.input = {}
             $scope.isDirty = false;
             let nzDisplayLanguage = "en-x-sctlang-23162100-0210105"
             let snomed = "http://snomed.info/sct"
+
+            //the version is used to identify which include section is used for which purpose
+            // >>>>>>>> this approach won't work any more to discriminate between the
+            //different include elements - but I'll keep them as separate versions in case we need them to be different
             let versionEcl = "http://snomed.info/sct/21000210109"      //the version that has the ECL statements
+            let versionDirect = "http://snomed.info/sct/21000210109"             //concepts directly included in the VS. Often changing the display
+            let versionPrePub = "http://snomed.info/sct/21000210109"  //the version that has concepts not yet published
 
-            //http://snomed.info/sct/21000210109
-            let versionPrePub = "http://snomed.info/xsct/21000210109"  //the version that has concepts not yet published
 
+            //get the CodeSystem used for pre published codes
+            updateVSSvc.getCodeSystem().then(
+                function (cs) {
+                    $scope.prepubCS = cs
+                }, function (err) {
+                    alert(err)
+                }
+            )
+
+
+            //an extension that describes the type of concept when directly included in the VS
+            //So I can split them up in the UI
+            //code - values: 'prepub' (pre published) 'display' (changing the display)
+         //   let extUrl = "http://canshare.co.nz/fhir/StructureDefinition/concept-type"
+
+            /*
+            //get the type of the concept - from the extension. values 'prepub' and 'display'
+            function getConceptType(el) {
+                let code
+                if (el.extension) {
+                    el.extension.forEach(function (ext) {
+                        if (ext.url == extUrl) {
+                            code = ext.valueCode
+                        }
+
+                    })
+                }
+                return code
+            }
+
+            //set the concept type = 'prepub' and 'display'
+            //right now we can assume that this will be the only extension we use.
+            function setConceptType(el,type) {
+                //If there's already an extension on this element then just remve it
+                if (el.extension) {
+                    el.extension.length = 0
+                } else {
+                    el.extension = []
+                }
+
+                let ext = {url:extUrl,valueCode:type}
+                el.extension.push(ext)
+            }
+
+
+            */
 
             //retrieve ValueSets
             getValueSets = function () {
@@ -19,8 +69,7 @@ angular.module("pocApp")
                 let deferred = $q.defer()
 
                 let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&_sort=title`
-                //let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&status=${status}&_sort=title`
-                console.log(qry)
+
                 let encodedQry = encodeURIComponent(qry)
 
                 $http.get(`nzhts?qry=${encodedQry}`).then(
@@ -53,12 +102,37 @@ angular.module("pocApp")
                 }
             )
 
-            //add a concept to the
+
+
+            //add a concept to the list directly included in the VS. In an include section with the version 'versionDirect'
+            $scope.addDirectConcept = function () {
+
+                $scope.input.directConcepts = $scope.input.directConcepts || []
+                let concept = {code:$scope.input.newDirectCode,display:$scope.input.newDirectDisplay}
+                updateVSSvc.setConceptType(concept,'display') //adds the concepttype extension
+
+                $scope.input.directConcepts.push(concept)
+                delete $scope.input.newDirectCode
+                delete $scope.input.newDirectDisplay
+                $scope.makeVS()
+            }
+
+            $scope.removeDirectConcept = function (inx) {
+                $scope.input.directConcepts.splice(inx,1)
+                $scope.makeVS()
+
+            }
+
+
+            //add a concept to the list of pre-published items
             $scope.addPPConcept = function () {
 
                 $scope.input.prePubConcepts = $scope.input.prePubConcepts || []
                 let concept = {code:$scope.input.newPPCode,display:$scope.input.newPPDisplay}
                 $scope.input.prePubConcepts.push(concept)
+                if (updateVSSvc.addConceptToCodeSystem( $scope.prepubCS,concept)) {
+                    $scope.csDirty = true
+                }
                 delete $scope.input.newPPCode
                 delete $scope.input.newPPDisplay
                 $scope.makeVS()
@@ -89,7 +163,24 @@ angular.module("pocApp")
                 let qry = '/nzhts/ValueSet'
                 $http.put(qry,vs).then(
                     function (data) {
-                        alert('Update complete')
+
+                        if ($scope.csDirty) {
+                            updateVSSvc.updateCodeSystem($scope.prepubCS).then(
+                                function () {
+                                    $scope.csDirty = false
+                                    alert('Both ValueSet and CodeSystem update complete')
+
+                                }, function (err) {
+                                    console.log(err)
+                                    alert(`The ValueSet was updated, but not the CodeSystem: ${angular.toJson(err)}`)
+                                }
+                            )
+
+                        } else {
+                            alert('ValueSet update complete')
+                        }
+
+
                         $scope.isDirty = false
                     }, function (err) {
                         alert(angular.toJson(err))
@@ -108,7 +199,7 @@ angular.module("pocApp")
                 if (confirm("Are you sure you wish to create this valueSet")) {
                     performUpdate($scope.selectedVS)
                 }
-                //alert("Not quite yet...")
+
             }
 
             $scope.createNew = function () {
@@ -177,30 +268,81 @@ angular.module("pocApp")
                 $scope.input.title = vs.title
                 $scope.input.description = vs.description
 
-                //there are now potentially 2 include statements
-                   //system = http://snomed.info/sct, version = https://snomed.info/sct/21000210109 and a filter
+                //there are now potentially 3 include statements
+                //ecl: system = http://snomed.info/sct, version = https://snomed.info/sct/21000210109 and a filter element
+                //direct:
+
+
                 if (vs.compose && vs.compose.include) {
+
                     vs.compose.include.forEach(function (inc) {
                         let system = inc.system
                         let version = inc.version
                         let identified = false
+
+                        //if the include has a filter, then it's the ecl. Otherwise it's a diect concept
+
+                        if (system == snomed) {
+                            if (inc.filter) {
+                                //this is the ecl
+                                $scope.input.ecl = inc.filter[0].value
+                            } else if (inc.concept) {
+                                //these are directly included concepts
+                                inc.concept.forEach(function (concept) {
+                                    let type = updateVSSvc.getConceptType(concept)  //
+
+                                    type = type || 'display'    //<<< todo as can't remove otherwise
+
+                                    switch (type) {
+                                        case 'prepub' :
+                                            //a concept not yet published
+                                            $scope.input.prepubConcepts = $scope.input.prepubConcepts || []
+                                            $scope.input.prepubConcepts.push(concept)
+                                            break
+                                        case 'display' :
+                                            //included so a different display can be added
+                                            $scope.input.directConcepts = $scope.input.directConcepts || []
+                                            $scope.input.directConcepts.push(concept)
+                                            break
+                                        default :
+                                            alert(`Unknown concept type: ${type}`)
+
+
+                                    }
+
+                                })
+                            } else {
+                                alert(`Unknown include element: ${angular.toJson(inc)}`)
+                            }
+
+                        } else {
+                            alert("Non snomed code in the VS. Are you sure of this?")
+                        }
+
+
+                        /*
                         if (system == snomed && version == versionEcl) {
                             //this is the main ecl statement
-                            //$scope.input.ecl = vs.compose.include[0].filter[0].value
                             $scope.input.ecl = inc.filter[0].value
                         } else if(system == snomed && version == versionPrePub) {
-                            //these are separate concepts
+                            //these are pre-published concepts
                             $scope.input.prePubConcepts = inc.concept
+                        } else if(system == snomed && version == versionDirect) {
+                            //these are direct concepts
+                            $scope.input.directConcepts = inc.concept
                         } else {
                             $scope.parseError = true
                             alert(`Unknown include. system:${system}, version:${version}`)
                         }
+
+                        */
 
                     })
                 }
 
             }
 
+            //When a ValueSet is selected from the list
             $scope.selectVSItem = function (item) {
                 $scope.isDirty = false
                 delete $scope.textEclVS
@@ -214,11 +356,8 @@ angular.module("pocApp")
                 delete $scope.qUsingVS
                 delete $scope.dummyQR
 
-                //let qry = `ValueSet.item.vs.id`
-                let qry = `ValueSet?url=${item.vs.url}&_summary=false`
-                // qry += "&_summary=false"
 
-                //let qry = `ValueSet/$expand?url=${item.url}&_summary=false`
+                let qry = `ValueSet?url=${item.vs.url}&_summary=false`
 
                 console.log(qry)
                 $scope.termServerQuery = qry
@@ -226,8 +365,6 @@ angular.module("pocApp")
                 $scope.showWaiting = true
                 $http.get(`nzhts?qry=${encodedQry}`).then(
                     function (data) {
-                        // $scope.selectedVS = data.data
-
                         //it's a query so a bundle is expected
                         if (data.data && data.data.entry) {
                             if (data.data.entry.length !== 1) {
@@ -250,15 +387,14 @@ angular.module("pocApp")
                         $scope.showWaiting = false
                     }
                 )
-
             }
-
 
             $scope.makeVS = function () {
                 let vo = {id:$scope.input.id,
                     title:$scope.input.title,
                     status : $scope.input.status,
                     description:$scope.input.description,
+                    directConcepts: $scope.input.directConcepts,
                     prePubConcepts: $scope.input.prePubConcepts,
                     ecl:$scope.input.ecl}
                 $scope.selectedVS = makeVSFromVo(vo)
@@ -295,7 +431,7 @@ angular.module("pocApp")
 
 
             //The display for a concept code. Used when adding pre-published codes
-            $scope.getDisplay = function (code) {
+            $scope.getDisplay = function (code,control) {
 
                 let qry = `CodeSystem/$lookup?system=${snomed}&code=${code}`
                 let encodedQry = encodeURIComponent(qry)
@@ -306,7 +442,9 @@ angular.module("pocApp")
                         if (paramResource.parameter) {
                             for (const param of paramResource.parameter) {
                                 if (param.name == 'display') {
-                                    $scope.input.newPPDisplay = param.valueString
+                                    $scope.input[control] = param.valueString
+                                    //$scope.input.newPPDisplay = param.valueString
+
                                     break
                                 }
                             }
@@ -361,15 +499,21 @@ angular.module("pocApp")
 
 
             function makeVSFromVo(vo) {
+
+                let da = new Date().toISOString()
+                let ar = da.split('T')
+                let dateString = ar[0]
+                let versionString = dateString.replace(/-/g, "");
+
                 let vs = {resourceType:"ValueSet",id:vo.id}
                 vs.language = "en-x-sctlang-23162100-0210105"
                 vs.url = `https://nzhts.digital.health.nz/fhir/ValueSet/${vo.id}`
                 vs.status = vo.status
-                vs.date = "2023-11-01"
+                vs.date = dateString
                 vs.name = vo.id
                 vs.title = vo.title
                 vs.experimental = false
-                vs.version = "20231101"
+                vs.version = versionString
                 vs.identifier = [{system:"http://canshare.co.nz/fhir/NamingSystem/valuesets",value:vo.id}]
                 vs.publisher = "Te Aho o Te Kahu"
                 vs.contact = [{telecom:[{system:"email",value:"info@teaho.govt.nz"}]}]
@@ -382,6 +526,17 @@ angular.module("pocApp")
                 let filter = {property:"constraint",op:"=",value:`${vo.ecl}`}
                 let include = {system:snomed,version:versionEcl,filter:[filter]}
                 vs.compose = {include:[include]}
+
+                if (vo.directConcepts && vo.directConcepts.length > 0) {
+                    //These are concepts directly added to the VS that are in the publishing env. but not the main env.
+                    //let directInclude = {system:snomed,version:versionDirect,concept:[]}
+                    let directInclude = {system:snomed,concept:[]}
+                    vo.directConcepts.forEach(function (concept) {
+                        directInclude.concept.push(concept)
+                    })
+                    vs.compose.include.push(directInclude)
+
+                }
 
                 if (vo.prePubConcepts && vo.prePubConcepts.length > 0) {
                     //These are concepts directly added to the VS that are in the publishing env. but not the main env.
