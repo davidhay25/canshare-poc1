@@ -1,6 +1,6 @@
 angular.module("pocApp")
 
-    .service('querySvc', function($q,$http) {
+    .service('querySvc', function($q,$http,commonSvc) {
 
         function findExtension(item,url) {
             //return an array with all matching extensions
@@ -34,7 +34,10 @@ angular.module("pocApp")
 
                         element.target.forEach(function (target) {
 
-                            let id = `${element.code}-${target.code}`
+                            //let id = `${element.code}-${target.code}`
+
+                            let id = commonSvc.createUUID()
+
 
                             let targetNode = {id:id,text:target.display,parent:elementNode.id,data:{type:'target',data:target}}
                             treeData.push(targetNode)
@@ -42,7 +45,8 @@ angular.module("pocApp")
                             if (target.dependsOn) {
                                 target.dependsOn.forEach(function (dep) {
                                     let text = `${dep.property} = ${dep.value} (${dep.display})`
-                                    let id = `${target.code}-${dep.property}-${dep.value}`
+                                    //let id = `${target.code}-${dep.property}-${dep.value}`
+                                    let id = commonSvc.createUUID()
                                     let depNode = {id:id,text:text,parent:targetNode.id,data:{type:'dependsOn',data:target}}
                                     treeData.push(depNode)
                                 })

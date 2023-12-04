@@ -48,6 +48,8 @@
     <script src="js/filters.js"></script>
     <script src="js/makeCMCtrl.js"></script>
 
+    <script src="js/commonSvc.js"></script>
+
     <script src="directive/viewBundle/viewBundleDir.js"></script>
     <script src="directive/viewBundle/viewBundleSvc.js"></script>
 
@@ -282,7 +284,10 @@
                         <uib-tab heading="Tree">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div id="cmTree"></div>
+                                    <div class="myScroll">
+                                        <div id="cmTree"></div>
+                                    </div>
+
                                 </div>
                                 <div class="col-md-6">
                                     <div ng-show="selectedCmTreeTarget.type == 'source'">
@@ -411,7 +416,12 @@
                                             <button class="btn btn-danger pull-right" ng-click="performTranslate()">Perform lookup</button>
                                             <br/><br/>
 
-                                            <strong>Internal filter (not using terminology server)</strong>
+
+                                            <div class="myScroll">
+
+
+
+                                            <strong>Internal filter (not using terminology server) <span class="badge">{{myResult.length}}</span> </strong>
 
                                             <uib-tabset ng-show="myResult">
                                                 <uib-tab heading="List">
@@ -435,7 +445,7 @@
 
 
                                             <div class="pull-right clickable" ng-click="input.showParams = ! input.showParams">Show Parameters query</div>
-                                            <strong>Result from Terminology server</strong>
+                                            <strong>Result from Terminology server <span class="badge">{{resultParametersList.length}}</span> </strong>
                                             <pre ng-show="translateError">{{translateError | json}}</pre>
                                             <br/>
 
@@ -459,7 +469,7 @@
                                             </uib-tabset>
 
 
-
+                                            </div>
 
 
                                         </div>

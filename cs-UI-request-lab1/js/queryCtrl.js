@@ -56,16 +56,29 @@ angular.module("pocApp")
 
             //when a source is selected in the ConceptMap mapper, set the possible 'depends on' properties
             $scope.setDependsOnProperties = function (source) {
-                delete $scope.translateParameters
-                let vo = querySvc.getCMProperties($scope.fullSelectedCM,source.code)
-                $scope.doProperties = vo.hashProperties // querySvc.getCMProperties($scope.fullSelectedCM)
+                if (source) {
+                    delete $scope.translateParameters
+                    let vo = querySvc.getCMProperties($scope.fullSelectedCM,source.code)
+                    $scope.doProperties = vo.hashProperties // querySvc.getCMProperties($scope.fullSelectedCM)
+                }
+
             }
 
             $scope.expandVSFromCM = function (code) {
                 //when a VS is selected in a CM expansion...
+                //This can either be a valueset url or a code
+
+                let url
+                if (code.indexOf('http') > -1) {
+                    //this is a valueset url
+                    url = code
+                } else {
+                    url = `http://snomed.info/sct?fhir_vs=refset/${code}`
+                }
 
 
-                url = `http://snomed.info/sct?fhir_vs=refset/${code}`
+
+
 
 
                 $scope.input.showParams = false
@@ -93,7 +106,7 @@ angular.module("pocApp")
 
             //translate for all sources, given a
             $scope.performTranslateAllSources = function () {
-
+                alert("Not enabled")
             }
 
             //translate for a single source

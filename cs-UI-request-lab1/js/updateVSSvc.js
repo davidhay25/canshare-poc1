@@ -10,7 +10,7 @@ angular.module("pocApp")
 
         //let csId = "canshare-prepub-concepts"
 
-        let csVersion = "http://snomed.info/sct/21000210109/version/20231204"
+        let csVersion = "http://snomed.info/sct/version/21000210109"
 
         let snomed = "http://snomed.info/sct"
 
@@ -33,9 +33,10 @@ angular.module("pocApp")
             updateCodeSystem : function (cs) {
                 //save the CS to the terminology server
                 let deferred = $q.defer()
+                /*
                 deferred.reject()
                 //return
-/* temp
+*/
                 let qry = '/nzhts/CodeSystem'
                 $http.put(qry,cs).then(
                     function (data) {
@@ -44,7 +45,7 @@ angular.module("pocApp")
                         deferred.reject(angular.toJson(err))
                     }
                 )
-*/
+
                 return deferred.promise
 
             },
