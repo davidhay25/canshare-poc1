@@ -33,10 +33,10 @@ angular.module("pocApp")
             updateCodeSystem : function (cs) {
                 //save the CS to the terminology server
                 let deferred = $q.defer()
-                /*
-                deferred.reject()
+
+                deferred.reject({msg:"CodeSystem update disabled"})
                 //return
-*/
+/* temp
                 let qry = '/nzhts/CodeSystem'
                 $http.put(qry,cs).then(
                     function (data) {
@@ -45,7 +45,7 @@ angular.module("pocApp")
                         deferred.reject(angular.toJson(err))
                     }
                 )
-
+*/
                 return deferred.promise
 
             },
@@ -86,12 +86,12 @@ angular.module("pocApp")
                                     //a new CodeSystem
                                     let cs = {resourceType : 'CodeSystem',status:'active',name:"UnpublishedConcepts"}
                                     cs.id = csId
-                                    cs.url = snomed //csUrl
-                                    cs.version =  csVersion //"http://snomed.info/sct/21000210109"
+                                    cs.url = "http://snomed.info/xsct"
+                                    //cs.version =  csVersion //"http://snomed.info/sct/21000210109"
                                     cs.title = "Concepts that are not yet formally published"
                                     cs.identifier = [{system:"http://canshare.co.nz/fhir/NamingSystem/codesystems",value:cs.name}]
                                     //cs.supplements = snomed
-                                    cs.content = "fragment"
+                                    //cs.content = "fragment"
                                     cs.publisher = "Te Aho o Te Kahu"
                                     cs.contact = [{telecom:[{system:"email",value:"info@teaho.govt.nz"}]}]
                                     cs.concept = []

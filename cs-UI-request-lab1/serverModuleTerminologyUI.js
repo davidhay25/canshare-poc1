@@ -117,6 +117,45 @@ function setup(app) {
     })
 
 
+    //get syndication status
+
+    app.get('/nzhts/syndStatus',async function(req,res){
+        let resourceType = req.query.resourceType
+        let id = req.query.id
+
+        let qry = `https://authoring.nzhts.digital.health.nz/synd/getSyndicationStatus?id=${id}&resourceType=${resourceType}`
+
+
+
+        let token = await getNZHTSAccessToken()
+        if (token) {
+
+            var decoded = jwt_decode(token);
+            // let timeToExpire = decoded.exp * 1000 - Date.now()       //exp is in seconds
+            // console.log(timeToExpire / (1000 * 60 *60 ));
+
+            let config = {headers:{authorization:'Bearer ' + token}}
+            config['content-type'] = "application/fhir+json"
+
+            axios.get(qry,config).then(function(data) {
+                //console.log(data.data)
+                res.json(data.data)
+            }).catch(function(ex) {
+                if (ex.response) {
+                    res.status(ex.response.status).json(ex.response.data)
+                } else {
+                    res.status(500).json(ex)
+                }
+
+            })
+        } else {
+
+            res.status(500).json({msg:"Unable to get Access Token."})
+        }
+
+
+    })
+
     //make an ECL query
 
     app.get('/nzhts/ecl',async function(req,res){

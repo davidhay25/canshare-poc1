@@ -496,6 +496,9 @@ console.log($scope.allTargets)
             //select a different instance of the Terminology server
             $scope.changeInstance = function (tsInstance) {
                 delete $scope.allVSItem
+                delete $scope.selectedVS
+
+                //$scope.showWaiting = true
                 querySvc.getValueSets(tsInstance).then(
                     function (ar) {
                         $scope.allVSItem = ar

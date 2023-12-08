@@ -129,6 +129,7 @@ angular.module("pocApp")
 
                 $scope.input.prePubConcepts = $scope.input.prePubConcepts || []
                 let concept = {code:$scope.input.newPPCode,display:$scope.input.newPPDisplay}
+                updateVSSvc.setConceptType(concept,'prepub') //adds the concepttype extension
                 $scope.input.prePubConcepts.push(concept)
                 if (updateVSSvc.addConceptToCodeSystem( $scope.prepubCS,concept)) {
                     $scope.csDirty = true

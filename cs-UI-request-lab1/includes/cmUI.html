@@ -1,0 +1,148 @@
+<div>
+
+
+  <uib-tabset>
+    <uib-tab heading="Rules">
+      <br/>
+      <div class="row">
+        <div class="col-md-2">
+          Property
+        </div>
+        <div class="col-md-2">
+          <select ng-model = "input.cmProperty" class="form-control"
+
+                  ng-options="k as k for (k,v) in cmProperties" ng-change="makeListOfTargets(input.cmProperty)"></select>
+
+        </div>
+
+        <div class="col-md-1">
+          <button class="btn btn-link" ng-click="resetUIData()">Reset</button>
+        </div>
+      </div>
+
+
+
+      <uib-tabset>
+        <uib-tab heading="List of targets">
+          <br/>
+
+
+
+
+          <div class="row">
+            <div class="col-md-7">
+              <div class="rounded-box">
+              <button class="btn-link btn pull-right" ng-click="getOptionsOneProperty()">Select concepts</button>
+
+              <div ng-repeat="(k,v) in hashProperties">
+                <div class="row">
+                  <div class="col-md-2">
+                    {{k}}
+                  </div>
+                  <div class="col-md-6">
+                    <select class="form-control" ng-model="local.cm.property[k]"
+                            ng-options="showConcept(c) for c in v"></select>
+                  </div>
+
+
+
+                </div>
+
+              </div>
+
+              <em>These lists are populated from all dependsOn values in the property element. They are NOT
+              progressively populated as selections are made</em>
+              </div>
+
+              <hr/>
+              <strong>Potential targets</strong>
+              <div class="myScroll">
+                <table class="table table-bordered">
+                  <tr><th>Criteria</th><th>ValueSet or Concept</th></tr>
+                  <tr ng-repeat="target in selectedElement.target">
+                    <td>
+                      <table class="table table-bordered">
+
+                        <tr ng-repeat="do in target.dependsOn">
+                          <td>{{do.property}}</td>
+                          <td>{{do.display}} ({{do.value}})</td>
+
+                        </tr>
+                      </table>
+                    </td>
+                    <td>
+                      <div ng-show="target.code.indexOf('http') == -1">{{target.display}} ({{target.code}})</div>
+                      <div ng-show="target.code.indexOf('http') !== -1" class="clickable" ng-click="cmExpandVS(target.code)">{{target.display}}</div>
+                    </td>
+
+
+                  </tr>
+                </table>
+              </div>
+
+
+
+            </div>
+            <div class="col-md-5">
+
+              <div ng-show="matchingVS.length > 0" >
+                <ul>
+                  <li ng-repeat="vs in matchingVS">{{vs}}</li>
+                </ul>
+
+              </div>
+
+              <div class="banner">{{cmExpandedVS.url}}</div>
+              <div class="myScroll">
+                <ul>
+                  <li ng-repeat="concept in cmExpandedVS.expansion.contains">
+                    {{concept.display}} ({{concept.code}})
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+
+
+
+        </uib-tab>
+        <uib-tab heading = "Json">
+
+          <pre>{{selectedElement | json}}</pre>
+        </uib-tab>
+      </uib-tabset>
+    </uib-tab>
+    <uib-tab heading="UI">
+      <div class="row">
+        <div class="col-md-4">
+          <table class="table table-bordered">
+            <tr ng-repeat = "(k,v) in cmProperties">
+              <td width = "30%">
+                <div class = 'clickable' ng-click="makeListOfTargets(k)">{{k}}</div>
+              </td>
+              <td>
+                <select class="form-control" ng-model="local.cmOptions[k]"
+                        ng-change="cmLookup(v,local.cmOptions[k],k)"
+                        ng-options="v.display for (k,v) in v.options">
+                </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="col-md-8">
+
+
+
+
+
+        </div>
+      </div>
+
+    </uib-tab>
+  </uib-tabset>
+
+
+
+
+</div>

@@ -55,7 +55,7 @@ angular.module("pocApp")
                         })
                     })
 
-                    console.log(treeData)
+                    //console.log(treeData)
                     return treeData
 
                 },
@@ -110,11 +110,90 @@ angular.module("pocApp")
                     return results
 
                 },
+                processMyTranslateDefaultOut : function (lookingForCode,params,cm) {
+                    //performing the translate 'lookup' function using my simplified approach
+                    //>>>>> uses the pattern that if there is a dependsOn then all of the
+                    //doenpdsOn values must match a parameter. This is different to the way that Ontoserver does it.
+                    //lookingForCode is the code of the thing we want - eg Intentof treatment
+                    //params is [{property: value:}]    - key is the property in the dependsOn, value is the CodeableConcept value
+                    //cm is the concept map
+
+                    //iterate through the cm.group and group.element looking for a matching code. There should only be 1
+                    //when the element is found, iterate through all the targets.
+                    //for each target:
+                    //      if there is no dependsOn then the target is added to the result. Otherwise:
+                    //      for each item in params, look for a matching target with that property. The logic is AND
+                    //          if the matching property in the target does not match the param, then the comparison fails.
+                    //              any failure to match means the target is not added to the result
+                    //          if there is no target.property that matches the params.property then the comparison FAILS
+
+
+                    let results = []    //returns an array of matching target entries
+                    cm.group.forEach(function (group) {
+                        group.element.forEach(function (element) {
+                            if (element.code == lookingForCode.code) {
+                                element.target.forEach(function (target) {
+                                    if (target.dependsOn) {
+                                        //create a hash by property
+                                        let hashProperty = {}
+                                        target.dependsOn.forEach(function (dep) {
+                                            hashProperty[dep.property] = dep
+                                        })
+                                        //now iterate through the params, checking the property and value
+
+                                        //let include = false     //will only match if depeondOn lements match
+
+                                        let allMatch = true  //any non=matches will reset this
+
+                                        params.forEach(function (param) {
+                                            if (hashProperty[param.property]) {
+                                                //check the value
+                                                let p = hashProperty[param.property]
+                                                if (p.value !== param.value.code) {
+                                                    allMatch = false
+                                                }
+                                            } else {
+                                                //if the target doesn't have a corresponding property, then don't include it
+                                                allMatch = false
+                                            }
+
+                                        })
+
+
+                                        if (allMatch) {
+                                            //add any ValueSet directly to the target
+                                            //todo - not using this now...
+                                            /*
+                                            let ext = findExtension(target,"http://canshare.co.nz/fhir/StructureDefinition/conceptmap-valueset")
+                                            if (ext[0] && ext[0].valueUri) {
+                                                target.valueSet = ext[0].valueUri
+                                            }
+                                            */
+                                            results.push(target)
+                                        }
+
+
+                                    } else {
+                                        //if no dependsOn, then always add
+                                        results.push(target)
+                                    }
+
+                                })
+
+                                //console.log('gotcha!')
+                            }
+                        })
+                    })
+
+                    return results
+
+                },
+
 
                 processMyTranslate : function (lookingForCode,params,cm) {
                     //performing the translate 'lookup' function using my simplified approach
                     //lookingForCode is the code of the thing we want - eg Intentof treatment
-                    //params is {property: value:}    - key is the property in the dependsOn, value is the CodeableConcept value
+                    //params is [{property: value:}]    - key is the property in the dependsOn, value is the CodeableConcept value
                     //cm is the concept map
 
                     //iterate through the cm.group and group.element looking for a matching code. There should only be 1
@@ -139,7 +218,9 @@ angular.module("pocApp")
                                             hashProperty[dep.property] = dep
                                         })
                                         //now iterate through the params, checking the property and value
+
                                         let include = true     //whether to include the target. default true
+
                                         params.forEach(function (param) {
                                             if (hashProperty[param.property]) {
                                                 //check the value

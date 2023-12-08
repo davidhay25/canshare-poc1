@@ -47,7 +47,8 @@
     <script src="js/showParameters.js"></script>
     <script src="js/filters.js"></script>
     <script src="js/makeCMCtrl.js"></script>
-
+    <script src="js/cmCtrl.js"></script>
+    <script src="js/cmSvc.js"></script>
     <script src="js/commonSvc.js"></script>
 
     <script src="directive/viewBundle/viewBundleDir.js"></script>
@@ -122,6 +123,7 @@
 
 
     <uib-tabset>
+
 
         <uib-tab >
             <uib-tab-heading>CanShare ValueSets <span class="badge">{{allVSItem.length}}</span> </uib-tab-heading>
@@ -251,6 +253,16 @@
 
         </uib-tab>
 
+        <uib-tab  heading="ActNow ConceptMap">
+            <div ng-controller="cmCtrl">
+
+                <ng-include src = "'./includes/cmUI.html'"></ng-include>
+
+            </div>
+        </uib-tab>
+
+
+
         <uib-tab  heading="ConceptMap">
             <!-- This accesses, displays and uses Concept maps on the server. The CMs are created by a script from the spreadsheet.-->
 
@@ -281,104 +293,6 @@
 
                     <uib-tabset>
 
-                        <uib-tab heading="Tree">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="myScroll">
-                                        <div id="cmTree"></div>
-                                    </div>
-
-                                </div>
-                                <div class="col-md-6">
-                                    <div ng-show="selectedCmTreeTarget.type == 'source'">
-                                        <p>This is the 'thing' that we are looking to get the set of possible options
-                                        for - like the clinical 'T' values. The contents of the set will vary according
-                                            to external properties - such as the cancer service or type</p>
-                                        <br>
-                                        <div class="clickable" ng-click="lookup(selectedCmTreeTarget.data.code)">Lookup {{selectedCmTreeTarget.data.code}}</div>
-
-<!--
-                                        <table class="table">
-                                            <tr
-                                        </table>
--->
-                                        <div class="myScroll">
-                                            <pre>{{selectedCmTreeTarget.data | json}}</pre>
-                                        </div>
-                                    </div>
-
-
-                                    <div ng-show="selectedCmTreeTarget.type == 'target'">
-                                        These are the potential refsets that could be included in the source set. Each
-                                        target has a set of properties (dependsOn) which determine if the target concept is to be
-                                        included in the set. They define the required values for the external properties.
-                                        Only a single target should match any given combination of properties.
-                                        <br/>
-
-                                        In some cases
-                                        the .code might be a single code rather than a refset code. In this case there is an extension
-                                        on the target that indicates this.
-
-                                        <br>
-                                        <uib-tabset>
-                                            <uib-tab heading = "Json">
-                                                <div class="myScroll">
-                                                    <pre>{{selectedCmTreeTarget.data | json}}</pre>
-                                                </div>
-                                            </uib-tab>
-                                            <uib-tab heading = "Contents">
-                                                <div class="clickable pull-right" ng-click="expandVSFromCM(selectedCmTreeTarget.data.code)">Show ValueSet / refSet</div>
-
-                                                <div>Count: {{expandedCMVS.expansion.contains.length}}</div>
-                                                <table class="table table-bordered">
-                                                    <tr><th>Display</th><th>Code</th><th>System</th></tr>
-                                                    <tr ng-repeat="concept in expandedCMVS.expansion.contains">
-                                                        <td>{{concept.display}}</td>
-                                                        <td>
-                                                            <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
-                                                        <td>{{concept.system}}</td>
-                                                    </tr>
-                                                </table>
-
-                                                <div ng-show="expandedCMVS.url"><em>{{expandVSFromCMQuery}}</em></div>
-                                            </uib-tab>
-                                            <uib-tab ng-show="expandedCMVS.url" heading = "ValueSet">
-                                                <pre>{{expandedCMVS | json}}</pre>
-                                            </uib-tab>
-
-                                        </uib-tabset>
-                                        <!--
-                                        <div class="clickable" ng-click="lookup(selectedCmTreeTarget.data.code)">Lookup {{selectedCmTreeTarget.data.code}}</div>
--->
-
-
-
-                                    </div>
-                                    <div ng-show="selectedCmTreeTarget.type == 'dependsOn'">
-                                       These are the individual properties whose value must match the external properties.
-                                        Within a target, all properties must match for the target to be included in the set. Only
-                                        a single target should match any given combination of properties.
-
-                                        <br>
-                                        <div ng-repeat = "dep in selectedCmTreeTarget.data.dependsOn">
-                                            <div class="clickable" ng-click="lookup(dep.value)">Lookup {{dep.value}}</div>
-
-                                        </div>
-
-                                        <div class="myScroll">
-                                            <pre>{{selectedCmTreeTarget.data.dependsOn | json}}</pre>
-                                        </div>
-
-                                    </div>
-
-                                    <br/>
-
-
-                                </div>
-                            </div>
-
-                        </uib-tab>
-
                         <uib-tab heading="Translate operation" >
 
                             <div ng-hide="fullSelectedCM.group">
@@ -388,6 +302,20 @@
                             </div>
 
                             <uib-tabset ng-show = "fullSelectedCM.group">
+
+
+                                <uib-tab heading="Example UI">
+                                    <div ng-controller="cmCtrl">
+
+                                        <ng-include src = "'./includes/cmUI.html'"></ng-include>
+
+                                    </div>
+
+
+
+                                </uib-tab>
+
+
 
                                 <uib-tab heading="Single item lookup">
 
@@ -417,56 +345,56 @@
                                             <br/><br/>
 
 
-                                            <div class="myScroll">
+                                            <div >
 
 
 
-                                            <strong>Internal filter (not using terminology server) <span class="badge">{{myResult.length}}</span> </strong>
+                                                <strong>Internal filter (not using terminology server) <span class="badge">{{myResult.length}}</span> </strong>
 
-                                            <uib-tabset ng-show="myResult">
-                                                <uib-tab heading="List">
-                                                    <table class="table-bordered table">
-                                                        <tr ng-repeat = "target in myResult">
-                                                            <td>{{target.code}}</td>
-                                                            <td>{{target.display}}</td>
-                                                            <td>
-                                                                <div ng-display="target.valueSet">
-                                                                    <div class="clickable" ng-click="expandVSFromCM(target.code)">Show VS</div>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </uib-tab>
-                                                <uib-tab heading="Json">
-                                                    <pre>{{myResult | json}}</pre>
-                                                </uib-tab>
-                                            </uib-tabset>
+                                                <uib-tabset ng-show="myResult">
+                                                    <uib-tab heading="List">
+                                                        <table class="table-bordered table">
+                                                            <tr ng-repeat = "target in myResult">
+                                                                <td>{{target.code}}</td>
+                                                                <td>{{target.display}}</td>
+                                                                <td>
+                                                                    <div ng-display="target.valueSet">
+                                                                        <div class="clickable" ng-click="expandVSFromCM(target.code)">Show VS</div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </uib-tab>
+                                                    <uib-tab heading="Json">
+                                                        <pre>{{myResult | json}}</pre>
+                                                    </uib-tab>
+                                                </uib-tabset>
 
 
 
-                                            <div class="pull-right clickable" ng-click="input.showParams = ! input.showParams">Show Parameters query</div>
-                                            <strong>Result from Terminology server <span class="badge">{{resultParametersList.length}}</span> </strong>
-                                            <pre ng-show="translateError">{{translateError | json}}</pre>
-                                            <br/>
+                                                <div class="pull-right clickable" ng-click="input.showParams = ! input.showParams">Show Parameters query</div>
+                                                <strong>Result from Terminology server <span class="badge">{{resultParametersList.length}}</span> </strong>
+                                                <pre ng-show="translateError">{{translateError | json}}</pre>
+                                                <br/>
 
-                                            <uib-tabset ng-show="resultParameters">
-                                                <uib-tab heading="List">
-                                                    <table class="table-bordered table">
-                                                        <tr ng-repeat = "concept in resultParametersList">
-                                                            <td>{{concept.code}}</td>
-                                                            <td>{{concept.display}}</td>
-                                                            <td>
-                                                                <div ng-display="target.valueSet">
-                                                                    <div class="clickable" ng-click="expandVSFromCM(concept.code)">Show VS</div>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </uib-tab>
-                                                <uib-tab heading="Json">
-                                                    <pre>{{resultParameters | json}}</pre>
-                                                </uib-tab>
-                                            </uib-tabset>
+                                                <uib-tabset ng-show="resultParameters">
+                                                    <uib-tab heading="List">
+                                                        <table class="table-bordered table">
+                                                            <tr ng-repeat = "concept in resultParametersList">
+                                                                <td>{{concept.code}}</td>
+                                                                <td>{{concept.display}}</td>
+                                                                <td>
+                                                                    <div ng-display="target.valueSet">
+                                                                        <div class="clickable" ng-click="expandVSFromCM(concept.code)">Show VS</div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </uib-tab>
+                                                    <uib-tab heading="Json">
+                                                        <pre>{{resultParameters | json}}</pre>
+                                                    </uib-tab>
+                                                </uib-tabset>
 
 
                                             </div>
@@ -595,6 +523,106 @@
 
                         </uib-tab>
 
+                        <uib-tab heading="Tree">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="myScroll">
+                                        <div id="cmTree"></div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-6">
+                                    <div ng-show="selectedCmTreeTarget.type == 'source'">
+                                        <p>This is the 'thing' that we are looking to get the set of possible options
+                                            for - like the clinical 'T' values. The contents of the set will vary according
+                                            to external properties - such as the cancer service or type</p>
+                                        <br>
+                                        <div class="clickable" ng-click="lookup(selectedCmTreeTarget.data.code)">Lookup {{selectedCmTreeTarget.data.code}}</div>
+
+                                        <!--
+                                                                                <table class="table">
+                                                                                    <tr
+                                                                                </table>
+                                        -->
+                                        <div class="myScroll">
+                                            <pre>{{selectedCmTreeTarget.data | json}}</pre>
+                                        </div>
+                                    </div>
+
+
+                                    <div ng-show="selectedCmTreeTarget.type == 'target'">
+                                        These are the potential refsets that could be included in the source set. Each
+                                        target has a set of properties (dependsOn) which determine if the target concept is to be
+                                        included in the set. They define the required values for the external properties.
+                                        Only a single target should match any given combination of properties.
+                                        <br/>
+
+                                        In some cases
+                                        the .code might be a single code rather than a refset code. In this case there is an extension
+                                        on the target that indicates this.
+
+                                        <br>
+                                        <uib-tabset>
+                                            <uib-tab heading = "Json">
+                                                <div class="myScroll">
+                                                    <pre>{{selectedCmTreeTarget.data | json}}</pre>
+                                                </div>
+                                            </uib-tab>
+                                            <uib-tab heading = "Contents">
+                                                <div class="clickable pull-right" ng-click="expandVSFromCM(selectedCmTreeTarget.data.code)">Show ValueSet / refSet</div>
+
+                                                <div>Count: {{expandedCMVS.expansion.contains.length}}</div>
+                                                <table class="table table-bordered">
+                                                    <tr><th>Display</th><th>Code</th><th>System</th></tr>
+                                                    <tr ng-repeat="concept in expandedCMVS.expansion.contains">
+                                                        <td>{{concept.display}}</td>
+                                                        <td>
+                                                            <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
+                                                        <td>{{concept.system}}</td>
+                                                    </tr>
+                                                </table>
+
+                                                <div ng-show="expandedCMVS.url"><em>{{expandVSFromCMQuery}}</em></div>
+                                            </uib-tab>
+                                            <uib-tab ng-show="expandedCMVS.url" heading = "ValueSet">
+                                                <pre>{{expandedCMVS | json}}</pre>
+                                            </uib-tab>
+
+                                        </uib-tabset>
+                                        <!--
+                                        <div class="clickable" ng-click="lookup(selectedCmTreeTarget.data.code)">Lookup {{selectedCmTreeTarget.data.code}}</div>
+-->
+
+
+
+                                    </div>
+                                    <div ng-show="selectedCmTreeTarget.type == 'dependsOn'">
+                                        These are the individual properties whose value must match the external properties.
+                                        Within a target, all properties must match for the target to be included in the set. Only
+                                        a single target should match any given combination of properties.
+
+                                        <br>
+                                        <div ng-repeat = "dep in selectedCmTreeTarget.data.dependsOn">
+                                            <div class="clickable" ng-click="lookup(dep.value)">Lookup {{dep.value}}</div>
+
+                                        </div>
+
+                                        <div class="myScroll">
+                                            <pre>{{selectedCmTreeTarget.data.dependsOn | json}}</pre>
+                                        </div>
+
+                                    </div>
+
+                                    <br/>
+
+
+                                </div>
+                            </div>
+
+                        </uib-tab>
+
+
+
                         <uib-tab heading="Maps">
                             <div ng-hide="fullSelectedCM.group">
                                 <br/>
@@ -636,9 +664,9 @@
                                                         </span>
                                                     </div>
                                                 </td>
-                                               <td>
+                                                <td>
 
-                                               </td>
+                                                </td>
                                             </tr>
                                             </tbody>
 
@@ -676,8 +704,7 @@
 
 
 
-
-        <uib-tab heading="NZHTS analysis">
+        <uib-tab ng-show="false" heading="NZHTS analysis">
             <br/>
 
             <button ng-hide="rawAnalysis" class="btn btn-primary pull-right" ng-click="vsAnalysis()">Perform analysis</button>
