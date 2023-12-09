@@ -12,7 +12,10 @@ angular.module("pocApp")
             //expand a ValueSet
             $scope.cmExpandVS = function (url) {
                 delete $scope.cmExpandedVS
-                //delete $scope.cmExpandedVS
+                delete $scope.lstMatchingConcepts
+                delete $scope.matchingVS
+
+
                 let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=en-x-sctlang-23162100-0210105`
                 console.log(qry)
                 let encodedQry = encodeURIComponent(qry)
@@ -73,15 +76,28 @@ angular.module("pocApp")
                 return `${c.display} (${c.code})`
             }
 
+            //get all the concepts for a single property
             $scope.getOptionsOneProperty = function() {
                 console.log($scope.local.cm.property)
+                delete $scope.lstMatchingConcepts
+                delete $scope.cmExpandedVS      //so it't not in the display area
                 //call the rules engine to determine the possible concepts. The engine needs:
                 //  the list of user selected values for all properties so far  - local.cm.property
                 //  the property that needs the list - input.cmProperty & $scope.selectedElement
+                let vo = cmSvc.getOptionsOneProperty($scope.input.cmProperty,$scope.local.cm.property,$scope.selectedElement)
 
-                $scope.matchingVS = cmSvc.getOptionsOneProperty($scope.input.cmProperty,$scope.local.cm.property,$scope.selectedElement)
-console.log($scope.matchingVS)
-                //
+                $scope.matchingVS = vo.lstVS
+                $scope.matchedRules = vo.lstMatches
+
+                let qry = `/nzhts/expandMultipleVs`
+                $http.post(qry,vo.lstVS).then(
+                    function (data) {
+                        console.log(data)
+                        $scope.lstMatchingConcepts = data.data
+                    }, function (err) {
+                        console.log(err)
+                    }
+                )
 
             }
 
@@ -141,7 +157,39 @@ console.log($scope.matchingVS)
 
             //called when a property option in the UI changes
             $scope.cmLookup = function (prop,v,propKey) {
-                console.log(prop,v)
+                console.log(prop,v,propKey)
+                return;
+
+                //just set the next one
+                let nextProperty = $scope.cmProperties[prop.next]
+
+                //
+
+                let params = makeHashParams()   //a hash of all data thus far ?todo only the preceeding ones
+
+                //find the cm element that corresponds to the option being populated - it has the potential targets
+
+
+                //parameters:
+                //  property - the property name for which concepts are sought - eg cancer-stream
+                //  hashInput - a hash keyed by property name that has all the properties where the user has selected a value
+                //  element -  has all the possible targets for that property (each property has one element in the CM)
+
+
+                //let vo = cmSvc.getOptionsOneProperty($scope.input.cmProperty,$scope.local.cm.property,$scope.selectedElement)
+
+                let vo = cmSvc.getOptionsOneProperty(nextProperty,params,$scope.selectedElement)
+                //$scope.matchingVS = vo.lstVS
+
+
+                //$scope.matchedRules = vo.lstMatches
+
+                //let results = querySvc.processMyTranslate( nextProperty.concept,params,$scope.fullSelectedCM)
+                console.log(vo)
+
+
+                return
+
 
                 //get the set of options for each of the properties based on the current values of all properties
                 let currentValues = makeParams()
@@ -200,6 +248,28 @@ console.log($scope.matchingVS)
                         //myParams.push(item)
 
                         params.push(item)
+                    }
+
+                }
+                return params
+
+            }
+
+            function makeHashParams() {
+                let params = {}
+                for (const key of Object.keys($scope.cmProperties)) {
+
+                    let v = $scope.local.cmOptions[key]
+                    console.log(key,v)
+                    if (v) {
+                        params[key] = v
+
+                        //let item = {}
+                        //item.property = key
+                        //item.value = v
+                        //myParams.push(item)
+
+                        //params.push(item)
                     }
 
                 }

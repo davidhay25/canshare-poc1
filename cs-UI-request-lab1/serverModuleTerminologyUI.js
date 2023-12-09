@@ -116,6 +116,70 @@ function setup(app) {
 
     })
 
+    //expand multiple VS and return single list of concepts
+    app.post('/nzhts/expandMultipleVs',async function(req,res){
+        let arVsUrl = req.body
+        let lstConcepts = []    //the list that will be returned
+        let hashConcepts = {}   //concepts keyed on code+system
+        console.log(arVsUrl)
+        let token = await getNZHTSAccessToken()
+        if (token) {
+            let config = {headers:{authorization:'Bearer ' + token}}
+            config['content-type'] = "application/fhir+json"
+
+            try {
+                for (const url of arVsUrl){
+                    let qry = `${nzhtsconfig.serverBase}ValueSet/$expand?url=${url}&displayLanguage=en-x-sctlang-23162100-0210105`
+                    let result = await axios.get(qry,config)
+                    let vs = result.data
+                    if (vs && vs.expansion && vs.expansion.contains) {
+                        for (const item of vs.expansion.contains) {
+                            let concept = {code:item.code,display:item.display,system:item.system}
+                            let key = `${concept.code}-${concept.system}`
+                            hashConcepts[key] = concept
+
+                        }
+
+                    }
+                }
+                //console.log(hashConcepts)
+
+                for (const key of Object.keys(hashConcepts)) {
+                    lstConcepts.push(hashConcepts[key])
+                }
+
+                lstConcepts.sort(function (a,b) {
+                    let display1 = a.display || ""
+                    let display2 = b.display || ""
+                    if (display1 > display2) {
+                        return 1
+                    } else {
+                        return -1
+                    }
+
+                })
+
+                res.json(lstConcepts)
+
+
+
+            } catch (ex) {
+                if (ex.response) {
+                    res.status(ex.response.status).json(ex.response.data)
+                } else {
+                    res.status(500).json(ex)
+                }
+
+            }
+
+
+
+
+        }
+
+
+    })
+
 
     //get syndication status
 
@@ -203,8 +267,7 @@ function setup(app) {
 
 
         let headers = req.headers
-        //console.log(headers)
-        //console.log(headers['x-ts-instance'])
+
 
         //The instance of the TS server that will be queried
         let tsInstance = nzhtsconfig.serverBaseAuthor
@@ -309,11 +372,6 @@ function setup(app) {
         }
 
 
-
-
-
-        //res.send(token)
-
     })
 
 
@@ -357,29 +415,7 @@ function setup(app) {
                 return
             }
             res.json()      //no error
-            /*
-            let token = await getNZHTSAccessToken()
-            if (token) {
 
-                let config = {headers:{authorization:'Bearer ' + token}}
-                config['content-type'] = "application/fhir+json"
-
-                axios.put(qry,req.body,config).then(function(data) {
-                    res.json(data.data)
-                }).catch(function(ex) {
-                    if (ex.response) {
-                        console.log("Status code:",ex.response.status)
-                        console.log("err",ex.response.data)
-                        res.status(ex.response.status).json(ex.response.data)
-                    } else {
-                        res.status(500).json(ex)
-                    }
-                })
-            } else {
-                res.status(ex.response.status).json({msg:"Unable to get Access Token."})
-            }
-
-            */
 
         } else {
             res.status(400).json({msg:"Must have urlencoded qry query"})

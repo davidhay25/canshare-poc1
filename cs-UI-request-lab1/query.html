@@ -124,6 +124,15 @@
 
     <uib-tabset>
 
+        <uib-tab  heading="ActNow ConceptMap">
+            <div ng-controller="cmCtrl">
+
+                <ng-include src = "'./includes/cmUI.html'"></ng-include>
+
+            </div>
+        </uib-tab>
+
+
 
         <uib-tab >
             <uib-tab-heading>CanShare ValueSets <span class="badge">{{allVSItem.length}}</span> </uib-tab-heading>
@@ -251,14 +260,6 @@
             </div>
 
 
-        </uib-tab>
-
-        <uib-tab  heading="ActNow ConceptMap">
-            <div ng-controller="cmCtrl">
-
-                <ng-include src = "'./includes/cmUI.html'"></ng-include>
-
-            </div>
         </uib-tab>
 
 

@@ -1,5 +1,10 @@
 <div>
 
+  <style>
+    .matched {
+      background-color: lightgreen;
+    }
+  </style>
 
   <uib-tabset>
     <uib-tab heading="Rules">
@@ -20,14 +25,9 @@
         </div>
       </div>
 
-
-
       <uib-tabset>
         <uib-tab heading="List of targets">
           <br/>
-
-
-
 
           <div class="row">
             <div class="col-md-7">
@@ -59,13 +59,14 @@
               <div class="myScroll">
                 <table class="table table-bordered">
                   <tr><th>Criteria</th><th>ValueSet or Concept</th></tr>
-                  <tr ng-repeat="target in selectedElement.target">
+                  <tr ng-repeat="target in selectedElement.target" ng-class ="{matched:target.matched}">
                     <td>
                       <table class="table table-bordered">
 
                         <tr ng-repeat="do in target.dependsOn">
                           <td>{{do.property}}</td>
                           <td>{{do.display}} ({{do.value}})</td>
+
 
                         </tr>
                       </table>
@@ -74,6 +75,7 @@
                       <div ng-show="target.code.indexOf('http') == -1">{{target.display}} ({{target.code}})</div>
                       <div ng-show="target.code.indexOf('http') !== -1" class="clickable" ng-click="cmExpandVS(target.code)">{{target.display}}</div>
                     </td>
+
 
 
                   </tr>
@@ -85,18 +87,40 @@
             </div>
             <div class="col-md-5">
 
-              <div ng-show="matchingVS.length > 0" >
-                <ul>
-                  <li ng-repeat="vs in matchingVS">{{vs}}</li>
-                </ul>
 
+                <div ng-show="matchingVS.length > 0" >
+                  <strong>Matching ValueSets</strong>
+                  <ul>
+                    <li ng-repeat="vs in matchingVS">{{vs}}</li>
+                  </ul>
+
+                </div>
+
+
+
+
+
+              <div ng-show = "lstMatchingConcepts">
+                <strong>Concepts from all matching ValueSets</strong>
+                <div class="myScroll">
+                  <ul>
+                    <li ng-repeat="concept in lstMatchingConcepts">
+                      {{concept.display}}
+                      (<span class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</span>)
+                    </li>
+                  </ul>
+                </div>
               </div>
+
+
+
 
               <div class="banner">{{cmExpandedVS.url}}</div>
               <div class="myScroll">
                 <ul>
                   <li ng-repeat="concept in cmExpandedVS.expansion.contains">
-                    {{concept.display}} ({{concept.code}})
+                    {{concept.display}}
+                    (<span class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</span>)
                   </li>
                 </ul>
               </div>

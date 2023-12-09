@@ -16,7 +16,7 @@ angular.module("pocApp")
                 //get the options for a property.
                 //parameters:
                 //  property - the property name for which concepts are sought - eg cancer-stream
-                //  haspInput - a hash keyed by property name that has all the properties where the user has selected a value
+                //  hashInput - a hash keyed by property name that has all the properties where the user has selected a value
                 //  element -  has all the possible targets for that property (each property has one element in the CM)
 
                 //current processing:
@@ -34,10 +34,13 @@ angular.module("pocApp")
                 }
 
                 let lstVs = []          //this will be a list of valueSets whose contents are in the list of possible values
-                element.target.forEach(function (target) {
-                    //let include = false
+                let lstMatchingRules = []   //the rules that were matched
+                element.target.forEach(function (target,inx) {
+                    //let include = falsein
+                    target.matched = false
                     if (! target.dependsOn) {
                         //No depends on means the VS contents are added
+                        target.matched = true
                         lstVs.push(target.code)
                     } else {
                         //there is at least dependsOn. All must match for the target VS to be included
@@ -69,6 +72,8 @@ angular.module("pocApp")
                         if (include) {
                             // yes!
                             lstVs.push(target.code)
+                            lstMatchingRules.push(inx)
+                            target.matched = true
                         }
 
 
@@ -76,7 +81,7 @@ angular.module("pocApp")
 
                 })
 
-                return lstVs
+                return {lstVS:lstVs,lstMatches:lstMatchingRules}
 
 
             }
