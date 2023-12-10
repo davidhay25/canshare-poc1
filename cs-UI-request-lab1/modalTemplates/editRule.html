@@ -1,0 +1,77 @@
+
+<div>
+    <!--<div ng-controller="newResourceCtrl">-->
+
+    <div class="modal-header">
+        <div class="row">
+            <div class="col-md-10 col-sm-10">
+                <h3 class="modal-title">
+                    Edit rule
+                </h3>
+            </div>
+
+
+            <div class="col-md-2 col-sm-2">
+                <button class="btn btn-primary pull-right"
+                        ng-show="input.url && input.display"
+                        ng-click="select()">Save</button>
+                <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
+
+
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-body">
+       <uib-tabset>
+           <uib-tab heading = "Rule contents">
+
+               <table class="table table-bordered">
+                   <tr>
+                       <td>VS Url</td>
+                       <td><input placeholder="VS Url or Concept code" class="form-control" type="text" ng-model="input.url"/> </td>
+                   </tr>
+                   <tr>
+                       <td>Display</td>
+                       <td><input class="form-control" type="text" ng-model="input.display"/> </td>
+                   </tr>
+                   <tr>
+                       <td>Triggers</td>
+                       <td>
+                           <table class="table">
+                               <tr ng-repeat="don in input.dependsOn">
+                                   <td>{{don.property}}</td>
+                                   <td>{{don.display}}</td>
+                                   <td>{{don.value}}</td>
+                                   <td><i class="glyphicon glyphicon-remove clickable"></i></td>
+                               </tr>
+                               <tr>
+                                   <td>
+                                       <select ng-model="input.newTriggerProperty" class="form-control"
+                                               ng-options = "prop for prop in properties"></select>
+
+                                   </td>
+                                   <td><input type="text" class="form-control" ng-model="input.newTriggerDisplay"/> </td>
+                                   <td><input type="text" class="form-control" ng-model="input.newTriggerValue"/> </td>
+                                   <td><i ng-show="input.newTriggerProperty && input.newTriggerDisplay && input.newTriggerValue"
+                                          ng-click = "addTrigger()"
+                                           class="glyphicon glyphicon-plus clickable"></i></td>
+                               </tr>
+                           </table>
+                       </td>
+                   </tr>
+               </table>
+
+           </uib-tab>
+           <uib-tab heading = "Json">
+               <pre>{{target | json}}</pre>
+           </uib-tab>
+       </uib-tabset>
+    </div>
+
+    <div class="modal-header">
+
+    </div>
+
+
+</div>

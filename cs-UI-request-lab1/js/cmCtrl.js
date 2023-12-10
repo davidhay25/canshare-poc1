@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('cmCtrl',
-        function ($scope,$http,$q,querySvc,cmSvc) {
+        function ($scope,$http,$q,querySvc,cmSvc,$uibModal) {
 
             let snomed = "http://snomed.info/sct"
             $scope.local = {cmOptions : {},cm:{property:{}}}
@@ -8,6 +8,65 @@ angular.module("pocApp")
 
             //load the CM
             $scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-scripted-dec"}})
+
+
+            $scope.editRule = function (target) {
+
+                $uibModal.open({
+                    backdrop: 'static',      //means can't close by clicking on the backdrop.
+                    keyboard: false,       //same as above.
+                    size : 'lg',
+                    templateUrl: 'modalTemplates/editRule.html',
+
+                    controller: function ($scope,target) {
+                        $scope.input = {}
+                        $scope.target = target
+
+                        $scope.properties = []
+                        $scope.properties.push("cancer-service")
+                        $scope.properties.push("cancer-stream")
+                        $scope.properties.push("cancer-substream")
+                        $scope.properties.push("cancer-type")
+                        $scope.properties.push("primary-site-laterality")
+                        $scope.properties.push("histologic-type-primary")
+
+
+                        if (target) {
+                            $scope.input.url = target.code
+                            $scope.input.display = target.display
+                            $scope.input.dependsOn = target.dependsOn
+                        } else {
+                            $scope.input.dependsOn = []
+                        }
+
+                        $scope.addTrigger = function () {
+                            let trigger = {property:$scope.input.newTriggerProperty}
+                            trigger.display = $scope.input.newTriggerDisplay
+                            trigger.value = $scope.input.newTriggerValue
+                            $scope.input.dependsOn.push(trigger)
+                            delete $scope.input.newTriggerProperty
+                            delete $scope.input.newTriggerDisplay
+                            delete $scope.input.newTriggerValue
+                        }
+
+                    },
+                    resolve: {
+                        target: function () {
+                            return target
+                        }
+                    }
+
+                })
+
+            }
+
+            $scope.deleteRule = function () {
+
+            }
+
+            $scope.addRule = function () {
+
+            }
 
             //expand a ValueSet
             $scope.cmExpandVS = function (url) {

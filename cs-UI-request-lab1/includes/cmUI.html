@@ -9,30 +9,35 @@
   <uib-tabset>
     <uib-tab heading="Rules">
       <br/>
-      <div class="row">
-        <div class="col-md-2">
-          Property
-        </div>
-        <div class="col-md-2">
-          <select ng-model = "input.cmProperty" class="form-control"
 
-                  ng-options="k as k for (k,v) in cmProperties" ng-change="makeListOfTargets(input.cmProperty)"></select>
+      <div >
+        <div class="row">
+          <div class="col-md-2">
+            <strong>Select property</strong>
+          </div>
+          <div class="col-md-2">
+            <select ng-model = "input.cmProperty" class="form-control"
 
-        </div>
+                    ng-options="k as k for (k,v) in cmProperties" ng-change="makeListOfTargets(input.cmProperty)"></select>
 
-        <div class="col-md-1">
-          <button class="btn btn-link" ng-click="resetUIData()">Reset</button>
+          </div>
+
+          <div class="col-md-1">
+            <button class="btn btn-link" ng-click="resetUIData()">Reset</button>
+          </div>
         </div>
       </div>
+      <br/>
 
-      <uib-tabset>
-        <uib-tab heading="List of targets">
+
+      <uib-tabset ng-show="selectedElement">
+        <uib-tab heading="List of targets for {{input.cmProperty}}">
           <br/>
 
           <div class="row">
             <div class="col-md-7">
               <div class="rounded-box">
-              <button class="btn-link btn pull-right" ng-click="getOptionsOneProperty()">Select concepts</button>
+              <button class="btn-primary btn pull-right" ng-click="getOptionsOneProperty()">Select concepts</button>
 
               <div ng-repeat="(k,v) in hashProperties">
                 <div class="row">
@@ -50,15 +55,16 @@
 
               </div>
 
-              <em>These lists are populated from all dependsOn values in the property element. They are NOT
-              progressively populated as selections are made</em>
+                <br/>
+              <em>These lists are populated from all dependsOn values for all rules (target) in the property element. They are NOT
+              progressively populated as selections are made (the UI tab will do that eventually).</em>
               </div>
 
               <hr/>
-              <strong>Potential targets</strong>
+              <strong>Potential targets from ConceptMap</strong>
               <div class="myScroll">
                 <table class="table table-bordered">
-                  <tr><th>Criteria</th><th>ValueSet or Concept</th></tr>
+                  <tr><th>Criteria</th><th>ValueSet or Concept</th><th>Action</th></tr>
                   <tr ng-repeat="target in selectedElement.target" ng-class ="{matched:target.matched}">
                     <td>
                       <table class="table table-bordered">
@@ -76,6 +82,12 @@
                       <div ng-show="target.code.indexOf('http') !== -1" class="clickable" ng-click="cmExpandVS(target.code)">{{target.display}}</div>
                     </td>
 
+                    <td>
+                      <i class="glyphicon glyphicon-edit clickable" ng-click="editRule(target)"></i>
+                      <div><i class="glyphicon glyphicon-remove clickable"></i></div>
+
+
+                    </td>
 
 
                   </tr>
@@ -131,7 +143,7 @@
 
 
         </uib-tab>
-        <uib-tab heading = "Json">
+        <uib-tab heading = "Json of element">
 
           <pre>{{selectedElement | json}}</pre>
         </uib-tab>
