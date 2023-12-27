@@ -30,7 +30,6 @@ angular.module("pocApp")
                         $scope.properties.push("primary-site-laterality")
                         $scope.properties.push("histologic-type-primary")
 
-
                         if (target) {
                             $scope.input.url = target.code
                             $scope.input.display = target.display
@@ -55,6 +54,8 @@ angular.module("pocApp")
                             return target
                         }
                     }
+
+                }).result.then(function (vo) {
 
                 })
 
