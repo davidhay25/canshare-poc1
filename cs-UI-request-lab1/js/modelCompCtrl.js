@@ -1,10 +1,42 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('modelCompositionCtrl',
-        function ($scope,$uibModal,$timeout,librarySvc,modelsSvc) {
+        function ($scope,$uibModal,$timeout,librarySvc,modelsSvc,$localStorage) {
 
+
+            $localStorage.qStrategy = $localStorage.qStrategy || {}
+            $scope.qStrategy = $localStorage.qStrategy
 
             $scope.compositionKind = ['request','report','general']
+
+            $scope.qGenerationOptions = function () {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/qGenerationOptions.html',
+                    backdrop: 'static',
+                    //size : 'lg',
+                    controller: function($scope,strategy){
+                        $scope.strategy = strategy
+                        //$scope.input = {}
+                        $scope.save = function () {
+                            $scope.$close($scope.strategy)
+                        }
+                    }, resolve: {
+                        strategy: function () {
+                            return $localStorage.qStrategy
+                        }
+                    }
+
+                }).result.then(function (strategy) {
+                    console.log(strategy)
+                    $localStorage.qStrategy = strategy
+
+                    //need to set the fullQ on the parent scope
+                    $scope.selectComposition($scope.selectedComposition)
+                    //$scope.$parent.fullQ =  makeQSvc.makeQFromTree(treeObject,$scope.selectedComposition,$localStorage.qStrategy)
+
+
+                })
+            }
 
             $scope.cloneComp = function (comp) {
                 let title = prompt("What title should the new Composition have? (leave blank to cancel)")

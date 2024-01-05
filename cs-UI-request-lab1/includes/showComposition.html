@@ -36,6 +36,10 @@
                 ng-click="cloneComp(selectedComposition)">Make a copy of this Composition</button>
       </div>
 
+      <div>
+
+      </div>
+
     </div>
     <div class="col-md-5">
 
@@ -63,8 +67,13 @@
 
 
       <table class="table-condensed table table-bordered">
-        <tr><td>Tumour stream</td><td>{{selectedComposition.meta.tumourStream}}</td></tr>
-        <tr><td>Category</td><td>{{selectedComposition.meta.category}}</td></tr>
+        <!--
+       <tr><td>ValueSet in Q</td>
+         <td> <checkbox  ng-model="input.includeVS"></checkbox> Include VS as answerOption</td></tr>
+-->
+
+       <tr><td>Tumour stream</td><td>{{selectedComposition.meta.tumourStream}}</td></tr>
+       <tr><td>Category</td><td>{{selectedComposition.meta.category}}</td></tr>
 
         <tr><td></td><td><em>Set these in the Metadata tab</em></td></tr>
       </table>
@@ -175,7 +184,7 @@
                       {{selectedCompositionNode.data.ed.title}}
                     </td>
                   </tr>
-                  <tr  selectedCompositionNode.data.ed.kind == 'root'">
+                  <tr ng-hide="selectedCompositionNode.data.ed.kind == 'root'">
                     <td class="detailName" > Description</td>
                     <td>  {{selectedCompositionNode.data.ed.description}}</td>
                   </tr>
@@ -607,8 +616,27 @@
     </uib-tab>
 
     <uib-tab heading="Form">
+      <!--
+      <div class="row">
+        <div class="col-md-12">
+          <checkbox ng-model="test"></checkbox>
+        </div>
+      </div>
+      -->
 
       <button class="btn-link btn pull-right" ng-click="previewQ(fullQ)">Examine Q</button>
+
+
+<!--
+      <button class="btn-link btn pull-right" ng-click="qGenerationOptions()">edit</button>
+-->
+      <span style="padding-top: 8px" class="pull-right">
+        <span class="clickable" ng-click="qGenerationOptions()">Q generation: </span>
+        <span ng-show="qStrategy.expandVS">expand VS</span>
+        <span ng-hide="qStrategy.expandVS">separate VS</span>
+
+      </span>
+
 
       <renderform q="fullQ" qr="{}"></renderform>
 

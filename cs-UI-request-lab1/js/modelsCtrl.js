@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
 
-            $scope.version = "0.6.4"
+            $scope.version = "0.6.5"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -1178,7 +1178,7 @@ angular.module("pocApp")
             $scope.showComposition = function (comp) {
                 let show = true
                 if ($scope.input.selectedTumourStream !== 'All') {
-                    if (comp.meta.tumourStream !== $scope.input.selectedTumourStream) {
+                    if (comp && comp.meta && comp.meta.tumourStream !== $scope.input.selectedTumourStream) {
                         show = false
                     }
                 }
@@ -1611,7 +1611,6 @@ angular.module("pocApp")
             }
 
 
-
             //make the tree of the composition
             function makeCompTree(treeData,rootNodeId) {
                 $('#compositionTree').jstree('destroy');
@@ -1631,12 +1630,8 @@ angular.module("pocApp")
                     $(this).jstree("open_node",id);
                     let treeObject = $(this).jstree(true).get_json('#', { 'flat': false })
 
-                    $scope.fullQ =  makeQSvc.makeQFromTree(treeObject,$scope.selectedComposition)
-//console.log($scope.fullQ)
-                   // $scope.fullQ =  makeQSvc.makeQfromSections()
+                    $scope.fullQ =  makeQSvc.makeQFromTree(treeObject,$scope.selectedComposition,$localStorage.qStrategy)
 
-
-                    //console.log($scope.fullQ)
                     $scope.$digest();
                 });
 

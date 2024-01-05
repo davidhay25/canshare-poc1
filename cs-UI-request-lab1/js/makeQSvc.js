@@ -1,6 +1,6 @@
 angular.module("pocApp")
 
-    .service('makeQSvc', function($http) {
+    .service('makeQSvc', function($http,codedOptionsSvc) {
 
         let config = {}
         let nzHTSPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/"
@@ -33,6 +33,7 @@ angular.module("pocApp")
                         break
                     case 'CodeableConcept' :
                         //  if (ed.valueSet) {
+                        //todo - need to check for type-ahead
                         controlHint = "drop-down"
                         controlType = "choice"
                     //   }
@@ -71,8 +72,15 @@ angular.module("pocApp")
 
         //set the control type (and hint extension) for the item
         //updates the item object directly
+        //config has options for populating choice elements
+        //  - maxFromValueSet - if from a ValueSet, include this number of elements as answerOption
+        //  - aoIfUnder - if from a ValueSet, include as answerOption only if the total is under this count. Otherwise don't.
         //ed has controlType and controlHint
-        function setControlType(ed,item) {
+        function setControlType(ed,item,strategy) {
+            //if useVS is true, then
+            strategy = strategy || {}
+
+            //config = config || {maxFromValueSet : 500}
 
             let vo = getControlDetails(ed) //get the control details from the ed
 
@@ -88,50 +96,100 @@ angular.module("pocApp")
                 item.extension.push(ext)
             }
 
-
             switch (vo.controlHint) {
                 case 'drop-down' :
+                    //will be 'drop-down' if the type is CodeableConcept...
+                    //use the options service to get the list of options. could come from the options element of expanded vs
+                    codedOptionsSvc.getOptionsForEd(ed).then(
+                        function (vo) {
+                            // {options:,status:,vsUrl:}
+                            //console.log(ed.title,vo)
+                            switch (vo.status) {
+                                case 'options' :
+                                    //the list of options came from an options element in the ED. They must be answerOption
+                                    item.answerOption = []
+                                    for (const Coding of vo.options) {
+                                        item.answerOption.push({valueCoding:Coding})
+                                    }
+                                    break
+                                case 'vs' :
+                                    //the list of options came from an expanded valueset
+                                    if (strategy.expandVS) {
+                                    //if (config && config.maxFromValueSet && vo.options.length <= config.maxFromValueSet) {
+                                        item.answerOption = []
+                                        for (const Coding of vo.options) {
+                                            item.answerOption.push({valueCoding:Coding})
+                                        }
+                                    } else {
+                                        item.answerValueSet = ed.valueSet
+                                    }
+                                    break
+                                case 'not-found' :
+                                    //there was a ValueSet, but it wasn't found on the terminology server
+
+                                    break
+                                case 'no-options-or-vs':
+                                    console.log(`The element ${ed.title} had neither ValueSet not options defined`)
+                                    break
+
+                            }
+
+
+                        },function (err) {
+console.log(err)
+                        }
+                    )
+
                     //populate the answerOption. Get it from 'options' if set, otherwise the vs
-                    item.answerOption = []
 
 
+                    //item.answerOption = []
+
+/*
                     if (ed.valueSet) {
-                        //if there's a valueSet, then tru to expand it
-                        let vsUrl = ed.valueSet
-                        if (vsUrl.indexOf('http') == -1) {
-                            //if there's no preceeding http then assume this is HTS and pre-pend the url
-                            vsUrl = nzHTSPrefix + vsUrl
+                        //if there's a valueSet, then just add to the Q
+                        item.answerValueSet = ed.valueSet
+
+                        if (false) {
+                            let vsUrl = ed.valueSet
+                            if (vsUrl.indexOf('http') == -1) {
+                                //if there's no preceeding http then assume this is HTS and pre-pend the url
+                                vsUrl = nzHTSPrefix + vsUrl
+                            }
+
+                            let qry = `ValueSet/$expand?url=${vsUrl}&_summary=false`
+                            let encodedQry = encodeURIComponent(qry)
+
+                            $http.get(`nzhts?qry=${encodedQry}`).then(
+                                function (data) {
+                                    let expandedVS = data.data
+                                    if (expandedVS.expansion && expandedVS.expansion.contains) {
+                                        for (const concept of expandedVS.expansion.contains) {
+                                            item.answerOption.push(
+                                                {valueCoding:{system:concept.system, code:concept.code, display:concept.display}})
+                                        }
+                                    }
+
+                                    //console.log(data.data)
+
+
+                                }, function (err) {
+                                    item.answerOption.push({valueCoding:{display:"VS not found"}})
+                                    console.log(`There was no ValueSet with the url:${ed.valueSet}`)
+                                }
+                            )
                         }
 
 
-
-                        let qry = `ValueSet/$expand?url=${vsUrl}&_summary=false`
-                        let encodedQry = encodeURIComponent(qry)
-
-                        $http.get(`nzhts?qry=${encodedQry}`).then(
-                            function (data) {
-                                let expandedVS = data.data
-                                if (expandedVS.expansion && expandedVS.expansion.contains) {
-                                    for (const concept of expandedVS.expansion.contains) {
-                                        item.answerOption.push(
-                                            {valueCoding:{system:concept.system, code:concept.code, display:concept.display}})
-                                    }
-                                }
-
-                                //console.log(data.data)
-
-
-                            }, function (err) {
-                                item.answerOption.push({valueCoding:{display:"VS not found"}})
-                                console.log(`There was no ValueSet with the url:${ed.valueSet}`)
-                            }
-                        )
 
                     } else if (ed.options){
+                        item.answerOption = []
                         for (const option of ed.options) {
-                            item.answerOption.push({valueCoding:{code:option.code,display:option.display}})
+                            let system = option.system || "http://example.com/fhir/CodeSystem/example"
+                            item.answerOption.push({valueCoding:{code:option.code,display:option.display, system:system}})
                         }
                     }
+                    */
 
 /*
                     //do the ValueSet first...
@@ -170,6 +228,9 @@ angular.module("pocApp")
 
 
                     break
+
+                case 'typeahead' :
+                    break
             }
 
 
@@ -178,7 +239,7 @@ angular.module("pocApp")
 
         return {
             makeTreeFromQ : function (Q) {
-                //pass in a Q and return a tree array
+                //pass in a Q and return a tree array representation
                 let treeData = []
                 let issues = []         //any issues found during
                 let lstElements = []    //a flat list of elements
@@ -210,7 +271,7 @@ angular.module("pocApp")
                     processItem(item,'root')
                 })
 
-                console.log(treeData)
+                //console.log(treeData)
 
                 //now
 
@@ -221,7 +282,6 @@ angular.module("pocApp")
 
 
             },
-            //todo pass in hashAllElements
 
             makeQfromCompListDEP : function (comp,allElements) {
 
@@ -475,7 +535,6 @@ angular.module("pocApp")
 
             },
 
-
             getAllEW : function (Q) {
                 //Create a hash of all the 'EnableWhens' in a Q
                 let hashAllEW = {}
@@ -505,9 +564,8 @@ angular.module("pocApp")
 
             },
 
-
-            //this is used by the composition
-            makeQFromTree : function (treeObject,comp) {
+            //this is used by the composition to build the Q
+            makeQFromTree : function (treeObject,comp,strategy) {
                 //Given a tree array representing a composition (from jstree), construct a Q resource
                 let that = this
 
@@ -541,11 +599,14 @@ angular.module("pocApp")
                     //the node id structure is {comp name}.{section name}.{dg name}...
                     //todo - need to think about z elements
 
+
+
+
                     let ar = node.id.split('.')
                     if (ar.length == 2) {
-                        //this is a section definition. Create a new section and add to the Q root
+                        //this is a section definition. Create a new Q section and add to the Q root
                         let sectionName = ar[1]     //the second segment
-                        section = {text:node.text,linkId:node.id,item:[]}
+                        section = {text:node.text,linkId:node.id,type:'group',item:[]}
 
                         //are there any conditionals (enableWhen) to add
                         if (hashSectionEW[sectionName]) {
@@ -564,7 +625,7 @@ angular.module("pocApp")
                         }
 
                         Q.item.push(section)
-                        canAdd = false          //because it's already beed added
+                        canAdd = false          //because it's already been added
                     } else if (ar.length == 3) {
                         //this is the DG name attached to the section
                         //we've got the children enumerated - we want to enumerate them but not add this one
@@ -589,8 +650,6 @@ angular.module("pocApp")
                            }
                        }
 
-
-
                     }
 
 
@@ -603,14 +662,15 @@ angular.module("pocApp")
                         }
 
 
-                        //the path prexis is the path to the DG in the composition - {compname}.{section name}.
+                        //the path prefix is the path to the DG in the composition - {compname}.{section name}.
                         //this is the first 2 segments in the node id (which is the full path)
                         let ar = node.id.split('.')
 
                         let pathPrefix = `${ar[0]}.${ar[1]}.`
-                        addEnableWhen(node.data.ed,item,pathPrefix)  //If there are any contitionals
-                        setControlType(node.data.ed,item)  //set the control type to use
+                        addEnableWhen(node.data.ed,item,pathPrefix)  //If there are any conditionals
 
+                        //set the control type to use. Will add the VS or answerOptions to the item
+                        setControlType(node.data.ed,item,strategy)
                         parent.item = parent.item || []
                         parent.item.push(item)
                     }
@@ -619,8 +679,8 @@ angular.module("pocApp")
                     if (node.children && node.children.length > 0) {
 
                         //create a new group item and add to the current section
-                        let group = {text:`group-${node.text}`,type:'group',linkId:`group-${node.id}` ,item:[],extension:[]}
-
+                        let group = {text:`${node.text}`,type:'group',linkId:`group-${node.id}` ,item:[],extension:[]}
+                        //let group = {text:`group-${node.text}`,type:'group',linkId:`group-${node.id}` ,item:[],extension:[]}
                         let ext = {url:"http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"}
                         ext.valueInteger = 2
                         group.extension.push(ext)
@@ -636,10 +696,24 @@ angular.module("pocApp")
                     }
                 }
 
-                //there's only a single child whoch returns the top level
+                //there's only a single child which returns the top level
                 treeObject[0].children.forEach(function (node) {
                     addChild(section,node,section)
                 })
+
+
+                //the DG name is added as a child to the section item. Not sure how to prevent that - for now, remove them
+                Q.item.forEach(function (item) {
+
+                    console.log(item.item)
+                    if (item.item) {
+                        //just remove the first child - it will have the empty item
+                        item.item.splice(0,1)
+                    }
+
+                })
+
+
 
                 return Q //that.makeQ(treeObject)
 
@@ -685,7 +759,6 @@ angular.module("pocApp")
                         }
 
 
-
                         switch (data.controlHint) {
                             case 'drop-down' :
                                 //populate the answerOption. For now, get it from 'options, but later:
@@ -699,26 +772,42 @@ angular.module("pocApp")
                                     }
                                 } else if (data.ed.valueSet) {
                                     //if there's a valueSet, then tru to expand it
-                                    let qry = `ValueSet/$expand?url=${data.ed.valueSet}&_summary=false`
-                                    let encodedQry = encodeURIComponent(qry)
 
-                                    $http.get(`nzhts?qry=${encodedQry}`).then(
-                                        function (data) {
-                                            let expandedVS = data.data
-                                            for (const concept of expandedVS.expansion.contains) {
-                                                item.answerOption.push(
-                                                    {valueCoding:{system:concept.system, code:concept.code, display:concept.display}})
+                                    //let url = `https://nzhts.digital.health.nz/fhir/ValueSet/${targetVSName}`
+
+                                    //don't expand it - just add the VS to the Q (but keep the code)
+                                    let vs = data.ed.valueSet
+                                    if (vs.indexOf('http:') == -1) {
+                                        vs = `https://nzhts.digital.health.nz/fhir/ValueSet/${vs}`
+                                    }
+                                    item.answerValueSet = vs
+
+
+                                    if (false) {
+                                        let qry = `ValueSet/$expand?url=${data.ed.valueSet}&_summary=false`
+                                        let encodedQry = encodeURIComponent(qry)
+
+                                        $http.get(`nzhts?qry=${encodedQry}`).then(
+                                            function (data) {
+                                                let expandedVS = data.data
+                                                for (const concept of expandedVS.expansion.contains) {
+                                                    item.answerOption.push(
+                                                        {valueCoding:{system:concept.system, code:concept.code, display:concept.display}})
+                                                }
+                                                console.log(data.data)
+
+
+
+
+                                            }, function (err) {
+                                                item.answerOption.push({valueCoding:{display:"VS not found"}})
+                                                console.log(`There was no ValueSet with the url:${data.ed.valueSet}`)
                                             }
-                                            console.log(data.data)
+                                        )
+                                    }
 
 
 
-
-                                        }, function (err) {
-                                            item.answerOption.push({valueCoding:{display:"VS not found"}})
-                                            console.log(`There was no ValueSet with the url:${data.ed.valueSet}`)
-                                        }
-                                    )
 
 
                                 }
