@@ -173,6 +173,8 @@ async function setup(app) {
 
     //======== datagroups  =========================
 
+
+
     //get all active datagroups
     app.get('/model/allDG', async function(req,res) {
         //retrieve all the DG
@@ -657,6 +659,14 @@ async function setup(app) {
 
 
 }
+
+
+
+//------------ create FSH
+
+
+
+
 
 module.exports = {
     setup : setup

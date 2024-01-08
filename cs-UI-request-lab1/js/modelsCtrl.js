@@ -58,7 +58,7 @@ angular.module("pocApp")
 
 
 
-            console.log($scope.hashAllDG)
+            //console.log($scope.hashAllDG)
 
             //look for DG errors like repeating parents in the hierarchy tree
             if ($scope.hashAllDG) {
@@ -174,6 +174,20 @@ angular.module("pocApp")
 
             }
 
+            //create an FSH with all DG
+            $scope.makeAllFsh = function () {
+                $scope.allFsh = ""
+                Object.keys($scope.hashAllDG).forEach(function (key) {
+                    let dg = $scope.hashAllDG[key]
+                    let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
+                    let fsh = igSvc.makeFshForDG(dg,vo.allElements)
+                    $scope.allFsh += fsh
+                    $scope.allFsh += '\n\n'
+
+                    //console.log(fsh)
+
+                })
+            }
 
 
             //--------- login stuff
@@ -235,7 +249,7 @@ angular.module("pocApp")
             $scope.previewQ = function (Q) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/previewQ.html',
-                    //backdrop: 'static',
+                    backdrop: 'static',
                     size : 'lg',
                     controller: 'previewQCtrl',
                     resolve: {
@@ -1390,7 +1404,7 @@ angular.module("pocApp")
                 makeCompTree(treeData,rootNodeId)
 
 
-                igSvc.makeFshForComp(comp,$scope.allCompElements,$scope.hashCompElements)
+                $scope.compFsh = igSvc.makeFshForComp(comp,$scope.allCompElements,$scope.hashCompElements)
 
                 console.log($scope.fullQ)
 

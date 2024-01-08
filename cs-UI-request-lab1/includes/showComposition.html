@@ -743,7 +743,13 @@
     </uib-tab>
 
     <uib-tab heading=" FSH">
+      <span class="pull-right">
+           <i class="glyphicon glyphicon-paperclip pull-right clickable"
+              ng-click="copyFshToClipboard(compFsh)"></i>
+          </span>
       The FHIR shorthand that represents the composition as a FHIR Logical Model
+      <br/>
+      <pre>{{compFsh}}</pre>
     </uib-tab>
 
     <uib-tab heading = "Json">

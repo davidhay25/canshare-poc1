@@ -63,24 +63,34 @@
       </uib-tab>
 
       <uib-tab heading="LinkIds">
-        <div class="row">
-          <div class="col-md-8">
-            <table class="table table-bordered">
-              <tr><th>LinkId</th><th>Text</th><th>Definition</th></tr>
-              <tr ng-repeat="element in lstElements">
-                <td>{{element.linkId}}</td>
-                <td>{{element.item.text}}</td>
-                <td>
-                  <span ng-click = "showED(element.item.definition)">{{element.item.definition}}</span>
-                </td>
-              </tr>
-            </table>
+        <table class="table table-bordered">
+          <tr><th>Text</th><th>LinkId</th></tr>
+          <tr ng-repeat="element in lstElements">
+            <td>{{element.item.text}}</td>
+            <td>{{element.linkId}}</td>
+           <!--
+            <td>
+              <span ng-click = "showED(element.item.definition)">{{element.item.definition}}</span>
+            </td>
+            -->
+          </tr>
+        </table>
 
-          </div>
-          <div class="col-md-4">
-            lstElements
-          </div>
-        </div>
+      </uib-tab>
+
+      <uib-tab heading="Definitions">
+        <table class="table table-bordered">
+          <tr><th>Text</th><th>Definition</th></tr>
+          <tr ng-repeat="element in lstElements">
+            <td>{{element.item.text}}</td>
+            <td>{{element.item.definition}}</td>
+            <!--
+             <td>
+               <span ng-click = "showED(element.item.definition)">{{element.item.definition}}</span>
+             </td>
+             -->
+          </tr>
+        </table>
 
       </uib-tab>
 

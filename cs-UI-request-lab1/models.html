@@ -561,7 +561,38 @@
 
         </uib-tab>
 
-        <uib-tab ng-show = 'false' heading="LM StructureDefinitions">
+
+        <uib-tab heading="IG artifacts">
+            <br/>
+
+            <uib-tabset>
+                <uib-tab heading="FSH All DG">
+                    <button class="btn-link btn pull-right" ng-click="makeAllFsh()">Make FSH</button>
+
+                    <span class="pull-right">
+                       <i class="glyphicon glyphicon-paperclip pull-right clickable"
+                          ng-click="copyFshToClipboard(allFsh)"></i>
+                      </span>
+                    <br/>
+                    <div class="myScroll">
+                        <pre ng-show="allFsh">{{allFsh}}</pre>
+                    </div>
+                </uib-tab>
+
+                <uib-tab heading="Index pages">
+                    Generate the index pages - DG & Composition
+                    download as a
+                    create from server API so can use from command line script
+
+                </uib-tab>
+            </uib-tabset>
+
+
+
+        </uib-tab>
+
+
+        <uib-tab ng-show="false" heading="LM StructureDefinitions">
             <button class="btn-link btn pull-right" ng-click="makeBundle()">Make Bundle</button>
             <button ng-show="lmBundle" class="btn-link btn pull-right" ng-click="validateBundle(lmBundle)">Validate</button>
 

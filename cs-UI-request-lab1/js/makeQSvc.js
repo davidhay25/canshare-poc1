@@ -656,6 +656,20 @@ console.log(err)
 
                     if (canAdd) {
                         let item = {text:node.text,linkId:node.id,type:'string'}
+
+                        //the definition is the link back to the model - the DG. We drop the first 2 segments
+                        //in the path as they are the composition & section name
+
+                        if (node.data.ed.path) {
+                            let ar = node.data.ed.path.split('.')
+                            ar.splice(0,2)
+                            //todo  - will become a uri - when the DGs are published as models
+                            item.definition = ar.join('.')
+                        }
+
+
+
+
                         //todo - get correct type. This is just a placeholder
                         if (node.children && node.children.length > 0) {
                             item.type = 'group'
