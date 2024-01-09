@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
 
-            $scope.version = "0.6.5"
+            $scope.version = "0.6.6"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -79,7 +79,7 @@ angular.module("pocApp")
             //a handler that will re-draw the list and tree views of the DGs.
 
             $scope.$on('updateDGList',function(ev,vo) {
-                console.log(vo)
+                //console.log(vo)
                 sortDG()    //update the sorted list of DG
 
 
@@ -1406,7 +1406,7 @@ angular.module("pocApp")
 
                 $scope.compFsh = igSvc.makeFshForComp(comp,$scope.allCompElements,$scope.hashCompElements)
 
-                console.log($scope.fullQ)
+                //console.log($scope.fullQ)
 
                // console.log(makeQSvc.makeTreeFromQ($scope.fullQ))
                 //makeQfromSections
@@ -1434,6 +1434,8 @@ angular.module("pocApp")
 
                 //sort the elements list to better display slicing
                 $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
+
+                //console.log($scope.fullElementList)
 
                 //create the list of potential enableWhen sources
                 $scope.ewSources = []
@@ -1463,6 +1465,7 @@ angular.module("pocApp")
                 $scope.allDependencies = modelDGSvc.getAllEW($scope.fullElementList,$scope.selectedModel.name)
 
 
+                //console.log($scope.fullElementList)
             }
 
             //only used for DG now

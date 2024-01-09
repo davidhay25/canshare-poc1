@@ -195,17 +195,7 @@
     </div>
   </div>
 
-  <!--
-  <div class = "clickable pull-right">
 
-    <button class="btn-link btn pull-right"
-
-            ng-click="dglibraryInteraction(selectedModel)">Compare to library</button>
-
-
-  </div>
-
-  -->
 
   <uib-tabset>
 
@@ -1084,8 +1074,6 @@
                 <td>
                   <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
 
-
-
                     <!-- {{element.path | dropFirstInPath}} -->
                     <div ng-hide="input.showFullModel">
                       {{element.ed.path | dropFirstInPath}}
@@ -1126,7 +1114,6 @@
 
                 <td ng-show="canEdit(selectedModel)">
                   <i class="glyphicon glyphicon-edit pull-right clickable"
-
                      ng-click="editDGItem(element)"></i>
                 </td>
 

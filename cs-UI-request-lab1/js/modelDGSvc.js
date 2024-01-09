@@ -38,7 +38,7 @@ angular.module("pocApp")
                     }
 
                 })
-
+/*
                 lstElements.sort(function (a,b) {
                     if (a.path > b.path) {
                         return 1
@@ -46,7 +46,7 @@ angular.module("pocApp")
                         return -1
                     }
                 })
-
+*/
 
                 return allDependencies
 
