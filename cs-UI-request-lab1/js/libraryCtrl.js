@@ -7,7 +7,54 @@ angular.module("pocApp")
             $scope.user = user
             //$scope.input.mainTabActive = 1
 
+            $scope.input.filter = {}
+
             $scope.localDGCount = Object.keys(allDG).length
+
+            $scope.clearFilter = function () {
+                $scope.input.filter = {}
+            }
+
+
+            //whether a composition is shown.
+            //if there are filters set, then all must match for either library or local com
+            $scope.showComp = function (item) {
+                //let show = true
+
+                //if there's no filter then return true
+                if (Object.keys($scope.input.filter).length == 0) {
+                    return true
+                }
+
+                if (item.library && checkMeta(item.library)) {
+                    return true
+                }
+                if (item.local && checkMeta(item.local)) {
+                    return true
+                }
+
+
+                //return show
+
+                function checkMeta(comp) {
+                    if (! comp.meta) {
+                        return false
+                    }
+
+                    let show = true
+                    Object.keys($scope.input.filter).forEach(function (key) {
+                        let value = $scope.input.filter[key]
+                        if (value) {
+                            //there's a value, then the value from meta must match
+                            if (! comp.meta[key] || comp.meta[key] !== value) {
+                                show = false
+                            }
+                        }
+                    })
+                    return show
+
+                }
+            }
 
             let trusted = {}; //https://stackoverflow.com/questions/33297444/uib-popover-html-wont-accept-my-html-string
             $scope.getPopoverHtmlDEP = function(obj) {
@@ -65,17 +112,22 @@ angular.module("pocApp")
                 })
 */
 
+            //local comp and library comp
             function makeCompSummary(allComp,libraryComp) {
                 let libraryHash = {}
 
+                $scope.hashMetaProperties = {}     //all metadata properties and their values
+
                 libraryComp.forEach(function (comp) {
                     libraryHash[comp.name] = comp
+                    updateMetaValues(comp)              //update all the possible metadata values for library compositions
                 })
 
-                $scope.summaryComp = []        //the summary compositions array
+                $scope.summaryComp = []        //the summary compositions array {name: title: local: library: note
 
                 Object.keys(allComp).forEach(function (key) {
                     let localComp = allComp[key]
+                    updateMetaValues(localComp)              //update all the possible metadata values for local compositions
                     let item = {name:key,title:localComp.title,local:localComp}
                     if (libraryHash[key]) {
                         item.library = libraryHash[key]
@@ -102,6 +154,25 @@ angular.module("pocApp")
                     }
 
                 })
+
+                console.log($scope.hashMetaProperties)
+
+                //update the list of meta items and their possible values for the filtered view
+                function updateMetaValues(comp) {
+                    if (comp.meta) {
+                        Object.keys(comp.meta).forEach(function (key) {
+                            $scope.hashMetaProperties[key] = $scope.hashMetaProperties[key] || []
+
+                            let v = comp.meta[key]
+                            if ($scope.hashMetaProperties[key].indexOf(v) == -1) {
+                                $scope.hashMetaProperties[key].push(v)
+                            }
+
+
+                        })
+                    }
+
+                }
 
             }
 

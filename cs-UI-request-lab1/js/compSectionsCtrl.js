@@ -157,6 +157,7 @@ angular.module("pocApp")
 
                 $timeout(function () {
                     showDGTree(vo1.treeData)
+                    showDGTree(vo1.sectionTreeData,'#headingDGTree')
                 },1000)
 
             }
@@ -240,11 +241,16 @@ angular.module("pocApp")
 
             }
 
-            function showDGTree(treeData) {
+            function showDGTree(treeData,htmlElement) {
                 console.log(`Draw select tree. ${treeData.length} elements.`)
-                $('#dgSelectTree').jstree('destroy');
 
-                $scope.allDGTree = $('#dgSelectTree').jstree(
+                htmlElement = htmlElement || '#dgSelectTree'
+               // $(htmlElement).jstree('destroy');
+
+
+                $(htmlElement).jstree('destroy');
+
+                $scope.allDGTree = $(htmlElement).jstree(
                     {'core': {'multiple': false, 'data': treeData,
                             'themes': {name: 'proton', responsive: true}}}
                 ).on('changed.jstree', function (e, data) {

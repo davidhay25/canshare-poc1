@@ -1,3 +1,5 @@
+//This is the current service to make Q
+
 angular.module("pocApp")
 
     .service('makeQSvc', function($http,codedOptionsSvc) {
@@ -54,7 +56,7 @@ angular.module("pocApp")
         //When used by the Composition, we add a prefix which is {compname}.{section name}. (note the trailing dot)
         function addEnableWhen(ed,item,pathPrefix) {
             pathPrefix = pathPrefix || ""
-            if (ed && ed.enableWhen) {
+            if (ed && ed.enableWhen && ed.enableWhen.length > 0) {
                 //console.log(ed,'has ew')
                 item.enableWhen = []
                 ed.enableWhen.forEach(function (ew) {
@@ -72,9 +74,8 @@ angular.module("pocApp")
 
         //set the control type (and hint extension) for the item
         //updates the item object directly
-        //config has options for populating choice elements
-        //  - maxFromValueSet - if from a ValueSet, include this number of elements as answerOption
-        //  - aoIfUnder - if from a ValueSet, include as answerOption only if the total is under this count. Otherwise don't.
+        //strategy has options for populating choice elements
+        //  - expandVS - if true, generate answerOption elements
         //ed has controlType and controlHint
         function setControlType(ed,item,strategy) {
             //if useVS is true, then
@@ -101,14 +102,19 @@ angular.module("pocApp")
                     //will be 'drop-down' if the type is CodeableConcept...
                     //use the options service to get the list of options. could come from the options element of expanded vs
                     codedOptionsSvc.getOptionsForEd(ed).then(
-                        function (vo) {
-                            // {options:,status:,vsUrl:}
-                            //console.log(ed.title,vo)
-                            switch (vo.status) {
+                        function (vo1) {
+
+                            if (! vo1.options || (vo1.options && vo1.options.length == 0) ) {
+                                vo1.options = vo1.options || []
+                                vo1.options.push({code:'nocode',system:'http://example.com/CodeSystem/unknown',display:"No codes supplied"})
+                            }
+
+                            switch (vo1.status) {
                                 case 'options' :
                                     //the list of options came from an options element in the ED. They must be answerOption
-                                    item.answerOption = []
-                                    for (const Coding of vo.options) {
+
+                                    for (const Coding of vo1.options) {
+                                        item.answerOption = item.answerOption ||[]
                                         item.answerOption.push({valueCoding:Coding})
                                     }
                                     break
@@ -116,19 +122,27 @@ angular.module("pocApp")
                                     //the list of options came from an expanded valueset
                                     if (strategy.expandVS) {
                                     //if (config && config.maxFromValueSet && vo.options.length <= config.maxFromValueSet) {
-                                        item.answerOption = []
-                                        for (const Coding of vo.options) {
+                                        //item.answerOption = []
+                                        for (const Coding of vo1.options) {
+                                            item.answerOption = item.answerOption ||[]
                                             item.answerOption.push({valueCoding:Coding})
                                         }
                                     } else {
-                                        item.answerValueSet = ed.valueSet
+                                        let vs = ed.valueSet
+                                        if (vs.indexOf('http') == -1) {
+                                            //the vs in the model might not have the full url
+                                            vs = `https://nzhts.digital.health.nz/fhir/ValueSet/${vs}`
+                                        }
+                                        item.answerValueSet = vs
                                     }
                                     break
                                 case 'not-found' :
                                     //there was a ValueSet, but it wasn't found on the terminology server
-
+                                    item.answerOption = [{valueCoding:{code:'not-found',system:'http://example.com/CodeSystem/unknown',display:`VS ${ed.valueSet} not found`}}]
+                                    console.log(`The element ${ed.title} had the ValueSet ${ed.valueSet} which was not on the terminology server`)
                                     break
                                 case 'no-options-or-vs':
+                                    item.answerOption = [{valueCoding:{code:'no-options',system:'http://example.com/CodeSystem/unknown',display:`Neither options nor ValueSet`}}]
                                     console.log(`The element ${ed.title} had neither ValueSet not options defined`)
                                     break
 
@@ -139,88 +153,6 @@ angular.module("pocApp")
 console.log(err)
                         }
                     )
-
-                    //populate the answerOption. Get it from 'options' if set, otherwise the vs
-
-
-                    //item.answerOption = []
-
-/*
-                    if (ed.valueSet) {
-                        //if there's a valueSet, then just add to the Q
-                        item.answerValueSet = ed.valueSet
-
-                        if (false) {
-                            let vsUrl = ed.valueSet
-                            if (vsUrl.indexOf('http') == -1) {
-                                //if there's no preceeding http then assume this is HTS and pre-pend the url
-                                vsUrl = nzHTSPrefix + vsUrl
-                            }
-
-                            let qry = `ValueSet/$expand?url=${vsUrl}&_summary=false`
-                            let encodedQry = encodeURIComponent(qry)
-
-                            $http.get(`nzhts?qry=${encodedQry}`).then(
-                                function (data) {
-                                    let expandedVS = data.data
-                                    if (expandedVS.expansion && expandedVS.expansion.contains) {
-                                        for (const concept of expandedVS.expansion.contains) {
-                                            item.answerOption.push(
-                                                {valueCoding:{system:concept.system, code:concept.code, display:concept.display}})
-                                        }
-                                    }
-
-                                    //console.log(data.data)
-
-
-                                }, function (err) {
-                                    item.answerOption.push({valueCoding:{display:"VS not found"}})
-                                    console.log(`There was no ValueSet with the url:${ed.valueSet}`)
-                                }
-                            )
-                        }
-
-
-
-                    } else if (ed.options){
-                        item.answerOption = []
-                        for (const option of ed.options) {
-                            let system = option.system || "http://example.com/fhir/CodeSystem/example"
-                            item.answerOption.push({valueCoding:{code:option.code,display:option.display, system:system}})
-                        }
-                    }
-                    */
-
-/*
-                    //do the ValueSet first...
-                    if (ed.options) {
-                        for (const option of ed.options) {
-                            item.answerOption.push({valueCoding:{code:option.code,display:option.display}})
-                        }
-                    } else if (ed.valueSet) {
-                        //if there's a valueSet, then tru to expand it
-                        let qry = `ValueSet/$expand?url=${ed.valueSet}&_summary=false`
-                        let encodedQry = encodeURIComponent(qry)
-
-                        $http.get(`nzhts?qry=${encodedQry}`).then(
-                            function (data) {
-                                let expandedVS = data.data
-                                for (const concept of expandedVS.expansion.contains) {
-                                    item.answerOption.push(
-                                        {valueCoding:{system:concept.system, code:concept.code, display:concept.display}})
-                                }
-                                console.log(data.data)
-
-
-                            }, function (err) {
-                                item.answerOption.push({valueCoding:{display:"VS not found"}})
-                                console.log(`There was no ValueSet with the url:${ed.valueSet}`)
-                            }
-                        )
-
-
-                    }
-*/
 
 
 
@@ -270,12 +202,6 @@ console.log(err)
                 Q.item.forEach(function (item) {
                     processItem(item,'root')
                 })
-
-                //console.log(treeData)
-
-                //now
-
-
 
 
                 return {treeData:treeData,issues : issues,lstElements:lstElements}
@@ -462,7 +388,6 @@ console.log(err)
                 //now can build the Q
                 let Q = {resourceType:"Questionnaire",item:[]}
 
-
                 //there's a single section (item) for the DG (This is not the same as the composition section)
                 let section = {text:lstElements[0].ed.title,linkId:`${dgName}-section`,item:[]}
                 section.definition = lstElements[0].ed.path
@@ -472,7 +397,6 @@ console.log(err)
                 //let currentPathRoot
                 let topGroup = makeGroup({title:'',path:dgName})
                 let group = topGroup
-
 
                 let processingDGPath = null     //When processing a group, what the path of that group is
                 lstQElements.forEach(function (ed) {

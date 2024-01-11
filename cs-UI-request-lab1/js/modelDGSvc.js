@@ -227,6 +227,13 @@ angular.module("pocApp")
                 let root = {id:"root",text: "DataGroups tree",parent:'#',data:{}}
                 treeData.push(root)
 
+                //set up the sections (headings) tree
+                let hashSections = {'Section': true}
+                let sectionTreeData = []
+                let sectionRoot = {id:"Section",text: "Sections tree",parent:'#',data:{}}
+                sectionTreeData.push(sectionRoot)
+
+
                 //make sorted list
                 let ar = []
                 Object.keys(hashAllDG).forEach(function (key) {
@@ -247,12 +254,23 @@ angular.module("pocApp")
                     let parent = dg.parent || "root"
                     let node = {id:dg.name,text:text,parent:parent,data:{dg:dg}}
                     treeData.push(node)
+
+                        //if (dg.name == 'Section' || hashSections[dg.parent]) {
+                    if (hashSections[dg.parent]) {
+                        let sectionNode = {id:dg.name,text:text,parent:parent,data:{dg:dg}}
+                        sectionTreeData.push(sectionNode)
+                        hashSections[dg.name] = true
+
+                    }
+
+
                 })
 
                 //sort by
 
+                console.log(sectionTreeData)
 
-                return {treeData:treeData}
+                return {treeData:treeData,sectionTreeData : sectionTreeData}
 
             },
 

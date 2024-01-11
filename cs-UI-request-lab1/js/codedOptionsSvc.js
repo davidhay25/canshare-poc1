@@ -44,11 +44,13 @@ angular.module("pocApp")
                     for (const option of ed.options) {
                         let system = option.system || "http://example.com/fhir/CodeSystem/example"
                         let code = option.code || 'unknownCode'
+                        code = code.replace(/\s/g,'')   //trim all whitespace
                         let display = option.display || 'Unknown display'
                         arOptions.push({code:code,system:system,display:display})
                     }
                     deferred.resolve({options:arOptions,status:'options'})
                 } else if (ed.valueSet) {
+
                     //if there's a valueSet, then tru to expand it
 
                     //if it exists in the cache can just return it from the cache

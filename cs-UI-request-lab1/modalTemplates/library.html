@@ -279,9 +279,24 @@
 
       <uib-tab heading="Compositions">
 
+
+
+        <div class="row">
+          <div class = "col-md-3" ng-repeat = "(k,v) in hashMetaProperties">
+            {{k}}:
+            <select class="form-control" ng-model="input.filter[k]"
+                    ng-options="v for v in hashMetaProperties[k]"></select>
+          </div>
+          <div class = "col-md-3">
+            <button class="btn btn-link" ng-click="clearFilter()">Show all</button>
+          </div>
+        </div>
+
+
+
         <table class="table table-bordered table-condensed">
-          <tr><th>Title</th><th>Local sections</th><th>Library sections</th><th>Note</th></tr>
-          <tr ng-repeat="item in summaryComp">
+          <tr><th>Title</th><th>Local sections</th><th>Local Meta</th><th>Library sections</th><th>Library Meta</th><th>Note</th></tr>
+          <tr ng-repeat="item in summaryComp" ng-show="showComp(item)">
             <td>
               {{item.title}}
               <div class="clickable"
@@ -297,12 +312,25 @@
 
 
             </td>
+
+            <td>
+              <div ng-repeat="(k,v) in item.local.meta">
+                {{k}}: {{v}}
+              </div>
+
+            </td>
             <td>
               <ul class="list-unstyled">
                 <li ng-repeat="section in item.library.sections">
                   {{section.name}} ({{section.items.length}})
                 </li>
               </ul>
+
+            </td>
+            <td>
+              <div ng-repeat="(k,v) in item.library.meta">
+                {{k}}: {{v}}
+              </div>
 
             </td>
             <td>

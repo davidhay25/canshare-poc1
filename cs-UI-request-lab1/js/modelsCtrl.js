@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
 
-            $scope.version = "0.6.6"
+            $scope.version = "0.6.7"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -18,6 +18,8 @@ angular.module("pocApp")
             */
 
 
+            $scope.input.metaProcedures = ['small diagnostic sample','resection']
+            $scope.input.metaCategories = ['histopathology request','histopathology report']
 
             $localStorage.trace = $localStorage.trace || {on:false,limit:500,contents:[]}
 
@@ -86,6 +88,8 @@ angular.module("pocApp")
                 //--------- build the tree with all DG
                // if ($scope.hashAllDG) {
                     let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
+
+
                     showAllDGTree(vo1.treeData)
                // }
 
@@ -590,8 +594,18 @@ angular.module("pocApp")
                         makeGraphAllDG(vo.graphData)
 
                         //--------- build the tree with all DG
+                        //todo - this call is duplicated...
                         let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
                         showAllDGTree(vo1.treeData)
+
+                        $timeout(function () {
+                            showAllDGTree(vo1.sectionTreeData,'#sectionDGTree')
+                        },1)
+
+
+
+
+
 
                         //--- make the category hash for the category tree display of DG
                         let hashCategories = modelDGSvc.analyseCategories($scope.hashAllDG)
@@ -633,10 +647,12 @@ angular.module("pocApp")
 
 
             //display the tree with all DG
-            function showAllDGTree(treeData) {
-                $('#allDGTree').jstree('destroy');
+            function showAllDGTree(treeData,htmlElement) {
 
-                $scope.allDGTree = $('#allDGTree').jstree(
+
+                htmlElement = htmlElement || '#allDGTree'
+                $(htmlElement).jstree('destroy');
+                $scope.allDGTree = $(htmlElement).jstree(
                     {'core': {'multiple': false, 'data': treeData,
                             'themes': {name: 'proton', responsive: true}}}
                 ).on('changed.jstree', function (e, data) {
@@ -744,12 +760,14 @@ angular.module("pocApp")
 
             $scope.copyFshToClipboard = function (fsh) {
 
+
+
                 navigator.clipboard.writeText(fsh).then(
                     () => {
-                        alert('FSH text copied to clipboard');
+                        alert('Q text copied to clipboard');
                     },
                     () => {
-                        alert('FSH text not copied to clipboard');
+                        alert('Q text not copied to clipboard');
                     },
                 )
 
@@ -1391,14 +1409,11 @@ angular.module("pocApp")
                 let download = modelCompSvc.makeDownload(vo.allElements)
                // console.log(download)
 
-                //$scope.downloadLinkCompTsv = window.URL.createObjectURL(new Blob([angular.toJson(download,true) ],{type:"text/tsv"}))
                 $scope.downloadLinkCompTsv = window.URL.createObjectURL(new Blob([download ],{type:"text/csv"}))
                 $scope.downloadLinkCompTsvName = `comp-${comp.name}.csv`
 
                 let rootNodeId = $scope.allCompElements[0].path
                 let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
-
-                //temp - not sure this is correct$scope.treeData = treeData      //used in the Q builder
 
 
                 makeCompTree(treeData,rootNodeId)
@@ -1406,10 +1421,6 @@ angular.module("pocApp")
 
                 $scope.compFsh = igSvc.makeFshForComp(comp,$scope.allCompElements,$scope.hashCompElements)
 
-                //console.log($scope.fullQ)
-
-               // console.log(makeQSvc.makeTreeFromQ($scope.fullQ))
-                //makeQfromSections
 
 
             }

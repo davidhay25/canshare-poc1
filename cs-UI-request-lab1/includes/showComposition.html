@@ -426,6 +426,16 @@
 
     <uib-tab heading = "MetaData">
 
+      <!-- Category – with drop down options ‘histopathology request’ and ‘histopathology report’
+
+Stream – free text
+
+organ – free text
+
+Procedure – with drop down options ‘small diagnostic sample’ and ‘resection’
+
+  -->
+
       <div class="row">
         <div class="col-md-6">
           <table class="table">
@@ -445,10 +455,20 @@
             </tr>
             <tr>
               <td>Category</td>
-              <td><input ng-disabled = "! canEditComp(selectedComposition)"
+              <td>
+                <select ng-disabled = "! canEditComp(selectedComposition)"
+                        type="text" class="form-control"
+                        ng-blur="updateMetaValues()"
+                        ng-options = "cat for cat in input.metaCategories"
+                        ng-model="selectedComposition.meta.category" ></select>
+                <!--
+                <input ng-disabled = "! canEditComp(selectedComposition)"
                          type="text" class="form-control"
                          ng-blur="updateMetaValues()"
-                         ng-model="selectedComposition.meta.category" />  </td>
+                         ng-model="selectedComposition.meta.category" />
+                -->
+
+              </td>
             </tr>
 
           </table>
@@ -463,6 +483,28 @@
                          ng-blur="updateMetaValues()"
                          ng-model="selectedComposition.meta.tumourStream" /> </td>
             </tr>
+
+            <tr>
+              <td>Organ</td>
+              <td><input ng-disabled = "! canEditComp(selectedComposition)"
+                         type="text" class="form-control"
+                         ng-blur="updateMetaValues()"
+                         ng-model="selectedComposition.meta.organ" /> </td>
+            </tr>
+
+            <tr>
+              <td>Procedure</td>
+              <td>
+
+                <select ng-disabled = "! canEditComp(selectedComposition)"
+                         type="text" class="form-control"
+                         ng-blur="updateMetaValues()"
+                        ng-options = "proc for proc in input.metaProcedures"
+                        ng-model="selectedComposition.meta.procedure" ></select>
+
+              </td>
+            </tr>
+
 
             <tr>
               <td>Tags</td>

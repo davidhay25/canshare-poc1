@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('previewQCtrl',
-        function ($scope,Q,makeQSvc,$timeout,$http) {
+        function ($scope,Q,makeQSvc,$timeout,$http,$localStorage) {
 
             $scope.input = {}
             $scope.Q = Q
@@ -9,7 +9,44 @@ angular.module("pocApp")
             let vo = makeQSvc.makeTreeFromQ(Q)
             let treeData = vo.treeData
 
-            $scope.serverbase = "http://hapi.fhir.org/baseR4/"
+            $localStorage.formsManagers = $localStorage.formsManagers || []
+            $scope.formsManagers = $localStorage.formsManagers
+
+            $scope.addFm = function () {
+                let fm = {name:$scope.input.fmName,url:$scope.input.fmUrl}
+                $localStorage.formsManagers.push(fm)
+                delete $scope.input.fmName
+                delete $scope.input.fmUrl
+            }
+
+            $scope.deleteFm = function (inx) {
+                $localStorage.formsManagers.splice(inx,1)
+            }
+
+            $scope.copyToClipboard = function () {
+
+                let txt = angular.toJson($scope.Q)
+
+                navigator.clipboard.writeText(txt).then(
+                    () => {
+                        alert('Q text copied to clipboard');
+                    },
+                    () => {
+                        alert('Error: Q text not copied to clipboard');
+                    },
+                )
+
+            }
+
+            $scope.publishToFm = function (fm) {
+                let url = `${url}/Questionnaire`
+                alert(url)
+
+            }
+
+
+
+            $scope.serverbase = "http://hapi.fhir.org/baseR4/"  //used for validation
 
             $scope.issues = vo.issues
             $scope.lstElements = vo.lstElements
