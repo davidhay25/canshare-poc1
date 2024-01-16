@@ -6,6 +6,10 @@
     .myIcon {
       margin: 8px;
     }
+
+    .hideElement {
+      background-color: mistyrose;
+    }
   </style>
 
   <div class="modelInfo row">
@@ -1074,7 +1078,7 @@
 -->
       <div class="pull-right">
         <div style="padding-top: 8px">
-          <checkbox   ng-model="input.showHiddenDGElement"></checkbox> Show hidden (0..0)
+          <checkbox ng-model="input.showHiddenDGElement"></checkbox> Show hidden (0..0)
         </div>
 
       </div>
@@ -1091,6 +1095,7 @@
               <tbody>
               <!---     <tr ng-repeat="element in fullElementList">-->
               <tr ng-repeat="element in fullElementList"
+                  ng-class="{hideElement: element.ed.mult == '0..0'}"
                   ng-show="canShowDGElement(element,$index)"
                   ng-hideX="$index==0">
                 <td>
