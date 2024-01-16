@@ -18,7 +18,18 @@
       </div>
 
       <div ng-show="user.email">
-        <div class="clickable" ng-click="cloneDG(selectedModel)">Make a copy</div>
+        <span class="clickable" ng-click="cloneDG(selectedModel)">Make a copy</span>
+
+          <span class=" clickable spacer" ng-show = "canEdit(selectedModel)"
+               ng-click="editModel(selectedModel)">Edit</span>
+
+          <span class=" clickable spacer"
+               ng-click="newModel('dg',selectedModel)">New child</span>
+
+
+
+
+
       </div>
 
       <br/>
@@ -201,7 +212,7 @@
 
 
 
-    <uib-tab heading="Editor tree">
+    <uib-tab heading="Tree">
       <br/>
       <div class="row">
         <div class="col-md-6">
@@ -1058,7 +1069,17 @@
 
 
     <uib-tab heading="Full element list">
+      <!--
       <em class="pull-right">Expanded. Includes items with a Cardinality of 0..0</em>
+-->
+      <div class="pull-right">
+        <div style="padding-top: 8px">
+          <checkbox   ng-model="input.showHiddenDGElement"></checkbox> Show hidden (0..0)
+        </div>
+
+      </div>
+
+
       <uib-tabset>
         <uib-tab heading="List">
           <div class="tableFixHead">
@@ -1070,7 +1091,8 @@
               <tbody>
               <!---     <tr ng-repeat="element in fullElementList">-->
               <tr ng-repeat="element in fullElementList"
-                  ng-hide="$index==0">
+                  ng-show="canShowDGElement(element,$index)"
+                  ng-hideX="$index==0">
                 <td>
                   <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
 
@@ -1141,14 +1163,7 @@
       </span>
       <br/>
       <pre>{{dgFshLM}}</pre>
-
-
-
     </uib-tab>
-
-
-
-
 
 
     <uib-tab ng-show="false && selectedModel.kind == 'comp'" heading="Overrides">
@@ -1230,7 +1245,7 @@
       </table>
     </uib-tab>
 
-    <uib-tab heading="DG Json">
+    <uib-tab heading="Json">
       <em>The definition for this model (not expanded)</em>
       <span class="pull-right">
        <i class="glyphicon glyphicon-paperclip pull-right clickable"

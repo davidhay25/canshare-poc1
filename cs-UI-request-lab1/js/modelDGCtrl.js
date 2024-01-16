@@ -13,6 +13,25 @@ angular.module("pocApp")
                 return `${ed.path} (${ed.title})`
             }
 
+            //whether to show an element in the full element list.
+            $scope.canShowDGElement = function(element,inx) {
+                if (inx ==0) {
+                    return false
+                }
+
+                if ($scope.input.showHiddenDGElement) {
+                    return true
+                } else {
+                    if (element.ed.mult == '0..0') {
+                        return false
+                    } else {return true}
+                }
+
+
+
+
+            }
+
             $scope.cloneDG = function (dg) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/getName.html',
@@ -56,6 +75,18 @@ angular.module("pocApp")
 
 
             $scope.deleteDGDiff = function (inx) {
+
+                //check that this isn't a parent
+                let diffToDelete = $scope.selectedModel.diff[inx]
+                for (const diff of $scope.selectedModel.diff) {
+                    if (diff.path !== diffToDelete.path && diff.path.startsWith(diffToDelete.path)) {
+                        alert("This diff has child elements so can't be removed")
+                        return
+                    }
+                }
+
+
+
                 if (confirm("Are you sure you wish to remove this Override? It will be removed from all children (unless they have overriden it)")) {
                     //traceSvc.addAction({action:'delete element',model:$scope.selectedModel,description:"From diff display"})
 
@@ -66,11 +97,7 @@ angular.module("pocApp")
                         action:"delete-diff",
                         model:$scope.selectedModel})
 
-
-
                     $scope.refreshFullList($scope.selectedModel)
-
-
                     $scope.termSelectDG({DGName:$scope.selectedModel.name})
                 }
             }
@@ -703,8 +730,8 @@ angular.module("pocApp")
             //set the fixed value for a CC - creates / update override element
             //todo may be able to use this code for comp as well
             //use for both default and fixed
-            //kind is 'fixed' or 'default'
-            $scope.setFixedValue = function(ed,kind) {
+            //kind is 'fixed' or 'default' - I don't believe this is user any more...
+            $scope.setFixedValueDEP = function(ed,kind) {
 
                 //figure out the type from the ed
                 let type // = 'Coding'         //the default
@@ -859,6 +886,10 @@ angular.module("pocApp")
                 //rebuild the full element list for the table
                 let vo = modelsSvc.getFullListOfElements($scope.selectedModel,$scope.input.types,$scope.input.showFullModel)
                 $scope.fullElementList = vo.allElements
+
+
+
+
 
                 //$scope.$parent.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG, $scope.xref )
 

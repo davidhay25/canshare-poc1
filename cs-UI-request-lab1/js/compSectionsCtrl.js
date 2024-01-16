@@ -151,13 +151,31 @@ angular.module("pocApp")
             }
 
 
+            //generate the tree to show possible DGs.
+            //todo If a new DG is added, then this should be updated..
             $scope.setup = function () {
                 let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
                 //showDGTree(vo1.treeData)
 
                 $timeout(function () {
                     showDGTree(vo1.treeData)
-                    showDGTree(vo1.sectionTreeData,'#headingDGTree')
+
+                    try {
+                        //the tree data for the sections branch of DG
+                        let sections = modelDGSvc.makeSectionsTree($scope.hashAllDG)
+                        //let sectionTreeData = modelDGSvc.makeSectionsTree($scope.hashAllDG)
+                        //console.log(sectionTreeData)
+                        showDGTree(sections.treeData,'#headingDGTree')
+                    } catch (ex) {
+                        console.log(ex)
+                        alert("Error building sections tree")
+                    }
+
+
+
+
+                   // let sectionTreeData = modelDGSvc.makeSectionsTree($scope.hashAllDG)
+                   // showDGTree(vo1.sectionTreeData,'#headingDGTree')
                 },1000)
 
             }

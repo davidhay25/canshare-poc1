@@ -9,7 +9,10 @@ angular.module("pocApp")
             let vo = makeQSvc.makeTreeFromQ(Q)
             let treeData = vo.treeData
 
-            $localStorage.formsManagers = $localStorage.formsManagers || []
+            let pocFormsServer = {name:"POC Server",url:'/dashboard/Questionnaire'}
+            $localStorage.formsManagers = $localStorage.formsManagers || [pocFormsServer]
+
+
             $scope.formsManagers = $localStorage.formsManagers
 
             $scope.addFm = function () {
@@ -38,9 +41,26 @@ angular.module("pocApp")
 
             }
 
-            $scope.publishToFm = function (fm) {
-                let url = `${url}/Questionnaire`
-                alert(url)
+            $scope.publishToFm = function (inx) {
+                let fm = $localStorage.formsManagers[inx]
+                let qry = `${fm.url}` ///${$scope.Q.id}`
+                msg = `Please confirm query: ${qry}`
+                if (confirm(msg)) {
+                    $http.put(qry,$scope.Q).then(
+                        function (data) {
+                            alert("The form has been copied onto the designated Forms server, and is available for use")
+                        }, function (err) {
+                            alert(angular.toJson(err))
+                        }
+                    )
+                }
+               // alert(url)
+
+              //  return
+
+
+               // let qry = `/dashboard/Questionnaire`
+
 
             }
 

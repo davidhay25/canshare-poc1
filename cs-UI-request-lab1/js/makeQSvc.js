@@ -507,7 +507,8 @@ console.log(err)
 
                 console.log(treeObject)
                 let qName = treeObject[0].id
-                Q = {resourceType:"Questionnaire",status:"draft",name:qName,item:[]}
+                let id = "cs-"+qName
+                Q = {resourceType:"Questionnaire",id:id,status:"draft",name:qName,item:[]}
 
                 let section = {text:"section",linkId:qName,item:[]}
 

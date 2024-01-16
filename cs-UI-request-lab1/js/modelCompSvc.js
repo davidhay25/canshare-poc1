@@ -6,6 +6,14 @@ angular.module("pocApp")
 
 
         return {
+            makeHISOReport : function (treeData) {
+                //generate the HISO report. Use the treeData array as that is what the user
+                //will see, so if there are errors they will be most apparent there
+
+
+
+
+            },
             allDGsInComp: function(comp,hashAllDG){
                 //return a list of all DG's used in a given composition
 
@@ -106,20 +114,55 @@ angular.module("pocApp")
 
             },
 
-            makeDownload : function (lstElements) {
+            makeTSVDownload : function (lstElements) {
+                //create a simple download of all items in the Composition
                 let lst = []
+                let lne = `Path\tTitle\tDescription\tType\tValueSet\tCard.`
+                lne += "\r\n"
+                lst.push(lne)
 
                 lstElements.forEach(function (item) {
-                    let lne = `${item.ed.path},${item.ed.title}`
+                    let shortPath = $filter('dropFirstInPath')(item.ed.path)
+
+                    let lne = `${shortPath}\t${getValue(item.ed.title)}`
+                    lne += "\t" + getValue(item.ed.description)
                     if (item.ed.type) {
-                        //lne += "\t" + item.ed.type[0]
-                        lne += "," + item.ed.type[0]
+                        lne += "\t" + item.ed.type[0]
+                    } else {
+                        lne += "\t"
                     }
+                    //lne += "\t" + item.ed.type[0]
+                    lne += "\t" + getValue(item.ed.valueSet)
+                    lne += "\t" + getValue(item.ed.mult)
+
+                    /*
+                    if (item.ed.type) {
+                        lne += "\t" + item.ed.type[0]
+                        //lne += "," + item.ed.type[0]
+                    } else {
+                        lne += "\t"
+                    }
+
+                    */
                     lne += "\r\n"
                     //console.log(lne)
                     lst.push(lne)
                 })
-                return lst
+
+
+                let result = lst.toString()
+                result = result.replace(/\,/g, "")  //no idea why it's inserting commas...
+                return result
+
+                function getValue(s){
+                    if (s) {
+                        return s
+                    } else {
+                        return""
+                    }
+
+                }
+
             },
 
             makeFullList: function (inComp,inTypes,inHashAllDG) {
@@ -217,12 +260,28 @@ angular.module("pocApp")
 
                             if (inx > 0) {          //ignoring the first one
                                 let ed = item.ed
+
+                                if (! ed.kind) {
+                                    ed.kind = 'no kind set'     //actually, this should never occur as there's always a type...
+
+                                    if (ed.type) {
+                                        let type = ed.type[0]
+                                        if (types[type] && types[type].name) {
+                                            ed.kind = 'dg'
+                                        } else {
+                                            ed.kind = 'element'
+                                        }
+
+                                    }
+
+                                }
+
                                 //ed.kind = 'element'
-                                ed.kind = ed.kind || 'element'  //<<< aded oct 2
+                               //jan 16 ed.kind = ed.kind ||  'no kind set'  //'element'  //<<< aded oct 2
                                 let shortPath = $filter('dropFirstInPath')(ed.path)
 
-                                let p
-                                if (ed.type) { p = ed.type[0]}
+                                //jan 16 let p
+                                //jan 16if (ed.type) { p = ed.type[0]}
                                 //console.log(shortPath,ed.path,ed.mult,p)
 
                                 let path = `${childPathRoot}.${shortPath}`

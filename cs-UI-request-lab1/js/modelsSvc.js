@@ -761,6 +761,7 @@ angular.module("pocApp")
             },
 
 
+            //get the complete list of elements for a DG
             getFullListOfElements(inModel,inTypes,hashAllDG) {
                 console.log('getFullListOfElements for '+ inModel.name)
                 if (! inModel) {
@@ -778,6 +779,9 @@ angular.module("pocApp")
                 fdt.forEach(function (dt) {
                     types[dt] = dt
                 })
+
+
+                let hashHidden = {}     //ed's with mult = 0..0
 
                 let relationshipsSummary = {parents:[],references:[],children:[]}       //all the relationships for this DG (reference 1 level only)
 
@@ -806,7 +810,13 @@ angular.module("pocApp")
                 let hashParents = {}
 
                 try {
+                    //udpates allElements
                     extractElements(model,model.name,'root')   //the guts of the function
+
+
+
+
+
                     arLog.length = 0        //don't return the log contents if all was OK
                 } catch (ex) {
                     //thrown when the number of iterations is excessive (>300 ATM).
@@ -819,6 +829,20 @@ angular.module("pocApp")
                     //return {allElements: [],graphData:{},relationshipsSummary:relationshipsSummary}
 
                 }
+
+
+                //set the mult to 0..0 for any element where an ancestor (ie path in a parent) is 0..0
+                //this doesn't change the ED stored in the browser - it's only the memory copy
+                allElements.forEach(function (item) {
+                    //item.ed.mult = '0..0'
+                    for (const key of Object.keys(hashHidden)) {
+                        if (item.ed.path.startsWith(key)) {
+                            item.ed.mult = '0..0'
+                            break
+                        }
+                    }
+                })
+
 
 
                 let nodes = new vis.DataSet(arNodes)
@@ -837,7 +861,9 @@ angular.module("pocApp")
                     }
                 })
 
-                return {allElements: allElements,graphData:graphData,relationshipsSummary:relationshipsSummary,log:arLog}
+
+
+                return {allElements: allElements,graphData:graphData,relationshipsSummary:relationshipsSummary,log:arLog,hashHidden:hashHidden}
 
                 // add to list of elements, replacing any with the same path (as it has been overwritten)
                 //todo - what was 'host' for?
@@ -862,6 +888,29 @@ angular.module("pocApp")
                     if (sourceModel) {
                         itemToInsert.ed.sourceModelName = sourceModel.name
                     }
+
+                    //jan16
+                    if (ed.mult == '0..0') {
+                        //this one is hidden. Add it to the hash
+                        hashHidden[ed.path] = true
+                    }
+
+/*
+                    //added Jan16 - set mult 0..0 if parent is hidden
+                    if (ed.mult == '0..0') {
+                        //this one is hidden. Add it to the hash
+                        hashHidden[ed.path] = true
+                    } else {
+                        //are any of the ancestors hidden?
+                        for (const key of Object.keys(hashHidden)) {
+                            if (ed.path.startsWith(key)) {
+                                ed.mult = '0..0'
+                                break
+                            }
+                        }
+                    }
+*/
+
 
                     if (pos > -1) {
                         //replace the existing path
@@ -901,8 +950,6 @@ angular.module("pocApp")
                         alert(`Excessive iteration count for DG ${inModel.name}. The tree view will be incorrect. The processing steps are shown in an errors tab.`)
                         throw new Error(`Excessive iteration count for DG ${inModel.name}`)
                     }
-
-                   // console.log(pathRoot,model.name)
 
                     //add to nodes list
 

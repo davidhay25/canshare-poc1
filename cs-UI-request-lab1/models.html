@@ -244,22 +244,21 @@
 
                         <uib-tab heading = "Inheritance">
                             <div>
+                                <!--
                                 <div class="pull-right clickable spacer"
-
                                      ng-show = "canEdit(selectedModel)"  ng-click="editModel(selectedModel)">Edit</div>
+                                -->
+                                <div class="pull-right clickable spacer" ng-show = "user.email"
+                                     ng-click="newModel('dg')">New dg</div>
 
-
-                                <div class="pull-right clickable spacer" ng-show = "user.email"  ng-click="newModel('dg')">New</div>
-
-
-                                <div class="pull-right clickable spacer" ng-show = "user.email"  ng-click="newModel('dg',selectedModel)">New child</div>
+<!--
+                                <div class="pull-right clickable spacer" ng-show = "user.email && selectedModel"
+                                     ng-click="newModel('dg',selectedModel)">New child</div>
+                                -->
 
                             </div>
 
                             <div class="clearfix"></div>
-
-
-
 
                             <div class="myScrollSmall">
                                 <div id="allDGTree"></div>
@@ -340,6 +339,19 @@
 
 
                         <uib-tab heading = "Sections">
+                            <div>
+                                <div class="pull-right clickable spacer"
+                                     ng-show = "canEdit(selectedModel)"  ng-click="editModel(selectedModel)">Edit</div>
+                                <div class="pull-right clickable spacer" ng-show = "user.email"  ng-click="newModel('dg')">New dg</div>
+
+
+                                <div class="pull-right clickable spacer"
+                                     ng-show = "user.email && selectedModel"
+                                     ng-click="newModel('dg',selectedModel)">New child</div>
+
+                            </div>
+
+                            <div class="clearfix"></div>
                             <div class="myScrollSmall">
                                 <div id="sectionDGTree"></div>
                             </div>

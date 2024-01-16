@@ -298,10 +298,23 @@
           <tr><th>Title</th><th>Local sections</th><th>Local Meta</th><th>Library sections</th><th>Library Meta</th><th>Note</th></tr>
           <tr ng-repeat="item in summaryComp" ng-show="showComp(item)">
             <td>
-              {{item.title}}
+              <strong>{{item.title}}</strong>
               <div class="clickable"
                    ng-show="item.library && ! item.local"
                    ng-click="downloadComp(item.library)">Download</div>
+              <div ng-show="item.library.checkedOut">
+                <br/>
+                CheckedOut: {{item.library.checkedOut}}
+              </div>
+
+              <div ng-show="item.local && (item.local.checkedOut !== item.library.checkedOut)">
+                Error! Local checkout is {{item.local.checkedOut}}, but library checkout is {{item.library.checkedOut}}
+
+              </div>
+
+
+
+
             </td>
             <td>
               <ul class="list-unstyled">

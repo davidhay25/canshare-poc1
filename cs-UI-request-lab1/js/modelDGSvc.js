@@ -214,6 +214,9 @@ angular.module("pocApp")
                 }
             },
 
+
+
+
             makeTreeViewOfDG : function(hashAllDG) {
                 if (! hashAllDG) {
                     //return an empty tree
@@ -228,19 +231,53 @@ angular.module("pocApp")
                 treeData.push(root)
 
                 //set up the sections (headings) tree
-                let hashSections = {'Section': true}
+                //let hashSections = {'Section': true}
                 let sectionTreeData = []
                 let sectionRoot = {id:"Section",text: "Sections tree",parent:'#',data:{}}
                 sectionTreeData.push(sectionRoot)
 
+                //todo get
 
-                //make sorted list
+
+                //make a list
                 let ar = []
                 Object.keys(hashAllDG).forEach(function (key) {
                     let dg = hashAllDG[key]
                     ar.push(dg)
                 })
 
+                /*
+                //create the sections tree. The tree must be in path order - whereas the main tree is in name order
+                ar.sort(function (a,b) {
+                    if (a.path > b.path) {
+                        return 1
+                    } else { return -1}
+                })
+
+                //now create the sections tree
+                ar.forEach(function (dg) {
+                    let text = dg.title || dg.name
+                    let parent = dg.parent || "root"
+                   // let node = {id:dg.name,text:text,parent:parent,data:{dg:dg}}
+                   // treeData.push(node)
+
+                    //if the parent is in the sections hash, then add it to the section tree
+                    //and add it to the has so any of it's children
+                    if (hashSections[dg.parent]) {
+                        let sectionNode = {id:dg.name,text:text,parent:parent,data:{dg:dg}}
+                        sectionTreeData.push(sectionNode)
+                        hashSections[dg.name] = true
+
+                    }
+
+
+                })
+
+                */
+
+
+
+                //now sort by name for the full DG tree
                 ar.sort(function (a,b) {
                     let aTitle = a.title || a.name
                     let bTitle = b.title || b.name
@@ -255,7 +292,9 @@ angular.module("pocApp")
                     let node = {id:dg.name,text:text,parent:parent,data:{dg:dg}}
                     treeData.push(node)
 
-                        //if (dg.name == 'Section' || hashSections[dg.parent]) {
+                       /*
+                    //if the parent is in the sections hash, then add it to the section tree
+                    //and add it to the has so any of it's children
                     if (hashSections[dg.parent]) {
                         let sectionNode = {id:dg.name,text:text,parent:parent,data:{dg:dg}}
                         sectionTreeData.push(sectionNode)
@@ -263,14 +302,76 @@ angular.module("pocApp")
 
                     }
 
-
+*/
                 })
 
                 //sort by
 
+
+
+
                 console.log(sectionTreeData)
 
                 return {treeData:treeData,sectionTreeData : sectionTreeData}
+
+            },
+
+            makeSectionsTree : function(hashAllDG) {
+                //only the sections branch
+
+                let branchName = "Section"        //we want all DG's whose ultimate paretn is this one
+                let sectionTreeData = []
+                let sectionRoot = {id:"Section",text: "Sections tree",parent:'#',data:{}}
+                sectionTreeData.push(sectionRoot)
+
+                Object.keys(hashAllDG).forEach(function (key) {
+                    if (key !== branchName) {
+                        let dgToFindUltimateParent = hashAllDG[key]
+
+                        //findUltimateParent can throw an exception - let it bubble up
+                        let ultimateParent = findUltimateParent(dgToFindUltimateParent)
+                        console.log(dgToFindUltimateParent.title,ultimateParent.title)
+
+                        if (ultimateParent.name == branchName) {
+                            let sectionNode = {id:dgToFindUltimateParent.name,
+                                text:dgToFindUltimateParent.title,
+                                parent:dgToFindUltimateParent.parent,data:{dg:dgToFindUltimateParent}}
+                            sectionTreeData.push(sectionNode)
+                        }
+                    }
+
+
+
+
+                })
+
+                return {treeData: sectionTreeData}
+
+                function findUltimateParent(dg) {
+                    let dgName = dg.name
+                    let tmpDG = dg
+
+                    let ctr = 0
+
+                    while (tmpDG.parent) {
+                        let dgTitle = tmpDG.title
+                        tmpDG = hashAllDG[tmpDG.parent]
+                        if (! tmpDG) {
+                            throw new Error(`DG ${tmpDG.parent} was not found. Referenced in ${dgTitle}`)
+                        }
+
+                        ctr++
+                        if (ctr > 100) {
+                            throw new Error(`Error finding ultimate parent of ${dgName}`)
+                        }
+
+                    }
+                    return tmpDG
+                   // if (! dg.parent) {
+                       // return dg
+                  //  }
+
+                }
 
             },
 
@@ -375,11 +476,7 @@ angular.module("pocApp")
 
             },
 
-            makeDgDownload: function (allDG) {
-                //create a download of all the DG
-//console.log(allDG)
 
-            },
 
             makeUpdateList: function (allDG,xref) {
                 //create a list of all DG updates

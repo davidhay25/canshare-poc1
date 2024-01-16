@@ -25,8 +25,9 @@ function setup(app) {
 
         let qry = `${serverBase}Questionnaire/${Q.id}`
 
-        console.log(qry)
 
+        console.log(qry)
+        console.log(Q)
         try {
             let config = {headers:{'cache-control':'no-cache'}}
             let response = await axios.put(qry,Q,config)

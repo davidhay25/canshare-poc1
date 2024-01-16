@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
 
-            $scope.version = "0.6.7"
+            $scope.version = "0.6.8"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -597,10 +597,24 @@ angular.module("pocApp")
                         //todo - this call is duplicated...
                         let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
                         showAllDGTree(vo1.treeData)
+                        try {
+                            //the tree data for the sections branch of DG
+                            let sections = modelDGSvc.makeSectionsTree($scope.hashAllDG)
+                            //let sectionTreeData = modelDGSvc.makeSectionsTree($scope.hashAllDG)
+                            //console.log(sectionTreeData)
+                            showAllDGTree(sections.treeData,'#sectionDGTree')
+                        } catch (ex) {
+                            console.log(ex)
+                            alert("Error building sections tree")
+                        }
 
+
+                        /*
                         $timeout(function () {
                             showAllDGTree(vo1.sectionTreeData,'#sectionDGTree')
                         },1)
+
+                        */
 
 
 
@@ -612,10 +626,11 @@ angular.module("pocApp")
                         let vo2 = modelDGSvc.makeTreeViewOfCategories(hashCategories)
                         showCategoryDGTree(vo2.treeData)
 
-                        modelDGSvc.makeDgDownload($scope.hashAllDG)
+                        //Jan15 - why is this here modelDGSvc.makeDgDownload($scope.hashAllDG)
 
 
                     } catch (ex) {
+                        console.log(ex)
                         alert("There was an error creating the graph of all DT")
                     }
 
@@ -670,6 +685,10 @@ angular.module("pocApp")
                     $scope.$digest();       //as the event occurred outside of angular...
                 }).bind("loaded.jstree", function (event, data) {
                     let id = treeData[0].id
+
+                   // let treeObject = $(this).jstree(true).get_json('#', { 'flat': true })
+
+
                     $(this).jstree("open_node",id);
 
                     if ($scope.selectedModel) {
@@ -1406,11 +1425,16 @@ angular.module("pocApp")
                 $scope.allCompElements = vo.allElements
                 $scope.hashCompElements = vo.hashAllElements
 
-                let download = modelCompSvc.makeDownload(vo.allElements)
-               // console.log(download)
 
-                $scope.downloadLinkCompTsv = window.URL.createObjectURL(new Blob([download ],{type:"text/csv"}))
-                $scope.downloadLinkCompTsvName = `comp-${comp.name}.csv`
+
+                let download = modelCompSvc.makeTSVDownload(vo.allElements)
+                console.log(download)
+
+
+                $scope.downloadLinkCompTsv = window.URL.createObjectURL(new Blob([download ],{type:"text/tsv;charset=utf-8;"}))
+                $scope.downloadLinkCompTsvName = `comp-${comp.name}.tsv`
+
+
 
                 let rootNodeId = $scope.allCompElements[0].path
                 let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
@@ -1445,6 +1469,20 @@ angular.module("pocApp")
 
                 //sort the elements list to better display slicing
                 $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
+/*
+
+                $scope.fullElementList.forEach(function (item) {
+                    item.ed.mult == '0..0'
+                    for (const key of Object.keys(vo.hashHidden)) {
+                        if (item.ed.path.startsWith(key)) {
+                            item.ed.mult == '0..0'
+                            break
+                        }
+                    }
+                })
+                */
+
+
 
                 //console.log($scope.fullElementList)
 
