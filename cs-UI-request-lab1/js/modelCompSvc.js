@@ -21,9 +21,7 @@ angular.module("pocApp")
 
                 //add all the elements that are DG's to the list
                 function processDG(dg,path) {
-                    //let type = dg.type[0]
-                    //hashUsedDG[type] = hashUsedDG[type] || []
-                    //hashUsedDG[type].push({path:item.name})
+
                     if (dg.diff) {
                         dg.diff.forEach(function (ed) {
                             let type = ed.type[0]

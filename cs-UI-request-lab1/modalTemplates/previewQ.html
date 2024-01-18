@@ -4,14 +4,15 @@
 
   <div class="modal-header">
     <div class="row">
-      <div class="col-md-6 col-sm-6">
+      <div class="col-md-4 col-sm-4">
         <h3 class="modal-title">
           Examine Questionnaire
         </h3>
+        <div style="padding-top: 8px; color: red" ng-show="validating">Validating...</div>
       </div>
 
       <div class="col-md-2 col-sm-2">
-        <button class="btn btn-link" ng-click="copyToClipboard()">Clipboard</button>
+        <button class="btn btn-link " ng-click="copyToClipboard()">Clipboard</button>
       </div>
 
       <div class="col-md-2 col-sm-2">
@@ -23,8 +24,27 @@
         </div>
       </div>
 
+<!--
+      <div class="col-md-1 col-sm-1">
+        <div style="padding-top: 8px; color: red" ng-show="validating">Validating...</div>
+      </div>
+      -->
 
-      <div class="col-md-2 col-sm-2">
+      <div class="col-md-3 col-sm-3">
+        <div style="padding-top: 0px">
+
+          <div ng-hide="pathToQ" >
+            <button class="btn btn-link" ng-click="saveToServer()">Save Q to server</button>
+          </div>
+
+
+          <a ng-show="pathToQ" href="https://hackweek.fhirpath-lab.com/Questionnaire/tester?id={{pathToQ}}"
+           target="_blank">View in FHIRpath Lab</a>
+        </div>
+      </div>
+
+
+      <div class="col-md-1 col-sm-1">
         <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
 
       </div>
@@ -100,23 +120,32 @@
 
       <uib-tab>
         <uib-tab-heading>
-          Validate <span class="badge">{{errorCount}}</span>
+          Validate <span class="badge">{{errorCount}} / {{warningCount}}</span>
         </uib-tab-heading>
         <!--
         <button class="btn btn-link pull-right" ng-click="validate()">Validate</button>
+                <button class="link" ng-click="validate("
         -->
 
         <div class="pull-right" style="padding-top: 8px">
           <checkbox ng-model="input.errorOnly"></checkbox> Error only
         </div>
 
+
+
+
+
         <uib-tabset>
           <uib-tab heading="List">
             <table class="table table-bordered">
-              <tr ng-repeat="iss in oo.issue" ng-show="showIssue(iss)">
+              <tr ng-repeat="iss in oo.issue track by $index" ng-show="showIssue(iss)">
                 <td>{{iss.severity}}</td>
                 <td>{{iss.diagnostics}}
                   <div><em>{{iss.location[0]}}</em></div>
+                  <div>{{iss.details.text}}</div>
+                  <div ng-repeat = "exp in iss.expression">
+                    <em>{{exp}}</em>
+                  </div>
                 </td>
 
               </tr>
@@ -164,10 +193,8 @@
 
 
   </div>
+
   <div class="modal-header">
-    <ul ng-repeat="issue in issues">
-      {{issue}}
-    </ul>
 
   </div>
 </div>

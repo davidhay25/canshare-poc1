@@ -1,9 +1,12 @@
 angular.module("pocApp")
     .controller('previewQCtrl',
-        function ($scope,Q,makeQSvc,$timeout,$http,$localStorage) {
+        function ($scope,Q,makeQSvc,$timeout,$http,$localStorage,Qtab) {
+
+
+            //https://hackweek.fhirpath-lab.com/Questionnaire?id={url to Q}
 
             $scope.input = {}
-            $scope.Q = Q
+            $scope.Q = Qtab //Q
             $scope.QR = {}
 
             let vo = makeQSvc.makeTreeFromQ(Q)
@@ -63,10 +66,40 @@ angular.module("pocApp")
 
 
             }
+            
+            
+            $scope.saveToServer = function () {
+                //saves the Q to the hapi server so that we can invoke the fhirpath lab
+                //Once the POC is ssl then we can save there instead
+                if (confirm("This will save the Q to the public HAPI server so it can be accessed by the Questionnaire renderer.")) {
+                    let qry = `https://hapi.fhir.org/baseR4/Questionnaire/${$scope.Q.id}`
+                    $http.put(qry,$scope.Q).then(
+                        function (data) {
+                            alert("Resource saved.")
+                            $scope.pathToQ = qry
+                        },
+                        function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+                }
+
+                
+            }
 
 
 
             $scope.serverbase = "http://hapi.fhir.org/baseR4/"  //used for validation
+
+            //$scope.serverbase = "https://fhir.forms-lab.com/"
+
+            let hapiServer = "http://hapi.fhir.org/baseR4/"  //used for validation
+            let brianServer = "https://fhir.forms-lab.com/"
+
+            $scope.validate = function () {
+                
+            }
+            
 
             $scope.issues = vo.issues
             $scope.lstElements = vo.lstElements
@@ -93,21 +126,27 @@ angular.module("pocApp")
             }
 
 
-            $scope.validate = function () {
+            let validate = function (Q,server) {
                 delete $scope.oo
                 $scope.errorCount = 0
-                let url = `${$scope.serverbase}Questionnaire/$validate`
+                $scope.warningCount = 0
+                $scope.validating = true
+                let url = `${server}Questionnaire/$validate`
                 $http.post(url,Q).then(
                     function (data) {
+                        $scope.validating = false
                         $scope.oo = data.data
                         //console.log(data.data)
                         $scope.oo.issue.forEach(function (iss) {
                             if (iss.severity == 'error') {
                                 $scope.errorCount ++
+                            } else {
+                                $scope.warningCount ++
                             }
                         })
 
                     },function (err) {
+                        $scope.validating = false
                         $scope.oo = err.data
                         //console.log(err.data)
                     }
@@ -115,7 +154,7 @@ angular.module("pocApp")
             }
 
             //validate on load
-            $scope.validate()
+            validate($scope.Q,$scope.serverbase)
 
             $scope.showED = function (definition) {
                 //for now the definition is the path to the ED. This may change (specifically it should be a url)

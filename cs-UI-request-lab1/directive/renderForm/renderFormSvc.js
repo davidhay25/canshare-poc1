@@ -903,6 +903,8 @@ angular.module("formsApp")
                 let template = []
 
                 if (Q.item) {
+
+                    
                     Q.item.forEach(function (sectionItem) {
 
                         let section = {linkId:sectionItem.linkId,text:sectionItem.text,rows:[],item:sectionItem}
@@ -1172,6 +1174,7 @@ angular.module("formsApp")
                     //ATM there could be both an answerValueSet and answerOptions - not strictly correct
                     //If there is a ValueSet, then remove all the answerOptions in the active copy of the ve
 
+                    //console.log(cell)
 
                     if (cell.item.answerValueSet) {
                         //todo: if there is a VS, then check the displayhint. If it's a lookup, then do nothing here - when

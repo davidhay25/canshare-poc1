@@ -65,7 +65,7 @@ angular.module("pocApp")
 
                     let qry = `ValueSet/$expand?url=${vsUrl}&_summary=false`
                     let encodedQry = encodeURIComponent(qry)
-
+console.log(qry)
                     $http.get(`nzhts?qry=${encodedQry}`).then(
                         function (data) {
                             let expandedVS = data.data

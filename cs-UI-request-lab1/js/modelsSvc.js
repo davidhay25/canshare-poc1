@@ -513,7 +513,7 @@ angular.module("pocApp")
 
 
             makeTreeFromElementList : function(arElements){
-                //construct a DG tree assuming that arElements is in path order
+                //construct a DG and composition tree assuming that arElements is in path order
                 let that = this
                 let rootEd = arElements[0].ed
                 rootEd.kind = 'root'

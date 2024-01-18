@@ -330,7 +330,7 @@ angular.module("pocApp")
 
                         //findUltimateParent can throw an exception - let it bubble up
                         let ultimateParent = findUltimateParent(dgToFindUltimateParent)
-                        console.log(dgToFindUltimateParent.title,ultimateParent.title)
+                        //console.log(dgToFindUltimateParent.title,ultimateParent.title)
 
                         if (ultimateParent.name == branchName) {
                             let sectionNode = {id:dgToFindUltimateParent.name,

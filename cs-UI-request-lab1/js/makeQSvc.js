@@ -60,7 +60,10 @@ angular.module("pocApp")
                 //console.log(ed,'has ew')
                 item.enableWhen = []
                 ed.enableWhen.forEach(function (ew) {
+
                     let qEW = {operator:ew.operator,answerCoding:ew.value}
+                    delete qEW.answerCoding.pt  //the preferred term...
+                    qEW.answerCoding.system = qEW.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
 
                     //need to determine the path to the question. For now, assume that
                     //qEW.question = `${parent.linkId}.${ew.source}` //linkId of source is relative to the parent (DG)
@@ -77,99 +80,127 @@ angular.module("pocApp")
         //strategy has options for populating choice elements
         //  - expandVS - if true, generate answerOption elements
         //ed has controlType and controlHint
-        function setControlType(ed,item,strategy) {
+         function setControlType(ed,item,strategy) {
             //if useVS is true, then
-            strategy = strategy || {}
+             return new Promise((resolve) => {
+                 strategy = strategy || {}
 
-            //config = config || {maxFromValueSet : 500}
+                 //config = config || {maxFromValueSet : 500}
 
-            let vo = getControlDetails(ed) //get the control details from the ed
+                 let vo = getControlDetails(ed) //get the control details from the ed
 
-            item.type = vo.controlType    //the 'official' type for the item
+                 item.type = vo.controlType    //the 'official' type for the item
 
-            //Add the hint instruction
-            if (vo.controlType !== vo.controlHint)  {
-                //console.log(item.text,data.controlType,data.controlHint)
-                //the hint is the extension that gives more options to the renderer
-                item.extension = item.extension || []
-                let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
-                ext.valueCodeableConcept = {coding:[{code:vo.controlHint,system:"http://hl7.org/fhir/questionnaire-item-control"}]}
-                item.extension.push(ext)
-            }
+                 //Add the hint instruction
+                 if (vo.controlType !== vo.controlHint) {
+                     //console.log(item.text,data.controlType,data.controlHint)
+                     //the hint is the extension that gives more options to the renderer
+                     item.extension = item.extension || []
+                     let ext = {url: "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+                     ext.valueCodeableConcept = {
+                         coding: [{
+                             code: vo.controlHint,
+                             system: "http://hl7.org/fhir/questionnaire-item-control"
+                         }]
+                     }
+                     item.extension.push(ext)
+                 }
 
-            switch (vo.controlHint) {
-                case 'drop-down' :
-                    //will be 'drop-down' if the type is CodeableConcept...
-                    //use the options service to get the list of options. could come from the options element of expanded vs
-                    codedOptionsSvc.getOptionsForEd(ed).then(
-                        function (vo1) {
+                 switch (vo.controlHint) {
+                     case 'drop-down' :
+                         //will be 'drop-down' if the type is CodeableConcept...
+                         //use the options service to get the list of options. could come from the options element of expanded vs
+                         let timerLabel = `sct${ed.path}`
+                         console.time(timerLabel)
+                         codedOptionsSvc.getOptionsForEd(ed).then(
 
-                            if (! vo1.options || (vo1.options && vo1.options.length == 0) ) {
-                                vo1.options = vo1.options || []
-                                vo1.options.push({code:'nocode',system:'http://example.com/CodeSystem/unknown',display:"No codes supplied"})
-                            }
+                             function (vo1) {
+                                 console.timeEnd(timerLabel)
+                                 if (!vo1.options || (vo1.options && vo1.options.length == 0)) {
+                                     vo1.options = vo1.options || []
+                                     vo1.options.push({
+                                         code: 'nocode',
+                                         system: 'http://example.com/CodeSystem/unknown',
+                                         display: "No codes supplied"
+                                     })
+                                 }
 
-                            switch (vo1.status) {
-                                case 'options' :
-                                    //the list of options came from an options element in the ED. They must be answerOption
+                                 switch (vo1.status) {
+                                     case 'options' :
+                                         //the list of options came from an options element in the ED. They must be answerOption
 
-                                    for (const Coding of vo1.options) {
-                                        item.answerOption = item.answerOption ||[]
-                                        item.answerOption.push({valueCoding:Coding})
-                                    }
-                                    break
-                                case 'vs' :
-                                    //the list of options came from an expanded valueset
-                                    if (strategy.expandVS) {
-                                    //if (config && config.maxFromValueSet && vo.options.length <= config.maxFromValueSet) {
-                                        //item.answerOption = []
-                                        for (const Coding of vo1.options) {
-                                            item.answerOption = item.answerOption ||[]
-                                            item.answerOption.push({valueCoding:Coding})
-                                        }
-                                    } else {
-                                        let vs = ed.valueSet
-                                        if (vs.indexOf('http') == -1) {
-                                            //the vs in the model might not have the full url
-                                            vs = `https://nzhts.digital.health.nz/fhir/ValueSet/${vs}`
-                                        }
-                                        item.answerValueSet = vs
-                                    }
-                                    break
-                                case 'not-found' :
-                                    //there was a ValueSet, but it wasn't found on the terminology server
-                                    item.answerOption = [{valueCoding:{code:'not-found',system:'http://example.com/CodeSystem/unknown',display:`VS ${ed.valueSet} not found`}}]
-                                    console.log(`The element ${ed.title} had the ValueSet ${ed.valueSet} which was not on the terminology server`)
-                                    break
-                                case 'no-options-or-vs':
-                                    item.answerOption = [{valueCoding:{code:'no-options',system:'http://example.com/CodeSystem/unknown',display:`Neither options nor ValueSet`}}]
-                                    console.log(`The element ${ed.title} had neither ValueSet not options defined`)
-                                    break
+                                         for (const Coding of vo1.options) {
+                                             item.answerOption = item.answerOption || []
+                                             item.answerOption.push({valueCoding: Coding})
+                                         }
+                                         break
+                                     case 'vs' :
+                                         //the list of options came from an expanded valueset
+                                         if (strategy.expandVS) {
+                                             //if (config && config.maxFromValueSet && vo.options.length <= config.maxFromValueSet) {
+                                             //item.answerOption = []
+                                             for (const Coding of vo1.options) {
+                                                 item.answerOption = item.answerOption || []
+                                                 item.answerOption.push({valueCoding: Coding})
+                                             }
+                                         } else {
+                                             let vs = ed.valueSet
+                                             if (vs.indexOf('http') == -1) {
+                                                 //the vs in the model might not have the full url
+                                                 vs = `https://nzhts.digital.health.nz/fhir/ValueSet/${vs}`
+                                             }
+                                             item.answerValueSet = vs
+                                         }
+                                         break
+                                     case 'not-found' :
+                                         //there was a ValueSet, but it wasn't found on the terminology server
+                                         item.answerOption = [{
+                                             valueCoding: {
+                                                 code: 'not-found',
+                                                 system: 'http://example.com/CodeSystem/unknown',
+                                                 display: `VS ${ed.valueSet} not found`
+                                             }
+                                         }]
+                                         console.log(`The element ${ed.title} had the ValueSet ${ed.valueSet} which was not on the terminology server`)
+                                         break
+                                     case 'no-options-or-vs':
+                                         item.answerOption = [{
+                                             valueCoding: {
+                                                 code: 'no-options',
+                                                 system: 'http://example.com/CodeSystem/unknown',
+                                                 display: `Neither options nor ValueSet`
+                                             }
+                                         }]
+                                         console.log(`The element ${ed.title} had neither ValueSet not options defined`)
+                                         break
 
-                            }
+                                 }
+                                 //resolve(item)
+
+                             }, function (err) {
+                                 console.log(err)
+                                 //resolve(item)
+
+                             }
+                         )
 
 
-                        },function (err) {
-console.log(err)
-                        }
-                    )
+                         break
 
-
-
-
-
-
-                    break
-
-                case 'typeahead' :
-                    break
-            }
-
+                     case 'typeahead' :
+                         //resolve(item)
+                         break
+                 }
+                 resolve(item)
+             })
 
         }
 
 
         return {
+
+
+
             makeTreeFromQ : function (Q) {
                 //pass in a Q and return a tree array representation
                 let treeData = []
@@ -488,178 +519,494 @@ console.log(err)
 
             },
 
+
+
+            getQFromTreeDEP :  function(treeObject,comp,strategy) {
+                return new Promise((resolve) => {
+
+                    async function test() {
+
+
+                    }
+
+                    /*
+                    setTimeout(() => {
+                        resolve('resolved');
+                    }, 2000);
+                    */
+                });
+
+            },
+
             //this is used by the composition to build the Q
-            makeQFromTree : function (treeObject,comp,strategy) {
-                //Given a tree array representing a composition (from jstree), construct a Q resource
-                let that = this
+            //this has the structure needed for tabs
+            makeQFromTreeTab :  async function (treeObject,comp,strategy) {
+                //this is a version I'm using during connectathon to implemnet the tabs extensions
+                //the Q that are created won't be able to be used in my renderer...
 
-                let pathsToHide = []    //a list of paths that should not appear in the Q. It is assembled dynamically
+                return new Promise(async (resolve) => {
+                    //Given a tree array representing a composition (from jstree), construct a Q resource
+                    let that = this
 
-                //get the EnableWhens defined on the Composition for the sections
-                let hashSectionEW = {}      //any enableWhen for this section
-                if (comp && comp.enableWhen) {
-                    comp.enableWhen.forEach(function (ew) {
-                        hashSectionEW[ew.targetSection] = hashSectionEW[ew.targetSection] || []
-                        hashSectionEW[ew.targetSection].push(ew)
-                    })
-                }
+                    let pathsToHide = []    //a list of paths that should not appear in the Q. It is assembled dynamically
 
-
-                console.log(treeObject)
-                let qName = treeObject[0].id
-                let id = "cs-"+qName
-                Q = {resourceType:"Questionnaire",id:id,status:"draft",name:qName,item:[]}
-
-                let section = {text:"section",linkId:qName,item:[]}
-
-                let obj = {}
-
-                //parent is what the item will be added to (a section of a group
-                //node is the node from the tree - multi level
-                // section is the current section. Used when adding a new group
-                function addChild(parent,node,section) {
-
-                    let canAdd = true
-                    //if the id / path length is 2, then this is representing a section from the tree
-                    //the node id structure is {comp name}.{section name}.{dg name}...
-                    //todo - need to think about z elements
+                    //get the EnableWhens defined on the Composition for the sections
+                    let hashSectionEW = {}      //any enableWhen for this section
+                    if (comp && comp.enableWhen) {
+                        comp.enableWhen.forEach(function (ew) {
+                            hashSectionEW[ew.targetSection] = hashSectionEW[ew.targetSection] || []
+                            hashSectionEW[ew.targetSection].push(ew)
+                        })
+                    }
 
 
+                    console.log(treeObject)
+                    let qName = treeObject[0].id
+                    let id = "cs-" + qName
+                    Q = {resourceType: "Questionnaire", id: id, status: "active", name: qName, item: []}
+                    Q.url = `http://canshare.co.nz/fhir/Questionnaire/${id}`
+                    let extTS = {url:"http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-preferredTerminologyServer"}
+                    extTS.valueUrl = "https://nzhts.digital.health.nz/fhir/"
+                    Q.extension = [extTS]
 
 
-                    let ar = node.id.split('.')
-                    if (ar.length == 2) {
-                        //this is a section definition. Create a new Q section and add to the Q root
-                        let sectionName = ar[1]     //the second segment
-                        section = {text:node.text,linkId:node.id,type:'group',item:[]}
+                    //create a top level item to represent a tab container
+                    //all of the sections are added to that item
+                    let containerSection = {text: "tabContainer", linkId: qName, extension:[], type:'group', item: []}
 
-                        //are there any conditionals (enableWhen) to add
-                        if (hashSectionEW[sectionName]) {
-                            section.enableWhen = section.enableWhen || []
-                            hashSectionEW[sectionName].forEach(function (vo) {
-                               // let vo = hashSectionEW[sectionName]
-                                let ew = {}
-                                ew.question = `${ar[0]}.${vo.sourceSection}.${vo.ed}`
-                                ew.operator = "="
-                                ew.answerCoding = vo.value
-                                section.enableWhen.push(ew)
+                    let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+                    ext.valueCodeableConcept = {coding:[{code:"tab-container",system:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}]}
+                    containerSection.extension.push(ext)
+
+
+                    Q.item.push(containerSection)
+
+
+
+                    // section is the current section. Used when adding a new group
+
+                    let section // = {text: "section", linkId: qName, item: []}
+
+                    let obj = {}
+
+                    //parent is what the item will be added to (a section of a group
+                    //node is the node from the tree - multi level
+                    // section is the current section. Used when adding a new group
+                    async function addChild(parent, node, section) {
+
+                        console.log(node.data.level)
+                        let canAdd = true
+
+                      //  if (node.data.level == 'section') {
+                       //     canAdd = false
+                       // }
+
+                        //if the id / path length is 2, then this is representing a section from the tree
+                        //the node id structure is {comp name}.{section name}.{dg name}...
+                        //todo - need to think about z elements
+
+
+                        let ar = node.id.split('.')
+                        if (ar.length == 2) {
+                            //this is a section definition. Create a new Q section and add to the Q root
+
+                            let sectionName = ar[1]     //the second segment
+                            section = {text: node.text, linkId: node.id, type: 'group', extension:[],item: []}
+
+                            //Add the tab container extension as well
+                            let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+                            ext.valueCodeableConcept = {coding:[{code:"page",system:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}]}
+                            section.extension.push(ext)
+
+                            //are there any conditionals (enableWhen) to add
+                            if (hashSectionEW[sectionName]) {
+                                section.enableWhen = section.enableWhen || []
+                                hashSectionEW[sectionName].forEach(function (vo) {
+                                    // let vo = hashSectionEW[sectionName]
+                                    let ew = {}
+                                    ew.question = `${ar[0]}.${vo.sourceSection}.${vo.ed}`
+                                    ew.operator = "="
+                                    ew.answerCoding = vo.value
+                                    section.enableWhen.push(ew)
+                                })
+
+                                console.log(section.enableWhen)
+
+                            }
+
+                            //here is where the section is added to the Q. All other items are added to the section
+                            if (section) {
+
+                                containerSection.item.push(section)
+                            }
+
+
+                            //Q.item.push(section)
+
+                            canAdd = false          //because it's already been added
+                        } else if (ar.length == 3) {
+                            //this is the DG name attached to the section
+                            //we've got the children enumerated - we want to enumerate them but not add this one
+                            canAdd = false
+                        }
+
+                        //so, we've determined that this element can be added. is the 'hideInQ' set
+                        //for it (or for any of the ancestors.
+                        if (canAdd) {
+                            if (node.data.ed.hideInQ) {
+                                //if this is set to hide, then set canAdd false, and add the
+                                //path to the list of 'pathsToHide'
+                                pathsToHide.push(node.data.ed.path)
+                                canAdd = false
+                            } else {
+                                //check that the path of this element is not in the pathsToHide list
+                                for (const path of pathsToHide) {
+                                    if (node.data.ed.path.startsWith(path)) {
+                                        canAdd = false
+                                        break
+                                    }
+                                }
+                            }
+
+                        }
+
+
+                        if (canAdd) {
+                            let item = {text: node.text, linkId: node.id, type: 'string'}
+
+                            if (node.data.ed.mult == '0..*' || node.data.ed.mult == '1..*') {
+                                item.repeats = true
+                            }
+
+                            //the definition is the link back to the model - the DG. We drop the first 2 segments
+                            //in the path as they are the composition & section name
+
+                            if (node.data.ed.path) {
+                                let ar = node.data.ed.path.split('.')
+                                ar.splice(0, 2)
+                                //todo  - will become a uri - when the DGs are published as models
+                                item.definition = ar.join('.')
+                            }
+
+                            //todo - get correct type. This is just a placeholder
+                            if (node.children && node.children.length > 0) {
+                                item.type = 'group'
+                            }
+
+
+                            //the path prefix is the path to the DG in the composition - {compname}.{section name}.
+                            //this is the first 2 segments in the node id (which is the full path)
+                            let ar = node.id.split('.')
+
+                            let pathPrefix = `${ar[0]}.${ar[1]}.${ar[2]}.`
+                            addEnableWhen(node.data.ed, item, pathPrefix)  //If there are any conditionals
+
+                            //set the control type to use. Will add the VS or answerOptions to the item
+                            let response = await setControlType(node.data.ed, item, strategy)
+
+                            //applying formatting to a label
+                           // let ext1 = {url:"http://hl7.org/fhir/StructureDefinition/rendering-xhtml"}
+                           // ext1.valueString = `<div style="color: green">${response.text}</div>`
+                            //response['_text'] = {extension: [ext1]}
+
+                            if (node.data.ed.mult == '0..*' || node.data.ed.mult == '1..*') {
+                                let ext2 = {url:"http://hl7.org/fhir/StructureDefinition/rendering-xhtml"}
+                                ext2.valueString = `<div style="font-weight:bold">${response.text}</div>`
+                                response['_text'] = {extension: [ext2]}
+                            }
+
+
+
+
+
+                            //add a tooltip with the description
+                            response.item = []
+                            if (node.data.ed.description) {
+                                let tt = {text: node.data.ed.description, linkId: `${node.data.ed.path}-tt`, type: 'display',extension:[]}
+                                let ext = {url: "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+                                //ext.valueCodeableConcept = {coding:[{system:"http://hl7.org/fhir/questionnaire-item-control",code:"flyover"}]}
+                                ext.valueCodeableConcept = {coding:[{system:"http://hl7.org/fhir/questionnaire-item-control",code:"help"}]}
+                                tt.extension.push(ext)
+
+                                //response.extension = response.extension || []
+                                response.item.push(tt)
+                            }
+
+
+                            console.log(parent.linkId)
+                            console.log(response.linkId)
+                            console.log("")
+                            parent.item = parent.item || []
+                            parent.item.push(response)
+                        }
+
+
+
+                        if (node.children && node.children.length > 0) {
+
+                            //create a new group item and add to the current section
+                            let group = {
+                                text: `${node.text}`,
+                                type: 'group',
+                                linkId: `group-${node.id}`,
+                                item: []
+                            }
+
+
+
+                            console.log(section.linkId)
+                            console.log(group.linkId)
+                            console.log("")
+
+                            section.item = section.item || []
+                            //section.item.push(group)
+
+
+                            //For some reason the routine adds an additional element after adding the group.
+                            //This prevents that. Took ages to figure out! Change at your peril...
+                            if (group.linkId !== `group-${section.linkId}`) {
+                                section.item.push(group)
+                            } else {
+                                console.log(`not adding ${group.linkId}`)
+                            }
+
+
+
+                            //pass the group in as the parent
+                            node.children.forEach(function (childNode) {
+                                //addChild(item,childNode)
+                                addChild(group, childNode, section)
                             })
 
-                           console.log(section.enableWhen)
+
 
                         }
-
-                        Q.item.push(section)
-                        canAdd = false          //because it's already been added
-                    } else if (ar.length == 3) {
-                        //this is the DG name attached to the section
-                        //we've got the children enumerated - we want to enumerate them but not add this one
-                        canAdd = false
                     }
 
-                    //so, we've determined that this element can be added. is the 'hideInQ' set
-                    //for it (or for any of the ancestors.
-                    if (canAdd) {
-                       if (node.data.ed.hideInQ) {
-                           //if this is set to hide, then set canAdd false, and add the
-                           //path to the list of 'pathsToHide'
-                           pathsToHide.push(node.data.ed.path)
-                           canAdd = false
-                       } else {
-                           //check that the path of this element is not in the pathsToHide list
-                           for (const path of pathsToHide) {
-                               if (node.data.ed.path.startsWith(path)) {
-                                   canAdd = false
-                                   break
-                               }
-                           }
-                       }
-
-                    }
+                    //there's only a single child which returns the top level
+                    treeObject[0].children.forEach(function (node) {
+                        addChild(section, node, section)
+                    })
 
 
+                    //the DG name is added as a child to the section item. Not sure how to prevent that - for now, remove them
+                    Q.item.forEach(function (item) {
 
-                    if (canAdd) {
-                        let item = {text:node.text,linkId:node.id,type:'string'}
-
-                        //the definition is the link back to the model - the DG. We drop the first 2 segments
-                        //in the path as they are the composition & section name
-
-                        if (node.data.ed.path) {
-                            let ar = node.data.ed.path.split('.')
-                            ar.splice(0,2)
-                            //todo  - will become a uri - when the DGs are published as models
-                            item.definition = ar.join('.')
+                        console.log(item.item)
+                        if (item.item) {
+                            //just remove the first child - it will have the empty item
+                        //temp    item.item.splice(0, 1)
                         }
 
+                    })
 
 
 
-                        //todo - get correct type. This is just a placeholder
-                        if (node.children && node.children.length > 0) {
-                            item.type = 'group'
-                        }
 
 
-                        //the path prefix is the path to the DG in the composition - {compname}.{section name}.
-                        //this is the first 2 segments in the node id (which is the full path)
-                        let ar = node.id.split('.')
-
-                        let pathPrefix = `${ar[0]}.${ar[1]}.`
-                        addEnableWhen(node.data.ed,item,pathPrefix)  //If there are any conditionals
-
-                        //set the control type to use. Will add the VS or answerOptions to the item
-                        setControlType(node.data.ed,item,strategy)
-                        parent.item = parent.item || []
-                        parent.item.push(item)
-                    }
-
-
-                    if (node.children && node.children.length > 0) {
-
-                        //create a new group item and add to the current section
-                        let group = {text:`${node.text}`,type:'group',linkId:`group-${node.id}` ,item:[],extension:[]}
-                        //let group = {text:`group-${node.text}`,type:'group',linkId:`group-${node.id}` ,item:[],extension:[]}
-                        let ext = {url:"http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"}
-                        ext.valueInteger = 2
-                        group.extension.push(ext)
-
-                        section.item =  section.item || []
-                        section.item.push(group)
-                        //pass the group in as the parent
-                        node.children.forEach(function (childNode) {
-                            //addChild(item,childNode)
-                            addChild(group,childNode,section)
-                        })
-
-                    }
-                }
-
-                //there's only a single child which returns the top level
-                treeObject[0].children.forEach(function (node) {
-                    addChild(section,node,section)
+                    resolve(Q) //that.makeQ(treeObject)
                 })
-
-
-                //the DG name is added as a child to the section item. Not sure how to prevent that - for now, remove them
-                Q.item.forEach(function (item) {
-
-                    console.log(item.item)
-                    if (item.item) {
-                        //just remove the first child - it will have the empty item
-                        item.item.splice(0,1)
-                    }
-
-                })
-
-
-
-                return Q //that.makeQ(treeObject)
 
 
             },
 
-            makeQ: function(treeObject) {
+            //this is used by the composition to build the Q
+            //this is the version that my renderer can support
+            makeQFromTree :  async function (treeObject,comp,strategy) {
+                //this is the original Q creator before I started hacking around with it
+                return new Promise(async (resolve) => {
+                    //Given a tree array representing a composition (from jstree), construct a Q resource
+                    let that = this
+
+                    let pathsToHide = []    //a list of paths that should not appear in the Q. It is assembled dynamically
+
+                    //get the EnableWhens defined on the Composition for the sections
+                    let hashSectionEW = {}      //any enableWhen for this section
+                    if (comp && comp.enableWhen) {
+                        comp.enableWhen.forEach(function (ew) {
+                            hashSectionEW[ew.targetSection] = hashSectionEW[ew.targetSection] || []
+                            hashSectionEW[ew.targetSection].push(ew)
+                        })
+                    }
+
+
+                    console.log(treeObject)
+                    let qName = treeObject[0].id
+                    let id = "cs-" + qName
+                    Q = {resourceType: "Questionnaire", id: id, status: "draft", name: qName, item: []}
+
+                    let section = {text: "section", linkId: qName, item: []}
+
+                    let obj = {}
+
+                    //parent is what the item will be added to (a section of a group
+                    //node is the node from the tree - multi level
+                    // section is the current section. Used when adding a new group
+                    async function addChild(parent, node, section) {
+
+                        let canAdd = true
+                        //if the id / path length is 2, then this is representing a section from the tree
+                        //the node id structure is {comp name}.{section name}.{dg name}...
+                        //todo - need to think about z elements
+
+
+                        let ar = node.id.split('.')
+                        if (ar.length == 2) {
+                            //this is a section definition. Create a new Q section and add to the Q root
+                            //Add the tab container extension as well
+                            let sectionName = ar[1]     //the second segment
+                            section = {text: node.text, linkId: node.id, type: 'group', item: []}
+
+
+
+                            //are there any conditionals (enableWhen) to add
+                            if (hashSectionEW[sectionName]) {
+                                section.enableWhen = section.enableWhen || []
+                                hashSectionEW[sectionName].forEach(function (vo) {
+                                    // let vo = hashSectionEW[sectionName]
+                                    let ew = {}
+                                    ew.question = `${ar[0]}.${vo.sourceSection}.${vo.ed}`
+                                    ew.operator = "="
+                                    ew.answerCoding = vo.value
+                                    section.enableWhen.push(ew)
+                                })
+
+                                console.log(section.enableWhen)
+
+                            }
+
+                            Q.item.push(section)
+                            canAdd = false          //because it's already been added
+                        } else if (ar.length == 3) {
+                            //this is the DG name attached to the section
+                            //we've got the children enumerated - we want to enumerate them but not add this one
+                            canAdd = false
+                        }
+
+                        //so, we've determined that this element can be added. is the 'hideInQ' set
+                        //for it (or for any of the ancestors.
+                        if (canAdd) {
+                            if (node.data.ed.hideInQ) {
+                                //if this is set to hide, then set canAdd false, and add the
+                                //path to the list of 'pathsToHide'
+                                pathsToHide.push(node.data.ed.path)
+                                canAdd = false
+                            } else {
+                                //check that the path of this element is not in the pathsToHide list
+                                for (const path of pathsToHide) {
+                                    if (node.data.ed.path.startsWith(path)) {
+                                        canAdd = false
+                                        break
+                                    }
+                                }
+                            }
+
+                        }
+
+
+                        if (canAdd) {
+                            let item = {text: node.text, linkId: node.id, type: 'string'}
+
+                            //the definition is the link back to the model - the DG. We drop the first 2 segments
+                            //in the path as they are the composition & section name
+
+                            if (node.data.ed.path) {
+                                let ar = node.data.ed.path.split('.')
+                                ar.splice(0, 2)
+                                //todo  - will become a uri - when the DGs are published as models
+                                item.definition = ar.join('.')
+                            }
+
+                            //todo - get correct type. This is just a placeholder
+                            if (node.children && node.children.length > 0) {
+                                item.type = 'group'
+                            }
+
+
+                            //the path prefix is the path to the DG in the composition - {compname}.{section name}.
+                            //this is the first 2 segments in the node id (which is the full path)
+                            let ar = node.id.split('.')
+
+                            let pathPrefix = `${ar[0]}.${ar[1]}.${ar[2]}.`
+                            addEnableWhen(node.data.ed, item, pathPrefix)  //If there are any conditionals
+
+                            //set the control type to use. Will add the VS or answerOptions to the item
+                            let timerlabel = node.id
+                            console.time(timerlabel)
+                            let response = await setControlType(node.data.ed, item, strategy)
+
+                            console.log(response)
+                            console.timeEnd(timerlabel)
+                            parent.item = parent.item || []
+                            //parent.item.push(item)
+                            parent.item.push(response)
+                        }
+
+
+                        if (node.children && node.children.length > 0) {
+
+                            //create a new group item and add to the current section
+                            let group = {
+                                text: `${node.text}`,
+                                type: 'group',
+                                linkId: `group-${node.id}`,
+                                item: [],
+                                extension: []
+                            }
+                            //let group = {text:`group-${node.text}`,type:'group',linkId:`group-${node.id}` ,item:[],extension:[]}
+                            let ext = {url: "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"}
+                            ext.valueInteger = 2
+                            group.extension.push(ext)
+
+                            section.item = section.item || []
+
+
+                            //For some reason the routine adds an additional element after adding the group.
+                            //This prevents that. Took ages to figure out! Change at your peril...
+                            if (group.linkId !== `group-${section.linkId}`) {
+                                section.item.push(group)
+                            }
+
+
+                            //section.item.push(group)
+
+
+
+                            //pass the group in as the parent
+                            node.children.forEach(function (childNode) {
+                                //addChild(item,childNode)
+                                addChild(group, childNode, section)
+                            })
+
+                        }
+                    }
+
+                    //there's only a single child which returns the top level
+                    treeObject[0].children.forEach(function (node) {
+                        addChild(section, node, section)
+                    })
+
+
+                    //the DG name is added as a child to the section item. Not sure how to prevent that - for now, remove them
+                    Q.item.forEach(function (item) {
+
+                        console.log(item.item)
+                        if (item.item) {
+                            //just remove the first child - it will have the empty item
+                            item.item.splice(0, 1)
+                        }
+
+                    })
+
+
+                    resolve(Q) //that.makeQ(treeObject)
+                })
+
+
+            },
+
+
+            makeQDEP: function(treeObject) {
                 //construct a Questionnaire resource - called by the makeQ controller - will be deprecated probably
                 //treeObject comes from the jstree control - it's actually an array
                 let qName = treeObject[0].id

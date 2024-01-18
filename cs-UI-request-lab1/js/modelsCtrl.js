@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
 
-            $scope.version = "0.6.8"
+            $scope.version = "0.6.9"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -253,12 +253,16 @@ angular.module("pocApp")
             $scope.previewQ = function (Q) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/previewQ.html',
-                    backdrop: 'static',
+                    //backdrop: 'static',
                     size : 'lg',
                     controller: 'previewQCtrl',
                     resolve: {
                         Q: function () {
                             return Q
+                        },
+                        Qtab : function () {
+                            //the tab version of the Q
+                            return $scope.fullQTab
                         }
                     }
                 })
@@ -1428,7 +1432,7 @@ angular.module("pocApp")
 
 
                 let download = modelCompSvc.makeTSVDownload(vo.allElements)
-                console.log(download)
+                //console.log(download)
 
 
                 $scope.downloadLinkCompTsv = window.URL.createObjectURL(new Blob([download ],{type:"text/tsv;charset=utf-8;"}))
@@ -1696,14 +1700,35 @@ angular.module("pocApp")
                     $(this).jstree("open_node",id);
                     let treeObject = $(this).jstree(true).get_json('#', { 'flat': false })
 
-                    $scope.fullQ =  makeQSvc.makeQFromTree(treeObject,$scope.selectedComposition,$localStorage.qStrategy)
+                    asyncCall(treeObject,$scope.selectedComposition,
+                        $localStorage.qStrategy)
+
+                    /* temp while working out async
+                    $scope.fullQ =  makeQSvc.makeQFromTree(treeObject,$scope.selectedComposition,
+                        $localStorage.qStrategy)
+*/
 
                     $scope.$digest();
                 });
 
             }
 
+            //making async to deal with needing to get ValueSets from server.
+            //not sure if it is working property yet...
+            async function asyncCall(treeObject,comp,strategy) {
+                console.log('calling');
+                console.time('q')
+                $scope.fullQ = await makeQSvc.makeQFromTree(treeObject,comp,strategy)
+                //this is a version structured for tabs.
+                //todo I need to decide whether to update the renderer, use an external component
+                //or possibly derive fullQ from fullQTab.
+                $scope.fullQTab = await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
 
+                console.timeEnd('q')
+                //$scope.fullQ = await makeQSvc.getQFromTree(treeObject,comp,strategy)
+                console.log($scope.fullQ);
+                // Expected output: "resolved"
+            }
 
 
             /*$timeout(function(){
