@@ -1561,7 +1561,6 @@ angular.module("pocApp")
 
                     $scope.refreshUpdates()     //update the xref and the list of all updates
 
-
                     //create the list of override elements
                     $scope.overrides = []
                     //$scope.directElements = {}    //elements directly on the DG. These can have fixed values
@@ -1718,11 +1717,19 @@ angular.module("pocApp")
             async function asyncCall(treeObject,comp,strategy) {
                 console.log('calling');
                 console.time('q')
-                $scope.fullQ = await makeQSvc.makeQFromTree(treeObject,comp,strategy)
+
+
+                //$scope.fullQ = await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+
+                let voQ = await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+
+                //$scope.fullQ = await makeQSvc.makeQFromTree(treeObject,comp,strategy)
+                $scope.fullQ = voQ.Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+                $scope.Qlog = voQ.log   //the log of activity that occurred as the Q was created
                 //this is a version structured for tabs.
                 //todo I need to decide whether to update the renderer, use an external component
                 //or possibly derive fullQ from fullQTab.
-                $scope.fullQTab = await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+                $scope.fullQTab = voQ.Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
 
                 console.timeEnd('q')
                 //$scope.fullQ = await makeQSvc.getQFromTree(treeObject,comp,strategy)

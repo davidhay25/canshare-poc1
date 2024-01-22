@@ -70,6 +70,9 @@ angular.module("pocApp")
             }
 
 
+            $scope.showLogEntry = function (le) {
+                $scope.logEntry = le
+            }
 
             $scope.revert = function () {
                 if (confirm("Are you sure you wish to revert this Composition? Any changes will be lost.")){

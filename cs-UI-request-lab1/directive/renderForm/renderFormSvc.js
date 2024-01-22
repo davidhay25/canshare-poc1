@@ -1,7 +1,7 @@
 
 
 angular.module("formsApp")
-    .service('renderFormsSvc', function($q,$http,moment) {
+    .service('renderFormsSvc', function($q,$http,moment,utilsSvc) {
 
         let arExpandedVsCache = {}
 
@@ -300,6 +300,9 @@ angular.module("formsApp")
                 return ar
 
             },
+
+
+
             getMetaInfoForItem : function(item) {
                 //populate meta info - like resource extraction. Basically pull all extensions into a VO
                 var that = this
@@ -885,6 +888,7 @@ angular.module("formsApp")
             //pass in the formdata to allow  values to be set....
 
             makeFormTemplate : function(Q,formData) {
+                //let that = this
                 if (!Q) {
                     return
                 }
@@ -904,9 +908,22 @@ angular.module("formsApp")
 
                 if (Q.item) {
 
-                    
-                    Q.item.forEach(function (sectionItem) {
+                    let rootItem = Q.item       //original - array of items
+                    let coding = utilsSvc.findExtensionCC(rootItem[0],'http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl')
 
+                    //let ext = that.findExtension(rootItem[0],'http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl')
+                    if (coding) {
+                        if (coding.code == "tab-container") {
+                            rootItem = Q.item[0].item        //for the tab view
+                            console.log('Using tab view')
+                        }
+                    }
+
+
+                    //let rootItem = Q.item[0].item        //for the tab view
+
+                    rootItem.forEach(function (sectionItem) {
+                        //Q.item.forEach(function (sectionItem) {
                         let section = {linkId:sectionItem.linkId,text:sectionItem.text,rows:[],item:sectionItem}
                         section.meta = that.getMetaInfoForItem(sectionItem)
 
@@ -1452,9 +1469,11 @@ angular.module("formsApp")
                 function checkEqualCoding(source,target) {
                     //source is from the form, target is the  Q
 
+                    if (source.code == target.code) {
+                        return true
+                    }
 
-
-
+/* - Jan22 2024 - commented out
                     if (source && target) {
                         if (source.system) {
                             if ((source.system == target.system) && (source.code == target.code)) {
@@ -1466,6 +1485,7 @@ angular.module("formsApp")
                             }
                         }
                     }
+                    */
 
 
                 }

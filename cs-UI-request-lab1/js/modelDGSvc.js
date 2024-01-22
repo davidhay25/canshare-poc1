@@ -20,7 +20,10 @@ angular.module("pocApp")
                 //construct a hash of all elments
                 let hashElements = {}
                 lstElements.forEach(function (item) {
-                    hashElements[item.ed.path] = item.ed
+                    if (item.ed.mult !== '0..0') {
+                        hashElements[item.ed.path] = item.ed
+                    }
+
                 })
 
                 //now create the ew list
@@ -28,25 +31,25 @@ angular.module("pocApp")
                     if (item.ed && item.ed.enableWhen) {
                         //note that the ew here is not the same as in the Q - for example it has 'source' rather than 'question'
                         item.ed.enableWhen.forEach(function (ew) {
+                            let sourceEd = hashElements[ew.source]
+
 
                             //for inherited elements the first segment is always the current dg name
                             let ar = item.ed.path.split('.')
                             ar[0] = dgName
                             let newPath = ar.join('.')
-                            allDependencies.push({path:newPath,ew:ew,ed:hashElements[ew.question]})
+
+                            let entry = {path:newPath,ew:ew,ed:sourceEd}
+                            if (! sourceEd) {
+                                entry.error = `Warning! source ed not found at path ${ew.source}`
+                            }
+
+                            allDependencies.push(entry)
                         })
                     }
 
                 })
-/*
-                lstElements.sort(function (a,b) {
-                    if (a.path > b.path) {
-                        return 1
-                    } else {
-                        return -1
-                    }
-                })
-*/
+
 
                 return allDependencies
 

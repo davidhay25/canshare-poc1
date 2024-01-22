@@ -65,6 +65,7 @@
             <div ng-show="selectedNode.data">
               <strong >Selected Q Item</strong>
               <pre>{{selectedNode.data | json}}</pre>
+              <em>Any Item element has been removed</em>
             </div>
 
           </div>
@@ -83,6 +84,25 @@
       </uib-tab>
 
       <uib-tab heading="Enable whens">
+
+
+        <table class="table-bordered table">
+          <tr ng-repeat="item in allEW">
+            <td>{{item.targetText}}</td>
+            <td>{{item.dep.text}}</td>
+            <td>
+              <div> {{item.targetItem.operator}} {{item.targetItem.answerCoding.display}}
+                ({{item.targetItem.answerCoding.code}} |
+                {{item.targetItem.answerCoding.system}})</div>
+              <div>
+                <br/>
+                <em>{{item.targetItem.question | dropFirstInPath}}</em>
+
+              </div>
+            </td>
+          </tr>
+        </table>
+
         <pre>{{allEW | json}}</pre>
       </uib-tab>
 
@@ -132,9 +152,6 @@
         </div>
 
 
-
-
-
         <uib-tabset>
           <uib-tab heading="List">
             <table class="table table-bordered">
@@ -159,7 +176,7 @@
         </uib-tabset>
       </uib-tab>
 
-      <uib-tab heading = "Publish">
+      <uib-tab ng-show = "false" heading = "Publish">
         <br/>
         <em>Options to publish the Q to a forms Manager</em>
 
@@ -184,7 +201,10 @@
       </uib-tab>
 
       <uib-tab heading="Json">
-      <pre>{{Q | json}}</pre>
+        <div class="myScroll">
+          <pre>{{Q | json}}</pre>
+        </div>
+
       </uib-tab>
 
 
@@ -195,6 +215,7 @@
   </div>
 
   <div class="modal-header">
+    <div>Validation server: {{serverbase}}</div>
 
   </div>
 </div>

@@ -245,16 +245,10 @@
 
           <div class="row">
             <div class="col-md-4">
-              <!--
-              <button class="btn-link btn" ng-click="hideinQ(selectedNode.data.ed)">
-                Hide in Q
-              </button>
-              -->
+
             </div>
             <div class="col-md-8">
-<!--
-              <button class="btn-link btn  pull-right" ng-click="deleteDGItem(selectedNode.data.ed)">Delete this item ({{selectedNode.data.ed.title}})</button>
--->
+
 
 
 
@@ -1058,10 +1052,16 @@
 
 
       <table class="table-bordered table">
-        <tr><th>Target (what to hide)</th><th>Source (what controls it)</th><th>Op</th><th>Value (that will show target)</th></tr>
+        <tr><th>Target (what to hide)</th><th>Source (what controls it)</th><th>Source description</th><th>Op</th><th>Value (that will show target)</th></tr>
         <tr ng-repeat="dep in allDependencies">
           <td>{{dep.path}}</td>
           <td>{{dep.ew.source}}</td>
+          <td>{{dep.ed.description}}
+            <div ng-show="dep.error">
+              <div class="alert alert-danger">{{dep.error}}</div>
+            </div>
+
+          </td>
           <td>{{dep.ew.operator}}</td>
           <td>{{dep.ew.value.code}} | {{dep.ew.value.display}} |</td>
         </tr>

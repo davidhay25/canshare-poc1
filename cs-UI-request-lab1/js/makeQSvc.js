@@ -110,12 +110,12 @@ angular.module("pocApp")
                      case 'drop-down' :
                          //will be 'drop-down' if the type is CodeableConcept...
                          //use the options service to get the list of options. could come from the options element of expanded vs
-                         let timerLabel = `sct${ed.path}`
-                         console.time(timerLabel)
+                         //let timerLabel = `sct${ed.path}`
+                        // console.time(timerLabel)
                          codedOptionsSvc.getOptionsForEd(ed).then(
 
                              function (vo1) {
-                                 console.timeEnd(timerLabel)
+                                 //console.timeEnd(timerLabel)
                                  if (!vo1.options || (vo1.options && vo1.options.length == 0)) {
                                      vo1.options = vo1.options || []
                                      vo1.options.push({
@@ -481,7 +481,7 @@ angular.module("pocApp")
                     let group = {text:ed.title,linkId: ed.path,type:'group',item:[]}
                     group.definition = ed.path
                     let ext = {'url':'http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count'}
-                    ext.valueInteger = "2"
+                    ext.valueInteger = 2
                     group.extension = [ext]
                     //group.linkId = ed.path
                     section.item.push(group)
@@ -492,13 +492,21 @@ angular.module("pocApp")
 
             getAllEW : function (Q) {
                 //Create a hash of all the 'EnableWhens' in a Q
+                //used by previewQ
                 let hashAllEW = {}
 
+
+                let hashAllElements = {} // hash of all items so can locate the dependency
+
+
                 function getEW(item) {
+                    hashAllElements[item.linkId] = item
                     if (item.enableWhen) {
                         item.enableWhen.forEach(function (ew) {
-                            hashAllEW[ew.question] = hashAllEW[ew.question] || []
-                            hashAllEW[ew.question].push(ew)
+                            hashAllEW[item.linkId] = hashAllEW[item.linkId] || []
+                            //title is the thing that is being effected, ew are the rules for showing
+                            //item.linkId is the linkId of the item
+                            hashAllEW[item.linkId].push({title:item.text,ew:ew})
                         })
                     }
 
@@ -507,15 +515,39 @@ angular.module("pocApp")
                             getEW(child)
                         })
                     }
-
                 }
+
 
                 if (Q.item) {
                     Q.item.forEach(function (item) {
                         getEW(item)
                     })
                 }
-                return hashAllEW
+
+                let arEW = []
+                //add the items to the ew hash
+                Object.keys(hashAllEW).forEach(function (key) {     //key is the linkId of the target item
+                    let target =  hashAllElements[key]
+                    let arConditions = hashAllEW[key]         //the items in this element  whose visibility is effected by the dependency
+                    //let ar = hashAllEW[key]     //this is the item whose visibility is controlled
+
+                    arConditions.forEach(function (ewObject) {      // ewObject = {dep: ew: }
+
+                        //locate the dependent item - ie the one whose value enables the source
+                        let dep = hashAllElements[ewObject.ew.question] || {text:'not found in Q'}
+                        //ewObject.dep = dep
+
+                        //construct a single item to represent the dependency.
+                        // If a single item were 2 have 2 dependencies (ews) there will be multiple iteme
+                        let item = {targetText : target.text,targetItem:ewObject.ew }
+                        item.dep = dep
+                        item.depText = dep.text
+                        arEW.push(item)
+
+                    })
+                })
+
+                return arEW
 
             },
 
@@ -546,7 +578,12 @@ angular.module("pocApp")
 
                 return new Promise(async (resolve) => {
                     //Given a tree array representing a composition (from jstree), construct a Q resource
+
                     let that = this
+
+                    //This generation is complex! Create a log to capture significant activity for debugging
+                    //It will also indicate the order in which operations occur
+                    let log = []
 
                     let pathsToHide = []    //a list of paths that should not appear in the Q. It is assembled dynamically
 
@@ -560,7 +597,7 @@ angular.module("pocApp")
                     }
 
 
-                    console.log(treeObject)
+                    //console.log(treeObject)
                     let qName = treeObject[0].id
                     let id = "cs-" + qName
                     Q = {resourceType: "Questionnaire", id: id, status: "active", name: qName, item: []}
@@ -579,6 +616,8 @@ angular.module("pocApp")
                     containerSection.extension.push(ext)
 
 
+                    log.push({msg:`Added container section`,item:angular.copy(containerSection)})
+
                     Q.item.push(containerSection)
 
 
@@ -594,17 +633,7 @@ angular.module("pocApp")
                     // section is the current section. Used when adding a new group
                     async function addChild(parent, node, section) {
 
-                        console.log(node.data.level)
                         let canAdd = true
-
-                      //  if (node.data.level == 'section') {
-                       //     canAdd = false
-                       // }
-
-                        //if the id / path length is 2, then this is representing a section from the tree
-                        //the node id structure is {comp name}.{section name}.{dg name}...
-                        //todo - need to think about z elements
-
 
                         let ar = node.id.split('.')
                         if (ar.length == 2) {
@@ -626,8 +655,24 @@ angular.module("pocApp")
                                     let ew = {}
                                     ew.question = `${ar[0]}.${vo.sourceSection}.${vo.ed}`
                                     ew.operator = "="
+
                                     ew.answerCoding = vo.value
+                                    delete ew.answerCoding.pt
+                                    ew.answerCoding.system = ew.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
                                     section.enableWhen.push(ew)
+
+                                    /*let qEW = {operator:ew.operator,answerCoding:ew.value}
+                    delete qEW.answerCoding.pt  //the preferred term...
+                    qEW.answerCoding.system = qEW.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
+
+                    //need to determine the path to the question. For now, assume that
+                    //qEW.question = `${parent.linkId}.${ew.source}` //linkId of source is relative to the parent (DG)
+                    qEW.question = `${pathPrefix}${ew.source}` //linkId of source is relative to the parent (DG)
+
+                    item.enableWhen.push(qEW)*/
+
+
+
                                 })
 
                                 console.log(section.enableWhen)
@@ -636,7 +681,7 @@ angular.module("pocApp")
 
                             //here is where the section is added to the Q. All other items are added to the section
                             if (section) {
-
+                                log.push({msg:`Added section ${section.text}`,item:angular.copy(section)})
                                 containerSection.item.push(section)
                             }
 
@@ -645,12 +690,16 @@ angular.module("pocApp")
 
                             canAdd = false          //because it's already been added
                         } else if (ar.length == 3) {
-                            //this is the DG name attached to the section
+                            //this is the section DG name attached to the section item
                             //we've got the children enumerated - we want to enumerate them but not add this one
+                            canAdd = false
+                        } else if (ar.length == 4) {
+                            //this is the DG name within the section
                             canAdd = false
                         }
 
-                        //so, we've determined that this element can be added. is the 'hideInQ' set
+
+                        //so, we've determined that this element can be added and isn't a group or description child. is the 'hideInQ' set
                         //for it (or for any of the ancestors.
                         if (canAdd) {
                             if (node.data.ed.hideInQ) {
@@ -680,7 +729,6 @@ angular.module("pocApp")
 
                             //the definition is the link back to the model - the DG. We drop the first 2 segments
                             //in the path as they are the composition & section name
-
                             if (node.data.ed.path) {
                                 let ar = node.data.ed.path.split('.')
                                 ar.splice(0, 2)
@@ -716,11 +764,8 @@ angular.module("pocApp")
                             }
 
 
-
-
-
                             //add a tooltip with the description
-                            response.item = []
+                            //response.item = []
                             if (node.data.ed.description) {
                                 let tt = {text: node.data.ed.description, linkId: `${node.data.ed.path}-tt`, type: 'display',extension:[]}
                                 let ext = {url: "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
@@ -728,16 +773,16 @@ angular.module("pocApp")
                                 ext.valueCodeableConcept = {coding:[{system:"http://hl7.org/fhir/questionnaire-item-control",code:"help"}]}
                                 tt.extension.push(ext)
 
-                                //response.extension = response.extension || []
+                                response.item = response.item || []
                                 response.item.push(tt)
                             }
 
-
-                            console.log(parent.linkId)
-                            console.log(response.linkId)
-                            console.log("")
+                            /* don't
+                            log.push({msg:`Adding item ${response.text} to ${parent.text}`,item:angular.copy(response)})
                             parent.item = parent.item || []
                             parent.item.push(response)
+                            */
+
                         }
 
 
@@ -753,6 +798,11 @@ angular.module("pocApp")
                             }
 
 
+                            let ext = {url: "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"}
+                            ext.valueInteger = 2
+                            group.extension = group.extension || []
+                            group.extension.push(ext)
+
 
                             console.log(section.linkId)
                             console.log(group.linkId)
@@ -765,8 +815,10 @@ angular.module("pocApp")
                             //For some reason the routine adds an additional element after adding the group.
                             //This prevents that. Took ages to figure out! Change at your peril...
                             if (group.linkId !== `group-${section.linkId}`) {
+                                log.push({msg:`Added group ${group.text}`,item:angular.copy(group)})
                                 section.item.push(group)
                             } else {
+                                log.push({msg:`DID NOT add group ${group.text}`,item:angular.copy(group)})
                                 console.log(`not adding ${group.linkId}`)
                             }
 
@@ -802,9 +854,7 @@ angular.module("pocApp")
 
 
 
-
-
-                    resolve(Q) //that.makeQ(treeObject)
+                    resolve({Q:Q,log:log}) //that.makeQ(treeObject)
                 })
 
 
@@ -812,7 +862,8 @@ angular.module("pocApp")
 
             //this is used by the composition to build the Q
             //this is the version that my renderer can support
-            makeQFromTree :  async function (treeObject,comp,strategy) {
+            //now using the tab version only...
+            makeQFromTreeDEP :  async function (treeObject,comp,strategy) {
                 //this is the original Q creator before I started hacking around with it
                 return new Promise(async (resolve) => {
                     //Given a tree array representing a composition (from jstree), construct a Q resource

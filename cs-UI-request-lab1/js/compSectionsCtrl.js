@@ -27,7 +27,7 @@ angular.module("pocApp")
                 $scope.local.ewDGs = []         //datagroups in section
                 $scope.local.ewEDs = []            //EDs in selected DG
                 $scope.local.ewValues = []          //actual values for the selected DG
-                if (section.items) {
+                if (section && section.items) {
                     section.items.forEach(function (item) {
                         let dg = $scope.hashAllDG[item.type[0]]
                         $scope.local.ewDGs.push(dg)
@@ -79,8 +79,20 @@ angular.module("pocApp")
                 let ew = {targetSection:$scope.selectedSection.name, sourceSection:section.name,dg:dg.name,ed:ed.path,value:value}
                 console.log(ew)
 
+                //add to the whole composition todo ?why did I do it this way
                 $scope.selectedComposition.enableWhen = $scope.selectedSection.enableWhen || []
                 $scope.selectedComposition.enableWhen.push(ew)
+
+                //add to the section as well..
+                $scope.selectedSection.enableWhen = $scope.selectedSection.enableWhen || []
+                $scope.selectedSection.enableWhen.push(ew)
+
+                delete $scope.local.ewSection
+                delete $scope.local.ewDG
+                delete $scope.local.ewED
+                delete $scope.local.ewValue
+
+
             }
 
             //-------------

@@ -3,11 +3,15 @@ angular.module("pocApp")
         function ($scope,Q,makeQSvc,$timeout,$http,$localStorage,Qtab) {
 
 
+            //todo - need to think about Q vs Qtab
             //https://hackweek.fhirpath-lab.com/Questionnaire?id={url to Q}
 
             $scope.input = {}
-            $scope.Q = Qtab //Q
+            $scope.Q = Q // Qtab //Q
             $scope.QR = {}
+
+            $scope.serverbase = "http://hapi.fhir.org/baseR4/"  //used for validation
+
 
             let vo = makeQSvc.makeTreeFromQ(Q)
             let treeData = vo.treeData
@@ -89,7 +93,7 @@ angular.module("pocApp")
 
 
 
-            $scope.serverbase = "http://hapi.fhir.org/baseR4/"  //used for validation
+
 
             //$scope.serverbase = "https://fhir.forms-lab.com/"
 
@@ -195,7 +199,8 @@ angular.module("pocApp")
                         // the node selection event...
 
                         if (data.node) {
-                            $scope.selectedNode = data.node;
+                            $scope.selectedNode = angular.copy(data.node)
+                            delete $scope.selectedNode.data.item
                         }
 
                         $scope.$digest();       //as the event occurred outside of angular...

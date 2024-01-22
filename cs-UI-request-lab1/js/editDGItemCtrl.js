@@ -444,7 +444,6 @@ angular.module("pocApp")
                                 $scope.fixed = {elName:'fixedCoding',value:elValue}
                                 $scope.fixedDisplay = `${elValue.code} | ${elValue.display} | ${elValue.system}`
 
-
                             }
                             break
                         case "Quantity":
@@ -497,10 +496,13 @@ angular.module("pocApp")
 
             $scope.addOption = function () {
                 $scope.options = $scope.options || []
-                $scope.options.push({code:$scope.input.newOptionCode,
+
+                let code = $scope.input.newOptionCode
+                code = code.replace(/ /g, "");
+
+                $scope.options.push({code:code,
                     display:$scope.input.newOptionDisplay,
-                    fsn:$scope.input.newOptionFSN,
-                    system:snomed})
+                    fsn:$scope.input.newOptionFSN})         //was adding snomed here...
                 delete $scope.input.newOptionCode
                 delete $scope.input.newOptionDisplay
                 delete $scope.input.newOptionFSN
