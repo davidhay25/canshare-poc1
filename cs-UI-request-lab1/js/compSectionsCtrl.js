@@ -84,8 +84,8 @@ angular.module("pocApp")
                 $scope.selectedComposition.enableWhen.push(ew)
 
                 //add to the section as well..
-                $scope.selectedSection.enableWhen = $scope.selectedSection.enableWhen || []
-                $scope.selectedSection.enableWhen.push(ew)
+               // $scope.selectedSection.enableWhen = $scope.selectedSection.enableWhen || []
+                //$scope.selectedSection.enableWhen.push(ew)
 
                 delete $scope.local.ewSection
                 delete $scope.local.ewDG

@@ -74,6 +74,26 @@ angular.module("pocApp")
                 $scope.logEntry = le
             }
 
+            //removes a conditional hide / show from a comp.
+            $scope.deleteSectionConditional = function (inx) {
+                if (confirm("Are you sure you wish to remove this conditional")) {
+                    $scope.selectedComposition.enableWhen.splice(inx,1)
+                }
+            }
+
+            $scope.getRulesCount = function () {
+                let cnt = 0
+                if ($scope.allCompElements) {
+                    $scope.allCompElements.forEach(function (item) {
+                        if (item.ed.rules) {
+                            cnt ++
+                        }
+                    })
+                }
+
+                return cnt
+            }
+
             $scope.revert = function () {
                 if (confirm("Are you sure you wish to revert this Composition? Any changes will be lost.")){
 
@@ -240,9 +260,14 @@ angular.module("pocApp")
             }
 
 
-            $scope.selectCompTreePath = function (path) {
+            $scope.selectRuleTreePath = function (path) {
 
+                let ar = path.split('.')
+                let dgName = ar.splice(0,1)[0]
+                let newPath = ar.join('.')
+                $scope.termSelectDGItem({DHName:dgName,hiddenDGName:dgName,path:newPath})
 
+              /*
                 $timeout(function () {
 
                     //let fullPath = `${item.hiddenDGName}.${item.path}`
@@ -253,7 +278,7 @@ angular.module("pocApp")
                     $scope.input.compTabActive = $scope.compUi.tree //make sure the tree is selected
 
                 },500)
-
+*/
 
             }
 

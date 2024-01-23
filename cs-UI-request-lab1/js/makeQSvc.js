@@ -82,7 +82,7 @@ angular.module("pocApp")
         //ed has controlType and controlHint
          function setControlType(ed,item,strategy) {
             //if useVS is true, then
-             return new Promise((resolve) => {
+           //  return new Promise((resolve) => {
                  strategy = strategy || {}
 
                  //config = config || {maxFromValueSet : 500}
@@ -191,8 +191,8 @@ angular.module("pocApp")
                          //resolve(item)
                          break
                  }
-                 resolve(item)
-             })
+               //  resolve(item)
+           //  })
 
         }
 
@@ -661,18 +661,6 @@ angular.module("pocApp")
                                     ew.answerCoding.system = ew.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
                                     section.enableWhen.push(ew)
 
-                                    /*let qEW = {operator:ew.operator,answerCoding:ew.value}
-                    delete qEW.answerCoding.pt  //the preferred term...
-                    qEW.answerCoding.system = qEW.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
-
-                    //need to determine the path to the question. For now, assume that
-                    //qEW.question = `${parent.linkId}.${ew.source}` //linkId of source is relative to the parent (DG)
-                    qEW.question = `${pathPrefix}${ew.source}` //linkId of source is relative to the parent (DG)
-
-                    item.enableWhen.push(qEW)*/
-
-
-
                                 })
 
                                 console.log(section.enableWhen)
@@ -750,14 +738,16 @@ angular.module("pocApp")
                             addEnableWhen(node.data.ed, item, pathPrefix)  //If there are any conditionals
 
                             //set the control type to use. Will add the VS or answerOptions to the item
-                            let response = await setControlType(node.data.ed, item, strategy)
+                            //temp let response = await setControlType(node.data.ed, item, strategy)
+                            setControlType(node.data.ed, item, strategy)
+                            let response = item
 
                             //applying formatting to a label
                            // let ext1 = {url:"http://hl7.org/fhir/StructureDefinition/rendering-xhtml"}
                            // ext1.valueString = `<div style="color: green">${response.text}</div>`
                             //response['_text'] = {extension: [ext1]}
 
-                            if (node.data.ed.mult == '0..*' || node.data.ed.mult == '1..*') {
+                            if (false && node.data.ed.mult == '0..*' || node.data.ed.mult == '1..*') {
                                 let ext2 = {url:"http://hl7.org/fhir/StructureDefinition/rendering-xhtml"}
                                 ext2.valueString = `<div style="font-weight:bold">${response.text}</div>`
                                 response['_text'] = {extension: [ext2]}
@@ -766,7 +756,7 @@ angular.module("pocApp")
 
                             //add a tooltip with the description
                             //response.item = []
-                            if (node.data.ed.description) {
+                            if (false && node.data.ed.description) {
                                 let tt = {text: node.data.ed.description, linkId: `${node.data.ed.path}-tt`, type: 'display',extension:[]}
                                 let ext = {url: "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
                                 //ext.valueCodeableConcept = {coding:[{system:"http://hl7.org/fhir/questionnaire-item-control",code:"flyover"}]}
@@ -777,17 +767,45 @@ angular.module("pocApp")
                                 response.item.push(tt)
                             }
 
-                            /* don't
+
                             log.push({msg:`Adding item ${response.text} to ${parent.text}`,item:angular.copy(response)})
-                            parent.item = parent.item || []
-                            parent.item.push(response)
-                            */
+                           // parent.item = parent.item || []
+                           // parent.item.push(response)
+
+                            //let root = parent
+                            let root = section
+
+                            if (node.children && node.children.length > 0) {
+                                response.text
+                                response.type = 'group'
+                                response.item = []
+
+
+                                let ext = {url: "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"}
+                                ext.valueInteger = 2
+                                response.extension = response.extension || []
+                                response.extension.push(ext)
+
+
+                                root.item.push(response)
+
+
+                                node.children.forEach(function (childNode) {
+                                    //addChild(item,childNode)
+                                    addChild(response, childNode, section)
+                                })
+                            } else {
+                                parent.item.push(response)
+                            }
+
+
+
 
                         }
 
 
 
-                        if (node.children && node.children.length > 0) {
+                        if (!canAdd &&   node.children && node.children.length > 0) {
 
                             //create a new group item and add to the current section
                             let group = {
@@ -804,9 +822,9 @@ angular.module("pocApp")
                             group.extension.push(ext)
 
 
-                            console.log(section.linkId)
-                            console.log(group.linkId)
-                            console.log("")
+                            //console.log(section.linkId)
+                            //console.log(group.linkId)
+                            //console.log("")
 
                             section.item = section.item || []
                             //section.item.push(group)
@@ -855,6 +873,13 @@ angular.module("pocApp")
 
 
                     resolve({Q:Q,log:log}) //that.makeQ(treeObject)
+
+                    function processChildren() {
+
+                    }
+
+
+
                 })
 
 

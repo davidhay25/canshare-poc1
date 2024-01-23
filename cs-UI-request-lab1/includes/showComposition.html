@@ -315,6 +315,7 @@
                 <div ng-show = "canEditComp(selectedComposition)">
 
             <!-- If the root is selected, we can add a new section-->
+                  <!--
             <div ng-show="selectedCompositionNode.id.indexOf('.') == -1">
               <br/>
               <strong>Add section</strong>
@@ -333,13 +334,15 @@
               </div>
             </div>
 
+                  -->
+
 
             <div ng-hide ="selectedCompositionNode.data.ed.mult == '0..0'  ||
               selectedCompositionNode.data.ed.zElement || selectedCompositionNode.data.ed.kind == 'root'">
 
               <button class="btn-link btn pull-right"
                 ng-hide = "selectedCompositionNode.data.ed.kind == 'section'"
-                      ng-click="removeElement(selectedCompositionNode.data.ed)">Remove this element</button>
+                      ng-click="removeElement(selectedCompositionNode.data.ed)">Hide this element</button>
 
               <button class="btn-link btn pull-right"
                       ng-show = "selectedCompositionNode.data.ed.kind == 'element'"
@@ -357,6 +360,7 @@
               </div>
 
 
+                  <!--
                <div ng-show="selectedCompositionNode.data.ed.kind == 'section'">
                  <br/><br/>
                  <strong>Add new DG to section</strong>
@@ -402,6 +406,8 @@
                  </div>
                </div>
             </div>
+
+                  -->
 
             </div>
 
@@ -620,7 +626,8 @@ Procedure – with drop down options ‘small diagnostic sample’ and ‘resect
 
 
 
-    <uib-tab heading="Conditionals">
+    <uib-tab>
+      <uib-tab-heading>Section conditionals <span class="badge">{{selectedComposition.enableWhen.length}}</span> </uib-tab-heading>
       <br/>
       <div ng-show="selectedComposition.enableWhen.length > 0">
         <strong>Section level Conditionals present in the Composition</strong>
@@ -633,6 +640,8 @@ Procedure – with drop down options ‘small diagnostic sample’ and ‘resect
             <td>{{ew.dg}}</td>
             <td>{{ew.ed}}</td>
             <td>{{ew.value}}</td>
+            <td><i class="glyphicon glyphicon-remove pull-right clickable"
+                   ng-click="deleteSectionConditional($index)"></i></td>
           </tr>
         </table>
         <em>Each row represents a source condition that must be true for the section to appear
@@ -789,7 +798,7 @@ Procedure – with drop down options ‘small diagnostic sample’ and ‘resect
         <tr ng-repeat="item in allCompElements"
             ng-show="item.ed.rules">
           <td style="width: 40%">
-            <div class="clickable" ng-click="selectCompTreePath(item.ed.path)">{{item.ed.path}}</div>
+            <div class="clickable" ng-click="selectRuleTreePath(item.ed.path)">{{item.ed.path}}</div>
           </td>
           <td>{{item.ed.rules}}</td>
         </tr>

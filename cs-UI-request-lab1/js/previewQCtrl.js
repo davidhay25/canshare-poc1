@@ -3,7 +3,7 @@ angular.module("pocApp")
         function ($scope,Q,makeQSvc,$timeout,$http,$localStorage,Qtab) {
 
 
-            //todo - need to think about Q vs Qtab
+
             //https://hackweek.fhirpath-lab.com/Questionnaire?id={url to Q}
 
             $scope.input = {}
@@ -11,6 +11,7 @@ angular.module("pocApp")
             $scope.QR = {}
 
             $scope.serverbase = "http://hapi.fhir.org/baseR4/"  //used for validation
+            //$scope.serverbase = "https://fhir.forms-lab.com/"
 
 
             let vo = makeQSvc.makeTreeFromQ(Q)
@@ -95,7 +96,7 @@ angular.module("pocApp")
 
 
 
-            //$scope.serverbase = "https://fhir.forms-lab.com/"
+
 
             let hapiServer = "http://hapi.fhir.org/baseR4/"  //used for validation
             let brianServer = "https://fhir.forms-lab.com/"

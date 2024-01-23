@@ -22,6 +22,12 @@ angular.module("pocApp")
                 return vsUrl
 
             },
+            populateCache : function (comp) {
+                // go through all the ValueSets in the composiiton and populate the cache for all of them
+                // idea is that this is called when the composition is loaded, then the results will be
+                // available when the form is created
+
+            },
             getOptionsForEd: function (ed) {
                 // return an array of options for an ed. Options have priority over ValueSet.
                 // return object {options:[],status:,vsUrl} - status is:

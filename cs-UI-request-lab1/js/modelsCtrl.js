@@ -1029,7 +1029,7 @@ angular.module("pocApp")
             //used by updates list as well -- and others -  hence moved to main controller
             //item = {hiddenDGName:, path:}  (path doesn't have leading dg name
             $scope.termSelectDGItem = function (item) {
-                // console.log(item)
+                 //console.log(item)
 
                 //set the tab to the DG tab
                 $scope.input.mainTabActive = $scope.ui.tabDG;
@@ -1727,14 +1727,9 @@ angular.module("pocApp")
                 $scope.fullQ = voQ.Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
                 $scope.Qlog = voQ.log   //the log of activity that occurred as the Q was created
                 //this is a version structured for tabs.
-                //todo I need to decide whether to update the renderer, use an external component
-                //or possibly derive fullQ from fullQTab.
                 $scope.fullQTab = voQ.Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
 
-                console.timeEnd('q')
-                //$scope.fullQ = await makeQSvc.getQFromTree(treeObject,comp,strategy)
-                console.log($scope.fullQ);
-                // Expected output: "resolved"
+
             }
 
 

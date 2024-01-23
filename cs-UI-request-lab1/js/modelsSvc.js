@@ -946,7 +946,7 @@ angular.module("pocApp")
                     }
 
                     iterationCount++
-                    if (iterationCount > 300) {
+                    if (iterationCount > 400) {
                         alert(`Excessive iteration count for DG ${inModel.name}. The tree view will be incorrect. The processing steps are shown in an errors tab.`)
                         throw new Error(`Excessive iteration count for DG ${inModel.name}`)
                     }
