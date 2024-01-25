@@ -34,11 +34,14 @@
       <uib-tab heading="DataGroups list" >
         <br/>
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div>Library DG count: {{libraryDGCount}}</div>
             <div>Local DG count: {{localDGCount}}</div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-3">
+            <div ng-show="user.email" class="pull-right clickable" ng-click="checkAllDGIn()">Check all DGs in</div>
+          </div>
+          <div class="col-md-5">
             <div class="pull-right">
               <checkbox  ng-change="refreshDGSummary(input.includeDeleted)"
                          ng-model="input.includeDeleted"></checkbox> Include deleted DG in list
@@ -287,9 +290,14 @@
             <select class="form-control" ng-model="input.filter[k]"
                     ng-options="v for v in hashMetaProperties[k]"></select>
           </div>
-          <div class = "col-md-3">
-            <button class="btn btn-link" ng-click="clearFilter()">Show all</button>
-          </div>
+          <div class = "col-md-6">
+            <div style="padding-top: 16px">
+
+              <button class="btn btn-link" ng-show="user.email" class="pull-right clickable" ng-click="checkAllCompIn()">Check all Compositions in</button>
+              <button
+                      class="btn btn-link" ng-click="clearFilter()">Show all</button>
+            </div>
+           </div>
         </div>
 
 

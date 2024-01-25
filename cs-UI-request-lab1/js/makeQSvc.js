@@ -767,6 +767,15 @@ angular.module("pocApp")
                                 response.item.push(tt)
                             }
 
+                            //add a placeholder
+                            if (node.data.ed.placeholder) {
+                                let extPlaceholder = {url:"http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-placeholder"}
+                                extPlaceholder.valueString = node.data.ed.placeholder
+                                response.extension = response.extension || []
+                                response.extension.push(extPlaceholder)
+                            }
+
+
 
                             log.push({msg:`Adding item ${response.text} to ${parent.text}`,item:angular.copy(response)})
                            // parent.item = parent.item || []

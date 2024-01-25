@@ -94,6 +94,41 @@
         </table>
       </div>
     </uib-tab>
+
+    <uib-tab heading = "Codes">
+      <div class="row">
+        <div class="col-md-2">
+          <input type="text" class="form-control" placeholder="Filter" ng-model="input.filterCodeReport"/>
+        </div>
+      </div>
+
+      <div class="tableFixHead">
+        <table class="table table-bordered table-condensed">
+          <thead>
+            <tr><th>Code|System</th><th>Display</th><th>Where used</th></tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="(k,v) in codeSummary" ng-show="canShowCodeReportLine(k)">
+            <td>{{k}}</td>
+            <td>{{v.display}}</td>
+            <td>
+              <div ng-repeat="item in v.lst">
+                DG: <span class="clickable" ng-click="termSelectDG(item)" >{{item.DGName}}</span>
+                Path: <span class="clickable" ng-click="termSelectDGItem(item)">{{item.path}}</span>
+                Type: <span>{{item.type}}</span>
+
+              </div>
+            </td>
+          </tr>
+          </tbody>
+
+        </table>
+      </div>
+
+
+    </uib-tab>
+
+
     <uib-tab heading = "Compositions">
       <div class="pull-right"> Composition overrides. Often (but not always) Terminology.</div>
 

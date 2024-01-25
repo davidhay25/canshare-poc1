@@ -34,6 +34,7 @@ angular.module("pocApp")
                 $scope.input.sourceReference = item.ed.sourceReference
                 $scope.input.path =  $filter('dropFirstInPath')(item.ed.path)
                 $scope.input.controlHint =  item.ed.controlHint
+                $scope.input.placeholder =  item.ed.placeholder
 
                 $scope.input.hideInQ =  item.ed.hideInQ
 
@@ -206,6 +207,7 @@ angular.module("pocApp")
                 ed.mult = $scope.input.mult
                 ed.valueSet = $scope.input.valueSet
                 ed.hideInQ = $scope.input.hideInQ
+                ed.placeholder = $scope.input.placeholder
                 if ($scope.input.controlHint) {
                     ed.controlHint = $scope.input.controlHint
                 }

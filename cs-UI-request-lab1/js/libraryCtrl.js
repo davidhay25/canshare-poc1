@@ -176,8 +176,6 @@ angular.module("pocApp")
 
             }
 
-
-
             //create the summary between library DG & local DG
             function makeDGSummary(allDG,libraryDG) {
                 let libraryHash = {}
@@ -406,6 +404,82 @@ angular.module("pocApp")
             }
 
 
+
+            $scope.checkAllDGIn = function () {
+                //only show if user logged in
+
+
+                let ctr = 0
+                Object.keys(allDG).forEach(function (key) {
+                    let DG = allDG[key]
+                    if (DG.checkedOut == user.email) {
+                        ctr++
+                    }
+                })
+
+                if (ctr == 0) {
+                    alert("There are no DataGroups checked out to you.")
+                    return
+                }
+
+                if (confirm(`Are you sure you want to check in all ${ctr} DGs checked out to you?`)) {
+                    //let lst = []
+                    Object.keys(allDG).forEach(function (key) {
+                        let DG = allDG[key]
+                        if (DG.checkedOut == user.email) {
+                           // lst.push(DG)
+                            librarySvc.checkIn(DG,user)
+                        }
+                    })
+                   // console.log(lst)
+                    alert("Check in complete. It may take a few seconds for all the checkins to be completed.")
+                    $scope.$close()
+
+
+
+
+                }
+
+            }
+
+            $scope.checkAllCompIn = function () {
+                //only show if user logged in
+
+
+                let ctr = 0
+                Object.keys(allComp).forEach(function (key) {
+                    let comp = allComp[key]
+                    if (comp.checkedOut == user.email) {
+                        ctr++
+                    }
+                })
+
+                if (ctr == 0) {
+                    alert("There are no Compositions checked out to you.")
+                    return
+                }
+
+                if (confirm(`Are you sure you want to check in all ${ctr} Compositions checked out to you?`)) {
+                    //let lst = []
+                    Object.keys(allComp).forEach(function (key) {
+                        let comp = allComp[key]
+                        if (comp.checkedOut == user.email) {
+                            // lst.push(DG)
+                            librarySvc.checkIn(comp,user)
+                        }
+                    })
+                    // console.log(lst)
+                    alert("Check in complete. It may take a few seconds for all the checkins to be completed.")
+                    $scope.$close()
+
+
+
+
+                }
+
+            }
+
+
             $scope.checkin = function (model) {
                 if (! model) {
                     alert("Library checkin was called on a null model")
@@ -414,6 +488,7 @@ angular.module("pocApp")
 
                 if (user && model.checkedOut == user.email) {
                     if ( confirm("Are you sure you want to check this in to the Library")) {
+
                         traceSvc.addAction({action:'checkin',model:model,description:"From library"})
                         librarySvc.checkIn (model,user,function(){
                             let dg = allDG[model.name]

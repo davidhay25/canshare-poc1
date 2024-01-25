@@ -141,7 +141,7 @@ angular.module('formsApp')
 
                 //called when the element receives focus. Emits an event so the host can display stuff
                 $scope.onFocus = function (cell) {
-                    console.log(cell)
+                    //console.log(cell)
                     $scope.$emit('elementSelected',{cell:cell})
 
                 }

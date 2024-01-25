@@ -6,6 +6,53 @@ angular.module("pocApp")
 
 
             return {
+                makeCodeSummary : function (hashDG) {
+                    //make a summary of all the codes used in the DG.
+                    //Examine fixed values, default values, options & Conditionals
+                    let hashCode = {}   //key is code|system
+                    Object.keys(hashDG).forEach(function (key) {
+                        let dg = hashDG[key]
+                        dg.diff.forEach(function (ed) {
+                            if (ed.fixedCoding) {
+                                let code = `${ed.fixedCoding.code}|${ed.fixedCoding.system}`
+                                hashCode[code] = hashCode[code] || {display:ed.fixedCoding.display,lst:[]}
+                                let t = hashCode[code]
+                                t.lst.push({code:code, DGName : key,hiddenDGName : key,path:ed.path,type:'fixed'})
+                            }
+                            if (ed.defaultCoding) {
+                                let code = `${ed.defaultCoding.code}|${ed.defaultCoding.system}`
+                                hashCode[code] = hashCode[code] || {display:ed.defaultCoding.display,lst:[]}
+                                let t = hashCode[code]
+                                t.lst.push({code:code, display:ed.defaultCoding.display,DGName : key,hiddenDGName : key,path:ed.path,type:'default'})
+                            }
+
+                            if (ed.options) {
+                                ed.options.forEach(function (opt) {
+                                    let code = `${opt.code}|${opt.system}`
+                                    hashCode[code] = hashCode[code] || {display:opt.display,lst:[]}
+                                    let t = hashCode[code]
+                                    t.lst.push({code:code, display:opt.display,DGName : key,hiddenDGName : key,path:ed.path,type:'option'})
+                                })
+
+                            }
+
+                            if (ed.enableWhen) {
+                                ed.enableWhen.forEach(function (ew) {
+                                    let code = `${ew.value.code}|${ew.value.system}`
+                                    hashCode[code] = hashCode[code] || {display:ew.display,lst:[]}
+                                    let t = hashCode[code]
+                                    t.lst.push({code:code, display:ew.value.display,dg:key,path:ed.path,type:'enableWhen'})
+                                })
+
+                            }
+
+                        })
+                    })
+
+                    return hashCode
+
+
+                },
                 makeNotesSummary: function (hashDG,hashComp) {
                     //All the notes fields from the current resources. currently just DG
                     let lstNotes = []

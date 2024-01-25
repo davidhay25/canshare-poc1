@@ -457,7 +457,12 @@
                       {{selectedNode.data.ed.rules}}
                     </td>
                   </tr>
-
+                  <tr>
+                    <td class="detailName">Placeholder</td>
+                    <td>
+                      {{selectedNode.data.ed.placeholder}}
+                    </td>
+                  </tr>
 
                   <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
                     <td class="detailName">Options</td>
@@ -1089,8 +1094,9 @@
           <div class="tableFixHead">
             <table class="table-bordered table">
               <thead>
-              <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Fixed value</th><th>Source</th>
-                <th ng-show="canEdit(selectedModel)">Edit</th></tr>
+              <tr><th><span ng-show="canEdit(selectedModel)">Edit</span></th><th>Path</th><th>Title</th>
+                <th>Description</th><th>Type</th><th>Mult.</th><th>Fixed value</th><th>Source</th>
+                </tr>
               </thead>
               <tbody>
               <!---     <tr ng-repeat="element in fullElementList">-->
@@ -1098,6 +1104,12 @@
                   ng-class="{hideElement: element.ed.mult == '0..0'}"
                   ng-show="canShowDGElement(element,$index)"
                   ng-hideX="$index==0">
+
+                <td>
+                  <i  ng-show="canEdit(selectedModel)" class="glyphicon glyphicon-edit pull-right clickable"
+                     ng-click="editDGItem(element)"></i>
+                </td>
+
                 <td>
                   <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
 
@@ -1136,13 +1148,14 @@
 
                     </td>
                 -->
-                <td>{{element.ed.fixedCoding}}</td>
+                <td>
+                  <div>{{element.ed.fixedCoding.code}}</div>
+                  <div>{{element.ed.fixedCoding.system}}</div>
+                  <div>{{element.ed.fixedCoding.display}}</div>
+                </td>
                 <td>{{element.sourceModelName}}</td>
 
-                <td ng-show="canEdit(selectedModel)">
-                  <i class="glyphicon glyphicon-edit pull-right clickable"
-                     ng-click="editDGItem(element)"></i>
-                </td>
+
 
 
 

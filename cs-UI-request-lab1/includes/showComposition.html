@@ -717,19 +717,21 @@ Procedure – with drop down options ‘small diagnostic sample’ and ‘resect
         </uib-tab>
         <uib-tab heading="Log">
           <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-7">
               <div class="myScroll">
                 <table class="table">
-                  <tr ng-repeat="row in Qlog">
+                  <tr  ng-class="{listItemSelected:row==logEntry}" ng-repeat="row in Qlog">
                     <td>{{$index}}</td>
-                    <td ng-click="showLogEntry(row)">{{row.msg}}</td>
+                    <td ng-click="showLogEntry(row)">{{row.msg}}
+                      <div><em>{{row.item.linkId}}</em></div>
+                    </td>
                   </tr>
                 </table>
               </div>
 
 
             </div>
-            <div class="col-md-4">
+            <div class="col-md-5">
               <div class="myScroll">
               <pre>{{logEntry | json}}</pre>
               </div>

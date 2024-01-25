@@ -18,8 +18,11 @@ angular.module("pocApp")
             */
 
 
-            $scope.input.metaProcedures = ['small diagnostic sample','resection']
-            $scope.input.metaCategories = ['histopathology request','histopathology report']
+            //console.log($window.indexedDB)
+
+
+            $scope.input.metaProcedures = ['Small diagnostic sample','Resection']
+            $scope.input.metaCategories = ['Histopathology request','Histopathology report']
 
             $localStorage.trace = $localStorage.trace || {on:false,limit:500,contents:[]}
 
@@ -59,6 +62,18 @@ angular.module("pocApp")
             $scope.hashAllDG = $localStorage.world.dataGroups
 
 
+            //allow filtering the code usage report
+            $scope.canShowCodeReportLine = function (code) {
+                if (code && $scope.input.filterCodeReport) {
+                    if (code.indexOf($scope.input.filterCodeReport) > -1 ){
+                        return true
+                    } else {
+                        return false
+                    }
+                } else {
+                    return true
+                }
+            }
 
             //console.log($scope.hashAllDG)
 
@@ -940,6 +955,7 @@ angular.module("pocApp")
                                 ed1.title = ed.title
                                 ed1.notes = ed.notes
                                 ed1.rules = ed.rules
+                                ed1.placeholder = ed.placeholder
                                 ed1.description = ed.description
                                 ed1.mult = ed.mult
                                 ed1.valueSet = ed.valueSet
@@ -1051,12 +1067,13 @@ angular.module("pocApp")
 
             //update
             $scope.updateTermSummary = function () {
-                console.log('Updating term summary')
+                //console.log('Updating term summary')
 
                 $scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
                 $scope.compTermSummary = modelTermSvc.makeCompOverrideSummary($scope.hashAllCompositions).list
                 $scope.hashVsSummary = modelTermSvc.makeValueSetSummary($scope.hashAllDG,$scope.hashAllCompositions).hashVS
                 $scope.notesSummary = modelTermSvc.makeNotesSummary($scope.hashAllDG,$scope.hashAllCompositions)
+                $scope.codeSummary = modelTermSvc.makeCodeSummary($scope.hashAllDG)
 
             }
 
