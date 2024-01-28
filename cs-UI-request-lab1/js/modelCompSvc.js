@@ -171,6 +171,8 @@ angular.module("pocApp")
                     return
                 }
 
+                let arLog = []    //error messages - eg missing DG
+
                 let comp = angular.copy(inComp)         //as we will be modifying the composition
                 let hashAllDG = angular.copy(inHashAllDG)
                 //generate a full list of elements for a composition. Like DG but need to accomodate sections
@@ -289,42 +291,14 @@ angular.module("pocApp")
                         })
 
 
-
-
-//console.log(vo.allElements)
-                        // - temp, checking out using the DG expansion    processDG(model,childPathRoot)
-
-
-
-                        /* not using a slice directly any more
-                        //if there's a slice, then add the slice name to the path..
-                        if (sectionItem.slice) {
-                            //childPathRoot += '-' + DG.slice.name
-
-                            childPathRoot = `${pathRoot}.${sectionItem.name}`
-                            //console.log('slice',childPathRoot,model)
-                            let slicedModel = angular.copy(model)
-                            slicedModel.path += "-" + sectionItem.slice.name
-                            slicedModel.title = sectionItem.slice.title
-                            slicedModel.slice = sectionItem.slice
-                            slicedModel.kind = 'slice'
-                            hashAllElements[childPathRoot] = {ed:slicedModel}
-
-                        } else {
-                            //childPathRoot = `${pathRoot}.${model.name}`
-                            childPathRoot = `${pathRoot}.${localPath}`
-                            hashAllElements[childPathRoot] = {ed:model,host:sectionItem}
-                        }
-
-                        */
-
-
-
                     } else {
                         console.log('missing name: ',model)
                         //this is a Z element - ie a FHIR DT directly attached to the section
                         // or a missing DG
-                        alert(`Missing type: ${type} (may be a z element - will need fixing if so)`)
+
+                        arLog.push(`Missing type: ${type} path: ${localPath}`)
+
+                       // alert(`Missing type: ${type} (may be a z element - will need fixing if so)`)
                     }
 
                 }
@@ -374,6 +348,15 @@ angular.module("pocApp")
 
                     ar.push(clone)
                 })
+
+                if (arLog.length > 0) {
+                    let msg = ""
+                    for (const s of arLog) {
+                        msg += s + '\n'
+                    }
+                    alert(msg)
+                }
+
 
                 return {allElements:ar,hashAllElements:hashAllElements}
 

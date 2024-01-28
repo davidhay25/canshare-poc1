@@ -13,30 +13,31 @@ angular.module("pocApp")
                     Object.keys(hashDG).forEach(function (key) {
                         let dg = hashDG[key]
                         dg.diff.forEach(function (ed) {
-                            if (ed.fixedCoding) {
-                                let code = `${ed.fixedCoding.code}|${ed.fixedCoding.system}`
-                                hashCode[code] = hashCode[code] || {display:ed.fixedCoding.display,lst:[]}
-                                let t = hashCode[code]
-                                t.lst.push({code:code, DGName : key,hiddenDGName : key,path:ed.path,type:'fixed'})
-                            }
-                            if (ed.defaultCoding) {
-                                let code = `${ed.defaultCoding.code}|${ed.defaultCoding.system}`
-                                hashCode[code] = hashCode[code] || {display:ed.defaultCoding.display,lst:[]}
-                                let t = hashCode[code]
-                                t.lst.push({code:code, display:ed.defaultCoding.display,DGName : key,hiddenDGName : key,path:ed.path,type:'default'})
-                            }
-
-                            if (ed.options) {
-                                ed.options.forEach(function (opt) {
-                                    let code = `${opt.code}|${opt.system}`
-                                    hashCode[code] = hashCode[code] || {display:opt.display,lst:[]}
+                            if (ed.mult !== '0..0') {
+                                if (ed.fixedCoding) {
+                                    let code = `${ed.fixedCoding.code}|${ed.fixedCoding.system}`
+                                    hashCode[code] = hashCode[code] || {display:ed.fixedCoding.display,lst:[]}
                                     let t = hashCode[code]
-                                    t.lst.push({code:code, display:opt.display,DGName : key,hiddenDGName : key,path:ed.path,type:'option'})
-                                })
+                                    t.lst.push({code:code, DGName : key,hiddenDGName : key,path:ed.path,type:'fixed'})
+                                }
+                                if (ed.defaultCoding) {
+                                    let code = `${ed.defaultCoding.code}|${ed.defaultCoding.system}`
+                                    hashCode[code] = hashCode[code] || {display:ed.defaultCoding.display,lst:[]}
+                                    let t = hashCode[code]
+                                    t.lst.push({code:code, display:ed.defaultCoding.display,DGName : key,hiddenDGName : key,path:ed.path,type:'default'})
+                                }
 
-                            }
+                                if (ed.options) {
+                                    ed.options.forEach(function (opt) {
+                                        let code = `${opt.code}|${opt.system}`
+                                        hashCode[code] = hashCode[code] || {display:opt.display,lst:[]}
+                                        let t = hashCode[code]
+                                        t.lst.push({code:code, display:opt.display,DGName : key,hiddenDGName : key,path:ed.path,type:'option'})
+                                    })
 
-                            if (ed.enableWhen) {
+                                }
+
+                                if (ed.enableWhen) {
                                 ed.enableWhen.forEach(function (ew) {
                                     let code = `${ew.value.code}|${ew.value.system}`
                                     hashCode[code] = hashCode[code] || {display:ew.display,lst:[]}
@@ -45,7 +46,7 @@ angular.module("pocApp")
                                 })
 
                             }
-
+                            }
                         })
                     })
 

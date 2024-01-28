@@ -261,9 +261,42 @@ angular.module("pocApp")
 
             $scope.downloadComp = function(comp) {
                 //set the comp property of the vo and exit. The caller (modelsCtrl.js) will update
-                $scope.$close({comp:comp})
+                //this is now an array of comp to support multiple comps being downloadad
+                $scope.$close({comp:[comp]})
+            }
+
+            $scope.downloadDisplayedComp = function () {
+                // download all of the compositions displayed (that aren't already present locally and checked out)
+                let arDownload = []     //array of compositions to download
+                for (const item of $scope.summaryComp) {
+                    if ($scope.showComp(item)) {
+                        if (item.library  ) {
+
+                            //the comp is in the library. Add to the download unless it is present locally
+                            //and checked out to the current user. ie overwrite locals not checked out to the current user
+                            if (item.local && item.local.checkedOut == user.email) {
+                                //do nothing
+                            } else {
+                                arDownload.push(item.library)
+                            }
+
+                        }
+                    }
+                }
+                console.log(arDownload)
+                if (arDownload.length == 0) {
+                    alert("All displayed Compositions are currently in your Local store")
+                    return
+                }
+
+                let msg = `There are ${arDownload.length} compositions not checked out to you that will be downloaded. Confirm you want this to happen.`
+
+                if (confirm(msg)) {
+                    $scope.$close({comp:arDownload})
+                }
 
             }
+
 
             $scope.downloadDG = function(dg) {
                 //set the comp property of the vo and exit. The caller (modelsCtrl.js) will update

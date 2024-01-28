@@ -5,7 +5,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
 
-            $scope.version = "0.6.9"
+            $scope.version = "0.6.10"
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -343,7 +343,11 @@ angular.module("pocApp")
 
                     if (vo && vo.comp) {
                         //a composition was passed in. Update (or add to) the $scope.hashAllCompositions
-                        $scope.hashAllCompositions[vo.comp.name] = vo.comp
+                        //updated: now an array of comp
+                        for (const c of vo.comp) {
+                            $scope.hashAllCompositions[c.name] = c
+                        }
+
 
                     }
 

@@ -251,6 +251,10 @@
                                 <div class="pull-right clickable spacer" ng-show = "user.email"
                                      ng-click="newModel('dg')">New dg</div>
 
+                                <div class="pull-right clickable spacer"
+                                     ng-show = "user.email && selectedModel"
+                                     ng-click="newModel('dg',selectedModel)">New child</div>
+
 <!--
                                 <div class="pull-right clickable spacer" ng-show = "user.email && selectedModel"
                                      ng-click="newModel('dg',selectedModel)">New child</div>

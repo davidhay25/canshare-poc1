@@ -293,9 +293,13 @@
           <div class = "col-md-6">
             <div style="padding-top: 16px">
 
-              <button class="btn btn-link" ng-show="user.email" class="pull-right clickable" ng-click="checkAllCompIn()">Check all Compositions in</button>
-              <button
+                <button
                       class="btn btn-link" ng-click="clearFilter()">Show all</button>
+
+              <button ng-show="user.email"
+                      class="btn btn-link" ng-click="downloadDisplayedComp()">Download all shown</button>
+              <button class="btn btn-link pull-right" ng-show="user.email" class="pull-right clickable" ng-click="checkAllCompIn()">Check all Compositions in</button>
+
             </div>
            </div>
         </div>
