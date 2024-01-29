@@ -500,7 +500,12 @@ angular.module("pocApp")
                 $scope.options = $scope.options || []
 
                 let code = $scope.input.newOptionCode
-                code = code.replace(/ /g, "");
+                if (code) {
+                    code = code.replace(/ /g, "");
+                } else {
+                    code = ""
+                }
+
 
                 $scope.options.push({code:code,
                     display:$scope.input.newOptionDisplay,
