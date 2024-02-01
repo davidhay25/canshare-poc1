@@ -3,10 +3,10 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
-                  $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
+                  $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc) {
 
             //$scope.version = "0.6.12"
-            $scope.version = modelsSvc.getVersion()
+            $scope.version = utilsSvc.getVersion()
             $scope.input = {}
             $scope.input.showFullModel = true
 
