@@ -6,7 +6,10 @@ angular.module("pocApp")
         this.fhir = {}
         this.user
 
+
+
         return {
+
             setUser : function (user) {
                 this.user = user
             },

@@ -1,10 +1,11 @@
 angular.module("pocApp")
     .controller('queryCtrl',
-        function ($scope,$http,$localStorage,$uibModal,$q,$timeout,querySvc) {
+        function ($scope,$http,$localStorage,$uibModal,$q,$timeout,querySvc,utilsSvc) {
 
             $scope.localStorage = $localStorage
 
             $scope.input = {}
+            $scope.version = utilsSvc.getVersion()
 
             $scope.input.tsInstance = "authoring"
 

@@ -6,6 +6,8 @@ angular.module("pocApp")
             $scope.local = {cmOptions : {},cm:{property:{}}}
             $scope.cmProperties = {}
 
+            //$scope.input.showHelp = true
+
             //load the CM
             $scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-scripted-dec"}})
 
@@ -138,9 +140,9 @@ angular.module("pocApp")
 
             //get all the concepts for a single property
             $scope.getOptionsOneProperty = function() {
-                console.log($scope.local.cm.property)
+                //console.log($scope.local.cm.property)
                 delete $scope.lstMatchingConcepts
-                delete $scope.cmExpandedVS      //so it't not in the display area
+                delete $scope.cmExpandedVS      //so it's not in the display area
                 //call the rules engine to determine the possible concepts. The engine needs:
                 //  the list of user selected values for all properties so far  - local.cm.property
                 //  the property that needs the list - input.cmProperty & $scope.selectedElement
@@ -189,12 +191,27 @@ angular.module("pocApp")
                                 if (target.dependsOn) {
                                     target.dependsOn.forEach(function(don) {
                                         let property = don.property
-                                        let v = don.value
+                                        let v = don.value //the value is actually a code
                                         $scope.hashProperties[property] = $scope.hashProperties[property] || []
+
+                                        //as the contents of the hash is an array, we need to look through the arrey
+                                        //to determine if this value has been alreadt added
+                                        let canAdd = true
+                                        for (const item of $scope.hashProperties[property]) {
+                                            if (item.code == v) {
+                                                canAdd = false
+                                                break
+                                            }
+                                        }
+
+                                        if (canAdd) {
+                                            $scope.hashProperties[property].push({code:v,display:don.display})
+                                        }
+/*
                                         if ($scope.hashProperties[property].indexOf(v) == -1) {
                                             $scope.hashProperties[property].push({code:v,display:don.display})
                                         }
-
+*/
 
                                     })
                                 }

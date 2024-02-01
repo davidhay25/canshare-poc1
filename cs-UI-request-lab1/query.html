@@ -56,7 +56,7 @@
 
     <script src="directive/renderForm/renderFormDir.js"></script>
     <script src="directive/renderForm/renderFormSvc.js"></script>
-
+    <script src="js/utilsSvc.js"></script>
     <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
 
 
@@ -77,17 +77,8 @@
 
             </div>
 
-            <div class="col-md-1 col-sm-1">
-                <div class="navbar-text">
-
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="navbar-text">
 
 
-                </div>
-            </div>
 
             <div class="col-md-4">
                 <div class="navbar-text">
@@ -108,7 +99,18 @@
                 </form>
             </div>
 
+            <div class="col-md-1 col-sm-1">
+                <div class="navbar-text">
+                    {{version}}
+                </div>
+            </div>
 
+            <div class="col-md-2">
+                <div class="navbar-text">
+                    <checkbox ng-model="input.showHelp"></checkbox> Show help
+
+                </div>
+            </div>
 
             <div class="col-md-2">
                 <a href="https://teaho.govt.nz/" target="_blank">
@@ -264,7 +266,7 @@
 
 
 
-        <uib-tab  heading="ConceptMap">
+        <uib-tab ng-show="false" heading="ConceptMap">
             <!-- This accesses, displays and uses Concept maps on the server. The CMs are created by a script from the spreadsheet.-->
 
             <div class="row">
@@ -523,7 +525,8 @@
 
 
                         </uib-tab>
-
+<!--
+This code moved to canshare specific view - if we want it here too then the tree div element will need a different id
                         <uib-tab heading="Tree">
                             <div class="row">
                                 <div class="col-md-6">
@@ -540,11 +543,7 @@
                                         <br>
                                         <div class="clickable" ng-click="lookup(selectedCmTreeTarget.data.code)">Lookup {{selectedCmTreeTarget.data.code}}</div>
 
-                                        <!--
-                                                                                <table class="table">
-                                                                                    <tr
-                                                                                </table>
-                                        -->
+
                                         <div class="myScroll">
                                             <pre>{{selectedCmTreeTarget.data | json}}</pre>
                                         </div>
@@ -590,9 +589,7 @@
                                             </uib-tab>
 
                                         </uib-tabset>
-                                        <!--
-                                        <div class="clickable" ng-click="lookup(selectedCmTreeTarget.data.code)">Lookup {{selectedCmTreeTarget.data.code}}</div>
--->
+
 
 
 
@@ -622,7 +619,7 @@
 
                         </uib-tab>
 
-
+-->
 
                         <uib-tab heading="Maps">
                             <div ng-hide="fullSelectedCM.group">

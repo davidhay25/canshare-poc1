@@ -4,12 +4,61 @@
     .matched {
       background-color: lightgreen;
     }
+
+    .elementName  {
+        font-family: "Courier New";
+        background-color: white;
+        border: 1px solid gainsboro;
+        padding : 3px;
+        margin: 3px;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+
+    }
   </style>
+
+    <div ng-show="input.showHelp">
+        <div class="pull-right">
+            <a target="_blank"
+               href="https://docs.google.com/document/d/1MNutsIBRlSE0Z7ZfxuKk7mC1_kEFwnhNvWRBqdOWouE/edit">
+                ConceptMap Documentation
+            </a>
+        </div>
+        <div class="alert alert-info">
+            This tab contains functions that display the contents of the ConceptMap that represent the
+            selection of specific properties for ACT-NOW data
+        </div>
+    </div>
 
   <uib-tabset>
     <uib-tab heading="Rules">
       <br/>
 
+        <div ng-show="input.showHelp" class="alert-info alert">
+            This tab indicates how the target matching works.
+            <br/><br/>
+            You first select a property. The app then displays a couple of things.
+            <br/><br/>
+            <ul>
+                <li>All the properties and values from all the <span class="elementName">target.dependsOn</span> parts
+                of all the targets. ie all the possible property values that can determine which target
+                    is selected. They are rendered in a drop-down which therefore contain all the possible
+                values.</li>
+                <li>A table containing all the targets. Each row in the table contains the criteria which cause that
+                target to be matched, and the corresponding ValueSet or Concept.</li>
+            </ul>
+
+            To see which target would be matched by a particular combination of property values,
+            make the appropriate selection in the dropdown and then click the 'Select target' button.
+            <br/><br/>
+            The target that matches the combination of property values is then outlined in green.
+            There should only be one match for any given combination. If there is more than one
+            then let the CanShare team know.
+
+
+
+        </div>
       <div >
         <div class="row">
           <div class="col-md-2">
@@ -37,7 +86,7 @@
           <div class="row">
             <div class="col-md-7">
               <div class="rounded-box">
-              <button class="btn-primary btn pull-right" ng-click="getOptionsOneProperty()">Select concepts</button>
+              <button class="btn-primary btn pull-right" ng-click="getOptionsOneProperty()">Select target</button>
 
               <div ng-repeat="(k,v) in hashProperties">
                 <div class="row">
@@ -57,20 +106,22 @@
 
                 <br/>
               <em>These lists are populated from all dependsOn values for all rules (target) in the property element. They are NOT
-              progressively populated as selections are made (the UI tab will do that eventually).</em>
+              progressively populated as selections are made (the UI tab will do that eventually). In other
+              words the contents of each target property has all the possible values from all the
+              dependsOn entries.</em>
               </div>
 
               <hr/>
               <strong>Potential targets from ConceptMap</strong>
               <div class="myScroll">
                 <table class="table table-bordered">
-                  <tr><th>Criteria</th><th>ValueSet or Concept</th><th>Action</th></tr>
+                  <tr><th>Criteria</th><th>Matched ValueSet or Concept</th><th ng-show="false">Action</th></tr>
                   <tr ng-repeat="target in selectedElement.target" ng-class ="{matched:target.matched}">
                     <td>
                       <table class="table table-bordered">
 
                         <tr ng-repeat="do in target.dependsOn">
-                          <td>{{do.property}}</td>
+                          <td style="width: 40%;">{{do.property}}</td>
                           <td>{{do.display}} ({{do.value}})</td>
 
 
@@ -82,7 +133,7 @@
                       <div ng-show="target.code.indexOf('http') !== -1" class="clickable" ng-click="cmExpandVS(target.code)">{{target.display}}</div>
                     </td>
 
-                    <td>
+                    <td ng-show="false">
                       <i class="glyphicon glyphicon-edit clickable" ng-click="editRule(target)"></i>
                       <div><i class="glyphicon glyphicon-remove clickable"></i></div>
 
@@ -101,7 +152,7 @@
 
 
                 <div ng-show="matchingVS.length > 0" >
-                  <strong>Matching ValueSets</strong>
+                  <strong>Matching ValueSet</strong>
                   <ul>
                     <li ng-repeat="vs in matchingVS">{{vs}}</li>
                   </ul>
@@ -144,12 +195,164 @@
 
         </uib-tab>
         <uib-tab heading = "Json of element">
+            <div ng-show="input.showHelp" class="alert-info alert">
+                This is the json of the selected element section. Note that there is an additional
+                entry in the json called 'match'. This is used internally by the app to indicate
+                which of the targets match the input values and is not part of the ConceptMap json.
+            </div>
 
           <pre>{{selectedElement | json}}</pre>
         </uib-tab>
       </uib-tabset>
     </uib-tab>
+
+
+    <uib-tab heading="Tree">
+        <div ng-show="input.showHelp" class="alert-info alert">
+            This tab represents a tree view of the ConceptMap and allows the individual entries within
+            the CM to be displayed in a number of formats including the raw Json.
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div ng-show="input.showHelp" class="alert-info alert">
+                    The top nodes of the tree are the individual properties that can
+                    be populated from the ConceptMap. These correspond to the
+                    <span class="elementName">ConceptMap.group.element</span> entry in the CM.
+
+                    The order is not significant.
+                    <br/>
+                    Expanding a node displays the <span class="elementName">ConceptMap.group.element.target</span>  entries.
+                    Each of these represents a possible ValueSet or concept for the property. Which one
+                    is the correct one depends on the <span class="elementName">.dependsOn</span> entries. They effectively act as a filter
+                    by matching the property values already selected in the UI with the dependsOn property & value.
+
+                    <br/>
+                    If there are multiple <span class="elementName">.dependsOn</span> entries
+                    then all must match
+                    for the target to apply. There should only be a single match for any given combination of
+                    <span class="elementName">.dependsOn</span> entries.
+                    <br/>
+                    A special case is where the <span class="elementName">.dependsOn.value</span> entry is
+                    <span class="elementName">0</span>. This means that there should be no existing value for that property - in effect
+                    it defines a default value.
+
+
+
+
+
+                </div>
+                <div class="myScroll">
+                    <div id="cmTree"></div>
+                </div>
+
+
+            </div>
+            <div class="col-md-6">
+                <div ng-show="selectedCmTreeTarget.type == 'source'">
+                    <p>This is the 'thing' that we are looking to get the set of possible options
+                        for - like the clinical 'T' values. The contents of the set will vary according
+                        to external properties - such as the cancer service or type</p>
+                    <br>
+                    <div class="clickable" ng-click="lookup(selectedCmTreeTarget.data.code)">Lookup {{selectedCmTreeTarget.data.code}}</div>
+
+
+                    <div class="myScroll">
+                        <pre>{{selectedCmTreeTarget.data | json}}</pre>
+                    </div>
+                </div>
+
+
+                <div ng-show="selectedCmTreeTarget.type == 'target'">
+                    These are the potential refsets or concepts that could be included in the source set. Each
+                    target has a set of properties (dependsOn) which determine if the target concept is to be
+                    included in the set. They define the required values for the external properties.
+                    Only a single target should match any given combination of properties.
+                    <br/>
+
+                    In some cases
+                    the .code might be a single code rather than a refset code. This can be determined by
+                    examining the format of the <span class="elementName">.code</span> entry. If it starts
+                    with 'http' then is is a ValueSet url. Otherwise it is a SNOMED-CT concept id.
+
+                    <br>
+                    <uib-tabset>
+                        <uib-tab heading = "Json">
+                            <div class="myScroll">
+                                <pre>{{selectedCmTreeTarget.data | json}}</pre>
+                            </div>
+                        </uib-tab>
+                        <uib-tab heading = "Contents">
+                            <div class="clickable pull-right" ng-click="expandVSFromCM(selectedCmTreeTarget.data.code)">Show ValueSet / refSet</div>
+
+                            <div>Count: {{expandedCMVS.expansion.contains.length}}</div>
+                            <table class="table table-bordered">
+                                <tr><th>Display</th><th>Code</th><th>System</th></tr>
+                                <tr ng-repeat="concept in expandedCMVS.expansion.contains">
+                                    <td>{{concept.display}}</td>
+                                    <td>
+                                        <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
+                                    <td>{{concept.system}}</td>
+                                </tr>
+                            </table>
+
+                            <div ng-show="expandedCMVS.url"><em>{{expandVSFromCMQuery}}</em></div>
+                        </uib-tab>
+                        <uib-tab ng-show="expandedCMVS.url" heading = "ValueSet">
+                            <pre>{{expandedCMVS | json}}</pre>
+                        </uib-tab>
+
+                    </uib-tabset>
+
+
+
+
+                </div>
+                <div ng-show="selectedCmTreeTarget.type == 'dependsOn'">
+                    These are the individual properties whose value must match the external properties.
+                    Within a target, all properties must match for the target to be included in the set. Only
+                    a single target should match any given combination of properties.
+
+                    <br>
+                    <div ng-repeat = "dep in selectedCmTreeTarget.data.dependsOn">
+                        <div class="clickable" ng-click="lookup(dep.value)">Lookup {{dep.value}}</div>
+
+                    </div>
+
+                    <div class="myScroll">
+                        <pre>{{selectedCmTreeTarget.data.dependsOn | json}}</pre>
+                    </div>
+
+                </div>
+
+                <br/>
+
+
+            </div>
+        </div>
+
+        </uib-tab>
+
+      <uib-tab heading="Json">
+          <br/>
+          <div ng-show="input.showHelp" class="alert-info alert">
+            This is the ConceptMap json as it was retrieved from the Terminology Server.
+          </div>
+
+          <a ng-show="downloadLinkMapName" class="btn btn-link pull-right" download="{{downloadLinkMapName}}"
+             href="{{downloadLinkMap}}" title="{{downloadLinkMapName}}" >
+              Download ConceptMap
+          </a>
+          <div class="clearfix"></div>
+
+          <pre>{{fullSelectedCM | json}}</pre>
+      </uib-tab>
+
     <uib-tab heading="UI">
+      <em>This tab is incomplete. The intention is to produce a sample UI that shows how the
+      options in the form can be populated taking into account the other options</em>
+        <div ng-show="input.showHelp" class="alert-info alert">
+
+        </div>
       <div class="row">
         <div class="col-md-4">
           <table class="table table-bordered">

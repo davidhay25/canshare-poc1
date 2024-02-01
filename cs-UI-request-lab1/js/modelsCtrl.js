@@ -5,7 +5,8 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc) {
 
-            $scope.version = "0.6.11"
+            //$scope.version = "0.6.12"
+            $scope.version = modelsSvc.getVersion()
             $scope.input = {}
             $scope.input.showFullModel = true
 
@@ -80,15 +81,19 @@ angular.module("pocApp")
             //look for DG errors like repeating parents in the hierarchy tree
             if ($scope.hashAllDG) {
                 modelDGSvc.checkAllDG($scope.hashAllDG)
+
+                //If there's a DG with no diff, all sorts of bad stuff happens. Shouldn't occur, but if it does it's a pain
+                //this at least prevents the app from crashing, so remedial action can be taken
+                Object.keys($scope.hashAllDG).forEach(function (key) {
+                    $scope.hashAllDG[key].diff = $scope.hashAllDG[key].diff || []
+                })
+
+
+
             } else {
                 alert("There don't appear to be any local DG's. You'll need to clear local and resync from the Library. Local changes will be lost. Sorry about that.")
             }
 
-            //If there's a DG with no diff, all sorts of bad stuff happens. Shouldn't occur, but if it does it's a pain
-            //this at least prevents the app from crashing, so remedial action can be taken
-            Object.keys($scope.hashAllDG).forEach(function (key) {
-                $scope.hashAllDG[key].diff = $scope.hashAllDG[key].diff || []
-            })
 
             //
 
