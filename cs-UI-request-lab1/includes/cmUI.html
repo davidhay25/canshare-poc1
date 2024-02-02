@@ -115,7 +115,7 @@
               <strong>Potential targets from ConceptMap</strong>
               <div class="myScroll">
                 <table class="table table-bordered">
-                  <tr><th>Criteria</th><th>Matched ValueSet or Concept</th><th ng-show="false">Action</th></tr>
+                  <tr><th>Criteria</th><th>Matched ValueSet or Concept</th><th>Action</th></tr>
                   <tr ng-repeat="target in selectedElement.target" ng-class ="{matched:target.matched}">
                     <td>
                       <table class="table table-bordered">
@@ -133,9 +133,13 @@
                       <div ng-show="target.code.indexOf('http') !== -1" class="clickable" ng-click="cmExpandVS(target.code)">{{target.display}}</div>
                     </td>
 
-                    <td ng-show="false">
-                      <i class="glyphicon glyphicon-edit clickable" ng-click="editRule(target)"></i>
-                      <div><i class="glyphicon glyphicon-remove clickable"></i></div>
+                    <td>
+                        <div ng-show="false">
+                            <i class="glyphicon glyphicon-edit clickable" ng-click="editRule(target)"></i>
+                            <div><i class="glyphicon glyphicon-remove clickable"></i></div>
+                        </div>
+                        <div class="clickable" ng-click = "showTarget(target)">Show</div>
+
 
 
                     </td>
@@ -176,9 +180,12 @@
               </div>
 
 
+                <div ng-show="selectedTarget">
+                    <pre>{{selectedTarget | json}}</pre>
+                </div>
 
 
-              <div class="banner">{{cmExpandedVS.url}}</div>
+              <div ng-show="cmExpandedVS" class="banner">{{cmExpandedVS.url}}</div>
               <div class="myScroll">
                 <ul>
                   <li ng-repeat="concept in cmExpandedVS.expansion.contains">
@@ -187,6 +194,10 @@
                   </li>
                 </ul>
               </div>
+
+
+
+
             </div>
           </div>
 

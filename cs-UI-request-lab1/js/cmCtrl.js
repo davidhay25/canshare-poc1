@@ -8,6 +8,15 @@ angular.module("pocApp")
 
             //$scope.input.showHelp = true
 
+            $scope.showTarget = function (target) {
+                if ($scope.selectedTarget && target.code == $scope.selectedTarget.code) {
+                    delete $scope.selectedTarget
+                } else {
+                    $scope.selectedTarget = target
+                }
+
+            }
+
             //load the CM
             $scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-scripted-dec"}})
 
@@ -74,6 +83,7 @@ angular.module("pocApp")
             //expand a ValueSet
             $scope.cmExpandVS = function (url) {
                 delete $scope.cmExpandedVS
+                delete $scope.selectedTarget
                 delete $scope.lstMatchingConcepts
                 delete $scope.matchingVS
 
@@ -176,6 +186,7 @@ angular.module("pocApp")
             $scope.makeListOfTargets = function (key) {
                 if (! key) {return}
                 delete $scope.selectedElement
+                delete $scope.selectedTarget
                 delete $scope.cmExpandedVS
                 let concept = $scope.cmProperties[key].concept
                 $scope.hashProperties = {} //a hash of all properties in all dependsOn and all their possible values
