@@ -16,19 +16,32 @@ angular.module("pocApp")
 
                     })
 
+                    $http.get('/model/allCompositions').then(
+                        function (data) {
+                            console.log(data.data)
+                            $scope.hashAllCompositions = {}
+                            data.data.forEach(function (comp) {
+                                $scope.hashAllCompositions[comp.name] = comp
+
+                            })
+
+                            //now we have both DG's and compositions we can build the hash of all types
+
+                            let world = {dataGroups:$scope.hashAllDG,compositions:$scope.hashAllCompositions}
+                            let vo1 = modelsSvc.validateModel(world)
+                            $scope.input.types = vo1.types      //a hash keyed by name
+
+                            console.log(vo1.errors)
+
+
+
+                        }
+                    )
+
                 }
             )
 
-            $http.get('/model/allCompositions').then(
-                function (data) {
-                    console.log(data.data)
-                    $scope.hashAllCompositions = {}
-                    data.data.forEach(function (comp) {
-                        $scope.hashAllCompositions[comp.name] = comp
 
-                    })
-                }
-            )
 
 
             //$scope.hashAllCompositions = $localStorage.world.compositions
@@ -37,10 +50,12 @@ angular.module("pocApp")
             $scope.version = utilsSvc.getVersion()
 
             //todo - currently generating $scope.input.types as a byproduct of validation. move to service
+/*
             let vo1 = modelsSvc.validateModel($localStorage.world)
             $scope.input.types = vo1.types      //a hash keyed by name
 
-
+            console.log(vo1.errors)
+*/
 
             //when a QR is created by the renderform directive -
             $scope.$on('elementSelected',function(event,vo) {
