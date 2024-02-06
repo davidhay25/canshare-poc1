@@ -150,7 +150,11 @@ angular.module('formsApp')
 
                 //note that this is called every time there is a change (eg keypress) in the forms component
                 //this is to ensure that the QR is always up to date. onBlur could miss the most recently updated firld...
-                $scope.makeQR = function() {
+                $scope.makeQR = function(linkId) {
+
+
+                    //$scope.$emit('qrCreated',)
+
 
                     //before building the QR, the comments from the tree need to be incorporated.
                     //use a clone of the model data so the displayed form is not updated

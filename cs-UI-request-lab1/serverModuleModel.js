@@ -60,7 +60,7 @@ async function setup(app) {
     database = client.db("canShare")
     await client.connect()
     //await listDatabases(client)
-    console.log("connected")
+    console.log("model connected")
 
     //==== access
 

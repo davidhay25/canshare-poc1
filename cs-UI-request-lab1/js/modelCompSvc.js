@@ -167,7 +167,7 @@ angular.module("pocApp")
 
                 //shouldn't happen
                 if (!inComp) {
-                    console.error("Called mekeFullList with empty comp")
+                    console.error("Called makeFullList with empty comp")
                     return
                 }
 

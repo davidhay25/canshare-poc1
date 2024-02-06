@@ -24,6 +24,7 @@ const commonModule = require("./serverModuleCommonUI.js")
 const clinicalViewerModule = require("./serverModuleClinicalViewerUI")
 const terminologyModule = require("./serverModuleTerminologyUI")
 const modelModule = require("./serverModuleModel")
+const reviewModule = require("./serverModuleReview")
 
 //let config = require("./config.json")
 
@@ -48,6 +49,7 @@ dashBoardModule.setup(app)
 clinicalViewerModule.setup(app)
 terminologyModule.setup(app)
 modelModule.setup(app)
+reviewModule.setup(app)
 
 //common calls (not specifically related to requester or lab. ?move to separate module
 

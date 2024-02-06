@@ -22,8 +22,8 @@ angular.module("pocApp")
             //console.log($window.indexedDB)
 
 
-            $scope.input.metaProcedures = ['Small diagnostic sample','Resection']
-            $scope.input.metaCategories = ['Histopathology request','Histopathology report']
+            $scope.input.metaProcedures = ['Small diagnostic sample','Resection','Radiation therapy','SACT therapy']
+            $scope.input.metaCategories = ['Histopathology request','Histopathology report','Treatment summary']
 
             $localStorage.trace = $localStorage.trace || {on:false,limit:500,contents:[]}
 
@@ -1468,8 +1468,6 @@ angular.module("pocApp")
 
                 let rootNodeId = $scope.allCompElements[0].path
                 let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
-
-
                 makeCompTree(treeData,rootNodeId)
 
 

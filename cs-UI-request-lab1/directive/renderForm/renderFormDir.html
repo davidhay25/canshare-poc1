@@ -53,7 +53,8 @@
     <div class="{{formPane}}">
 
       <br/>
-      <div ng-repeat="row in selectedSection.rows track by $index">
+      <div class="myScroll">
+        <div ng-repeat="row in selectedSection.rows track by $index">
 
         <!-- This is a check for group level showhide. If not a group then will be shown (but each item is checked as well)
         Note that each row created from the group (eg if col count is used) has the group attached to the row
@@ -169,9 +170,11 @@
 
 
       </div>
-
+      </div>
 
     </div>
+
+
 
     <div class="{{drawingPane}}">
       <canvas id="drawingCanvas" width="200" height="200" style="border: #c9302c" ></canvas>
@@ -183,10 +186,5 @@
 
 
   </div>
-
-
-
-
-
 
 </div>

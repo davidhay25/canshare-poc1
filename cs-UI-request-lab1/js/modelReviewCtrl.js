@@ -1,68 +1,87 @@
 angular.module("pocApp")
     .controller('modelReviewCtrl',
-        function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$timeout,$uibModal,$filter) {
+        function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$timeout,$uibModal,makeQSvc,utilsSvc) {
 
             $scope.input = {}
 
-            if (! $localStorage.world) {
-                    $localStorage.world = modelsDemoSvc.getDemo()
-                console.log("Re-creating world")
-            }
-
-            //todo while developing, store commemts in browser cache. Move to db later
-            $localStorage.world.comments = $localStorage.world.comments || {}
-
-            //console.log($localStorage.world.comments)
+            //todo - **** will need to be a query against the library
 
             $scope.hashAllCompositions = $localStorage.world.compositions
-
-
             $scope.hashAllDG = $localStorage.world.dataGroups
 
+            $scope.version = utilsSvc.getVersion()
+
+            //todo - currently generating $scope.input.types as a byproduct of validation. move to service
             let vo1 = modelsSvc.validateModel($localStorage.world)
-            $scope.errors = vo1.errors
             $scope.input.types = vo1.types      //a hash keyed by name
 
 
-            function makeAllCommentsSummary(){
-                $scope.allComments = []
-                let compName = $scope.selectedComp.name
-                let temp = $localStorage.world.comments[compName]       //hash keyed by path
-                if (temp) {
-                    Object.keys(temp).forEach(function (key) {
-                        let arComments = temp[key]
-                        arComments.forEach(function (note) {
-                            let comment = {id:note.id,comment:note.comment,path:key,disposition : note.disposition,
-                                dispositionNote: note.dispositionNote,author:note.author}
-                            $scope.allComments.push(comment)
-                        })
-                    })
+
+            //when a QR is created by the renderform directive -
+            $scope.$on('elementSelected',function(event,vo) {
+                // selectedCompositionNode.data.ed
+
+                let linkId = vo.cell.item.linkId
+                $scope.currentLinkId = linkId
+
+                $scope.commentsThisPath = $scope.commentsThisComp[linkId]
+
+                console.log(linkId)
+
+                //this is just making up a node to match the tree
+                $scope.selectedCompositionNode = {data:{}}
+                if ($scope.hashCompElements[linkId]) {
+                    $scope.selectedCompositionNode.data.ed = $scope.hashCompElements[linkId].ed
                 }
 
 
-            }
+
+
+                console.log(vo)
+            })
+
+
+
 
             //add a comment to the current comp
             $scope.addComment = function (note) {
-                let path = $scope.selectedCompositionNode.data.ed.path
-                let compName = $scope.selectedComp.name
-                $localStorage.world.comments[compName] = $localStorage.world.comments[compName] || {}
-                let temp = $localStorage.world.comments[compName]
-                temp[path] = temp[path] || []
+                //let path = $scope.selectedCompositionNode.data.ed.path
 
-                let comment = {comment:note}   //will need to add path when saving to db
+                path = $scope.currentLinkId
+
+
+                let compName = $scope.selectedComp.name
+
+
+                let comment = {path:path,compName:compName, comment:note}   //will need to add path when saving to db
                 comment.id = 'id-'+ new Date().getTime()
                 comment.author = $scope.input.author
-                temp[path].push(comment)
+
+
+                let url = "review"
+                $http.post(url,comment).then(
+                    function (data) {
+                        //alert('Comment has been saved')
+                        //console.log(data)
+                        $scope.setCommentsThisComp(function(){
+                            $scope.commentsThisPath = $scope.commentsThisComp[path]
+                        })
+
+
+
+                    }, function (err) {
+                        alert (angular.toJson(err))
+                    }
+                )
+
+
+               // temp[path].push(comment)
 
                 //$localStorage.world.comments[compName].push(comment)
                 delete $scope.input.comment
 
-                makeAllCommentsSummary()
-                setCommentsThisComp()
-                //alert("Comment added")
 
-                $scope.commentsThisPath = $scope.commentsThisComp[path]
+
 
             }
 
@@ -72,13 +91,14 @@ angular.module("pocApp")
 
             //passes in a single review to update
             $scope.addDisposition = function(comment) {
+
                 $uibModal.open({
                     templateUrl: 'modalTemplates/disposition.html',
                     backdrop: 'static',
                     controller: function ($scope, comment) {
                         $scope.input = {}
                         $scope.comment = comment
-                        csDisposition = "http://clinfhir.com/fhir/CodeSystem/disposition-code"
+                        csDisposition = "http://canshare.com/fhir/CodeSystem/disposition-code"
 
                         $scope.input = {}
 
@@ -112,7 +132,7 @@ angular.module("pocApp")
                     },
                     resolve: {
                         comment: function () {
-                            return comment
+                            return angular.copy(comment)
                         }
                     }
 
@@ -120,6 +140,23 @@ angular.module("pocApp")
                     //c is an updated comment
 
                     let compName = $scope.selectedComp.name
+
+                    let qry = `review/${compName}`
+                    $http.put(qry,c).then(
+                        function (data) {
+                            console.log(data)
+
+                            $scope.setCommentsThisComp()
+
+
+                            comment = c         //so the change will
+                        }, function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+
+/*
+
                     let hashCommentsForPath = $localStorage.world.comments[compName]
 
                     //todo - not saving. move to db.
@@ -137,6 +174,8 @@ angular.module("pocApp")
 
                         }
                     })
+
+                    */
 
 
 
@@ -166,12 +205,71 @@ angular.module("pocApp")
             }
 
 
-            function setCommentsThisComp() {
+            //get all the comments
+            $scope.setCommentsThisComp = function(vo) {
                 let compName = $scope.selectedComp.name
-                $scope.commentsThisComp =  $localStorage.world.comments[compName] || {}
+                delete $scope.allComments
+                $scope.commentsThisComp = {}
+
+                let url = `review/${compName}`
+                $http.get(url).then(
+                    function (data) {
+                        console.log(data)
+                        //what gets returned is an array of comments for this composition (based on name)
+                        //convert it to a hash keyed on path with the contents as an array of comments
+                        if (data.data && data.data.length > 0) {
+                            $scope.allComments = data.data
+                            data.data.forEach(function (comment) {
+                                let path = comment.path
+                                $scope.commentsThisComp[path] = $scope.commentsThisComp[path] || []
+                                $scope.commentsThisComp[path].push(comment)
+                            })
+                        }
+
+                        console.log($scope.commentsThisComp)
+
+                        //now construct a summary of comments by section
+                        $scope.commentsBySection = {}
+                        $scope.allComments.forEach(function (comment) {
+                            let ar = comment.path.split('.')
+                            let section = ar[1]     //section is always the 2nd element
+                            let control = ar[ar.length-1]   //the name of the element. May be an issue if there is a duplaicted name - like status
+
+                            $scope.commentsBySection[section] = $scope.commentsBySection[section] || []
+                            let item = {control:control,comment:comment}
+                            item.shortPath = ar.slice(3).join('.')
+                            $scope.commentsBySection[section].push(item)
+                        })
+
+                        //now sort by control name
+                        Object.keys($scope.commentsBySection).forEach(function (key) {
+                            let obj = $scope.commentsBySection[key]
+                            obj.sort(function (a,b) {
+                                if (a.control > b.control) {
+                                    return 1
+                                } else {
+                                    return -1
+                                }
+                            })
+                        })
+
+                        if (vo) {
+                            vo()
+                        }
+
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+
+
+                //$scope.commentsThisComp =  $localStorage.world.comments[compName] || {}
             }
 
             $scope.selectComposition = function (comp) {
+                if (! comp) {
+                    return
+                }
                 $scope.selectedComp = comp
                 console.log(comp)
 
@@ -188,8 +286,8 @@ angular.module("pocApp")
                 console.log(treeData)
                 makeCompTree(treeData,rootNodeId)
 
-                setCommentsThisComp()
-                makeAllCommentsSummary()
+                $scope.setCommentsThisComp()
+
 
             }
 
@@ -207,17 +305,45 @@ angular.module("pocApp")
                         $scope.commentsThisPath = $scope.commentsThisComp[$scope.selectedCompositionNode.data.ed.path]
 
 
+                        $scope.currentLinkId = $scope.selectedCompositionNode.data.ed.path
+
+
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...
                 }).bind("loaded.jstree", function (event, data) {
                     let id = treeData[0].id
                     $(this).jstree("open_node",id);
+
+                    let treeObject = $(this).jstree(true).get_json('#', { 'flat': false })
+
+
+                    let strategy = null
+                    asyncCall(treeObject,$scope.selectedComp,
+                        strategy)
+
+
                     $scope.$digest();
                 });
 
             }
+            async function asyncCall(treeObject,comp,strategy) {
+                console.log('calling');
+                console.time('q')
 
+
+                //$scope.fullQ = await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+
+                let voQ = await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+
+                //$scope.fullQ = await makeQSvc.makeQFromTree(treeObject,comp,strategy)
+                $scope.fullQ = voQ.Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+                $scope.Qlog = voQ.log   //the log of activity that occurred as the Q was created
+                //this is a version structured for tabs.
+                //$scope.fullQTab = voQ.Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+
+
+            }
 
             //todo - temp, for debugging
             $timeout(function(){

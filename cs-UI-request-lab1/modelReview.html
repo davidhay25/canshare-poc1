@@ -44,10 +44,22 @@
 
     <script src="js/modelCompSvc.js"></script>
     <script src="js/filters.js"></script>
+    <script src="js/makeQSvc.js"></script>
+    <script src="js/codedOptionsSvc.js"></script>
+    <script src="js/utilsSvc.js"></script>
 
+    <script src="js/utilsSvc.js"></script>
+
+
+
+    <script src="directive/renderForm/renderFormSvc.js"></script>
+    <script src="directive/renderForm/renderFormDir.js"></script>
+    <script src="directive/renderSingleItem/renderSingleItemDir.js"></script>
+
+<!--
     <script src="js/models/ObservationModels.js"></script>
     <script src="js/models/StagingModels.js"></script>
-
+-->
 </head>
 
 <body style="padding: 8px;padding-top: 80px">
@@ -65,28 +77,24 @@
 
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <div class="navbar-text">
 
                     <select class="form-control" ng-model="selectedComp"
                         ng-change="selectComposition(selectedComp)"
-                            ng-options = "k for (k,v) in hashAllCompositions"></select>
+                            ng-options = "v.title for (k,v) in hashAllCompositions"></select>
                 </div>
             </div>
 
-            <div class="col-md-2">
-                <div class="navbar-text">
 
-                </div>
-            </div>
             <div class="col-md-1 col-sm-1">
                 <form class="navbar-form navbar-left">
                     <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
                 </form>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <div class="navbar-text">
-
+                    {{version}}
                 </div>
             </div>
             <div class="col-md-2">
@@ -100,40 +108,54 @@
     </nav>
 
 
-    <uib-tabset>
-        <uib-tab heading="Tree">
+    <uib-tabset  ng-show="selectedComp">
+        <uib-tab heading="Composition">
+
 
             <div class="row">
-                <div class="col-md-4">
-                    <div class="pull-right clickable" ng-click="expandCompTree()">Expand all ({{allCompElements.length}})</div>
-                    <div class="myScroll">
-                        <div id="compositionTree"></div>
-                    </div>
+                <div class="col-md-8">
+
+                    <uib-tabset>
+                        <uib-tab heading="Form">
+                            <div class="pull-right"><em>This form is only to assist with reviewing and does not represent what a 'real' form might look like.</em></div>
+                            <renderform q="fullQ" qr="{}"></renderform>
+                        </uib-tab>
+                        <uib-tab heading="Tree">
+                            <div class="pull-right clickable" ng-click="expandCompTree()">Expand all ({{allCompElements.length}})</div>
+                            <div class="myScroll">
+                                <div id="compositionTree"></div>
+                            </div>
+                        </uib-tab>
+
+                    </uib-tabset>
 
                 </div>
+
+
                 <div class="col-md-4">
 
                     <div ng-show="selectedCompositionNode">
-                        <strong>Details</strong>
-<!--
-                        <div class="row">
-                            <div class="col-md-3">
-                                Path
-                            </div>
-                            <div class="col-md-9">
-                                {{selectedCompositionNode.data.ed.path}}
-                            </div>
-                        </div>
 
-                        <div class="row">
-                            <div class="col-md-3">
-                                Kind
-                            </div>
-                            <div class="col-md-9">
-                                {{selectedCompositionNode.data.ed.kind}}
-                            </div>
-                        </div>
-                        -->
+                        <div class="banner">Details</div>
+                                <!--
+                                                        <div class="row">
+                                                            <div class="col-md-3">
+                                                                Path
+                                                            </div>
+                                                            <div class="col-md-9">
+                                                                {{selectedCompositionNode.data.ed.path}}
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row">
+                                                            <div class="col-md-3">
+                                                                Kind
+                                                            </div>
+                                                            <div class="col-md-9">
+                                                                {{selectedCompositionNode.data.ed.kind}}
+                                                            </div>
+                                                        </div>
+                                                        -->
 
                         <div ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
 
@@ -181,7 +203,7 @@
 
                                 </div>
                             </div>
-
+<!--
                             <div class="row" ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
                                 <div class="col-md-3">
                                     ValueSet
@@ -196,49 +218,30 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="row" ng-show="selectedCompositionNode.data.ed.options">
-                                <div class="col-md-3">
-                                    Options List
-                                </div>
-                                <div class="col-md-9">
-
-                                    <ul>
-                                        <li ng-repeat="opt in selectedCompositionNode.data.ed.options ">
-                                            {{opt.pt}}
-                                        </li>
-                                    </ul>
+                            -->
 
 
-                                </div>
-                            </div>
 
 
 
                         </div>
 
                         <div class="row" ng-show = "selectedCompositionNode.data.ed.zElement">
-                            <div class="col-md-3">
+                                    <div class="col-md-3">
 
-                            </div>
-                            <div class="col-md-9">
-                                <em>This element has been added directly (a 'Z' element)</em>
-                            </div>
-                        </div>
-
-                    </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <em>This element has been added directly (a 'Z' element)</em>
+                                    </div>
+                                </div>
 
 
-                </div>
-                <div class="col-md-4">
-                    <div ng-show="selectedCompositionNode">
-                        <strong>Comments</strong>
+                        <div class="banner">Comments</div>
 
-                        <table class="table table-condensed">
-                            <tr><th>Comment</th><th>Author</th><th>Disposition</th></tr>
+                        <table class="table table-condensed" ng-show="commentsThisPath.length > 0">
+                            <tr><th>Comment</th><th>Disposition</th></tr>
                             <tr ng-repeat = "com in commentsThisPath">
                                 <td>{{com.comment}}</td>
-                                <td>{{com.author}}</td>
                                 <td>{{com.disposition.display}}
                                     <div><em>{{com.dispositionNote}}</em></div>
 
@@ -267,28 +270,72 @@
 
             </div>
 
+
+
         </uib-tab>
 
         <uib-tab>
             <uib-tab-heading>All comments <span class="badge">{{allComments.length}}</span> </uib-tab-heading>
-            <table class="table-condensed table-bordered table">
-                <tr><th>Path</th><th>Comment</th><th>Author</th><th>Disposition</th></tr>
-                <tr ng-repeat="comment in allComments">
-                    <td>{{comment.path}}</td>
-                    <td>{{comment.comment}}</td>
-                    <td>{{comment.author}}</td>
-                    <td>
-                        <div ng-show="comment.disposition">
-                            {{comment.disposition.display}}
-                            <div><em>{{comment.dispositionNote}}</em></div>
-                        </div>
-                        <div ng-show="! comment.disposition">
-                            <div class="clickable" ng-click="addDisposition(comment)">Add disposition</div>
-                        </div>
 
-                    </td>
-                </tr>
-            </table>
+
+            <uib-tabset>
+
+                <uib-tab heading="By section">
+                    <div ng-repeat="(k,v) in commentsBySection">
+                        <div><strong>{{k}}</strong></div>
+                        <table class="table table-bordered">
+                            <tr><th>Path</th><th>Author</th><th>Comment</th><th>Disposition</th></tr>
+                            <tr ng-repeat="item in v">
+                                <td width="15%">
+                                    <div  uib-popover="{{item.shortPath}}"
+                                          popover-append-to-body=true
+                                          popover-placement="auto top"
+                                          popover-trigger="'mouseenter'">
+                                        {{item.control}}
+                                    </div>
+
+                                </td>
+                                <td width="15%">{{item.comment.author}}</td>
+                                <td width="45%">{{item.comment.comment}}</td>
+                                <td>
+                                    <div ng-show="item.comment.disposition">
+                                        {{item.comment.disposition.display}}
+                                        <div><em>{{item.comment.dispositionNote}}</em></div>
+                                    </div>
+                                    <div ng-show="! item.comment.disposition">
+                                        <div class="clickable" ng-click="addDisposition(item.comment)">Add disposition</div>
+                                    </div>
+
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </uib-tab>
+                <uib-tab heading="Raw">
+                    <table class="table-condensed table-bordered table">
+                        <tr><th>Path</th><th>Author</th><th>Comment</th><th>Disposition</th></tr>
+                        <tr ng-repeat="comment in allComments">
+                            <td>{{comment.path}}</td>
+                            <td>{{comment.author}}</td>
+                            <td>{{comment.comment}}</td>
+
+                            <td>
+                                <div ng-show="comment.disposition">
+                                    {{comment.disposition.display}}
+                                    <div><em>{{comment.dispositionNote}}</em></div>
+                                </div>
+                                <div ng-show="! comment.disposition">
+                                    <div class="clickable" ng-click="addDisposition(comment)">Add disposition</div>
+                                </div>
+
+                            </td>
+                        </tr>
+                    </table>
+
+                </uib-tab>
+            </uib-tabset>
+
 
         </uib-tab>
 
