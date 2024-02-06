@@ -4,7 +4,7 @@ angular.module("pocApp")
 
         return {
             getVersion : function(){
-                return "0.6.14"
+                return "0.6.15"
             },
             findExtensionCC : function(item,url) {
                 //assume that the extension is a CC abd we're looking for the first entry

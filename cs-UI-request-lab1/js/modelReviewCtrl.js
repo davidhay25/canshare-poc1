@@ -6,8 +6,33 @@ angular.module("pocApp")
 
             //todo - **** will need to be a query against the library
 
-            $scope.hashAllCompositions = $localStorage.world.compositions
-            $scope.hashAllDG = $localStorage.world.dataGroups
+
+            $http.get('/model/allDG').then(
+                function (data) {
+                    console.log(data.data)
+                    $scope.hashAllDG = {}
+                    data.data.forEach(function (dg) {
+                        $scope.hashAllDG[dg.name] = dg
+
+                    })
+
+                }
+            )
+
+            $http.get('/model/allCompositions').then(
+                function (data) {
+                    console.log(data.data)
+                    $scope.hashAllCompositions = {}
+                    data.data.forEach(function (comp) {
+                        $scope.hashAllCompositions[comp.name] = comp
+
+                    })
+                }
+            )
+
+
+            //$scope.hashAllCompositions = $localStorage.world.compositions
+            //$scope.hashAllDG = $localStorage.world.dataGroups
 
             $scope.version = utilsSvc.getVersion()
 
@@ -216,9 +241,12 @@ angular.module("pocApp")
                     function (data) {
                         console.log(data)
                         //what gets returned is an array of comments for this composition (based on name)
+                        //the array may be empty
                         //convert it to a hash keyed on path with the contents as an array of comments
+
+                        $scope.allComments = data.data
                         if (data.data && data.data.length > 0) {
-                            $scope.allComments = data.data
+
                             data.data.forEach(function (comment) {
                                 let path = comment.path
                                 $scope.commentsThisComp[path] = $scope.commentsThisComp[path] || []
@@ -267,6 +295,12 @@ angular.module("pocApp")
             }
 
             $scope.selectComposition = function (comp) {
+                delete $scope.selectedComp
+                //delete
+
+                delete  $scope.fullQ
+                delete  $scope.Qlog
+
                 if (! comp) {
                     return
                 }
@@ -323,7 +357,7 @@ angular.module("pocApp")
                         strategy)
 
 
-                    $scope.$digest();
+                    //$scope.$digest();
                 });
 
             }
@@ -341,16 +375,17 @@ angular.module("pocApp")
                 $scope.Qlog = voQ.log   //the log of activity that occurred as the Q was created
                 //this is a version structured for tabs.
                 //$scope.fullQTab = voQ.Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
-
+                $scope.$digest();
 
             }
 
+            /*
             //todo - temp, for debugging
             $timeout(function(){
                 $scope.selectComposition($scope.hashAllCompositions['PathRequest'])
                // makeAllCommentsSummary()
             },500)
 
-
+*/
 
         })
