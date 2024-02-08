@@ -1,5 +1,21 @@
 angular.module("pocApp")
 
+    .filter('compositionSummaryPath',function(){
+        //return a version of the path removing unneeded segments (for display)
+        return function(path) {
+
+            if (path) {
+                let ar = path.split('.')
+                //let section = ar[1]
+                ar.splice(0,4)
+
+                return `${ar.join('.')}`
+            }
+
+
+        }
+    })
+
     .filter('lastInUrl',function(){
         //return the last element in a url
         //todo - there must be a more elegant way than this...

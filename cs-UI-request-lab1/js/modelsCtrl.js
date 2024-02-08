@@ -845,7 +845,9 @@ angular.module("pocApp")
 
                     dg.diff.forEach(function (ed) {
                         ed.type.forEach(function (typ) {
-                            if (typ == dgName) {
+                            //if the diff is a deleted one, then don't worry about it
+                            //todo - could there be a way of removing the diff from the source?
+                            if (ed.mult !== '0..0' && typ == dgName) {
                                 arRejectMessage.push(`This DG is referenced by ${dg.name} (${ed.path})`)
                             }
                         })

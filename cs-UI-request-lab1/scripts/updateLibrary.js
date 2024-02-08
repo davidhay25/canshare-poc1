@@ -1,16 +1,19 @@
 #!/usr/bin/env node
 
-//from an exported list, update the DG library
+//from an exported list, update the DG library with all the DSs in the export
+
 
 const axios = require('axios')
 
 let fs = require('fs')
-let fileName = "./allDataGroups-nov7.json"
-let serverUrl = "http://poc.canshare.co.nz"         //the server is listening on post 80
-//let serverUrl = "http://localhost:9500"
+let fileName = "./allDataGroups.json"
+//let serverUrl = "http://poc.canshare.co.nz"         //the server is listening on post 80
+let serverUrl = "http://localhost:9500"
 let dgs = fs.readFileSync(fileName).toString()
 
 //console.log(dgs)
+
+//return
 
 let hashDG = JSON.parse(dgs).dg
 //console.log(hashDG)

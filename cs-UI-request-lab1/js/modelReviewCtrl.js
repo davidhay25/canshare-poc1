@@ -1,15 +1,25 @@
 angular.module("pocApp")
     .controller('modelReviewCtrl',
-        function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$timeout,$uibModal,makeQSvc,utilsSvc) {
+        function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$timeout, $uibModal,makeQSvc,utilsSvc,$window) {
 
             $scope.input = {}
 
-            //todo - **** will need to be a query against the library
+            //in the table view, hide common DG like HCP as the details are not relevant to reviewers
+            $scope.input.hideSomeDG = true
+
+
+            let search = $window.location.search;
+            let modelName = null
+            if (search) {
+                modelName = search.substr(1)
+                //alert(modelName)
+
+            }
 
 
             $http.get('/model/allDG').then(
                 function (data) {
-                    console.log(data.data)
+                    //console.log(data.data)
                     $scope.hashAllDG = {}
                     data.data.forEach(function (dg) {
                         $scope.hashAllDG[dg.name] = dg
@@ -18,7 +28,7 @@ angular.module("pocApp")
 
                     $http.get('/model/allCompositions').then(
                         function (data) {
-                            console.log(data.data)
+                            //console.log(data.data)
                             $scope.hashAllCompositions = {}
                             data.data.forEach(function (comp) {
                                 $scope.hashAllCompositions[comp.name] = comp
@@ -33,6 +43,27 @@ angular.module("pocApp")
 
                             console.log(vo1.errors)
 
+                            //now that we have all the DG & Compositions, was a modelName passed in?
+
+                            if (modelName) {
+
+                                if ($scope.hashAllCompositions[modelName]) {
+                                    $scope.selectComposition($scope.hashAllCompositions[modelName])
+                                    $scope.selectedFromUrl = true      //to indicate that the modelname was passed in on the url
+                                } else if ($scope.hashAllDG[modelName]) {
+
+                                    $scope.selectDG($scope.hashAllDG[modelName])
+                                    $scope.selectedFromUrl = true      //to indicate that the modelname was passed in on the url
+                                } else {
+
+                                    alert(`The model name: ${modelName} was not found in the library for either Composition or DataGroup`)
+                                }
+
+
+
+                            }
+
+
 
 
                         }
@@ -42,27 +73,47 @@ angular.module("pocApp")
             )
 
 
-
-
-            //$scope.hashAllCompositions = $localStorage.world.compositions
-            //$scope.hashAllDG = $localStorage.world.dataGroups
+            //if showAllCommentSummary is true (ie the summary tab is being shown) display the full list of comments in the right pane
+            $scope.showAllCommentSummary = true
+            $scope.tabSelect = function (tabname) {
+                console.log(tabname)
+                if (tabname == 'summary') {
+                    $scope.showAllCommentSummary = true
+                } else {
+                    $scope.showAllCommentSummary = false
+                }
+            }
 
             $scope.version = utilsSvc.getVersion()
 
-            //todo - currently generating $scope.input.types as a byproduct of validation. move to service
-/*
-            let vo1 = modelsSvc.validateModel($localStorage.world)
-            $scope.input.types = vo1.types      //a hash keyed by name
 
-            console.log(vo1.errors)
-*/
+            //When an ed is selected in a table
+            $scope.selectED = function (ed) {
+                $scope.selectedED = ed
+                $scope.currentLinkId = ed.path
 
-            //when a QR is created by the renderform directive -
+                //this is just making up a node to match the tree
+                //todo - change details to just use ED - issue is section multiplicity
+                $scope.selectedCompositionNode = {data:{ed:ed}}
+
+                //now create the set of comments for this path
+                $scope.commentsThisPath = $scope.commentsThisComp[$scope.selectedCompositionNode.data.ed.path]
+
+
+            }
+
+            //when an element is selected in a form
             $scope.$on('elementSelected',function(event,vo) {
                 // selectedCompositionNode.data.ed
 
                 let linkId = vo.cell.item.linkId
+
+                //need to get the selectedED (to add to the comment)
                 $scope.currentLinkId = linkId
+                //todo - what if this is an ED?
+                $scope.selectedED = $scope.hashCompElements[linkId].ed
+
+
 
                 $scope.commentsThisPath = $scope.commentsThisComp[linkId]
 
@@ -74,36 +125,100 @@ angular.module("pocApp")
                     $scope.selectedCompositionNode.data.ed = $scope.hashCompElements[linkId].ed
                 }
 
-
-
-
                 console.log(vo)
             })
 
 
+            //called by the table view to determine if a row is displayed
+            $scope.showTableRow = function (ed) {
+                if (ed.mult == '0..0') {
+                    return false
+                }
+
+                let canShow = true
+
+                if ($scope.input.tableFilter) {
+                    if (ed.title) {
+                        let title = ed.title.toLowerCase()
+                        let srch = $scope.input.tableFilter.toLowerCase()
+                        if (title.indexOf(srch) == -1) {
+                            canShow = false
+                        }
+                    }
+                }
+
+                //If there's a specific section requested - only show conetnts of that section
+                let arPath = ed.path.split('.')
+                if ($scope.input.tableSection) {
+                    if ($scope.input.tableSection.name == 'all') {
+                        //return canShow
+                    } else {
+                        //need to check the second element of the ed path which is the section name...
+                        //let ar = ed.path.split('.')
+                        if (arPath[1] !== $scope.input.tableSection.name) {
+                            canShow = false
+                        }
+                    }
+                }
+
+                //If the row is a child of type HealthcarePractitionerSummary then hide
+                //todo - make optional, extend to others if it wprks
+
+                if ($scope.input.hideSomeDG) {
+                    //if the type is HCP then add to ignorepath
+                    if (ed.type && ed.type[0] == 'HealthcarePractitionerSummary') {
+                        $scope.pathsToIgnore[ed.path] = true
+                        console.log(ed.path)
+                    } else {
+                        Object.keys($scope.pathsToIgnore).forEach(function (key) {
+                            if (ed.path.startsWith(key)) {
+                                canShow = false
+                            }
+
+                        })
+                    }
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+                return canShow
+
+            }
 
 
             //add a comment to the current comp
             $scope.addComment = function (note) {
                 //let path = $scope.selectedCompositionNode.data.ed.path
 
-                path = $scope.currentLinkId
+                let path = $scope.currentLinkId
 
+
+                //let ed = $scope.selectedCompositionNode.data.ed
 
                 let compName = $scope.selectedComp.name
-
 
                 let comment = {path:path,compName:compName, comment:note}   //will need to add path when saving to db
                 comment.id = 'id-'+ new Date().getTime()
                 comment.author = $scope.input.author
+                comment.ed = $scope.selectedED
+
+
 
 
                 let url = "review"
                 $http.post(url,comment).then(
                     function (data) {
-                        //alert('Comment has been saved')
-                        //console.log(data)
-                        $scope.setCommentsThisComp(function(){
+
+                        $scope.setCommentsThisModel(function(){
                             $scope.commentsThisPath = $scope.commentsThisComp[path]
                         })
 
@@ -186,7 +301,7 @@ angular.module("pocApp")
                         function (data) {
                             console.log(data)
 
-                            $scope.setCommentsThisComp()
+                            $scope.setCommentsThisModel()
 
 
                             comment = c         //so the change will
@@ -244,9 +359,8 @@ angular.module("pocApp")
                 })
             }
 
-
-            //get all the comments
-            $scope.setCommentsThisComp = function(vo) {
+            //get all the comments for the given model (comp or dg)
+            $scope.setCommentsThisModel = function(vo) {
                 let compName = $scope.selectedComp.name
                 delete $scope.allComments
                 $scope.commentsThisComp = {}
@@ -269,19 +383,24 @@ angular.module("pocApp")
                             })
                         }
 
-                        console.log($scope.commentsThisComp)
+                        //console.log($scope.commentsThisComp)
 
                         //now construct a summary of comments by section
                         $scope.commentsBySection = {}
                         $scope.allComments.forEach(function (comment) {
-                            let ar = comment.path.split('.')
-                            let section = ar[1]     //section is always the 2nd element
-                            let control = ar[ar.length-1]   //the name of the element. May be an issue if there is a duplaicted name - like status
+                            if (comment.path) {
+                                let ar = comment.path.split('.')
+                                let section = ar[1]     //section is always the 2nd element
+                                let control = ar[ar.length-1]   //the name of the element. May be an issue if there is a duplaicted name - like status
 
-                            $scope.commentsBySection[section] = $scope.commentsBySection[section] || []
-                            let item = {control:control,comment:comment}
-                            item.shortPath = ar.slice(3).join('.')
-                            $scope.commentsBySection[section].push(item)
+                                $scope.commentsBySection[section] = $scope.commentsBySection[section] || []
+                                let item = {control:control,comment:comment}
+                                item.path = comment.path
+                                item.shortPath = ar.slice(3).join('.')
+                                $scope.commentsBySection[section].push(item)
+                            }
+
+
                         })
 
                         //now sort by control name
@@ -305,13 +424,70 @@ angular.module("pocApp")
                     }
                 )
 
+            }
 
-                //$scope.commentsThisComp =  $localStorage.world.comments[compName] || {}
+            $scope.selectDG = function (dg) {
+                console.log(dg)
+                //todo just for dev atm - not sure if
+                $scope.selectedComp = dg
+                $scope.setCommentsThisModel()   //retrieve comments for this model
+
+
+                let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
+                $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
+
+                let voQ = makeQSvc.makeQFromDG(vo.allElements,$scope.hashAllDG)
+                $scope.fullQ = voQ.Q
+
+
+
+                //The DG element tree
+                let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
+                //makeDGTree(treeData)
+
+
+                let rootNodeId = vo.allElements[0].path
+                //let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
+
+
+                console.log(treeData)
+                makeDGTree(treeData,rootNodeId)
+
+
+
+            }
+
+            $scope.getRowColour = function (ed) {
+                let colour
+                switch (ed.kind) {
+                    case 'section' :
+                        colour = "#eee"
+                        break
+
+                }
+
+                if (ed.type && ed.type[0] == 'Group') {
+                    colour = "#eee"
+                }
+
+                return colour
             }
 
             $scope.selectComposition = function (comp) {
                 delete $scope.selectedComp
                 //delete
+
+                //used to exclude paths like HCP from the table
+                $scope.pathsToIgnore = {}
+
+                $scope.selectedComp = comp
+                console.log(comp)
+
+                $scope.input.tableSections = [{name:'all',title:'All sections'}]
+                comp.sections.forEach(function (section) {
+                    $scope.input.tableSections.push({name:section.name,title:section.title})
+                })
+                $scope.input.tableSection = $scope.input.tableSections[0]
 
                 delete  $scope.fullQ
                 delete  $scope.Qlog
@@ -319,8 +495,7 @@ angular.module("pocApp")
                 if (! comp) {
                     return
                 }
-                $scope.selectedComp = comp
-                console.log(comp)
+
 
 
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
@@ -335,13 +510,12 @@ angular.module("pocApp")
                 console.log(treeData)
                 makeCompTree(treeData,rootNodeId)
 
-                $scope.setCommentsThisComp()
-
+                $scope.setCommentsThisModel()
 
             }
 
 
-            function makeCompTree(treeData,rootNodeId) {
+            function makeDGTree(treeData,rootNodeId) {
                 $('#compositionTree').jstree('destroy');
 
                 $scope.compTree = $('#compositionTree').jstree(
@@ -364,6 +538,36 @@ angular.module("pocApp")
                     let id = treeData[0].id
                     $(this).jstree("open_node",id);
 
+
+                });
+
+            }
+
+
+            function makeCompTree(treeData,rootNodeId) {
+                $('#compositionTree').jstree('destroy');
+
+                $scope.compTree = $('#compositionTree').jstree(
+                    {'core': {'multiple': false, 'data': treeData,
+                            'themes': {name: 'proton', responsive: true}}}
+                ).on('changed.jstree', function (e, data) {
+
+                    if (data.node) {
+                        $scope.selectedCompositionNode = data.node;
+                        $scope.commentsThisPath = $scope.commentsThisComp[$scope.selectedCompositionNode.data.ed.path]
+
+
+                        $scope.selectedED = data.node.data.ed
+                        $scope.currentLinkId = $scope.selectedCompositionNode.data.ed.path
+
+
+                    }
+
+                    $scope.$digest();       //as the event occurred outside of angular...
+                }).bind("loaded.jstree", function (event, data) {
+                    let id = treeData[0].id
+                    $(this).jstree("open_node",id);
+
                     let treeObject = $(this).jstree(true).get_json('#', { 'flat': false })
 
 
@@ -376,6 +580,7 @@ angular.module("pocApp")
                 });
 
             }
+
             async function asyncCall(treeObject,comp,strategy) {
                 console.log('calling');
                 console.time('q')

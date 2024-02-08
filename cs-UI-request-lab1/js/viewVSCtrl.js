@@ -13,11 +13,15 @@ angular.module("pocApp")
             $scope.languages.push({display:"Default",code:""})      //todo find nz expansion
             $scope.languages.push({display:"CanShare",code:"en-x-sctlang-23162100-0210105"})
 
-            //if the url does not start with 'http' then assume it is a canshae url and convert
+            $scope.input.selectedLanguage = $scope.languages[1]
+
+
+            //if the url does not start with 'http' then assume it is a canshare url and convert
             if (url.substring(0,4) !== 'http') {
                 $scope.url = `https://nzhts.digital.health.nz/fhir/ValueSet/${url}`
 
             }
+
 
 
 
@@ -50,7 +54,8 @@ angular.module("pocApp")
 
             }
 
-            //$scope.expandVSInTS(url)
+            //expand by default. Can always change later
+            $scope.expandVSInTS($scope.url)
 
             $scope.lookup = function (concept) {
 

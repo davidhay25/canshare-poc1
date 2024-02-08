@@ -134,6 +134,9 @@ angular.module("pocApp")
                 $scope.cmProperties['primary-site-laterality'] = {concept: {code:"297561000210100"},options:[]}
                 $scope.cmProperties['histologic-type-primary'] = {concept: {code:"512001000004108"},options:[]}
 
+                $scope.cmProperties['patient-sex'] = {concept: {code:"184100006"},options:[]}
+
+
                 //cancer service options are fixed - todo get from CM
                 $scope.cmProperties['cancer-service'].options.push({code:"394803006",display:"Clinical haematology"})
                 $scope.cmProperties['cancer-service'].options.push({code:"394593009",display:"Medical oncology"})

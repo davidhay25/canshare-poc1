@@ -97,9 +97,15 @@
                         Source reference
                     </div>
                     <div class="col-md-3">
+                        <textarea ng-change="setModelAttribute('sourceReference',input.sourceReference)"
+                                  class = "form-control" ng-model="input.sourceReference">
+
+                        </textarea>
+                        <!--
                         <input type="text"
                                ng-change="setModelAttribute('sourceReference',input.sourceReference)"
                                class = "form-control" ng-model="input.sourceReference"/>
+                        -->
                     </div>
                     <div class="col-md-7">
                         The source of the information that defined the contents of this Data Group.

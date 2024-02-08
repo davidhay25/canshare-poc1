@@ -125,6 +125,8 @@
       <button class="btn btn-link" ng-click="showHistory()">History ({{historyCount}})</button>
       <button class="btn btn-link" ng-click="deleteDG(selectedModel.name)">Delete</button>
 
+      <a ng-href="modelReview.html?{{selectedModel.name}}" target="_blank">Review</a>
+
       <div class="pull-right">
         <div ng-show="user.email">
 
@@ -248,8 +250,6 @@
 
             </div>
             <div class="col-md-8">
-
-
 
 
               <button class="btn btn-link pull-right"
@@ -429,13 +429,14 @@
                          ng-click="editDGItem(selectedNode.data)"></i>
                       -->
 
-                      <div>{{selectedNode.data.ed.valueSet}}</div>
                       <div>
                         <span ng-show="selectedNode.data.ed.valueSet"
-                          ng-click="viewVS(selectedNode.data.ed.valueSet)"
-                              class="clickable">View VS</span>
+                              ng-click="viewVS(selectedNode.data.ed.valueSet)"
+                              class="clickable pull-right">View VS</span>
 
                       </div>
+                      <div>{{selectedNode.data.ed.valueSet}}</div>
+
                     </td>
                   </tr>
 
