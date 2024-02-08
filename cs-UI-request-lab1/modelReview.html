@@ -479,11 +479,17 @@
 
 
             <uib-tabset>
+                <div>
+                    <div class="pull-right">
+                        <checkbox ng-model="input.newCommentsOnly"></checkbox> New comments only
+                    </div>
+                </div>
 
                 <uib-tab heading="List of comments">
                     <table class="table-condensed table-bordered table">
                         <tr><th>Path</th><th>Author</th><th>Comment</th><th>Disposition</th></tr>
-                        <tr ng-repeat="comment in allComments">
+                        <tr ng-repeat="comment in allComments"
+                            ng-show="showCommentLine(comment)">
                             <td>
 
                                 {{comment.path | compositionSummaryPath}}
@@ -511,7 +517,8 @@
                         <div><strong>{{k}}</strong></div>
                         <table class="table table-bordered">
                             <tr><th>Path</th><th>Author</th><th>Comment</th><th>Disposition</th></tr>
-                            <tr ng-repeat="item in v">
+                            <tr ng-repeat="item in v"
+                                ng-show="showCommentLine(item.comment)">
                                 <td width="15%">
                                     <!--
                                     <div  uib-popover="{{item.shortPath}}"
@@ -547,7 +554,7 @@
 
         </uib-tab>
 
-        <uib-tab heading="Json">
+        <uib-tab ng-show="false" heading="Json">
             <pre>{{selectedComp | json}}</pre>
         </uib-tab>
     </uib-tabset>

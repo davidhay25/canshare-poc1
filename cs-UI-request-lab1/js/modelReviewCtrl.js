@@ -72,6 +72,15 @@ angular.module("pocApp")
                 }
             )
 
+            //show a comment line in one of the 'allcomments' displays
+            $scope.showCommentLine = function (comment) {
+                if ($scope.input.newCommentsOnly) {
+                    if (comment.disposition && comment.disposition.display) {
+                        return false
+                    }
+                }
+                return true
+            }
 
             //if showAllCommentSummary is true (ie the summary tab is being shown) display the full list of comments in the right pane
             $scope.showAllCommentSummary = true
@@ -168,7 +177,7 @@ angular.module("pocApp")
                     //if the type is HCP then add to ignorepath
                     if (ed.type && ed.type[0] == 'HealthcarePractitionerSummary') {
                         $scope.pathsToIgnore[ed.path] = true
-                        console.log(ed.path)
+
                     } else {
                         Object.keys($scope.pathsToIgnore).forEach(function (key) {
                             if (ed.path.startsWith(key)) {
@@ -284,6 +293,11 @@ angular.module("pocApp")
                             comment.dispositionNote = $scope.input.dispositionNote
                             $scope.$close(comment)
                         }
+
+                        
+
+
+
                     },
                     resolve: {
                         comment: function () {
