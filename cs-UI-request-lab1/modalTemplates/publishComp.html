@@ -1,0 +1,36 @@
+
+<div>
+  <!--<div ng-controller="newResourceCtrl">-->
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-8 col-sm-8">
+        <h3 class="modal-title">
+          Publish composition
+        </h3>
+      </div>
+
+
+      <div class="col-md-4 col-sm-4">
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+        <button class="btn btn-primary pull-right" ng-click="publish()">Publish</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-body">
+  <br/><br/>
+    <div>Click the 'Publish' button to Publish the Composition. This will:</div>
+
+    <ul>
+      <li>Assemble a package of Composition and Questionnaire</li>
+      <li>Update the published composition status to 'published'</li>
+      <li>Save the package in the Published Compositions store</li>
+      <li>Increment the version in the working composition</li>
+    </ul>
+
+  </div>
+  <div class="modal-header">
+
+  </div>
+</div>

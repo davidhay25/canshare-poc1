@@ -112,7 +112,7 @@ angular.module("pocApp")
                 let fsh = that.makeFshForDG(comp,currentDG,true,initialSpacer)
                 arCompFsh.push(fsh)
 
-                console.log(arCompFsh)
+                //console.log(arCompFsh)
                 return arCompFsh.join('\n')
 
                 function adjustPath(path) {

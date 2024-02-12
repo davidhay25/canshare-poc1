@@ -17,7 +17,11 @@
   <div class="modelInfo row">
     <div class="col-md-7">
 
-        <strong>{{selectedComposition.title}} </strong> ({{selectedComposition.name}})
+        <strong>{{selectedComposition.title}}
+          <span class="pull-right"><em>version:{{selectedComposition.version}}</em> </span>
+        </strong>
+
+      ({{selectedComposition.name}})
         <div><em>{{selectedComposition.description}}</em></div>
         <div>
           <div ng-show="selectedComposition.sourceReference">
@@ -49,9 +53,12 @@
     <div class="col-md-5">
 
       <a ng-href="modelReview.html?{{selectedComposition.name}}" target="_blank">Review</a>
+
+      <span style="margin-left: 16px" class="clickable"
+            ng-show="selectedComposition.checkedOut && selectedComposition.checkedOut == user.email"
+            ng-click="publish(selectedComposition)">Publish</span>
+
       <div class="pull-right">
-
-
 
         <div ng-show="user.email">
 
@@ -505,6 +512,23 @@
           <table class="table">
 
             <tr>
+              <td>HISO number</td>
+              <td><input ng-disabled = "! canEditComp(selectedComposition)"
+                         type="text" class="form-control"
+                         ng-blur="updateMetaValues()"
+                         ng-model="selectedComposition.meta.hisoNumber" /> </td>
+            </tr>
+
+            <tr>
+              <td>Published version</td>
+              <td><input ng-disabled = "disabled"
+                         type="text" class="form-control"
+                         //ng-blur="updateMetaValues()"
+                         ng-model="selectedComposition.version" /> </td>
+            </tr>
+
+
+            <tr>
               <td>Tumour stream</td>
               <td><input ng-disabled = "! canEditComp(selectedComposition)"
                          type="text" class="form-control"
@@ -546,8 +570,8 @@
             <tr>
               <td>Source reference</td>
 
-              <td><input ng-disabled = "! canEditComp(selectedComposition)"
-                         type="text" class="form-control" ng-model="selectedComposition.sourceReference" />  </td>
+              <td><textarea ng-disabled = "! canEditComp(selectedComposition)"
+                            type="text" class="form-control" ng-model="selectedComposition.sourceReference" ></textarea>  </td>
 
             </tr>
 
@@ -594,6 +618,7 @@
           <tbody>
           <tr
                   ng-style="{ 'background-color': getRowColour(item.ed) }"
+                  ng-show="item.ed.mult !== '0..0'"
                   ng-repeat="item in allCompElements track by $index">
             <td>
               <div ng-style="{ 'padding-left': (item.ed.path | pathindent) }">

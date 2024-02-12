@@ -68,6 +68,16 @@ angular.module("pocApp")
         }
     })
 
+    .filter('pathindentCompTable', function() {
+        return function(path,cnt) {
+            if (path) {
+                cnt = cnt || 4
+                var ar = path.split('.');
+                return 10 * (ar.length - cnt );
+            }
+        }
+    })
+
     .filter('cleanTextDiv',function(){
         //remove the <div  xmlns='http://www.w3.org/1999/xhtml'>{texthere}</div> tgs...
         //todo - there must be a more elegant way than this...

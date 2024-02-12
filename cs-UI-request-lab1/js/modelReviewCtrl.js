@@ -7,6 +7,8 @@ angular.module("pocApp")
             //in the table view, hide common DG like HCP as the details are not relevant to reviewers
             $scope.input.hideSomeDG = true
 
+            let DGsToHideInCompTable = ['NZPersonName','HealthcarePractitionerSummary','NZAddress']
+
 
             let search = $window.location.search;
             let modelName = null
@@ -95,6 +97,12 @@ angular.module("pocApp")
 
             $scope.version = utilsSvc.getVersion()
 
+            $scope.getPathSegments = function (path) {
+                if (path) {
+                    return path.split('.')
+                }
+
+            }
 
             //When an ed is selected in a table
             $scope.selectED = function (ed) {
@@ -144,6 +152,14 @@ angular.module("pocApp")
                     return false
                 }
 
+                //path = {compname}.{section}.{sectionDG}.{topchildindg}
+
+                let arPath = ed.path.split('.')
+                if (arPath.length < 4) {
+                    //ignore the section and section group paths
+                    return false
+                }
+
                 let canShow = true
 
                 if ($scope.input.tableFilter) {
@@ -157,7 +173,7 @@ angular.module("pocApp")
                 }
 
                 //If there's a specific section requested - only show conetnts of that section
-                let arPath = ed.path.split('.')
+
                 if ($scope.input.tableSection) {
                     if ($scope.input.tableSection.name == 'all') {
                         //return canShow
@@ -171,11 +187,24 @@ angular.module("pocApp")
                 }
 
                 //If the row is a child of type HealthcarePractitionerSummary then hide
+                //$scope.pathsToIgnore is created when the comp is selected
                 //todo - make optional, extend to others if it wprks
-
+                //todo add NZPersonName
+                //todo - maybe assemble the list of $scope.pathsToIgnore when the comp is selected. There may be an issue with order...
                 if ($scope.input.hideSomeDG) {
                     //if the type is HCP then add to ignorepath
-                    if (ed.type && ed.type[0] == 'HealthcarePractitionerSummary') {
+                        //if (ed.type && ed.type[0] == 'HealthcarePractitionerSummary') {
+
+                    Object.keys($scope.pathsToIgnore).forEach(function (key) {
+                        if (ed.path.startsWith(key)  &&  ed.path.length > key.length ) {
+                            canShow = false
+                        }
+
+                    })
+
+
+                    /*
+                    if (ed.type && DGsToHideInCompTable.indexOf(ed.type[0]) > -1) {
                         $scope.pathsToIgnore[ed.path] = true
 
                     } else {
@@ -186,6 +215,7 @@ angular.module("pocApp")
 
                         })
                     }
+                    */
                 }
 
 
@@ -294,7 +324,7 @@ angular.module("pocApp")
                             $scope.$close(comment)
                         }
 
-                        
+
 
 
 
@@ -515,6 +545,21 @@ angular.module("pocApp")
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
                 $scope.allCompElements = vo.allElements
                 $scope.hashCompElements = vo.hashAllElements
+
+
+                //get the set of all paths to ignore. These are those where the DG type is in  DGsToHideInCompTable
+                //when rendering the table, any paths starting with any of this set will be ignored
+                $scope.allCompElements.forEach(function (item) {
+
+                    if (item.ed.type && DGsToHideInCompTable.indexOf(item.ed.type[0]) > -1) {
+                        $scope.pathsToIgnore[item.ed.path] = true
+
+                    }
+
+
+                })
+                console.log($scope.pathsToIgnore)
+
 
 
                 let rootNodeId = $scope.allCompElements[0].path

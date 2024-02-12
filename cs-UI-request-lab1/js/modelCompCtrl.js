@@ -32,7 +32,6 @@ angular.module("pocApp")
 
                     //need to set the fullQ on the parent scope
                     $scope.selectComposition($scope.selectedComposition)
-                    //$scope.$parent.fullQ =  makeQSvc.makeQFromTree(treeObject,$scope.selectedComposition,$localStorage.qStrategy)
 
 
                 })
@@ -69,6 +68,48 @@ angular.module("pocApp")
                 }
             }
 
+            //publish a comp version. Only if checked out. todo Should the comp be checked in afterwards?
+            $scope.publish = function (comp) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/publishComp.html',
+                    backdrop: 'static',
+                    size : 'lg',
+                    controller: 'publishCompCtrl',
+
+                    resolve: {
+                        comp: function () {
+                            return comp
+                        },
+                        arAllElements: function () {
+                            return $scope.allCompElements
+                        },
+                        user : function () {
+                            return $scope.user
+                        },
+                        Q : function () {
+                            return $scope.fullQ
+                        }
+
+
+
+                    }}
+                ).result.then(function (pubComp) {
+                    //pass back the version that was published
+                    //need to update the version in the local store & possible check in
+                    $scope.selectedComposition.version = pubComp.version +1
+
+                })
+            }
+
+            $scope.selectCompTreePath = function (path) {
+                $timeout(function () {
+                    //let fullPath = `${item.hiddenDGName}.${item.path}`
+                    $("#compositionTree").jstree("select_node",  path);
+                    $("#compositionTree").jstree("open_node",  path);
+                    $scope.input.compTabActive = $scope.compUi.tree //make sure the tree is selected
+                },500)
+
+            }
 
             $scope.showLogEntry = function (le) {
                 $scope.logEntry = le

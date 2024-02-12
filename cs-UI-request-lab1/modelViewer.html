@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>Model viewer</title>
+
+    <script src="js/libs/jquery-1.9.0.min.js"></script>
+    <script src="js/libs/angular.min1-5.js"></script>
+    <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+    <script src="js/libs/moment.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
+    <script src="js/libs/jstree.min.js"></script>
+
+    <script>
+        angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage']).config(function($locationProvider) {
+
+            // enable html5Mode for pushstate ('#'-less URLs)
+            $locationProvider.html5Mode(true);
+            $locationProvider.hashPrefix('!');
+        });
+        angular.module("pocApp").constant("moment", moment);
+
+        //this allows the directives (which are in the formsApp) to be used. see https://stackoverflow.com/questions/15641730/angular-js-directives-in-different-modules
+        angular.module("formsApp",[])
+        angular.module('topApp', ['pocApp', 'formsApp'])
+
+    </script>
+
+    <script src="js/modelViewerCtrl.js"></script>
+    <script src="js/modelsSvc.js"></script>
+
+
+    <script src="js/libs/ngStorage.min.js"></script>
+    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
+
+    <script src="js/viewVSCtrl.js"></script>
+
+
+    <script src="js/utilsSvc.js"></script>
+    <script src="js/libs/vis.min.js"></script>
+    <script src="js/showParameters.js"></script>
+    <script src="js/filters.js"></script>
+
+<!--
+    <script src="js/modelsDemoSvc.js"></script>
+    <script src="js/modelCompSvc.js"></script>
+
+    <script src="js/makeQSvc.js"></script>
+    <script src="js/codedOptionsSvc.js"></script>
+    -->
+
+    <script src="directive/renderForm/renderFormSvc.js"></script>
+    <script src="directive/renderForm/renderFormDir.js"></script>
+    <script src="directive/renderSingleItem/renderSingleItemDir.js"></script>
+
+<!--
+    <script src="js/models/ObservationModels.js"></script>
+    <script src="js/models/StagingModels.js"></script>
+-->
+</head>
+
+<body style="padding: 8px;padding-top: 80px">
+    <div ng-app="topApp" ng-controller="modelViewerCtrl" class="container-fluid">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+        <div class="container-fluid">
+            <div class="col-md-5">
+                <span>
+                    <a class="navbar-brand" href="#">
+                        Te Aho o Te Kahu, Cancer Control Agency Data Standards Manager - version 2
+                    </a>
+                </span>
+            </div>
+
+            <div class="col-md-3">
+                <div class="navbar-text">
+
+                </div>
+            </div>
+
+
+            <div class="col-md-1 col-sm-1">
+                <form class="navbar-form navbar-left">
+                    <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+                </form>
+            </div>
+            <div class="col-md-1">
+                <div class="navbar-text">
+                    {{version}}
+                </div>
+            </div>
+            <div class="col-md-2">
+                <a href="https://teaho.govt.nz/" target="_blank">
+                    <img width="150" height="auto" class="pull-right"
+                         style="padding: 3px"
+                         src="images/TAK-logo-midgreen.png"/>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="row">
+        <div class="col-md-3">
+            <uib-accordion close-others="false">
+                <div uib-accordion-group class="panel-default" is-open="true">
+                    <uib-accordion-heading>
+                        Structured Path
+                    </uib-accordion-heading>
+                        <div ng-repeat = "hisoStatus in arHisoStatus">
+                            <strong>{{hisoStatus}}</strong>
+                            <br/>
+                            <div class="list-group">
+                                <div  ng-class="{'list-group-item':true,listItemSelected:v.name == selectedComp.name}"
+                                      style="cursor: pointer"
+                                      ng-repeat="(k,v) in hashComp"
+                                      ng-show="v.meta.hisoStatus == hisoStatus">
+                                    <div ng-click = "loadComp(v)">{{v.title}}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                </div>
+                <div uib-accordion-group class="panel-default" is-open="false">
+                    <uib-accordion-heading>
+                        ACT-NOW
+                    </uib-accordion-heading>
+                </div>
+
+            </uib-accordion>
+        </div>
+        <div class="col-md-6">
+
+
+            <div ng-hide="selectedComp">
+                <ng-include src = "'includes/dsIntroNone.html'"></ng-include>
+            </div>
+
+            <div class="banner" ng-show="selectedComp">
+                {{selectedComp.title}} (version: {{selectedComp.version}})
+                <div>{{selectedComp.meta.hisoNumber}}</div>
+            </div>
+            <div style="text-align: center;" ><em>{{selectedComp.description}}</em></div>
+
+            <uib-tabset ng-show="selectedComp">
+
+                <uib-tab heading="Table">
+
+                    <br/>
+                    <div class="row" style="margin-top: 8px;margin-bottom: 8px">
+                        <div class="col-md-2">
+                            Sections
+                        </div>
+                        <div class="col-md-3">
+                            <select ng-model="input.tableSection" class="form-control"
+                                    ng-options="section.title for section in input.tableSections"></select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" class = "form-control" placeholder="title filter" ng-model="input.tableFilter"/>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="pull-right">
+                                <checkbox ng-model="input.hideSomeDG"></checkbox> Hide common DG
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="tableFixHead">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr><th>Title</th><th>Description</th><th>Type</th><th>Card.</th><th>Cond.</th></tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-style="{ 'background-color': getRowColour(ed) }"
+                                ng-class="{listItemSelected:ed==selectedED}"
+                                ng-click="selectED(ed)"
+                                ng-show="showTableRow(ed)"
+                                style="cursor: pointer"
+                                ng-repeat="ed in selectedComp.snapshot track by $index">
+
+
+                                <td><div ng-style="{ 'padding-left': (ed.path | pathindentCompTable : 1) }">{{ed.title}}</div>
+
+
+                                </td>
+
+                                <td>{{ed.description}}
+
+                                </td>
+                                <td>
+
+                                    <div ng-show="ed.type[0] == 'CodeableConcept'">
+                                        <button ng-show="ed.valueSet"
+                                                ng-click="viewVS(ed.valueSet)"
+                                                class="btn-link btn">{{ed.type[0]}}</button>
+                                        <div ng-hide="ed.valueSet">
+                                            {{ed.type[0]}}
+                                        </div>
+
+                                    </div>
+
+                                    <div ng-hide="ed.type[0] == 'CodeableConcept'">
+                                        {{ed.type[0]}}
+                                    </div>
+
+
+
+                                </td>
+
+                                <td>
+
+
+                                    <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
+                                    {{ed.mult}}
+
+
+                                </td>
+                                <td>
+                                    <div ng-show="item.ed.enableWhen.length > 0">Yes</div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+
+                </uib-tab>
+
+                <uib-tab heading = "Form">
+                    <renderform q="Q" qr="{}"></renderform>
+                </uib-tab>
+
+                <uib-tab heading="Tree">
+                    <div id="compositionTree"></div>
+                </uib-tab>
+
+                <uib-tab ng-show="true" heading="Snapshot (dev)">
+                    <table class="table table-bordered">
+                        <tr><th>Path</th><th>Title</th></tr>
+                        <tr ng-repeat="ed in selectedComp.snapshot">
+                            <td>{{ed.path}}</td>
+                            <td>{{ed.title}}</td>
+                        </tr>
+                    </table>
+                </uib-tab>
+
+                <uib-tab ng-show = "true" heading="Json (dev)">
+                    <pre>{{selectedComp | json}}</pre>
+                </uib-tab>
+
+            </uib-tabset>
+
+        </div>
+        <div class="col-md-3">
+            <div ng-show="selectedED">
+
+                <div class="banner">Details</div>
+
+
+                <div ng-hide = "selectedED.kind == 'section' || selectedED.kind == 'root'">
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            Title
+                        </div>
+                        <div class="col-md-9">
+                            {{selectedED.title}}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            Description
+                        </div>
+                        <div class="col-md-9">
+                            {{selectedED.description}}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            Type
+                        </div>
+                        <div class="col-md-9">
+                            <div ng-repeat="type in selectedED.type">
+                                <div ng-show="fhirDataTypes.indexOf(type) > -1" class="pull-right">
+                                    <a target = "_blank" ng-href="{{fhirRoot}}datatypes.html#{{type}}">Details in spec</a>
+                                </div>
+                                {{type}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            Cardinality
+                        </div>
+                        <div class="col-md-9">
+                            <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
+
+                            <div ng-show = "selectedCompositionNode.data.host">Host:{{selectedCompositionNode.data.host.mult}}</div>
+                            <div ng-hide = "selectedCompositionNode.data.host">{{selectedED.mult}}</div>
+
+                        </div>
+                    </div>
+
+                    <div class="row" ng-show="selectedED.options">
+                        <div class="col-md-3">
+                            Options
+                        </div>
+                        <div class="col-md-9">
+                            <ul>
+                                <li ng-repeat="option in selectedED.options">
+                                    {{option.display}}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+<!--
+                    <div class="row" >
+                        <div class="col-md-3">
+                            Full Path
+                        </div>
+                        <div class="col-md-9">
+
+                            <div ng-repeat="segment in getPathSegments(selectedED.path) track by $index">
+                                <div ng-show="$index > 0"> {{segment}}</div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                    -->
+
+                    <div class="row" ng-show="selectedED.type[0] == 'CodeableConcept' ">
+                        <div class="col-md-3">
+                            ValueSet
+                        </div>
+                        <div class="col-md-9">
+                            <div><em>{{selectedED.valueSet}}</em>
+
+                                <div ng-hide="selectedED.valueSet">
+                                    No ValueSet specified
+                                </div>
+
+
+                            </div>
+                            <div>
+                                <button ng-show="selectedED.valueSet"
+                                        ng-click="viewVS(selectedED.valueSet)"
+                                        class="btn-link btn">View VS</button>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-show="selectedED.enableWhen">
+                        <div class="col-md-3">
+                            Conditional
+                        </div>
+                        <div class="col-md-9">
+                            <table class="table">
+                                <tr><th>Source</th><th>Op.</th><th>Value</th></tr>
+                                <tr ng-repeat="ew in selectedED.enableWhen">
+                                    <td>{{ew.source}}</td>
+                                    <td>{{ew.operator}}</td>
+                                    <td>{{ew.value.code}} | {{ew.value.display}}</td>
+                                </tr>
+                            </table>
+
+                        </div>
+                    </div>
+
+                    <div class="row" ng-show="selectedED.sourceReference">
+                        <div class="col-md-3">
+                            Source Ref
+                        </div>
+                        <div class="col-md-9">
+                            {{selectedED.sourceReference}}
+
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="row" ng-show = "selectedED.zElement">
+                    <div class="col-md-3">
+
+                    </div>
+                    <div class="col-md-9">
+                        <em>This element has been added directly (a 'Z' element)</em>
+                    </div>
+                </div>
+
+<!--
+                <div class="banner">Comments</div>
+
+                <table class="table table-condensed" ng-show="commentsThisPath.length > 0">
+                    <tr><th>Comment</th><th>Disposition</th></tr>
+                    <tr ng-repeat = "com in commentsThisPath">
+                        <td>{{com.comment}}</td>
+                        <td>{{com.disposition.display}}
+                            <div><em>{{com.dispositionNote}}</em></div>
+
+                        </td>
+                    </tr>
+
+                </table>
+
+                <strong>New comment</strong>
+
+                <textarea class="form-control" ng-model="input.comment"></textarea>
+                <br/>
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" ng-model="input.author" placeholder="Your name"/>
+                    </div>
+                    <div class="col-md-6">
+                        <button ng-show="input.comment"
+                                class="btn btn-link pull-right" ng-click="addComment(input.comment)">Add comment</button>
+                    </div>
+
+                </div>
+
+                -->
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

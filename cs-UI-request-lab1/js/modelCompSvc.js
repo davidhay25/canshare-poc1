@@ -143,8 +143,11 @@ angular.module("pocApp")
 
                     */
                     lne += "\r\n"
-                    //console.log(lne)
-                    lst.push(lne)
+                    //console.log(lne)\
+                    if (item.ed.mult !== '0..0') {
+                        lst.push(lne)
+                    }
+
                 })
 
 

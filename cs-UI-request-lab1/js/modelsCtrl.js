@@ -1451,13 +1451,10 @@ angular.module("pocApp")
                 )
 
 
-
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
 
                 $scope.allCompElements = vo.allElements
                 $scope.hashCompElements = vo.hashAllElements
-
-
 
                 let download = modelCompSvc.makeTSVDownload(vo.allElements)
                 //console.log(download)
@@ -1745,15 +1742,18 @@ angular.module("pocApp")
                 console.time('q')
 
 
-                //$scope.fullQ = await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+                if (true) {
+                    //performance test
+                    let voQ = await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
 
-                let voQ = await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+                    //$scope.fullQ = await makeQSvc.makeQFromTree(treeObject,comp,strategy)
+                    $scope.fullQ = voQ.Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+                    $scope.Qlog = voQ.log   //the log of activity that occurred as the Q was created
+                    //this is a version structured for tabs.
+                    $scope.fullQTab = voQ.Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+                }
 
-                //$scope.fullQ = await makeQSvc.makeQFromTree(treeObject,comp,strategy)
-                $scope.fullQ = voQ.Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
-                $scope.Qlog = voQ.log   //the log of activity that occurred as the Q was created
-                //this is a version structured for tabs.
-                $scope.fullQTab = voQ.Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+
 
 
             }

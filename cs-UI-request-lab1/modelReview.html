@@ -226,7 +226,7 @@
                             <div class="tableFixHead">
                                 <table class="table table-bordered">
                                     <thead>
-                                    <tr><th>Title</th><th>Description</th><th>Type</th><th>Card.</th></tr>
+                                    <tr><th>Title</th><th>Description</th><th>Type</th><th>Card.</th><th>Cond.</th></tr>
                                     </thead>
                                     <tbody>
                                     <tr ng-style="{ 'background-color': getRowColour(item.ed) }"
@@ -241,7 +241,7 @@
                                         -->
 
 
-                                        <td><div ng-style="{ 'padding-left': (item.ed.path | pathindent) }">{{item.ed.title}}</div>
+                                        <td><div ng-style="{ 'padding-left': (item.ed.path | pathindentCompTable) }">{{item.ed.title}}</div>
 
 
                                         </td>
@@ -249,7 +249,25 @@
                                         <td>{{item.ed.description}}
 
                                         </td>
-                                        <td>{{item.ed.type[0]}}</td>
+                                        <td>
+
+                                            <div ng-show="item.ed.type[0] == 'CodeableConcept'">
+                                                <button ng-show="item.ed.valueSet"
+                                                        ng-click="viewVS(item.ed.valueSet)"
+                                                        class="btn-link btn">{{item.ed.type[0]}}</button>
+                                                <div ng-hide="item.ed.valueSet">
+                                                    {{item.ed.type[0]}}
+                                                </div>
+
+                                            </div>
+
+                                            <div ng-hide="item.ed.type[0] == 'CodeableConcept'">
+                                                {{item.ed.type[0]}}
+                                            </div>
+
+
+
+                                        </td>
 
                                         <td>
 
@@ -259,6 +277,9 @@
                                             <div ng-show = "item.host">{{item.host.mult}}</div>
                                             <div ng-hide = "item.host">{{item.ed.mult}}</div>
 
+                                        </td>
+                                        <td>
+                                            <div ng-show="item.ed.enableWhen.length > 0">Yes</div>
                                         </td>
                                     </tr>
                                     </tbody>
@@ -374,6 +395,21 @@
                                 </div>
                             </div>
 
+                            <div class="row" >
+                                <div class="col-md-3">
+                                    Full Path
+                                </div>
+                                <div class="col-md-9">
+
+                                    <div ng-repeat="segment in getPathSegments(selectedCompositionNode.data.ed.path) track by $index">
+                                        <div ng-show="$index > 0"> {{segment}}</div>
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+
                             <div class="row" ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept' ">
                                 <div class="col-md-3">
                                     ValueSet
@@ -398,7 +434,7 @@
 
                             <div class="row" ng-show="selectedCompositionNode.data.ed.enableWhen">
                                 <div class="col-md-3">
-                                    Dependency
+                                    Conditional
                                 </div>
                                 <div class="col-md-9">
                                     <table class="table">
@@ -415,7 +451,7 @@
 
                             <div class="row" ng-show="selectedCompositionNode.data.ed.sourceReference">
                                 <div class="col-md-3">
-                                    Source Reference
+                                    Source Ref
                                 </div>
                                 <div class="col-md-9">
                                     {{selectedCompositionNode.data.ed.sourceReference}}
@@ -466,6 +502,7 @@
                         </div>
 
                     </div>
+
                 </div>
 
             </div>

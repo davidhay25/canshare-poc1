@@ -555,6 +555,8 @@ async function setup(app) {
         }
     })
 
+
+
     //create / update a single composition. In theory the name param is not needed, but cleaner
     app.put('/model/comp/:name', async function(req,res) {
 
@@ -581,6 +583,103 @@ async function setup(app) {
         }
 
 
+    })
+
+
+    //--------------  publishing endpoints
+
+    //publish a Comp to the published collection. A single comp (keyed by name) can have multiple versions
+    app.post('/publish/comp', async function(req,res) {
+
+        let userEmail = req.headers['x-user-email']
+
+        if (! userEmail) {
+            res.status(400).json({msg:'must be a logged in user'})
+            return
+        }
+
+        //let name = req.params.name
+        let package = req.body
+        //console.log(comp)
+        //todo - should we check that the version is unique?
+        try {
+            const cursor = await database.collection("publishedComp").insertOne(package)
+            //await saveHistory(comp,userEmail || "unknown User")
+            res.json(package)
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+
+    })
+
+
+
+    //get a single published composition. returns most recent versions
+    app.get('/publish/comp/:name', async function(req,res) {
+        let name = req.params.name
+        let qry = {"comp.name":name}
+        try {
+            const cursor = await database.collection("publishedComp").find(qry).toArray()
+            //returns package collection {comp: Q:}
+            //console.log(cursor)
+            let maxVersion = -1
+            let currentPackage;
+            cursor.forEach(function (package) {
+                let version = package.comp.version || 1
+                if (version > maxVersion) {
+                    maxVersion = version
+                    currentPackage = package
+                }
+            })
+
+            res.json(currentPackage)
+
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+
+
+    })
+
+    //get the summary of all published compositions.
+    //only include the most recent version
+    app.get('/publish/comp', async function(req,res) {
+
+        //const query = {name:name}
+        try {
+            const cursor = await database.collection("publishedComp").find().toArray()
+            let hashComp = {}
+
+
+            cursor.forEach(function (package) {
+                delete package.comp.snapshot
+                delete package.comp.override
+                let name = package.comp.name
+
+                console.log(package.comp)
+
+                if (hashComp[name]) {
+                    //make sure this is the most recent publication
+                    let version = package.comp.version || 1
+                    if (version > hashComp[name].version) {
+                        hashComp[name] = package.comp
+                    }
+                } else {
+                    hashComp[name] = package.comp
+                }
+            })
+            res.json(hashComp)
+
+
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
     })
 
 
