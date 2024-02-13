@@ -544,8 +544,39 @@ angular.module("pocApp")
                 let ar = item.path.split(".")       //this i sthe full path - with prepended dg name
                 let dgName = ar[0]      //so the DG name is the first segment (should be the same as selectedModel
 
-                ar.splice(0,1)          //remove the first element
+                ar.splice(0,1)          //remove the first element (the dg name)
                 let pathToDelete =  ar.join(".") // $filter('dropFirstInPath')(item.path)   //remove the DT name from the path
+
+
+                //this is a special case involving sliced elements. In this case we physically remove the path and all childre from the diff
+                if (item.path.indexOf('.slice:') > -1) {
+                    let slicePathToDelete = ar.join('.')        //the full element to delete - without the dg name at the front
+                    if (confirm("Do you want to remove this slice and all it's contents")) {
+                        traceSvc.addAction({action:'delete-slice',model:$scope.selectedModel,
+                            path:slicePathToDelete,description:'delete slice'})
+
+                        let dg = $scope.hashAllDG[dgName]
+                        if (dg && dg.diff) {
+                            let ar1 = []
+                            dg.diff.forEach(function (ed) {
+                                if (ed.path.indexOf(slicePathToDelete) == -1) {
+                                    ar1.push(ed)
+                                }
+
+                            })
+                            dg.diff = ar1
+
+
+
+                            //rebuild fullList and re-draw the tree
+                            $scope.refreshFullList($scope.selectedModel)
+                        }
+                    }
+                    return
+                }
+
+
+
 
                 //check that there aren't any child elements off this one
                 let canDelete = true
@@ -603,7 +634,6 @@ angular.module("pocApp")
 
                     //set the minimum required elements..
                     let ed = {path:pathToDelete,mult:"0..0",type:['string']}
-                    //ed.path = ar.join('.')
                     $scope.selectedModel.diff.push(ed)
                     traceSvc.addAction({action:'delete-element',model:$scope.selectedModel,
                         path:pathToDelete,description:'add diff'})
@@ -612,7 +642,7 @@ angular.module("pocApp")
                 //rebuild fullList and re-draw the tree
                 $scope.refreshFullList($scope.selectedModel)
 
-                //$scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:displayPath})
+
 
 
             }
