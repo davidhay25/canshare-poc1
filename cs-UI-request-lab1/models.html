@@ -47,6 +47,8 @@
         }
     </style>
 
+    <!-- Note that all scripts are at the bottom-->
+
 </head>
 <body style="padding: 8px;padding-top: 80px" >
 <div ng-app="topApp" ng-controller="modelsCtrl" class="container-fluid" ng-cloak>
@@ -437,7 +439,7 @@
                             <uib-tab heading="Data Model">
 
                                 <div class="banner">CanShare Data Model</div>
-                                <img width="100%" src="images/LIM-1.png" usemap="#image_map"/>
+                                <img width="100%" src="images/LIM-org.png" usemap="#image_map"/>
                             </uib-tab>
                             <uib-tab heading="Graph" select="fitAllDGGraph()">
                                 <div class="row">
@@ -706,7 +708,25 @@
 
 </div>
 
+<script>
+    //add a function to determine if a given path is a child of another. Used when excluding paths
+    //eg seg1.seg2 is a child of seg1.  seg1path is not.
+    //Add here to ensure it is available before any functions that use it are loaded...
+    String.prototype.isChildPath = function (parent) {
+        let test = parent + "."
+        if (this.indexOf(test) > -1) {
+            return true
+        } else { return false}
 
+    };
+
+
+
+    console.log("seg1.path".isChildPath("seg1"))  //true
+    console.log("seg1.path".isChildPath("seg1.path"))  //false
+    console.log("seg1long".isChildPath("seg1")) //false
+
+</script>
 
 <script src="js/libs/jquery-1.9.0.min.js"></script>
 <script src="js/libs/angular.min1-5.js"></script>
@@ -846,6 +866,7 @@
 
 <script src="js/compSectionsCtrl.js"></script>
 <script src="js/publishCompCtrl.js"></script>
+<script src="js/addEWCtrl.js"></script>
 
 <script src="js/libs/firebase.js"></script>
 <script src="js/libs/angularfire.min.js"></script>

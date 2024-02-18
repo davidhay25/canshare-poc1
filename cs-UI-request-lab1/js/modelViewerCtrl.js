@@ -169,7 +169,8 @@ angular.module("pocApp")
                     //if (ed.type && ed.type[0] == 'HealthcarePractitionerSummary') {
 
                     Object.keys($scope.pathsToIgnore).forEach(function (key) {
-                        if (ed.path.startsWith(key)  &&  ed.path.length > key.length ) {
+                        //if (ed.path.startsWith(key)  &&  ed.path.length > key.length ) {
+                        if (ed.path.isChildPath(key)  ) {
                             canShow = false
                         }
                     })
@@ -215,7 +216,8 @@ console.log(arSections)
                             let sectionNode = {id:sectionPath,text:section.title, parent:'topElement',data:{}}
                             treeData.push(sectionNode)
                             arElements.forEach(function (ed) {
-                                if (ed.path.startsWith(sectionPath)) {
+                                // if (ed.path.startsWith(sectionPath)) {
+                                if (ed.path.isChildPath(sectionPath)) {
                                     let ar1 = ed.path.split('.')
                                     ar1.pop()
                                     let parent = ar1.join('.')

@@ -694,7 +694,7 @@ angular.module("pocApp")
                 })
 
                 // now we can build the ordered list
-                //console.log(hash)
+
 
                 let arLines = []
 
@@ -734,7 +734,8 @@ angular.module("pocApp")
                         } else{
                             arHiddenElements.forEach(function (prefix) {
                                 let pathToTest = item.ed.path
-                                if (pathToTest.startsWith(prefix) && pathToTest.indexOf('slice:') == -1) {
+                                //if (pathToTest.startsWith(prefix) && pathToTest.indexOf('slice:') == -1) {
+                                if (pathToTest.isChildPath(prefix) && pathToTest.indexOf('slice:') == -1) {
                                     item.ed.mult = "0..0"
                                 }
                             })
@@ -839,7 +840,8 @@ angular.module("pocApp")
                 allElements.forEach(function (item) {
                     //item.ed.mult = '0..0'
                     for (const key of Object.keys(hashHidden)) {
-                        if (item.ed.path.startsWith(key)) {
+                        //if (item.ed.path.startsWith(key +'.')) {
+                        if (item.ed.path.isChildPath(key)) {
                             item.ed.mult = '0..0'
                             break
                         }

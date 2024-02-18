@@ -92,7 +92,8 @@ angular.module("pocApp")
                     let path = item.ed.path
                     let include = true
                     for (const excl of lstExclude) {
-                        if (path.startsWith(excl) || path == excl){
+                        //if (path.startsWith(excl) || path == excl){
+                        if (path.isChildPath(excl) || path == excl){
                             include = false
                             break
                         }

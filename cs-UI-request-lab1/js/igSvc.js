@@ -170,7 +170,8 @@ angular.module("pocApp")
                         //is this a descendent of a hidden element
                         let path = ed.path
                         for (const p of pathsToHide) {
-                            if (path.startsWith(p)) {
+                            if (path.isChildPath(p)) {
+                            //if (path.startsWith(p)) {
                                 canAdd = false
                                 break
                             }

@@ -196,7 +196,8 @@ angular.module("pocApp")
                         //if (ed.type && ed.type[0] == 'HealthcarePractitionerSummary') {
 
                     Object.keys($scope.pathsToIgnore).forEach(function (key) {
-                        if (ed.path.startsWith(key)  &&  ed.path.length > key.length ) {
+                        //if (ed.path.startsWith(key)  &&  ed.path.length > key.length ) {
+                        if (ed.path.isChildPath(key)  ) {
                             canShow = false
                         }
 

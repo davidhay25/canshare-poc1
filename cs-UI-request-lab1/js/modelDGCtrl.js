@@ -79,13 +79,12 @@ angular.module("pocApp")
                 //check that this isn't a parent
                 let diffToDelete = $scope.selectedModel.diff[inx]
                 for (const diff of $scope.selectedModel.diff) {
-                    if (diff.path !== diffToDelete.path && diff.path.startsWith(diffToDelete.path)) {
+                    //if (diff.path !== diffToDelete.path && diff.path.startsWith(diffToDelete.path)) {
+                    if (diff.path.isChildPath(diffToDelete.path)) {
                         alert("This diff has child elements so can't be removed")
                         return
                     }
                 }
-
-
 
                 if (confirm("Are you sure you wish to remove this Override? It will be removed from all children (unless they have overriden it)")) {
                     //traceSvc.addAction({action:'delete element',model:$scope.selectedModel,description:"From diff display"})
@@ -204,14 +203,43 @@ angular.module("pocApp")
                 })
             }
 
+
+            $scope.addEWNew = function () {
+                //create a new function to add an EW is a separate modal
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/addEW.html',
+                    backdrop: 'static',
+                    size: 'lg',
+                    controller: 'addEWCtrl',
+                    resolve: {
+                        ED: function () {
+                            //The ED that will be controlled
+                            return $scope.selectedNode.data.ed
+                        },
+                        DG: function () {
+                            //the full datagroup
+                            return $scope.selectedModel
+                        },
+                        fullElementList : function () {
+                            return $scope.fullElementList
+                        }
+                    }
+
+                }).result.then(function (vo) {
+                    $scope.addEnableWhen({ed:vo.ed},vo.value,vo.op)
+
+                })
+            }
+
             //add an enableWhen within the scope of the current DG. Assume (for now) that the trigger is a coded value
             //value is assumed to be a Coding
             $scope.addEnableWhen = function(item,value,op) {
                 //item is the controlling ed - the one whose value will hide/show the currently selected element
 
                 //let sourcePath = item.shortPath       //this is the path of the source
-                let sourcePath = item.ed.path       //not completely sure how these should work ATM
-                let targetPath = $filter('dropFirstInPath')($scope.selectedNode.data.ed.path)
+                let sourcePath = item.ed.path       //the controlling ED
+                //let targetPath =$scope.selectedNode.data.ed.path
+                let targetPath = $filter('dropFirstInPath')($scope.selectedNode.data.ed.path)  //the currently selected ED - the one that will be controlled
                 let targetED = $scope.selectedNode.data.ed  //this ED - the one that will be shown / hidden
 
                 //console.log(sourcePath,targetPath,value)
@@ -243,24 +271,26 @@ angular.module("pocApp")
                 delete $scope.input.ewSourceValue
                 delete $scope.input.ewSource
                 //in modelsCtrl
+
                 $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:targetPath})
 
             }
 
-            $scope.removeEnableWhen = function (inx) {
-
-                let path = $filter('dropFirstInPath')($scope.selectedNode.data.ed.path)
-
+            $scope.removeEnableWhen = function (inx,path) {
+                //the path is the full path (incl. DGName) of the element where the EW is to be removed from.
+                //inx is the position within the array of EW
+                //let path = $filter('dropFirstInPath')($scope.selectedNode.data.ed.path)
+                let pathInDG = $filter('dropFirstInPath')(path) //the path in the DG doesn't have the DF type name in front
                 for (const ed of $scope.selectedModel.diff) {
-                    if (ed.path == path) {
+                    if (ed.path == pathInDG) {
                         if (ed.enableWhen && ed.enableWhen.length > inx) {
                             let ew = ed.enableWhen.splice(inx,1)
 
                             traceSvc.addAction({action:'remove-enablewhen',model:$scope.selectedModel,
                                 path:path,description:angular.toJson(ew[0])})
                             //in modelsCtrl
-                            $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:path})
-
+                            $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:pathInDG})
+                            break
                         }
 
                     }
@@ -291,25 +321,7 @@ angular.module("pocApp")
                             )
                         }
                     }
-              //  }
-                    //$scope.fullElementList.forEach(function (item) {
-/*
-                    //get the ed from the current model as it may have been updated
-                    let sourcePath = $filter('dropFirstInPath')(source.ed.path)
 
-                    let sourceEd =  $scope.selectedModel.diff.filter(ed => ed.path == sourcePath)
-                    if (sourceEd.length == 1) {
-                        modelDGSvc.expandEdValues(sourceEd[0]).then(
-                            function (ar) {
-                                $scope.ewSourceValues = ar
-                            },
-                            function (err) {
-                                console.log(err)
-                            }
-                        )
-                    }
-
-                    */
 
 
 
@@ -548,7 +560,7 @@ angular.module("pocApp")
                 let pathToDelete =  ar.join(".") // $filter('dropFirstInPath')(item.path)   //remove the DT name from the path
 
 
-                //this is a special case involving sliced elements. In this case we physically remove the path and all childre from the diff
+                //this is a special case involving sliced elements. In this case we physically remove the path and all children from the diff
                 if (item.path.indexOf('.slice:') > -1) {
                     let slicePathToDelete = ar.join('.')        //the full element to delete - without the dg name at the front
                     if (confirm("Do you want to remove this slice and all it's contents")) {
@@ -566,8 +578,6 @@ angular.module("pocApp")
                             })
                             dg.diff = ar1
 
-
-
                             //rebuild fullList and re-draw the tree
                             $scope.refreshFullList($scope.selectedModel)
                         }
@@ -583,10 +593,11 @@ angular.module("pocApp")
                 let dg = $scope.hashAllDG[dgName]
                 if (dg && dg.diff) {
                     dg.diff.forEach(function (ed) {
-                        //let path = ed.path
-                        if (ed.path.startsWith(pathToDelete) && ed.path !== pathToDelete) { //don't want it matching on itself!
+
+                        if (ed.path.isChildPath(pathToDelete))  {  //Is this ed a child of the path to delete?
+                        //if (ed.path.startsWith(pathToDelete + ".") && ed.path !== pathToDelete) { //don't want it matching on itself!
                             if (ed.mult !== '0..0') {
-                                //if the child is deleted, then it's safe to delete this one...
+                                //if the child is deleted, then it's safe to delete this one... todo - this will leave the child an orphan...
                                 canDelete = false
                             }
 

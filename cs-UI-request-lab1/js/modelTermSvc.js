@@ -37,15 +37,20 @@ angular.module("pocApp")
 
                                 }
 
-                                if (ed.enableWhen) {
-                                ed.enableWhen.forEach(function (ew) {
-                                    let code = `${ew.value.code}|${ew.value.system}`
-                                    hashCode[code] = hashCode[code] || {display:ew.display,lst:[]}
-                                    let t = hashCode[code]
-                                    t.lst.push({code:code, display:ew.value.display,dg:key,path:ed.path,type:'enableWhen'})
-                                })
 
-                            }
+                                if (ed.enableWhen) {
+                                    ed.enableWhen.forEach(function (ew) {
+                                        //ew.value is assumed to be a Coding (could have been better named). Other possible is valueBoolean
+                                        if (ew.value ) {
+                                            let code = `${ew.value.code}|${ew.value.system}`
+                                            hashCode[code] = hashCode[code] || {display:ew.display,lst:[]}
+                                            let t = hashCode[code]
+                                            t.lst.push({code:code, display:ew.value.display,dg:key,path:ed.path,type:'enableWhen'})
+                                        }
+
+                                    })
+
+                                }
                             }
                         })
                     })

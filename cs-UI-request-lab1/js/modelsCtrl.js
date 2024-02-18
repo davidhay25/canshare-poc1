@@ -10,24 +10,13 @@ angular.module("pocApp")
             $scope.input = {}
             $scope.input.showFullModel = true
 
-            //load the models from the local store. Need to check that the inheritance
-            //chain is corrected - this is a DAG after all, and circular dependencies can crash the browser (I know, they shouldn't)
-           /* not sure about this
-            if (! $localStorage.world) {
-                $localStorage.world = modelsDemoSvc.getDemo()
-            }
-            */
 
-
-            //console.log($window.indexedDB)
 
 
             $scope.input.metaProcedures = ['Small diagnostic sample','Resection','Radiation therapy','SACT therapy']
             $scope.input.metaCategories = ['Histopathology request','Histopathology report','Treatment summary']
 
             $localStorage.trace = $localStorage.trace || {on:false,limit:500,contents:[]}
-
-            //$scope.trace = $localStorage.trace //todo: note that updating $localStotage directly didn't seem to update $scope
 
             $scope.toggleTrace = function () {
                 $localStorage.trace.on = ! $localStorage.trace.on
@@ -57,8 +46,6 @@ angular.module("pocApp")
             //todo need a better validation ?
             $scope.input.types = $localStorage.world.dataGroups  //<<<< temp
 
-
-
             //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
             $scope.hashAllDG = $localStorage.world.dataGroups
 
@@ -76,7 +63,7 @@ angular.module("pocApp")
                 }
             }
 
-            //console.log($scope.hashAllDG)
+
 
             //look for DG errors like repeating parents in the hierarchy tree
             if ($scope.hashAllDG) {
@@ -1070,7 +1057,7 @@ angular.module("pocApp")
                 $timeout(function () {
                     let fullPath = `${item.hiddenDGName}.${item.path}`
                     $("#dgTree").jstree("select_node",  fullPath);
-                },500)
+                },1000)
             }
 
 
@@ -1496,18 +1483,7 @@ angular.module("pocApp")
 
                 //sort the elements list to better display slicing
                 $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
-/*
 
-                $scope.fullElementList.forEach(function (item) {
-                    item.ed.mult == '0..0'
-                    for (const key of Object.keys(vo.hashHidden)) {
-                        if (item.ed.path.startsWith(key)) {
-                            item.ed.mult == '0..0'
-                            break
-                        }
-                    }
-                })
-                */
 
 
 

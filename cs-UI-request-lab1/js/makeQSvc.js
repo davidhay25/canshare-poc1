@@ -402,18 +402,17 @@ angular.module("pocApp")
                         if (ed.mult == '0..0') {okToAdd = false}
                         if (okToAdd) {
                             for (const pth of basePathsToHide) {
-                                if (ed.path.startsWith(pth)) {
+                                //if (ed.path.startsWith(pth)) {
+                                if (ed.path.isChildPath(pth)) {
                                     okToAdd = false
                                     break
                                 }
                             }
                         }
-
                         if (okToAdd) {
                             lstQElements.push(ed)
                         }
                     }
-
                 })
 
                 //now can build the Q
@@ -446,7 +445,8 @@ angular.module("pocApp")
                         //need to see if we've finished procesing a path
                         if (processingDGPath) {
                             //yes, we have started processing a DG group. Are we still on that path?
-                            if ( !path.startsWith(processingDGPath)) {
+                            //if ( !path.startsWith(processingDGPath)) {
+                            if ( !path.isChildPath(processingDGPath)) {
                                 //group = topGroup  - this puts everyting at the top
                                 //We've moved on past the DG
 
@@ -698,7 +698,8 @@ angular.module("pocApp")
                             } else {
                                 //check that the path of this element is not in the pathsToHide list
                                 for (const path of pathsToHide) {
-                                    if (node.data.ed.path.startsWith(path)) {
+                                    //if (node.data.ed.path.startsWith(path)) {
+                                    if (node.data.ed.path.isChildPath(path)) {
                                         canAdd = false
                                         break
                                     }
@@ -979,7 +980,8 @@ angular.module("pocApp")
                             } else {
                                 //check that the path of this element is not in the pathsToHide list
                                 for (const path of pathsToHide) {
-                                    if (node.data.ed.path.startsWith(path)) {
+                                    //if (node.data.ed.path.startsWith(path)) {
+                                    if (node.data.ed.path.isChildPath(path)) {
                                         canAdd = false
                                         break
                                     }
@@ -1379,8 +1381,8 @@ angular.module("pocApp")
                 //add any that start with the path of the passed in
                 allElementsThisSection.forEach(function (ed1) {
                     //note that the path is the full path (including DG name)
-
-                    if (ed1.path.startsWith(path)) {
+                    //if (ed1.path.startsWith(path)) {
+                    if (ed1.path.isChildPath(path)) {
                         //console.log(ed1.path)
 
                         let voControl = that.getControlDetails(ed1)

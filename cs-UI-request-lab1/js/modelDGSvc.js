@@ -17,18 +17,17 @@ angular.module("pocApp")
                 //given the expanded element list - construct a list of all dependencies (enableWhen)
                 let allDependencies = []
 
-                //construct a hash of all elments
+                //construct a hash of all elments in this DG
                 let hashElements = {}
                 lstElements.forEach(function (item) {
                     if (item.ed.mult !== '0..0') {
                         hashElements[item.ed.path] = item.ed
                     }
-
                 })
 
                 //now create the ew list
                 lstElements.forEach(function (item) {
-                    if (item.ed && item.ed.enableWhen) {
+                    if (item.ed && item.ed.enableWhen && item.ed.mult !== '0..0') {
                         //note that the ew here is not the same as in the Q - for example it has 'source' rather than 'question'
                         item.ed.enableWhen.forEach(function (ew) {
                             let sourceEd = hashElements[ew.source]

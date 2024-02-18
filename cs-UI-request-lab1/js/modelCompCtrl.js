@@ -470,7 +470,8 @@ angular.module("pocApp")
                 //count the number of times (if any) that this path appears
                 section.items.forEach(function (item) {
                     console.log(item)
-                    if (item.name.startsWith(path)) {
+                    //if (item.name.startsWith(path)) {
+                    if (item.name.isChildPath(path)) {
                         ctr++
                     }
                 })
