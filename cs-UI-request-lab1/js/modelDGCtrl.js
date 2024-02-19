@@ -28,8 +28,6 @@ angular.module("pocApp")
                 }
 
 
-
-
             }
 
             $scope.cloneDG = function (dg) {
@@ -62,9 +60,10 @@ angular.module("pocApp")
 
                             $scope.hashAllDG[newDG.name] = newDG
                             traceSvc.addAction({action:'clone-model',model:newDG})
-                            $scope.$emit('updateDGList',newDG.name)
 
-                            //$scope.selectModel(newDG)      //in modelsCtrl
+                            $scope.makeAllDTList()  //create the various lists (and trees) for the dt list
+
+                            $scope.$emit('updateDGList',{name:newDG.name})
 
                         }, function() {
                             alert(`Sorry, this name (${vo.name}) is not unique`)

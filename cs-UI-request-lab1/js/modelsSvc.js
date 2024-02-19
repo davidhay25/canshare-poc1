@@ -817,10 +817,6 @@ angular.module("pocApp")
                     //udpates allElements
                     extractElements(model,model.name,'root')   //the guts of the function
 
-
-
-
-
                     arLog.length = 0        //don't return the log contents if all was OK
                 } catch (ex) {
                     //thrown when the number of iterations is excessive (>300 ATM).

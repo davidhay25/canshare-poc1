@@ -7,7 +7,76 @@ angular.module("pocApp")
 
 
         return {
-            auditDG : function (dg,hashAllDG) {
+            auditDGDiff : function (dg,hashAllDG) {
+                //locate any 0..0 diff elements in the DG that do not correspond with parents. Occurs when parents are updated
+
+                //first, go through the parental hierarchy and assemble a list of all elements in the hierarchy
+                let hashAllParentalElements = {}
+                let parentName = dg.parent  //the name of the parent
+
+                while (parentName) {
+                    let pDG = hashAllDG[parentName]
+                    if (pDG) {
+                        if (pDG.diff) {
+                            pDG.diff.forEach(function (ed) {
+                                if (ed.mult !== '0..0') {      //only concern ourselves with actual definitions atm
+                                    hashAllParentalElements[ed.path] = {path:ed.path,defined:parentName,definedTitle:pDG.title, type:ed.type}
+                                }
+                            })
+                        }
+                        parentName = pDG.parent
+                    } else {
+                        alert(`The parent: ${parentName}  was not found`)
+                        return {allElements: {},lstRedundantEd:[]}
+                    }
+
+                }
+
+                //now go through the diff of the DG under check and see if any of the 0..0 elements there are not in the hierarchy
+                let lstRedundant = []
+                if (dg.diff) {
+                    dg.diff.forEach(function (ed) {
+                        let definition =  hashAllParentalElements[ed.path]  //is this element from a parent?
+
+                        if (ed.mult == '0..0') {
+                            //let definition =  hashAllParentalElements[ed.path]
+                            if (definition) {
+                                //Yes! this is zeroing out an element from the hierarchy
+                                definition.mult = '0..0'
+                            } else {
+                                //this is zeroing out an element no longer in the hierarchy
+                                lstRedundant.push(ed)
+                            }
+                        } else {
+                            if (definition) {
+                                definition.mult = ed.mult
+                            } else {
+                                //this ed is defined in the DG
+                                //It's safe to add it to the hash at this point - even though it wasn't defined on a parent
+                                hashAllParentalElements[ed.path] = {path:ed.path,defined:dg.name,definedTitle:dg.title, mult:ed.mult,type:ed.type}
+                            }
+                        }
+
+                    })
+                }
+
+                //finally, create a sortedlist of the definitions (to make the display a little easier)
+                let lst = []
+                Object.keys(hashAllParentalElements).forEach(function (key) {
+                    lst.push(hashAllParentalElements[key])
+                })
+                lst.sort(function (a,b) {
+                    if (a.path > b.path) {
+                        return 1
+                    } else {
+                        return -1
+                    }
+
+                })
+
+                return {allElements: lst,lstRedundantEd:lstRedundant}
+
+                //console.log(hashAllParentalElements)
 
 
 
@@ -53,7 +122,7 @@ angular.module("pocApp")
                 return allDependencies
 
             },
-            auditDG : function (hashAllDG) {
+            auditDGDEP : function (hashAllDG) {
                 //compare the DG hash with $localStorage. There could be a bug where localStorage is not being updated
                 Object.keys(hashAllDG).forEach(function (key) {
                     let dg = hashAllDG[key]
@@ -332,7 +401,6 @@ angular.module("pocApp")
 
                         //findUltimateParent can throw an exception - let it bubble up
                         let ultimateParent = findUltimateParent(dgToFindUltimateParent)
-                        //console.log(dgToFindUltimateParent.title,ultimateParent.title)
 
                         if (ultimateParent.name == branchName) {
                             let sectionNode = {id:dgToFindUltimateParent.name,
@@ -377,8 +445,10 @@ angular.module("pocApp")
 
             },
 
-            makeFullGraph : function(in_hashAllDG,) {
-                //create a single graph with all DGs. include hierarchy and references
+            makeFullGraph : function(in_hashAllDG,hideReferences) {
+
+                //create a single graph with all DGs. hashierarchy and optionally references
+                //shows on the main page
 
                 let hashIdNodesCreated = {}
 
@@ -389,7 +459,6 @@ angular.module("pocApp")
                 //create the root node. This is the default parent (unless a DG already has one
                 let rootNode = {id:"root", label: "root",shape: 'box',color:'white'}
                 rootNode.data = {dg:{}}
-                //arNodes.push(rootNode)
 
 
                 Object.keys(hashAllDG).forEach(function (key) {
@@ -405,11 +474,13 @@ angular.module("pocApp")
                         let node = {id: DG.name, label: DG.name,shape: 'box'}
                         node.data = {dg:DG}
                         arNodes.push(node)
+                    } else {
+                        console.error(`Duplicate DG name: ${DG.name}`)
                     }
 
 
 
-                    //add the defauls parent if needed
+                    //add the default parent if needed
                     if (! DG.parent) {
                         DG.parent = "root"
                     }
@@ -435,20 +506,24 @@ angular.module("pocApp")
 
                         //let leafPath = $filter('lastInPath')(ed.path)
 
-                        if (hashAllDG[type] && hashAllDG[type].diff) {
-                            //this is a DG (rather than a FHIR DT) as it has a diff
-                            //create a reference edge
-                            let edge = {id: 'e' + arEdges.length +1,
-                                from: DG.name,
-                                //to: model.parent,
-                                to: hashAllDG[type].name,
-                                //color: 'red',
-                                //width: 4,
-                                label: ed.path,arrows : {to:true}}
-                            arEdges.push(edge)
+                        if (! hideReferences) {
+                            if (hashAllDG[type] && hashAllDG[type].diff) {
+                                //this is a DG (rather than a FHIR DT) as it has a diff
+                                //create a reference edge
+                                let edge = {id: 'e' + arEdges.length +1,
+                                    from: DG.name,
+                                    //to: model.parent,
+                                    to: hashAllDG[type].name,
+                                    //color: 'red',
+                                    //width: 4,
+                                    label: ed.path,arrows : {to:true}}
+                                arEdges.push(edge)
 
 
+                            }
                         }
+
+
 
                     })
 

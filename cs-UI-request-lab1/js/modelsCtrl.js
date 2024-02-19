@@ -95,13 +95,8 @@ angular.module("pocApp")
                 //--------- build the tree with all DG
                // if ($scope.hashAllDG) {
                     let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
-
-
                     showAllDGTree(vo1.treeData)
                // }
-
-
-
                 if (vo && vo.name) {
                     $scope.selectModel($scope.hashAllDG[vo.name] )
                 }
@@ -524,7 +519,7 @@ angular.module("pocApp")
 
             //create a list of all DT + fhir types
             //also assemble a list of bespoke tage (ie tags where the system is 'bespoke'
-            makeAllDTList = function() {
+            $scope.makeAllDTList = function() {
 
                 $scope.tags = {} //a hash keyed on tag code containing an array of DG with that tag
 
@@ -598,13 +593,12 @@ angular.module("pocApp")
 
 
 
-                //todo - should move the js to the bottom of the page so it's loaded before the script runs...!
                 $timeout(function () {
 
 
                     let vo
                     try {
-                        vo = modelDGSvc.makeFullGraph($scope.hashAllDG)
+                        vo = modelDGSvc.makeFullGraph($scope.hashAllDG,true)
 
                         makeGraphAllDG(vo.graphData)
 
@@ -615,8 +609,6 @@ angular.module("pocApp")
                         try {
                             //the tree data for the sections branch of DG
                             let sections = modelDGSvc.makeSectionsTree($scope.hashAllDG)
-                            //let sectionTreeData = modelDGSvc.makeSectionsTree($scope.hashAllDG)
-                            //console.log(sectionTreeData)
                             showAllDGTree(sections.treeData,'#sectionDGTree')
                         } catch (ex) {
                             console.log(ex)
@@ -655,10 +647,8 @@ angular.module("pocApp")
                 },500)
 
 
-
-
             }
-            makeAllDTList()         //initial invokation on load
+            $scope.makeAllDTList()         //initial invokation on load
 
 
 
@@ -668,7 +658,7 @@ angular.module("pocApp")
                 $localStorage.userTags1 = $localStorage.userTags1  || {}
                 $localStorage.userTags1[$scope.selectedModel.name] = tags
 
-                makeAllDTList()
+                $scope.makeAllDTList()
             }
 
             $scope.rememberSelectedTag = function (tag) {
@@ -853,7 +843,7 @@ angular.module("pocApp")
                         delete $scope.hashAllDG[dgName]
                         delete $scope.selectedModel
 
-                        makeAllDTList()
+                        $scope.makeAllDTList()
                         $scope.refreshUpdates()
                         //alert("The DG has been removed. It is advisable to refresh the page.")
                     }
@@ -1349,17 +1339,12 @@ angular.module("pocApp")
                         }
                         $scope.hashAllDG[newModel.name] = newModel
                         sortDG()
-
-                       // let vo1 = modelsSvc.validateModel($localStorage.world)
-                       // $scope.errors = vo1.errors
-                       // $scope.input.types = vo1.types      //a hash keyed by name
-
-                        $scope.input.types[newModel.name] = newModel
+                        $scope.input.types[newModel.name] = newModel    //todo - this is a duplicate of hashAllDG
 
                         //a hash by type of all elements that reference it
                         $scope.analysis = modelsSvc.analyseWorld($localStorage.world,$scope.input.types)
 
-                        makeAllDTList()      //updated
+                        $scope.makeAllDTList()      //updated
 
                         $scope.selectModel(newModel)
 
@@ -1415,7 +1400,9 @@ angular.module("pocApp")
             $scope.selectComposition = function(comp){
                 clearB4Select()
                 //$scope.selectedModel = comp
-                $scope.lstUsedDG = modelCompSvc.allDGsInComp(comp,$scope.hashAllDG).lstUsedDG //hashUsedDG
+                let vo1 =  modelCompSvc.allDGsInComp(comp,$scope.hashAllDG)
+                $scope.lstUsedDG = vo1.lstUsedDG //hashUsedDG
+
 
                 $scope.selectedComposition = comp
 
@@ -1484,11 +1471,6 @@ angular.module("pocApp")
                 //sort the elements list to better display slicing
                 $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
 
-
-
-
-                //console.log($scope.fullElementList)
-
                 //create the list of potential enableWhen sources
                 $scope.ewSources = []
                 $scope.fullElementList.forEach(function (item) {
@@ -1517,13 +1499,15 @@ angular.module("pocApp")
                 $scope.allDependencies = modelDGSvc.getAllEW($scope.fullElementList,$scope.selectedModel.name)
 
 
-                //console.log($scope.fullElementList)
             }
 
             //only used for DG now
             $scope.selectModel = function (dg) {
                 if (dg) {
                     traceSvc.addAction({action:'select',model:dg})
+
+                    $scope.dgAudit = modelDGSvc.auditDGDiff(dg,$scope.hashAllDG)
+
 
                     //make sure that $localStorage has been updated
                     if (angular.toJson(dg) !== angular.toJson($localStorage.world.dataGroups[dg.name])) {

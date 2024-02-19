@@ -29,11 +29,6 @@
 
           <span class=" clickable spacer"
                ng-click="newModel('dg',selectedModel)">New child</span>
-
-
-
-
-
       </div>
 
       <br/>
@@ -72,49 +67,12 @@
             </div>
           </div>
 
-          <!--
-
-                   <div class="col-md-2">
-
-
-                     <div ng-show="selectedModel.profile">
-                       <a ng-href="{{igBase}}{{selectedModel.profile}}" target="_blank">Profile</a>
-                     </div>
-
-
-                     <div ng-show="selectedModel.ss">
-                       <a ng-href="{{selectedModel.ss}}" target="_blank">SpreadSheet</a>
-                     </div>
-
-
-
-
-          </div>
- -->
-
 
         </div>
 
       </div>
 
       <br/>
-
-      <!--
-      <br/>
-      <div class="row">
-        <div class="col-md-6">
-          <div ng-show="user.email">
-            <div ng-hide="selectedModel.checkedOut" class="clickable" ng-click="checkOut()">Check out</div>
-            <div ng-show="selectedModel.checkedOut" class="clickable" ng-click="checkIn()">Check in</div>
-          </div>
-
-
-        </div>
-        <div class="col-md-6">
-          <div class="clickable" ng-click="deleteDG(selectedModel.name)">Delete</div>
-        </div>
-      </div>
-      -->
 
 
     </div>
@@ -276,11 +234,6 @@
             </div>
 
 
-<!--
-            <i class="glyphicon glyphicon-edit pull-right clickable"
-               ng-show="canEdit(selectedModel)"
-               ng-click="editDGItem(selectedNode.data)"></i>
--->
             <button class="btn-link btn pull-right"
                     ng-show="canEdit(selectedModel)"
                     ng-click="editDGItem(selectedNode.data)">Edit </button>
@@ -1276,6 +1229,87 @@
           </td>
         </tr>
       </table>
+    </uib-tab>
+
+    <uib-tab ng-show="false" heading="Audit">
+      <!-- Audit only looks at hierarchy - not referenced DG-->
+      <uib-tab-heading>Audit <span ng-show="dgAudit.lstRedundantEd.length > 0" class="badge">{{dgAudit.lstRedundantEd.length}}</span> </uib-tab-heading>
+        <br/>
+        <uib-tabset>
+
+          <uib-tab heading="Diff Analysis">
+
+            <div ng-show="dgAudit.lstRedundantEd.length > 0">
+              <h4>Redundant diff entries - no matching parent element</h4>
+              <table class="table-bordered table">
+                <tr><th>Path</th><th>Title</th><th>Type</th><th>Card.</th></tr>
+                <tr ng-repeat="row in dgAudit.lstRedundantEd">
+                  <td>{{row.path}}</td>
+                  <td>{{row.title}}</td>
+                  <td>{{row.type[0]}}</td>
+                  <td>{{row.mult}}</td>
+                </tr>
+              </table>
+              <div>
+                <div class="btn btn-link pull-right" ng-click="deleteAllRedundantDiff()">Delete all redundant diff</div>
+              </div>
+              <div class="clearfix"></div>
+
+            </div>
+
+
+
+
+            <h4>Diff entries that match a parent element</h4>
+            <table class="table-bordered table">
+              <tr><th>Path</th><th>Where defined</th><th>Type</th><th>Card.</th></tr>
+              <tr ng-repeat="row in dgAudit.allElements" ng-show="row.mult == '0..0'">
+                <td>{{row.path}}</td>
+                <td>{{row.definedTitle}}</td>
+                <td>{{row.type[0]}}</td>
+                <td>{{row.mult}}</td>
+              </tr>
+            </table>
+
+
+
+          </uib-tab>
+
+
+          <uib-tab heading="All elements">
+
+            <div class="row">
+              <div class="col-md-12">
+                <h4>All elements</h4>
+                <table class="table-bordered table">
+                  <tr><th>Path</th><th>Where defined</th><th>Type</th><th>Card.</th></tr>
+                  <tr ng-repeat="row in dgAudit.allElements" ng-show="row.mult !== '0..0'">
+                    <td>{{row.path}}</td>
+                    <td>{{row.definedTitle}}</td>
+                    <td>{{row.type[0]}}</td>
+                    <td>{{row.mult}}</td>
+                  </tr>
+                </table>
+              </div>
+              <div class="col-md-0">
+
+
+
+              </div>
+            </div>
+
+
+
+          </uib-tab>
+          <uib-tab heading="Json">
+            <pre>{{dgAudit | json}}</pre>
+          </uib-tab>
+        </uib-tabset>
+
+
+
+
+
     </uib-tab>
 
     <uib-tab heading="Json">

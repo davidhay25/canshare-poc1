@@ -4,7 +4,7 @@ angular.module("pocApp")
 
         return {
             getVersion : function(){
-                return "0.7.1"
+                return "0.7.2"
             },
 
             getSizeOfObject : function( object ) {
@@ -39,7 +39,7 @@ angular.module("pocApp")
                 return bytes;
             },
             findExtensionCC : function(item,url) {
-                //assume that the extension is a CC abd we're looking for the first entry
+                //assume that the extension is a CC and we're looking for the first entry
                 //Return the Coding or null this is really common
                 let result = null
 

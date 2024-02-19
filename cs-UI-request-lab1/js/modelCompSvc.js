@@ -11,9 +11,8 @@ angular.module("pocApp")
                 //will see, so if there are errors they will be most apparent there
 
 
-
-
             },
+
             allDGsInComp: function(comp,hashAllDG){
                 //return a list of all DG's used in a given composition
 
