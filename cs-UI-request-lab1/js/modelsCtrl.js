@@ -164,7 +164,7 @@ angular.module("pocApp")
                 let host = $location.absUrl().split('?')[0]
 
                 if (type == 'dg') {
-                    host += "?dt=" + $scope.selectedModel.name
+                    host += "?dg=" + $scope.selectedModel.name
                 }
                 if (type == 'comp') {
                     host += "?comp=" + $scope.selectedComposition.name
