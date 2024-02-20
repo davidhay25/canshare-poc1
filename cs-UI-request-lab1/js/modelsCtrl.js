@@ -3,13 +3,12 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
-                  $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc) {
+                  $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
             //$scope.version = "0.6.12"
             $scope.version = utilsSvc.getVersion()
             $scope.input = {}
             $scope.input.showFullModel = true
-
 
 
 
@@ -121,26 +120,60 @@ angular.module("pocApp")
             //was the page called with a DG name?
             let search = $window.location.search;
             if (search) {
-
+//console.log($location.absUrl())
                 let srch = search.substr(1)
                 let ar = srch.split('=')
+                //console.log(srch,ar)
                 if (ar.length == 2) {
-                    if (ar[0] == 'dt') {
-                        $scope.initialDT = ar[1]
-                        //console.log($scope.initialDT)
+                    if (ar[0] == 'dg') {
+                         let initialDG = ar[1]
 
                         //wait a second then select the DT. todo really need to refactor this controller...
                         $timeout(function () {
-                            if ($scope.hashAllDG[$scope.initialDT]) {
-                                $scope.selectModel($scope.hashAllDG[$scope.initialDT])
+                            $scope.input.mainTabActive = $scope.ui.tabDG
+                            if ($scope.hashAllDG[initialDG]) {
+                                $scope.selectModel($scope.hashAllDG[initialDG])
+                            }else {
+                                alert(`Can't find the DG with the name ${initialDG}`)
                             }
 
-                        },500)
+                        },1000)
+
+                    }
+                    if (ar[0] == 'comp') {
+                        let initialComp = ar[1]
+
+                        //wait a second then select the DT. todo really need to refactor this controller...
+                        $timeout(function () {
+                            $scope.input.mainTabActive = $scope.ui.tabComp
+
+
+                            if ($scope.hashAllCompositions[initialComp]) {
+                                $scope.selectComposition($scope.hashAllCompositions[initialComp])
+                            } else {
+                                alert(`Cant find the composition with the name ${initialComp}`)
+                            }
+
+                        },1000)
 
                     }
                 }
             }
 
+            $scope.showLink = function (type) {
+                let host = $location.absUrl().split('?')[0]
+
+                if (type == 'dg') {
+                    host += "?dt=" + $scope.selectedModel.name
+                }
+                if (type == 'comp') {
+                    host += "?comp=" + $scope.selectedComposition.name
+                }
+
+                alert(host)
+
+               // let link =
+            }
 
             $scope.leftPanel = 'col-md-3'
             $scope.rightPanel = 'col-md-9'
@@ -160,7 +193,7 @@ angular.module("pocApp")
             $scope.setInitialTab = function (inx) {
                 $localStorage.initialModelTab = inx
             }
-            //$scope.input.mainTabActive = $scope.ui.tabQ
+            //$scope.input.mainTabActive = $scope.ui.tabDG
 
             //used in DG & Comp so when a type is a FHIR DT, we can create a link to the spec
             $scope.fhirDataTypes = modelsSvc.fhirDataTypes()

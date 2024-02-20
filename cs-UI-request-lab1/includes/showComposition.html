@@ -52,7 +52,9 @@
     </div>
     <div class="col-md-5">
 
-      <a ng-href="modelReview.html?{{selectedComposition.name}}" target="_blank">Review</a>
+      <button class="btn btn-link" ng-click="showLink('comp')">Link</button>
+
+      <a class="btn" ng-href="modelReview.html?{{selectedComposition.name}}" target="_blank">Review</a>
 
       <span style="margin-left: 16px" class="clickable"
             ng-show="selectedComposition.checkedOut && selectedComposition.checkedOut == user.email"

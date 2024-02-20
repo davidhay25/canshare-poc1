@@ -79,11 +79,14 @@
 
 
     <div class="col-md-6">
-
+<!--
       <button class="btn btn-link" ng-click="showHistory()">History ({{historyCount}})</button>
+      -->
       <button class="btn btn-link" ng-click="deleteDG(selectedModel.name)">Delete</button>
 
-      <a ng-href="modelReview.html?{{selectedModel.name}}" target="_blank">Review</a>
+      <a class="btn" ng-href="modelReview.html?{{selectedModel.name}}" target="_blank">Review</a>
+
+      <button class="btn btn-link" ng-click="showLink('dg')">Link</button>
 
       <div class="pull-right">
         <div ng-show="user.email">
