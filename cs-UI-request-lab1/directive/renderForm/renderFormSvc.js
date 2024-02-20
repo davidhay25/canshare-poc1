@@ -1468,10 +1468,13 @@ angular.module("formsApp")
 
                 function checkEqualCoding(source,target) {
                     //source is from the form, target is the  Q
-
-                    if (source.code == target.code) {
-                        return true
+                    if (source && target) {
+                        if (source.code == target.code) {
+                            return true
+                        }
                     }
+
+
 
 /* - Jan22 2024 - commented out
                     if (source && target) {

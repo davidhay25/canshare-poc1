@@ -4,7 +4,7 @@ angular.module("pocApp")
 
         return {
             getVersion : function(){
-                return "0.7.2"
+                return "0.7.3"
             },
 
             getSizeOfObject : function( object ) {

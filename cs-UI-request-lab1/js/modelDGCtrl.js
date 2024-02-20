@@ -211,8 +211,8 @@ angular.module("pocApp")
                     size: 'lg',
                     controller: 'addEWCtrl',
                     resolve: {
-                        ED: function () {
-                            //The ED that will be controlled
+                        targetED: function () {
+                            //The ED that will be controlled - thos one
                             return $scope.selectedNode.data.ed
                         },
                         DG: function () {
@@ -236,12 +236,11 @@ angular.module("pocApp")
                 //item is the controlling ed - the one whose value will hide/show the currently selected element
 
                 //let sourcePath = item.shortPath       //this is the path of the source
-                let sourcePath = item.ed.path       //the controlling ED
+                let sourcePath = item.ed.path       //the controlling ED path. THIS MUST BE THE FULL PATH includeing DG name
                 //let targetPath =$scope.selectedNode.data.ed.path
                 let targetPath = $filter('dropFirstInPath')($scope.selectedNode.data.ed.path)  //the currently selected ED - the one that will be controlled
                 let targetED = $scope.selectedNode.data.ed  //this ED - the one that will be shown / hidden
 
-                //console.log(sourcePath,targetPath,value)
 
                 //todo - what if there is no diff
                 let found = false
@@ -299,7 +298,7 @@ angular.module("pocApp")
             }
 
             //When adding a new EW and the source has been selected. The possible values of that source need to be determined.
-            $scope.ewSourceSelected = function (source) {
+            $scope.ewSourceSelectedDEP = function (source) {
                 //console.log(source)
                 delete $scope.ewSourceValues
                 $scope.input.ewSourceOp = "="       //default to =

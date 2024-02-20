@@ -1,13 +1,39 @@
 angular.module("pocApp")
     .controller('editDGItemCtrl',
         function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal,$http) {
-            $scope.item = item
+            $scope.item = item      //will be {ed:} if editing an existing
             $scope.allTypes = allTypes
             $scope.input = {}
             $scope.fullElementList = fullElementList
 
             $scope.options = []     //a list of options. Will be saved as ed.options
             $scope.units = [] //a list of units. Will be saved as ed.units
+
+
+            /*
+            //parentEd is the ed to which the new one is going to be added. It's ignored during editing existing
+            //we want to be sure that any path added at this level is unique
+            let hashChildNames = {} //all the existing child path names
+            if (parentEd && parentEd.path) {
+                let ar = parentEd.path.split('.')
+                let posOfChildren = ar.length     //this is where all the direct children will sit - 0 based
+                fullElementList.forEach(function (item) {
+                    let ed = item.ed
+                    if (ed && ed.path) {
+                        let ar = ed.path.split('.')
+                        if (ar.length >= posOfChildren) {
+                            //this is a child - or a child of a child
+                            let segmentName = ar[posOfChildren]
+                            hashChildNames[segmentName] = true
+                        }
+                    }
+
+                })
+            }
+
+            console.log(hashChildNames)
+
+            */
 
             let snomed = "http://snomed.info/sct"
 

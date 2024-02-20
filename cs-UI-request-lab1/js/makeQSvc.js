@@ -29,6 +29,10 @@ angular.module("pocApp")
                             controlType = "text"
                         }
                         break
+                    case 'boolean' :
+                        controlHint = "boolean"
+                        controlType = "boolean"
+                        break
                     case 'dateTime' :
                         controlHint = "dateTime"
                         controlType = "dateTime"
@@ -58,16 +62,29 @@ angular.module("pocApp")
             pathPrefix = pathPrefix || ""
             if (ed && ed.enableWhen && ed.enableWhen.length > 0) {
                 //console.log(ed,'has ew')
-                item.enableWhen = []
-                ed.enableWhen.forEach(function (ew) {
+                 item.enableWhen = []
 
-                    let qEW = {operator:ew.operator,answerCoding:ew.value}
-                    delete qEW.answerCoding.pt  //the preferred term...
-                    qEW.answerCoding.system = qEW.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
+                ed.enableWhen.forEach(function (ew) {
+                    let qEW = {}
+                    qEW.question = `${pathPrefix}${ew.source}` //linkId of source is relative to the parent (DG)
+                    qEW.operator = ew.operator
+                    //if the ew.value is an object then assume a Coding. Otherwise a boolean (we only support these 2)
+
+                    if (typeof ew.value == 'boolean') {
+                        //this is a boolean
+                        qEW.answerBoolean = ew.value
+                    } else {
+                        //let qEW = {operator:ew.operator,answerCoding:ew.value}
+                        qEW.answerCoding = ew.value
+                        delete qEW.answerCoding.pt  //the preferred term...
+                        qEW.answerCoding.system = qEW.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
+                    }
+
+
 
                     //need to determine the path to the question. For now, assume that
                     //qEW.question = `${parent.linkId}.${ew.source}` //linkId of source is relative to the parent (DG)
-                    qEW.question = `${pathPrefix}${ew.source}` //linkId of source is relative to the parent (DG)
+                   // qEW.question = `${pathPrefix}${ew.source}` //linkId of source is relative to the parent (DG)
 
                     item.enableWhen.push(qEW)
                 })
@@ -654,16 +671,24 @@ angular.module("pocApp")
                                     // let vo = hashSectionEW[sectionName]
                                     let ew = {}
                                     ew.question = `${ar[0]}.${vo.sourceSection}.${vo.ed}`
-                                    ew.operator = "="
+                                    ew.operator = vo.operator || "="
 
-                                    ew.answerCoding = vo.value
-                                    delete ew.answerCoding.pt
-                                    ew.answerCoding.system = ew.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
+
+                                    if (typeof ew.value == 'boolean') {
+                                        //this is a boolean
+                                        ew.answerBoolean = vo.value
+                                    } else {
+                                        //must be a coding
+                                        ew.answerCoding = vo.value
+                                        delete ew.answerCoding.pt
+                                        ew.answerCoding.system = ew.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
+                                    }
+
                                     section.enableWhen.push(ew)
 
                                 })
 
-                                console.log(section.enableWhen)
+                                //console.log(section.enableWhen)
 
                             }
 

@@ -894,11 +894,11 @@ angular.module("pocApp")
                 }).result.then(function (ed) {
                     //update specific items. Not the whole ED
                     //what changed
-                    let changes = ""
+                    //let changes = ""
                     let displayPath = ""  //this will be the path in the changes display
                     if (isNew) {
                         //if it's new, then add it as a child of the currently selected element
-                        changes = "New element"
+                      //  changes = "New element"
 
                         //need to determine the 'root' path.
                         let pathOfCurrentElement = ""  //$scope.selectedModel.name  //by default, add to the DG root
@@ -1634,6 +1634,7 @@ angular.module("pocApp")
                     delete $scope.input.ewSourceValue
                     //delete $scope.ewSourceValues
 
+                    /* no longer supporting this way of setting EW
                     $scope.ewSourcesThisElement = []
                     if ($scope.ewSources) {
                         $scope.ewSources.forEach(function (item) {
@@ -1643,7 +1644,7 @@ angular.module("pocApp")
                         })
                     }
 
-
+*/
 
 
                     $scope.$digest();       //as the event occurred outside of angular...

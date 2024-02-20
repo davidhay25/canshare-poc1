@@ -240,6 +240,11 @@
 
 
             <uib-tabset ng-hide="selectedNode.data.ed.kind == 'root'">
+
+
+              <div ng-show="false" class="btn-link btn" ng-click="addEWNew()">Add new EW (temp loc.)</div>
+
+
               <uib-tab heading="Details">
                 <table class="table table-bordered table-condensed">
 
@@ -611,18 +616,23 @@
                 <table class="table table-bordered">
                   <tr><th>Source</th><th>Operator</th><th>Value</th></tr>
                   <tr ng-repeat="dep in selectedNode.data.ed.enableWhen">
-                    <td>{{dep.source}}</td>
+                    <td>{{dep.source | dropFirstInPath}}</td>
                     <td>{{dep.operator}}</td>
-                    <td>{{dep.value.code}} | {{dep.value.display}}</td>
+                    <td>
+                      <div ng-show="dep.value.code">{{dep.value.code}} | {{dep.value.display}}</div>
+                      <div ng-hide="dep.value.code">{{dep.value}}</div>
+                    </td>
                     <td> <i style="color: red" class="glyphicon glyphicon-remove clickable"
                             ng-show = "canEdit(selectedModel)"
                             ng-click="removeEnableWhen($index,selectedNode.data.ed.path)"></i></td>
                   </tr>
                 </table>
+                <em ng-show="selectedNode.data.ed.enableWhen.length > 0">This element will be hidden in a form unless one of the above conditions is true</em>
 
                 <!-- TODO - come back to this after bug fixes -->
-                <div ng-show="false" class="btn-link btn" ng-click="addEWNew()">Add new EW</div>
+                <div ng-show="canEdit(selectedModel)" class="btn-link btn pull-right" ng-click="addEWNew()">Add new control element</div>
 
+                <!--
 
                 <div class="row" ng-show="canEdit(selectedModel)">
 
@@ -654,6 +664,8 @@
                   </div>
 
                 </div>
+
+                -->
 
               </uib-tab>
 
@@ -1031,7 +1043,10 @@
 
           </td>
           <td>{{dep.ew.operator}}</td>
-          <td>{{dep.ew.value.code}} | {{dep.ew.value.display}} |</td>
+          <td>
+            <div ng-show="dep.ew.value.code">{{dep.ew.value.code}} | {{dep.ew.value.display}}</div>
+            <div ng-hide="dep.ew.value.code">{{dep.ew.value}}</div>
+          </td>
           <td ng-show="canEdit(selectedModel)">
             <i style="color: red" class="glyphicon glyphicon-remove clickable"
                ng-click="removeEnableWhen($index,dep.path)"></i>
@@ -1045,7 +1060,7 @@
 
 
     <uib-tab>
-      <uib-tab-heading>Full element list <span class="badge">{{fullElementList.length}}</span></uib-tab-heading>
+      <uib-tab-heading>Full element list <span class="badge">{{fullElementList.length -1}}</span></uib-tab-heading>
       <!--
       <em class="pull-right">Expanded. Includes items with a Cardinality of 0..0</em>
 -->
