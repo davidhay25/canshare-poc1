@@ -408,7 +408,7 @@ angular.module("pocApp")
 
 
 
-            $scope.setOtherAllowedStatus = function (ed,allowed) {
+            $scope.setOtherAllowedStatusDEP = function (ed,allowed) {
                 console.log(allowed)
 
 

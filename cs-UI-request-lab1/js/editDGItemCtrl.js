@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('editDGItemCtrl',
-        function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal,$http) {
+        function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal,$http,parentEd) {
             $scope.item = item      //will be {ed:} if editing an existing
             $scope.allTypes = allTypes
             $scope.input = {}
@@ -10,30 +10,32 @@ angular.module("pocApp")
             $scope.units = [] //a list of units. Will be saved as ed.units
 
 
-            /*
+
             //parentEd is the ed to which the new one is going to be added. It's ignored during editing existing
-            //we want to be sure that any path added at this level is unique
+            //we want to be sure that any path added at this level is unique (but OK at other levels)
+            let posOfChildren = 1  //by default, will look for dups in the first segment. Don't always have a selected element - eg when a DG is first selected
             let hashChildNames = {} //all the existing child path names
             if (parentEd && parentEd.path) {
                 let ar = parentEd.path.split('.')
-                let posOfChildren = ar.length     //this is where all the direct children will sit - 0 based
-                fullElementList.forEach(function (item) {
-                    let ed = item.ed
-                    if (ed && ed.path) {
-                        let ar = ed.path.split('.')
-                        if (ar.length >= posOfChildren) {
-                            //this is a child - or a child of a child
-                            let segmentName = ar[posOfChildren]
-                            hashChildNames[segmentName] = true
-                        }
-                    }
-
-                })
+                posOfChildren = ar.length     //this is where all the direct children will sit - 0 based
             }
+
+            fullElementList.forEach(function (item) {
+                let ed = item.ed
+                if (ed && ed.path) {
+                    let ar = ed.path.split('.')
+                    if (ar.length >= posOfChildren) {
+                        //this is a child - or a child of a child
+                        let segmentName = ar[posOfChildren]
+                        hashChildNames[segmentName] = true
+                    }
+                }
+
+            })
 
             console.log(hashChildNames)
 
-            */
+
 
             let snomed = "http://snomed.info/sct"
 
@@ -60,6 +62,7 @@ angular.module("pocApp")
                 $scope.input.sourceReference = item.ed.sourceReference
                 $scope.input.path =  $filter('dropFirstInPath')(item.ed.path)
                 $scope.input.controlHint =  item.ed.controlHint
+                $scope.input.otherType =  item.ed.otherType
                 $scope.input.placeholder =  item.ed.placeholder
 
                 $scope.input.hideInQ =  item.ed.hideInQ
@@ -218,7 +221,18 @@ angular.module("pocApp")
 
             }
 
+            function deleteOtherConditional(ed) {
+                //remove any conditionals related to the 'otherType' - 74964007
+                if (ed.enableWhen) {
+                    let ar = []
+                    //will hold new enable when
 
+                }
+            }
+
+            function addOtherConditional() {
+
+            }
 
 
             //doesn't set the path - as that is different when being used to create a new DG element
@@ -237,6 +251,25 @@ angular.module("pocApp")
                 if ($scope.input.controlHint) {
                     ed.controlHint = $scope.input.controlHint
                 }
+
+                if ($scope.input.otherType) {
+                    ed.otherType = $scope.input.otherType
+                    /*
+                    switch ($scope.input.otherType) {
+                        case 'sometimes' :
+                            addOtherConditional()
+                            break
+                        default :
+                            deleteOtherConditional()
+                            break
+                    }
+                    */
+
+                } else {
+                    //delete any otherType conditional that may be present
+                    //deleteOtherConditional()
+                }
+
                 ed.sourceReference = $scope.input.sourceReference
 
 
@@ -290,6 +323,14 @@ angular.module("pocApp")
 
                 if ($scope.isNew) {
                     //don't allow an existing path to be added. This is legit as an override, but not through this dialog
+
+                   if (hashChildNames[$scope.input.path] ){
+                       alert("This path has already been used at this level in this DG")
+                       return
+                   }
+
+
+                    /*
                     for (const item of fullElementList) {
                         let p = $filter('dropFirstInPath')(item.ed.path)
                         if (p && p == $scope.input.path) {
@@ -298,6 +339,7 @@ angular.module("pocApp")
                             break
                         }
                     }
+                    */
 
                     //check that there are no spaces in the path
                     if ($scope.input.path.indexOf(" ") > -1) {

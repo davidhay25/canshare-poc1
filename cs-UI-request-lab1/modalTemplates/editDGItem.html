@@ -128,6 +128,19 @@
             </td>
           </tr>
 
+          <tr  ng-show="input.selectedType == 'CodeableConcept'">
+            <td>'Other' type</td>
+            <td>
+              <span ng-repeat = "opt in ['sometimes','always','textonly']">
+                  <input type="radio"
+                         ng-change="setControlHint(selectedNode.data.ed,opt)"
+                         ng-model="input.otherType" value="{{opt}}"> {{opt}}
+                </span>
+
+            </td>
+          </tr>
+
+
           <tr ng-show="isFixedType(input.selectedType)">
             <td>Fixed value</td>
             <td>

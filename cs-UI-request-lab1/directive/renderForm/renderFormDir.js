@@ -125,9 +125,12 @@ angular.module('formsApp')
                                            }
                 );
 
+
                 function setupQ () {
+                    console.log('renderForm setup')
                     delete $scope.selectedSection       //c;ears the current section display
                     if ($scope.q) {
+                        console.log('create form temaplte')
                         let vo = renderFormsSvc.makeFormTemplate($scope.q,$scope.input.form)
                         if (vo) {
                             $scope.input.formTemplate = vo.template     //an array of sections

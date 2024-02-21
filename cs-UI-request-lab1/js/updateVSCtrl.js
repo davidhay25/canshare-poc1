@@ -1,6 +1,9 @@
 angular.module("pocApp")
     .controller('updateCtrl',
-        function ($scope,$http,$uibModal,$q,updateVSSvc) {
+        function ($scope,$http,$uibModal,$q,updateVSSvc,utilsSvc) {
+
+            $scope.version = utilsSvc.getVersion()
+
 
             $scope.input = {}
             $scope.isDirty = false;
@@ -209,6 +212,7 @@ angular.module("pocApp")
                 delete $scope.input.title
                 delete $scope.input.description
                 delete $scope.input.ecl
+                delete $scope.input.directConcepts
                 $scope.input.status = 'active'
 
                 $scope.makeVS()

@@ -936,7 +936,7 @@ angular.module("formsApp")
                         //now look at the items below the section level.
                         if (sectionItem.item) {
                             sectionItem.item.forEach(function (item) {
-
+console.log('processing ',item.text)
                                 let meta = that.getMetaInfoForItem(item)
                                 hashItem[item.linkId] = {item:item,meta:meta}
                                 if (meta.hidden) {
@@ -959,6 +959,7 @@ angular.module("formsApp")
 
                                             item.item.forEach(function (child,inx) {
                                                 let childMeta = that.getMetaInfoForItem(child)
+                                                console.log('processing ',child.text, child.answerValueSet,child)
                                                 //hidden items don't apper in the form at all.
                                                 if (! meta.hidden) {
                                                     hashItem[child.linkId] = {item:child,meta:childMeta}
@@ -1060,6 +1061,7 @@ angular.module("formsApp")
                                         let row = {}   //will have a single entry - left
                                         row.item = item
                                         row.meta = meta
+                                        console.log(item.text,item.answerValueSet)
                                         let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
                                         fillFromValueSet(cell,termServer)
                                         setDecoration(cell,item)
@@ -1191,6 +1193,7 @@ angular.module("formsApp")
                     //ATM there could be both an answerValueSet and answerOptions - not strictly correct
                     //If there is a ValueSet, then remove all the answerOptions in the active copy of the ve
 
+                    console.log('fill from valueset ',cell.item.answerValueSet)
                     //console.log(cell)
 
                     if (cell.item.answerValueSet) {

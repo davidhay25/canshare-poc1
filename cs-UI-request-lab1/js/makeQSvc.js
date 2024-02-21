@@ -55,6 +55,46 @@ angular.module("pocApp")
 
         }
 
+
+        //If the ed has the 'otherType set, then an additional item mutst be created - possibl with an enableWhen
+        //The function returns the items to insert (including the source) - possibly not needed, but I'll leave it like this for now
+        function addOtherItem(ed,sourceItem) {
+            let arItems = []        //the function returns the list of items
+            switch (ed.otherType) {
+                case "always" :
+                    //just add the extra item
+                    let item = {text:`Other ${ed.title}`,linkId:`${ed.path}-other`,type:'string'}
+                    arItems.push(sourceItem)
+                    arItems.push(item)
+                    break
+                case "sometimes" :
+                    //add the additional item, plus a conditional on the sourceItem
+                    let item1 = {text:`Other ${ed.title}`,linkId:`${ed.path}-other`,type:'string'}
+
+                    let qEW = {}
+                    qEW.question = sourceItem.linkId
+                    qEW.operator = '='
+                    qEW.answerCoding = {code:"74964007",system:'http://snomed.info/sct'}
+                    item1.enableWhen = sourceItem.enableWhen || []
+                    item1.enableWhen.push(qEW)
+
+                    arItems.push(sourceItem)
+                    arItems.push(item1)
+                    break
+                case "textonly" :
+                    //the original item (a CC) is NOT included. In this case only the text box is added
+                    //even though the source is not included in the Q, the linkId of the inserted item has '-other' appended
+                    //though the text is copied form the source
+                    let item2 = {text:`${ed.title}`,linkId:`${ed.path}-other`,type:'string'}
+                    arItems.push(item2)
+
+                    break
+
+
+            }
+            return arItems
+        }
+
         //Add the 'enable when' to the Q
         //updates the item object directly
         //When used by the Composition, we add a prefix which is {compname}.{section name}. (note the trailing dot)
@@ -123,6 +163,16 @@ angular.module("pocApp")
                      item.extension.push(ext)
                  }
 
+                 //we need to do this before the async function codedOptionsSvc.getOptionsForEd() otherwise the form is rendered
+                //before it is returned and won't appear.
+                 if (ed.valueSet) {
+                     let vs = ed.valueSet
+                     if (vs.indexOf('http:') == -1) {
+                         vs = `https://nzhts.digital.health.nz/fhir/ValueSet/${vs}`
+                     }
+                     item.answerValueSet = vs
+                 }
+
                  switch (vo.controlHint) {
                      case 'drop-down' :
                          //will be 'drop-down' if the type is CodeableConcept...
@@ -166,7 +216,7 @@ angular.module("pocApp")
                                                  //the vs in the model might not have the full url
                                                  vs = `https://nzhts.digital.health.nz/fhir/ValueSet/${vs}`
                                              }
-                                             item.answerValueSet = vs
+                                             //item.answerValueSet = vs
                                          }
                                          break
                                      case 'not-found' :
@@ -480,11 +530,26 @@ angular.module("pocApp")
                         let item = {text:ed.title,linkId:ed.path,type:'string'}
                         item.definition = ed.path
 
+
+
                         addEnableWhen(ed,item)  //If there are any contitionals
                         setControlType(ed,item)  //set the control type to use
 
 //console.log(ed,item.type)
-                        group.item.push(item)
+                        //group.item.push(item)
+
+                        //have to check here to ensure 'other' item is after main one
+                        if (ed.otherType) {
+                            //if there's an 'otherType set then the function will return the items to insert (as conditionals need to be set)
+                            let lstItem = addOtherItem(ed,item)    //if the element has the 'otherType' set then add the extra item + ew
+                            //the function returns the items to add, in order
+                            lstItem.forEach(function (newItem) {
+                                group.item.push(newItem)
+                            })
+                        } else {
+                            //if there's no otherType then just add the new item
+                            group.item.push(item)
+                        }
                     }
 
                 })
@@ -1116,7 +1181,7 @@ angular.module("pocApp")
 
 
             },
-
+/*
 
             makeQDEP: function(treeObject) {
                 //construct a Questionnaire resource - called by the makeQ controller - will be deprecated probably
@@ -1178,7 +1243,7 @@ angular.module("pocApp")
                                     if (vs.indexOf('http:') == -1) {
                                         vs = `https://nzhts.digital.health.nz/fhir/ValueSet/${vs}`
                                     }
-                                    item.answerValueSet = vs
+                                    //item.answerValueSet = vs
 
 
                                     if (false) {
@@ -1274,7 +1339,7 @@ angular.module("pocApp")
 
         },
 
-
+*/
 
             moveDown : function (node,treeData) {
                 //move up within the parent

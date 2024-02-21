@@ -1,5 +1,11 @@
 <div ng-controller="modelTermCtrl">
 
+  <style>
+    .issue {
+      background-color: #f2dede;
+    }
+  </style>
+
   <br/>
   <div ng-click="updateTermSummary()" class="clickable pull-right">Refresh reports</div>
 
@@ -15,12 +21,12 @@
       <div class="tableFixHead">
         <table class="table table-bordered">
           <thead>
-          <tr><th>Url</th><th>Where used</th></tr>
+          <tr><th>ValueSet Url</th><th>Where used</th></tr>
           </thead>
           <tbody>
-          <tr ng-repeat="(k,v) in hashVsSummary">
+          <tr ng-repeat="v in arVsSummary" ng-class="{issue:v.issue}">
             <td>
-              <span class = 'clickable' ng-click="viewVS(k)">{{k}}</span></td>
+              <span class = 'clickable' ng-click="viewVS(v.url)">{{v.url}}</span></td>
             <td>
               <div ng-repeat = "item in v">
                 <div ng-show="item.DGName">

@@ -83,11 +83,11 @@ angular.module("pocApp")
                         let dg = hashDG[key]
                             dg.diff.forEach(function (ed) {
                                 //let item = {}
-                                if (ed.valueSet) {
+                                if (ed.valueSet && ed.mult !== '0..0') {
                                     //hiddenDGName is used when linking to the DG item
                                     let entry = {DGName : dg.name,hiddenDGName : dg.name, path: ed.path}
                                     hashVS[ed.valueSet] = hashVS[ed.valueSet] || []
-                                    //are there optyions defined as well?
+                                    //are there options defined as well?
                                     if (ed.options) {
                                         //yes, add them to the summary
                                         entry.options = ed.options
@@ -95,7 +95,7 @@ angular.module("pocApp")
                                     hashVS[ed.valueSet].push(entry)
 
                                 } else {
-                                    if (ed.options) {
+                                    if (ed.options && ed.options.length > 0) {
                                         //This is where there are options but no VS
                                         let vsUrlTmp = `${dg.name}-${ed.path}`
                                         let entry = {DGName : dg.name, path: ed.path}
@@ -105,7 +105,6 @@ angular.module("pocApp")
                                     }
                                 }
                             })
-
                     })
 
                     //now check the composition overrides
@@ -146,7 +145,31 @@ angular.module("pocApp")
 
                     })
 
-                    return {hashVS:hashVS}
+                    //convert to an array and sort
+                    let arVS = []
+                    Object.keys(hashVS).forEach(function (key) {
+                        let item = hashVS[key]
+                        item.url = key
+                        if (key.indexOf(' ') > -1) {
+                            item.issue = true
+                        }
+                        arVS.push(item)
+                    })
+
+                    arVS.sort(function (a,b) {
+                        try {
+                            if (a.url.toUpperCase() > b.url.toUpperCase()) {
+                                return 1
+                            } else {
+                                return -1
+                            }
+                        } catch (ex) {
+                            return 0
+                        }
+
+                    })
+
+                    return {hashVS:hashVS,arVS:arVS}
 
                 },
                 makeCompOverrideSummary : function (hashComp) {

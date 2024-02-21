@@ -198,6 +198,9 @@ angular.module("pocApp")
                         },
                         hashAllDG : function () {
                             return $scope.hashAllDG
+                        },
+                        parentEd : function () {
+                            return  null    //parentEd is only ude whne adding a new Ed
                         }
                     }
 

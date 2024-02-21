@@ -329,11 +329,18 @@
                       {{type}}&nbsp;
 
                       <div ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept' && canEdit(selectedModel)">
+
+
+                        <div ng-show="selectedNode.data.ed.otherType">
+                          'Other' type: {{selectedNode.data.ed.otherType}}
+                        </div>
+
+                        <!--
                         <checkbox
                                 ng-change = "setOtherAllowedStatus(selectedNode.data.ed,selectedNode.data.ed.otherAllowed)"
                                 ng-model="selectedNode.data.ed.otherAllowed"></checkbox>
                          'Other' value allowed
-
+                        -->
 
                       </div>
 

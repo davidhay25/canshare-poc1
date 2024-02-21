@@ -170,9 +170,18 @@ angular.module("pocApp")
                     host += "?comp=" + $scope.selectedComposition.name
                 }
 
-                alert(host)
+                navigator.clipboard.writeText(host).then(
+                    () => {
+                        alert(`Link: ${host} \ncopied to clipBoard`);
+                    },
+                    () => {
+                        alert(`Link is ${host}`);
+                    },
+                )
 
-               // let link =
+
+
+
             }
 
             $scope.leftPanel = 'col-md-3'
@@ -921,6 +930,16 @@ angular.module("pocApp")
                         },
                         hashAllDG : function () {
                             return $scope.hashAllDG
+                        },
+                        parentEd : function () {
+
+                            //$scope.selectedModel.diff.
+                            if ($scope.selectedNode && $scope.selectedNode.data) {
+                                return $scope.selectedNode.data.ed
+                            } else {
+                                return null
+                            }
+
                         }
                     }
 
@@ -982,6 +1001,7 @@ angular.module("pocApp")
                                 ed1.valueSet = ed.valueSet
                                 ed1.sourceReference = ed.sourceReference
                                 ed1.controlHint = ed.controlHint
+                                ed1.otherType = ed.otherType
                                 ed1.hideInQ = ed.hideInQ
 
                                 ed1.fixedCoding = ed.fixedCoding
@@ -1092,7 +1112,10 @@ angular.module("pocApp")
 
                 $scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
                 $scope.compTermSummary = modelTermSvc.makeCompOverrideSummary($scope.hashAllCompositions).list
-                $scope.hashVsSummary = modelTermSvc.makeValueSetSummary($scope.hashAllDG,$scope.hashAllCompositions).hashVS
+
+               //$scope.hashVsSummary = modelTermSvc.makeValueSetSummary($scope.hashAllDG,$scope.hashAllCompositions).hashVS
+                $scope.arVsSummary = modelTermSvc.makeValueSetSummary($scope.hashAllDG,$scope.hashAllCompositions).arVS
+
                 $scope.notesSummary = modelTermSvc.makeNotesSummary($scope.hashAllDG,$scope.hashAllCompositions)
                 $scope.codeSummary = modelTermSvc.makeCodeSummary($scope.hashAllDG)
 
@@ -1521,6 +1544,7 @@ angular.module("pocApp")
 
                 //a Q representation of the DG
                 let voQ = makeQSvc.makeQFromDG(vo.allElements,$scope.hashAllDG)
+                console.log(voQ.Q)
                 $scope.dgQ = voQ.Q
 
 

@@ -38,35 +38,7 @@
     <script src="js/updateVSSvc.js"></script>
     <script src="js/showParameters.js"></script>
     <script src="js/loginCtrl.js"></script>
-    <!--
-
-    <script src="js/questionnaireSvc.js"></script>
-
-    <script src="js/dashboardCtrl.js"></script>
-    <script src="js/dashboardSvc.js"></script>
-
-    <script src="directive/viewBundle/viewBundleDir.js"></script>
-    <script src="directive/viewBundle/viewBundleSvc.js"></script>
-    <script src="js/libs/vis.min.js"></script>
-
-    <script src="directive/renderForm/renderFormDir.js"></script>
-    <script src="directive/renderForm/renderFormSvc.js"></script>
-
-    <script src="directive/renderForm/renderFormAsTreeDir.js"></script>
-
-
-    <script src="directive/showQTree/showQTreeDir.html"></script>
-
-    <script src="directive/showQTree/showQTreeDir.js"></script>
-
-    <script src="directive/QRDisplay/QRDisplayDir.js"></script>
-
-    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
-
-    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
-    <script src="js/libs/jstree.min.js"></script>
-
--->
+    <script src="js/utilsSvc.js"></script>
 
     <script src="js/libs/firebase.js"></script>
     <script src="js/libs/angularfire.min.js"></script>
@@ -94,7 +66,7 @@
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
         <div class="container-fluid">
-            <div class="col-md-5">
+            <div class="col-md-4">
                     <span>
                         <a class="navbar-brand" href="#">
                             Update ValueSet
@@ -109,6 +81,12 @@
                     <span class="badge">{{allVSItem.length}}</span>
                 </div>
 
+            </div>
+
+            <div class="col-md-1">
+                <div class="navbar-text" >
+                    <div class="pull-right btn">{{version}}</div>
+                </div>
             </div>
 
             <div class="col-md-1 col-sm-1">
@@ -267,7 +245,7 @@
 
 
                         <tr>
-                            <td>Direct concepts</td>
+                            <td>Unpublished concepts</td>
                             <td>
 
                                 <table class="table table-bordered">
