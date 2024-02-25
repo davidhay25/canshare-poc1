@@ -338,7 +338,6 @@
                                      ng-show = "canEdit(selectedModel)"  ng-click="editModel(selectedModel)">Edit</div>
                                 <div class="pull-right clickable spacer" ng-show = "user.email"  ng-click="newModel('dg')">New dg</div>
 
-
                                 <div class="pull-right clickable spacer"
                                      ng-show = "user.email && selectedModel"
                                      ng-click="newModel('dg',selectedModel)">New child</div>
@@ -456,6 +455,12 @@
         <uib-tab heading="Reports"  select="setInitialTab(3)">
             <ng-include src="'/includes/terminology.html'"></ng-include>
         </uib-tab>
+
+        <uib-tab heading="Profiling"  select="setInitialTab(4)">
+
+            <ng-include src="'/includes/profilingDG.html'"></ng-include>
+        </uib-tab>
+
 
         <uib-tab heading="Errors" ng-show="errorLog.length > 0">
             <em>This table shows the steps take by the DG 'inflater' as it creates the complete list of elements
@@ -778,8 +783,12 @@
 <script src="js/libs/angular-bootstrap-checkbox.js"></script>
 
 <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
-
 <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
+
+<link rel="stylesheet" type="text/css" href="css/codemirror.css"/>
+<link rel="stylesheet" type="text/css" href="css/foldgutter.css"/>
+
+
 <script src="js/libs/jstree.min.js"></script>
 
 <script src="js/loginCtrl.js"></script>
@@ -840,7 +849,12 @@
 <script src="directive/renderForm/renderFormDir.js"></script>
 <script src="directive/renderSingleItem/renderSingleItemDir.js"></script>
 
+<script src="js/libs/codemirror.js"></script>
 
+<script src="js/libs/foldcode.js"></script>
+
+
+<script src="js/libs/comment-fold.js"></script>
 
 <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
 
@@ -852,6 +866,8 @@
 <script src="js/compSectionsCtrl.js"></script>
 <script src="js/publishCompCtrl.js"></script>
 <script src="js/addEWCtrl.js"></script>
+
+<script src="js/profilingDG.js"></script>
 
 <script src="js/libs/firebase.js"></script>
 <script src="js/libs/angularfire.min.js"></script>

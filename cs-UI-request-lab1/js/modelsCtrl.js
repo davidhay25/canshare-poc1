@@ -5,12 +5,16 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
+
+
+            $timeout(function () {
+                $scope.selectModel($scope.hashAllDG['Patient'])
+            },2000)
+
             //$scope.version = "0.6.12"
             $scope.version = utilsSvc.getVersion()
             $scope.input = {}
             $scope.input.showFullModel = true
-
-
 
             $scope.input.metaProcedures = ['Small diagnostic sample','Resection','Radiation therapy','SACT therapy']
             $scope.input.metaCategories = ['Histopathology request','Histopathology report','Treatment summary']
@@ -21,8 +25,12 @@ angular.module("pocApp")
                 $localStorage.trace.on = ! $localStorage.trace.on
             }
 
-            $localStorage.world = $localStorage.world || {}
+            //This is the browser cache object.
+            $localStorage.world = $localStorage.world || {dataGroups:{},compositions:{}}
             $scope.world = $localStorage.world
+            //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
+            $scope.hashAllDG = $localStorage.world.dataGroups
+
 
             let size = modelsSvc.getSizeOfObject($scope.world)
             console.log(`Size of world: ${size/1024} K`)
@@ -45,8 +53,6 @@ angular.module("pocApp")
             //todo need a better validation ?
             $scope.input.types = $localStorage.world.dataGroups  //<<<< temp
 
-            //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
-            $scope.hashAllDG = $localStorage.world.dataGroups
 
 
             //allow filtering the code usage report
@@ -65,7 +71,7 @@ angular.module("pocApp")
 
 
             //look for DG errors like repeating parents in the hierarchy tree
-            if ($scope.hashAllDG) {
+            if (Object.keys($scope.hashAllDG).length > 0) {         //There are DG's stored locally
                 modelDGSvc.checkAllDG($scope.hashAllDG)
 
                 //If there's a DG with no diff, all sorts of bad stuff happens. Shouldn't occur, but if it does it's a pain
@@ -74,10 +80,31 @@ angular.module("pocApp")
                     $scope.hashAllDG[key].diff = $scope.hashAllDG[key].diff || []
                 })
 
-
-
             } else {
-                alert("There don't appear to be any local DG's. You'll need to clear local and resync from the Library. Local changes will be lost. Sorry about that.")
+                if (confirm("There don't appear to be any local DG's. Would you like to refresh from the Library?")) {
+                    //$localStorage.world = {dataGroups:{},compositions:{}}
+                    //$scope.hashAllDG = $localStorage.world.dataGroups
+                    let qry = '/model/allDG'
+                    $http.get(qry).then(
+                        function (data) {
+                            //console.log(data)
+
+                            let arDG = data.data
+                            arDG.forEach(function (dg) {
+                                if (dg.kind == 'dg') {
+                                    $scope.hashAllDG[dg.name] = dg
+                                }
+
+                            })
+
+                        })
+                } else {
+                    alert("The app won't work correctly. I suggest you start again and agree to the Library refresh")
+
+                }
+
+
+               // alert("There don't appear to be any local DG's. You'll need to clear local and resync from the Library. Local changes will be lost. Sorry about that.")
             }
 
 
@@ -637,7 +664,6 @@ angular.module("pocApp")
 
                 $timeout(function () {
 
-
                     let vo
                     try {
                         vo = modelDGSvc.makeFullGraph($scope.hashAllDG,true)
@@ -656,18 +682,6 @@ angular.module("pocApp")
                             console.log(ex)
                             alert("Error building sections tree")
                         }
-
-
-                        /*
-                        $timeout(function () {
-                            showAllDGTree(vo1.sectionTreeData,'#sectionDGTree')
-                        },1)
-
-                        */
-
-
-
-
 
 
                         //--- make the category hash for the category tree display of DG
@@ -1003,6 +1017,9 @@ angular.module("pocApp")
                                 ed1.controlHint = ed.controlHint
                                 ed1.otherType = ed.otherType
                                 ed1.hideInQ = ed.hideInQ
+                                ed1.fsh = ed.fsh
+                                ed1.fhirPath = ed.fhirPath
+                                ed1.extUrl = ed.extUrl
 
                                 ed1.fixedCoding = ed.fixedCoding
                                 ed1.fixedQuantity = ed.fixedQuantity
@@ -1500,6 +1517,7 @@ angular.module("pocApp")
                 makeCompTree(treeData,rootNodeId)
 
 
+                //generates the FSH representation of the Composition as a Logical Model
                 $scope.compFsh = igSvc.makeFshForComp(comp,$scope.allCompElements,$scope.hashCompElements)
 
 
@@ -1566,11 +1584,12 @@ angular.module("pocApp")
                     $scope.dgAudit = modelDGSvc.auditDGDiff(dg,$scope.hashAllDG)
 
 
+                    /* not sure about these 'errors' - seem to be many false positives.
                     //make sure that $localStorage has been updated
                     if (angular.toJson(dg) !== angular.toJson($localStorage.world.dataGroups[dg.name])) {
                         alert(`Warning! the Browser copy of the DG ${dg.name} doesn't match the copy in memory! You should re-load the page and check it. From modelsCtrl:select`)
                     }
-
+*/
                     clearB4Select()
                     $scope.selectedModel = dg
 
@@ -1582,6 +1601,22 @@ angular.module("pocApp")
                         }
                     )
 
+                    //get the FSH for this DG
+                    delete $scope.input.dgFsh
+                    let url1 = `/fsh/DG/${dg.name}`
+                    $http.get(url1).then(
+                        function (data) {
+                            $scope.input.dgFsh = data.data
+                            $scope.$broadcast('dgSelected')     //so the FSH can be re-drawn
+                            //console.log(data.data)
+                        }, function (err) {
+                            $scope.$broadcast('dgSelected')
+                            //console.log(err.data)
+                        }
+                    )
+
+                    $scope.fhirResourceType = igSvc.findResourceType(dg,$scope.hashAllDG)
+                    // alert($scope.fhirResourceType)
                     //check the current checkedout state on the library.
                     //Always update the local version checkedout (not data) with the one from the library
                     let name = dg.name
@@ -1771,15 +1806,8 @@ angular.module("pocApp")
                     $scope.fullQTab = voQ.Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
                 }
 
-
-
-
             }
 
-
-            /*$timeout(function(){
-                    $scope.selectModel($scope.hashAllDG['Specimen'],$scope.hashAllDG)
-            },500)*/
 
 
             $scope.fitAllDGGraph = function () {

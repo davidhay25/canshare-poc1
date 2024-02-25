@@ -31,7 +31,7 @@ angular.module("pocApp")
 
 
             
-            $scope.import = function (data) {
+            $scope.importDEP = function (data) {
                 $scope.model.diff == $scope.model.diff || []
                 let ar = data.split(/\r?\n/)
                 ar.forEach(function (row) {
@@ -175,6 +175,7 @@ angular.module("pocApp")
                 $scope.input.newModelTitle = model.title
                 $scope.input.sourceReference = model.sourceReference
                 $scope.input.newModelDescription = model.description
+                $scope.input.type = model.type
                 if (model.parent) {
                     $scope.input.newModelParent = model.parent
                 }
@@ -510,6 +511,7 @@ angular.module("pocApp")
 
 
             $scope.save = function () {
+                $scope.model.type = $scope.input.type
                 if (isNew) {
                     if ($scope.isUnique) {
                         $scope.model.status = 'new'

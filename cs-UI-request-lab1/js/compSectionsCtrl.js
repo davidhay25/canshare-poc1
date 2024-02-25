@@ -163,7 +163,7 @@ angular.module("pocApp")
             }
 
 
-            //generate the tree to show possible DGs.
+            //generate the tree to show possible DGs to add to a section.
             //todo If a new DG is added, then this should be updated..
             $scope.setup = function () {
                 let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)

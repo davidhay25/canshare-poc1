@@ -60,6 +60,9 @@ angular.module("pocApp")
                 $scope.input.rules = item.ed.rules
                 $scope.input.valueSet = item.ed.valueSet
                 $scope.input.sourceReference = item.ed.sourceReference
+                $scope.input.fsh = item.ed.fsh
+                $scope.input.fhirPath = item.ed.fhirPath
+                $scope.input.extUrl = item.ed.extUrl
                 $scope.input.path =  $filter('dropFirstInPath')(item.ed.path)
                 $scope.input.controlHint =  item.ed.controlHint
                 $scope.input.otherType =  item.ed.otherType
@@ -96,15 +99,7 @@ angular.module("pocApp")
                 if (item.ed.fixedQuantity) {
                     $scope.fixed = {elName:'fixedQuantity',value:item.ed.fixedQuantity}
                     $scope.fixedDisplay = makeQuantityDisplay(item.ed.fixedQuantity)
-                    /*
-                    $scope.fixedDisplay = ""
-                    if (item.ed.fixedQuantity.unit) {
-                        $scope.fixedDisplay += `Unit: ${item.ed.fixedQuantity.unit}`
-                    }
-                    if (item.ed.fixedQuantity.value) {
-                        $scope.fixedDisplay += `Value: ${item.ed.fixedQuantity.value}`
-                    }
-                    */
+
 
 
                 }
@@ -123,18 +118,6 @@ angular.module("pocApp")
                 if (item.ed.defaultQuantity) {
                     $scope.default = {elName:'defaultQuantity',value:item.ed.defaultQuantity}
                     $scope.defaultDisplay = makeQuantityDisplay(item.ed.defaultQuantity)
-/*
-                    $scope.defaultDisplay = ""
-                    if (item.ed.defaultQuantity.unit) {
-                        $scope.defaultDisplay += `Unit: ${item.ed.defaultQuantity.unit}`
-                    }
-                    if (item.ed.defaultQuantity.value) {
-                        $scope.defaultDisplay += `Value: ${item.ed.defaultQuantity.value}`
-                    }
-*/
-
-                    //$scope.defaultDisplay = `Unit: ${item.ed.defaultQuantity.unit}`
-
 
 
                 }
@@ -271,7 +254,9 @@ angular.module("pocApp")
                 }
 
                 ed.sourceReference = $scope.input.sourceReference
-
+                ed.fsh = $scope.input.fsh
+                ed.fhirPath = $scope.input.fhirPath
+                ed.extUrl = $scope.input.extUrl
 
 
 
@@ -330,16 +315,6 @@ angular.module("pocApp")
                    }
 
 
-                    /*
-                    for (const item of fullElementList) {
-                        let p = $filter('dropFirstInPath')(item.ed.path)
-                        if (p && p == $scope.input.path) {
-                            alert("This path has already been used in this DG")
-                            return
-                            break
-                        }
-                    }
-                    */
 
                     //check that there are no spaces in the path
                     if ($scope.input.path.indexOf(" ") > -1) {
@@ -369,31 +344,7 @@ angular.module("pocApp")
                     let ed = {}
                     ed.path = `new.${$scope.input.path}`        //the 'new.' is stripped off, as the full path is passed in for editing existing
                     editED(ed)
-/*
-                    let ed = {}
-                    //ed.type = [$scope.input.type]
-                    ed.type = [$scope.input.selectedType]
-                    ed.path = `new.${$scope.input.path}`        //the 'new.' is stripped off, as the full path is passed in for editing existing
-                    ed.description = $scope.input.description
-                    ed.notes = $scope.input.notes
-                    ed.title = $scope.input.title
-                    ed.mult = $scope.input.mult
-                    ed.valueSet = $scope.input.valueSet
-                    if ($scope.input.controlHint) {
-                        ed.controlHint = $scope.input.controlHint
-                    }
-                    ed.sourceReference = $scope.input.sourceReference
 
-                    if ($scope.fixed && $scope.fixed.elName) {
-                        ed[$scope.fixed.elName] = $scope.fixed.value
-                    }
-
-                    if ($scope.default && $scope.default.elName) {
-                        ed[$scope.default.elName] = $scope.default.value
-                    }
-
-                    ed.options = $scope.options
-                    */
 
                     $scope.$close(ed)
 
@@ -402,32 +353,11 @@ angular.module("pocApp")
 
                     //this actually edits the passed in ed. So an element not updated
                     //will 'pass through' attributes not editable in this dialog
-                   // item.ed = makeED()
+
 
                     editED(item.ed)
 
-/*
-                    item.ed.type = [$scope.input.selectedType]
-                    item.ed.notes = $scope.input.notes
-                    if ($scope.input.controlHint) {
-                        item.ed.controlHint = $scope.input.controlHint
-                    }
-                    item.ed.description = $scope.input.description
-                    item.ed.title = $scope.input.title
-                    item.ed.mult = $scope.input.mult
-                    item.ed.valueSet = $scope.input.valueSet
-                    item.ed.sourceReference = $scope.input.sourceReference
 
-                    if ($scope.fixed && $scope.fixed.elName) {
-                        item.ed[$scope.fixed.elName] = $scope.fixed.value
-                    }
-
-                    if ($scope.default && $scope.default.elName) {
-                        item.ed[$scope.default.elName] = $scope.default.value
-                    }
-
-                    item.ed.options = $scope.options
-*/
                     $scope.$close(item.ed)
                 }
 
@@ -689,9 +619,6 @@ angular.module("pocApp")
                 alert("Options have been updated")
 
             }
-
-
-
 
         }
     )

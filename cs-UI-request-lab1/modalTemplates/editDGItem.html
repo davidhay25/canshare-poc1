@@ -274,6 +274,45 @@
           </table>
       </uib-tab>
 
+      <uib-tab heading="Profiling">
+        <div class="row">
+          <div class="col-md-2">
+            FSH rule
+          </div>
+          <div class="col-md-6">
+            <textarea class="form-control" ng-model="input.fsh"></textarea>
+          </div>
+          <div class="col-md-4">
+            FSH text to insert into the profile. If present, the FHIRPath and extension Urls will be ignored.
+          </div>
+        </div>
+<br/>
+        <div class="row">
+          <div class="col-md-2">
+            FHIRPath
+          </div>
+          <div class="col-md-6">
+            <input type="text" class="form-control" ng-model="input.fhirPath"/>
+          </div>
+          <div class="col-md-4">
+            The FHIRPath that this element corresponds to. Really only needed if the element is being modified in the profile (like a fixed value or extension)
+          </div>
+        </div>
+
+        <br/>
+        <div class="row">
+          <div class="col-md-2">
+            Extension url
+          </div>
+          <div class="col-md-6">
+            <input type="text" class="form-control" ng-model="input.extUrl"/>
+          </div>
+          <div class="col-md-4">
+            This element is an extension with this Url. If the url contains the word 'canshare' it will be generated.
+          </div>
+        </div>
+
+      </uib-tab>
 
       <uib-tab heading="Json">
         <pre>{{item | json}}</pre>

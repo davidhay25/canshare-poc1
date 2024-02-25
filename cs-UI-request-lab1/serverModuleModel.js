@@ -586,6 +586,62 @@ async function setup(app) {
     })
 
 
+    //--------------- FSH endpoints
+
+    //get the fsh for a DG
+    app.get('/fsh/DG/:name', async function(req,res) {
+        let name = req.params.name
+
+        const query = {name:name}   //structure {name: fsh:}
+        try {
+            const cursor = await database.collection("dgFsh").find(query).toArray()
+            if (cursor.length == 1) {
+                let comp = cursor[0]
+                delete comp['_id']
+                res.json(comp)
+            } else {
+                if (cursor.length == 0) {
+                    res.status(404).json({msg:'FSH not found'})
+                } else {
+                    res.status(500).json({msg:`There were ${cursor.length} FSHs with this name. This shouldn't happen.`})
+                }
+
+            }
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+
+
+    })
+
+    //create / update the fsh for a single DG.
+    app.put('/fsh/DG/:name', async function(req,res) {
+        let name = req.params.name
+        let fsh = req.body      //structure {name: fsh:}
+        let userEmail = req.headers['x-user-email']
+
+        if (! userEmail) {
+            res.status(400).json({msg:'must be a logged in user'})
+            return
+        }
+
+        const query = {name:name}
+        try {
+            const cursor = await database.collection("dgFsh").replaceOne(query,fsh,{upsert:true})
+            //await saveHistory(dg,userEmail || "unknown User")
+
+            res.json(fsh)
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+    })
+
+
+
     //--------------  publishing endpoints
 
     //publish a Comp to the published collection. A single comp (keyed by name) can have multiple versions

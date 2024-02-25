@@ -388,32 +388,38 @@ angular.module("pocApp")
             },
 
             makeSectionsTree : function(hashAllDG) {
-                //only the sections branch
+                //oMake a tree that contains only the sections branch - ie all DG wheere the ultimate parent is "Section"
 
                 let branchName = "Section"        //we want all DG's whose ultimate paretn is this one
                 let sectionTreeData = []
                 let sectionRoot = {id:"Section",text: "Sections tree",parent:'#',data:{}}
                 sectionTreeData.push(sectionRoot)
 
-                Object.keys(hashAllDG).forEach(function (key) {
-                    if (key !== branchName) {
-                        let dgToFindUltimateParent = hashAllDG[key]
+                try {
+                    Object.keys(hashAllDG).forEach(function (key) {
+                        if (key !== branchName) {
+                            let dgToFindUltimateParent = hashAllDG[key]
+console.log(key,dgToFindUltimateParent)
+                            //findUltimateParent can throw an exception - let it bubble up
+                            let ultimateParent = findUltimateParent(dgToFindUltimateParent)
 
-                        //findUltimateParent can throw an exception - let it bubble up
-                        let ultimateParent = findUltimateParent(dgToFindUltimateParent)
-
-                        if (ultimateParent.name == branchName) {
-                            let sectionNode = {id:dgToFindUltimateParent.name,
-                                text:dgToFindUltimateParent.title,
-                                parent:dgToFindUltimateParent.parent,data:{dg:dgToFindUltimateParent}}
-                            sectionTreeData.push(sectionNode)
+                            if (ultimateParent.name == branchName) {
+                                let sectionNode = {id:dgToFindUltimateParent.name,
+                                    text:dgToFindUltimateParent.title,
+                                    parent:dgToFindUltimateParent.parent,data:{dg:dgToFindUltimateParent}}
+                                sectionTreeData.push(sectionNode)
+                            }
                         }
-                    }
 
 
 
 
-                })
+                    })
+                } catch (ex) {
+                    alert(ex)
+                }
+
+
 
                 return {treeData: sectionTreeData}
 

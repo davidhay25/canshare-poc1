@@ -6,6 +6,87 @@ angular.module("pocApp")
         return {
 
 
+            findResourceType(dg,hashAllDG) {
+                //find the resource type to profile the DG by stepping up the hierarchy
+
+                if (! dg) {
+                    return
+                }
+
+                if (dg.type) {
+                    return dg.type
+                }
+
+                let dgName = dg.name
+                let tmpDG = dg
+
+                let ctr = 0
+
+                while (tmpDG.parent) {
+                    let dgTitle = tmpDG.title
+                    tmpDG = hashAllDG[tmpDG.parent]
+                    if (! tmpDG) {
+                        alert(`DG ${tmpDG.parent} was not found. Referenced in ${dgTitle}`)
+                        return
+                    }
+
+                    if (tmpDG.type) {
+                        return tmpDG.type
+                    }
+
+                    ctr++
+                    if (ctr > 100) {
+                        alert(`Error finding ultimate parent of ${dgName} - recursion issue mostlikely`)
+                        return
+                    }
+
+                }
+
+                return
+
+
+            },
+
+            makeProfileFshDg : function (dg,type,fullElementList) {
+                let ar = []
+                let logEd = []    //log of Eds that had fsh related content. Not all entries will...
+                let errors = []     //errors encountered during generation
+                ar.push(`Profile:\t\t${dg.name}`)
+                ar.push(`Parent:\t\t\t${type}`)
+                ar.push(`Id:\t\t\t\t"${dg.name}"`)
+                ar.push(`Title:\t\t\t"${dg.title}"`)
+                if (dg.description) {
+                    ar.push(`Description:\t${dg.description}`)
+                }
+                ar.push(`\n`)
+
+                fullElementList.forEach(function (item) {
+                    let ed = item.ed
+                    if (ed.mult !== '0..0') {
+                        if (ed.fsh) {
+                            let ar1 = ed.fsh.split('\n')
+                            ar = ar.concat(ar1)
+                            logEd.push({ed:ed,reason:'Direct FSH in ED',content:ar1})
+                        }
+
+
+                    }
+
+
+
+
+
+                })
+
+                let vo = {fsh: ar.join('\n'),logEd:logEd}
+
+               return vo
+
+
+
+
+
+            },
 
             makeFshForComp : function(comp,elements,hashElements) {
                 let that = this
@@ -148,7 +229,7 @@ angular.module("pocApp")
 
             },
             makeFshForDG : function (dg,elements,hideHeader,initialSpacer) {
-                //generate a FSH file for a given DG
+                //generate a FSH file (Logical Model)for a given DG
                 //elements is the complete list of elements, including those derived from parents and
                 //with child values updated from parents (if any)
                 //if hideHeader is true then don't generate the LM header - this is being used by the composition generation
