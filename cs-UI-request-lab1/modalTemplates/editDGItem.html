@@ -4,7 +4,7 @@
     <div class="row">
       <div class="col-md-8 col-sm-8">
         <h3 class="modal-title">
-          Edit DG Item
+          Edit DG Item <span ng-show="item.ed">: {{item.ed.title}}</span>
         </h3>
       </div>
 
@@ -275,6 +275,12 @@
       </uib-tab>
 
       <uib-tab heading="Profiling">
+        <br/>
+        <div class="alert alert-warning" ng-hide="fhirResourceType">
+          There is no base FHIR resource type defined.
+        </div>
+
+
         <div class="row">
           <div class="col-md-2">
             FSH rule
@@ -283,19 +289,28 @@
             <textarea class="form-control" ng-model="input.fsh"></textarea>
           </div>
           <div class="col-md-4">
-            FSH text to insert into the profile. If present, the FHIRPath and extension Urls will be ignored.
+            FSH text to insert into the profile. If present, the other profiling entries will be ignored.
           </div>
         </div>
-<br/>
+        <br/>
         <div class="row">
           <div class="col-md-2">
             FHIRPath
           </div>
           <div class="col-md-6">
-            <input type="text" class="form-control" ng-model="input.fhirPath"/>
+            <div class="row">
+              <div class="col-md-10">
+                <input type="text" class="form-control" ng-model="input.fhirPath"/>
+              </div>
+              <div class="col-md-2">
+                <div class="clickable" ng-click="selectElementPath()">Dialog</div>
+
+              </div>
+            </div>
+
           </div>
           <div class="col-md-4">
-            The FHIRPath that this element corresponds to. Really only needed if the element is being modified in the profile (like a fixed value or extension)
+            The FHIRPath that this element corresponds to. Really only needed if the element is being modified in the profile (like a fixed value or extension).
           </div>
         </div>
 
@@ -308,7 +323,21 @@
             <input type="text" class="form-control" ng-model="input.extUrl"/>
           </div>
           <div class="col-md-4">
-            This element is an extension with this Url. If the url contains the word 'canshare' it will be generated.
+            This element is an extension with this Url. If the url does not start with 'http' it will be generated in a canshare domain. Set the fhirPath if the extension is not on the root.
+          </div>
+        </div>
+
+        <br/>
+        <div class="row">
+          <div class="col-md-2">
+            Is a reference
+          </div>
+          <div class="col-md-6">
+            <checkbox ng-model="input.isReference"></checkbox>
+
+          </div>
+          <div class="col-md-4">
+            This element is a reference to another DataGroup.
           </div>
         </div>
 

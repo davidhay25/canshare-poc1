@@ -1,15 +1,16 @@
 angular.module("pocApp")
     .controller('editDGItemCtrl',
-        function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal,$http,parentEd) {
+        function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal,$http,parentEd,igSvc) {
             $scope.item = item      //will be {ed:} if editing an existing
             $scope.allTypes = allTypes
             $scope.input = {}
             $scope.fullElementList = fullElementList
+            let dgName = fullElementList[0].ed.path     //it's aways the forst element in the list...
 
             $scope.options = []     //a list of options. Will be saved as ed.options
             $scope.units = [] //a list of units. Will be saved as ed.units
 
-
+            $scope.fhirResourceType = igSvc.findResourceType(hashAllDG[dgName],hashAllDG)
 
             //parentEd is the ed to which the new one is going to be added. It's ignored during editing existing
             //we want to be sure that any path added at this level is unique (but OK at other levels)
@@ -20,6 +21,7 @@ angular.module("pocApp")
                 posOfChildren = ar.length     //this is where all the direct children will sit - 0 based
             }
 
+            //used to detect duplicate path names
             fullElementList.forEach(function (item) {
                 let ed = item.ed
                 if (ed && ed.path) {
@@ -30,7 +32,6 @@ angular.module("pocApp")
                         hashChildNames[segmentName] = true
                     }
                 }
-
             })
 
             console.log(hashChildNames)
@@ -60,9 +61,16 @@ angular.module("pocApp")
                 $scope.input.rules = item.ed.rules
                 $scope.input.valueSet = item.ed.valueSet
                 $scope.input.sourceReference = item.ed.sourceReference
-                $scope.input.fsh = item.ed.fsh
-                $scope.input.fhirPath = item.ed.fhirPath
-                $scope.input.extUrl = item.ed.extUrl
+
+                //profiling related stuff
+                if (item.ed.profile) {
+                    $scope.input.fsh = item.ed.profile.fsh
+                    $scope.input.fhirPath = item.ed.profile.fhirPath
+                    $scope.input.extUrl = item.ed.profile.extUrl
+                    $scope.input.isReference = item.ed.profile.isReference
+                }
+
+
                 $scope.input.path =  $filter('dropFirstInPath')(item.ed.path)
                 $scope.input.controlHint =  item.ed.controlHint
                 $scope.input.otherType =  item.ed.otherType
@@ -142,7 +150,7 @@ angular.module("pocApp")
                 $scope.isNew = true         //allows cancel
             }
 
-            //retur true if the datatype can have a fixed value
+            //return true if the datatype can have a fixed value
             $scope.isFixedType = function (type) {
 
                 if (type == 'CodeableConcept' || type == 'Quantity' || type == 'Ratio') {
@@ -152,6 +160,41 @@ angular.module("pocApp")
 
             }
 
+            $scope.selectElementPath = function () {
+                //select an element path from the fhirPath profiling dialog
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/selectResourcePath.html',
+                    //backdrop: 'static',
+                    //size : 'xlg',
+                    controller: function ($scope,$http,resourceType) {
+                        if (resourceType) {
+                            $http.get(`/fsh/fhirtype/${resourceType}`).then(
+                                function (data) {
+                                    $scope.resourceElements = data.data
+
+
+                                }
+                            )
+                        }
+
+                        $scope.selectPath = function (element) {
+                            $scope.$close(element)
+                        }
+
+                    },
+
+                    resolve: {
+
+                        resourceType: function () {
+                            return $scope.fhirResourceType
+                        }
+                    }
+
+                }).result.then(function (element) {
+                    $scope.input.fhirPath = element
+                    console.log(element)
+                })
+            }
 
             $scope.changeType = function (){
                 $uibModal.open({
@@ -254,9 +297,17 @@ angular.module("pocApp")
                 }
 
                 ed.sourceReference = $scope.input.sourceReference
-                ed.fsh = $scope.input.fsh
-                ed.fhirPath = $scope.input.fhirPath
-                ed.extUrl = $scope.input.extUrl
+
+
+                if ($scope.input.fsh || $scope.input.fhirPath || $scope.input.extUrl || $scope.input.isReference) {
+                    ed.profile = {}
+                    ed.profile.fsh = $scope.input.fsh
+                    ed.profile.fhirPath = $scope.input.fhirPath
+                    ed.profile.extUrl = $scope.input.extUrl
+                    ed.profile.isReference = $scope.input.isReference
+                }
+
+
 
 
 

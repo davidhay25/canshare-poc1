@@ -8,7 +8,7 @@ angular.module("pocApp")
 
 
             $timeout(function () {
-                $scope.selectModel($scope.hashAllDG['Patient'])
+             //   $scope.selectModel($scope.hashAllDG['Patient'])
             },2000)
 
             //$scope.version = "0.6.12"
@@ -1017,9 +1017,18 @@ angular.module("pocApp")
                                 ed1.controlHint = ed.controlHint
                                 ed1.otherType = ed.otherType
                                 ed1.hideInQ = ed.hideInQ
-                                ed1.fsh = ed.fsh
-                                ed1.fhirPath = ed.fhirPath
-                                ed1.extUrl = ed.extUrl
+
+                                if (ed.profile) {
+                                    ed1.profile = {}
+                                    ed1.profile.fsh = ed.profile.fsh
+                                    ed1.profile.fhirPath = ed.profile.fhirPath
+                                    ed1.profile.extUrl = ed.profile.extUrl
+                                    ed1.profile.isReference = ed.profile.isReference
+                                } else {
+                                    delete ed1.profile
+                                }
+
+
 
                                 ed1.fixedCoding = ed.fixedCoding
                                 ed1.fixedQuantity = ed.fixedQuantity
@@ -1478,6 +1487,8 @@ angular.module("pocApp")
 
 
                 $scope.selectedComposition = comp
+
+                $scope.$broadcast("compSelected")   //for the profiling
 
                 //check the current checkedout state on the library.
                 //Always update the local version checkedout (not data) with the one from the library

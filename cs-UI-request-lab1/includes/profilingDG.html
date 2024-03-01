@@ -2,13 +2,46 @@
 
 
   <uib-tabset>
+
+    <uib-tab heading="Summary">
+      <br/>
+      <div class="tableFixHead">
+        <table class="table-condensed table">
+          <thead>
+          <tr><th>Title</th><th>Source</th><th>fhirPath</th><th>Extension</th><th>Fsh</th></tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="item in fullElementList" ng-show="item.ed.mult !== '0..0' && $index > 0">
+            <td> <div class="clickable" ng-click="editDGItem({ed:item.ed})">{{item.ed.title}}</div> </td>
+            <td>{{item.ed.sourceModelName}}</td>
+
+            <td>{{item.ed.profile.fhirPath}}</td>
+            <td>{{item.ed.profile.extUrl}}</td>
+            <td>
+              <ul class="list-unstyled">
+                <li ng-repeat="lne in item.ed.profile.fsh.split('\n') track by $index">
+                  {{lne}}
+                </li>
+              </ul>
+
+            </td>
+
+          </tr>
+          </tbody>
+
+        </table>
+      </div>
+    </uib-tab>
+
+
     <uib-tab heading="Profile">
 
       <div class="row">
-        <div class="col-md-9">
+        <div class="col-md-8">
           <textarea id="dgFshFile" class="form-control" cols = "20" ng-model="input.dgFsh.fsh"></textarea>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
+          <div>{{fshSource}}</div>
           <div ng-show="fhirResourceType">
             Resource Type: {{fhirResourceType}}
             <div>
@@ -21,11 +54,51 @@
               of its parents. This means that the automated FSH generation won't work. Edit the DG
               (or any of its parents) to set the resource type.</div>
           </div>
-
+<!--
           <button class="btn-link btn" ng-click="refresh()">Refresh from server</button>
+          -->
           <button class="btn-link btn"
                   ng-show="isDirty"
                   ng-click="updateFsh(selectedModel.name,input.dgFsh.fsh)">Update to server</button>
+
+          <button class="btn-link btn" ng-click="runSushi()">Run sushi</button>
+
+          <div ng-show="executingSushi">
+            <br/>
+            Running the Sushi transformer to produce a StructureDefinition from the FSH. Please be patient -
+            this can take a few seconds...
+          </div>
+
+          <div ng-show="sushi">
+
+
+            <uib-tabset>
+              <uib-tab>
+                <uib-tab-heading>Errors <span class="badge">{{sushi.errors.length}}</span> </uib-tab-heading>
+                <table class="table-bordered table table-condensed">
+                  <tr ng-repeat="err in sushi.errors">
+                    <td>{{err.message}}</td>
+                    <td>{{err.location.startLine}}</td>
+                  </tr>
+                </table>
+              </uib-tab>
+              <uib-tab>
+                <uib-tab-heading>Warnings <span class="badge">{{sushi.warnings.length}}</span> </uib-tab-heading>
+                <table class="table-bordered table table-condensed">
+                  <tr ng-repeat="warn in sushi.warnings">
+                    <td>{{warn.message}}</td>
+                    <td>{{warn.location.startLine}}</td>
+                  </tr>
+                </table>
+              </uib-tab>
+              <uib-tab heading="StructureDefinition">
+                <pre>{{sushi.fhir | json}}</pre>
+              </uib-tab>
+            </uib-tabset>
+
+
+
+          </div>
 
         </div>
       </div>
@@ -35,17 +108,37 @@
 
     <uib-tab ng-show="logEd" heading="Generation log">
       <table class="table table-bordered">
+        <tr><th>Path</th><th>Title</th><th>Type</th><th>Details</th></tr>
         <tr ng-repeat="log in logEd">
-          <td><div class="clickable" ng-click="editDGItem({ed:log.ed})">{{log.ed.title}}</div> </td>
+          <td><div class="clickable" ng-click="editDGItem({ed:log.ed})">{{log.ed.path | dropFirstInPath}}</div> </td>
+          <td>{{log.ed.title }}</td>
           <td>{{log.reason}}</td>
           <td>
             <div ng-repeat="lne in log.content track by $index">
               {{lne}}
             </div>
         </tr>
+      </table>
+    </uib-tab>
+
+    <uib-tab ng-show="errors.length > 0" heading="Generation errors">
+      <table class="table table-bordered">
+        <tr ng-repeat="err in errors">
+          <td><div class="clickable" ng-click="editDGItem({ed:err.ed})">{{err.ed.title}}</div> </td>
+          <td>{{err.issue}}</td>
+          <td>
+            <div ng-repeat="lne in err.content track by $index">
+              {{lne}}
+            </div>
+        </tr>
 
       </table>
     </uib-tab>
+
+    <uib-tab ng-show="manifest" heading="Manifest">
+      <pre>{{manifest | json}}</pre>
+    </uib-tab>
+
 
     <uib-tab heading="Logical Model">
       The FHIR shorthand that represents this DataGroup as a FHIR Logical Model.

@@ -1,0 +1,45 @@
+
+<div>
+    <!--<div ng-controller="newResourceCtrl">-->
+
+    <div class="modal-header">
+        <div class="row">
+            <div class="col-md-10 col-sm-10">
+                <h3 class="modal-title">
+                    Select resource path
+                </h3>
+            </div>
+
+
+            <div class="col-md-2 col-sm-2">
+                <button class="btn btn-primary pull-right"
+                        ng-show="input.url && input.display"
+                        ng-click="select()">Save</button>
+                <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
+
+
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-body">
+
+        <table class="table table-bordered">
+            <tr ng-repeat="element in resourceElements">
+                <td><div class="clickable" ng-click="selectPath(element.path)">{{element.path}}</div> </td>
+                <td><div ng-repeat="type in element.types">{{type.code}}</div></td>
+                <td>{{element.min}}..{{element.max}}</td>
+               <!-- <td>{{element.definition}}</td>-->
+            </tr>
+        </table>
+
+
+        <pre>{{resourceElements | json}}</pre>
+    </div>
+
+    <div class="modal-header">
+
+    </div>
+
+
+</div>

@@ -457,8 +457,10 @@
         </uib-tab>
 
         <uib-tab heading="Profiling"  select="setInitialTab(4)">
+            <div ng-controller="profilingSummaryCtrl">
+                <ng-include src="'/includes/profilingSummary.html'"></ng-include>
+            </div>
 
-            <ng-include src="'/includes/profilingDG.html'"></ng-include>
         </uib-tab>
 
 
@@ -868,6 +870,8 @@
 <script src="js/addEWCtrl.js"></script>
 
 <script src="js/profilingDG.js"></script>
+<script src="js/profilingComp.js"></script>
+<script src="js/profilingSummaryCtrl.js"></script>
 
 <script src="js/libs/firebase.js"></script>
 <script src="js/libs/angularfire.min.js"></script>

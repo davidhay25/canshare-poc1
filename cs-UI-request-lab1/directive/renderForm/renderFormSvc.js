@@ -959,7 +959,7 @@ console.log('processing ',item.text)
 
                                             item.item.forEach(function (child,inx) {
                                                 let childMeta = that.getMetaInfoForItem(child)
-                                                console.log('processing ',child.text, child.answerValueSet,child)
+                                                //console.log('processing ',child.text, child.answerValueSet,child)
                                                 //hidden items don't apper in the form at all.
                                                 if (! meta.hidden) {
                                                     hashItem[child.linkId] = {item:child,meta:childMeta}
@@ -1193,7 +1193,7 @@ console.log('processing ',item.text)
                     //ATM there could be both an answerValueSet and answerOptions - not strictly correct
                     //If there is a ValueSet, then remove all the answerOptions in the active copy of the ve
 
-                    console.log('fill from valueset ',cell.item.answerValueSet)
+                    //console.log('fill from valueset ',cell.item.answerValueSet)
                     //console.log(cell)
 
                     if (cell.item.answerValueSet) {
@@ -1203,10 +1203,10 @@ console.log('processing ',item.text)
 
                         //if there's a vakueset then replace the item.answerOption with the expanded vs. todo - this is just a forst step...
 
-                        console.log(cell.item.answerValueSet)
+                        //console.log(cell.item.answerValueSet)
 
                         let qry = `ValueSet/$expand?url=${cell.item.answerValueSet}&displayLanguage=en-x-sctlang-23162100-0210105`
-                        console.log(qry)
+                        //console.log(qry)
                         let encodedQry = encodeURIComponent(qry)
 
                         $http.get(`nzhts?qry=${encodedQry}`).then(

@@ -13,6 +13,11 @@
 
 const axios = require("axios");
 
+//const gofshClient = require('gofsh').gofshClient;//.gofshClient
+const sushiClient = require('fsh-sushi').sushiClient;
+
+const fhirResourceTypes = require('./artifacts/resourceElementsR4.json')
+
 // https://www.mongodb.com/developer/languages/javascript/node-connect-mongodb/
 
 let MongoClient = require('mongodb').MongoClient;
@@ -616,10 +621,11 @@ async function setup(app) {
 
     })
 
-    //create / update the fsh for a single DG.
+    //create / update the fsh for a single DG. Includes extensions (as they are generated from the DG)
     app.put('/fsh/DG/:name', async function(req,res) {
         let name = req.params.name
-        let fsh = req.body      //structure {name: fsh:}
+        let fsh = req.body      //structure {name: fsh: manifest: extensions:}
+
         let userEmail = req.headers['x-user-email']
 
         if (! userEmail) {
@@ -639,6 +645,160 @@ async function setup(app) {
 
         }
     })
+
+
+    //keeping it as synchronous ATM
+    app.post('/fsh/transform',function(req,res) {
+
+        console.log('transform')
+
+
+        //console.log('body',req.body)
+
+        //run the actual transform.
+        //let json = JSON.parse(req.body)
+       //console.log(json)
+
+        let fsh = req.body.fsh; //JSON.stringify(json.fsh);
+
+        let fhirVersion = "4.0.1"
+        if (req.body.fhirVersion) {
+            fhirVersion = json.fhirVersion.version
+        }
+
+        //console.log('fsh',fsh)
+
+        if (fsh) {
+
+
+            //let config = json.options || {}
+
+            const options = {
+                canonical: 'http://canshare.co.nz/fhir',
+                version: '0.0.1',
+                dependencies: [],
+                logLevel: 'silent' ,
+                fhirVersion : fhirVersion
+            };
+
+            void async function() {
+                let results;
+                try {
+                    //console.log('start')
+                    results = await sushiClient.fshToFhir(fsh, options);
+
+                    //console.log(results)
+                    let str = JSON.stringify(results.fhir)
+
+
+                } catch(ex) {
+                    console.log(ex)
+
+                    res.status(500);
+                    res.json({err: ex.message});
+                }
+
+                res.json(results)
+
+            }();
+        } else {
+            res.status(500);
+            res.json({err: "No FSH supplied"});
+        }
+
+
+    })
+
+    //create a summary of profiling. Currently a list of extensions usage
+    app.get('/fsh/summary', async function(req,res) {
+        const query = {}   //all dgfas
+        try {
+            const cursor = await database.collection("dgFsh").find(query).toArray()
+            let hashUrl = {}        //A hash of where extensions are used
+            cursor.forEach(function (doc) {
+                let dgName = doc.name
+                if (doc.manifest ) {
+                    if (doc.manifest.extensions) {
+                        Object.keys(doc.manifest.extensions).forEach(function (url) {
+                            hashUrl[url] = hashUrl[url] || []
+                            let arPaths = doc.manifest.extensions[url]
+                            arPaths.forEach(function (item) {
+                                let item1 = {dg:dgName,path:item.path,type:item.summary.type,name:item.summary.name}
+                                hashUrl[url].push(item1)
+                            })
+                            
+                        })
+                    }
+                }
+            })
+            res.json(hashUrl)
+
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+        }
+    })
+
+
+    //get all extensions
+    //Only have a single entrey per extension
+    //todo - have an audit that looks for extensions with the same url defined differently
+    app.get('/fsh/extensions', async function(req,res) {
+
+        let format = req.query.format   //set to 'text' to get a textual format suitable for generation
+
+        console.log(format)
+        let hashExtensions = {}     //a hash of extensions keyed on url. Content is a list of {fsh: dgname:}
+
+        let arText = []      //array for textual representation
+
+
+        try {
+            const cursor = await database.collection("dgFsh").find({}).toArray()
+            cursor.forEach(function (doc) {
+                if (doc.extensions) {
+                    Object.keys(doc.extensions).forEach(function (url) {
+                        hashExtensions[url] = hashExtensions[url] || []
+                        let item = {dg:doc.name,fsh:doc.extensions[url]}
+
+                        if (format == 'text' &&  hashExtensions[url].length == 0) { //only want one entry per url in the text. todo - see not about need for auditing
+                            arText = arText.concat(doc.extensions[url])
+                            arText.push('\n')
+                        }
+                        hashExtensions[url].push(item)
+                    })
+                }
+
+            })
+
+            if (format == 'text') {
+                res.send(arText.join('\n'))
+            } else {
+                res.json(hashExtensions)
+            }
+
+
+
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+
+
+    })
+
+    //get elements for a resource type
+    app.get('/fsh/fhirtype/:type', async function(req,res) {
+        let type = req.params.type
+        if (type && fhirResourceTypes[type]) {
+            res.json(fhirResourceTypes[type])
+        } else {
+            res.status(404).json({msg:`Type ${type} unknown`})
+        }
+
+    })
+
 
 
 

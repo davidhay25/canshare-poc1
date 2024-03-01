@@ -1,0 +1,49 @@
+<div>
+    <br/>
+
+    <uib-tabset>
+        <uib-tab heading="Extensions by usage">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="list-group">
+                        <div class="list-group-item" ng-repeat="(k,v) in profileSummary"
+                             style="cursor: pointer"
+                             ng-click="selectUrl(k)"
+                             ng-class="{listItemSelected:selectedUrl == k}">
+                            {{k}}
+                            <span class="pull-right badge">{{v.length}}</span>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-8">
+                    <table class="table table-bordered">
+                        <tr><th>DataGroup</th><th>Path</th></tr>
+                        <tr ng-repeat="item in selectedUrlUses">
+                            <td>{{item.dg}}</td>
+                            <td>{{item.path}}</td>
+                            <td>{{item.type}}</td>
+                        </tr>
+                    </table>
+
+
+
+                </div>
+            </div>
+        </uib-tab>
+        <uib-tab heading="Audit Extensions">
+        Analyse extensions by url - look for extensions with the same url defined differently
+            - currently each DG defines its own extensions (not sure how that could change) so there's the possibility of duplications that are different
+            - need something like the IG publisher error checking
+            - the call to '/fsh/extensions' returns usage as well as definition so could be the basis of the report
+        </uib-tab>
+        <uib-tab heading="Examples">
+            Creating examples using FSH and validating them against the profiles
+        </uib-tab>
+    </uib-tabset>
+
+
+
+
+
+</div>
