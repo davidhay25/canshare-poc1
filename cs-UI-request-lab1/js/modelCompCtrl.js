@@ -201,6 +201,9 @@ angular.module("pocApp")
                         },
                         parentEd : function () {
                             return  null    //parentEd is only ude whne adding a new Ed
+                        },
+                        initialTab : function () {
+                            return null
                         }
                     }
 

@@ -226,9 +226,11 @@
               <table class="table table-bordered table-condensed">
                 <tr><td>Name</td><td>{{selectedModel.name}}</td></tr>
                 <tr><td>Description</td><td>{{selectedModel.description}}</td></tr>
+                <tr ng-show="selectedModel.type"><td>Resource type</td><td>{{selectedModel.type}}</td></tr>
                 <tr ng-show="selectedModel.sourceReference"><td>Source reference</td><td>{{selectedModel.sourceReference}}</td></tr>
-                <tr ng-show="selectedModel.checkedOut"><td>Checked out to</td>
+                <tr ng-show="selectedModel.checkedOut"><td>Checked out</td>
                   <td>{{selectedModel.checkedOut}}</td></tr>
+
               </table>
 
 

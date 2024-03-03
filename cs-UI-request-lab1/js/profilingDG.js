@@ -19,44 +19,60 @@ angular.module("pocApp")
 
         //When a DG is selected, if there's an fsh in the library then load that, else generate fsh
         $scope.$on('dgSelected',function (ev,vo) {
-            $timeout(function () {
+           // $timeout(function () {
 
-                //clear the editor
-                $scope.fshEditor.setValue("")
-                $scope.fshEditor.refresh()
 
-                delete $scope.fshSource
+                setupCM(function () {
+                    //clear the editor
+                    $scope.fshEditor.setValue("")
+                    $scope.fshEditor.refresh()
 
-                //retrieve from the libarary
-                let name = $scope.selectedModel.name
-                loadFshFromLibrary(name,function (found,item) {
-                    if (found) {
-                        //there was an fsh entry for this DG in the library
-                        $scope.fshSource = "FSH from Library"
-                        $scope.fshEditor.setValue(item.fsh)
-                        $timeout(function () {
-                            $scope.fshEditor.refresh()
-                        },500)
+                    delete $scope.fshSource
 
-                        $scope.isDirty = false
-                    } else {
-                        //no entry - generate it from the currently selected model if there's a base resource type
-                        //if there's no fhirResourceType then a message will be shown anyway
-                        if ($scope.fhirResourceType) {
-                            $scope.generateFsh()
-                            $scope.fshSource = "FSH generated from model"
+                    delete $scope.logEd
+                    delete $scope.errors
+                    delete $scope.sushi
+
+                    //retrieve from the libarary
+                    let name = $scope.selectedModel.name
+                    loadFshFromLibrary(name,function (found,item) {
+                        if (found) {
+                            //there was an fsh entry for this DG in the library
+                            $scope.fshSource = "FSH from Library"
+                            $scope.fshEditor.setValue(item.fsh)
+                            $timeout(function () {
+                                $scope.fshEditor.refresh()
+                            },500)
+
+                            $scope.isDirty = false
+                        } else {
+                            //no entry - generate it from the currently selected model if there's a base resource type
+                            //if there's no fhirResourceType then a message will be shown anyway
+                            if ($scope.fhirResourceType) {
+                                $scope.generateFsh()
+                                $scope.fshSource = "FSH generated from model"
+                            }
+
                         }
+                        //console.log(item)
+                    })
 
-                    }
-                    //console.log(item)
-                })
+                })       //may not have been setup yet
+
 
 
                 //$scope.refresh()
                 //$scope.$digest()
-            },1)
+         //   },1)
         })
 
+        $scope.refreshEditor = function () {
+            $timeout(function () {
+                setupCM()
+            },200)
+
+            //$scope.fshEditor.refresh()
+        }
 
         $scope.runSushi = function () {
             let qry = '/fsh/transform'
@@ -113,11 +129,11 @@ angular.module("pocApp")
         }
 
 
-        let setupCM = function(node){
+        let setupCM = function(cb){
             //set up CM editor for a single view . Has to be when the textarea is visible...
             if (! $scope.fshEditor) {
                 // set up the codemirror editor used for display of resource
-                $timeout(function(){
+             //   $timeout(function(){    //to make sure the page is fully loade
                     var elFSH = document.getElementById("dgFshFile");
                     let cmOptions = {lineNumbers:true};
 
@@ -136,22 +152,26 @@ angular.module("pocApp")
 
                     });
 
+                    if (cb) {cb()}
 
-                },1000)
+
+            //    },1000)
             } else {
-                $timeout(function(){
+              //  $timeout(function(){
                     $scope.fshEditor.refresh()
-                },500)
+                    if (cb) {cb()}
+              //  },500)
 
             }
         };
 
-        setupCM()
+       // setupCM()
 
         //write to library
         $scope.updateFsh = function (name) {
             let fsh = $scope.fshEditor.getValue()  //get the fsh directly from the editor
             let vo = {name:name,fsh:fsh,manifest:$scope.manifest,extensions:$scope.extensions}
+            vo.date = new Date()
             let url = `fsh/DG/${name}`
             let config = {headers:{'x-user-email': $scope.user.email}}
             $http.put(url,vo,config).then(

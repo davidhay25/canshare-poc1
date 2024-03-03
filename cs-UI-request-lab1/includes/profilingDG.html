@@ -8,11 +8,12 @@
       <div class="tableFixHead">
         <table class="table-condensed table">
           <thead>
-          <tr><th>Title</th><th>Source</th><th>fhirPath</th><th>Extension</th><th>Fsh</th></tr>
+          <tr><th>Title</th><th>Type</th><th>Source</th><th>fhirPath</th><th>Extension</th><th>Fsh</th></tr>
           </thead>
           <tbody>
           <tr ng-repeat="item in fullElementList" ng-show="item.ed.mult !== '0..0' && $index > 0">
-            <td> <div class="clickable" ng-click="editDGItem({ed:item.ed})">{{item.ed.title}}</div> </td>
+            <td> <div class="clickable" ng-click="editDGItem({ed:item.ed},'profile')">{{item.ed.title}}</div> </td>
+            <td>{{item.ed.type[0]}}</td>
             <td>{{item.ed.sourceModelName}}</td>
 
             <td>{{item.ed.profile.fhirPath}}</td>
@@ -34,7 +35,7 @@
     </uib-tab>
 
 
-    <uib-tab heading="Profile">
+    <uib-tab heading="Profile" select="refreshEditor()">
 
       <div class="row">
         <div class="col-md-8">
@@ -121,7 +122,10 @@
       </table>
     </uib-tab>
 
-    <uib-tab ng-show="errors.length > 0" heading="Generation errors">
+    <uib-tab ng-show="errors.length > 0">
+      <uib-tab-heading>
+        Generation issues <span class="badge">{{errors.length}}</span>
+      </uib-tab-heading>
       <table class="table table-bordered">
         <tr ng-repeat="err in errors">
           <td><div class="clickable" ng-click="editDGItem({ed:err.ed})">{{err.ed.title}}</div> </td>
@@ -135,7 +139,7 @@
       </table>
     </uib-tab>
 
-    <uib-tab ng-show="manifest" heading="Manifest">
+    <uib-tab ng-show="false && manifest" heading="Manifest">
       <pre>{{manifest | json}}</pre>
     </uib-tab>
 

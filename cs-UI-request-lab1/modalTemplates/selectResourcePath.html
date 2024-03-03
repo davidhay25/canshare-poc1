@@ -25,7 +25,8 @@
     <div class="modal-body">
 
         <table class="table table-bordered">
-            <tr ng-repeat="element in resourceElements">
+            <tr><th>Element path</th><th>Types</th><th>Card.</th></tr>
+            <tr ng-repeat="element in resourceElements" ng-show="showElement(element)">
                 <td><div class="clickable" ng-click="selectPath(element.path)">{{element.path}}</div> </td>
                 <td><div ng-repeat="type in element.types">{{type.code}}</div></td>
                 <td>{{element.min}}..{{element.max}}</td>
@@ -34,7 +35,7 @@
         </table>
 
 
-        <pre>{{resourceElements | json}}</pre>
+
     </div>
 
     <div class="modal-header">

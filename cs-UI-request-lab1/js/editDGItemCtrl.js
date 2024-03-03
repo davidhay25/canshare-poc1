@@ -1,11 +1,16 @@
 angular.module("pocApp")
     .controller('editDGItemCtrl',
-        function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal,$http,parentEd,igSvc) {
-            $scope.item = item      //will be {ed:} if editing an existing
+        function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal,$http,parentEd,igSvc,initialTab) {
+            $scope.item = item      //will be {ed:} if editing an existing item
             $scope.allTypes = allTypes
             $scope.input = {}
+
+            //set the initial tab displayed
+            if (initialTab == 'profile') {
+                $scope.input.mainTabActive = 3
+            }
             $scope.fullElementList = fullElementList
-            let dgName = fullElementList[0].ed.path     //it's aways the forst element in the list...
+            let dgName = fullElementList[0].ed.path     //it's aways the first element in the list...
 
             $scope.options = []     //a list of options. Will be saved as ed.options
             $scope.units = [] //a list of units. Will be saved as ed.units
@@ -34,7 +39,7 @@ angular.module("pocApp")
                 }
             })
 
-            console.log(hashChildNames)
+            //console.log(hashChildNames)
 
 
 
@@ -131,6 +136,7 @@ angular.module("pocApp")
                 }
                 
 
+                //todo why this? (and there's another when creating new
                 for (const typ of allTypes) {
                     if (item.ed.type[0] == typ) {
                         $scope.input.type = typ
@@ -142,6 +148,7 @@ angular.module("pocApp")
             } else {
                 $scope.input.mult = "0..1"// $scope.mult[1]      //default to 0..1
 
+                //todo - why did I do this?
                 for (typ of allTypes) {
                     if (typ == 'CodeableConcept') {
                         $scope.input.type = typ
@@ -166,15 +173,28 @@ angular.module("pocApp")
                     templateUrl: 'modalTemplates/selectResourcePath.html',
                     //backdrop: 'static',
                     //size : 'xlg',
-                    controller: function ($scope,$http,resourceType) {
+                    controller: function ($scope,$http,resourceType,elementType) {
                         if (resourceType) {
                             $http.get(`/fsh/fhirtype/${resourceType}`).then(
                                 function (data) {
                                     $scope.resourceElements = data.data
-
-
                                 }
                             )
+                        }
+
+                        $scope.showElement = function (element) {
+                            let canShow = false
+                            let types = element.types
+                            if (types && elementType) {
+                                let ar = types.filter(t => t.code == elementType)
+                                if (ar.length > 0) {
+                                    canShow = true
+                                }
+                            } else {
+                               canShow = true
+                            }
+                            return canShow
+
                         }
 
                         $scope.selectPath = function (element) {
@@ -184,9 +204,11 @@ angular.module("pocApp")
                     },
 
                     resolve: {
-
                         resourceType: function () {
                             return $scope.fhirResourceType
+                        },
+                        elementType : function () {
+                            return $scope.input.selectedType
                         }
                     }
 

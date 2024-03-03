@@ -1,5 +1,5 @@
 //https://imagemap.org/
-
+//https://www.joelonsoftware.com/2000/04/06/things-you-should-never-do-part-i/
 angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
@@ -917,7 +917,7 @@ angular.module("pocApp")
 
 
             //edits some of the attributes of a single ED.
-            $scope.editDGItem = function (item) {
+            $scope.editDGItem = function (item,initialTab) {
                 let originalED = {}
                 let isNew = true
                 if (item) {
@@ -954,6 +954,9 @@ angular.module("pocApp")
                                 return null
                             }
 
+                        },
+                        initialTab : function () {
+                            return initialTab
                         }
                     }
 

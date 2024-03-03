@@ -117,33 +117,52 @@ angular.module("pocApp")
                 fullElementList.forEach(function (item) {
                     let ed = item.ed
                     //todo - need to think about where an element explicitely removes an element. Do we want to support that anyway?
-                    if (ed.mult !== '0..0' && ed.profile) {
-                        if (ed.profile.fsh) {
-                            //this is where the full fsh is in the ed
-                            let ar1 = ed.profile.fsh.split('\n')
-                            arFsh = arFsh.concat(ar1)
-                            logEd.push({ed:ed,reason:'Direct FSH in ED',content:ar1})
+                    if (ed.mult !== '0..0') {
+
+                        if (ed.profile) {
+                            if (ed.profile.fsh) {
+                                //this is where the full fsh is in the ed
+                                let ar1 = ed.profile.fsh.split('\n')
+                                arFsh = arFsh.concat(ar1)
+                                logEd.push({ed:ed,reason:'Direct FSH in ED',content:ar1})
+                            } else {
+                                //Only checked if there is no explicit fsh on the ed
+
+                                if (ed.profile.extUrl) {
+                                    //this is an extension. todo - right now these are simple extensions only
+
+                                    let summary = addExtension(ed)
+
+                                    manifest.extensions[ed.profile.extUrl] = manifest.extensions[ed.profile.extUrl] || []
+                                    let path = ed.profile.fhirPath ? ed.profile.fhirPath : 'root'
+
+                                    manifest.extensions[ed.profile.extUrl].push({path:path,summary:summary})
+
+                                } else if (ed.profile.isReference) {
+                                    //this is a reference to another dg/resource. The fhirPath is still used
+                                    addReference(ed)
+                                } else if (ed.profile.fhirPath) {
+                                    //this is a fhirPath only. Just add to the arFsh (though will allow for bundings, fixed values etc.
+                                    addSingleElement(ed)
+                                }
+                            }
                         } else {
-                            //Only checked if there is no explicit fsh on the ed
+                            //this is an ed with no profiling info. check for things (like fixed values) that require profiling
+                            //todo - does this need to be more specific? eg a fixed value with extension set makes no sense...
 
-                            if (ed.profile.extUrl) {
-                                //this is an extension. todo - right now these are simple extensions only
+                            if (ed.fixedCoding) {
+                                errors.push({ed:ed,issue:'fhirPath is missing - there is a fixed value',content:[ed.fixedCoding]})
+                            }
 
-                                let summary = addExtension(ed)
+                            if (ed.defaultCoding) {
+                                errors.push({ed:ed,issue:'fhirPath is missing - there is a default value',content:[ed.defaultCoding]})
+                            }
 
-                                manifest.extensions[ed.profile.extUrl] = manifest.extensions[ed.profile.extUrl] || []
-                                let path = ed.profile.fhirPath ? ed.profile.fhirPath : 'root'
-
-                                manifest.extensions[ed.profile.extUrl].push({path:path,summary:summary})
-
-                            } else if (ed.profile.isReference) {
-                                //this is a reference to another dg/resource. The fhirPath is still used
-                                addReference(ed)
-                            } else if (ed.profile.fhirPath) {
-                                //this is a fhirPath only. Just add to the arFsh (though will allow for bundings, fixed values etc.
-                                addSingleElement(ed)
+                            if (ed.valueSet) {
+                                errors.push({ed:ed,issue:'fhirPath is missing - there is a valueSet defined',content:[ed.valueSet]})
                             }
                         }
+
                     }
 
                 })
@@ -229,13 +248,29 @@ angular.module("pocApp")
 
                 function addSingleElement(ed) {
                     //add a single element. todo: add support for bindings, fixed values etc.
-                    //we know that there is a profile.fhirPath
+                    //called when there is a FHIRPath entry, but no extension, fsh or 'is reference' set
+
                     let path = $filter('dropFirstInPath')(ed.profile.fhirPath)
 
-                    let lne = `* ${path} = ${ed.type[0]} ${ed.mult}`
+                    //the default line
+                    let lne = `* ${path} ${ed.mult}`
 
+                    if (ed.valueSet) {
+                        lne = `* ${path} from ${ed.valueSet} (preferred)`
+                    }
+
+                    //shouldn't have both a default and a fixed value
+                    if (ed.defaultCoding) {
+                        lne = `* ${path} ^defaultValueCodeableConcept = ${ed.defaultCoding.system}#${ed.defaultCoding.code}  //default value`
+                    }
+
+                    if (ed.fixedCoding) {
+                        lne = `* ${path} = ${ed.fixedCoding.system}#${ed.fixedCoding.code}  //fixed value`
+                    }
 
                     arFsh.push(lne)
+
+                    // code ^defaultValueCodeableConcept = http://mysystem#cd
 
                     logEd.push({ed:ed,reason:'Single element',content:[lne]})
 

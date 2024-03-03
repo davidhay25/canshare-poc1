@@ -22,7 +22,7 @@
 
   </div>
   <div class="modal-body">
-    <uib-tabset>
+    <uib-tabset active="input.mainTabActive">
       <uib-tab heading="Details">
         <table class="table-bordered table table-condensed">
           <tr>
@@ -278,6 +278,9 @@
         <br/>
         <div class="alert alert-warning" ng-hide="fhirResourceType">
           There is no base FHIR resource type defined.
+        </div>
+        <div ng-show="fhirResourceType">
+          <strong>Base FHIR Resource type: {{fhirResourceType}}</strong>
         </div>
 
 
