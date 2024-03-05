@@ -12,6 +12,8 @@ angular.module("pocApp")
             if (current) {
                 //there is a current value that is being edited
                 switch (type) {
+                    case 'code' :
+                        $scope.input.code = current
                     case 'Coding' :
                         $scope.input.code = current.code
                         $scope.input.display = current.display
@@ -97,6 +99,11 @@ angular.module("pocApp")
 
                 let canSave = false
                 switch (type) {
+                    case 'code' :
+                        if ($scope.input.code) {
+                            canSave = true
+                        }
+                        break
                     case 'Coding' :
                         if ($scope.input.system) {
                             canSave = true
@@ -130,6 +137,9 @@ angular.module("pocApp")
             $scope.save = function () {
                 let v
                 switch (type) {
+                    case "code" :
+                        v = $scope.input.code
+                        break
                     case "Coding" :
                         v = {system:$scope.input.system,code:$scope.input.code}
                         if ($scope.input.display) {

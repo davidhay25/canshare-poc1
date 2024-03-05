@@ -302,7 +302,6 @@ angular.module("pocApp")
                 treeData.push(root)
 
                 //set up the sections (headings) tree
-                //let hashSections = {'Section': true}
                 let sectionTreeData = []
                 let sectionRoot = {id:"Section",text: "Sections tree",parent:'#',data:{}}
                 sectionTreeData.push(sectionRoot)
@@ -316,35 +315,6 @@ angular.module("pocApp")
                     let dg = hashAllDG[key]
                     ar.push(dg)
                 })
-
-                /*
-                //create the sections tree. The tree must be in path order - whereas the main tree is in name order
-                ar.sort(function (a,b) {
-                    if (a.path > b.path) {
-                        return 1
-                    } else { return -1}
-                })
-
-                //now create the sections tree
-                ar.forEach(function (dg) {
-                    let text = dg.title || dg.name
-                    let parent = dg.parent || "root"
-                   // let node = {id:dg.name,text:text,parent:parent,data:{dg:dg}}
-                   // treeData.push(node)
-
-                    //if the parent is in the sections hash, then add it to the section tree
-                    //and add it to the has so any of it's children
-                    if (hashSections[dg.parent]) {
-                        let sectionNode = {id:dg.name,text:text,parent:parent,data:{dg:dg}}
-                        sectionTreeData.push(sectionNode)
-                        hashSections[dg.name] = true
-
-                    }
-
-
-                })
-
-                */
 
 
 
@@ -363,17 +333,6 @@ angular.module("pocApp")
                     let node = {id:dg.name,text:text,parent:parent,data:{dg:dg}}
                     treeData.push(node)
 
-                       /*
-                    //if the parent is in the sections hash, then add it to the section tree
-                    //and add it to the has so any of it's children
-                    if (hashSections[dg.parent]) {
-                        let sectionNode = {id:dg.name,text:text,parent:parent,data:{dg:dg}}
-                        sectionTreeData.push(sectionNode)
-                        hashSections[dg.name] = true
-
-                    }
-
-*/
                 })
 
                 //sort by

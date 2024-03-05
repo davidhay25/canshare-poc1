@@ -13,6 +13,11 @@ angular.module("pocApp")
                 return `${ed.path} (${ed.title})`
             }
 
+//fhirRoot
+
+
+
+
             //whether to show an element in the full element list.
             $scope.canShowDGElement = function(element,inx) {
                 if (inx ==0) {
@@ -660,7 +665,7 @@ angular.module("pocApp")
             $scope.isFixedType = function (ed) {
                 if (ed && ed.type) {
                     let type = ed.type[0]       //only look at the first
-                    if (type == 'CodeableConcept' || type == 'Quantity' || type == 'Ratio') {
+                    if (type == 'CodeableConcept' || type == 'Quantity' || type == 'Ratio' || type == 'code') {
                         //if (type == 'CodeableConcept' || type == 'decimal' || type == 'string') {
                         return true
                     }
@@ -826,6 +831,11 @@ angular.module("pocApp")
                     let elName
 
                     switch (type) {
+                        case "code" :
+                            elName = "fixedCode"
+                            if (kind == "default") {
+                                elName = "defaultCode"
+                            }
                         case "Coding":
                             elName = "fixedCoding"
                             if (kind == "default") {

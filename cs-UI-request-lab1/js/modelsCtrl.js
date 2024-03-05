@@ -6,10 +6,7 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
 
-
-            $timeout(function () {
-             //   $scope.selectModel($scope.hashAllDG['Patient'])
-            },2000)
+        
 
             //$scope.version = "0.6.12"
             $scope.version = utilsSvc.getVersion()
@@ -1032,11 +1029,12 @@ angular.module("pocApp")
                                 }
 
 
-
+                                ed1.fixedCode = ed.fixedCode
                                 ed1.fixedCoding = ed.fixedCoding
                                 ed1.fixedQuantity = ed.fixedQuantity
                                 ed1.fixedRatio = ed.fixedRatio
 
+                                ed1.defaultCode = ed.defaultCode
                                 ed1.defaultCoding = ed.defaultCoding
                                 ed1.defaultQuantity = ed.defaultQuantity
                                 ed1.defaultRatio = ed.defaultRatio

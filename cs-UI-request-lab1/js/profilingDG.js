@@ -170,7 +170,21 @@ angular.module("pocApp")
         //write to library
         $scope.updateFsh = function (name) {
             let fsh = $scope.fshEditor.getValue()  //get the fsh directly from the editor
-            let vo = {name:name,fsh:fsh,manifest:$scope.manifest,extensions:$scope.extensions}
+
+            //The extensions are defined separately so remove them from the fsh being saved
+            //todo - this may be a little brittle. Might pay to keep them separate in the forst place...
+            let ar = fsh.split('\n')
+            let arFsh = []
+            for (const lne of ar) {
+                if (lne.startsWith("//---extensions")) {
+                    break
+                }
+                arFsh.push(lne)
+            }
+
+
+
+            let vo = {name:name,fsh:arFsh.join('\n'),manifest:$scope.manifest,extensions:$scope.extensions}
             vo.date = new Date()
             let url = `fsh/DG/${name}`
             let config = {headers:{'x-user-email': $scope.user.email}}

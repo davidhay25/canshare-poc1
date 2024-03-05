@@ -1,7 +1,7 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('modelCompositionCtrl',
-        function ($scope,$uibModal,$timeout,librarySvc,modelsSvc,$localStorage) {
+        function ($scope,$uibModal,$timeout,librarySvc,modelsSvc,$localStorage,$http) {
 
 
             $localStorage.qStrategy = $localStorage.qStrategy || {}
@@ -158,6 +158,23 @@ angular.module("pocApp")
 
             $scope.checkIn = function () {
                 librarySvc.checkIn($scope.selectedComposition,$scope.user)
+
+                //save the comp logical fsh to the library. Could do this in the library I guess, but easy here
+                if ($scope.compFsh) {
+                    let url = `/fsh/comp/logical/${$scope.selectedComposition.name}`
+                    let vo = {name:$scope.selectedComposition.name,fsh:$scope.compFsh}
+                    let config = {headers:{'x-user-email': $scope.user.email}}
+
+                    $http.put(url,vo,config).then(
+                        function (data) {
+
+                        }, function (err) {
+                            alert("There was an error saving the Logical Model FSH")
+                        }
+                    )
+                }
+
+
 
             }
 

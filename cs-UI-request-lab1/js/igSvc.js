@@ -3,6 +3,19 @@ angular.module("pocApp")
 
     .service('igSvc', function(modelsSvc,$filter) {
 
+
+        function makeSafeString(s) {
+            if (s) {
+                s = s.replace(/"/g, "'");
+
+
+                return s
+            } else {
+                return ""
+            }
+
+        }
+
         return {
 
 
@@ -41,7 +54,7 @@ angular.module("pocApp")
 
                     ctr++
                     if (ctr > 100) {
-                        alert(`Error finding ultimate parent of ${dgName} - recursion issue mostlikely`)
+                        alert(`Error finding ultimate parent of ${dgName} - recursion issue most likely`)
                         return
                     }
 
@@ -54,9 +67,10 @@ angular.module("pocApp")
 
             makeProfileFshComp : function (comp,hashAllDg) {
                 let arFsh = []
-                arFsh.push(`Profile:\t\t${comp.name}_profile`)
+                let compName = comp.name.replace(/ /g,"")
+                arFsh.push(`Profile:\t\t${compName}_profile`)
                 arFsh.push(`Parent:\t\tComposition`)
-                arFsh.push(`Id:\t\t\t${comp.name}-id`)
+                arFsh.push(`Id:\t\t\t${compName}-id`)
                 arFsh.push(`Title:\t\t\t"${comp.title}"`)
                 if (comp.description) {
                     arFsh.push(`Description:\t"${comp.description}"`)
@@ -81,8 +95,11 @@ angular.module("pocApp")
                     //todo - do we need to create a profile for the sectionDG that just includes the types it uses?
                     ar.push(`\n`)
                     ar.push(`* section[${section.name}].code = http://dummy.org#${section.name}`)
-                    let cUrl = section.items[0].type[0]
-                    ar.push(`* section[${section.name}].entry = Reference(${cUrl})`)
+                    if (section.items && section.items.length > 0) {
+                        let cUrl = section.items[0].type[0]
+                        ar.push(`* section[${section.name}].entry = Reference(${cUrl})`)
+                    }
+
 
                 })
                 arFsh[arFsh.length-1] = arFsh[arFsh.length-1].slice(0,-3)   //remove the trailing and
@@ -95,7 +112,6 @@ angular.module("pocApp")
                 return {fsh:fsh}
             },
 
-
             makeProfileFshDg : function (dg,type,fullElementList) {
                 let extensionUrlRoot = "http://canshare.co.nz/StructureDefinition"
                 let valueSetUrlRoot = "https://nzhts.digital.health.nz/fhir/ValueSet"
@@ -107,9 +123,9 @@ angular.module("pocApp")
                 arFsh.push(`Profile:\t\t${dg.name}_profile`)
                 arFsh.push(`Parent:\t\t\t${type}`)
                 arFsh.push(`Id:\t\t\t\t${dg.name}-id`)
-                arFsh.push(`Title:\t\t\t"${dg.title}"`)
+                arFsh.push(`Title:\t\t\t"${makeSafeString(dg.title)}"`)
                 if (dg.description) {
-                    arFsh.push(`Description:\t"${dg.description}"`)
+                    arFsh.push(`Description:\t"${makeSafeString(dg.description)}"`)
                 }
                 arFsh.push(`\n`)
 
@@ -150,10 +166,12 @@ angular.module("pocApp")
                             //this is an ed with no profiling info. check for things (like fixed values) that require profiling
                             //todo - does this need to be more specific? eg a fixed value with extension set makes no sense...
 
+                            if (ed.fixedCode) {
+                                errors.push({ed:ed,issue:'fhirPath is missing - there is a fixed value',content:[ed.fixedCode]})
+                            }
                             if (ed.fixedCoding) {
                                 errors.push({ed:ed,issue:'fhirPath is missing - there is a fixed value',content:[ed.fixedCoding]})
                             }
-
                             if (ed.defaultCoding) {
                                 errors.push({ed:ed,issue:'fhirPath is missing - there is a default value',content:[ed.defaultCoding]})
                             }
@@ -192,18 +210,19 @@ angular.module("pocApp")
                             hashExtensionUrl[url].push(`Id:\t\t\t\t${internalName}-id`)
                             hashExtensionUrl[url].push(`Title:\t\t\t"${internalName}"`)
                             if (ed.description) {
-                                hashExtensionUrl[url].push(`Description:\t"${ed.description}"`)
+                                hashExtensionUrl[url].push(`Description:\t"${makeSafeString(ed.description)}"`)
                             }
                             hashExtensionUrl[url].push(`* ^url = "${url}"`)
                             hashExtensionUrl[url].push(`* value[x] only ${type}`)
 
                             if (item.valueSet) {
-                                let vs = item.valueSet
-                                if (vs.indexOf('http') == -1) {
-                                    vs = `${valueSetUrlRoot}\${vs}`
+                                let vsUrl = item.valueSet
+
+                                if (vsUrl.indexOf('http') == -1) {
+                                    vsUrl = `${valueSetUrlRoot}/${vsUrl}`
                                 }
 
-                                hashExtensionUrl[url].push(`* value[x] from ${vs} (preferred)`)
+                                hashExtensionUrl[url].push(`* value[x] from ${vsUrl} (preferred)`)
                             }
 
                             //add the extension definition to the arExtensions array.
@@ -239,6 +258,8 @@ angular.module("pocApp")
 
 
                 //now concatenate the extension definitions to the fsh array
+
+                arExtensions.splice(0,0,"\n//---extensions---- Any updates to extensions will not be saved---------\n")
                 arFsh = arFsh.concat(arExtensions)
 
 
@@ -266,6 +287,10 @@ angular.module("pocApp")
 
                     if (ed.fixedCoding) {
                         lne = `* ${path} = ${ed.fixedCoding.system}#${ed.fixedCoding.code}  //fixed value`
+                    }
+
+                    if (ed.fixedCode) {
+                        lne = `* ${path} = #${ed.fixedCode} //fixed value`
                     }
 
                     arFsh.push(lne)
@@ -349,7 +374,7 @@ angular.module("pocApp")
 
             makeFshForComp : function(comp,elements,hashElements) {
                 let that = this
-                //generate a fsh file for a composition.
+                //generate a fsh file for a composition logical model.
                 //the sections will be the top level entries. We use the composition to structure the model by
                 //iterating over the sections, then the contents of the sections.
                 //but because the composition can override the DG's, we need to iterate using the values in hashElements
@@ -364,7 +389,10 @@ angular.module("pocApp")
                 let arCompFsh = []  //the fsh for each DG within each section - as well as the Comp header
 
                 //let arLines = []
-                let compName = comp.name
+                let compName = comp.name.replace(/ /g,"")
+
+
+
                 arCompFsh.push(`Logical:\t ${compName}`)
                 arCompFsh.push(`Id:\t\t ${compName}`)
                 arCompFsh.push(`Title:\t\t "${comp.title}"`)
@@ -372,6 +400,8 @@ angular.module("pocApp")
                     arCompFsh.push(`Description:\t "${comp.description}"`)
                 }
                 arCompFsh.push("")
+                arCompFsh.push(`* ^identifier.system = "http://canshare.co.nz/ns/lmComp"`)
+                arCompFsh.push(`* ^identifier.value = "${compName}"`)
 
                 let initialSpacer = "  "  //all the lines generated by the DG need to be inset
 
@@ -392,58 +422,28 @@ angular.module("pocApp")
                             if (currentDG.length > 0) {
                                 //all of the elements in the previous DG have been added to currentDG. Generate the FSH
                                 let fsh = that.makeFshForDG(comp,currentDG,true,initialSpacer)
-                                //console.log(fsh)
                                 arCompFsh.push(fsh)
                                 arCompFsh.push('')
                                 currentDG.length = 0
-
                             }
-
-                            //let clone = angular.copy(item)
-                            //write out the first line of the DG
-                           //temp clone.ed.path = adjustPath(clone.ed.path)
-                           //temp currentDG.push(clone)
 
                             let lne = `* ${ed.name} ${ed.mult} BackboneElement "${ed.title}"`
                             arCompFsh.push(lne)
                             //arCompFsh.push("")
                             break
                         case 3:
-                            //this is the contents of the DG
+                            //this is the contents of the DG. They have been expanded prior to calling this function
 
                             //let clone = angular.copy(item)
                             clone.ed.path = adjustPath(clone.ed.path)
                             currentDG.push(clone)
-                            /*
-                            if (currentDG.length > 0) {
-                                //all of the elements in the previous DG have been added to currentDG. Generate the FSH
-                                let fsh = that.makeFshForDG(comp,currentDG,true,initialSpacer)
-                                console.log(fsh)
-                                arCompFsh.push(fsh)
-                                arCompFsh.push('')
-                                currentDG.length = 0
-                                let clone = angular.copy(item)
-                                clone.ed.path = adjustPath(clone.ed.path)
-                                currentDG.push(clone)
-                            } else {
-                                //this is the first pass through
-                                currentDG.length = 0
-                                let clone = angular.copy(item)
-                                clone.ed.path = adjustPath(clone.ed.path)
-                                currentDG.push(clone)
-                            }
-                            */
+
                             break
                         default:
                             //contents of the DG (and any z elements). Add to the current array
-                            //remove the first 2 segments from the path
-                            //let ar = item.ed.path.split('.')
-                            //ar.splice(0,2)
-                            item.ed.path = adjustPath(item.ed.path)
+                            item.ed.path = adjustPath(item.ed.path)  //remove the first 2 segments from the path
                             currentDG.push(item)
                     }
-
-
 
 
 
@@ -452,7 +452,7 @@ angular.module("pocApp")
                 let fsh = that.makeFshForDG(comp,currentDG,true,initialSpacer)
                 arCompFsh.push(fsh)
 
-                //console.log(arCompFsh)
+
                 return arCompFsh.join('\n')
 
                 function adjustPath(path) {
@@ -462,29 +462,6 @@ angular.module("pocApp")
                 }
 
 
-/*
-
-                return fsh//todo - finish later
-
-                //so it's really a superset of what is done for DG's - we can't just re-use that code
-
-
-                //hashElements has all elements by path todo - check that DG inheritance works properly
-                console.log(comp)
-                console.log(elements)
-                let that = this
-
-
-                
-                comp.sections.forEach(function (sect) {
-                    sect.items.forEach(function (item) {
-                        let type = item.type[0]         //only have a single type
-                        let fsh = that.makeFshForDG()
-
-                    })
-                })
-
-*/
 
             },
             makeFshForDG : function (dg,elements,hideHeader,initialSpacer) {
@@ -556,19 +533,20 @@ angular.module("pocApp")
 
                 if (! hideHeader) {
                     //ensure the first letter is capitalized
+                    //add '_cs' to the end of the lm so that it isn't the same as a FHIR resource type. Causes issues with the IG!
                     let dgName = dg.name.charAt(0).toUpperCase() + dg.name.slice(1)
-                    arLines.push(`Logical:\t ${dgName}`)
-                    arLines.push(`Id:\t\t ${dgName}`)
-                    arLines.push(`Title:\t\t "${dg.title}"`)
+                    arLines.push(`Logical:\t ${dgName}_cs`)
+                    arLines.push(`Id:\t\t ${dgName}-cs`)
+                    arLines.push(`Title:\t\t "${makeSafeString(dg.title)}"`)
                     if (dg.description) {
-                        arLines.push(`Description:\t "${dg.description}"`)
+                        arLines.push(`Description:\t "${makeSafeString(dg.description)}"`)
                     }
                     arLines.push("")
                 }
 
 
-                console.log(dg.name)
-                console.log(hash)
+                //console.log(dg.name)
+                //console.log(hash)
                 //the recursive processing function
                 function processNode(ar,node,spacer) {
                     //ar.push(node.ed.path)
@@ -603,11 +581,7 @@ angular.module("pocApp")
 
                     if (ed.type) {
                         let arLne = []
-                        /*
-                        if (ed.mult == '0..0') {
-                            return []
-                        }
-*/
+
                         let lne = ""
                         let type = ed.type[0]
                         //if the type is not a FHIR type, then it will be one of the DG. Replace it with 'BackboneElement'

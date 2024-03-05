@@ -99,6 +99,12 @@ angular.module("pocApp")
                 }
 
                 //displays for fixed
+                if (item.ed.fixedCode) {
+                    $scope.fixed = {elName:'fixedCode',value:item.ed.fixedCode}
+                    $scope.fixedDisplay = item.ed.fixedCode
+                }
+
+
                 if (item.ed.fixedCoding) {
                     $scope.fixed = {elName:'fixedCoding',value:item.ed.fixedCoding}
                     $scope.fixedDisplay = `${item.ed.fixedCoding.code} | ${item.ed.fixedCoding.display} | ${item.ed.fixedCoding.system}`
@@ -118,6 +124,11 @@ angular.module("pocApp")
                 }
 
                 //displays for default
+
+                if (item.ed.defaultCode) {
+                    $scope.default = item.ed.defaultCode
+                    $scope.defaultDisplay = item.ed.defaultCode
+                }
                 if (item.ed.defaultCoding) {
                     $scope.default = {elName:'defaultCoding',value:item.ed.defaultCoding}
                     $scope.defaultDisplay = `${item.ed.defaultCoding.code} | ${item.ed.defaultCoding.display} | ${item.ed.defaultCoding.system}`
@@ -160,7 +171,7 @@ angular.module("pocApp")
             //return true if the datatype can have a fixed value
             $scope.isFixedType = function (type) {
 
-                if (type == 'CodeableConcept' || type == 'Quantity' || type == 'Ratio') {
+                if (type == 'CodeableConcept' || type == 'Quantity' || type == 'Ratio' || type == 'code') {
                     //if (type == 'CodeableConcept' || type == 'decimal' || type == 'string') {
                     return true
                 }
@@ -302,16 +313,7 @@ angular.module("pocApp")
 
                 if ($scope.input.otherType) {
                     ed.otherType = $scope.input.otherType
-                    /*
-                    switch ($scope.input.otherType) {
-                        case 'sometimes' :
-                            addOtherConditional()
-                            break
-                        default :
-                            deleteOtherConditional()
-                            break
-                    }
-                    */
+
 
                 } else {
                     //delete any otherType conditional that may be present
@@ -341,6 +343,8 @@ angular.module("pocApp")
                     ed[$scope.fixed.elName] = $scope.fixed.value
                 } else {
                     let type = $scope.input.selectedType
+                    if (type == 'code') {type = "Code"}
+
                     if (type == 'CodeableConcept') {type = 'Coding'}
                     let elName = `fixed${type}`
                     delete ed[elName]
@@ -350,6 +354,7 @@ angular.module("pocApp")
                     ed[$scope.default.elName] = $scope.default.value
                 } else {
                     let type = $scope.input.selectedType
+                    if (type == 'code') {type = "Code"}
                     if (type == 'CodeableConcept') {type = 'Coding'}
                     let elName = `default${type}`
                     delete ed[elName]
@@ -455,6 +460,14 @@ angular.module("pocApp")
 
                 switch ($scope.input.selectedType) {
                 //switch (ed.type[0]) {
+                    case "code" :
+                        type = 'code'
+                        current = ed.fixedCode
+                        if (kind == 'default') {
+                            current = ed.defaultCode
+                        }
+
+                        break
                     case "CodeableConcept" :
                         type = 'Coding'
                         current = ed.fixedCoding
@@ -508,6 +521,16 @@ angular.module("pocApp")
                     //let displayKey = `${kind}Display`       //fixedDisplay or defaultDisplay
 
                     switch (type) {
+                        case "code" :
+                            if (kind == "default") {
+                                $scope.default = {elName:'defaultCode',value:elValue}
+                                $scope.defaultDisplay = elValue
+                            } else {
+                                $scope.fixed = {elName:'fixedCode',value:elValue}
+                                $scope.fixedDisplay = elValue
+
+                            }
+                            break
                         case "Coding":
                             if (kind == "default") {
                                 $scope.default = {elName:'defaultCoding',value:elValue}

@@ -10,7 +10,12 @@ angular.module("pocApp")
         $scope.$on('compSelected',function (ev,vo) {
             $timeout(function () {
                 let vo = igSvc.makeProfileFshComp($scope.selectedComposition,$scope.hashAllDG)
-                $scope.input.fsh = vo.fsh
+                if ($scope.fshEditor) {
+                    $scope.fshEditor.setValue(vo.fsh)
+                }
+
+
+                //$scope.input.fsh = vo.fsh
                // $scope.refresh()
                // $scope.$digest()
             },1)
@@ -61,7 +66,7 @@ angular.module("pocApp")
         }
 
 
-        $scope.refresh = function () {
+        $scope.refreshDEP = function () {
             let fsh = ""
             if ($scope.input.dgFsh && $scope.input.dgFsh.fsh) {
                 fsh = $scope.input.dgFsh.fsh
@@ -81,7 +86,7 @@ angular.module("pocApp")
                 if (! $scope.fshEditor) {
                     // set up the codemirror editor used for display of resource
                     $timeout(function(){
-                        var elFSH = document.getElementById("dgFshFile");
+                        var elFSH = document.getElementById("compFshFile");
                         let cmOptions = {lineNumbers:true};
 
                         $scope.fshEditor = CodeMirror.fromTextArea(elFSH,cmOptions);
@@ -110,18 +115,21 @@ angular.module("pocApp")
             setupCM()
 
             $scope.updateFsh = function (name) {
-                let fsh = $scope.fshEditor.getValue()  //get the fsh directly from the editor
-                let vo = {name:name,fsh:fsh}
-                let url = `fsh/DG/${name}`
-                let config = {headers:{'x-user-email': $scope.user.email}}
-                $http.put(url,vo,config).then(
-                    function () {
-                        alert("Fsh updated")
-                    },function (err) {
-                        alert(angular.toJson(err.data))
-                    }
+                if (confirm("Are you sure you wish to update the library")) {
+                    let fsh = $scope.fshEditor.getValue()  //get the fsh directly from the editor
+                    let vo = {name:name,fsh:fsh}
+                    let url = `fsh/comp/profile/${name}`
+                    let config = {headers:{'x-user-email': $scope.user.email}}
+                    $http.put(url,vo,config).then(
+                        function () {
+                            alert("Fsh updated")
+                        },function (err) {
+                            alert(angular.toJson(err.data))
+                        }
 
-                )
+                    )
+
+                }
 
 
             }

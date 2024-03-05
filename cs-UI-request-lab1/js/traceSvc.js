@@ -42,13 +42,20 @@ angular.module("pocApp")
                     }
                 }
 
+                //Mar 5 - disabling the equality check. Not sure how useful it it.
+                return
+
                 //check that the memory & localstorage are the same
                 //wait 500 ms to allow updates to occur...
                 $timeout(function () {
                     if (action.model && action.model.kind == 'dg') {
                         console.log("validate DG")
                         //make sure that $localStorage has been updated
-                        if ($localStorage.world.dataGroups[action.model.name] && angular.toJson(action.model) !== angular.toJson($localStorage.world.dataGroups[action.model.name])) {
+
+
+
+                        if ($localStorage.world.dataGroups[action.model.name] && angular.toJson(action.model)
+                            !== angular.toJson($localStorage.world.dataGroups[action.model.name])) {
 
                             //send a copy to the trace store so it is in the trail
 

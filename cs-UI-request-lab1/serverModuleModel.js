@@ -15,6 +15,7 @@ const axios = require("axios");
 
 //const gofshClient = require('gofsh').gofshClient;//.gofshClient
 const sushiClient = require('fsh-sushi').sushiClient;
+const serverModuleIg = require('./serverModuleIG')
 
 const fhirResourceTypes = require('./artifacts/resourceElementsR4.json')
 
@@ -178,6 +179,33 @@ async function setup(app) {
 
     //======== datagroups  =========================
 
+    //get the DG index for the IG
+    //todo >>>>>>> not currently used
+    app.get('/model/dgIndex', async function(req,res) {
+        //retrieve all the DG
+        let query = {active:true} // active: { $lt: 15 } };
+
+        console.log('query',query)
+        const colDG = database.collection("dg");
+
+        try {
+            const cursor = await colDG.find(query).toArray()
+            let hashDG = {}
+            cursor.forEach(function (doc) {
+                delete doc['_id']
+                delete doc.diff
+                hashDG[doc.name] = doc
+
+            })
+
+            let index = serverModuleIg.makeDGIndex(hashDG)
+            res.json(index)
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+    })
 
 
     //get all active datagroups
@@ -274,7 +302,7 @@ async function setup(app) {
 
     })
 
-    //get the history of a resource
+    //get the history of a DG
     app.get('/model/DG/:name/history', async function(req,res) {
         let name = req.params.name
 
@@ -593,13 +621,14 @@ async function setup(app) {
 
     //--------------- FSH endpoints
 
-    //get the fsh for a DG
+    //------- DG
+    //get the fsh for a DG profile
     app.get('/fsh/DG/:name', async function(req,res) {
         let name = req.params.name
 
         const query = {name:name}   //structure {name: fsh:}
         try {
-            const cursor = await database.collection("dgFsh").find(query).toArray()
+            const cursor = await database.collection("dgProfileFsh").find(query).toArray()
             if (cursor.length == 1) {
                 let comp = cursor[0]
                 delete comp['_id']
@@ -610,18 +639,28 @@ async function setup(app) {
                 } else {
                     res.status(500).json({msg:`There were ${cursor.length} FSHs with this name. This shouldn't happen.`})
                 }
-
             }
         } catch(ex) {
             console.log(ex)
             res.status(500).json(ex.message)
 
         }
-
-
     })
 
-    //create / update the fsh for a single DG. Includes extensions (as they are generated from the DG)
+    //get all the fsh DG profiles in a single call.
+    app.get('/fsh/profile/allDG', async function(req,res) {
+        try {
+            const cursor = await database.collection("dgProfileFsh").find({}).toArray()
+            res.json(cursor)
+
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+        }
+    })
+
+
+    //create / update the profile fsh for a single DG profile. Includes extensions (as they are generated from the DG)
     app.put('/fsh/DG/:name', async function(req,res) {
         let name = req.params.name
         let fsh = req.body      //structure {name: fsh: manifest: extensions:}
@@ -635,7 +674,7 @@ async function setup(app) {
 
         const query = {name:name}
         try {
-            const cursor = await database.collection("dgFsh").replaceOne(query,fsh,{upsert:true})
+            const cursor = await database.collection("dgProfileFsh").replaceOne(query,fsh,{upsert:true})
             //await saveHistory(dg,userEmail || "unknown User")
 
             res.json(fsh)
@@ -646,18 +685,88 @@ async function setup(app) {
         }
     })
 
+    //-------- composition
 
-    //keeping it as synchronous ATM
+    //All the composition profiles
+    app.get('/fsh/profile/allComp', async function(req,res) {
+
+        try {
+            const cursor = await database.collection("compProfileFsh").find({}).toArray()
+            res.json(cursor)
+
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+    })
+
+    //save the profile fsh for a composition
+    app.put('/fsh/comp/profile/:name', async function(req,res) {
+        let name = req.params.name
+        let fsh = req.body      //structure {name: fsh:}
+
+        let userEmail = req.headers['x-user-email']
+
+        if (! userEmail) {
+            res.status(400).json({msg:'must be a logged in user'})
+            return
+        }
+        const query = {name:name}
+        try {
+            const cursor = await database.collection("compProfileFsh").replaceOne(query,fsh,{upsert:true})
+
+            res.json(fsh)
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+    })
+
+    //All the composition models
+    app.get('/fsh/logical/allComp', async function(req,res) {
+
+        try {
+            const cursor = await database.collection("compLogicalFsh").find({}).toArray()
+            res.json(cursor)
+
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+    })
+
+
+    //save the logical fsh for a composition
+    app.put('/fsh/comp/logical/:name', async function(req,res) {
+        let name = req.params.name
+        let fsh = req.body      //structure {name: fsh:}
+
+        let userEmail = req.headers['x-user-email']
+
+        if (! userEmail) {
+            res.status(400).json({msg:'must be a logged in user'})
+            return
+        }
+        const query = {name:name}
+        try {
+            const cursor = await database.collection("compLogicalFsh").replaceOne(query,fsh,{upsert:true})
+
+            res.json(fsh)
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+    })
+
+    //---- misc
+
+    //Run sushi to process fsh. keeping it as synchronous ATM
     app.post('/fsh/transform',function(req,res) {
 
-        console.log('transform')
-
-
-        //console.log('body',req.body)
-
-        //run the actual transform.
-        //let json = JSON.parse(req.body)
-       //console.log(json)
 
         let fsh = req.body.fsh; //JSON.stringify(json.fsh);
 
@@ -666,7 +775,7 @@ async function setup(app) {
             fhirVersion = json.fhirVersion.version
         }
 
-        //console.log('fsh',fsh)
+
 
         if (fsh) {
 
@@ -687,7 +796,7 @@ async function setup(app) {
                     //console.log('start')
                     results = await sushiClient.fshToFhir(fsh, options);
 
-                    //console.log(results)
+                    console.log(results)
                     let str = JSON.stringify(results.fhir)
 
 
@@ -741,7 +850,7 @@ async function setup(app) {
 
 
     //get all extensions
-    //Only have a single entrey per extension
+    //Only have a single entry per extension
     //todo - have an audit that looks for extensions with the same url defined differently
     app.get('/fsh/extensions', async function(req,res) {
 
@@ -788,7 +897,7 @@ async function setup(app) {
 
     })
 
-    //get elements for a resource type
+    //get elements for a resource type. Uses the fhirResourceTypes object created for graphbuilder
     app.get('/fsh/fhirtype/:type', async function(req,res) {
         let type = req.params.type
         if (type && fhirResourceTypes[type]) {

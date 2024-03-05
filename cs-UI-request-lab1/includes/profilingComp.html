@@ -4,9 +4,13 @@
         <uib-tab heading="Profile">
             <div class="row">
                 <div class="col-md-6">
-                    <textarea class="form-control" rows="20" ng-model="input.fsh"></textarea>
+
+                    <textarea id="compFshFile"class="form-control" rows="20" ng-model="input.compFsh"></textarea>
                 </div>
                 <div class="col-md-6">
+
+                    <button class="btn-link btn" ng-click="updateFsh(selectedComposition.name)">Save to Library</button>
+
                     <button class="btn-link btn" ng-click="runSushi()">Run sushi</button>
                     <div ng-show="executingSushi">
                         <br/>
@@ -43,7 +47,7 @@
             </div>
 
 
-          <br/>
+
 
 
 
