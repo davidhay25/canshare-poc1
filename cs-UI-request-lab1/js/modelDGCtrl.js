@@ -3,19 +3,9 @@ angular.module("pocApp")
     .controller('modelDGCtrl',
         function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc,$timeout,librarySvc,traceSvc) {
 
-        //todo - is this still being used?
-            let fixedValueText = {}
-            fixedValueText.coding = "What is the SNOMED code and display (separated by space)"
-            fixedValueText.string = "What is the fixed string"
-            fixedValueText.decimal = "What is the fixed decimal"
-
             $scope.dependencySourceDisplay = function (ed) {
                 return `${ed.path} (${ed.title})`
             }
-
-//fhirRoot
-
-
 
 
             //whether to show an element in the full element list.
@@ -236,7 +226,7 @@ angular.module("pocApp")
             }
 
             //add an enableWhen within the scope of the current DG. Assume (for now) that the trigger is a coded value
-            //value is assumed to be a Coding
+            //value is assumed to be a Coding todo - we now support boolean
             $scope.addEnableWhen = function(item,value,op) {
                 //item is the controlling ed - the one whose value will hide/show the currently selected element
 
@@ -334,7 +324,7 @@ angular.module("pocApp")
 
             
 
-            $scope.getCategory = function (DG) {
+            $scope.getCategoryDEP = function (DG) {
                 if (!DG) {
                     return {}
                 }
@@ -375,7 +365,7 @@ angular.module("pocApp")
                 return categoryTag
             }
 
-            $scope.dglibraryInteraction = function (DG) {
+            $scope.dglibraryInteractionDEP = function (DG) {
 
                 $uibModal.open({
                     templateUrl: 'modalTemplates/libraryDG.html',
@@ -661,7 +651,7 @@ angular.module("pocApp")
 
             }
 
-            //retur true if the datatype can have a fixed or default value
+            //return true if the datatype can have a fixed or default value
             $scope.isFixedType = function (ed) {
                 if (ed && ed.type) {
                     let type = ed.type[0]       //only look at the first
@@ -673,7 +663,7 @@ angular.module("pocApp")
             }
 
             //locate the model where this item was defined
-            //todo - this needs a little work
+            //todo - this could be removed after refactoring
             $scope.getSourceModelName = function (ed) {
 
                 if (ed) {
@@ -771,178 +761,6 @@ angular.module("pocApp")
                 })
             }
 
-            //set the fixed value for a CC - creates / update override element
-            //todo may be able to use this code for comp as well
-            //use for both default and fixed
-            //kind is 'fixed' or 'default' - I don't believe this is user any more...
-            $scope.setFixedValueDEP = function(ed,kind) {
-
-                //figure out the type from the ed
-                let type // = 'Coding'         //the default
-                let current
-
-                switch (ed.type[0]) {
-                    case "CodeableConcept" :
-                        type = 'Coding'
-                        current = ed.fixedCoding
-                        if (kind == 'default') {
-                            current = ed.defaultCoding
-                        }
-
-                        break
-                    case "Quantity" :
-                        type = "Quantity"
-                        current = ed.fixedQuantity
-                        if (kind == 'default') {
-                            current = ed.defaultQuantity
-                        }
-
-                        break
-                    case "Ratio" :
-                        type = 'Ratio'
-                        current = ed.fixedRatio
-                        if (kind == 'default') {
-                            current = ed.defaultRatio
-                        }
-                        break
-
-                }
-
-
-                $uibModal.open({
-                    templateUrl: 'modalTemplates/fixValues.html',
-                    backdrop: 'static',
-                    //size : 'lg',
-                    controller: 'fixValuesCtrl',
-
-                    resolve: {
-                        type: function () {
-                            return type
-                        }, kind: function () {
-                            return kind
-                        }, current: function () {
-                            return current
-                        }
-                    }
-
-                }).result.then(function (vo) {
-                    //the type of vo is appropriate to the type
-                    let elValue = vo
-                    let elName
-
-                    switch (type) {
-                        case "code" :
-                            elName = "fixedCode"
-                            if (kind == "default") {
-                                elName = "defaultCode"
-                            }
-                        case "Coding":
-                            elName = "fixedCoding"
-                            if (kind == "default") {
-                                elName = "defaultCoding"
-                            }
-                            break
-                        case "Quantity":
-                            elName = "fixedQuantity"
-                            if (kind == "default") {
-                                elName = "defaultQuantity"
-                            }
-                            break
-                        case "Ratio":
-                            elName = "fixedRatio"
-                            if (kind == "default") {
-                                elName = "defaultRatio"
-                            }
-                            break
-
-                    }
-
-
-                    let path = $filter('dropFirstInPath')(ed.path)
-
-
-                    //remove the fixedCode from any existing element with this path
-                    let found = false
-                    for (const ed of $scope.selectedModel.diff) {
-                        if (ed.path == path) {
-                            ed[elName] = elValue
-                            traceSvc.addAction({action:'set-fixed',model:$scope.selectedModel,path:path,description:`edit diff`})
-
-
-                            found = true
-                            break
-                        }
-                    }
-
-                    if (! found) {
-                        let overrideEd = angular.copy(ed)
-
-                        overrideEd[elName] = elValue
-                        overrideEd.path = path
-                        $scope.selectedModel.diff.push(overrideEd)
-                        traceSvc.addAction({action:'set-fixed',model:$scope.selectedModel,path:path,description:`add diff`})
-
-                    }
-
-                    ed[elName] = elValue   //for the display
-
-
-                    //rebuild the full element list for the table
-                    let vo1 = modelsSvc.getFullListOfElements($scope.selectedModel,$scope.input.types,$scope.input.showFullModel)
-                    $scope.fullElementList = vo1.allElements
-
-                })
-
-
-            }
-
-            //remove the fixed or default element, but leave the (likely override) in place
-            //as there may have been other parts in that element that were overriden - like multiplicity
-            $scope.clearFixedValueDEP = function(ed,kind) {
-
-                let path = $filter('dropFirstInPath')(ed.path)
-
-
-                let found
-                for (const ed1 of $scope.selectedModel.diff) {
-                    if (ed1.path == path) {
-                        found = true
-
-                        //This will clear all fixed (or default) elements - though there should only be 1
-                        Object.keys(ed).forEach(function (key) {
-
-                            //if (key.substring(0,5) == 'fixed') {
-                            if (key.substring(0,kind.length) == kind) {
-                                delete ed[key]
-                                delete ed1[key]
-                                traceSvc.addAction({action:'remove-fixed',model:$scope.selectedModel,path:path})
-                            }
-
-                        })
-
-
-                        break
-                    }
-                }
-
-                //this should no longer be triggerred as routine is only called when can be cleared
-                if (! found) {
-                    let sourceModeName = $scope.getSourceModelName(ed)
-                    alert(`Fixed values can only be removed on the DG where it was set (${sourceModeName})`)
-                }
-
-
-                //rebuild the full element list for the table
-                let vo = modelsSvc.getFullListOfElements($scope.selectedModel,$scope.input.types,$scope.input.showFullModel)
-                $scope.fullElementList = vo.allElements
-
-
-
-
-
-                //$scope.$parent.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG, $scope.xref )
-
-            }
 
 
 

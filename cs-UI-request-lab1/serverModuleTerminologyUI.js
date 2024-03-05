@@ -5,6 +5,11 @@ const axios = require("axios");
 const fs = require("fs")
 //const commonModule = require("./serverModuleCommonUI");
 
+//going to try caching ValueSets on the server to avoid the expensive calls to the term server.
+//
+let vsCache = {}
+let vsCacheStats = {hit:0,miss:0}
+
 const commonModule = require("./serverModuleCommonUI.js")
 
 let jwt_decode = require( "jwt-decode")
@@ -180,7 +185,6 @@ function setup(app) {
 
     })
 
-
     //get syndication status
 
     app.get('/nzhts/syndStatus',async function(req,res){
@@ -221,7 +225,6 @@ function setup(app) {
     })
 
     //make an ECL query
-
     app.get('/nzhts/ecl',async function(req,res){
 
 
@@ -260,10 +263,70 @@ function setup(app) {
 
     })
 
+    app.get('/nzhts/cachestats',function (req,res) {
+        let vo = vsCacheStats
+        vo.size = getSizeOfObject(vsCache)
+        res.json(vo)
+
+        function getSizeOfObject ( object ) {
+            //the memory usage of an obect - from https://stackoverflow.com/questions/1248302/how-to-get-the-size-of-a-javascript-object#11900218
+            var objectList = [];
+            var stack = [ object ];
+            var bytes = 0;
+
+            while ( stack.length ) {
+                var value = stack.pop();
+
+                if ( typeof value === 'boolean' ) {
+                    bytes += 4;
+                }
+                else if ( typeof value === 'string' ) {
+                    bytes += value.length * 2;
+                }
+                else if ( typeof value === 'number' ) {
+                    bytes += 8;
+                }
+                else if (
+                    typeof value === 'object'
+                    && objectList.indexOf( value ) === -1
+                ) {
+                    objectList.push( value );
+
+                    for( var i in value ) {
+                        stack.push( value[ i ] );
+                    }
+                }
+            }
+            return bytes;
+        }
+
+    })
 
     //queries against the Terminology Server
     app.get('/nzhts',async function(req,res){
+        let query = req.query.qry
         console.log(`nzhts query: ${req.query.qry}`)
+
+        //if the cache is active then see if the VS is in there
+        if (vsCache) {
+            if (vsCache[query]) {
+                vsCacheStats.hit++
+                if (vsCache[query] == "404") {
+                    //the previous query was a 404
+                    res.status(404).json({})
+                    return
+                } else {
+                    res.json(vsCache[query])
+                    return
+                }
+
+            } else {
+                //the response is not (yet) in the cache
+                vsCacheStats.miss++
+            }
+
+        }
+
 
 
         let headers = req.headers
@@ -302,9 +365,14 @@ function setup(app) {
 
                 axios.get(qry,config).then(function(data) {
                     //console.log(data.data)
+                    //note that the 'query' variable is the original query sans server
+                    vsCache[query] = data.data
                     res.json(data.data)
+                    console.log("----- found -----")
                 }).catch(function(ex) {
+                    vsCache[query] = 404        //we're assuming that all errors are 404
                     if (ex.response) {
+                        console.log("----- NOT found -----")
                         res.status(ex.response.status).json(ex.response.data)
                     } else {
                         res.status(500).json(ex)

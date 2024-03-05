@@ -1,26 +1,26 @@
 #!/usr/bin/env node
 
-//from an exported list, update the DG library with all the DSs in the export
+//from an exported list, update the DG library with all the DSs and compositions in the export
 
 
 const axios = require('axios')
 
 let fs = require('fs')
 let fileName = "./allDataGroups.json"
-//let serverUrl = "http://poc.canshare.co.nz"         //the server is listening on post 80
 let serverUrl = "http://localhost:9500"
-let dgs = fs.readFileSync(fileName).toString()
+let data = fs.readFileSync(fileName).toString()
 
 //console.log(dgs)
 
 //return
-
-let hashDG = JSON.parse(dgs).dg
+let json = JSON.parse(data)
+let hashDG = json.dg
+let hashComp = json.comp
 //console.log(hashDG)
-async function uploadDG() {
-    for (const key of Object.keys(hashDG)) {
-        let dg = hashDG[key]
-        let qry = `${serverUrl}/model/DG/${dg.name}`  //todo check type of model -
+async function uploadArtifact(type,hash) {
+    for (const key of Object.keys(hash)) {
+        let dg = hash[key]
+        let qry = `${serverUrl}/model/${type}/${dg.name}`  //todo check type of model -
         let config = {headers:{'x-user-email': "david.hay25@gmail.com"}}
 
         try {
@@ -36,11 +36,10 @@ async function uploadDG() {
             }
             break
         }
-
-
-
     }
 }
 
 
-uploadDG()
+
+uploadArtifact('DG',hashDG)
+uploadArtifact('comp',hashComp)

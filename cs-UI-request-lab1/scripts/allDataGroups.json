@@ -188,8 +188,7 @@
         }
       ],
       "active": true,
-      "lastUpdate": "linda@bellbirdinformatics.com",
-      "checkedOut": "linda@bellbirdinformatics.com"
+      "lastUpdate": "linda@bellbirdinformatics.com"
     },
     "MacroscopicFinding": {
       "kind": "dg",
@@ -265,10 +264,13 @@
           "path": "NZName",
           "description": "A person’s name details",
           "notes": "hiso-10046-2023-consumer-health-identity-standard-20230828",
-          "title": "Person Name",
+          "title": "Person name",
           "mult": "0..1",
           "otherAllowed": false,
-          "controlHint": "string"
+          "controlHint": "string",
+          "hideInQ": false,
+          "options": [],
+          "units": []
         },
         {
           "type": [
@@ -604,37 +606,7 @@
         }
       ],
       "active": true,
-      "lastUpdate": "linda@bellbirdinformatics.com",
-      "changes": [
-        {
-          "edPath": "ContactInfo",
-          "msg": "remove element"
-        },
-        {
-          "edPath": "ContactInfo.ContactUsage",
-          "msg": "remove element"
-        },
-        {
-          "edPath": "ContactInfo.ContactType",
-          "msg": "remove element"
-        },
-        {
-          "edPath": "ContactInfo.ContactDetails",
-          "msg": "remove element"
-        },
-        {
-          "edPath": "ContactInfo.ContactProtectedFlag",
-          "msg": "remove element"
-        },
-        {
-          "edPath": "ContactInfo.ContactDetailsPeriod",
-          "msg": "remove element"
-        },
-        {
-          "edPath": "ContactInfo.PreferredContact",
-          "msg": "remove element"
-        }
-      ]
+      "lastUpdate": "linda@bellbirdinformatics.com"
     },
     "NZAddress": {
       "kind": "dg",
@@ -5507,7 +5479,7 @@
       "kind": "dg",
       "parent": "StagingAJCCClinical",
       "name": "StagingAJCCClinicalBreast",
-      "title": "Clinical TNM Staging Breast",
+      "title": "Clinical TNM Staging (breast)",
       "description": "Clinical TNM staging for invasive carcinoma of the breast, and ductal carcinoma in situ of the breast.",
       "status": "new",
       "diff": [
@@ -7474,9 +7446,13 @@
           ],
           "path": "DiagnosisDate",
           "description": "The date (and optionally time) on which the medical conditions was first diagnosed.",
-          "title": "DiagnosisDate",
+          "title": "Diagnosis date",
           "mult": "0..1",
-          "otherAllowed": false
+          "otherAllowed": false,
+          "controlHint": "dateTime",
+          "hideInQ": false,
+          "options": [],
+          "units": []
         },
         {
           "type": [
@@ -8510,17 +8486,6 @@
         }
       ]
     },
-    "TreatmentRequestDetails": {
-      "kind": "dg",
-      "diff": [],
-      "parent": "RequestDetails",
-      "name": "TreatmentRequestDetails",
-      "title": "Treatment request details",
-      "description": "The administrative details on a treatment request.",
-      "status": "new",
-      "author": "natasha.hope@teaho.govt.nz",
-      "active": true
-    },
     "CarePlanDetails": {
       "kind": "dg",
       "diff": [
@@ -9125,17 +9090,6 @@
       ],
       "active": true
     },
-    "SpecimenRef": {
-      "kind": "dg",
-      "diff": [],
-      "parent": "Specimen",
-      "name": "SpecimenRef",
-      "title": "Specimen reference",
-      "description": "A reference to a specimen collected from a patient.",
-      "status": "new",
-      "author": "linda@bellbirdinformatics.com",
-      "active": true
-    },
     "TumourDepth": {
       "kind": "dg",
       "diff": [
@@ -9305,11 +9259,24 @@
             "fsn": "Histologic feature of neoplasm (observable entity)"
           },
           "options": []
+        },
+        {
+          "path": "TumourIdentifier",
+          "type": [
+            "Identifier"
+          ],
+          "description": "An identifier for the tumour about which the observation is made.",
+          "title": "Tumour identifier",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false
         }
       ],
       "parent": "SpecimenObservation",
       "name": "HistologicTest",
-      "title": "Histologic finding",
+      "title": "Microscopic finding",
       "description": "The examination of tissues and/or cells under a microscope to diagnose and study diseases of the tissues.",
       "status": "new",
       "author": "linda@bellbirdinformatics.com",
@@ -9328,6 +9295,20 @@
     "MarginStatus": {
       "kind": "dg",
       "diff": [
+        {
+          "path": "TumourIdentifier",
+          "type": [
+            "Identifier"
+          ],
+          "description": "An identifier for the tumour about which the observation is made.",
+          "rules": "=Tumour.Identifier",
+          "title": "Tumour Identifier",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": true,
+          "options": [],
+          "controlHint": "string"
+        },
         {
           "type": [
             "CodeableConcept"
@@ -9364,124 +9345,16 @@
           "hideInQ": false
         },
         {
-          "type": [
-            "Group"
-          ],
-          "path": "ClosestMarginDetails",
-          "notes": "Details about the margin on a resected specimen that is closest to the tumour.",
-          "title": "Closest margin details",
-          "mult": "0..1",
-          "otherAllowed": false,
-          "enableWhen": [
-            {
-              "source": "MarginStatus.ResidualCancerStatus",
-              "operator": "=",
-              "value": {
-                "pt": "Not involved (R0)",
-                "code": "Not involved (R0)",
-                "display": "Not involved (R0)"
-              }
-            }
-          ]
-        },
-        {
-          "type": [
-            "Group"
-          ],
-          "path": "MarginDetails",
-          "description": "Any relevant details about margins on a resected specimen.",
-          "title": "Margin details",
-          "mult": "0..*",
-          "otherAllowed": false,
-          "enableWhen": [
-            {
-              "source": "MarginStatus.ResidualCancerStatus",
-              "operator": "=",
-              "value": {
-                "code": "Not involved (R0)",
-                "display": "Not involved (R0)"
-              }
-            },
-            {
-              "source": "MarginStatus.ResidualCancerStatus",
-              "operator": "=",
-              "value": {
-                "code": "Microscopically involved (R1)",
-                "display": "Microscopically involved (R1)"
-              }
-            },
-            {
-              "source": "MarginStatus.ResidualCancerStatus",
-              "operator": "=",
-              "value": {
-                "code": "Macroscopically involved (R2)",
-                "display": "Macroscopically involved (R2)"
-              }
-            }
-          ],
-          "controlHint": "string"
-        },
-        {
+          "path": "InvolvedMargins",
           "type": [
             "string"
           ],
-          "path": "MarginDetails.Margin",
-          "description": "A description of the relevant margin.",
-          "title": "Margin",
-          "mult": "1..1",
-          "otherAllowed": false,
-          "controlHint": "string"
-        },
-        {
-          "type": [
-            "Quantity"
-          ],
-          "path": "MarginDetails.DistanceToMargin",
-          "description": "The distance between the given margin and the tumour on the resected specimen.",
-          "title": "Distance to margin",
+          "description": "A free text description of the margins involved with respect to the tumour.",
+          "title": "Involved margins",
+          "units": [],
           "mult": "0..1",
-          "otherAllowed": false,
-          "enableWhen": [
-            {
-              "source": "MarginStatus.ResidualCancerStatus",
-              "operator": "=",
-              "value": {
-                "code": "Not involved (R0)",
-                "display": "Not involved (R0)"
-              }
-            }
-          ],
-          "notes": "TO DO: Add \"mm\" to units (when the non-saving features is fixed).",
-          "controlHint": "string"
-        },
-        {
-          "type": [
-            "string"
-          ],
-          "path": "ClosestMarginDetails.ClosestMargin",
-          "description": "The margin on a resected specimen that is closest to the tumour.",
-          "title": "Closest margin",
-          "mult": "1..1",
-          "otherAllowed": false
-        },
-        {
-          "type": [
-            "Quantity"
-          ],
-          "path": "ClosestMarginDetails.DistanceFromClosestMargin",
-          "description": "The distance (in mm) of the tumour to the closest margin.",
-          "title": "Distance of tumour from closest margin",
-          "mult": "0..1",
-          "otherAllowed": false
-        },
-        {
-          "type": [
-            "CodeableConcept"
-          ],
-          "path": "ClosestMarginDetails.DistanceRangeFromClosestMargin",
-          "description": "The distance range (in mm) of the tumour to the closest margin.",
-          "title": "Distance range of tumour from closest margin",
-          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
           "otherAllowed": false
         },
         {
@@ -9500,77 +9373,6 @@
           "hideInQ": false
         },
         {
-          "path": "ClosestMarginDetails.NatureOfTissueBetweenTumourAndMargin",
-          "type": [
-            "CodeableConcept"
-          ],
-          "description": "The type of tissue found between the tumour and closest margin on the specimen.",
-          "title": "Nature of tissue between tumour and closest margin",
-          "units": [],
-          "mult": "0..1",
-          "hideInQ": false,
-          "options": [
-            {
-              "pt": "Fat",
-              "code": "Fat",
-              "display": "Fat"
-            },
-            {
-              "pt": "Muscle",
-              "code": "Muscle",
-              "display": "Muscle"
-            },
-            {
-              "pt": "Fascia",
-              "code": "Fascia",
-              "display": "Fascia"
-            }
-          ],
-          "otherAllowed": false,
-          "controlHint": "drop-down"
-        },
-        {
-          "path": "MarginDetails.NatureOfTissueBetweenTumourAndMargin",
-          "type": [
-            "CodeableConcept"
-          ],
-          "description": "The type of tissue found between the tumour and other margin on the specimen.",
-          "title": "Nature of tissue between tumour and margin",
-          "units": [],
-          "mult": "0..1",
-          "hideInQ": false,
-          "options": [
-            {
-              "pt": "Fat",
-              "code": "Fat",
-              "display": "Fat"
-            },
-            {
-              "pt": "Muscle",
-              "code": "Muscle",
-              "display": "Muscle"
-            },
-            {
-              "pt": "Fascia",
-              "code": "Fascia",
-              "display": "Fascia"
-            }
-          ],
-          "otherAllowed": false,
-          "controlHint": "drop-down",
-          "enableWhen": [
-            {
-              "source": "MarginStatus.ResidualCancerStatus",
-              "operator": "=",
-              "value": {
-                "pt": "Not involved (R0)",
-                "code": "Not involved (R0)",
-                "display": "Not involved (R0)"
-              }
-            }
-          ]
-        },
-        {
           "type": [
             "CodeableConcept"
           ],
@@ -9584,13 +9386,155 @@
           "sourceModelName": "Observation",
           "controlType": "choice",
           "units": [],
-          "hideInQ": false,
+          "hideInQ": true,
           "fixedCoding": {
             "system": "http://snomed.info/sct",
             "code": "371488000",
             "display": "Presence of neoplasm at excised surgical margin",
             "fsn": "Presence of neoplasm at excised surgical margin (observable entity)"
           },
+          "options": [],
+          "notes": "TO DO: Add fixed value"
+        },
+        {
+          "path": "MarginDetail",
+          "type": [
+            "MarginDetails"
+          ],
+          "description": "Any relevant details about margins on a resected specimen.",
+          "title": "Margin details",
+          "units": [],
+          "mult": "0..*",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string"
+        },
+        {
+          "status": "new",
+          "path": "Status",
+          "title": "Status",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The status of the observation",
+          "mult": "1..1",
+          "otherAllowed": false,
+          "valueSet": "",
+          "options": [
+            {
+              "code": "398166005",
+              "display": "Performed",
+              "fsn": "Performed (qualifier value)",
+              "system": "http://snomed.info/sct"
+            },
+            {
+              "code": "340841000210104",
+              "display": "Not performed",
+              "fsn": "Did not perform (qualifier value)",
+              "system": "http://snomed.info/sct"
+            },
+            {
+              "code": "385651009",
+              "display": "In progress",
+              "fsn": "In progress (qualifier value)",
+              "system": "http://snomed.info/sct"
+            }
+          ],
+          "controlHint": "drop-down",
+          "hideInQ": true,
+          "units": [],
+          "sourceModelName": "Observation",
+          "controlType": "choice",
+          "fixedCoding": {
+            "system": "http://snomed.info/sct",
+            "code": "398166005",
+            "display": "Performed",
+            "fsn": "Performed (qualifier value)"
+          }
+        },
+        {
+          "type": [
+            "CodeableConcept"
+          ],
+          "path": "Method",
+          "description": "The technique, procedure, or system used to perform the observation.",
+          "mapping": "Observation.method",
+          "title": "Method",
+          "mult": "0..0",
+          "otherAllowed": false,
+          "sourceModelName": "Observation",
+          "controlType": "choice",
+          "controlHint": "drop-down",
+          "units": [],
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "type": [
+            "HealthcarePractitionerSummary"
+          ],
+          "path": "PerformedBy",
+          "description": "A person responsible for performing the observation.",
+          "mapping": "Observation.performer",
+          "title": "Performed by",
+          "mult": "0..0",
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "Observation",
+          "controlType": "string",
+          "units": [],
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "path": "SpecimenId",
+          "type": [
+            "Identifier"
+          ],
+          "description": "An identifier of the specimen being observed.",
+          "title": "Specimen identifier",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "SpecimenObservation",
+          "controlType": "string",
+          "rules": "=Specimen.Identifier"
+        },
+        {
+          "type": [
+            "dateTime"
+          ],
+          "path": "Date",
+          "description": "The date and/or time that the observation was performed.",
+          "mapping": "Observation.effective[dateTime]",
+          "title": "Date",
+          "mult": "0..0",
+          "otherAllowed": false,
+          "sourceModelName": "Observation",
+          "controlType": "dateTime",
+          "controlHint": "dateTime",
+          "units": [],
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "type": [
+            "string"
+          ],
+          "path": "Comments",
+          "description": "Plain text comments about the observation.",
+          "mapping": "Observation.note",
+          "title": "Comments",
+          "mult": "0..0",
+          "sourceModelName": "Observation",
+          "controlType": "string",
+          "controlHint": "string",
+          "units": [],
+          "hideInQ": false,
           "options": []
         }
       ],
@@ -9636,56 +9580,6 @@
           "sourceModelName": "MarginStatus",
           "controlType": "choice",
           "hideInQ": false
-        },
-        {
-          "type": [
-            "CodeableConcept"
-          ],
-          "path": "ClosestMarginDetails.DistanceRangeFromClosestMargin",
-          "description": "The distance range (in mm) of the tumour to the closest margin.",
-          "title": "Distance range of tumour from closest margin",
-          "mult": "0..0",
-          "otherAllowed": false,
-          "sourceModelName": "MarginStatus",
-          "controlType": "choice",
-          "controlHint": "drop-down"
-        },
-        {
-          "type": [
-            "Quantity"
-          ],
-          "path": "ClosestMarginDetails.DistanceFromClosestMargin",
-          "description": "The distance (in mm) of the tumour to the closest margin.",
-          "title": "Distance of tumour from closest margin",
-          "mult": "0..0",
-          "otherAllowed": false,
-          "sourceModelName": "MarginStatus",
-          "controlType": "string",
-          "controlHint": "string"
-        },
-        {
-          "type": [
-            "Quantity"
-          ],
-          "path": "MarginDetails.DistanceToMargin",
-          "description": "The distance between the given margin and the tumour on the resected specimen.",
-          "title": "Distance to margin",
-          "mult": "0..0",
-          "otherAllowed": false,
-          "enableWhen": [
-            {
-              "source": "MarginStatus.ResidualCancerStatus",
-              "operator": "=",
-              "value": {
-                "code": "Not involved (R0)",
-                "display": "Not involved (R0)"
-              }
-            }
-          ],
-          "notes": "TO DO: Add \"mm\" to units (when the non-saving features is fixed).",
-          "controlHint": "string",
-          "sourceModelName": "MarginStatus",
-          "controlType": "string"
         },
         {
           "status": "new",
@@ -9805,20 +9699,6 @@
           "controlHint": "string",
           "sourceModelName": "SpecimenObservation",
           "controlType": "string"
-        },
-        {
-          "path": "MarginDetails.NatureOfTissueBetweenTumourAndMargin",
-          "mult": "0..0",
-          "type": [
-            "string"
-          ]
-        },
-        {
-          "path": "ClosestMarginDetails.NatureOfTissueBetweenTumourAndMargin",
-          "mult": "0..0",
-          "type": [
-            "string"
-          ]
         }
       ],
       "parent": "MarginStatus",
@@ -11347,38 +11227,6 @@
           "sourceModelName": "Observation",
           "controlType": "choice",
           "hideInQ": true
-        },
-        {
-          "type": [
-            "CodeableConcept"
-          ],
-          "path": "TumourDimensions.TumourDimensionsStatus",
-          "description": "Whether or not the tumour dimensions have been measured.",
-          "title": "Tumour dimensions status",
-          "mult": "0..1",
-          "otherAllowed": false,
-          "options": [
-            {
-              "pt": "Assessed",
-              "code": "Assessed",
-              "display": "Assessed"
-            },
-            {
-              "pt": "No identifiable tumour",
-              "code": "No identifiable tumour",
-              "display": "No identifiable tumour"
-            },
-            {
-              "pt": "Cannot be assessed",
-              "code": "Cannot be assessed",
-              "display": "Cannot be assessed"
-            }
-          ],
-          "controlHint": "drop-down",
-          "hideInQ": false,
-          "units": [],
-          "sourceModelName": "TumourDimensions",
-          "controlType": "choice"
         }
       ],
       "parent": "SectionSoftTissueAndBone",
@@ -11539,6 +11387,19 @@
           "hideInQ": false,
           "options": [],
           "otherAllowed": false
+        },
+        {
+          "path": "ReferralCriteria.Comments",
+          "type": [
+            "string"
+          ],
+          "description": "Additional free text comments about the referral criteria.",
+          "title": "Referral criteria comments",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false
         }
       ],
       "name": "ReferralPathway",
@@ -11648,7 +11509,7 @@
           "controlHint": "string"
         }
       ],
-      "parent": "SectionGeneral",
+      "parent": "SectionPatientDetails",
       "name": "SectionPathologyPatient",
       "title": "Patient details (pathology)",
       "description": "A short summary of the main identifying details for a patient, as seen on a pathology form.",
@@ -11912,55 +11773,33 @@
           "controlHint": "string"
         },
         {
-          "path": "ReferralPathway.ReferralCriteria",
-          "type": [
-            "Group"
-          ],
-          "description": "The applicable referral criteria that apply to each referral criteria set.",
-          "title": "Referral criteria",
-          "mult": "0..0",
-          "hideInQ": false,
-          "options": [],
-          "otherAllowed": false,
-          "enableWhen": [],
-          "sourceModelName": "ReferralPathway",
-          "controlType": "string",
-          "controlHint": "string"
-        },
-        {
           "path": "ReferralPathway.PathwayType",
           "type": [
             "CodeableConcept"
           ],
-          "description": "The method or programme that led to this service request, e.g. screening, surveillance, diagnostic.",
-          "title": "PathwayType",
+          "description": "The method or programme that led to this service request, e.g. screening, surveillance, diagnostic, acute.",
+          "title": "Pathway type",
           "mult": "1..1",
-          "hideInQ": false,
-          "options": [
-            {
-              "pt": "Diagnostic",
-              "code": "Diagnostic",
-              "display": "Diagnostic"
-            },
-            {
-              "pt": "National screening programme",
-              "code": "National screening programme",
-              "display": "National screening programme"
-            },
-            {
-              "pt": "Surveillance",
-              "code": "Surveillance",
-              "display": "Surveillance"
-            }
-          ],
+          "hideInQ": true,
+          "options": [],
           "otherAllowed": false,
+          "controlHint": "drop-down",
+          "units": [],
           "sourceModelName": "ReferralPathway",
           "controlType": "choice",
-          "controlHint": "drop-down",
-          "notes": "TO DO: Add fixed value for | Surveillance of colorectal cancer (regime/therapy) |, as a child of | Surveillance of cancer (regime/therapy) | as a child of 302805002 |Preventive monitoring (regime/therapy)|",
           "fixedCoding": {
-            "system": "http://snomed.info/sct"
+            "system": "http://snomed.info/sct",
+            "code": "340801000210102",
+            "display": "Surveillance of colorectal cancer",
+            "fsn": "Surveillance of colorectal cancer (regime/therapy)"
           }
+        },
+        {
+          "path": "ReferralPathway.ReferralCriteria.ReferralCriteriaSet",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
         }
       ],
       "parent": "SectionColorectalReferralPathway",
@@ -12057,6 +11896,30 @@
           "sourceModelName": "ReferralPathway",
           "controlType": "choice",
           "controlHint": "drop-down"
+        },
+        {
+          "type": [
+            "CodeableConcept"
+          ],
+          "path": "PreviousSamplingDiagnosis.Code",
+          "description": "The type of observation made.",
+          "title": "Type",
+          "mult": "1..1",
+          "valueSet": "canshare-observation",
+          "otherAllowed": false,
+          "controlHint": "drop-down",
+          "sourceModelName": "HistologicType",
+          "controlType": "choice",
+          "notes": "",
+          "units": [],
+          "hideInQ": true,
+          "fixedCoding": {
+            "system": "http://snomed.info/sct",
+            "code": "340831000210107",
+            "display": "Histologic type of morphologically abnormal structure",
+            "fsn": "Histologic type of morphologically abnormal structure (observable entity)"
+          },
+          "options": []
         }
       ],
       "parent": "SectionColorectalReferralPathway",
@@ -12603,8 +12466,7 @@
       "description": "Relevant details about the specimen in a soft tissue histopathology composition.",
       "status": "new",
       "author": "natasha.hope@teaho.govt.nz",
-      "active": true,
-      "checkedOut": "linda@bellbirdinformatics.com"
+      "active": true
     },
     "SoftTissueBiopsyHistoClinicalInformation": {
       "kind": "dg",
@@ -13345,6 +13207,13 @@
           "controlType": "choice",
           "controlHint": "drop-down",
           "notes": "TO DO: Add option |Random specimen collection (procedure)| as an Option (child of |Specimen collection (procedure)| in SNOMED CT)"
+        },
+        {
+          "path": "Specimen.TumourIdentifier",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
         }
       ],
       "parent": "SectionGastrointestinal",
@@ -16606,12 +16475,23 @@
           "type": [
             "string"
           ]
+        },
+        {
+          "path": "Specimen",
+          "type": [
+            "Specimen"
+          ],
+          "title": "Specimen details",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": []
         }
       ],
       "parent": "SectionGastrointestinal",
       "name": "ColorectalHistoRequestTumour",
-      "title": "Tumour (colorectal histopathology request)",
-      "description": "Relevant details about the patient's tumour, as documented on a colorectal histopathology request.",
+      "title": "Specimen tumour (colorectal histopathology request)",
+      "description": "Relevant details about the patient's tumour on a specimen, as documented on a colorectal histopathology request.",
       "status": "new",
       "author": "linda@bellbirdinformatics.com",
       "active": true
@@ -16760,6 +16640,20 @@
           "hideInQ": false,
           "units": [],
           "valueSet": "canshare-AJCC-residual-tumour-clinical"
+        },
+        {
+          "path": "MarginDetail",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "InvolvedMargins",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
         }
       ],
       "parent": "ClinicalMarginStatus",
@@ -17518,7 +17412,7 @@
           "description": "Whether or not there was a response to the neoadjuvant therapy.",
           "title": "Status",
           "units": [],
-          "mult": "1..1",
+          "mult": "0..1",
           "hideInQ": false,
           "options": [
             {
@@ -17537,7 +17431,8 @@
               "display": "Cannot be assessed"
             }
           ],
-          "otherAllowed": false
+          "otherAllowed": false,
+          "controlHint": "drop-down"
         },
         {
           "path": "ReasonCannotBeAssessed",
@@ -17565,6 +17460,19 @@
           ]
         },
         {
+          "path": "ScoringSystem",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The system (including version) used to score the patient's response to neoadjuvant therapy.",
+          "title": "Scoring system",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false
+        },
+        {
           "path": "Component",
           "type": [
             "SpecimenObservation"
@@ -17576,6 +17484,45 @@
           "hideInQ": false,
           "options": [],
           "otherAllowed": false
+        },
+        {
+          "path": "Score",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The score used to indicate the patient's response to neoadjuvant therapy, as scored using a standardised neoadjuvant response scoring system.",
+          "title": "Neoadjuvant therapy response score",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false
+        },
+        {
+          "path": "OtherScore",
+          "type": [
+            "string"
+          ],
+          "description": "The score used to indicate the patient's response to neoadjuvant therapy, as scored using another neoadjuvant response scoring system that is not listed.",
+          "title": "Neoadjuvant response score (text)",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string"
+        },
+        {
+          "path": "Comments",
+          "type": [
+            "string"
+          ],
+          "description": "Free text comments about the neoadjuvant therapy response.",
+          "title": "Comments",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": []
         }
       ],
       "name": "NeoadjuvantTherapyResponse",
@@ -17701,6 +17648,34 @@
         },
         {
           "path": "Component.slice:CellDifferentiationPercent.DifferentiationStatus",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "ScoringSystem",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "Score",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "OtherScore",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "Comments",
           "mult": "0..0",
           "type": [
             "string"
@@ -18019,7 +17994,7 @@
           "description": "The anatomical level of the lymph nodes being assessed.",
           "title": "Node level",
           "units": [],
-          "mult": "1..1",
+          "mult": "0..1",
           "valueSet": "canshare-lymphnode",
           "hideInQ": false,
           "options": [],
@@ -18034,7 +18009,7 @@
           "description": "Whether or not the lymph node status has been assessed.",
           "title": "Test status",
           "units": [],
-          "mult": "1..1",
+          "mult": "0..1",
           "hideInQ": false,
           "options": [
             {
@@ -18165,17 +18140,29 @@
           "hideInQ": false,
           "options": [
             {
-              "pt": "None identified",
-              "code": "None identified",
-              "display": "None identified"
+              "code": "82334004",
+              "display": "Indeterminate",
+              "fsn": "Indeterminate (qualifier value)"
             },
             {
-              "pt": "Present",
-              "code": "Present",
-              "display": "Present"
+              "code": "260415000",
+              "display": "Not detected",
+              "fsn": "Not detected (qualifier value)"
+            },
+            {
+              "code": "52101004",
+              "display": "Present",
+              "fsn": "Present (qualifier value)"
+            },
+            {
+              "code": "1156316003",
+              "display": "Cannot be determined",
+              "fsn": "Cannot be determined (qualifier value)"
             }
           ],
-          "otherAllowed": false
+          "otherAllowed": false,
+          "valueSet": "canshare-present-tumour-finding",
+          "controlHint": "drop-down"
         },
         {
           "path": "NeoplasticPathologyComments",
@@ -18744,13 +18731,6 @@
           ]
         },
         {
-          "path": "MarginStatus.ClosestMarginDetails.DistanceRangeFromClosestMargin",
-          "mult": "0..0",
-          "type": [
-            "string"
-          ]
-        },
-        {
           "path": "LymphNodeStatus",
           "type": [
             "LymphNodeStatus"
@@ -18985,6 +18965,356 @@
         },
         {
           "path": "Comments.SpecimenSentForObservation",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:ClosestMarginDetails",
+          "type": [
+            "MarginDetails"
+          ],
+          "description": "Details about the margin on a resected specimen that is closest to the tumour.",
+          "title": "Closest margin details",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "MarginStatus",
+          "controlType": "string",
+          "slicedFrom": "SoftTissueHistoMicroscopic.MarginStatus.MarginDetail"
+        },
+        {
+          "path": "MarginStatus.MarginDetail",
+          "type": [
+            "Group"
+          ],
+          "description": "Any relevant details about margins on a resected specimen.",
+          "title": "Margin details",
+          "units": [],
+          "mult": "0..*",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "SoftTissueHistoMicroscopic",
+          "controlType": "string",
+          "originalType": [
+            "MarginDetails"
+          ]
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:ClosestMarginDetails.Margin",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The margin on a resected specimen that is closest to the tumour.",
+          "title": "Closest margin",
+          "units": [],
+          "mult": "1..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "drop-down",
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice"
+        },
+        {
+          "type": [
+            "CodeableConcept"
+          ],
+          "path": "MarginStatus.MarginDetail.slice:ClosestMarginDetails.Code",
+          "description": "The type of observation made.",
+          "title": "Type",
+          "mult": "1..1",
+          "valueSet": "canshare-observation",
+          "otherAllowed": false,
+          "controlHint": "drop-down",
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "notes": "",
+          "units": [],
+          "hideInQ": true,
+          "options": [],
+          "fixedCoding": {
+            "system": "http://snomed.info/sct",
+            "code": "371491000",
+            "display": "Closest surgical margin to neoplasm in excised specimen",
+            "fsn": "Closest surgical margin to neoplasm in excised specimen (observable entity)"
+          }
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:ClosestMarginDetails.MarginStatus",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "Whether or not this margin of the resected specimen is involved in the given tumour.",
+          "title": "MarginStatus",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "valueSet": "canshare-AJCC-residual-tumour",
+          "controlHint": "drop-down",
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:ClosestMarginDetails.MarginQualifier",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "An additional qualification of the margin description, e.g. Proximal, Distal.",
+          "title": "MarginQualifier",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:ClosestMarginDetails.DistanceToMarginRange",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The distance range between the given margin and the tumour on the resected specimen.",
+          "title": "Distance to margin (range)",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:ClosestMarginDetails.DistanceToMarginMeasurement",
+          "type": [
+            "Quantity"
+          ],
+          "description": "The distance (in mm) of the tumour to the closest margin.",
+          "title": "Distance of tumour from closest margin",
+          "units": [
+            "mm"
+          ],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "string",
+          "controlHint": "string",
+          "fixedQuantity": {
+            "unit": "mm"
+          }
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:ClosestMarginDetails.NatureOfTissueBetweenTumourAndMargin",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The type of tissue found between the tumour and the closest margin on the specimen.",
+          "title": "Nature of tissue between tumour and closest margin",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [
+            {
+              "code": "Fat",
+              "display": "Fat"
+            },
+            {
+              "code": "Muscle",
+              "display": "Muscle"
+            },
+            {
+              "code": "Fascia",
+              "display": "Fascia"
+            }
+          ],
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:ClosestMarginDetails.MarginComments",
+          "type": [
+            "string"
+          ],
+          "description": "Additional free text comments about the given margin on the resected specimen.",
+          "title": "Margin comments",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "string",
+          "controlHint": "string"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:OtherMarginDetails",
+          "type": [
+            "MarginDetails"
+          ],
+          "description": "Any relevant details about other margins on a resected specimen.",
+          "title": "Other margin details",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "SoftTissueHistoMicroscopic",
+          "controlType": "string",
+          "originalType": [
+            "MarginDetails"
+          ],
+          "slicedFrom": "SoftTissueHistoMicroscopic.MarginStatus.MarginDetail"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:OtherMarginDetails.MarginStatus",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "Whether or not this margin of the resected specimen is involved in the given tumour.",
+          "title": "MarginStatus",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "valueSet": "canshare-AJCC-residual-tumour",
+          "controlHint": "drop-down",
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:OtherMarginDetails.MarginQualifier",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "An additional qualification of the margin description, e.g. Proximal, Distal.",
+          "title": "MarginQualifier",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:OtherMarginDetails.DistanceToMarginRange",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The distance range between the given margin and the tumour on the resected specimen.",
+          "title": "Distance to margin (range)",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:OtherMarginDetails.DistanceToMarginMeasurement",
+          "type": [
+            "Quantity"
+          ],
+          "description": "The measurement of the distance between the given margin and the tumour on the resected specimen.",
+          "title": "Distance to margin (measurement)",
+          "units": [
+            "mm"
+          ],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "string",
+          "controlHint": "string",
+          "fixedQuantity": {
+            "unit": "mm"
+          }
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:OtherMarginDetails.NatureOfTissueBetweenTumourAndMargin",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The type of tissue found between the tumour and given margin on the specimen.",
+          "title": "Nature of tissue between tumour and margin",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [
+            {
+              "code": "Fat",
+              "display": "Fat"
+            },
+            {
+              "code": "Muscle",
+              "display": "Muscle"
+            },
+            {
+              "code": "Fascia",
+              "display": "Fascia"
+            }
+          ],
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:OtherMarginDetails.MarginComments",
+          "type": [
+            "string"
+          ],
+          "description": "Additional free text comments about the given margin on the resected specimen.",
+          "title": "Margin comments",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "string",
+          "controlHint": "string"
+        },
+        {
+          "path": "NeoadjuvantTherapyResponse.ScoringSystem",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "NeoadjuvantTherapyResponse.Score",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "NeoadjuvantTherapyResponse.OtherScore",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "NeoadjuvantTherapyResponse.Comments",
           "mult": "0..0",
           "type": [
             "string"
@@ -20812,7 +21142,8 @@
       "description": "Relevant details about the patient's tumour, as documented on a colorectal histopathology report.",
       "status": "new",
       "author": "linda@bellbirdinformatics.com",
-      "active": true
+      "active": true,
+      "checkedOut": "linda@bellbirdinformatics.com"
     },
     "ColorectalDiagnosticHistoReportMacro": {
       "kind": "dg",
@@ -21802,6 +22133,207 @@
           "options": []
         },
         {
+          "path": "CoexistentPathologyPrecursor",
+          "type": [
+            "CoexistentPathology"
+          ],
+          "description": "Details about the presence of coexistent precursor lesion or polyp pathology",
+          "title": "Precursor lesion or polyp",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false
+        },
+        {
+          "path": "CoexistentPathologyPrecursor.OtherPathologyComments",
+          "type": [
+            "string"
+          ],
+          "description": "Free text comments about any non-neoplastic coexistent pathology identified.",
+          "title": "Non-neoplastic pathology comments",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "enableWhen": [
+            {
+              "source": "CoexistentPathology.CoexistentPathologyStatus",
+              "operator": "=",
+              "value": {
+                "pt": "Present",
+                "code": "Present",
+                "display": "Present"
+              }
+            }
+          ],
+          "controlHint": "string",
+          "sourceModelName": "CoexistentPathology",
+          "controlType": "string"
+        },
+        {
+          "path": "CoexistentPathologyPrecursor.NeoplasticPathologyComments",
+          "type": [
+            "string"
+          ],
+          "description": "Free text comments about any neoplastic coexistent pathology identified.",
+          "title": "Neoplastic pathology comments",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "enableWhen": [
+            {
+              "source": "CoexistentPathology.CoexistentPathologyStatus",
+              "operator": "=",
+              "value": {
+                "pt": "Present",
+                "code": "Present",
+                "display": "Present"
+              }
+            }
+          ],
+          "controlHint": "string",
+          "sourceModelName": "CoexistentPathology",
+          "controlType": "string"
+        },
+        {
+          "path": "CoexistentPathologyPrecursor.TumourIdentifier",
+          "type": [
+            "Identifier"
+          ],
+          "description": "An identifier for the tumour about which the observation is made.",
+          "title": "Tumour identifier",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "HistologicTest",
+          "controlType": "string",
+          "controlHint": "string",
+          "rules": "=Tumour.Identifier"
+        },
+        {
+          "status": "new",
+          "path": "CoexistentPathologyPrecursor.Status",
+          "title": "Status",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The status of the observation",
+          "mult": "1..1",
+          "otherAllowed": false,
+          "valueSet": "",
+          "options": [
+            {
+              "code": "398166005",
+              "display": "Performed",
+              "fsn": "Performed (qualifier value)",
+              "system": "http://snomed.info/sct"
+            },
+            {
+              "code": "340841000210104",
+              "display": "Not performed",
+              "fsn": "Did not perform (qualifier value)",
+              "system": "http://snomed.info/sct"
+            },
+            {
+              "code": "385651009",
+              "display": "In progress",
+              "fsn": "In progress (qualifier value)",
+              "system": "http://snomed.info/sct"
+            }
+          ],
+          "controlHint": "drop-down",
+          "hideInQ": true,
+          "units": [],
+          "sourceModelName": "CoexistentPathology",
+          "controlType": "choice",
+          "fixedCoding": {
+            "system": "http://snomed.info/sct",
+            "code": "398166005",
+            "display": "Performed",
+            "fsn": "Performed (qualifier value)"
+          }
+        },
+        {
+          "type": [
+            "CodeableConcept"
+          ],
+          "path": "CoexistentPathologyPrecursor.Code",
+          "description": "The type of observation made.",
+          "title": "Type",
+          "mult": "1..1",
+          "valueSet": "canshare-observation",
+          "otherAllowed": false,
+          "controlHint": "drop-down",
+          "sourceModelName": "CoexistentPathology",
+          "controlType": "choice",
+          "units": [],
+          "hideInQ": true,
+          "fixedCoding": {
+            "system": "http://snomed.info/sct",
+            "code": "396984004",
+            "display": "Histologic feature of neoplasm",
+            "fsn": "Histologic feature of neoplasm (observable entity)"
+          },
+          "options": [],
+          "notes": "TO DO: Make this observation more specific to precursor lesion or polyps."
+        },
+        {
+          "type": [
+            "string"
+          ],
+          "path": "CoexistentPathologyPrecursor.Comments",
+          "description": "Plain text comments about the coexistent pathology.",
+          "mapping": "Observation.note",
+          "title": "Coexistent pathology comments",
+          "mult": "0..0",
+          "sourceModelName": "CoexistentPathology",
+          "controlType": "string",
+          "controlHint": "string",
+          "otherAllowed": false,
+          "units": [],
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "path": "CoexistentPathologyPrecursor.SpecimenId",
+          "type": [
+            "Identifier"
+          ],
+          "description": "An identifier of the specimen being observed.",
+          "title": "Specimen identifier",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "SpecimenObservation",
+          "controlType": "string",
+          "rules": "=Specimen.Identifier"
+        },
+        {
+          "type": [
+            "boolean"
+          ],
+          "path": "CoexistentPathologyPrecursor.SpecimenSentForObservation",
+          "description": "Whether or not the specimen has been sent for observation.",
+          "title": "Specimen sent for observation?",
+          "mult": "0..0",
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "SpecimenObservation",
+          "controlType": "string",
+          "units": [],
+          "hideInQ": false
+        },
+        {
           "path": "CoexistentPathology",
           "type": [
             "CoexistentPathology"
@@ -21810,6 +22342,1284 @@
           "title": "Coexistent pathology",
           "units": [],
           "mult": "0..1",
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "path": "CoexistentPathology.OtherPathologyComments",
+          "type": [
+            "string"
+          ],
+          "description": "Free text comments about any non-neoplastic coexistent pathology identified.",
+          "title": "Non-neoplastic pathology comments",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "enableWhen": [
+            {
+              "source": "CoexistentPathology.CoexistentPathologyStatus",
+              "operator": "=",
+              "value": {
+                "pt": "Present",
+                "code": "Present",
+                "display": "Present"
+              }
+            }
+          ],
+          "controlHint": "string",
+          "sourceModelName": "CoexistentPathology",
+          "controlType": "string"
+        },
+        {
+          "path": "CoexistentPathology.NeoplasticPathologyComments",
+          "type": [
+            "string"
+          ],
+          "description": "Free text comments about any neoplastic coexistent pathology identified.",
+          "title": "Neoplastic pathology comments",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "enableWhen": [
+            {
+              "source": "CoexistentPathology.CoexistentPathologyStatus",
+              "operator": "=",
+              "value": {
+                "pt": "Present",
+                "code": "Present",
+                "display": "Present"
+              }
+            }
+          ],
+          "controlHint": "string",
+          "sourceModelName": "CoexistentPathology",
+          "controlType": "string"
+        },
+        {
+          "path": "CoexistentPathology.TumourIdentifier",
+          "type": [
+            "Identifier"
+          ],
+          "description": "An identifier for the tumour about which the observation is made.",
+          "title": "Tumour identifier",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "HistologicTest",
+          "controlType": "string",
+          "controlHint": "string",
+          "rules": "= Tumour.identifier"
+        },
+        {
+          "status": "new",
+          "path": "CoexistentPathology.Status",
+          "title": "Status",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The status of the observation",
+          "mult": "1..1",
+          "otherAllowed": false,
+          "valueSet": "",
+          "options": [
+            {
+              "code": "398166005",
+              "display": "Performed",
+              "fsn": "Performed (qualifier value)",
+              "system": "http://snomed.info/sct"
+            },
+            {
+              "code": "340841000210104",
+              "display": "Not performed",
+              "fsn": "Did not perform (qualifier value)",
+              "system": "http://snomed.info/sct"
+            },
+            {
+              "code": "385651009",
+              "display": "In progress",
+              "fsn": "In progress (qualifier value)",
+              "system": "http://snomed.info/sct"
+            }
+          ],
+          "controlHint": "drop-down",
+          "hideInQ": true,
+          "units": [],
+          "sourceModelName": "CoexistentPathology",
+          "controlType": "choice",
+          "fixedCoding": {
+            "system": "http://snomed.info/sct",
+            "code": "398166005",
+            "display": "Performed",
+            "fsn": "Performed (qualifier value)"
+          }
+        },
+        {
+          "type": [
+            "string"
+          ],
+          "path": "CoexistentPathology.Comments",
+          "description": "Plain text comments about the coexistent pathology.",
+          "mapping": "Observation.note",
+          "title": "Coexistent pathology comments",
+          "mult": "0..0",
+          "sourceModelName": "CoexistentPathology",
+          "controlType": "string",
+          "controlHint": "string",
+          "otherAllowed": false,
+          "units": [],
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "path": "CoexistentPathology.SpecimenId",
+          "type": [
+            "Identifier"
+          ],
+          "description": "An identifier of the specimen being observed.",
+          "title": "Specimen identifier",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "SpecimenObservation",
+          "controlType": "string",
+          "rules": "=Specimen.Identifier"
+        },
+        {
+          "type": [
+            "boolean"
+          ],
+          "path": "CoexistentPathology.SpecimenSentForObservation",
+          "description": "Whether or not the specimen has been sent for observation.",
+          "title": "Specimen sent for observation?",
+          "mult": "0..0",
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "SpecimenObservation",
+          "controlType": "string",
+          "units": [],
+          "hideInQ": false
+        },
+        {
+          "path": "LymphovascularInvasion.TumourIdentifier",
+          "type": [
+            "Identifier"
+          ],
+          "description": "An identifier for the tumour about which the observation is made.",
+          "title": "Tumour identifier",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "TumourObservation",
+          "controlType": "string",
+          "controlHint": "string"
+        },
+        {
+          "path": "TumourBudding.TumourIdentifier",
+          "type": [
+            "Identifier"
+          ],
+          "description": "An identifier for the tumour about which the observation is made.",
+          "title": "Tumour identifier",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "TumourObservation",
+          "controlType": "string",
+          "controlHint": "string"
+        },
+        {
+          "path": "TumourInvasion.TumourIdentifier",
+          "type": [
+            "Identifier"
+          ],
+          "description": "An identifier for the tumour about which the observation is made.",
+          "title": "Tumour identifier",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "TumourObservation",
+          "controlType": "string",
+          "controlHint": "string"
+        },
+        {
+          "path": "Ki67ProliferationIndex.TumourIdentifier",
+          "type": [
+            "Identifier"
+          ],
+          "description": "An identifier for the tumour about which the observation is made.",
+          "title": "Tumour identifier",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "HistologicTest",
+          "controlType": "string",
+          "controlHint": "string"
+        },
+        {
+          "path": "MitoticCount.TumourIdentifier",
+          "type": [
+            "Identifier"
+          ],
+          "description": "An identifier for the tumour about which the observation is made.",
+          "title": "Tumour identifier",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "HistologicTest",
+          "controlType": "string",
+          "controlHint": "string"
+        },
+        {
+          "path": "HistologicType.TumourIdentifier",
+          "type": [
+            "Identifier"
+          ],
+          "description": "An identifier for the tumour about which the observation is made.",
+          "title": "Tumour identifier",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "HistologicTest",
+          "controlType": "string",
+          "controlHint": "string"
+        },
+        {
+          "path": "MarginStatus",
+          "type": [
+            "MarginStatus"
+          ],
+          "description": "The status of the tissue on the margin of a resected specimen.",
+          "title": "Margin status",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false
+        },
+        {
+          "path": "MarginStatus.MarginDetail",
+          "type": [
+            "Group"
+          ],
+          "description": "Any relevant details about margins on a resected specimen.",
+          "title": "Margin details",
+          "units": [],
+          "mult": "0..*",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "ColorectalHistoMicroscopic",
+          "controlType": "string",
+          "originalType": [
+            "MarginDetails"
+          ]
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:DeepMarginStatus",
+          "type": [
+            "MarginDetails"
+          ],
+          "description": "Any relevant details about margins on a resected specimen.",
+          "title": "Deep margin",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "MarginStatus",
+          "controlType": "string",
+          "slicedFrom": "ColorectalHistoMicroscopic.MarginStatus.MarginDetail"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:DeepMarginStatus.Margin",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The type of margin observed.",
+          "title": "Margin",
+          "units": [],
+          "mult": "1..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "drop-down",
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "notes": "",
+          "fixedCoding": {
+            "system": "http://snomed.info/sct",
+            "code": "396265008",
+            "display": "Surgical deep margin finding",
+            "fsn": "Surgical deep margin finding (finding)"
+          }
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:DeepMarginStatus.MarginComments",
+          "type": [
+            "string"
+          ],
+          "description": "Additional free text comments about the given margin on the resected specimen.",
+          "title": "Margin comments",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "string",
+          "controlHint": "string"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:DeepMarginStatus.NatureOfTissueBetweenTumourAndMargin",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The type of tissue found between the tumour and given margin on the specimen.",
+          "title": "Nature of tissue between tumour and margin",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [
+            {
+              "code": "Fat",
+              "display": "Fat"
+            },
+            {
+              "code": "Muscle",
+              "display": "Muscle"
+            },
+            {
+              "code": "Fascia",
+              "display": "Fascia"
+            }
+          ],
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:DeepMarginStatus.DistanceToMarginMeasurement",
+          "type": [
+            "Quantity"
+          ],
+          "description": "The measurement of the distance between the deep margin and the tumour on the resected specimen.",
+          "title": "Distance to margin (measurement)",
+          "units": [
+            "mm"
+          ],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "string",
+          "controlHint": "string",
+          "fixedQuantity": {
+            "unit": "mm"
+          }
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:DeepMarginStatus.DistanceToMarginRange",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The distance range between the given margin and the tumour on the resected specimen.",
+          "title": "Distance to margin (range)",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:DeepMarginStatus.MarginQualifier",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "An additional qualification of the margin description, e.g. Proximal, Distal.",
+          "title": "MarginQualifier",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:LateralMargin",
+          "type": [
+            "MarginDetails"
+          ],
+          "description": "Any relevant details about margins on a resected specimen.",
+          "title": "Lateral margin",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "ColorectalHistoMicroscopic",
+          "controlType": "string",
+          "originalType": [
+            "MarginDetails"
+          ],
+          "slicedFrom": "ColorectalHistoMicroscopic.MarginStatus.MarginDetail"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:LateralMargin.Margin",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The type of margin observed.",
+          "title": "Margin",
+          "units": [],
+          "mult": "1..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "drop-down",
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "fixedCoding": {
+            "system": "http://snomed.info/sct",
+            "code": "396514004",
+            "display": "Surgical lateral margin finding",
+            "fsn": "Surgical lateral margin finding (finding)"
+          }
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:LateralMargin.MarginComments",
+          "type": [
+            "string"
+          ],
+          "description": "Additional free text comments about the given margin on the resected specimen.",
+          "title": "Margin comments",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "string",
+          "controlHint": "string"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:LateralMargin.NatureOfTissueBetweenTumourAndMargin",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The type of tissue found between the tumour and given margin on the specimen.",
+          "title": "Nature of tissue between tumour and margin",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [
+            {
+              "code": "Fat",
+              "display": "Fat"
+            },
+            {
+              "code": "Muscle",
+              "display": "Muscle"
+            },
+            {
+              "code": "Fascia",
+              "display": "Fascia"
+            }
+          ],
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:LateralMargin.DistanceToMarginMeasurement",
+          "type": [
+            "Quantity"
+          ],
+          "description": "The measurement of the distance between the lateral margin and the tumour on the resected specimen.",
+          "title": "Distance to margin (measurement)",
+          "units": [
+            "mm"
+          ],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "string",
+          "controlHint": "string",
+          "fixedQuantity": {
+            "unit": "mm"
+          }
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:LateralMargin.DistanceToMarginRange",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The distance range between the given margin and the tumour on the resected specimen.",
+          "title": "Distance to margin (range)",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:LongitudinalMarginDetails",
+          "type": [
+            "MarginDetails"
+          ],
+          "description": "Any relevant details about margins on a resected specimen.",
+          "title": "Longitudinal margin",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "ColorectalHistoMicroscopic",
+          "controlType": "string",
+          "originalType": [
+            "MarginDetails"
+          ],
+          "slicedFrom": "ColorectalHistoMicroscopic.MarginStatus.MarginDetail"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:LongitudinalMarginDetails.MarginComments",
+          "type": [
+            "string"
+          ],
+          "description": "Additional free text comments about the given margin on the resected specimen.",
+          "title": "Margin comments",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "string",
+          "controlHint": "string"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:LongitudinalMarginDetails.NatureOfTissueBetweenTumourAndMargin",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The type of tissue found between the tumour and given margin on the specimen.",
+          "title": "Nature of tissue between tumour and margin",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [
+            {
+              "code": "Fat",
+              "display": "Fat"
+            },
+            {
+              "code": "Muscle",
+              "display": "Muscle"
+            },
+            {
+              "code": "Fascia",
+              "display": "Fascia"
+            }
+          ],
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:LongitudinalMarginDetails.MarginQualifier",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "An additional qualification of the margin description, e.g. Proximal, Distal.",
+          "title": "Proximal or distal?",
+          "units": [],
+          "mult": "0..*",
+          "hideInQ": false,
+          "options": [
+            {
+              "code": "396269002",
+              "display": "Surgical distal margin finding",
+              "fsn": "Surgical distal margin finding (finding)"
+            },
+            {
+              "code": "396267000",
+              "display": "Surgical proximal margin finding",
+              "fsn": "Surgical proximal margin finding (finding)"
+            }
+          ],
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down",
+          "otherAllowed": false
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:LongitudinalMarginDetails.DistanceToMarginMeasurement",
+          "type": [
+            "Quantity"
+          ],
+          "description": "The measurement of the distance between the closest longitudinal margin and the tumour on the resected specimen.",
+          "title": "Distance to closest margin (measurement)",
+          "units": [
+            "mm"
+          ],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "string",
+          "controlHint": "string",
+          "fixedQuantity": {
+            "unit": "mm"
+          }
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:LongitudinalMarginDetails.MarginStatus",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "Whether or not this margin of the resected specimen is involved in the given tumour.",
+          "title": "Margin status",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "valueSet": "canshare-AJCC-residual-tumour",
+          "controlHint": "drop-down",
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:LongitudinalMarginDetails.DistanceToMarginRange",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The distance range between the closest longitudinal margin and the tumour on the resected specimen.",
+          "title": "Distance to closest margin (range)",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:CircumferentialMarginDetail",
+          "type": [
+            "MarginDetails"
+          ],
+          "description": "Any relevant details about the circumferential margin on the resected specimen.",
+          "title": "Circumferential margin",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "ColorectalHistoMicroscopic",
+          "controlType": "string",
+          "originalType": [
+            "MarginDetails"
+          ],
+          "slicedFrom": "ColorectalHistoMicroscopic.MarginStatus.MarginDetail"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:CircumferentialMarginDetail.MarginComments",
+          "type": [
+            "string"
+          ],
+          "description": "Additional free text comments about the margin involvement (other than the tumour) in the resected specimen.",
+          "title": "Comments on margin involvement (other than the tumour)",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "string",
+          "controlHint": "string"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:CircumferentialMarginDetail.DistanceToMarginRange",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The distance range between the given margin and the tumour on the resected specimen.",
+          "title": "Distance to margin (range)",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:CircumferentialMarginDetail.NatureOfTissueBetweenTumourAndMargin",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The type of tissue found between the tumour and given margin on the specimen.",
+          "title": "Nature of tissue between tumour and margin",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [
+            {
+              "code": "Fat",
+              "display": "Fat"
+            },
+            {
+              "code": "Muscle",
+              "display": "Muscle"
+            },
+            {
+              "code": "Fascia",
+              "display": "Fascia"
+            }
+          ],
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:CircumferentialMarginDetail.DistanceToMarginMeasurement",
+          "type": [
+            "Quantity"
+          ],
+          "description": "The measurement of the distance between the given margin and the tumour on the resected specimen.",
+          "title": "Distance to margin measurement",
+          "units": [
+            "mm",
+            "cm"
+          ],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "MarginDetails",
+          "controlType": "string",
+          "controlHint": "string"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:CircumferentialMarginDetail.MarginStatus",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "Whether or not this margin of the resected specimen is involved (<=1mm) in the given tumour.",
+          "title": "Margin status",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "valueSet": "canshare-AJCC-residual-tumour",
+          "controlHint": "drop-down",
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:CircumferentialMarginDetail.MarginQualifier",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "An indication of whether the involvement (<=1mm) is by the primary tumour or other.",
+          "title": "Primary tumour or other?",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:CircumferentialMarginDetail.Margin",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The type of margin observed.",
+          "title": "Margin",
+          "units": [],
+          "mult": "1..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "drop-down",
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "fixedCoding": {
+            "system": "http://snomed.info/sct",
+            "code": "396271002",
+            "display": "Surgical circumferential margin finding",
+            "fsn": "Surgical circumferential margin finding (finding)"
+          }
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:LateralMargin.MarginStatus",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "Whether or not this margin of the resected specimen is involved in the given tumour.",
+          "title": "Margin status",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "valueSet": "canshare-AJCC-residual-tumour",
+          "controlHint": "drop-down",
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:LateralMargin.MarginQualifier",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The type of the lateral margin.",
+          "title": "Lateral margin type",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice",
+          "controlHint": "drop-down",
+          "notes": "TO DO: Change to only Other text."
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:DeepMarginStatus.MarginStatus",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "Whether or not this margin of the resected specimen is involved in the given tumour.",
+          "title": "Margin status",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "valueSet": "canshare-AJCC-residual-tumour",
+          "controlHint": "drop-down",
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice"
+        },
+        {
+          "path": "MarginStatus.MarginDetail.slice:LongitudinalMarginDetails.Margin",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The type of margin observed.",
+          "title": "Margin",
+          "units": [],
+          "mult": "1..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "drop-down",
+          "sourceModelName": "MarginDetails",
+          "controlType": "choice"
+        },
+        {
+          "path": "LymphNodeStatusGI",
+          "type": [
+            "LymphNodeStatusGI"
+          ],
+          "title": "Lymph node status",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "path": "NeoadjuvantTherapyResponse",
+          "type": [
+            "NeoadjuvantTherapyResponse"
+          ],
+          "description": "An assessment of the response to neoadjuvant therapy.",
+          "title": "Neoadjuvant therapy response",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "path": "NeoadjuvantTherapyResponse.Component",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "NeoadjuvantTherapyResponse.Status",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "Whether or not there was a response to the neoadjuvant therapy.",
+          "title": "Status",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [
+            {
+              "pt": "Cannot be assessed",
+              "code": "Cannot be assessed",
+              "display": "Cannot be assessed"
+            },
+            {
+              "code": "Assessed",
+              "display": "Assessed"
+            }
+          ],
+          "otherAllowed": false,
+          "controlHint": "drop-down",
+          "sourceModelName": "NeoadjuvantTherapyResponse",
+          "controlType": "choice"
+        },
+        {
+          "path": "NeoadjuvantTherapyResponse.ScoringSystem",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The system (including version) used to score the patient's response to neoadjuvant therapy.",
+          "title": "Scoring system",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [
+            {
+              "pt": "Modified Ryan",
+              "code": "Modified Ryan",
+              "display": "Modified Ryan"
+            },
+            {
+              "pt": "Other",
+              "code": "Other",
+              "display": "Other"
+            }
+          ],
+          "otherAllowed": false,
+          "sourceModelName": "NeoadjuvantTherapyResponse",
+          "controlType": "choice",
+          "controlHint": "drop-down",
+          "enableWhen": [
+            {
+              "source": "ColorectalHistoMicroscopic.NeoadjuvantTherapyResponse.Status",
+              "operator": "=",
+              "value": {
+                "code": "Assessed",
+                "display": "Assessed"
+              }
+            }
+          ],
+          "notes": "TO DO: Add value set with 'Modified Ryan' and 'Other'."
+        },
+        {
+          "path": "NeoadjuvantTherapyResponse.Score",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The score used to indicate the patient's response to neoadjuvant therapy, as scored using a standardised neoadjuvant response scoring system.",
+          "title": "Neoadjuvant therapy response score",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "NeoadjuvantTherapyResponse",
+          "controlType": "choice",
+          "controlHint": "drop-down",
+          "enableWhen": [
+            {
+              "source": "ColorectalHistoMicroscopic.NeoadjuvantTherapyResponse.ScoringSystem",
+              "operator": "=",
+              "value": {
+                "pt": "Modified Ryan",
+                "code": "Modified Ryan",
+                "display": "Modified Ryan"
+              }
+            }
+          ],
+          "valueSet": "canshare-modified-ryan-score"
+        },
+        {
+          "path": "NeoadjuvantTherapyResponse.OtherScore",
+          "type": [
+            "string"
+          ],
+          "description": "The score used to indicate the patient's response to neoadjuvant therapy, as scored using another neoadjuvant response scoring system that is not listed.",
+          "title": "Neoadjuvant response score (text)",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "NeoadjuvantTherapyResponse",
+          "controlType": "string",
+          "enableWhen": [
+            {
+              "source": "ColorectalHistoMicroscopic.NeoadjuvantTherapyResponse.Status",
+              "operator": "=",
+              "value": {
+                "code": "Assessed",
+                "display": "Assessed"
+              }
+            },
+            {
+              "source": "ColorectalHistoMicroscopic.NeoadjuvantTherapyResponse.ScoringSystem",
+              "operator": "=",
+              "value": {
+                "pt": "Other",
+                "code": "Other",
+                "display": "Other"
+              }
+            }
+          ]
+        },
+        {
+          "path": "NeoadjuvantTherapyResponse.Comments",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "MicroscopicFindings",
+          "type": [
+            "HistologicTest"
+          ],
+          "description": "The examination of tissues and/or cells under a microscope to diagnose and study diseases of the tissues.",
+          "title": "Microscopic findings",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "path": "MicroscopicFindings.TumourIdentifier",
+          "type": [
+            "Identifier"
+          ],
+          "description": "An identifier for the tumour about which the observation is made.",
+          "title": "Tumour identifier",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "HistologicTest",
+          "controlType": "string",
+          "controlHint": "string",
+          "rules": "=Tumour.Identifier"
+        },
+        {
+          "type": [
+            "boolean"
+          ],
+          "path": "MicroscopicFindings.SpecimenSentForObservation",
+          "description": "Whether or not the specimen has been sent for observation.",
+          "title": "Specimen sent for observation?",
+          "mult": "0..0",
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "SpecimenObservation",
+          "controlType": "string",
+          "units": [],
+          "hideInQ": false
+        },
+        {
+          "path": "MicroscopicFindings.SpecimenId",
+          "type": [
+            "Identifier"
+          ],
+          "description": "An identifier of the specimen being observed.",
+          "title": "Specimen identifier",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "SpecimenObservation",
+          "controlType": "string",
+          "rules": "=Specimen.Identifier"
+        },
+        {
+          "type": [
+            "string"
+          ],
+          "path": "MicroscopicFindings.Comments",
+          "description": "Additional free text comments about the microscopic findings.",
+          "mapping": "Observation.note",
+          "title": "Additional comments",
+          "mult": "0..1",
+          "sourceModelName": "Observation",
+          "controlType": "string",
+          "controlHint": "string",
+          "units": [],
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "path": "MicroscopicFindings.PerformedBy.HealthWorkerRole.FacilityId",
+          "type": [
+            "Identifier"
+          ],
+          "description": "The identifier of the healthcare facility at which the practitioner works in this role.",
+          "title": "Facility identifier",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "HealthcarePractitioner",
+          "controlType": "string",
+          "controlHint": "string"
+        },
+        {
+          "type": [
+            "HealthcarePractitionerSummary"
+          ],
+          "path": "MicroscopicFindings.PerformedBy",
+          "description": "A person responsible for performing the observation.",
+          "mapping": "Observation.performer",
+          "title": "Performed by",
+          "mult": "0..0",
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "Observation",
+          "controlType": "string",
+          "units": [],
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "status": "new",
+          "path": "MicroscopicFindings.Status",
+          "title": "Status",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The status of the observation",
+          "mult": "1..1",
+          "otherAllowed": false,
+          "valueSet": "",
+          "options": [
+            {
+              "code": "398166005",
+              "display": "Performed",
+              "fsn": "Performed (qualifier value)",
+              "system": "http://snomed.info/sct"
+            }
+          ],
+          "controlHint": "drop-down",
+          "hideInQ": true,
+          "units": [],
+          "sourceModelName": "Observation",
+          "controlType": "choice",
+          "fixedCoding": {
+            "system": "http://snomed.info/sct",
+            "code": "398166005",
+            "display": "Performed",
+            "fsn": "Performed (qualifier value)"
+          }
+        },
+        {
+          "type": [
+            "CodeableConcept"
+          ],
+          "path": "MicroscopicFindings.Code",
+          "description": "The type of observation made.",
+          "title": "Type",
+          "mult": "1..1",
+          "valueSet": "canshare-observation",
+          "otherAllowed": false,
+          "controlHint": "drop-down",
+          "sourceModelName": "HistologicTest",
+          "controlType": "choice",
+          "units": [],
+          "hideInQ": true,
+          "fixedCoding": {
+            "system": "http://snomed.info/sct",
+            "code": "395527009",
+            "display": "Microscopic specimen observable",
+            "fsn": "Microscopic specimen observable (observable entity)"
+          },
+          "options": []
+        },
+        {
+          "type": [
+            "CodeableConcept"
+          ],
+          "path": "MicroscopicFindings.Method",
+          "description": "The technique, procedure, or system used to perform the observation.",
+          "mapping": "Observation.method",
+          "title": "Method",
+          "mult": "0..0",
+          "otherAllowed": false,
+          "sourceModelName": "Observation",
+          "controlType": "choice",
+          "controlHint": "drop-down",
+          "units": [],
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "type": [
+            "dateTime"
+          ],
+          "path": "MicroscopicFindings.Date",
+          "description": "The date and/or time that the observation was performed.",
+          "mapping": "Observation.effective[dateTime]",
+          "title": "Date",
+          "mult": "0..0",
+          "otherAllowed": false,
+          "sourceModelName": "Observation",
+          "controlType": "dateTime",
+          "controlHint": "dateTime",
+          "units": [],
           "hideInQ": false,
           "options": []
         }
@@ -21862,6 +23672,27 @@
         },
         {
           "path": "CoexistentPathology",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "MarginStatus",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "LymphNodeStatusGI",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "NeoadjuvantTherapyResponse",
           "mult": "0..0",
           "type": [
             "string"
@@ -27497,6 +29328,668 @@
       "status": "new",
       "author": "linda@bellbirdinformatics.com",
       "active": true
+    },
+    "MarginDetails": {
+      "kind": "dg",
+      "diff": [
+        {
+          "path": "SpecimenSentForObservation",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "TumourIdentifier",
+          "type": [
+            "Identifier"
+          ],
+          "description": "An identifier for the tumour about which the observation is made.",
+          "rules": "= MarginStatus.TumourIdentifier",
+          "title": "Tumour identifier",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string"
+        },
+        {
+          "path": "Margin",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The type of margin observed.",
+          "title": "Margin",
+          "units": [],
+          "mult": "1..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginStatus",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "Whether or not this margin of the resected specimen is involved in the given tumour.",
+          "title": "MarginStatus",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "valueSet": "canshare-AJCC-residual-tumour",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "MarginQualifier",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "An additional qualification of the margin description, e.g. Proximal, Distal.",
+          "title": "MarginQualifier",
+          "units": [],
+          "mult": "0..*",
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "path": "DistanceToMarginRange",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The distance range between the given margin and the tumour on the resected specimen.",
+          "title": "Distance to margin (range)",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false
+        },
+        {
+          "path": "DistanceToMarginMeasurement",
+          "type": [
+            "Quantity"
+          ],
+          "description": "The measurement of the distance between the given margin and the tumour on the resected specimen.",
+          "title": "Distance to margin (measurement)",
+          "units": [
+            "mm",
+            "cm"
+          ],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string"
+        },
+        {
+          "path": "NatureOfTissueBetweenTumourAndMargin",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The type of tissue found between the tumour and given margin on the specimen.",
+          "title": "Nature of tissue between tumour and margin",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [
+            {
+              "code": "Fat",
+              "display": "Fat"
+            },
+            {
+              "code": "Muscle",
+              "display": "Muscle"
+            },
+            {
+              "code": "Fascia",
+              "display": "Fascia"
+            }
+          ]
+        },
+        {
+          "path": "Comments",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "MarginComments",
+          "type": [
+            "string"
+          ],
+          "description": "Additional free text comments about the given margin on the resected specimen.",
+          "title": "Margin comments",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false
+        },
+        {
+          "type": [
+            "CodeableConcept"
+          ],
+          "path": "Method",
+          "description": "The technique, procedure, or system used to perform the observation.",
+          "mapping": "Observation.method",
+          "title": "Method",
+          "mult": "0..0",
+          "otherAllowed": false,
+          "sourceModelName": "Observation",
+          "controlType": "choice",
+          "controlHint": "drop-down",
+          "units": [],
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "type": [
+            "dateTime"
+          ],
+          "path": "Date",
+          "description": "The date and/or time that the observation was performed.",
+          "mapping": "Observation.effective[dateTime]",
+          "title": "Date",
+          "mult": "0..0",
+          "otherAllowed": false,
+          "sourceModelName": "Observation",
+          "controlType": "dateTime",
+          "controlHint": "dateTime",
+          "units": [],
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "type": [
+            "HealthcarePractitionerSummary"
+          ],
+          "path": "PerformedBy",
+          "description": "A person responsible for performing the observation.",
+          "mapping": "Observation.performer",
+          "title": "Performed by",
+          "mult": "0..0",
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "Observation",
+          "controlType": "string",
+          "units": [],
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "type": [
+            "CodeableConcept"
+          ],
+          "path": "Code",
+          "description": "The type of observation made.",
+          "title": "Type",
+          "mult": "1..1",
+          "valueSet": "canshare-observation",
+          "otherAllowed": false,
+          "controlHint": "drop-down",
+          "sourceModelName": "Observation",
+          "controlType": "choice",
+          "notes": "TO DO: Fixed value",
+          "units": [],
+          "hideInQ": true,
+          "options": []
+        },
+        {
+          "status": "new",
+          "path": "Status",
+          "title": "Status",
+          "type": [
+            "CodeableConcept"
+          ],
+          "description": "The status of the observation",
+          "mult": "1..1",
+          "otherAllowed": false,
+          "valueSet": "",
+          "options": [
+            {
+              "code": "398166005",
+              "display": "Performed",
+              "fsn": "Performed (qualifier value)",
+              "system": "http://snomed.info/sct"
+            },
+            {
+              "code": "340841000210104",
+              "display": "Not performed",
+              "fsn": "Did not perform (qualifier value)",
+              "system": "http://snomed.info/sct"
+            },
+            {
+              "code": "385651009",
+              "display": "In progress",
+              "fsn": "In progress (qualifier value)",
+              "system": "http://snomed.info/sct"
+            }
+          ],
+          "controlHint": "drop-down",
+          "hideInQ": true,
+          "units": [],
+          "sourceModelName": "Observation",
+          "controlType": "choice",
+          "fixedCoding": {
+            "system": "http://snomed.info/sct",
+            "code": "398166005",
+            "display": "Performed",
+            "fsn": "Performed (qualifier value)"
+          }
+        },
+        {
+          "path": "SpecimenId",
+          "type": [
+            "Identifier"
+          ],
+          "description": "An identifier of the specimen being observed.",
+          "title": "Specimen identifier",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": true,
+          "options": [],
+          "otherAllowed": false,
+          "controlHint": "string",
+          "sourceModelName": "SpecimenObservation",
+          "controlType": "string",
+          "rules": "= MarginStatus.SpecimenIdentifier"
+        }
+      ],
+      "parent": "SpecimenObservation",
+      "name": "MarginDetails",
+      "title": "Margin details",
+      "description": "Details about a particular margin on a resected specimen.",
+      "status": "new",
+      "author": "linda@bellbirdinformatics.com",
+      "active": true
+    },
+    "SpecimenRef": {
+      "kind": "dg",
+      "diff": [],
+      "parent": "Specimen",
+      "name": "SpecimenRef",
+      "title": "Specimen reference",
+      "description": "A reference to a specimen collected from a patient.",
+      "status": "new",
+      "author": "linda@bellbirdinformatics.com",
+      "active": true
+    },
+    "TreatmentRequestDetails": {
+      "kind": "dg",
+      "diff": [],
+      "parent": "RequestDetails",
+      "name": "TreatmentRequestDetails",
+      "title": "Treatment request details",
+      "description": "The administrative details on a treatment request.",
+      "status": "new",
+      "author": "natasha.hope@teaho.govt.nz",
+      "active": true
+    },
+    "LymphNodeStatusGI": {
+      "kind": "dg",
+      "diff": [
+        {
+          "path": "TumourDeposits",
+          "type": [
+            "CodeableConcept"
+          ],
+          "title": "Tumour deposits",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [
+            {
+              "pt": "Not identified",
+              "code": "Not identified",
+              "display": "Not identified"
+            },
+            {
+              "pt": "Present",
+              "code": "Present",
+              "display": "Present"
+            }
+          ],
+          "otherAllowed": false,
+          "description": "Whether or not tumour deposits are present in the lymphatic drainage bed of the (primary) tumour.",
+          "controlHint": "drop-down"
+        },
+        {
+          "path": "TumourDepositQuantity",
+          "type": [
+            "integer"
+          ],
+          "title": "Number of tumour deposits",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false,
+          "enableWhen": [
+            {
+              "source": "LymphNodeStatusGI.TumourDeposits",
+              "operator": "=",
+              "value": {
+                "pt": "Present",
+                "code": "Present",
+                "display": "Present"
+              }
+            }
+          ],
+          "description": "The number of tumour deposits that are present in the lymphatic drainage bed of the (primary) tumour.",
+          "controlHint": "string"
+        },
+        {
+          "path": "NodeLevel",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "LymphNodeInvolvementStatus",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        },
+        {
+          "path": "LymphNodesInvolvedCountableStatus",
+          "mult": "0..0",
+          "type": [
+            "string"
+          ]
+        }
+      ],
+      "parent": "LymphNodeStatus",
+      "name": "LymphNodeStatusGI",
+      "title": "Lymph node status (gastrointestinal)",
+      "description": "Whether or not lymph nodes are involved in a gastrointestinal cancer diagnosis and if so relevant information about their involvement.",
+      "status": "new",
+      "author": "linda@bellbirdinformatics.com",
+      "active": true
+    },
+    "SectionPatientDetails": {
+      "kind": "dg",
+      "diff": [
+        {
+          "path": "Patient",
+          "type": [
+            "Patient"
+          ],
+          "description": "A short summary of the main identifying details for a patient.",
+          "title": "Patient",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false
+        },
+        {
+          "path": "Patient.ContactInformation",
+          "type": [
+            "NZContactDetails"
+          ],
+          "description": "The method of electronic communication to be used to contact the patient",
+          "notes": "",
+          "title": "ContactInformation",
+          "units": [],
+          "mult": "0..0",
+          "hideInQ": false,
+          "sourceReference": "HISO 10046:2023 Consumer Health Identity Standard",
+          "options": [],
+          "otherAllowed": false,
+          "sourceModelName": "Patient",
+          "controlType": "string",
+          "controlHint": "string"
+        },
+        {
+          "type": [
+            "code"
+          ],
+          "path": "Patient.Language",
+          "description": "A code representing a language spoken or understood by the person",
+          "title": "Language",
+          "mult": "0..0",
+          "sourceReference": "hiso-10046-2023-consumer-health-identity-standard-20230828",
+          "otherAllowed": false,
+          "sourceModelName": "Patient",
+          "controlType": "string",
+          "controlHint": "string",
+          "units": [],
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "type": [
+            "Group"
+          ],
+          "path": "Patient.DeathInformation",
+          "description": "Information on patient death",
+          "title": "DeathInformation",
+          "mult": "0..0",
+          "otherAllowed": false,
+          "sourceModelName": "Patient",
+          "controlType": "string",
+          "controlHint": "string",
+          "units": [],
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "type": [
+            "Group"
+          ],
+          "path": "Patient.NZResidencyCitizenship",
+          "description": "New Zealand residency and citizenship details",
+          "title": "New Zealand residency and citizenship",
+          "mult": "0..0",
+          "sourceReference": "hiso-10046-2023-consumer-health-identity-standard-20230828",
+          "otherAllowed": false,
+          "sourceModelName": "Patient",
+          "controlType": "string",
+          "controlHint": "string",
+          "units": [],
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "type": [
+            "string"
+          ],
+          "path": "Patient.MotherBirthName",
+          "description": "The full name of the person’s mother at the time of the mother’s birth",
+          "title": "Mother’s birth name",
+          "mult": "0..0",
+          "otherAllowed": false,
+          "sourceModelName": "Patient",
+          "controlType": "string",
+          "controlHint": "string",
+          "units": [],
+          "hideInQ": false,
+          "options": []
+        }
+      ],
+      "parent": "SectionGeneral",
+      "name": "SectionPatientDetails",
+      "title": "Patient details",
+      "description": "A short summary of the main identifying details for a patient, as seen on a CanShare form.",
+      "status": "new",
+      "author": "linda@bellbirdinformatics.com",
+      "active": true
+    },
+    "SectionROCAdministration": {
+      "kind": "dg",
+      "diff": [
+        {
+          "path": "Administration",
+          "type": [
+            "CarePlanDetails"
+          ],
+          "description": "Administration details relevant to a radiation oncology treatment summary.",
+          "title": "Administration",
+          "units": [],
+          "mult": "1..1",
+          "hideInQ": false,
+          "options": []
+        }
+      ],
+      "parent": "SectionRadiationOncology",
+      "name": "SectionROCAdministration",
+      "title": "Administration (radiation oncology)",
+      "description": "Administration details relevant to a radiation oncology treatment summary form.",
+      "status": "new",
+      "author": "linda@bellbirdinformatics.com",
+      "active": true
+    },
+    "SectionROCDiagnosis": {
+      "kind": "dg",
+      "diff": [
+        {
+          "path": "PrimaryCancerDiagnosis",
+          "type": [
+            "PrimaryCancerDiagnosis"
+          ],
+          "description": "A primary cancer condition that is diagnosed in the patient (either clinically or pathologically). For solid cancers, this is the original or first neoplasm in the body. For haematologic cancers, this is the original cancer type in the body. This also includes cancers of uncertain origin or behaviour.",
+          "title": "Primary cancer diagnosis",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": []
+        },
+        {
+          "path": "HistologicType",
+          "type": [
+            "HistologicType"
+          ],
+          "description": "A categorisation of the physical features of the cells and their surrounding tissue as seen under a microscope.",
+          "title": "Histologic type",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": []
+        }
+      ],
+      "parent": "SectionRadiationOncology",
+      "name": "SectionROCDiagnosis",
+      "title": "Diagnosis (radiation oncology)",
+      "description": "Diagnosis details relevant to a radiation oncology treatment summary form.",
+      "status": "new",
+      "author": "natasha.hope@teaho.govt.nz",
+      "active": true
+    },
+    "SectionROCStaging": {
+      "kind": "dg",
+      "diff": [
+        {
+          "path": "StagingAJCCClinical",
+          "type": [
+            "StagingAJCCClinical"
+          ],
+          "description": "Clinical TNM staging using the AJCC staging manual.",
+          "title": "Clinical TNM staging",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false
+        },
+        {
+          "path": "StagingAJCCPathological",
+          "type": [
+            "StagingAJCCPathological"
+          ],
+          "description": "Pathological TNM staging using the AJCC staging manual.",
+          "title": "Pathological TNM staging",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false
+        }
+      ],
+      "parent": "SectionRadiationOncology",
+      "name": "SectionROCStaging",
+      "title": "Staging (radiation oncology)",
+      "description": "TNM staging using the AJCC staging manual, which is relevant to a radiation oncology treatment summary form.",
+      "status": "new",
+      "author": "natasha.hope@teaho.govt.nz",
+      "active": true
+    },
+    "SectionROCTreatmentCourse": {
+      "kind": "dg",
+      "diff": [
+        {
+          "path": "ECOGStatus",
+          "type": [
+            "ECOGStatus"
+          ],
+          "description": "The performance status of a patient as defined by the Eastern Cooperative Oncology Group (ECOG).",
+          "title": "ECOG status",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false
+        },
+        {
+          "path": "ROCTherapy",
+          "type": [
+            "ROCTherapy"
+          ],
+          "description": "A single course of radiation therapy.",
+          "title": "Radiation therapy course",
+          "units": [],
+          "mult": "0..1",
+          "hideInQ": false,
+          "options": [],
+          "otherAllowed": false
+        }
+      ],
+      "parent": "SectionRadiationOncology",
+      "name": "SectionROCTreatmentCourse",
+      "title": "Treatment course (radiation oncology)",
+      "description": "Details about the treatment course(s) relevant to a radiation oncology treatment summary form.",
+      "status": "new",
+      "author": "natasha.hope@teaho.govt.nz",
+      "active": true
+    },
+    "ColorectalEndoResectionHistoMicroscopic": {
+      "kind": "dg",
+      "diff": [],
+      "parent": "ColorectalResectionHistoMicroscopic",
+      "name": "ColorectalEndoResectionHistoMicroscopic",
+      "title": "Microscopic findings (colorectal histopathology endoscopic resection report)",
+      "description": "Observations on a specimen that are only visible under a microscope, as documented on a colorectal endoscopic resection histopathology report.",
+      "status": "new",
+      "author": "linda@bellbirdinformatics.com",
+      "active": true
+    },
+    "ColorectalOpResectionHistoMicroscopic": {
+      "kind": "dg",
+      "diff": [],
+      "parent": "ColorectalResectionHistoMicroscopic",
+      "description": "Observations on a specimen that are only visible under a microscope, as documented on a colorectal operative resection histopathology report.",
+      "name": "ColorectalOpResectionHistoMicroscopic",
+      "title": "Microscopic findings (colorectal histopathology operative resection report)",
+      "status": "new",
+      "author": "linda@bellbirdinformatics.com",
+      "active": true
+    },
+    "ColorectalMetaResectionHistoMicroscopic": {
+      "kind": "dg",
+      "diff": [],
+      "parent": "ColorectalHistoMicroscopic",
+      "description": "Observations on a specimen that are only visible under a microscope, as documented on a colorectal metastectomy histopathology report.",
+      "title": "Microscopic findings (colorectal histopathology metastectomy resection report)",
+      "name": "ColorectalMetaResectionHistoMicroscopic",
+      "status": "new",
+      "author": "linda@bellbirdinformatics.com",
+      "active": true
     }
   },
   "comp": {
@@ -28207,7 +30700,8 @@
       "meta": {
         "tumourStream": "Gastrointestinal",
         "category": "histopathology report"
-      }
+      },
+      "checkedOut": "linda@bellbirdinformatics.com"
     },
     "HistopathologyRequestColorectalSurveillance": {
       "kind": "comp",
@@ -29046,14 +31540,32 @@
           "name": "PatientDetails",
           "title": "Patient details",
           "mult": "1..1",
-          "items": []
+          "items": [
+            {
+              "name": "SectionPatientDetails",
+              "title": "Patient details",
+              "mult": "0..1",
+              "type": [
+                "SectionPatientDetails"
+              ]
+            }
+          ]
         },
         {
           "kind": "section",
           "name": "Administration",
           "title": "Administration",
           "mult": "1..1",
-          "items": []
+          "items": [
+            {
+              "name": "SectionROCAdministration",
+              "title": "Administration (radiation oncology)",
+              "mult": "0..1",
+              "type": [
+                "SectionROCAdministration"
+              ]
+            }
+          ]
         },
         {
           "kind": "section",
@@ -29079,8 +31591,10 @@
       ],
       "description": "A summary of the courses of radiation treatment for a given cancer diagnosis.",
       "updated": true,
-      "checkedOut": "linda@bellbirdinformatics.com",
-      "meta": {}
+      "meta": {
+        "category": "Treatment summary",
+        "procedure": "Radiation therapy"
+      }
     }
   }
 }

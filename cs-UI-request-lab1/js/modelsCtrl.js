@@ -6,7 +6,7 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
 
-        
+
 
             //$scope.version = "0.6.12"
             $scope.version = utilsSvc.getVersion()
@@ -48,6 +48,7 @@ angular.module("pocApp")
             }
             //temp validateModel()  //this will have an alert for all circular references - potentially a lot...
             //todo need a better validation ?
+
             $scope.input.types = $localStorage.world.dataGroups  //<<<< temp
 
 
@@ -79,8 +80,7 @@ angular.module("pocApp")
 
             } else {
                 if (confirm("There don't appear to be any local DG's. Would you like to refresh from the Library?")) {
-                    //$localStorage.world = {dataGroups:{},compositions:{}}
-                    //$scope.hashAllDG = $localStorage.world.dataGroups
+
                     let qry = '/model/allDG'
                     $http.get(qry).then(
                         function (data) {
@@ -93,6 +93,7 @@ angular.module("pocApp")
                                 }
 
                             })
+                            alert("All datagroups have been downloaded. To access compositions, click the Library button at the top of the screen, then the Compositions tab and select the Compositions you wish to view")
 
                         })
                 } else {
@@ -1205,7 +1206,7 @@ angular.module("pocApp")
                 $scope.xref = modelsSvc.getReferencedModels($scope.hashAllDG,$scope.hashAllCompositions)
 
                 //updates to DG made over the ones in the code
-                $scope.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG, $scope.xref )
+                // no longer used $scope.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG, $scope.xref )
 
             }
             $scope.refreshUpdates()
@@ -1290,11 +1291,11 @@ angular.module("pocApp")
 
             //Generate a bundle of SD's to save on a FHIR server
             //each model (comp or dg) will be an SD
-            $scope.makeBundle = function () {
+            $scope.makeBundleDEP = function () {
                 $scope.lmBundle = modelsSvc.createLMBundle($localStorage.world)
             }
 
-            $scope.validateBundle = function (bundle) {
+            $scope.validateBundleDEP = function (bundle) {
                 delete $scope.lmValidate
                 let qry = "http://hapi.fhir.org/baseR4/Bundle/$validate"
                 $http.post(qry,bundle).then(
@@ -1461,7 +1462,7 @@ angular.module("pocApp")
 
             }
 
-            $scope.updateFullModelShow = function () {
+            $scope.updateFullModelShowDEP = function () {
                 //when the 'show full model' checkbox is checked
                 delete $scope.selectedNode
                 $timeout(function(){
@@ -1593,7 +1594,9 @@ angular.module("pocApp")
                 if (dg) {
                     traceSvc.addAction({action:'select',model:dg})
 
-                    $scope.dgAudit = modelDGSvc.auditDGDiff(dg,$scope.hashAllDG)
+                    //note to self - there is a lot of audit stuff that is likely
+                    //not needed now 'cause we trap recursive references. If there appears to be a need, perhaps a separate invokable command...
+                    // temp - not using the audit now I think$scope.dgAudit = modelDGSvc.auditDGDiff(dg,$scope.hashAllDG)
 
 
                     /* not sure about these 'errors' - seem to be many false positives.
@@ -1605,6 +1608,7 @@ angular.module("pocApp")
                     clearB4Select()
                     $scope.selectedModel = dg
 
+                    /* - not really using version count at present.
                     //get the count of the  versions. May not need this.
                     let url = `/model/DG/${dg.name}/history/count`
                     $http.get(url).then(
@@ -1612,8 +1616,9 @@ angular.module("pocApp")
                             $scope.historyCount = data.data
                         }
                     )
+                    */
 
-                    //get the FSH for this DG
+                    //get the profile FSH for this DG
                     delete $scope.input.dgFsh
                     let url1 = `/fsh/DG/${dg.name}`
                     $http.get(url1).then(
@@ -1622,8 +1627,8 @@ angular.module("pocApp")
                             $scope.$broadcast('dgSelected')     //so the FSH can be re-drawn
                             //console.log(data.data)
                         }, function (err) {
-                            $scope.$broadcast('dgSelected')
-                            //console.log(err.data)
+                            //why do this on error??? $scope.$broadcast('dgSelected')
+                            console.log(err.data)
                         }
                     )
 
@@ -1646,8 +1651,9 @@ angular.module("pocApp")
                     )
 
 
-                    $scope.refreshUpdates()     //update the xref and the list of all updates
+                    $scope.refreshUpdates()     //update the xref
 
+                    /* not using overides
                     //create the list of override elements
                     $scope.overrides = []
                     //$scope.directElements = {}    //elements directly on the DG. These can have fixed values
@@ -1657,12 +1663,15 @@ angular.module("pocApp")
                             $scope.overrides.push(ed)
                         }
                     })
+                    */
 
                     $scope.refreshFullList(dg)      //the complete list of elements for this DG + graph & Q
                 }
 
             }
 
+
+            //this is the DG graph
             function makeGraph() {
 
                 let container = document.getElementById('graph');
@@ -1736,19 +1745,7 @@ angular.module("pocApp")
                     delete $scope.ewSourceValues
                     delete $scope.input.ewSource
                     delete $scope.input.ewSourceValue
-                    //delete $scope.ewSourceValues
 
-                    /* no longer supporting this way of setting EW
-                    $scope.ewSourcesThisElement = []
-                    if ($scope.ewSources) {
-                        $scope.ewSources.forEach(function (item) {
-                            if (item.ed.path !== $scope.selectedNode.data.ed.path) {
-                                $scope.ewSourcesThisElement.push(item)
-                            }
-                        })
-                    }
-
-*/
 
 
                     $scope.$digest();       //as the event occurred outside of angular...
