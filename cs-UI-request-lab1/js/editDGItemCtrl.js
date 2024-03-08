@@ -593,6 +593,7 @@ angular.module("pocApp")
             $scope.addOption = function () {
                 $scope.options = $scope.options || []
 
+
                 let code = $scope.input.newOptionCode
                 if (code) {
                     code = code.replace(/ /g, "");
@@ -600,13 +601,25 @@ angular.module("pocApp")
                     code = ""
                 }
 
-
-                $scope.options.push({code:code,
+                let concept = {code:code,
                     display:$scope.input.newOptionDisplay,
-                    fsn:$scope.input.newOptionFSN})         //was adding snomed here...
+                    fsn:$scope.input.newOptionFSN}
+                if ($scope.input.newOptionSystem) {
+
+                    //set all the options to the same system
+                    $scope.options.forEach(function (option) {
+                        option.system = $scope.input.newOptionSystem
+                    })
+
+
+                    concept.system = $scope.input.newOptionSystem
+                }
+
+                $scope.options.push(concept)         //was adding snomed here...
                 delete $scope.input.newOptionCode
                 delete $scope.input.newOptionDisplay
                 delete $scope.input.newOptionFSN
+               // delete $scope.input.newOptionSystem - don't delete
             }
 
             //lookup from the TS

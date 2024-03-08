@@ -4,7 +4,7 @@ angular.module("pocApp")
 
         let extUrl = "http://canshare.co.nz/fhir/StructureDefinition/concept-type"
 
-        //A codesystem that has pre-published concepts
+        //A codesystem that has pre-published concepts (ie the same as unpublished)
         let csUrl = "http://canshare.co.nz/fhir/CodeSystem/prepub-concepts"
         let csId = "cansharePrepubConcepts"   //the id for the CodeSystem
 
@@ -52,22 +52,6 @@ angular.module("pocApp")
             getCodeSystem : function () {
                 //get the CodeSystem used for pre published concepts
                 let deferred = $q.defer()
-
-/*
-
-                let qry1 = `ConceptMap/${csId}`
-                let encodedQry1 = encodeURIComponent(qry1)
-
-                $http.get(`nzhts?qry=${encodedQry1}`).then(
-                    function (data) {
-                        console.log(data)
-                    }, function (err) {
-                        console.log(err)
-                    }
-                )
-
-                return
-*/
                 let qry = `ConceptMap?url=${csUrl}`
 
                 //console.log(qry)

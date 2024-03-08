@@ -108,20 +108,20 @@ angular.module("pocApp")
 
 
             //add a concept to the list directly included in the VS. In an include section with the version 'versionDirect'
-            $scope.addDirectConcept = function () {
+            $scope.addDisplayConcept = function () {
 
-                $scope.input.directConcepts = $scope.input.directConcepts || []
-                let concept = {code:$scope.input.newDirectCode,display:$scope.input.newDirectDisplay}
+                $scope.input.displayConcepts = $scope.input.displayConcepts || []
+                let concept = {code:$scope.input.newDisplayCode,display:$scope.input.newDisplayDisplay}
                 updateVSSvc.setConceptType(concept,'display') //adds the concepttype extension
 
-                $scope.input.directConcepts.push(concept)
-                delete $scope.input.newDirectCode
-                delete $scope.input.newDirectDisplay
+                $scope.input.displayConcepts.push(concept)
+                delete $scope.input.newDisplayCode
+                delete $scope.input.newDisplayDisplay
                 $scope.makeVS()
             }
 
-            $scope.removeDirectConcept = function (inx) {
-                $scope.input.directConcepts.splice(inx,1)
+            $scope.removeDisplayConcept = function (inx) {
+                $scope.input.displayConcepts.splice(inx,1)
                 $scope.makeVS()
 
             }
@@ -194,6 +194,10 @@ angular.module("pocApp")
 
             $scope.updateVS = function (vs) {
                 if (confirm("Are you sure you wish to update this valueSet")) {
+
+                    console.log(angular.toJson($scope.selectedVS,null,2))
+                   // return
+
                     performUpdate($scope.selectedVS)
 
                 }
@@ -212,7 +216,7 @@ angular.module("pocApp")
                 delete $scope.input.title
                 delete $scope.input.description
                 delete $scope.input.ecl
-                delete $scope.input.directConcepts
+                delete $scope.input.displayConcepts
                 $scope.input.status = 'active'
 
                 $scope.makeVS()
@@ -306,8 +310,8 @@ angular.module("pocApp")
                                             break
                                         case 'display' :
                                             //included so a different display can be added
-                                            $scope.input.directConcepts = $scope.input.directConcepts || []
-                                            $scope.input.directConcepts.push(concept)
+                                            $scope.input.displayConcepts = $scope.input.displayConcepts || []
+                                            $scope.input.displayConcepts.push(concept)
                                             break
                                         default :
                                             alert(`Unknown concept type: ${type}`)
@@ -360,6 +364,9 @@ angular.module("pocApp")
                 delete $scope.expandQry
                 delete $scope.qUsingVS
                 delete $scope.dummyQR
+                delete $scope.input.prePubConcepts
+                delete $scope.input.displayConcepts
+
 
 
                 let qry = `ValueSet?url=${item.vs.url}&_summary=false`
@@ -368,6 +375,7 @@ angular.module("pocApp")
                 $scope.termServerQuery = qry
                 let encodedQry = encodeURIComponent(qry)
                 $scope.showWaiting = true
+
                 $http.get(`nzhts?qry=${encodedQry}`).then(
                     function (data) {
                         //it's a query so a bundle is expected
@@ -399,7 +407,7 @@ angular.module("pocApp")
                     title:$scope.input.title,
                     status : $scope.input.status,
                     description:$scope.input.description,
-                    directConcepts: $scope.input.directConcepts,
+                    displayConcepts: $scope.input.displayConcepts,
                     prePubConcepts: $scope.input.prePubConcepts,
                     ecl:$scope.input.ecl}
                 $scope.selectedVS = makeVSFromVo(vo)
@@ -532,14 +540,14 @@ angular.module("pocApp")
                 let include = {system:snomed,version:versionEcl,filter:[filter]}
                 vs.compose = {include:[include]}
 
-                if (vo.directConcepts && vo.directConcepts.length > 0) {
-                    //These are concepts directly added to the VS that are in the publishing env. but not the main env.
-                    //let directInclude = {system:snomed,version:versionDirect,concept:[]}
-                    let directInclude = {system:snomed,concept:[]}
-                    vo.directConcepts.forEach(function (concept) {
-                        directInclude.concept.push(concept)
+                if (vo.displayConcepts && vo.displayConcepts.length > 0) {
+                    //These are concepts  added to the VS that are in the publishing env. but not the main env.
+
+                    let displayInclude = {system:snomed,concept:[]}
+                    vo.displayConcepts.forEach(function (concept) {
+                        displayInclude.concept.push(concept)
                     })
-                    vs.compose.include.push(directInclude)
+                    vs.compose.include.push(displayInclude)
 
                 }
 

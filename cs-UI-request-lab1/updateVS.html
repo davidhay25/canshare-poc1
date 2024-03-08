@@ -245,40 +245,42 @@
 
 
                         <tr>
-                            <td>Unpublished concepts</td>
+                            <td  width = "20%">Display concepts
+                                <div><br/><em>Published concepts where the description is incorrect</em></div>
+                            </td>
                             <td>
 
                                 <table class="table table-bordered">
                                     <tr><th>Code</th><th>Display</th><th></th></tr>
-                                    <tr ng-repeat="concept in input.directConcepts">
+                                    <tr ng-repeat="concept in input.displayConcepts">
                                         <td>
                                             {{concept.code}}
                                         </td>
                                         <td>{{concept.display}}</td>
                                         <td><i style="color: red" class="glyphicon glyphicon-remove clickable"
-                                               ng-click="removeDirectConcept($index)"></i></td>
+                                               ng-click="removeDisplayConcept($index)"></i></td>
                                     </tr>
                                     <tr>
                                         <td>
                                             <div class="row">
                                                 <div class="col-md-10">
-                                                    <input ng-model="input.newDirectCode" type="text" class="form-control"/>
+                                                    <input ng-model="input.newDisplayCode" type="text" class="form-control"/>
                                                 </div>
                                                 <div class="col-md-2">
                                                     <i style="color: orange" class="glyphicon glyphicon-question-sign clickable"
-                                                       ng-show="input.newDirectCode"
-                                                       ng-click="getDisplay(input.newDirectCode,'newDirectDisplay')"></i>
+                                                       ng-show="input.newDisplayCode"
+                                                       ng-click="getDisplay(input.newDisplayCode,'newDisplayDisplay')"></i>
                                                 </div>
                                             </div>
 
                                         </td>
-                                        <td><input ng-model="input.newDirectDisplay" type="text" class="form-control"/> </td>
+                                        <td><input ng-model="input.newDisplayDisplay" type="text" class="form-control"/> </td>
                                         <td>
 
 
                                             <i style="color: green" class="glyphicon glyphicon-ok clickable"
-                                               ng-show="input.newDirectCode && input.newDirectDisplay"
-                                               ng-click="addDirectConcept()"></i>
+                                               ng-show="input.newDisplayCode && input.newDisplayDisplay"
+                                               ng-click="addDisplayConcept()"></i>
 
                                         </td>
                                     </tr>
@@ -291,8 +293,10 @@
 
 
 
-                        <tr ng-show="false">
-                            <td>Pre published concepts</td>
+                        <tr>
+                            <td>Unpublished concepts
+                                <div><em><br/>Concepts created but not yet published. They are in a separate CodeSystem</em></div>
+                            </td>
                             <td>
 
                                 <table class="table table-bordered">

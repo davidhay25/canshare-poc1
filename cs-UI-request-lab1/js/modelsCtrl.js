@@ -79,7 +79,7 @@ angular.module("pocApp")
                 })
 
             } else {
-                if (confirm("There don't appear to be any local DG's. Would you like to refresh from the Library?")) {
+                if (confirm("There don't appear to be any local DataGroups's. Would you like to refresh from the Library?")) {
 
                     let qry = '/model/allDG'
                     $http.get(qry).then(
@@ -93,7 +93,7 @@ angular.module("pocApp")
                                 }
 
                             })
-                            alert("All datagroups have been downloaded. To access compositions, click the Library button at the top of the screen, then the Compositions tab and select the Compositions you wish to view")
+                            alert("All DataGroups have been downloaded. To access Compositions, click the Library button at the top of the screen, then the Compositions tab and select the Compositions you wish to download and view")
 
                         })
                 } else {
@@ -101,8 +101,6 @@ angular.module("pocApp")
 
                 }
 
-
-               // alert("There don't appear to be any local DG's. You'll need to clear local and resync from the Library. Local changes will be lost. Sorry about that.")
             }
 
 

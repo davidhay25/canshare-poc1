@@ -257,10 +257,14 @@ function setup(app) {
 
             })
         } else {
-
             res.status(500).json({msg:"Unable to get Access Token."})
         }
+    })
 
+    app.post('/nzhts/emptycache',function (req,res) {
+        vsCache = {}
+        vsCacheStats = {hit:0,miss:0}
+        res.json({})
     })
 
     app.get('/nzhts/cachestats',function (req,res) {
@@ -299,7 +303,6 @@ function setup(app) {
             }
             return bytes;
         }
-
     })
 
     //queries against the Terminology Server
@@ -307,8 +310,14 @@ function setup(app) {
         let query = req.query.qry
         console.log(`nzhts query: ${req.query.qry}`)
 
+        //the cache is 'opt-in' to avoid tricky cache issues...  It's mostly needed for the LIM forms
+        //it will be necessary to manually empty the cache when we update the TS
+        let allowcache = req.headers['x-allowcache']
+
+
+
         //if the cache is active then see if the VS is in there
-        if (vsCache) {
+        if (vsCache !== undefined && allowcache == 'yes') {
             if (vsCache[query]) {
                 vsCacheStats.hit++
                 if (vsCache[query] == "404") {
@@ -326,6 +335,8 @@ function setup(app) {
             }
 
         }
+
+
 
 
 
@@ -366,11 +377,16 @@ function setup(app) {
                 axios.get(qry,config).then(function(data) {
                     //console.log(data.data)
                     //note that the 'query' variable is the original query sans server
-                    vsCache[query] = data.data
+                    if (allowcache == 'yes') {
+                        vsCache[query] = data.data
+                    }
+
                     res.json(data.data)
                     console.log("----- found -----")
                 }).catch(function(ex) {
-                    vsCache[query] = 404        //we're assuming that all errors are 404
+                    if (allowcache == 'yes') {
+                        vsCache[query] = 404        //we're assuming that all errors are 404
+                    }
                     if (ex.response) {
                         console.log("----- NOT found -----")
                         res.status(ex.response.status).json(ex.response.data)
@@ -475,7 +491,7 @@ function setup(app) {
 
         if (vs) {
             let qry = `${nzhtsconfig.serverBase}ValueSet/${vs.id}`
-
+console.log(qry,vs)
             let result = await putResource(qry,vs)
             if (result) {
                 //A result is returned if there is an error
@@ -554,7 +570,9 @@ async function putResource(qry,resource) {
 
 
         try {
+            console.log('put',qry,JSON.stringify(resource,null,2))
             let result = await axios.put(qry,resource,config)
+            console.log('ok')
             return
         } catch (ex) {
 
@@ -584,6 +602,7 @@ async function putResource(qry,resource) {
 
 
     } else {
+        console.log("Token not acquired")
         return "Token not acquired"
     }
 

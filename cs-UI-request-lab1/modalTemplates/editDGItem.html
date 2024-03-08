@@ -131,10 +131,11 @@
           <tr  ng-show="input.selectedType == 'CodeableConcept'">
             <td>'Other' type</td>
             <td>
-              <span ng-repeat = "opt in ['sometimes','always','textonly']">
+              <!--  <span ng-repeat = "opt in ['sometimes','always','textonly']"> -->
+              <span ng-repeat = "opt in ['sometimes','textonly']">
                   <input type="radio"
                          ng-change="setControlHint(selectedNode.data.ed,opt)"
-                         ng-model="input.otherType" value="{{opt}}"> {{opt}}
+                         ng-model="input.otherType" value="{{opt}}"> {{opt}} &nbsp;
                 </span>
 
             </td>
@@ -189,6 +190,16 @@
 
         <uib-tabset>
           <uib-tab heading="Current List">
+
+            <div class="row">
+              <div class="col-md-6">
+
+              </div>
+              <div class="col-md-6">
+                <input class="form-control" placeholder = "System (if not SNOMED)" ng-model="input.newOptionSystem"/>
+              </div>
+            </div>
+
             <table class="table table-bordered">
               <tr><th>Code</th><th>Display</th><th>FSN</th><th></th></tr>
               <tr ng-repeat="row in options">
@@ -205,7 +216,7 @@
                       <input type="text" class="form-control" ng-model="input.newOptionCode"/>
                     </div>
                     <div class="col-md-4">
-                      <button class="btn btn-info" ng-click="lookupFSN(input.newOptionCode)">Lookup</button>
+                      <button ng-show="input.newOptionCode" class="btn btn-info" ng-click="lookupFSN(input.newOptionCode)">Lookup</button>
 
                     </div>
                   </div>
