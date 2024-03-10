@@ -112,7 +112,11 @@ angular.module("pocApp")
                 }
             };
 
-            setupCM()
+
+            $timeout(function(){
+                setupCM()
+            },1000)
+
 
             $scope.updateFsh = function (name) {
                 if (confirm("Are you sure you wish to update the library")) {

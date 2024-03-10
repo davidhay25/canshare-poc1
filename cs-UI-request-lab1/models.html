@@ -446,11 +446,13 @@
 
         </uib-tab>
 
+        <!--
         <uib-tab ng-show="false" heading="Q builder"  select="setInitialTab(2)">
             <div ng-controller="makeQCtrl">
                 <ng-include src="'/includes/makeQ.html'"></ng-include>
             </div>
         </uib-tab>
+        -->
 
         <uib-tab heading="Reports"  select="setInitialTab(3)">
             <ng-include src="'/includes/terminology.html'"></ng-include>
@@ -835,7 +837,9 @@
 
 <script src="js/fixValuesCtrl.js"></script>
 <script src="js/changeTypeCtrl.js"></script>
+<!--
 <script src="js/makeQCtrl.js"></script>
+-->
 <script src="js/makeQSvc.js"></script>
 <script src="js/librarySvc.js"></script>
 <script src="js/historyCtrl.js"></script>
