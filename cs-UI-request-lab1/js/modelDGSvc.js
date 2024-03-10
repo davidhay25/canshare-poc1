@@ -358,7 +358,7 @@ angular.module("pocApp")
                     Object.keys(hashAllDG).forEach(function (key) {
                         if (key !== branchName) {
                             let dgToFindUltimateParent = hashAllDG[key]
-console.log(key,dgToFindUltimateParent)
+                            //console.log(key,dgToFindUltimateParent)
                             //findUltimateParent can throw an exception - let it bubble up
                             let ultimateParent = findUltimateParent(dgToFindUltimateParent)
 

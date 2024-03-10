@@ -38,6 +38,9 @@ angular.module("pocApp")
 
                 let txt = angular.toJson($scope.Q)
 
+                $scope.localCopyToClipboard(txt)
+
+/*
                 navigator.clipboard.writeText(txt).then(
                     () => {
                         alert('Q text copied to clipboard');
@@ -46,6 +49,7 @@ angular.module("pocApp")
                         alert('Error: Q text not copied to clipboard');
                     },
                 )
+                */
 
             }
 

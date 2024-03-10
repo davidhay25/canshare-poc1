@@ -193,6 +193,10 @@ angular.module("pocApp")
                     host += "?comp=" + $scope.selectedComposition.name
                 }
 
+                $scope.localCopyToClipboard (host)
+                alert(`Link: ${host} \ncopied to clipBoard`);
+
+                /*
                 navigator.clipboard.writeText(host).then(
                     () => {
                         alert(`Link: ${host} \ncopied to clipBoard`);
@@ -201,6 +205,7 @@ angular.module("pocApp")
                         alert(`Link is ${host}`);
                     },
                 )
+                */
 
 
 
@@ -837,7 +842,9 @@ angular.module("pocApp")
             $scope.copyFshToClipboard = function (fsh) {
 
 
-
+                $scope.localCopyToClipboard (fsh)
+                alert("Fsh on clipboard")
+/*
                 navigator.clipboard.writeText(fsh).then(
                     () => {
                         alert('Q text copied to clipboard');
@@ -846,11 +853,16 @@ angular.module("pocApp")
                         alert('Q text not copied to clipboard');
                     },
                 )
+                */
 
             }
 
             $scope.copyToClipboard = function (json) {
                 let text = angular.toJson(json,true)
+
+                $scope.localCopyToClipboard (text)
+
+                /*
                 navigator.clipboard.writeText(text).then(
                     () => {
                         alert('Content copied to clipboard');
@@ -859,6 +871,7 @@ angular.module("pocApp")
                         alert('Content not copied to clipboard');
                     },
                 )
+                */
 
             }
 
@@ -1865,6 +1878,30 @@ angular.module("pocApp")
 
 
         }
+
+            $scope.localCopyToClipboard = function(text) {
+                let textArea = document.createElement("textarea");
+                textArea.value = text;
+
+                // Avoid scrolling to bottom
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.position = "fixed";
+
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    let successful = document.execCommand('copy');
+                    let msg = successful ? 'successful' : 'unsuccessful';
+                    console.log('Fallback: Copying text command was ' + msg);
+                } catch (err) {
+                    alert('Fallback: Oops, unable to copy', err);
+                }
+
+                document.body.removeChild(textArea);
+            }
 
 
 }

@@ -114,14 +114,7 @@
                   </div>
                 </uib-tab>
               </uib-tabset>
-              <!--
-              <div class="banner">Local DG</div>
-              <pre>{{input.selectedItem.local | json}}</pre>
 
-              <br/>
-              <div class="banner">Library DG</div>
-              <pre>{{input.selectedItem.library | json}}</pre>
--->
             </div>
 
           </div>
@@ -298,6 +291,7 @@
 
               <button ng-show="user.email"
                       class="btn btn-link" ng-click="downloadDisplayedComp()">Download all shown</button>
+
               <button class="btn btn-link pull-right" ng-show="user.email" class="pull-right clickable" ng-click="checkAllCompIn()">Check all Compositions in</button>
 
             </div>
@@ -314,6 +308,9 @@
               <div class="clickable"
                    ng-show="item.library && ! item.local"
                    ng-click="downloadComp(item.library)">Download</div>
+
+
+
               <div ng-show="item.library.checkedOut">
                 <br/>
                 CheckedOut: {{item.library.checkedOut}}
