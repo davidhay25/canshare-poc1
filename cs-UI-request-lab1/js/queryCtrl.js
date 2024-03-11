@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('queryCtrl',
-        function ($scope,$http,$localStorage,$uibModal,$q,$timeout,querySvc,utilsSvc) {
+        function ($scope,$http,$localStorage,$uibModal,$q,$timeout,querySvc,utilsSvc,cmSvc) {
 
             $scope.localStorage = $localStorage
 
@@ -216,6 +216,53 @@ console.log($scope.allTargets)
                 querySvc.getOneConceptMap(item.cm.url,expand).then(
                     function (ar) {
                         $scope.fullSelectedCM = ar[0]       //todo what of there's > 1
+
+                        //add the operator to the DependsOn element from the extension (makes UI processing easier
+                        let lstVsUrl = []   //list of all ValueSets that are used by 'in-vs' rules
+
+                        $scope.fullSelectedCM.group.forEach(function (group) {
+                            group.element.forEach(function (element) {
+                                element.target.forEach(function (target) {
+                                    if (target.dependsOn) {
+                                        target.dependsOn.forEach(function (dep) {
+                                            dep['x-operator'] = "="
+                                            if (dep.extension) {
+                                                dep.extension.forEach(function (ext) {
+                                                    if (ext.url == 'http://canshare.co.nz/fhir/StructureDefinition/do-operator') {
+                                                        dep['x-operator'] = ext.valueCode
+
+                                                        if (ext.valueCode == 'in-vs') {
+                                                            //dep.value is a ValueSet url. We will need the contents of this valueset for rules processing
+                                                            lstVsUrl.push(dep.value)
+                                                        }
+
+                                                    }
+                                                })
+                                            }
+
+                                        })
+                                    }
+
+
+                                })
+                            })
+
+                        })
+
+                        //expand all the valuesets
+                        if (lstVsUrl.length > 0) {
+                            cmSvc.getVSContentsHash(lstVsUrl).then(
+                                function (data) {
+                                    console.log(data)
+                                    $scope.$broadcast('hashExpandedVs',data)
+                                },
+                                function (err) {
+                                    alert(err)
+                                }
+                            )
+                        }
+
+
 
                         //make the download link
                         $scope.downloadLinkMap = window.URL.createObjectURL(new Blob([angular.toJson($scope.fullSelectedCM,true) ],{type:"application/json"}))

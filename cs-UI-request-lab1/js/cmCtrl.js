@@ -17,8 +17,17 @@ angular.module("pocApp")
 
             }
 
+            //as the expansion is performed by a child controller, I use this event to get the hash
+            $scope.$on('hashExpandedVs',function (event,data) {
+                $scope.hashExpandedVs = data
+                console.log(data)
+            })
+
             //load the CM
-            $scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-scripted-dec"}})
+            //$scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-scripted-dec"}})
+            $scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-scripted-mar2024"}})
+
+
 
 
             $scope.editRule = function (target) {
@@ -156,13 +165,34 @@ angular.module("pocApp")
                 //console.log($scope.local.cm.property)
                 delete $scope.lstMatchingConcepts
                 delete $scope.cmExpandedVS      //so it's not in the display area
+                delete $scope.displayMatchNumber
                 //call the rules engine to determine the possible concepts. The engine needs:
+
                 //  the list of user selected values for all properties so far  - local.cm.property
                 //  the property that needs the list - input.cmProperty & $scope.selectedElement
-                let vo = cmSvc.getOptionsOneProperty($scope.input.cmProperty,$scope.local.cm.property,$scope.selectedElement)
+
+                //
+
+
+
+
+                let vo = cmSvc.rulesEngine($scope.input.cmProperty,$scope.local.cm.property,$scope.selectedElement,$scope.hashExpandedVs)
 
                 $scope.matchingVS = vo.lstVS
                 $scope.matchedRules = vo.lstMatches
+
+                //look uo the matched elements (to display in the UI as well as the table)
+                $scope.displayMatchNumber = "Match: "
+                $scope.selectedElement.target.forEach(function (target) {
+                    if (target.matched) {
+                        $scope.displayMatchNumber += target.comment + " "
+                    }
+                })
+                if ( $scope.displayMatchNumber == "Match: ") {
+                    $scope.displayMatchNumber = 'No matching targets'
+                }
+
+
 
                 let qry = `/nzhts/expandMultipleVs`
                 $http.post(qry,vo.lstVS).then(
@@ -176,26 +206,35 @@ angular.module("pocApp")
 
             }
 
+            //clear the value for a specific property
+            $scope.resetValue = function (k) {
+                delete $scope.local.cm.property[k]
+            }
 
             $scope.resetUIData = function () {
+                delete $scope.displayMatchNumber
+                delete $scope.input.cmProperty
                 delete $scope.cmExpandedVS
                 delete $scope.matchingVS
                 setup()
                 delete $scope.selectedElement
                 $scope.local.cm.property = {}
+
             }
 
             //construct a list of all the potential targets for a given property
+            //invoked when the property to be populated is selected
             $scope.makeListOfTargets = function (key) {
                 if (! key) {return}
                 delete $scope.selectedElement
                 delete $scope.selectedTarget
                 delete $scope.cmExpandedVS
+                delete $scope.displayMatchNumber
                 let concept = $scope.cmProperties[key].concept
                 $scope.hashProperties = {} //a hash of all properties in all dependsOn and all their possible values
 
                 for (const element of $scope.fullSelectedCM.group[0].element) {
-                    if (element.code == concept.code) {
+                    if (element.code == concept.code) {     //this is the set of targets which could match this code
                         $scope.selectedElement = element
 
                         //now create the list of all properties referenced in all the dependsOn elements..
@@ -204,28 +243,32 @@ angular.module("pocApp")
                             element.target.forEach(function (target) {
                                 if (target.dependsOn) {
                                     target.dependsOn.forEach(function(don) {
-                                        let property = don.property
-                                        let v = don.value //the value is actually a code
-                                        $scope.hashProperties[property] = $scope.hashProperties[property] || []
-
-                                        //as the contents of the hash is an array, we need to look through the arrey
-                                        //to determine if this value has been alreadt added
+                                        let property = don.property   //this is the 'determinant'
                                         let canAdd = true
-                                        for (const item of $scope.hashProperties[property]) {
-                                            if (item.code == v) {
-                                                canAdd = false
-                                                break
+                                        $scope.hashProperties[property] = $scope.hashProperties[property] || []
+                                        if (don['x-operator'] == 'in-vs') {
+                                            //this is actually a reference to a valueset. the don will match if the supplied value
+                                            // of the property is in the valueset. So we need to add the contents of the VS to the
+                                            // set of possible values
+                                            let options = $scope.hashExpandedVs[don.value]
+                                            console.log(options)
+                                            options.forEach(function (concept) {
+                                                let ar = $scope.hashProperties[property].filter(c =>c.code == concept.code)
+                                                if (ar.length == 0) {
+                                                    $scope.hashProperties[property].push(concept)
+                                                }
+                                            })
+                                            
+                                            canAdd = false  //just to stop the value being added .
+                                        } else {
+                                            let v = don.value //the value is actually a code
+                                            let ar = $scope.hashProperties[property].filter(c =>c.code == v)
+                                            if (ar.length == 0) {
+                                                $scope.hashProperties[property].push({code:v,display:don.display})
                                             }
                                         }
 
-                                        if (canAdd) {
-                                            $scope.hashProperties[property].push({code:v,display:don.display})
-                                        }
-/*
-                                        if ($scope.hashProperties[property].indexOf(v) == -1) {
-                                            $scope.hashProperties[property].push({code:v,display:don.display})
-                                        }
-*/
+
 
                                     })
                                 }
@@ -269,7 +312,7 @@ angular.module("pocApp")
 
                 //let vo = cmSvc.getOptionsOneProperty($scope.input.cmProperty,$scope.local.cm.property,$scope.selectedElement)
 
-                let vo = cmSvc.getOptionsOneProperty(nextProperty,params,$scope.selectedElement)
+                let vo = cmSvc.rulesEngine(nextProperty,params,$scope.selectedElement)
                 //$scope.matchingVS = vo.lstVS
 
 
