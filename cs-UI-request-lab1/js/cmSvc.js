@@ -152,6 +152,13 @@ angular.module("pocApp")
                                 ar.push(concept)
                             })
 
+                            ar.sort(function (a,b) {
+                                if (a.display > b.display) {
+                                    return 1
+                                } else {
+                                    return -1
+                                }
+                            })
 
                             hashExpanded[response.data.url] = ar
                         }

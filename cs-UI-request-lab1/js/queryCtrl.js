@@ -254,7 +254,7 @@ console.log($scope.allTargets)
                             cmSvc.getVSContentsHash(lstVsUrl).then(
                                 function (data) {
                                     console.log(data)
-                                    $scope.$broadcast('hashExpandedVs',data)
+                                    $scope.$broadcast('hashExpandedVs',data)    //the list is processed by cmCtrl
                                 },
                                 function (err) {
                                     alert(err)

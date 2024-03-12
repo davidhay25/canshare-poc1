@@ -160,7 +160,7 @@ angular.module("pocApp")
                 return `${c.display} (${c.code})`
             }
 
-            //get all the concepts for a single property
+            //get all the concepts for a single property - this is applying the rules engine...
             $scope.getOptionsOneProperty = function() {
                 //console.log($scope.local.cm.property)
                 delete $scope.lstMatchingConcepts
@@ -172,8 +172,6 @@ angular.module("pocApp")
                 //  the property that needs the list - input.cmProperty & $scope.selectedElement
 
                 //
-
-
 
 
                 let vo = cmSvc.rulesEngine($scope.input.cmProperty,$scope.local.cm.property,$scope.selectedElement,$scope.hashExpandedVs)
@@ -191,8 +189,6 @@ angular.module("pocApp")
                 if ( $scope.displayMatchNumber == "Match: ") {
                     $scope.displayMatchNumber = 'No matching targets'
                 }
-
-
 
                 let qry = `/nzhts/expandMultipleVs`
                 $http.post(qry,vo.lstVS).then(
