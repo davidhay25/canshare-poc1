@@ -2,7 +2,7 @@
 //https://www.joelonsoftware.com/2000/04/06/things-you-should-never-do-part-i/
 angular.module("pocApp")
     .controller('modelsCtrl',
-        function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,
+        function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,orderingSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
 
@@ -1026,6 +1026,9 @@ angular.module("pocApp")
                                 ed1.mult = ed.mult
                                 ed1.valueSet = ed.valueSet
                                 ed1.sourceReference = ed.sourceReference
+
+                                ed1.insertAfter = ed.insertAfter
+
                                 ed1.controlHint = ed.controlHint
                                 ed1.otherType = ed.otherType
                                 ed1.hideInQ = ed.hideInQ
@@ -1569,6 +1572,8 @@ angular.module("pocApp")
                 //sort the elements list to better display slicing
                 $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
 
+                orderingSvc.sortFullListByInsertAfter($scope.fullElementList)   //adjust according to 'insertAfter' values
+
                 //create the list of potential enableWhen sources
                 $scope.ewSources = []
                 $scope.fullElementList.forEach(function (item) {
@@ -1585,7 +1590,8 @@ angular.module("pocApp")
                 makeGraph()
 
                 //a Q representation of the DG
-                let voQ = makeQSvc.makeQFromDG(vo.allElements,$scope.hashAllDG)
+                //let voQ = makeQSvc.makeQFromDG(vo.allElements,$scope.hashAllDG)
+                let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
                 console.log(voQ.Q)
                 $scope.dgQ = voQ.Q
 
@@ -1644,7 +1650,6 @@ angular.module("pocApp")
                     )
 
                     $scope.fhirResourceType = igSvc.findResourceType(dg,$scope.hashAllDG)
-                    // alert($scope.fhirResourceType)
                     //check the current checkedout state on the library.
                     //Always update the local version checkedout (not data) with the one from the library
                     let name = dg.name
@@ -1664,17 +1669,7 @@ angular.module("pocApp")
 
                     $scope.refreshUpdates()     //update the xref
 
-                    /* not using overides
-                    //create the list of override elements
-                    $scope.overrides = []
-                    //$scope.directElements = {}    //elements directly on the DG. These can have fixed values
-                    $scope.selectedModel.diff.forEach(function (ed) {
-                        //if there's a dot in the ed path, then it refers to an element in a child...
-                        if (ed.path.indexOf('.') > -1 ) {
-                            $scope.overrides.push(ed)
-                        }
-                    })
-                    */
+
 
                     $scope.refreshFullList(dg)      //the complete list of elements for this DG + graph & Q
                 }

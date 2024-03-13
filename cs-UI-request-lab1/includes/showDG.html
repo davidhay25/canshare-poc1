@@ -79,9 +79,7 @@
 
 
     <div class="col-md-6">
-<!--
-      <button class="btn btn-link" ng-click="showHistory()">History ({{historyCount}})</button>
-      -->
+
       <button class="btn btn-link" ng-click="deleteDG(selectedModel.name)">Delete</button>
 
       <a class="btn" ng-href="modelReview.html?{{selectedModel.name}}" target="_blank">Review</a>
@@ -259,16 +257,11 @@
                       {{selectedNode.data.ed.path | dropFirstInPath}}
 
 
-                      <!--  <span class="pull-right " >-->
                         <span class="pull-right clickable" ng-click="hideInQ(selectedNode.data.ed)">
                         <span ng-show="selectedNode.data.ed.hideInQ">Not shown in Q</span>
                         <span ng-hide="selectedNode.data.ed.hideInQ">Appears in Q</span>
                       </span>
-                      <!--
-                      <span class="pull-right" ng-show="selectedNode.data.ed.hideInQ">
-                        <strong ng-click="hideInQ(selectedNode.data.ed)">Not shown in Q</strong></span>
 
-                      -->
                     </td>
                   </tr>
 
@@ -310,11 +303,7 @@
 
                   <tr><td class="detailName">Type</td>
                     <td><div ng-repeat="type in selectedNode.data.ed.type">
-<!--
-                      <i class="glyphicon glyphicon-edit pull-right clickable"
-                         ng-show="canEdit(selectedModel)"
-                         ng-click="editDGItem(selectedNode.data)"></i>
--->
+
 
                       <div ng-show="fhirDataTypes.indexOf(type) > -1" class="pull-right">
                         <a style="padding-right: 12px" target = "_blank" ng-href="{{fhirRoot}}datatypes.html#{{type}}">Details in spec </a>
@@ -337,12 +326,7 @@
                           'Other' type: {{selectedNode.data.ed.otherType}}
                         </div>
 
-                        <!--
-                        <checkbox
-                                ng-change = "setOtherAllowedStatus(selectedNode.data.ed,selectedNode.data.ed.otherAllowed)"
-                                ng-model="selectedNode.data.ed.otherAllowed"></checkbox>
-                         'Other' value allowed
-                        -->
+
 
                       </div>
 
@@ -413,11 +397,7 @@
                   <tr>
                     <td class="detailName">Notes</td>
                     <td>
-                      <!--
-                      <i class="glyphicon glyphicon-edit pull-right clickable"
-                         ng-show="canEdit(selectedModel)"
-                         ng-click="editDGItem(selectedNode.data)"></i>
-                      -->
+
                       {{selectedNode.data.ed.notes}}
                     </td>
                   </tr>
@@ -452,15 +432,6 @@
 
 
 
-                      <!--
-                      <div ng-show="canEdit(selectedModel)">
-                        <button
-                                ng-click = "editDGOptionsList(selectedNode.data.ed,false)"
-                                class="btn-link btn">View / Edit list</button>
-                      </div>
-                      -->
-
-
 
                     </td>
                   </tr>
@@ -468,10 +439,7 @@
                   <tr ng-show="selectedNode.data.ed.type[0] == 'Quantity'">
                     <td class="detailName">Units</td>
                     <td>
-                      <!--
-                      <i class="glyphicon glyphicon-edit pull-right clickable"
-                         ng-click="setUnits(selectedNode.data.ed)"></i>
--->
+
 
                       <span ng-repeat="unit in selectedNode.data.ed.units">
                         {{unit}}&nbsp;
@@ -510,10 +478,7 @@
                       <div ng-show="selectedNode.data.ed.fixedCoding">
                         {{selectedNode.data.ed.fixedCoding.code}} | {{selectedNode.data.ed.fixedCoding.display}} | {{selectedNode.data.ed.fixedCoding.system}}
                       </div>
-<!--
-                      {{selectedNode.data.ed.fixedString}}
-                      {{selectedNode.data.ed.fixedDecimal}}
--->
+
                       <span ng-show="selectedNode.data.ed.fixedCoding ||
                         selectedNode.data.ed.fixedQuantity || selectedNode.data.ed.fixedRatio"
                             class="pull-right">
@@ -522,24 +487,8 @@
                           set on {{getSourceModelName(selectedNode.data.ed)}}
                         </span>
 
-                        <!--
-                        <div ng-show="canEdit(selectedModel)">
-                           <span ng-hide="getSourceModelName(selectedNode.data.ed) !== selectedModel.name"
-                                 class="clickable"
-                                 ng-click="clearFixedValue(selectedNode.data.ed,'fixed')">Clear fixed value</span>
-                        </div>
-                        -->
-
                       </span>
 
-                      <!--
-                      <div ng-show="canEdit(selectedModel)">
-                        <div class="clickable"
-                             ng-click="setFixedValue(selectedNode.data.ed,'fixed')">
-                          Set/edit fixed value
-                        </div>
-                      </div>
-                      -->
                     </td>
                   </tr>
 
@@ -571,13 +520,6 @@
                         {{selectedNode.data.ed.defaultCoding.code}} | {{selectedNode.data.ed.defaultCoding.display}} | {{selectedNode.data.ed.defaultCoding.system}}
                       </div>
 
-                      <!--
-                                            {{selectedNode.data.ed.fixedCoding}}
-
-                      {{selectedNode.data.ed.fixedString}}
-                      {{selectedNode.data.ed.fixedDecimal}}
--->
-
                       <span ng-show="selectedNode.data.ed.defaultCoding  || selectedNode.data.ed.defaultQuantity"
                             class=" pull-right">
 
@@ -585,22 +527,10 @@
                           set on {{getSourceModelName(selectedNode.data.ed)}}
                         </span>
 
-                        <!--
-                        <div ng-show="canEdit(selectedModel)">
-                           <span ng-hide="getSourceModelName(selectedNode.data.ed) !== selectedModel.name"
-                                 class="clickable"
-                                 ng-click="clearFixedValue(selectedNode.data.ed,'default')">Clear default value</span>
-                        </div>
-                        -->
+
 
                       </span>
-<!--
-                      <div ng-show="canEdit(selectedModel)">
-                        <div class="clickable"
-                             ng-click="setFixedValue(selectedNode.data.ed,'default',selectedNode.data.ed.defaultCoding)">Set/edit default value
-                        </div>
-                      </div>
-                      -->
+
                     </td>
                   </tr>
 
@@ -608,19 +538,22 @@
                   <tr>
                     <td class="detailName">Source reference</td>
                     <td>
-                      <!--
-                      <i class="glyphicon glyphicon-edit pull-right clickable"
-                         ng-show="canEdit(selectedModel)"
-                         ng-click="editDGItem(selectedNode.data)"></i>
-                      -->
+
                       {{selectedNode.data.ed.sourceReference}}
                     </td>
                   </tr>
 
+                  <tr ng-show = "selectedNode.data.ed.insertAfter">
+                    <td  class="detailName">Insert after</td>
+                    <td>
+
+                      {{selectedNode.data.ed.insertAfter | dropFirstInPath}}
+                    </td>
+                  </tr>
 
                 </table>
 
-                <!--<button class="btn-link btn" ng-click="deleteDGItem(selectedNode.data.ed)">Delete this item</button> -->
+
 
 
               </uib-tab>
@@ -651,40 +584,7 @@
                 <!-- TODO - come back to this after bug fixes -->
                 <div ng-show="canEdit(selectedModel)" class="btn-link btn pull-right" ng-click="addEWNew()">Add new control element</div>
 
-                <!--
 
-                <div class="row" ng-show="canEdit(selectedModel)">
-
-                  <div class="col-md-4">
-                    <select class="form-control" ng-model="input.ewSource"
-                            ng-change = "ewSourceSelected(input.ewSource)"
-                            ng-options="dependencySourceDisplay(element.ed) for element in ewSourcesThisElement">
-
-                    </select>
-                  </div>
-
-                  <div class="col-md-2">
-                    <select class="form-control" ng-model="input.ewSourceOp">
-                      <option value="=">=</option>
-                      <option value="!=">!=</option>
-                    </select>
-                  </div>
-
-                  <div class="col-md-4">
-                    <select class="form-control" ng-model="input.ewSourceValue"
-                            ng-options="concept.display for concept in ewSourceValues">
-
-                    </select>
-                  </div>
-                  <div class="col-md-2">
-                    <button class="btn-link btn"
-                            ng-show="input.ewSourceValue"
-                            ng-click="addEnableWhen(input.ewSource,input.ewSourceValue,input.ewSourceOp)">Add</button>
-                  </div>
-
-                </div>
-
-                -->
 
               </uib-tab>
 
@@ -1091,9 +991,13 @@
 
     </uib-tab>
 
-    <uib-tab heading="Dependencies">
-      <uib-tab-heading>Dependencies <span ng-show="allDependencies.length > 0" class="badge">{{allDependencies.length}}</span> </uib-tab-heading>
+    <uib-tab heading="Reports">
 
+
+<!--
+      <uib-tab-heading>Dependencies <span ng-show="allDependencies.length > 0" class="badge">{{allDependencies.length}}</span> </uib-tab-heading>
+-->
+      <h4>Dependencies</h4>
 
       <table class="table-bordered table">
         <tr><th>Target (what to hide)</th><th>Controlling element</th><th>Controller description</th><th>Op</th>
@@ -1123,6 +1027,24 @@
       </table>
 
       <em>All of the hide / show dependencies in this DG</em>
+
+      <h4>Insert after</h4>
+
+      <table class="table-bordered table">
+        <tr><th ng-show="canEdit(selectedModel)"><span >Edit</span></th><th>Element</th><th>Insert after</th>
+
+
+        </tr>
+        <tr ng-repeat="element in fullElementList" ng-show="element.ed.insertAfter">
+          <td ng-show="canEdit(selectedModel)">
+            <i   class="glyphicon glyphicon-edit pull-right clickable"
+                 ng-click="editDGItem(element)"></i>
+          </td>
+          <td>{{element.ed.title}}</td>
+          <td>{{element.ed.insertAfter}}</td>
+
+        </tr>
+      </table>
 
     </uib-tab>
 

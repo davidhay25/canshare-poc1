@@ -34,6 +34,20 @@
 
     </script>
 
+    <script>
+        //add a function to determine if a given path is a child of another. Used when excluding paths
+        //eg seg1.seg2 is a child of seg1.  seg1path is not.
+        //Add here to ensure it is available before any functions that use it are loaded...
+        String.prototype.isChildPath = function (parent) {
+            let test = parent + "."
+            if (this.indexOf(test) > -1) {
+                return true
+            } else { return false}
+
+        };
+
+    </script>
+
     <script src="js/modelReviewCtrl.js"></script>
     <script src="js/modelsSvc.js"></script>
 

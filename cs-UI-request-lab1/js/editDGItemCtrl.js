@@ -12,6 +12,15 @@ angular.module("pocApp")
             $scope.fullElementList = fullElementList
             let dgName = fullElementList[0].ed.path     //it's aways the first element in the list...
 
+            //create the list of all paths in the DG. Used by the 'insertAfter'
+            $scope.allPaths = []
+            $scope.fullElementList.forEach(function (item) {
+                if (item.ed.mult !== '0..0') {
+                    $scope.allPaths.push(item.ed.path)
+                }
+
+            })
+
             $scope.options = []     //a list of options. Will be saved as ed.options
             $scope.units = [] //a list of units. Will be saved as ed.units
 
@@ -66,6 +75,8 @@ angular.module("pocApp")
                 $scope.input.rules = item.ed.rules
                 $scope.input.valueSet = item.ed.valueSet
                 $scope.input.sourceReference = item.ed.sourceReference
+
+                $scope.input.insertAfter = item.ed.insertAfter
 
                 //profiling related stuff
                 if (item.ed.profile) {
@@ -321,6 +332,8 @@ angular.module("pocApp")
                 }
 
                 ed.sourceReference = $scope.input.sourceReference
+
+                ed.insertAfter = $scope.input.insertAfter
 
 
                 if ($scope.input.fsh || $scope.input.fhirPath || $scope.input.extUrl || $scope.input.isReference) {

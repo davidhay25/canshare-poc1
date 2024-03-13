@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('modelViewerCtrl',
-        function ($scope,$http,$uibModal,utilsSvc) {
+        function ($scope,$http,$uibModal,utilsSvc,orderingSvc) {
 
 
             $scope.version = utilsSvc.getVersion()

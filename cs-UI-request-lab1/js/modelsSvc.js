@@ -652,6 +652,8 @@ angular.module("pocApp")
 
                 }
 
+                //orderingSvc.sortDGTree(treeData)    //adjust the order in the tree
+                console.log(treeData)
 
                 return treeData
 

@@ -104,6 +104,23 @@ angular.module("pocApp")
                 $http.get(`nzhts?qry=${encodedQry}`).then(
                     function (data) {
                         $scope.cmExpandedVS = data.data
+
+
+                        if ($scope.cmExpandedVS.expansion && $scope.cmExpandedVS.expansion.contains) {
+
+                            $scope.cmExpandedVS.expansion.contains.sort(function(a,b) {
+                                if (a.display > b.display) {
+                                    return 1
+                                } else {
+                                    return -1
+                                }
+                            })
+
+                        }
+
+
+
+
                     }, function (err) {
 
                     }
@@ -135,6 +152,7 @@ angular.module("pocApp")
             function setup() {
                 $scope.local.cmOptions = {}
                 //these are the properties
+                $scope.cmProperties['patient-sex'] = {concept: {code:"184100006"},options:[]}
                 $scope.cmProperties['cancer-service'] = {concept: {code:"299801000210106"},next:'cancer-stream',options:[]}
                 $scope.cmProperties['cancer-stream'] = {concept:{code:"299811000210108",display:"Cancer Stream",system:snomed}, options : []}
                 $scope.cmProperties['cancer-substream'] = {concept: {code:"299821000210103"},options:[]}
@@ -143,7 +161,7 @@ angular.module("pocApp")
                 $scope.cmProperties['primary-site-laterality'] = {concept: {code:"297561000210100"},options:[]}
                 $scope.cmProperties['histologic-type-primary'] = {concept: {code:"512001000004108"},options:[]}
 
-                $scope.cmProperties['patient-sex'] = {concept: {code:"184100006"},options:[]}
+
 
 
                 //cancer service options are fixed - todo get from CM
@@ -275,11 +293,37 @@ angular.module("pocApp")
                         }
 
 
+                        //special handling for primary-site-laterality. The primary site is all sites
+                        //return the set of all codes
+                        if (key == 'primary-site-laterality') {
+                            $scope.hashProperties['primary-site'] = []     //empty the list assembled from dependsOn
+                            $scope.hashExpandedVs['https://nzhts.digital.health.nz/fhir/ValueSet/canshare-topography'].forEach(function (concept) {
+                                $scope.hashProperties['primary-site'].push(concept)
+                            })
+                            //alert('lat')
+                        }
+
 
 
 
                         console.log(element)
                         console.log($scope.hashProperties)
+
+                        Object.keys($scope.hashProperties).forEach(function (key) {
+                            //now sort the hash contents
+                            $scope.hashProperties[key].sort(function (a,b) {
+                                if (a.display > b.display) {
+                                    return 1
+                                } else {
+                                    return -1
+                                }
+
+                            })
+                        })
+
+
+
+
                         break
                     }
                 }

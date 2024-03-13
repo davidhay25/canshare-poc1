@@ -93,7 +93,7 @@ angular.module("pocApp")
 
                         //If there are any properties with input values that we haven't examined, then exclude
                         //ie if some other property has a value, but the don doesn't mention it then exclude it
-
+/* - not sure
                         Object.keys(hashInput).forEach(function (inputProperty) {
                             //inputProperty is a property that has a provided input
                             if (! hashPropertiesExamined[inputProperty]) {
@@ -101,10 +101,8 @@ angular.module("pocApp")
                                 //in this case the match fails.
                                 include = false
                             }
-
-
                         })
-
+*/
 
 
 

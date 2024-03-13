@@ -219,7 +219,8 @@ console.log($scope.allTargets)
 
                         //add the operator to the DependsOn element from the extension (makes UI processing easier
                         let lstVsUrl = []   //list of all ValueSets that are used by 'in-vs' rules
-
+                        //add the VS with all topography. used for the primary-site-laterality
+                        lstVsUrl.push('https://nzhts.digital.health.nz/fhir/ValueSet/canshare-topography')
                         $scope.fullSelectedCM.group.forEach(function (group) {
                             group.element.forEach(function (element) {
                                 element.target.forEach(function (target) {
@@ -233,7 +234,11 @@ console.log($scope.allTargets)
 
                                                         if (ext.valueCode == 'in-vs') {
                                                             //dep.value is a ValueSet url. We will need the contents of this valueset for rules processing
-                                                            lstVsUrl.push(dep.value)
+                                                            if (lstVsUrl.indexOf(dep.value) == -1) {
+                                                                lstVsUrl.push(dep.value)
+                                                            }
+
+
                                                         }
 
                                                     }

@@ -27,10 +27,7 @@
         <table class="table-bordered table table-condensed">
           <tr>
             <td>Path</td>
-<!--
-            <td><input type="text"
-                       ng-blur="setTitle(input.path)" ng-disabled="! isNew" class="form-control" ng-model="input.path"/> </td>
--->
+
             <td><input type="text" ng-blur="setTitle(input.path)"
                        ng-disabled="! isNew" class="form-control" ng-model="input.path"/> </td>
 
@@ -45,10 +42,7 @@
                          uib-typeahead="type for type in allTypes | filter:$viewValue"
                          class="form-control" />
 
-                  <!--
-                  <select  ng-disabled="! isNew" ng-model="input.type" class="form-control"
-                           ng-options="typ for typ in allTypes"></select>
-                  -->
+
 
                 </div>
                 <div class="col-md-2">
@@ -131,7 +125,6 @@
           <tr  ng-show="input.selectedType == 'CodeableConcept'">
             <td>'Other' type</td>
             <td>
-              <!--  <span ng-repeat = "opt in ['sometimes','always','textonly']"> -->
               <span ng-repeat = "opt in ['sometimes','textonly']">
                   <input type="radio"
                          ng-change="setControlHint(selectedNode.data.ed,opt)"
@@ -267,7 +260,6 @@
 
       </uib-tab>
 
-
       <uib-tab ng-show="input.selectedType == 'Quantity'">
         <uib-tab-heading>Units <span class="badge">{{units.length}}</span> </uib-tab-heading>
 
@@ -354,6 +346,33 @@
             This element is a reference to another DataGroup.
           </div>
         </div>
+
+      </uib-tab>
+
+      <uib-tab heading="Layout">
+        <table class="table-bordered table table-condensed">
+          <tr>
+            <td>Insert after</td>
+
+            <td>
+
+              <div class="row">
+                <div class="col-md-11">
+                  <select class="form-control" ng-model="input.insertAfter"
+                          ng-options="path for path in allPaths"></select>
+                </div>
+                <div class="col-md-1">
+                  <i class="btn btn-link glyphicon glyphicon-remove clickable"
+                     ng-click="input.insertAfter = ''"></i>
+                </div>
+              </div>
+
+              </td>
+
+
+
+          </tr>
+        </table>
 
       </uib-tab>
 
