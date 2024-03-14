@@ -5,6 +5,7 @@ angular.module("pocApp")
             $scope.version = utilsSvc.getVersion()
 
 
+
             $scope.input = {}
             $scope.isDirty = false;
             let nzDisplayLanguage = "en-x-sctlang-23162100-0210105"
@@ -14,14 +15,19 @@ angular.module("pocApp")
             // >>>>>>>> this approach won't work any more to discriminate between the
             //different include elements - but I'll keep them as separate versions in case we need them to be different
             let versionEcl = "http://snomed.info/sct/21000210109"      //the version that has the ECL statements
-            let versionDirect = "http://snomed.info/sct/21000210109"             //concepts directly included in the VS. Often changing the display
-            let versionPrePub = "http://snomed.info/sct/21000210109"  //the version that has concepts not yet published
+            //let versionDirect = "http://snomed.info/sct/21000210109"             //concepts directly included in the VS. Often changing the display
+            //let versionPrePub = "http://snomed.info/sct/21000210109"  //the version that has concepts not yet published
+
+            //the url for the unpublished concepts. this will be the system value in the valueset,
+            //and the url for the CodeSystem
+            let systemPrePub = "http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished"
+            let csId = "canshare-unpublished-concepts"   //the id for the CodeSystem
 
 
             //get the CodeSystem used for pre published codes
-            updateVSSvc.getCodeSystem().then(
+            updateVSSvc.getCodeSystem(csId,systemPrePub).then(
                 function (cs) {
-                    $scope.prepubCS = cs
+                    $scope.prePubCS = cs
                 }, function (err) {
                     alert(err)
                 }
@@ -107,12 +113,12 @@ angular.module("pocApp")
 
 
 
-            //add a concept to the list directly included in the VS. In an include section with the version 'versionDirect'
+            //add a concept to the list directly included in the VS. In an include section with the snomed system
             $scope.addDisplayConcept = function () {
 
                 $scope.input.displayConcepts = $scope.input.displayConcepts || []
                 let concept = {code:$scope.input.newDisplayCode,display:$scope.input.newDisplayDisplay}
-                updateVSSvc.setConceptType(concept,'display') //adds the concepttype extension
+               // updateVSSvc.setConceptType(concept,'display') //adds the concepttype extension
 
                 $scope.input.displayConcepts.push(concept)
                 delete $scope.input.newDisplayCode
@@ -131,10 +137,11 @@ angular.module("pocApp")
             $scope.addPPConcept = function () {
 
                 $scope.input.prePubConcepts = $scope.input.prePubConcepts || []
-                let concept = {code:$scope.input.newPPCode,display:$scope.input.newPPDisplay}
-                updateVSSvc.setConceptType(concept,'prepub') //adds the concepttype extension
+                let concept = {code:$scope.input.newPPCode, display:$scope.input.newPPDisplay}
+               // updateVSSvc.setConceptType(concept,'prepub') //adds the concepttype extension
                 $scope.input.prePubConcepts.push(concept)
-                if (updateVSSvc.addConceptToCodeSystem( $scope.prepubCS,concept)) {
+
+                if (updateVSSvc.addConceptToCodeSystem( $scope.prePubCS,concept)) {
                     $scope.csDirty = true
                 }
                 delete $scope.input.newPPCode
@@ -164,12 +171,38 @@ angular.module("pocApp")
             }
 
             function performUpdate(vs) {
+
+                //Update the CodeSystem then the ValueSet...
+
+                updateVSSvc.updateCodeSystem($scope.prePubCS).then(
+                    function () {
+                        $scope.csDirty = false
+                        let qry = '/nzhts/ValueSet'
+                        $http.put(qry,vs).then(
+                            function (data) {
+                                alert('Both ValueSet and CodeSystem update complete')
+                            },function (err) {
+                                alert('The CodeSystem was updated, but not the ValueSet:' + angular.toJson(err.data))
+                            }
+                        )
+
+
+
+                    }, function (err) {
+                        console.log(err)
+                        alert(`Neither CodeSystem nor ValueSet was updated: ${angular.toJson(err)}`)
+                    }
+                )
+
+
+                /*
+
                 let qry = '/nzhts/ValueSet'
                 $http.put(qry,vs).then(
                     function (data) {
 
                         if ($scope.csDirty) {
-                            updateVSSvc.updateCodeSystem($scope.prepubCS).then(
+                            updateVSSvc.updateCodeSystem($scope.prePubCS).then(
                                 function () {
                                     $scope.csDirty = false
                                     alert('Both ValueSet and CodeSystem update complete')
@@ -190,17 +223,44 @@ angular.module("pocApp")
                         alert(angular.toJson(err))
                     }
                 )
+
+                */
+
+/*
+                //a separate update function as sometimes the unpublished CodeSystem resource needs to be
+                function updateVsResource(vs,cb) {
+                    let qry = '/nzhts/ValueSet'
+                    $http.put(qry,vs).then(
+                        function (data) {
+
+                        }
+                }
+
+*/
+
+
+
             }
 
+            //called by the 'Update VS button
             $scope.updateVS = function (vs) {
-                if (confirm("Are you sure you wish to update this valueSet")) {
+                let msg = "Are you sure you wish to update this valueSet"
+                if ($scope.csDirty) {
+                    msg += " and CodeSystem"
+                }
+                if (confirm(msg)) {
 
                     console.log(angular.toJson($scope.selectedVS,null,2))
-                   // return
+
+
 
                     performUpdate($scope.selectedVS)
 
                 }
+
+
+
+
             }
 
             $scope.newVS = function () {
@@ -217,6 +277,17 @@ angular.module("pocApp")
                 delete $scope.input.description
                 delete $scope.input.ecl
                 delete $scope.input.displayConcepts
+
+                delete $scope.expandedVS
+                delete $scope.selectedVS
+                delete $scope.expandQry
+                delete $scope.qUsingVS
+                //delete $scope.dummyQR
+                delete $scope.input.prePubConcepts
+
+
+
+
                 $scope.input.status = 'active'
 
                 $scope.makeVS()
@@ -290,61 +361,49 @@ angular.module("pocApp")
                         let identified = false
 
                         //if the include has a filter, then it's the ecl. Otherwise it's a diect concept
-
-                        if (system == snomed) {
-                            if (inc.filter) {
-                                //this is the ecl
-                                $scope.input.ecl = inc.filter[0].value
-                            } else if (inc.concept) {
-                                //these are directly included concepts
-                                inc.concept.forEach(function (concept) {
-                                    let type = updateVSSvc.getConceptType(concept)  //
-
-                                    type = type || 'display'    //<<< todo as can't remove otherwise
-
-                                    switch (type) {
-                                        case 'prepub' :
-                                            //a concept not yet published
-                                            $scope.input.prepubConcepts = $scope.input.prepubConcepts || []
-                                            $scope.input.prepubConcepts.push(concept)
-                                            break
-                                        case 'display' :
-                                            //included so a different display can be added
-                                            $scope.input.displayConcepts = $scope.input.displayConcepts || []
-                                            $scope.input.displayConcepts.push(concept)
-                                            break
-                                        default :
-                                            alert(`Unknown concept type: ${type}`)
-
-
-                                    }
-
-                                })
-                            } else {
-                                alert(`Unknown include element: ${angular.toJson(inc)}`)
-                            }
-
-                        } else {
-                            alert("Non snomed code in the VS. Are you sure of this?")
-                        }
-
-
-                        /*
-                        if (system == snomed && version == versionEcl) {
-                            //this is the main ecl statement
+                        if (inc.filter) {
+                            //this is the ecl
                             $scope.input.ecl = inc.filter[0].value
-                        } else if(system == snomed && version == versionPrePub) {
-                            //these are pre-published concepts
-                            $scope.input.prePubConcepts = inc.concept
-                        } else if(system == snomed && version == versionDirect) {
-                            //these are direct concepts
-                            $scope.input.directConcepts = inc.concept
-                        } else {
-                            $scope.parseError = true
-                            alert(`Unknown include. system:${system}, version:${version}`)
-                        }
+                        } else if (inc.concept) {
+                            //these are directly included concepts might be display or pre-pub (unpublished)
+                            inc.concept.forEach(function (concept) {
+                                //if the system is snomed, then it is display - otherwise pre-pub
+                                if (inc.system == snomed) {
+                                    $scope.input.displayConcepts = $scope.input.displayConcepts || []
+                                    $scope.input.displayConcepts.push(concept)
+                                } else {
+                                    $scope.input.prePubConcepts = $scope.input.prePubConcepts || []
+                                    $scope.input.prePubConcepts.push(concept)
+                                }
 
-                        */
+/*
+
+                                let type = updateVSSvc.getConceptType(concept)  //
+
+                                type = type || 'display'    //<<< todo as can't remove otherwise
+
+                                switch (type) {
+                                    case 'prepub' :
+                                        //a concept not yet published
+                                        $scope.input.prePubConcepts = $scope.input.prePubConcepts || []
+                                        $scope.input.prePubConcepts.push(concept)
+                                        break
+                                    case 'display' :
+                                        //included so a different display can be added
+                                        $scope.input.displayConcepts = $scope.input.displayConcepts || []
+                                        $scope.input.displayConcepts.push(concept)
+                                        break
+                                    default :
+                                        alert(`Unknown concept type: ${type}`)
+
+
+                                }
+                                */
+
+                            })
+                        } else {
+                            alert(`Unknown include element: ${angular.toJson(inc)}`)
+                        }
 
                     })
                 }
@@ -363,7 +422,7 @@ angular.module("pocApp")
                 delete $scope.selectedVS
                 delete $scope.expandQry
                 delete $scope.qUsingVS
-                delete $scope.dummyQR
+                //delete $scope.dummyQR
                 delete $scope.input.prePubConcepts
                 delete $scope.input.displayConcepts
 
@@ -386,6 +445,7 @@ angular.module("pocApp")
                                 $scope.selectedVS = data.data.entry[0].resource
                                 parseVS($scope.selectedVS)
                                 console.log($scope.selectedVS)
+                                console.log($scope.input.prePubConcepts)
                             }
                         } else {
                             alert("The ValueSet was not found")
@@ -553,7 +613,7 @@ angular.module("pocApp")
 
                 if (vo.prePubConcepts && vo.prePubConcepts.length > 0) {
                     //These are concepts directly added to the VS that are in the publishing env. but not the main env.
-                    let ppInclude = {system:snomed,version:versionPrePub,concept:[]}
+                    let ppInclude = {system:systemPrePub,concept:[]}
                     vo.prePubConcepts.forEach(function (concept) {
                         ppInclude.concept.push(concept)
                     })

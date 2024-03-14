@@ -315,11 +315,13 @@
                                                 <div class="col-md-10">
                                                     <input ng-model="input.newPPCode" type="text" class="form-control"/>
                                                 </div>
+                                                <!--
                                                 <div class="col-md-2">
                                                     <i style="color: orange" class="glyphicon glyphicon-question-sign clickable"
                                                        ng-show="input.newPPCode"
                                                        ng-click="getDisplay(input.newPPCode,'newPPDisplay')"></i>
                                                 </div>
+                                                -->
                                             </div>
 
 
@@ -410,13 +412,18 @@
                     <pre>{{selectedVS | json}}</pre>
                 </uib-tab>
 
-                <uib-tab heading="Pre-published concepts">
+                <uib-tab heading="Unpublished concepts">
+                    <br/>
+                    <em>This is the custom ValueSet for unpublished concepts. These are concepts that have been defined
+                    in SNOMED but not yet published. They have a different system url (as they don't yet exist in the
+                    Terminology Server). If they are used by an implementer, then they will be responsible for making
+                    any changes required once the concepts are formally published. </em>
                     <uib-tabset>
                         <uib-tab heading="Table">
                             <br/>
                             <table class="table table-bordered">
                                 <tr><th>Code</th><th>Display</th></tr>
-                                <tr ng-repeat="concept in prepubCS.concept">
+                                <tr ng-repeat="concept in prePubCS.concept">
                                     <td>{{concept.code}}</td>
                                     <td>{{concept.display}}</td>
 
@@ -425,7 +432,7 @@
 
                         </uib-tab>
                         <uib-tab heading="Json">
-                            <pre>{{prepubCS | json}}</pre>
+                            <pre>{{prePubCS | json}}</pre>
 
                         </uib-tab>
                     </uib-tabset>

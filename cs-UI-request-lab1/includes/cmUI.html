@@ -91,6 +91,27 @@
               <div class="rounded-box">
 
 
+                  <div ng-repeat="(k,v) in cmProperties">
+                      <div class="row" ng-show="hashProperties[k]">
+                          <div class="col-md-3">
+                              {{k}}
+                          </div>
+                          <div class="col-md-7">
+                              <select class="form-control" ng-model="local.cm.property[k]"
+                                      ng-options="showConcept(c) for c in hashProperties[k]"></select>
+                          </div>
+
+
+                          <div class="col-md-2">
+                              <div class="clickable" ng-click="resetValue(k)">Reset</div>
+                          </div>
+
+                      </div>
+                  </div>
+
+
+<!--
+                  <hr/>
               <div ng-repeat="(k,v) in hashProperties">
 
 
@@ -99,18 +120,7 @@
                     {{k}}
                   </div>
 
-                    <!--
 
-                    <div ng-show="input.cmProperty == 'primary-site-laterality'">
-                        primary site here
-
-                        https://nzhts.digital.health.nz/fhir/ValueSet/canshare-topography
-                        <select class="form-control" ng-model="local.cm.property[k]"
-                                ng-options="showConcept(c) for c in v"></select>
-
-                    </div>
-
-                    -->
 
                   <div class="col-md-7">
                     <select class="form-control" ng-model="local.cm.property[k]"
@@ -125,7 +135,7 @@
                 </div>
 
               </div>
-
+-->
                 <br/>
 
 

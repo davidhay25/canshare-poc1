@@ -312,12 +312,12 @@ function setup(app) {
 
         //the cache is 'opt-in' to avoid tricky cache issues...  It's mostly needed for the LIM forms
         //it will be necessary to manually empty the cache when we update the TS
+        //should really only do this when expanding a VS
+
         let allowcache = req.headers['x-allowcache']
 
-
-
         //if the cache is active then see if the VS is in there
-        if (vsCache !== undefined && allowcache == 'yes') {
+        if (vsCache !== undefined && allowcache == 'yes')  {
             if (vsCache[query]) {
                 vsCacheStats.hit++
                 if (vsCache[query] == "404") {
@@ -459,6 +459,8 @@ function setup(app) {
     })
 
 
+    //get a Codesystem based on it's id
+
     //use when updating a CodeSystem
     app.put('/nzhts/CodeSystem',async function(req,res){
 
@@ -491,7 +493,6 @@ function setup(app) {
 
         if (vs) {
             let qry = `${nzhtsconfig.serverBase}ValueSet/${vs.id}`
-console.log(qry,vs)
             let result = await putResource(qry,vs)
             if (result) {
                 //A result is returned if there is an error
@@ -499,8 +500,6 @@ console.log(qry,vs)
                 return
             }
             res.json()      //no error
-
-
         } else {
             res.status(400).json({msg:"Must have urlencoded qry query"})
 

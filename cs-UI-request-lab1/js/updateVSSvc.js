@@ -6,7 +6,7 @@ angular.module("pocApp")
 
         //A codesystem that has pre-published concepts (ie the same as unpublished)
         let csUrl = "http://canshare.co.nz/fhir/CodeSystem/prepub-concepts"
-        let csId = "cansharePrepubConcepts"   //the id for the CodeSystem
+
 
         //let csId = "canshare-prepub-concepts"
 
@@ -24,7 +24,9 @@ angular.module("pocApp")
                         return
                     }
                 }
-                cs.concept.push(newConcept)
+                let nc = angular.copy(newConcept)
+                delete nc.extension
+                cs.concept.push(nc)
                 return true         //to indicate that the CS was updated
 
 
@@ -34,32 +36,35 @@ angular.module("pocApp")
                 //save the CS to the terminology server
                 let deferred = $q.defer()
 
-                deferred.reject({msg:"CodeSystem update disabled"})
+                //deferred.reject({msg:"CodeSystem update disabled"})
                 //return
-/* temp
+
                 let qry = '/nzhts/CodeSystem'
                 $http.put(qry,cs).then(
                     function (data) {
-                        deferred.resolve()
+                        deferred.resolve(data)
                     }, function (err) {
                         deferred.reject(angular.toJson(err))
                     }
                 )
-*/
+
                 return deferred.promise
 
             },
-            getCodeSystem : function () {
+            getCodeSystem : function (id,url) {
+
                 //get the CodeSystem used for pre published concepts
                 let deferred = $q.defer()
-                let qry = `ConceptMap?url=${csUrl}`
+                let qry = `CodeSystem/${id}`
 
                 //console.log(qry)
                 let encodedQry = encodeURIComponent(qry)
 
                 $http.get(`nzhts?qry=${encodedQry}`).then(
                     function (data) {
-
+                        //the CodeSystem was found
+                        deferred.resolve(data.data)
+/*
                         let bundle = data.data
                         console.log(bundle)
                         if (bundle ) {
@@ -69,13 +74,11 @@ angular.module("pocApp")
                                 case 0 :
                                     //a new CodeSystem
                                     let cs = {resourceType : 'CodeSystem',status:'active',name:"UnpublishedConcepts"}
-                                    cs.id = csId
-                                    cs.url = "http://snomed.info/xsct"
+                                    cs.id = id
+                                    cs.url = url
                                     //cs.version =  csVersion //"http://snomed.info/sct/21000210109"
                                     cs.title = "Concepts that are not yet formally published"
                                     cs.identifier = [{system:"http://canshare.co.nz/fhir/NamingSystem/codesystems",value:cs.name}]
-                                    //cs.supplements = snomed
-                                    //cs.content = "fragment"
                                     cs.publisher = "Te Aho o Te Kahu"
                                     cs.contact = [{telecom:[{system:"email",value:"info@teaho.govt.nz"}]}]
                                     cs.concept = []
@@ -95,13 +98,30 @@ angular.module("pocApp")
                         } else {
                             deferred.reject("No data returned ")
                         }
+                        */
 
                     }, function (err) {
-                        console.log(err)
-                        deferred.reject(err)
+                        if (err.status == '404') {
+                            //not found - create
+                            let cs = {resourceType : 'CodeSystem',status:'active',name:id}
+                            cs.id = id
+                            cs.url = url
+                            cs.content = "complete"
+                            cs.title = "Concepts that are not yet formally published"
+                            cs.identifier = [{system:"http://canshare.co.nz/fhir/NamingSystem/codesystems",value:cs.name}]
+                            cs.publisher = "Te Aho o Te Kahu"
+                            cs.contact = [{telecom:[{system:"email",value:"info@teaho.govt.nz"}]}]
+                            cs.concept = []
+                            deferred.resolve(cs)
+                        } else {
+                            console.log(err)
+                            deferred.reject(err)
+                        }
+
+
+
                     }
                 )
-
                 return deferred.promise
 
             },
