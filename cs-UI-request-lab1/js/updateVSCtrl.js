@@ -601,7 +601,7 @@ angular.module("pocApp")
                 vs.compose = {include:[include]}
 
                 if (vo.displayConcepts && vo.displayConcepts.length > 0) {
-                    //These are concepts  added to the VS that are in the publishing env. but not the main env.
+                    //These are concepts added to the VS that are in the publishing env. but not the main env.
 
                     let displayInclude = {system:snomed,concept:[]}
                     vo.displayConcepts.forEach(function (concept) {

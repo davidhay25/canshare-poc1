@@ -23,8 +23,21 @@ angular.module("pocApp")
                 arToBeOrdered.forEach(function (item) {
                     let preceding = item.ed.insertAfter        //the path of the item that the item should be inserted after
 
-                    //set the first segment to the DG name
+                    let insertPointFound = false
                     let ar = preceding.split('.')
+
+                    //the
+                    ar.splice(0,1)
+                    let endOfPath = ar.join('.')     //the path without the datatype name
+
+
+                    //set the first segment to the DG name
+
+
+
+
+
+
                     ar[0] = dgName
                     preceding = ar.join('.')
 
@@ -33,7 +46,8 @@ angular.module("pocApp")
 
                     for (let i=0; i< lst.length; i++) {
                         let tItem = lst[i]
-                        if (tItem.ed.path == preceding) {
+                        if (tItem.ed.path.endsWith(endOfPath)) {
+                        //if (tItem.ed.path == preceding) {
                             //this is the point to move the item to
                             console.log(i)
                             //first, remove the item from the tree
@@ -48,11 +62,15 @@ angular.module("pocApp")
 
                             //now insert it into the tree at 'i' - todo need to check if itemToMove is above or below insert point
                             lst.splice(i,0,itemToMove[0])
+                            insertPointFound = true
                             break
 
                         }
                     }
-                    console.log(lst)
+                    if (! insertPointFound) {
+                        console.log(`Insert point ${preceding} not found, noi re-ordering occurred`)
+                    }
+
 
                 })
 
