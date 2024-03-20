@@ -442,7 +442,10 @@ angular.module("pocApp")
 
             //called when a new element is being added. This is linked to the element name
             $scope.setTitle = function (name) {
-                $scope.input.title = name.charAt(0).toUpperCase() + name.slice(1)
+                if (name) {
+                    $scope.input.title = name.charAt(0).toUpperCase() + name.slice(1)
+                }
+
 
                 //check to see if this name is the same as an inherited one
                 //checkDuplicatePath(name)
