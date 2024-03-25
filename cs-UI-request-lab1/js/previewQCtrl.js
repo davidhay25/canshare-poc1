@@ -4,14 +4,19 @@ angular.module("pocApp")
 
 
 
+
             //https://hackweek.fhirpath-lab.com/Questionnaire?id={url to Q}
 
             $scope.input = {}
             $scope.Q = Q // Qtab //Q
             $scope.QR = {}
 
-            $scope.serverbase = "http://hapi.fhir.org/baseR4/"  //used for validation
-            //$scope.serverbase = "https://fhir.forms-lab.com/"
+            //todo Just for the ak demo -
+            ///scope.pathToQ = `https://fhir.forms-lab.com/Questionnaire/${$scope.Q.id}`
+
+
+            //$scope.serverbase = "http://hapi.fhir.org/baseR4/"  //used for validation
+            $scope.serverbase = "https://fhir.forms-lab.com/"
 
 
             let vo = makeQSvc.makeTreeFromQ(Q)
@@ -75,13 +80,20 @@ angular.module("pocApp")
 
 
             }
-            
-            
+
+
+
+
             $scope.saveToServer = function () {
                 //saves the Q to the hapi server so that we can invoke the fhirpath lab
                 //Once the POC is ssl then we can save there instead
                 if (confirm("This will save the Q to the public HAPI server so it can be accessed by the Questionnaire renderer.")) {
-                    let qry = `https://hapi.fhir.org/baseR4/Questionnaire/${$scope.Q.id}`
+
+                    let qry = `https://fhir.forms-lab.com/Questionnaire/${$scope.Q.id}`
+
+                    //let qry = `https://hapi.fhir.org/baseR4/Questionnaire/${$scope.Q.id}`
+
+
                     $http.put(qry,$scope.Q).then(
                         function (data) {
                             alert("Resource saved.")
@@ -220,6 +232,30 @@ angular.module("pocApp")
                     $scope.$digest();
                 });
 
+            }
+
+            $scope.localCopyToClipboard = function(text) {
+                let textArea = document.createElement("textarea");
+                textArea.value = text;
+
+                // Avoid scrolling to bottom
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.position = "fixed";
+
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    let successful = document.execCommand('copy');
+                    let msg = successful ? 'successful' : 'unsuccessful';
+                    console.log('Fallback: Copying text command was ' + msg);
+                } catch (err) {
+                    alert('Fallback: Oops, unable to copy', err);
+                }
+
+                document.body.removeChild(textArea);
             }
 
         }

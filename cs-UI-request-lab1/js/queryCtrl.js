@@ -2,9 +2,14 @@ angular.module("pocApp")
     .controller('queryCtrl',
         function ($scope,$http,$localStorage,$uibModal,$q,$timeout,querySvc,utilsSvc,cmSvc) {
 
-            $scope.localStorage = $localStorage
 
             $scope.input = {}
+            $scope.input.mainTabActive = 1      //just while developing - selects that conceptmap tab
+
+
+            $scope.localStorage = $localStorage
+
+
             $scope.version = utilsSvc.getVersion()
 
             $scope.input.tsInstance = "authoring"

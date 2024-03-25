@@ -4,8 +4,11 @@ angular.module("pocApp")
 
             let snomed = "http://snomed.info/sct"
             $scope.local = {cmOptions : {},cm:{property:{}}}
+
             $scope.cmProperties = {}
 
+            $scope.local.conceptMapTab = 3      //select the UI tab while developing
+            $scope.local.uiValues = {}          //a hash of values selected in the UI
             //$scope.input.showHelp = true
 
             $scope.showTarget = function (target) {
@@ -30,64 +33,7 @@ angular.module("pocApp")
 
 
 
-            $scope.editRule = function (target) {
 
-                $uibModal.open({
-                    backdrop: 'static',      //means can't close by clicking on the backdrop.
-                    keyboard: false,       //same as above.
-                    size : 'lg',
-                    templateUrl: 'modalTemplates/editRule.html',
-
-                    controller: function ($scope,target) {
-                        $scope.input = {}
-                        $scope.target = target
-
-                        $scope.properties = []
-                        $scope.properties.push("cancer-service")
-                        $scope.properties.push("cancer-stream")
-                        $scope.properties.push("cancer-substream")
-                        $scope.properties.push("cancer-type")
-                        $scope.properties.push("primary-site-laterality")
-                        $scope.properties.push("histologic-type-primary")
-
-                        if (target) {
-                            $scope.input.url = target.code
-                            $scope.input.display = target.display
-                            $scope.input.dependsOn = target.dependsOn
-                        } else {
-                            $scope.input.dependsOn = []
-                        }
-
-                        $scope.addTrigger = function () {
-                            let trigger = {property:$scope.input.newTriggerProperty}
-                            trigger.display = $scope.input.newTriggerDisplay
-                            trigger.value = $scope.input.newTriggerValue
-                            $scope.input.dependsOn.push(trigger)
-                            delete $scope.input.newTriggerProperty
-                            delete $scope.input.newTriggerDisplay
-                            delete $scope.input.newTriggerValue
-                        }
-
-                    },
-                    resolve: {
-                        target: function () {
-                            return target
-                        }
-                    }
-
-                }).result.then(function (vo) {
-
-                })
-
-            }
-
-            $scope.deleteRule = function () {
-
-            }
-
-            $scope.addRule = function () {
-
-            }
 
             //expand a ValueSet
             $scope.cmExpandVS = function (url) {
@@ -152,16 +98,23 @@ angular.module("pocApp")
             function setup() {
                 $scope.local.cmOptions = {}
                 //these are the properties
-                $scope.cmProperties['patient-sex'] = {concept: {code:"184100006"},options:[]}
+                $scope.cmProperties = {}
+                $scope.cmProperties['patient-sex'] = {concept: {code:"184100006"},next:'cancer-service',options:[]}
                 $scope.cmProperties['cancer-service'] = {concept: {code:"299801000210106"},next:'cancer-stream',options:[]}
-                $scope.cmProperties['cancer-stream'] = {concept:{code:"299811000210108",display:"Cancer Stream",system:snomed}, options : []}
-                $scope.cmProperties['cancer-substream'] = {concept: {code:"299821000210103"},options:[]}
-                $scope.cmProperties['cancer-type'] = {concept: {code:"299831000210101"},options:[]}
-                $scope.cmProperties['primary-site'] = {concept: {code:"399687005"},options:[]}
-                $scope.cmProperties['primary-site-laterality'] = {concept: {code:"297561000210100"},options:[]}
+                $scope.cmProperties['cancer-stream'] = {concept:{code:"299811000210108",display:"Cancer Stream",system:snomed},
+                    next:'cancer-substream', options : []}
+                $scope.cmProperties['cancer-substream'] = {concept: {code:"299821000210103"},next:'cancer-type',options:[]}
+                $scope.cmProperties['cancer-type'] = {concept: {code:"299831000210101"},next:'primary-site',options:[]}
+                $scope.cmProperties['primary-site'] = {concept: {code:"399687005"},next:'primary-site-laterality',options:[]}
+                $scope.cmProperties['primary-site-laterality'] = {concept: {code:"297561000210100"},next:'histologic-type-primary',options:[]}
                 $scope.cmProperties['histologic-type-primary'] = {concept: {code:"512001000004108"},options:[]}
 
 
+
+                $scope.cmProperties['patient-sex'].options.push({code:"U",display:"Unknown"})
+                $scope.cmProperties['patient-sex'].options.push({code:"O",display:"Other"})
+                $scope.cmProperties['patient-sex'].options.push({code:"F",display:"Female"})
+                $scope.cmProperties['patient-sex'].options.push({code:"M",display:"Male"})
 
 
                 //cancer service options are fixed - todo get from CM
@@ -179,6 +132,7 @@ angular.module("pocApp")
             }
 
             //get all the concepts for a single property - this is applying the rules engine...
+            //called from the Rules tab
             $scope.getOptionsOneProperty = function() {
                 //console.log($scope.local.cm.property)
                 delete $scope.lstMatchingConcepts
@@ -191,8 +145,10 @@ angular.module("pocApp")
 
                 //
 
-
-                let vo = cmSvc.rulesEngine($scope.input.cmProperty,$scope.local.cm.property,$scope.selectedElement,$scope.hashExpandedVs)
+                //rules engine takes:
+                //
+                let vo = cmSvc.rulesEngine($scope.input.cmProperty,$scope.local.cm.property,
+                    $scope.selectedElement,$scope.hashExpandedVs)
 
                 $scope.matchingVS = vo.lstVS
                 $scope.matchedRules = vo.lstMatches
@@ -300,7 +256,7 @@ angular.module("pocApp")
                             $scope.hashExpandedVs['https://nzhts.digital.health.nz/fhir/ValueSet/canshare-topography'].forEach(function (concept) {
                                 $scope.hashProperties['primary-site'].push(concept)
                             })
-                            //alert('lat')
+
                         }
 
 
@@ -321,21 +277,174 @@ angular.module("pocApp")
                             })
                         })
 
-
-
-
                         break
                     }
                 }
             }
 
+
+            //when a selection is made in the UI. We want to select options for the next one...
+            $scope.uiValueSelected = function (propKey) {
+                //console.log(propKey)
+
+                let def = $scope.cmProperties[propKey]
+                if (def && def.next) {
+                    $scope.populateUIControl(def.next)
+                }
+
+            }
+
+            //reset all the inputs for the UI
+            $scope.resetUI = function () {
+                delete $scope.lstMatchingConceptsForUI
+                delete $scope.uiMatchingVS
+                delete $scope.uiHashValues
+
+                $scope.local.cmOptions = {}     //the data entered
+/*
+                Object.keys($scope.cmProperties).forEach(function (key) {
+                    $scope.cmProperties[key].options = []
+                    delete $scope.cmProperties[key].singleConcept
+                    delete $scope.cmProperties[key].nomatches
+
+                })
+
+                */
+
+                setup()         //sets the defaulvalues
+
+            }
+
+            //called to populate the UI control for a single property
+            $scope.populateUIControl = function (propKey) {
+                delete $scope.lstMatchingConceptsForUI
+                delete $scope.uiMatchingVS
+                delete $scope.singleConcept     //if a single concept is returned (rather than a VS)
+
+                $scope.local.uiTitle = `Looking for possible values for ${propKey}`
+                //propKey is the property we're wanting to populate
+                //strategy is that we want to find the matching target in the CM based solely on the values
+                //of elements 'before' this property in the property order.
+
+
+                //get the ConceptMap element that has all the targets for this property
+                let propertyCode = $scope.cmProperties[propKey].concept.code        //the actual code in the element.code
+                let cmElement = {}
+                for (const element of $scope.fullSelectedCM.group[0].element) {
+                    if (element.code == propertyCode) {     //this is the set of targets which could match this code
+                        cmElement = element
+                    }
+                }
+
+                if (! cmElement) {
+                    alert(`An element in the Concept map for the code ${propertyCode} could not be located`)
+                    return
+                }
+
+
+                $scope.uiHashValues = {}     //a hash of all the data entered - but only those 'before' this element
+                for (const prop of Object.keys($scope.cmProperties)) {
+                    if (prop == propKey) {
+                        break
+                    }
+                    $scope.uiHashValues[prop] = $scope.local.cmOptions[prop] //$scope.local.cmOptions has the data entered thus far.
+                    //console.log(prop,$scope.local.cmOptions[prop])
+                }
+
+
+                //now, apply the rules engine to this element and set of codes
+                let vo = cmSvc.rulesEngine(null,$scope.uiHashValues,cmElement,$scope.hashExpandedVs)
+
+                $scope.uiMatchingVS = vo.lstVS                //The valuesets from all rules that were matched
+                //$scope.uiMmatchedRules = vo.lstMatches         //the actual targets that matched
+                $scope.uiMatchingTargets = vo.lstMatchingTargets
+
+
+                //console.log($scope.uiMatchingVS)
+
+
+
+                if ($scope.uiMatchingVS && $scope.uiMatchingVS.length > 0) {
+
+                    if ($scope.uiMatchingVS[0].indexOf('http') == -1) {
+                        //this is a single concept. We can get the display details from the forst element of $scope.uiMatchingTargets
+                        let target = $scope.uiMatchingTargets[0]
+                        $scope.singleConcept = {code:target.code,display:target.display,system:target.system}
+                        $scope.cmProperties[propKey].singleConcept = {code:target.code,display:target.display,system:target.system}
+
+                        //as there is only a single concept, which is not editable then move on to the next one
+                        //todo - this does mean we won't see the details
+                        let next = $scope.cmProperties[propKey].next
+                        if (next) {
+                            $scope.populateUIControl(next)
+                        }
+
+                    } else {
+                        //now expand the valuesets to get the actual concepts
+                        let qry = `/nzhts/expandMultipleVs`
+                        $http.post(qry,$scope.uiMatchingVS).then(
+                            function (data) {
+                                console.log(data)
+
+                                $scope.cmProperties[propKey].options = data.data
+
+                                $scope.lstMatchingConceptsForUI = data.data
+                            }, function (err) {
+                                console.log(err)
+                            }
+                        )
+                    }
+
+
+
+
+                } else {
+                    $scope.cmProperties[propKey].noMatches = true
+
+                    let next = $scope.cmProperties[propKey].next
+                    if (next) {
+                        $scope.populateUIControl(next)
+                    }
+
+                   // alert(`There were no matching ValueSets found for ${propKey}`)
+
+
+                }
+
+
+
+
+
+            }
+
             //called when a property option in the UI changes
-            $scope.cmLookup = function (prop,v,propKey) {
-                console.log(prop,v,propKey)
+            $scope.cmLookup = function (inputProp,v,propKey) {
+                //propKey is the property name = eg cancer-service
+
+
+
+                //console.log(inputProp,v,propKey)
+                //determine the set of properties that are inpts into this one.
+                //these are the properties 'before' the one we're looking at
+                //eg if we're after the property 'cancer-stream' then we're only interested in patient-sex and cancer-service
+
+                // $scope.local.uiValues  has the values selected thus far. a hash keyed on property. content is Coding
+
+                for (const prop of Object.keys($scope.cmProperties)) {
+                    console.log(prop)
+                    if (prop == propKey) {
+                        break
+                    }
+                }
+
+
+
+
+
                 return;
 
                 //just set the next one
-                let nextProperty = $scope.cmProperties[prop.next]
+                let nextProperty = $scope.cmProperties[inputProp.next]
 
                 //
 
@@ -451,8 +560,11 @@ angular.module("pocApp")
 
             }
 
+
+            //---------  deprecated functions here....
+
             //generate the translate query from the canshare lookup tab
-            function makeTranslateQuery(conceptWeWant,cmUrl)  {
+            function makeTranslateQueryDEP(conceptWeWant,cmUrl)  {
 
                 conceptWeWant.system = conceptWeWant.system || "http://snomed.info/sct"
 
@@ -497,7 +609,7 @@ console.log(p)
 
             }
 
-            function performTranslate(parameters) {
+            function performTranslateDEP(parameters) {
                 let deferred = $q.defer()
                 //let parameters = vo.parameters  //the parameters resource
                 $http.post('nzhts',parameters).then(
@@ -530,6 +642,68 @@ console.log(p)
                 )
 
                 return deferred.promise
+            }
+
+
+
+
+            $scope.editRuleDEP = function (target) {
+
+                $uibModal.open({
+                    backdrop: 'static',      //means can't close by clicking on the backdrop.
+                    keyboard: false,       //same as above.
+                    size : 'lg',
+                    templateUrl: 'modalTemplates/editRule.html',
+
+                    controller: function ($scope,target) {
+                        $scope.input = {}
+                        $scope.target = target
+
+                        $scope.properties = []
+                        $scope.properties.push("cancer-service")
+                        $scope.properties.push("cancer-stream")
+                        $scope.properties.push("cancer-substream")
+                        $scope.properties.push("cancer-type")
+                        $scope.properties.push("primary-site-laterality")
+                        $scope.properties.push("histologic-type-primary")
+
+                        if (target) {
+                            $scope.input.url = target.code
+                            $scope.input.display = target.display
+                            $scope.input.dependsOn = target.dependsOn
+                        } else {
+                            $scope.input.dependsOn = []
+                        }
+
+                        $scope.addTrigger = function () {
+                            let trigger = {property:$scope.input.newTriggerProperty}
+                            trigger.display = $scope.input.newTriggerDisplay
+                            trigger.value = $scope.input.newTriggerValue
+                            $scope.input.dependsOn.push(trigger)
+                            delete $scope.input.newTriggerProperty
+                            delete $scope.input.newTriggerDisplay
+                            delete $scope.input.newTriggerValue
+                        }
+
+                    },
+                    resolve: {
+                        target: function () {
+                            return target
+                        }
+                    }
+
+                }).result.then(function (vo) {
+
+                })
+
+            }
+
+            $scope.deleteRuleDEP = function () {
+
+            }
+
+            $scope.addRuleDEP = function () {
+
             }
 
         })

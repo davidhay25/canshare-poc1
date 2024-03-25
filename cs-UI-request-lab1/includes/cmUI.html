@@ -31,7 +31,7 @@
         </div>
     </div>
 
-  <uib-tabset>
+  <uib-tabset active="local.conceptMapTab">
     <uib-tab heading="Rules">
       <br/>
 
@@ -422,33 +422,107 @@
           <pre>{{fullSelectedCM | json}}</pre>
       </uib-tab>
 
-    <uib-tab heading="UI">
-      <em>This tab is incomplete. The intention is to produce a sample UI that shows how the
-      options in the form can be populated taking into account the other options</em>
-        <div ng-show="input.showHelp" class="alert-info alert">
 
-        </div>
+    <uib-tab heading="UI">
+
+
       <div class="row">
         <div class="col-md-4">
           <table class="table table-bordered">
             <tr ng-repeat = "(k,v) in cmProperties">
               <td width = "30%">
-                <div class = 'clickable' ng-click="makeListOfTargets(k)">{{k}}</div>
+                <div class = 'clickable' ng-click="populateUIControl(k)">{{k}}</div>
               </td>
               <td>
-                <select class="form-control" ng-model="local.cmOptions[k]"
-                        ng-change="cmLookup(v,local.cmOptions[k],k)"
-                        ng-options="v.display for (k,v) in v.options">
-                </select>
+
+
+                  <div ng-show="v.noMatches">
+                      There were no matching ValueSets or Concepts
+                  </div>
+
+                  <div ng-show="v.singleConcept">
+                      <input type="text" class="form-control" disabled="disabled" value="{{v.singleConcept.display}}"/>
+                  </div>
+
+                  <div ng-show="v.options.length > 1">
+                      <select class="form-control" ng-model="local.cmOptions[k]"
+                              ng-change="uiValueSelected(k)"
+                              ng-options="v.display for (k,v) in v.options">
+                      </select>
+                  </div>
+
+
+
               </td>
             </tr>
           </table>
+
+
+            <button class="btn-primary btn" ng-click="resetUI()">Reset</button>
+
         </div>
         <div class="col-md-8">
+            <div ng-show="input.showHelp" class="alert-info alert">
+                <p>Select the values from the top, heading down. </p>
+                <p>Clicking on the property name will get the options for that property.</p>
+                <p>When a property value is selected, the next property in order will be automatically populated. </p>
+                <p>If the matched option is a single concept (rather than a ValueSet) then it is shown in a disabled font.
+
+                </p>
+            </div>
+
+            <h3>{{local.uiTitle}}</h3>
+
+            <uib-tabset>
+                <uib-tab heading="Options">
+
+                    <div ng-show="singleConcept">
+                        <h4>A single concept was returned</h4>
+                        {{singleConcept.display}} {{singleConcept.code}} {{singleConcept.system}}
+                    </div>
+                    <div ng-hide="singleConcept">
+                        <h4>Matching ValueSet/s</h4>
+                        <ul class="list-unstyled">
+                            <li ng-repeat="url in uiMatchingVS">{{url}}</li>
+                        </ul>
 
 
+                        <h4>Possible values</h4>
 
 
+                        <div class="tableFixHead">
+                            <table class="table table-bordered table-condensed">
+                                <thead>
+                                <tr><th>Display</th><th>Code</th><th>System</th></tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="concept in lstMatchingConceptsForUI">
+                                    <td>{{concept.display}}</td>
+                                    <td>{{concept.code}}</td>
+                                    <td>{{concept.system}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </uib-tab>
+                <uib-tab heading="Engine details">
+                    <h4>Property values used by engine</h4>
+                    <table class="table table-condensed table-bordered">
+                        <tr><th>Property</th><th>Display</th><th>Code</th><th>System</th></tr>
+                        <tr ng-repeat="(k,v) in uiHashValues">
+                            <td>{{k}}</td>
+                            <td>{{v.display}}</td>
+                            <td>{{v.code}}</td>
+                            <td>{{v.system}}</td>
+                        </tr>
+                    </table>
+
+                    <h4>Matching targets</h4>
+                    <pre>{{uiMatchingTargets | json}}</pre>
+                </uib-tab>
+            </uib-tabset>
 
         </div>
       </div>

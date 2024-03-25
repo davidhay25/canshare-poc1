@@ -393,7 +393,7 @@ function createUUID() {
 }
 
 function checkUrlSlash(url) {
-    if (url.slice(-1) !== '/') {
+    if (url && url.slice(-1) !== '/') {
         return url + "/"
     } else {
         return url

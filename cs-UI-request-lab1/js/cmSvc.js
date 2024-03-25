@@ -11,12 +11,14 @@ angular.module("pocApp")
 
 
         return {
-            rulesEngine :  function (property,hashInput,element,hashExpandedVs) {
+            rulesEngine :  function (propertyDEP,hashInput,element,hashExpandedVs) {
                 //get the options for a property.
                 //parameters:
                 //  property - the property name for which concepts are sought - eg cancer-stream
                 //  hashInput - a hash keyed by property name that has all the properties where the user has selected a value. format {code: display:}
                 //  element -  has all the possible targets for that property (each property has one element in the CM)
+                //  hashExpandedVs - all the valueSets needed for the 'in-valueset' rule
+
 
                 //current processing:
                 //  start by creating a list for all the elements
@@ -27,15 +29,17 @@ angular.module("pocApp")
                 //      otherwise (the value is !== 0) then there must be an input value for that property for it to be included
                 //      if all the dependsOn criteria are met, then the target ValueSet is expanded and the contents added to the list
 
-                let lstConcepts = []    //this will be the set of possible concepts
+               // let lstConcepts = []    //this will be the set of possible concepts
                 if (! element.target) {
-                    return lstConcepts
+                    alert("No element.target")
+                    return {}
                 }
 
-                console.log(hashExpandedVs)
+                //console.log(hashExpandedVs)
 
                 let lstVs = []          //this will be a list of valueSets whose contents are in the list of possible values
-                let lstMatchingRules = []   //the rules that were matched
+                let lstMatchingRules = []       //the index of rules/targets that were matched
+                let lstMatchingTargets = []     //the targets that matched
                 element.target.forEach(function (target,inx) {
                     //let include = falsein
                     target.matched = false
@@ -69,48 +73,44 @@ angular.module("pocApp")
                                 //here is where we need to have different processing based on operator
                                 if (don['x-operator'] == "=" ) {
                                     //simple equality
-                                    if (! hashInput[don.property] || hashInput[don.property].code !== don.value) {
+                                    //if there is no value, or if there is a value and it is different then don't match
+                                    if (! hashInput[don.property] || (hashInput[don.property].code !== don.value) ) {
                                         include = false     //nope
                                     }
                                 } else  if (don['x-operator'] == "in-vs" ) {
                                     //need to see if the code in hashInput[don.property] is a member of the VS don.value
                                     include = false
+
                                     console.log(don)
-                                    let arCodes = hashExpandedVs[don.value]
-                                    let value = hashInput[don.property]
-                                    if (arCodes) {
-                                        for (const concept of arCodes) {
-                                            if (concept.code == value.code) {
-                                                include = true
-                                                break
+                                    let arCodes = hashExpandedVs[don.value]     //the set of codes in the indicated valueset
+                                    let value = hashInput[don.property]         //the value of the property we're looking at
+
+                                    //if there's a value for the property then see if it is in the ValueSet
+                                    if (value) {
+                                        if (arCodes && value) {
+                                            for (const concept of arCodes) {
+                                                //console.log(concept)
+                                                if (concept.code == value.code) {
+                                                    include = true
+                                                    break
+                                                }
                                             }
                                         }
                                     }
+
                                 }
                             }
 
                         })
 
-                        //If there are any properties with input values that we haven't examined, then exclude
-                        //ie if some other property has a value, but the don doesn't mention it then exclude it
-/* - not sure
-                        Object.keys(hashInput).forEach(function (inputProperty) {
-                            //inputProperty is a property that has a provided input
-                            if (! hashPropertiesExamined[inputProperty]) {
-                                //there is a property that was passed in with a value, but none of the DONs had it as a value.
-                                //in this case the match fails.
-                                include = false
-                            }
-                        })
-*/
-
-
 
                         //right, we've looked at all the dependsOn - should the target be included?
                         if (include) {
                             // yes!
+                            //todo - could tidy this up a bit
                             lstVs.push(target.code)
                             lstMatchingRules.push(inx)
+                            lstMatchingTargets.push(target)
                             target.matched = true
                         }
 
@@ -119,7 +119,7 @@ angular.module("pocApp")
 
                 })
 
-                return {lstVS:lstVs,lstMatches:lstMatchingRules}
+                return {lstVS:lstVs,lstMatches:lstMatchingRules,lstMatchingTargets:lstMatchingTargets}
 
 
             },

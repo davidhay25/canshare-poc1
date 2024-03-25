@@ -40,16 +40,24 @@ angular.module("pocApp")
                     case 'CodeableConcept' :
                         //  if (ed.valueSet) {
                         //todo - need to check for type-ahead
-                        controlHint = "drop-down"
-                        controlType = "choice"
+                        if (ed.controlHint ) {
+                            controlHint = ed.controlHint
+                        } else {
+                            controlHint = "drop-down"
+                            controlType = "choice"
+                        }
+
+
                     //   }
                 }
             }
 
-            if (ed.controlHint) {
+
+            /*
+            if (ed.controlHint && ) {
                 controlHint = ed.controlHint
             }
-
+*/
 
             return {controlType:controlType,controlHint:controlHint}
 
@@ -102,7 +110,7 @@ angular.module("pocApp")
             pathPrefix = pathPrefix || ""
             if (ed && ed.enableWhen && ed.enableWhen.length > 0) {
                 //console.log(ed,'has ew')
-                 item.enableWhen = []
+                 //item.enableWhen = []
 
                 ed.enableWhen.forEach(function (ew) {
                     let qEW = {}
@@ -110,14 +118,22 @@ angular.module("pocApp")
                     qEW.operator = ew.operator
                     //if the ew.value is an object then assume a Coding. Otherwise a boolean (we only support these 2)
 
+                    let canAdd = false
                     if (typeof ew.value == 'boolean') {
                         //this is a boolean
                         qEW.answerBoolean = ew.value
+                        canAdd = true
                     } else {
                         //let qEW = {operator:ew.operator,answerCoding:ew.value}
-                        qEW.answerCoding = ew.value
-                        delete qEW.answerCoding.pt  //the preferred term...
-                        qEW.answerCoding.system = qEW.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
+                        if (ew.value && ew.value.code) {        //must have a code
+                            qEW.answerCoding = ew.value
+                            delete qEW.answerCoding.pt  //the preferred term...
+                            delete qEW.answerCoding.fsn  //the preferred term...
+                            qEW.answerCoding.system = qEW.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
+                            canAdd = true
+                        }
+
+
                     }
 
 
@@ -125,8 +141,16 @@ angular.module("pocApp")
                     //need to determine the path to the question. For now, assume that
                     //qEW.question = `${parent.linkId}.${ew.source}` //linkId of source is relative to the parent (DG)
                    // qEW.question = `${pathPrefix}${ew.source}` //linkId of source is relative to the parent (DG)
+                    if (canAdd) {
+                        item.enableWhen = item.enableWhen || []
+                        item.enableWhen.push(qEW)
 
-                    item.enableWhen.push(qEW)
+                        if (item.enableWhen.length == 2) {
+                            //if there are 2 EW then set the EW behaviour. More than 2 and it will already be set...
+                            item.enableBehavior = 'any'    //todo - may need to specify this
+                        }
+                    }
+
                 })
             }
            // return item
@@ -145,7 +169,6 @@ angular.module("pocApp")
                  //config = config || {maxFromValueSet : 500}
 
                  let vo = getControlDetails(ed) //get the control details from the ed
-
                  item.type = vo.controlType    //the 'official' type for the item
 
                  //Add the hint instruction
@@ -170,7 +193,12 @@ angular.module("pocApp")
                      if (vs.indexOf('http:') == -1) {
                          vs = `https://nzhts.digital.health.nz/fhir/ValueSet/${vs}`
                      }
-                     item.answerValueSet = vs
+
+                     //todo seems to be an issue where despite the VS, the answeroptions are being added...
+                     //todo - need to think through the strategy for answeOption population
+                     // todo temp - just while debugging
+                     //item.answerValueSet = vs
+                     //delete item.answerOption   //if there's a valueset, then no options - mar 21
                  }
 
                  switch (vo.controlHint) {
@@ -182,6 +210,7 @@ angular.module("pocApp")
                          codedOptionsSvc.getOptionsForEd(ed).then(
 
                              function (vo1) {
+                                 console.log(vo1)
                                  //console.timeEnd(timerLabel)
                                  if (!vo1.options || (vo1.options && vo1.options.length == 0)) {
                                      vo1.options = vo1.options || []
@@ -210,6 +239,7 @@ angular.module("pocApp")
                                                  item.answerOption = item.answerOption || []
                                                  item.answerOption.push({valueCoding: Coding})
                                              }
+                                             //delete item.answerValueSet //mar 21
                                          } else {
                                              let vs = ed.valueSet
                                              if (vs.indexOf('http') == -1) {
@@ -231,13 +261,18 @@ angular.module("pocApp")
                                          console.log(`The element ${ed.title} had the ValueSet ${ed.valueSet} which was not on the terminology server`)
                                          break
                                      case 'no-options-or-vs':
-                                         item.answerOption = [{
-                                             valueCoding: {
-                                                 code: 'no-options',
-                                                 system: 'http://example.com/CodeSystem/unknown',
-                                                 display: `Neither options nor ValueSet`
-                                             }
-                                         }]
+
+                                         if (item.type == 'choice') {
+                                             item.answerOption = [{
+                                                 valueCoding: {
+                                                     code: 'no-options',
+                                                     system: 'http://example.com/CodeSystem/unknown',
+                                                     display: `Neither options nor ValueSet`
+                                                 }
+                                             }]
+
+                                         }
+
                                          console.log(`The element ${ed.title} had neither ValueSet not options defined`)
                                          break
 
@@ -682,7 +717,7 @@ angular.module("pocApp")
                     //console.log(treeObject)
                     let qName = treeObject[0].id
                     let id = "cs-" + qName
-                    Q = {resourceType: "Questionnaire", id: id, status: "active", name: qName, item: []}
+                    Q = {resourceType: "Questionnaire", id: id, status: "draft", name: qName, item: []}
                     Q.url = `http://canshare.co.nz/fhir/Questionnaire/${id}`
                     let extTS = {url:"http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-preferredTerminologyServer"}
                     extTS.valueUrl = "https://nzhts.digital.health.nz/fhir/"
