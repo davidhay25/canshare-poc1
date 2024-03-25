@@ -431,7 +431,7 @@
           <table class="table table-bordered">
             <tr ng-repeat = "(k,v) in cmProperties">
               <td width = "30%">
-                <div class = 'clickable' ng-click="populateUIControl(k)">{{k}}</div>
+                <div class = 'clickable' ng-click="populateUIControl(k,true)">{{k}}</div>
               </td>
               <td>
 
@@ -444,7 +444,7 @@
                       <input type="text" class="form-control" disabled="disabled" value="{{v.singleConcept.display}}"/>
                   </div>
 
-                  <div ng-show="v.options.length > 1">
+                  <div ng-show="v.options.length > 0">
                       <select class="form-control" ng-model="local.cmOptions[k]"
                               ng-change="uiValueSelected(k)"
                               ng-options="v.display for (k,v) in v.options">
@@ -464,9 +464,12 @@
         <div class="col-md-8">
             <div ng-show="input.showHelp" class="alert-info alert">
                 <p>Select the values from the top, heading down. </p>
-                <p>Clicking on the property name will get the options for that property.</p>
-                <p>When a property value is selected, the next property in order will be automatically populated. </p>
-                <p>If the matched option is a single concept (rather than a ValueSet) then it is shown in a disabled font.
+                <p>When a property value is selected in a control,
+                    the next property control in order will be automatically populated. </p>
+                <p>If the matched option is a single concept (rather than a ValueSet) then it is
+                    shown but is disabled.
+                <p>Clicking on the property name will get the options for that property WITHOUT
+                populating the next control.</p>
 
                 </p>
             </div>
@@ -498,7 +501,12 @@
                                 <tbody>
                                 <tr ng-repeat="concept in lstMatchingConceptsForUI">
                                     <td>{{concept.display}}</td>
-                                    <td>{{concept.code}}</td>
+                                    <td>
+                                        <div class="clickable" ng-click="lookup(concept.code)">
+                                            {{concept.code}}
+                                        </div>
+
+                                    </td>
                                     <td>{{concept.system}}</td>
                                 </tr>
                                 </tbody>
@@ -508,13 +516,18 @@
 
                 </uib-tab>
                 <uib-tab heading="Engine details">
-                    <h4>Property values used by engine</h4>
+                    <h4>Property values used by engine when locating matching targets</h4>
                     <table class="table table-condensed table-bordered">
                         <tr><th>Property</th><th>Display</th><th>Code</th><th>System</th></tr>
                         <tr ng-repeat="(k,v) in uiHashValues">
                             <td>{{k}}</td>
                             <td>{{v.display}}</td>
-                            <td>{{v.code}}</td>
+                            <td>
+                                <div class="clickable" ng-click="lookup(v.code)">
+                                    {{v.code}}
+                                </div>
+
+                            </td>
                             <td>{{v.system}}</td>
                         </tr>
                     </table>

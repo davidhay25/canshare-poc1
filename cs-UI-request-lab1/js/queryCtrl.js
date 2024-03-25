@@ -4,7 +4,7 @@ angular.module("pocApp")
 
 
             $scope.input = {}
-            $scope.input.mainTabActive = 1      //just while developing - selects that conceptmap tab
+            //$scope.input.mainTabActive = 1      //just while developing - selects that conceptmap tab
 
 
             $scope.localStorage = $localStorage
@@ -439,7 +439,10 @@ console.log($scope.allTargets)
             $scope.showVS = function (item) {
                 let filter = $scope.input.filterlist
                 if (filter) {
-                    if (item.display.toLowerCase().indexOf(filter.toLowerCase()) > -1) {
+                    let match = item.display.toLowerCase().indexOf(filter.toLowerCase()) > -1 || item.vs.url.toLowerCase().indexOf(filter.toLowerCase()) > -1
+
+
+                    if (match ) {
                         return true
                     } else {
                         return false

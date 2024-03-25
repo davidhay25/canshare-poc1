@@ -124,7 +124,121 @@ angular.module("pocApp")
 
             },
             getVSContentsHash : function (lst) {
+                let deferred = $q.defer()
+                console.log('getting hash')
                 //given a list of urls, expand all of them
+                //if a given expansion fails, just do the others. The assumption is that
+                //the VS is not available
+
+                let hashExpanded = {}
+              //  let deferred = $q.defer()
+                let promises = []
+
+                lst.forEach(function (url) {
+                    //let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=en-x-sctlang-23162100-0210105`
+                    //let encodedQry = encodeURIComponent(qry)
+                    //let call = `nzhts?qry=${encodedQry}`
+                    //promises.push($http.get(call))
+                    promises.push(addToHash(url,hashExpanded))
+                })
+
+                $q.all(promises).then(function(results) {
+                    // All promises resolved successfully
+
+                    //let hashExpanded = {}
+/*
+                    // Process each response
+                    angular.forEach(results, function(response) {
+
+                        console.log(response)
+                        if (response.data && response.data.expansion && response.data.expansion.contains) {
+
+                            let ar = []
+                            response.data.expansion.contains.forEach(function (concept) {
+                                ar.push(concept)
+                            })
+
+                            ar.sort(function (a,b) {
+                                if (a.display > b.display) {
+                                    return 1
+                                } else {
+                                    return -1
+                                }
+                            })
+
+                            hashExpanded[response.data.url] = ar
+                        }
+
+                    });
+*/
+
+                    console.log(hashExpanded)
+                    deferred.resolve(hashExpanded)
+
+                }).catch(function(error) {
+                    // At least one promise was rejected. This shouldn't actually happen as addToHash() never rejects
+                    console.error('Error:', error);
+                    console.log(hashExpanded)
+                    deferred.resolve(hashExpanded)
+                })
+
+                return deferred.promise
+
+
+                //retrieve the expanded VS from the server and add to hashExpanded
+                //ignore any errors - mostly 404
+                function addToHash(url,hash) {
+                    console.log(url)
+                    let defer = $q.defer()
+                    let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=en-x-sctlang-23162100-0210105`
+                    let encodedQry = encodeURIComponent(qry)
+                    let call = `nzhts?qry=${encodedQry}`
+
+                    $http.get(call).then(
+                        function (response) {
+                            console.log(`${url} success`)
+                            if (response.data && response.data.expansion && response.data.expansion.contains) {
+
+                                let ar = []
+                                response.data.expansion.contains.forEach(function (concept) {
+                                    ar.push(concept)
+                                })
+
+                                ar.sort(function (a,b) {
+                                    if (a.display > b.display) {
+                                        return 1
+                                    } else {
+                                        return -1
+                                    }
+                                })
+
+                                hash[response.data.url] = ar
+                                defer.resolve()
+                            }
+                        },
+                        function (err) {
+                            //ignore any errors
+                            console.log(`${url} fail`)
+                            defer.resolve()
+                        }
+                    )
+
+
+
+
+                    return defer.promise
+                }
+
+            },
+
+
+            getVSContentsHashOriginal : function (lst) {
+                console.trace('getting hash')
+                //given a list of urls, expand all of them
+                //if a given expansion fails, just do the others. The assumption is that
+                //the VS is not available
+
+
                 let deferred = $q.defer()
                 let promises = []
                 lst.forEach(function (url) {
@@ -173,11 +287,11 @@ angular.module("pocApp")
                 return deferred.promise
 
 
+                function f() {
+
+                }
 
             }
-
-
-
 
 
 
