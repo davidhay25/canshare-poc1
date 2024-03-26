@@ -224,11 +224,15 @@ console.log($scope.allTargets)
 
                         //add the operator to the DependsOn element from the extension (makes UI processing easier
                         let lstVsUrl = []   //list of all ValueSets that are used by 'in-vs' rules
+                        $scope.targetByRow = {}    //a hash of targets by row number
                         //add the VS with all topography. used for the primary-site-laterality
                         lstVsUrl.push('https://nzhts.digital.health.nz/fhir/ValueSet/canshare-topography')
                         $scope.fullSelectedCM.group.forEach(function (group) {
                             group.element.forEach(function (element) {
                                 element.target.forEach(function (target) {
+
+                                    $scope.targetByRow[target.comment] = target
+
                                     if (target.dependsOn) {
                                         target.dependsOn.forEach(function (dep) {
                                             dep['x-operator'] = "="
@@ -239,9 +243,13 @@ console.log($scope.allTargets)
 
                                                         if (ext.valueCode == 'in-vs') {
                                                             //dep.value is a ValueSet url. We will need the contents of this valueset for rules processing
-                                                            if (lstVsUrl.indexOf(dep.value) == -1) {
-                                                                lstVsUrl.push(dep.value)
+                                                            if (dep.value) {
+                                                                let v = dep.value.trim() 
+                                                                if (lstVsUrl.indexOf(v) == -1) {
+                                                                    lstVsUrl.push(v)
+                                                                }
                                                             }
+
 
 
                                                         }

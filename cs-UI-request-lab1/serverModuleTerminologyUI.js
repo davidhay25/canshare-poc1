@@ -33,7 +33,7 @@ servers.push({display:"Ontoserver",url:"https://r4.ontoserver.csiro.au/fhir/"})
 
 
 async function getNZHTSAccessToken() {
-    url = "https://authenticate.nzhts.digital.health.nz/auth/realms/nzhts/protocol/openid-connect/token"
+    let url = "https://authenticate.nzhts.digital.health.nz/auth/realms/nzhts/protocol/openid-connect/token"
     let body =`grant_type=client_credentials&client_id=${nzhtsconfig.clientId}&client_secret=${nzhtsconfig.clientSecret}`
     try {
         let result = await axios.post(url,body)
@@ -348,8 +348,6 @@ function setup(app) {
         if (headers['x-ts-instance'] == 'prod') {
             tsInstance = nzhtsconfig.serverBaseProd
         }
-
-
 
         //disabling wth term server down...
 

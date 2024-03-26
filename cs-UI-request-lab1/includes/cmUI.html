@@ -532,8 +532,26 @@
                         </tr>
                     </table>
 
-                    <h4>Matching targets</h4>
-                    <pre>{{uiMatchingTargets | json}}</pre>
+                    <uib-tabset>
+                        <uib-tab heading="Matched targets">
+                            <pre>{{uiMatchingTargets | json}}</pre>
+                        </uib-tab>
+                        <uib-tab heading="Lookup target by row number">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <input type="text" class="form-control" ng-model="input.rowNumber">
+                                    <div><button class="btn btn-link" ng-click="lookupByRowNumber(input.rowNumber)">Get target</button> </div>
+                                </div>
+                                <div class="col-md-10">
+                                    <pre>{{singleTargetByRow | json}}</pre>
+
+                                </div>
+                            </div>
+
+                        </uib-tab>
+                    </uib-tabset>
+
+
                 </uib-tab>
             </uib-tabset>
 

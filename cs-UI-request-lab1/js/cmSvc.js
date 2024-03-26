@@ -82,7 +82,7 @@ angular.module("pocApp")
                                     include = false
 
                                     console.log(don)
-                                    let arCodes = hashExpandedVs[don.value]     //the set of codes in the indicated valueset
+                                    let arCodes = hashExpandedVs[don.value.trim()]     //the set of codes in the indicated valueset
                                     let value = hashInput[don.property]         //the value of the property we're looking at
 
                                     //if there's a value for the property then see if it is in the ValueSet

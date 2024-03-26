@@ -547,10 +547,6 @@ angular.module("pocApp")
 
                 }
 
-
-
-
-
             }
 
             //called when a property option in the UI changes
@@ -697,6 +693,9 @@ angular.module("pocApp")
             }
 
 
+            $scope.lookupByRowNumber = function (rowNumber) {
+                $scope.singleTargetByRow = $scope.targetByRow[rowNumber]
+            }
 
             //---------  deprecated functions here....
 
@@ -719,7 +718,7 @@ angular.module("pocApp")
                     Object.keys($scope.local.cmOptions).forEach(function (key) {
                         let p = $scope.local.cmOptions[key]
                         p.system = snomed
-console.log(p)
+//console.log(p)
                         let depParam1 = {name:"dependency",part :[]}
                         translateParameters.parameter.push(depParam1)
                         let part1 = {"name":"element","valueUri":key}
