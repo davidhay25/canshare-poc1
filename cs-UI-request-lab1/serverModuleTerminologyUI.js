@@ -313,7 +313,7 @@ function setup(app) {
         //the cache is 'opt-in' to avoid tricky cache issues...  It's mostly needed for the LIM forms
         //it will be necessary to manually empty the cache when we update the TS
         //should really only do this when expanding a VS
-
+/*
         let allowcache = req.headers['x-allowcache']
 
         //if the cache is active then see if the VS is in there
@@ -336,7 +336,7 @@ function setup(app) {
 
         }
 
-
+*/
 
 
 
@@ -377,16 +377,19 @@ function setup(app) {
                 axios.get(qry,config).then(function(data) {
                     //console.log(data.data)
                     //note that the 'query' variable is the original query sans server
-                    if (allowcache == 'yes') {
+                  /*  if (allowcache == 'yes') {
                         vsCache[query] = data.data
                     }
+                    */
 
                     res.json(data.data)
                     console.log("----- found -----")
                 }).catch(function(ex) {
+                    /*
                     if (allowcache == 'yes') {
                         vsCache[query] = 404        //we're assuming that all errors are 404
                     }
+                    */
                     if (ex.response) {
                         console.log("----- NOT found -----")
                         res.status(ex.response.status).json(ex.response.data)

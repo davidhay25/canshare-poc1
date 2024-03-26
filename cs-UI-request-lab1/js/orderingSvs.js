@@ -11,11 +11,22 @@ angular.module("pocApp")
 
                 //get the list of elements that need to be ordered. todo - may need to think of some kind of precedence if there are multiple
                 let arToBeOrdered = []
+
+                let listOfTargets = []  //all the elements that are targets of a move
+
+
                 lst.forEach(function (item) {
                     if (item.ed && item.ed.insertAfter) {
                         arToBeOrdered.push(item)
+                        listOfTargets.push(item.ed.insertAfter)
                     }
+                })
 
+                //now, change the order of moves so that items that are targets of others are the first to be moved
+                let newListToBeOrdered = []
+                arToBeOrdered.forEach(function (item) {
+
+                   // if (item.pat)
                 })
 
                 console.log(arToBeOrdered)
@@ -30,17 +41,9 @@ angular.module("pocApp")
                     ar.splice(0,1)
                     let endOfPath = ar.join('.')     //the path without the datatype name
 
-
                     //set the first segment to the DG name
-
-
-
-
-
-
                     ar[0] = dgName
                     preceding = ar.join('.')
-
 
                     let currentPos = findCurrentPositionInList(item.ed.path)    //where the item to be moved is currently placed
 
@@ -71,7 +74,6 @@ angular.module("pocApp")
                         console.log(`Insert point ${preceding} not found, noi re-ordering occurred`)
                     }
 
-
                 })
 
                 function findCurrentPositionInList(path) {
@@ -85,9 +87,6 @@ angular.module("pocApp")
                         }
                     }
                 }
-
-
-
 
             },
 

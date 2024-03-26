@@ -405,19 +405,12 @@ angular.module("pocApp")
                         delete $scope.cmProperties[key].singleConcept //flag that the option is a single concept
                         delete $scope.cmProperties[key].noMatches  //flag that no options were found
                         delete $scope.local.uiValues[key]  //data enterd for that property
-
                         delete $scope.local.cmOptions[key]  //list of options for that property
-
                     }
-
                     if (key == propKey) {
                         clear = true
                     }
-
-
-
                 })
-
 
 
                 let def = $scope.cmProperties[propKey]
@@ -501,10 +494,19 @@ angular.module("pocApp")
                 if ($scope.uiMatchingVS && $scope.uiMatchingVS.length > 0) {
 
                     if ($scope.uiMatchingVS[0].indexOf('http') == -1) {
-                        //this is a single concept. We can get the display details from the forst element of $scope.uiMatchingTargets
+                        //this is a single concept. We can get the display details from the first element of $scope.uiMatchingTargets
                         let target = $scope.uiMatchingTargets[0]
                         $scope.singleConcept = {code:target.code,display:target.display,system:target.system}
                         $scope.cmProperties[propKey].singleConcept = {code:target.code,display:target.display,system:target.system}
+
+
+                        //set the value of the fixed element
+                        //todo - there are multiple objects storing this value - need to be refactored
+                        $scope.uiHashValues[propKey] = $scope.singleConcept
+                        $scope.local.cmOptions[propKey] = $scope.singleConcept
+
+                        //$//scope.uiHashValues[prop] = $scope.local.cmOptions[prop] //$scope.local.cmOptions has the data entered thus far.
+
 
                         //as there is only a single concept, which is not editable then move on to the next one
                         //todo - this does mean we won't see the details
