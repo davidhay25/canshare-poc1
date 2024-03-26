@@ -938,6 +938,11 @@ angular.module("formsApp")
                             sectionItem.item.forEach(function (item) {
 console.log('processing ',item.text)
                                 let meta = that.getMetaInfoForItem(item)
+
+
+                                delete meta.columnCount     //Mar26 2004 - force single column
+
+
                                 hashItem[item.linkId] = {item:item,meta:meta}
                                 if (meta.hidden) {
                                     hiddenFields[sectionItem.linkId] = hiddenFields[sectionItem.linkId] || []
