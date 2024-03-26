@@ -4,11 +4,11 @@ angular.module("pocApp")
 
         return {
             getVersion : function(){
-                return "0.7.12"
+                return "0.7.13"
             },
 
             getSizeOfObject : function( object ) {
-                //the memory usage of an obect - from https://stackoverflow.com/questions/1248302/how-to-get-the-size-of-a-javascript-object#11900218
+                //the memory usage of an object - from https://stackoverflow.com/questions/1248302/how-to-get-the-size-of-a-javascript-object#11900218
                 var objectList = [];
                 var stack = [ object ];
                 var bytes = 0;
