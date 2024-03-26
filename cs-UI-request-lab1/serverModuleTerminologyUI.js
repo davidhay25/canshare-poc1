@@ -31,14 +31,32 @@ servers.push({display:"Public hapi R4",url:"http://hapi.fhir.org/baseR4/"})
 servers.push({display:"Terminz",url:"https://terminz.azurewebsites.net/fhir/"})
 servers.push({display:"Ontoserver",url:"https://r4.ontoserver.csiro.au/fhir/"})
 
+let currentToken = {token:null,expires:null}    //expires is the date.getTime() of when the token expires
 
 async function getNZHTSAccessToken() {
+
+    //If there is a saved token then check the expiry and if not expired then return immediately.
+    //Otherwise, get a new token.
+    //Set the validity to 1 hour...
+    if (currentToken.token) {
+        let now = new Date().getTime()
+        if (now < currentToken.expires) {
+            //console.log('re-use token')
+            return currentToken.token
+        }
+    }
+
     let url = "https://authenticate.nzhts.digital.health.nz/auth/realms/nzhts/protocol/openid-connect/token"
     let body =`grant_type=client_credentials&client_id=${nzhtsconfig.clientId}&client_secret=${nzhtsconfig.clientSecret}`
     try {
         let result = await axios.post(url,body)
-        //console.log(result.data['access_token'])
-        return result.data['access_token']
+        //if here, then we need a new token
+        //console.log('new token')
+        let expires = result.data['expires_in']     //number of seconds till expiry. Currently 24 hours...
+        currentToken.token = result.data['access_token']
+        //set the expiry to an hour (even though, in theory, we have 24 hours)
+        currentToken.expires = new Date().getTime() + 60 * 60 * 1000
+        return currentToken.token
     } catch (ex) {
         console.log(ex)
         return null
@@ -126,7 +144,7 @@ function setup(app) {
         let arVsUrl = req.body
         let lstConcepts = []    //the list that will be returned
         let hashConcepts = {}   //concepts keyed on code+system
-        console.log(arVsUrl)
+        //console.log(arVsUrl)
         let token = await getNZHTSAccessToken()
         if (token) {
             let config = {headers:{authorization:'Bearer ' + token}}
@@ -260,7 +278,7 @@ function setup(app) {
             res.status(500).json({msg:"Unable to get Access Token."})
         }
     })
-
+/*
     app.post('/nzhts/emptycache',function (req,res) {
         vsCache = {}
         vsCacheStats = {hit:0,miss:0}
@@ -305,10 +323,11 @@ function setup(app) {
         }
     })
 
+    */
     //queries against the Terminology Server
     app.get('/nzhts',async function(req,res){
         let query = req.query.qry
-        console.log(`nzhts query: ${req.query.qry}`)
+      //  console.log(`nzhts query: ${req.query.qry}`)
 
         //the cache is 'opt-in' to avoid tricky cache issues...  It's mostly needed for the LIM forms
         //it will be necessary to manually empty the cache when we update the TS
@@ -360,9 +379,10 @@ function setup(app) {
             qry = qry.split('|').join("%7c")
 
             //todo - check expiry and refresh if needed
-            console.log(qry)
+           // console.log(qry)
 
             let token = await getNZHTSAccessToken()
+            console.log(`nzhts query: ${req.query.qry}`)
             if (token) {
 
                 var decoded = jwt_decode(token);
@@ -381,7 +401,7 @@ function setup(app) {
                     */
 
                     res.json(data.data)
-                    console.log("----- found -----")
+                   // console.log("----- found -----")
                 }).catch(function(ex) {
                     /*
                     if (allowcache == 'yes') {
@@ -389,7 +409,7 @@ function setup(app) {
                     }
                     */
                     if (ex.response) {
-                        console.log("----- NOT found -----")
+                        //console.log("----- NOT found -----")
                         res.status(ex.response.status).json(ex.response.data)
                     } else {
                         res.status(500).json(ex)

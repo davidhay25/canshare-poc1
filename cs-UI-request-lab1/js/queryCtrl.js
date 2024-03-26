@@ -244,7 +244,7 @@ console.log($scope.allTargets)
                                                         if (ext.valueCode == 'in-vs') {
                                                             //dep.value is a ValueSet url. We will need the contents of this valueset for rules processing
                                                             if (dep.value) {
-                                                                let v = dep.value.trim() 
+                                                                let v = dep.value.trim()
                                                                 if (lstVsUrl.indexOf(v) == -1) {
                                                                     lstVsUrl.push(v)
                                                                 }
