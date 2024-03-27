@@ -5,8 +5,6 @@ angular.module("pocApp")
 
         return {
 
-
-
             sortFullListByInsertAfter(lst,dg) {
                 //console.log(lst)
 
@@ -27,15 +25,35 @@ angular.module("pocApp")
                     ar[0] = dgName
                     preceding = ar.join('.')
 */
+
+                    //find the number of elements that start with the item to moves path
+                    let cnt = 0  //-- will be the number to move
+                    lst.forEach(function (item1) {
+                        if (item1.ed.path.startsWith(item.toMove)) {
+                            cnt++
+                        }
+                    })
+
+
                     let currentPos = findCurrentPositionInList(item.toMove)    //where the item to be moved is currently placed
 
-                    let itemToMove = lst.splice(currentPos,1)       //OK, it's removed
+                    //todo - should remove all those that start with the path, then re-insert all of them in order
 
+                    //let itemToMove = lst.splice(currentPos,1)       //OK, it's removed
+                    let itemToMove = lst.splice(currentPos,cnt)       //OK, they are removed
+
+                    //now find the insertion point
                     for (let i=0; i< lst.length; i++) {
                         let tItem = lst[i]
                         if (tItem.ed.path == item.insertAfter) {
                             //now insert it into the tree at 'i+1'
-                            lst.splice(i+1,0,itemToMove[0])
+                            //lst.splice(i+1,0,itemToMove[0])
+
+                            //from chatgpt
+                            Array.prototype.splice.apply(lst, [i+1, 0].concat(itemToMove));
+
+
+
                             insertPointFound = true
                             break
                         }
