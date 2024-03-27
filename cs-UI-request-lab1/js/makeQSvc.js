@@ -477,7 +477,7 @@ angular.module("pocApp")
             },
 
             //this is used by the DG form creation
-            makeQFromDG : async function (lstElements,hashAllDG) {
+            makeQFromDG : function (lstElements,hashAllDG) {
                 //generate a Q based on the list of elements that represents a DG
                 //todo create a copy of the lstElements, then delete mult=0.0 and hideInQ (element & DG)
                 //console.log(lstElements)

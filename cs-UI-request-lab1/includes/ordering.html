@@ -14,8 +14,13 @@
     <tr><th>Insert this element...</th><th>After this element</th><th></th></tr>
 
     <tr ng-repeat="order in selectedModel.ordering">
-      <td>{{order.toMove}}</td>
-      <td>{{order.insertAfter}}</td>
+      <td>
+        {{getElementEd(order.toMove).title}} <div><em>({{order.toMove}})</em></div>
+      </td>
+      <td>
+        {{getElementEd(order.insertAfter).title}} <div><em>({{order.insertAfter}})</em></div>
+
+      </td>
       <td>
 
         <span class="fixed-width">
@@ -53,6 +58,6 @@
         </td>
     </tr>
   </table>
-  
+
 
 </div>

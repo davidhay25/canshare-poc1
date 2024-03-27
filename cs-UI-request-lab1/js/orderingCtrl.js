@@ -2,8 +2,17 @@ angular.module("pocApp")
     .controller('orderingCtrl',
         function ($scope) {
 
-        $scope.local = {}
+            $scope.local = {}
 
+            //get the ed that corresponds to the path. Not that efficient but saves creating another hash...
+            $scope.getElementEd = function (path) {
+                for (const item of $scope.fullElementList) {
+                    if (path == item.ed.path) {
+                        return item.ed || {title:'Root'}
+                        break
+                    }
+                }
+            }
 
             $scope.moveUp = function (inx) {
                 let ar = $scope.selectedModel.ordering.splice(inx,1)

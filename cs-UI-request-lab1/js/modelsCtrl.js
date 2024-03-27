@@ -1537,17 +1537,12 @@ angular.module("pocApp")
                 $scope.downloadLinkCompTsv = window.URL.createObjectURL(new Blob([download ],{type:"text/tsv;charset=utf-8;"}))
                 $scope.downloadLinkCompTsvName = `comp-${comp.name}.tsv`
 
-
-
                 let rootNodeId = $scope.allCompElements[0].path
                 let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
                 makeCompTree(treeData,rootNodeId)
 
-
                 //generates the FSH representation of the Composition as a Logical Model
                 $scope.compFsh = igSvc.makeFshForComp(comp,$scope.allCompElements,$scope.hashCompElements)
-
-
 
             }
 
@@ -1571,7 +1566,6 @@ angular.module("pocApp")
 
                 //sort the elements list to better display slicing
                 $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
-
 
                 //create the list of all paths in the DG. Used by the 'ordering'
                 $scope.allPaths = []
