@@ -1572,7 +1572,18 @@ angular.module("pocApp")
                 //sort the elements list to better display slicing
                 $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
 
-                orderingSvc.sortFullListByInsertAfter($scope.fullElementList)   //adjust according to 'insertAfter' values
+
+                //create the list of all paths in the DG. Used by the 'ordering'
+                $scope.allPaths = []
+                $scope.fullElementList.forEach(function (item) {
+                    if (item.ed.mult !== '0..0') {
+                        $scope.allPaths.push(item.ed.path)
+                    }
+
+                })
+
+
+                orderingSvc.sortFullListByInsertAfter($scope.fullElementList,dg)   //adjust according to 'insertAfter' values
 
                 //create the list of potential enableWhen sources
                 $scope.ewSources = []
@@ -1591,6 +1602,8 @@ angular.module("pocApp")
 
                 //a Q representation of the DG
                 //let voQ = makeQSvc.makeQFromDG(vo.allElements,$scope.hashAllDG)
+
+
                 let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
                 console.log(voQ.Q)
                 $scope.dgQ = voQ.Q
@@ -1650,6 +1663,7 @@ angular.module("pocApp")
                     )
 
                     $scope.fhirResourceType = igSvc.findResourceType(dg,$scope.hashAllDG)
+
                     //check the current checkedout state on the library.
                     //Always update the local version checkedout (not data) with the one from the library
                     let name = dg.name

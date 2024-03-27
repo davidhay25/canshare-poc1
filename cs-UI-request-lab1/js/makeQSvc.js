@@ -477,7 +477,7 @@ angular.module("pocApp")
             },
 
             //this is used by the DG form creation
-            makeQFromDG : function (lstElements,hashAllDG) {
+            makeQFromDG : async function (lstElements,hashAllDG) {
                 //generate a Q based on the list of elements that represents a DG
                 //todo create a copy of the lstElements, then delete mult=0.0 and hideInQ (element & DG)
                 //console.log(lstElements)
@@ -568,7 +568,7 @@ angular.module("pocApp")
 
 
                         addEnableWhen(ed,item)  //If there are any contitionals
-                        setControlType(ed,item)  //set the control type to use
+                        setControlType(ed,item)  //set the control type to use - also expands any ValueSet
 
 //console.log(ed,item.type)
                         //group.item.push(item)

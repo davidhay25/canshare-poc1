@@ -11,7 +11,7 @@ angular.module("pocApp")
             }
             $scope.fullElementList = fullElementList
             let dgName = fullElementList[0].ed.path     //it's aways the first element in the list...
-
+/*
             //create the list of all paths in the DG. Used by the 'insertAfter'
             $scope.allPaths = []
             $scope.fullElementList.forEach(function (item) {
@@ -20,7 +20,7 @@ angular.module("pocApp")
                 }
 
             })
-
+*/
             $scope.options = []     //a list of options. Will be saved as ed.options
             $scope.units = [] //a list of units. Will be saved as ed.units
 

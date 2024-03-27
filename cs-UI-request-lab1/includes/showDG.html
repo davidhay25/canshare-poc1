@@ -991,12 +991,41 @@
 
     </uib-tab>
 
-    <uib-tab heading="Dependencies">
+    <uib-tab >
 
 
-<!--
-      <uib-tab-heading>Dependencies <span ng-show="allDependencies.length > 0" class="badge">{{allDependencies.length}}</span> </uib-tab-heading>
--->
+
+      <uib-tab-heading>
+        Dependencies <span class="badge">{{selectedModel.ordering.length}} / {{allDependencies.length}}</span>
+      </uib-tab-heading>
+
+
+      <div ng-controller="orderingCtrl">
+        <ng-include src="'/includes/ordering.html'"></ng-include>
+      </div>
+
+      <!--
+      <h4>Insert after</h4>
+
+
+
+      <table class="table-bordered table">
+        <tr><th ng-show="canEdit(selectedModel)"><span >Edit</span></th><th>Element</th><th>Insert after</th>
+
+
+        </tr>
+        <tr ng-repeat="element in fullElementList" ng-show="element.ed.insertAfter">
+          <td ng-show="canEdit(selectedModel)">
+            <i   class="glyphicon glyphicon-edit pull-right clickable"
+                 ng-click="editDGItem(element)"></i>
+          </td>
+          <td>{{element.ed.title}}</td>
+          <td>{{element.ed.insertAfter}}</td>
+
+        </tr>
+      </table>
+      -->
+
       <h4>Dependencies</h4>
 
       <table class="table-bordered table">
@@ -1028,23 +1057,7 @@
 
       <em>All of the hide / show dependencies in this DG</em>
 
-      <h4>Insert after</h4>
 
-      <table class="table-bordered table">
-        <tr><th ng-show="canEdit(selectedModel)"><span >Edit</span></th><th>Element</th><th>Insert after</th>
-
-
-        </tr>
-        <tr ng-repeat="element in fullElementList" ng-show="element.ed.insertAfter">
-          <td ng-show="canEdit(selectedModel)">
-            <i   class="glyphicon glyphicon-edit pull-right clickable"
-                 ng-click="editDGItem(element)"></i>
-          </td>
-          <td>{{element.ed.title}}</td>
-          <td>{{element.ed.insertAfter}}</td>
-
-        </tr>
-      </table>
 
     </uib-tab>
 

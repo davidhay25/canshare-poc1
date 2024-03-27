@@ -1,0 +1,58 @@
+<div>
+
+  <style>
+    .fixed-width {
+      display: inline-block;
+      width: 20px;
+    }
+  </style>
+
+  <h4>Ordering</h4>
+
+
+  <table class="table-bordered table">
+    <tr><th>Insert this element...</th><th>After this element</th><th></th></tr>
+
+    <tr ng-repeat="order in selectedModel.ordering">
+      <td>{{order.toMove}}</td>
+      <td>{{order.insertAfter}}</td>
+      <td>
+
+        <span class="fixed-width">
+            <i  ng-show="$index > 0" class="glyphicon glyphicon-arrow-up clickable"
+               ng-click="moveUp($index)"></i>
+        </span>
+
+        <span  class="fixed-width" >
+            <i ng-show="$index < selectedModel.ordering.length -1" class="glyphicon glyphicon-arrow-down clickable"
+               ng-click="moveDn($index)"></i>
+        </span>
+
+        <i class="glyphicon glyphicon-remove  clickable fixed-width"
+           ng-click="removeInsertAfter($index)"></i>
+
+      </td>
+    </tr>
+
+
+    <tr>
+      <td>
+        <select class="form-control" ng-model="local.toMove"
+                ng-options="path for path in allPaths"></select>
+      </td>
+      <td>
+        <select class="form-control" ng-model="local.insertAfter"
+                ng-options="path for path in allPaths"></select>
+
+      </td>
+      <td>
+        <i class="glyphicon glyphicon-plus-sign  clickable"
+           ng-show="local.toMove && local.insertAfter"
+           ng-click="addInsertAfter(local.toMove,local.insertAfter)"></i>
+
+        </td>
+    </tr>
+  </table>
+  
+
+</div>
