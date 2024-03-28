@@ -1577,7 +1577,7 @@ angular.module("pocApp")
                 })
 
 
-                orderingSvc.sortFullListByInsertAfter($scope.fullElementList,dg)   //adjust according to 'insertAfter' values
+                orderingSvc.sortFullListByInsertAfter($scope.fullElementList,dg,$scope.hashAllDG)   //adjust according to 'insertAfter' values
 
                 //create the list of potential enableWhen sources
                 $scope.ewSources = []

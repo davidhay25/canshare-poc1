@@ -1,18 +1,51 @@
 //functions used in re-ordering elements.
 angular.module("pocApp")
 
-    .service('orderingSvc', function() {
+    .service('orderingSvc', function($filter) {
 
         return {
 
-            sortFullListByInsertAfter(lst,dg) {
-                //console.log(lst)
+            sortFullListByInsertAfter(lst,dg,hashAllDG) {
 
-                if (!dg.ordering || dg.ordering.length < 1) {
+                let lstOrdering = []
+
+                if (dg.ordering && dg.ordering.length >0) {
+                    //there is ordering defined on the DG
+                    lstOrdering = dg.ordering
+                } else {
+                    //the DG has no ordering defined directly.
+                    //walk up the inheritance chain until we find a parent with ordering (if any)
+                    let tmpDG = dg
+                    let keepGoing = true
+                    let ctr = 0         // a counter to trap any infinate recursion error. probably unneeded
+                    while (tmpDG.parent && keepGoing) {
+                        let dgTitle = tmpDG.title
+                        tmpDG = hashAllDG[tmpDG.parent]
+                        if (! tmpDG) {
+                            alert(`DG ${tmpDG.parent} was not found. Referenced in ${dgTitle}`)
+                            return
+                        }
+
+                        if (tmpDG.ordering && tmpDG.ordering.length > 0) {
+                            lstOrdering = tmpDG.ordering
+                            keepGoing = false       //to stop the recursion
+                        }
+
+                        ctr++
+                        if (ctr > 100) {
+                            keepGoing = false
+                            alert(`Error finding ultimate parent of ${dg.name} - recursion issue most likely`)
+                            return
+                        }
+                    }
+                }
+
+                if (lstOrdering.length == 0) {
+                    //no ordering list was found in the DG or parental hierarchy
                     return
                 }
 
-                dg.ordering.forEach(function (item) {
+                lstOrdering.forEach(function (item) {
                     let insertPointFound = false
                     /*
                     let ar = preceding.split('.')
@@ -26,54 +59,55 @@ angular.module("pocApp")
                     preceding = ar.join('.')
 */
 
+                    //remove the first segment in the path - this is the DG name
+                    let toMove = $filter('dropFirstInPath')(item.toMove)
+                    let insertAfter = $filter('dropFirstInPath')(item.insertAfter)
+
                     //find the number of elements that start with the item to moves path
                     let cnt = 0  //-- will be the number to move
                     lst.forEach(function (item1) {
-                        if (item1.ed.path.startsWith(item.toMove)) {
+                        if ($filter('dropFirstInPath')(item1.ed.path).startsWith(toMove)) {
                             cnt++
                         }
                     })
 
 
-                    let currentPos = findCurrentPositionInList(item.toMove)    //where the item to be moved is currently placed
+                    let currentPos = findCurrentPositionInList(toMove)
 
-                    //todo - should remove all those that start with the path, then re-insert all of them in order
+                    if (currentPos > -1) {
+                        //remove the items and save in array for insertion later
+                        let itemsToMove = lst.splice(currentPos,cnt)
 
-                    //let itemToMove = lst.splice(currentPos,1)       //OK, it's removed
-                    let itemToMove = lst.splice(currentPos,cnt)       //OK, they are removed
-
-                    //now find the insertion point
-                    for (let i=0; i< lst.length; i++) {
-                        let tItem = lst[i]
-                        if (tItem.ed.path == item.insertAfter) {
-                            //now insert it into the tree at 'i+1'
-                            //lst.splice(i+1,0,itemToMove[0])
-
-                            //from chatgpt
-                            Array.prototype.splice.apply(lst, [i+1, 0].concat(itemToMove));
-
-
-
-                            insertPointFound = true
-                            break
+                        //now find the insertion point
+                        for (let i=0; i< lst.length; i++) {
+                            let tItem = lst[i]
+                            if ($filter('dropFirstInPath')(tItem.ed.path) == insertAfter) {
+                                Array.prototype.splice.apply(lst, [i+1, 0].concat(itemsToMove));
+                                insertPointFound = true
+                                break
+                            }
+                        }
+                        if (! insertPointFound) {
+                            console.log(`Insert point ${item.insertAfter} not found, no re-ordering occurred`)
                         }
                     }
-                    if (! insertPointFound) {
-                        console.log(`Insert point ${item.insertAfter} not found, no re-ordering occurred`)
-                    }
+
 
                 })
 
                 function findCurrentPositionInList(path) {
                     //find where an item is in the tree based on the path
                     //have to do this each time as it may change with other moves
+                    //ignores the first segment
                     let pos = -1
                     for (const item of lst) {
                         pos ++
-                        if (item.ed.path == path) {
-                            return pos
+                        if ($filter('dropFirstInPath')(item.ed.path) == path) {
+                            break
+                            //return pos
                         }
                     }
+                    return pos
                 }
 
             },

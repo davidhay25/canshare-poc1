@@ -7,6 +7,9 @@
     }
   </style>
 
+  <button class="btn-link btn pull-right"
+          ng-show="! selectedModel.ordering || selectedModel.ordering.length < 1"
+          ng-click="lookupParents()">Fill from parent</button>
   <h4>Ordering</h4>
 
 
