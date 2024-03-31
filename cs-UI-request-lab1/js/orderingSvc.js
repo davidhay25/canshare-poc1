@@ -112,6 +112,54 @@ angular.module("pocApp")
 
             },
 
+            getOrderingForReferences(lst,dg,hashAllDG) {
+                let ar = []
+                //get the ordering info for referenced datagroups - if they are not in the dg
+                //directly referenced only
+
+                //create a hash of move instructions that already exist. To avoid dups...
+                let hash = {}
+                if (dg.ordering) {
+                    dg.ordering.forEach(function (ord) {
+                        hash[ord.toMove+ord.insertAfter] = true
+                    })
+                }
+
+                lst.forEach(function (item) {
+                    let ed = item.ed
+
+                    if (ed.type) {
+                        let type = ed.type[0]
+                        let refDG = hashAllDG[type]     //the referenced dg
+                        if (refDG && refDG.ordering) {
+
+                            refDG.ordering.forEach(function (ord) {
+
+                                let toMove = ed.path + "." + $filter('dropFirstInPath')(ord.toMove)
+                                let insertAfter = ed.path + "." + $filter('dropFirstInPath')(ord.insertAfter)
+
+                                //now make sure that this move instruction is not yet in the dg ordering
+
+                                if (! hash[toMove+insertAfter]) {
+                                    let item = {path:ed.path,toMove:toMove,insertAfter:insertAfter}
+                                    ar.push(item)
+                                }
+
+                            })
+
+                            console.log(ed.path,type, hashAllDG[type].ordering)
+
+
+
+
+
+                        }
+                    }
+
+                })
+                return ar
+            },
+
             sortFullListByInsertAfterDEP(lst) {
                 console.log(lst)
                 let dgName = lst[0].ed.path     //the DGName is the first element

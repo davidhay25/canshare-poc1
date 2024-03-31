@@ -210,7 +210,7 @@ angular.module("pocApp")
                          codedOptionsSvc.getOptionsForEd(ed).then(
 
                              function (vo1) {
-                                 console.log(vo1)
+                                 //console.log(vo1)
                                  //console.timeEnd(timerLabel)
                                  if (!vo1.options || (vo1.options && vo1.options.length == 0)) {
                                      vo1.options = vo1.options || []

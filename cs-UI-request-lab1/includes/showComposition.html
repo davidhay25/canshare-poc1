@@ -810,9 +810,13 @@
         <tr ng-repeat="item in allCompElements"
           ng-show="item.ed.notes">
           <td>
-            <div class="clickable" ng-click="selectCompTreePath(item.ed.path)">{{item.ed.path}}</div>
+            <div class="clickable" ng-click="selectCompTreePath(item.ed.path)">
+              <!-- {{item.ed.path}} -->
+              {{item.ed.title}}
+            </div>
           </td>
           <td>{{item.ed.notes}}</td>
+         <!-- <td>{{item.ed.notes | dropFirstInPath}}</td> -->
         </tr>
       </table>
     </uib-tab>

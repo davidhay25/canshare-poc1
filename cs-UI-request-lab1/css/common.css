@@ -1,4 +1,15 @@
 
+
+.background {
+    background-color: #f7f7f7;
+    border: 1px solid gainsboro;
+    padding : 5px;
+    margin: 4px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
 .detailName {
     background-color: #dedede;
 }

@@ -10,6 +10,11 @@
   <button class="btn-link btn pull-right"
           ng-show="! selectedModel.ordering || selectedModel.ordering.length < 1"
           ng-click="lookupParents()">Fill from parent</button>
+<!--
+  <button class="btn-link btn pull-right"
+
+          ng-click="lookupChildren()">Lookup children</button>
+-->
   <h4>Ordering</h4>
 
 
@@ -24,7 +29,7 @@
         {{getElementEd(order.insertAfter).title}} <div><em>({{order.insertAfter}})</em></div>
 
       </td>
-      <td>
+      <td width="15%">
 
         <span class="fixed-width">
             <i  ng-show="$index > 0" class="glyphicon glyphicon-arrow-up clickable"
@@ -61,6 +66,21 @@
         </td>
     </tr>
   </table>
+
+  <div ng-show="dgReferencesOrdering.length > 0">
+    <h5>Referenced DG ordering (direct references only)</h5>
+    <table class="table table-bordered">
+      <tr><th>Path</th><th>Insert this element...</th><th>After this element</th><th></th></tr>
+      <tr ng-repeat="ord in dgReferencesOrdering">
+        <td>{{ord.path}}</td>
+        <td>{{ord.toMove}}</td>
+        <td>{{ord.insertAfter}}</td>
+        <td><div class="clickable" ng-click="addToDG(ord,$index)">Add</div> </td>
+      </tr>
+    </table>
+
+    <pre>{{dgReferencesOrdering}}</pre>
+  </div>
 
 
 </div>

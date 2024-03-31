@@ -1566,18 +1566,19 @@ angular.module("pocApp")
 
                 //sort the elements list to better display slicing
                 $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
-
+                $scope.fullElementHash = {}         //I seem to need this quite a lot. Though memory usage is getting high...
                 //create the list of all paths in the DG. Used by the 'ordering'
                 $scope.allPaths = []
                 $scope.fullElementList.forEach(function (item) {
+                    $scope.fullElementHash[item.ed.path] = item.ed
                     if (item.ed.mult !== '0..0') {
                         $scope.allPaths.push(item.ed.path)
                     }
-
                 })
 
 
                 orderingSvc.sortFullListByInsertAfter($scope.fullElementList,dg,$scope.hashAllDG)   //adjust according to 'insertAfter' values
+                $scope.dgReferencesOrdering = orderingSvc.getOrderingForReferences($scope.fullElementList,dg,$scope.hashAllDG)
 
                 //create the list of potential enableWhen sources
                 $scope.ewSources = []
@@ -1586,8 +1587,6 @@ angular.module("pocApp")
                         let t = {ed:item.ed,shortPath: $filter('dropFirstInPath')(item.ed.path)}
                         $scope.ewSources.push(t)
                     }
-
-
                 })
 
                 $scope.dgFshLM = igSvc.makeFshForDG(dg,vo.allElements)
@@ -1595,8 +1594,6 @@ angular.module("pocApp")
                 makeGraph()
 
                 //a Q representation of the DG
-                //let voQ = makeQSvc.makeQFromDG(vo.allElements,$scope.hashAllDG)
-
 
                 let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
                 console.log(voQ.Q)
@@ -1741,6 +1738,108 @@ angular.module("pocApp")
             }
 
             function makeDGTree(treeData) {
+                //enable drag / drop for re-ordering
+                $('#dgTree').jstree('destroy');
+
+                let x = $('#dgTree').jstree(
+                    {'core':
+                        {'multiple': false,
+                        'data': treeData,
+                        'themes': {name: 'proton', responsive: true}},
+                        'check_callback' : true,
+                        plugins:['dnd'],
+                        dnd: {
+                            'is_draggable' : function(nodes,e) {
+                                return true
+                                /* could inhibit certain groups
+                               let node = nodes[0]
+                               $scope.dndSource = node.data.ed
+                               console.log($scope.dndSource)
+
+
+                               delete $scope.dndSource
+                               let node = nodes[0]
+                               if (node.data && node.data.item && node.data.item.type == 'group') {
+                                   return false
+                               } else {
+                                   $scope.dndSource = node.data.item
+                                   return true
+                               }
+                               */
+
+                            }
+                        }
+                    }
+
+
+
+                ).on('changed.jstree', function (e, data) {
+                    // the node selection event...
+
+
+                    if (data.node) {
+                        $scope.selectedNode = data.node;
+                    }
+
+                    //set up the EnableWhen (conditional show)
+                    delete $scope.ewSourceValues
+                    delete $scope.input.ewSource
+                    delete $scope.input.ewSourceValue
+
+                    $scope.$digest();       //as the event occurred outside of angular...
+                }).bind("loaded.jstree", function (event, data) {
+                    let id = treeData[0].id
+                    $(this).jstree("open_node",id);
+                    //$(this).jstree("open_all");  //open all nodes
+
+
+                    $scope.$digest()
+                })
+
+            }
+
+
+            $(document).on('dnd_stop.vakata', function (e, data) {
+                let sourceId = getId(data.element.id)
+                let targetId = getId(data.event.target.id)
+
+
+                if (sourceId && targetId) {
+                    let sourceTitle = getElement(sourceId).title || sourceId
+                    let targetTitle = getElement(targetId).title || targetId
+                    if (confirm(`Are you sure you wish to move ${sourceTitle} after ${targetTitle}`)) {
+                        $scope.selectedModel.ordering = $scope.selectedModel.ordering || []
+                        $scope.selectedModel.ordering.push({toMove:sourceId,insertAfter:targetId})
+
+                        //re-order the full list & re-draw the tree
+                        orderingSvc.sortFullListByInsertAfter($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
+                        let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
+                        makeDGTree(treeData)
+
+                        $scope.$digest()
+
+                    }
+                }
+
+
+
+                function getId(s) {
+                    if (s) {
+                        let ar = s.split('_')
+                        return ar[0]
+                    }
+                }
+
+                //This is not efficient - I s
+                function getElement(path) {
+
+                    let el = $scope.fullElementHash[path]
+                    return el || {}
+                }
+
+            })
+
+            function makeDGTreeSAVE(treeData) {
                 $('#dgTree').jstree('destroy');
 
                 let x = $('#dgTree').jstree(
@@ -1773,6 +1872,7 @@ angular.module("pocApp")
                 });
 
             }
+
 
             $scope.expandCompTree = function () {
                 $('#compositionTree').jstree('open_all');

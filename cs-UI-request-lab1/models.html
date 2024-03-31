@@ -81,10 +81,17 @@
 
             <div class="col-md-1 col-sm-1">
                 <div class="navbar-text btn">
-                    <a href="https://docs.google.com/document/d/1InT4HDIudFl4gUAF5htUNeLJG2QT8rBnMjB_E1fe78s" target="_blank">Documentation</a>
+                    <a href="https://docs.google.com/document/d/1InT4HDIudFl4gUAF5htUNeLJG2QT8rBnMjB_E1fe78s"
+                       target="_blank">Documentation</a>
                 </div>
             </div>
 
+            <div class="col-md-1 col-sm-1">
+                <div class="navbar-text btn">
+                    <a href="query.html"
+                       target="_blank">Terminology</a>
+                </div>
+            </div>
 
 
             <div class="col-md-1">
@@ -95,7 +102,7 @@
 
 
 
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <div class="navbar-text" >
                     <div class="btn" ng-click = "toggleTrace()" class="clickable">
                         <span ng-show="localStorage.trace.on"><span style="color: red">
@@ -230,9 +237,12 @@
                 <div ng-class="leftPanel">
 
 
+
+
+
                     <uib-tabset>
 
-                        <uib-tab heading = "Inheritance">
+                        <uib-tab heading = "Inheritance" >
                             <div>
                                 <!--
                                 <div class="pull-right clickable spacer"
@@ -254,7 +264,7 @@
 
                             <div class="clearfix"></div>
 
-                            <div class="myScrollSmall">
+                            <div class="myScrollSmall background">
                                 <div id="allDGTree"></div>
                             </div>
 
@@ -363,11 +373,6 @@
 
 
 
-<!--
-                    <div>
-                        <button class="btn btn-link" ng-click="newModel('dg')">Custom DataGroup</button>
-                    </div>
-                    -->
                 </div>
                 <div ng-class="rightPanel">
 

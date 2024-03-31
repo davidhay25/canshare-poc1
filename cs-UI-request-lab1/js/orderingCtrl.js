@@ -1,10 +1,36 @@
 angular.module("pocApp")
     .controller('orderingCtrl',
-        function ($scope) {
+        function ($scope,orderingSvc,$filter) {
 
             $scope.local = {}
 
+            //add the move instruction from a referenced dg
+            $scope.addToDG = function (ord,inx) {
+                let pathInDg = ord.path
+
+              //  let toMove = pathInDg + "." + $filter('dropFirstInPath')(ord.toMove)
+               // let insertAfter = pathInDg + "." + $filter('dropFirstInPath')(ord.insertAfter)
+
+                $scope.selectedModel.ordering = $scope.selectedModel.ordering || []
+                $scope.selectedModel.ordering.push({toMove:ord.toMove,insertAfter:ord.insertAfter})
+
+                //remove the instruction from the list.
+                $scope.dgReferencesOrdering.splice(inx,1)
+
+            }
+
+
+            $scope.showReferencedMove = function () {
+
+            }
+
+
             //locate the closest parent with ordering set
+            $scope.lookupChildrenDEP = function (){
+                orderingSvc.getOrderingForReferences($scope.fullElementList,$scope.hashAllDG)
+            }
+
+
 
             $scope.lookupParents = function (){
 
@@ -81,6 +107,9 @@ angular.module("pocApp")
                 $scope.selectedModel.ordering.push({toMove:toMove,insertAfter:insertAfter})
                 delete $scope.local.toMove
                 delete $scope.local.insertAfter
+
+
+
             }
 
             $scope.removeInsertAfter = function (index) {

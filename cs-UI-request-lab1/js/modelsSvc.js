@@ -755,18 +755,6 @@ angular.module("pocApp")
 
 
 
-
-
-
-            getFullListOfElementsNEW(inModel,inTypes,hashAllDG) {
-                console.trace('getFullListOfElements for '+ inModel.name)
-
-                prompt("msg")
-                return {allElements: [],graphData:{},relationshipsSummary:{}}
-
-            },
-
-
             //get the complete list of elements for a DG
             getFullListOfElements(inModel,inTypes,hashAllDG) {
                 console.log('getFullListOfElements for '+ inModel.name)
