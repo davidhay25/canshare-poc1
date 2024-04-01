@@ -512,13 +512,13 @@ angular.module("pocApp")
                     }
 
 
-
+/*
                     //update the global change log
                     modelDGSvc.updateChanges($scope.selectedModel,
                         {edPath:newPath,
                             msg:`Sliced ${ed.path}`},
                         $scope)
-
+*/
                     //rebuild fullList and re-draw the tree
                     $scope.refreshFullList($scope.selectedModel)
 

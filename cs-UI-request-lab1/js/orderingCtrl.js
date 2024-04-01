@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('orderingCtrl',
-        function ($scope,orderingSvc,$filter) {
+        function ($scope,orderingSvc,$timeout) {
 
             $scope.local = {}
 
@@ -14,23 +14,12 @@ angular.module("pocApp")
                 $scope.selectedModel.ordering = $scope.selectedModel.ordering || []
                 $scope.selectedModel.ordering.push({toMove:ord.toMove,insertAfter:ord.insertAfter})
 
+                $scope.$emit('redrawTree')
+
                 //remove the instruction from the list.
                 $scope.dgReferencesOrdering.splice(inx,1)
 
             }
-
-
-            $scope.showReferencedMove = function () {
-
-            }
-
-
-            //locate the closest parent with ordering set
-            $scope.lookupChildrenDEP = function (){
-                orderingSvc.getOrderingForReferences($scope.fullElementList,$scope.hashAllDG)
-            }
-
-
 
             $scope.lookupParents = function (){
 
@@ -80,7 +69,6 @@ angular.module("pocApp")
 
             }
 
-
             //get the ed that corresponds to the path. Not that efficient but saves creating another hash...
             $scope.getElementEd = function (path) {
                 for (const item of $scope.fullElementList) {
@@ -108,12 +96,20 @@ angular.module("pocApp")
                 delete $scope.local.toMove
                 delete $scope.local.insertAfter
 
+                $scope.$emit('redrawTree')
+
 
 
             }
 
             $scope.removeInsertAfter = function (index) {
                 $scope.selectedModel.ordering.splice(index,1)
+
+                $timeout(function(){
+                    $scope.$emit('redrawTree')
+                },500)
+
+
             }
 
 

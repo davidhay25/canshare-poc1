@@ -510,7 +510,7 @@ angular.module("pocApp")
 
             },
 
-            updateChanges : function (DG,change,scope) {
+            updateChangesDEP : function (DG,change,scope) {
                 DG.changes = DG.changes || []
                 DG.changes.push(change)
                // console.log('emitting')

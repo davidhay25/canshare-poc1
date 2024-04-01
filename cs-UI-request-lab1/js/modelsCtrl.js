@@ -6,9 +6,6 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
 
-
-
-            //$scope.version = "0.6.12"
             $scope.version = utilsSvc.getVersion()
             $scope.input = {}
             $scope.input.showFullModel = true
@@ -1225,26 +1222,24 @@ angular.module("pocApp")
             }
             $scope.refreshUpdates()
 
+            /*
             $scope.$on('dgUpdated',function(ev,obj){
 
                 $scope.refreshUpdates()
             })
 
-
+*/
 
 
             //used in the DG list filtering
             //filter is the selected bespoke code (if any)
             $scope.showDG = function(DG,filter) {
                 if (filter) {
-
                     let show = false
                     if (DG.name && DG.name.toLowerCase().indexOf(filter.toLowerCase()) > -1) {
                         show = true
                     }
-
                     return show
-
                 } else {
                     return true
                 }
@@ -1303,35 +1298,12 @@ angular.module("pocApp")
 
             }
 
-            //Generate a bundle of SD's to save on a FHIR server
-            //each model (comp or dg) will be an SD
-            $scope.makeBundleDEP = function () {
-                $scope.lmBundle = modelsSvc.createLMBundle($localStorage.world)
-            }
-
-            $scope.validateBundleDEP = function (bundle) {
-                delete $scope.lmValidate
-                let qry = "http://hapi.fhir.org/baseR4/Bundle/$validate"
-                $http.post(qry,bundle).then(
-                    function (data) {
-                        $scope.lmValidate = data.data
-                        $scope.lmValidateSummary = modelsSvc.summarizeValidation(data.data,bundle)
-
-                    }, function (err) {
-                        $scope.lmValidate = err.data
-                        $scope.lmValidateSummary = modelsSvc.summarizeValidation(data.data,bundle)
-                    }
-                )
-
-            }
-
 
             //create a new model. If parent is set, then a new model automatically has that model as the parent
             $scope.newModel = function(kind,parent) {
                 let newModel = {kind:kind,diff:[]}
                 $scope.editModel(newModel,true,parent)
             }
-
 
             $scope.showComposition = function (comp) {
                 let show = true
@@ -1795,9 +1767,16 @@ angular.module("pocApp")
 
                     $scope.$digest()
                 })
-
             }
 
+            $scope.$on('redrawTree',function(){
+                console.log('redraw')
+                $scope.refreshFullList($scope.selectedModel)
+
+              //  orderingSvc.sortFullListByInsertAfter($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
+              //  let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
+              //  makeDGTree(treeData)
+            })
 
             $(document).on('dnd_stop.vakata', function (e, data) {
                 let sourceId = getId(data.element.id)
@@ -1810,6 +1789,7 @@ angular.module("pocApp")
                     if (confirm(`Are you sure you wish to move ${sourceTitle} after ${targetTitle}`)) {
                         $scope.selectedModel.ordering = $scope.selectedModel.ordering || []
                         $scope.selectedModel.ordering.push({toMove:sourceId,insertAfter:targetId})
+
 
                         //re-order the full list & re-draw the tree
                         orderingSvc.sortFullListByInsertAfter($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)

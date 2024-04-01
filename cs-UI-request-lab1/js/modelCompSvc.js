@@ -178,10 +178,11 @@ angular.module("pocApp")
 
                 let comp = angular.copy(inComp)         //as we will be modifying the composition
                 let hashAllDG = angular.copy(inHashAllDG)
+
                 //generate a full list of elements for a composition. Like DG but need to accomodate sections
                 //section name is in the path...
-                //assume that composition hierarcy is only 2 levels - ie a comp can have a parent, but the parent cannot
-                //this simplifies the parsing. May need to revisit if too limiting
+
+                //assume that composition do not have a hierarcy
 
                 //processing the DG hierarchy is destructive (the parent element is removed after processing
                 //to avoid infinite recursion
