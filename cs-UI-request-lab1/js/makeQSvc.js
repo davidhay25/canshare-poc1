@@ -132,11 +132,7 @@ angular.module("pocApp")
                             qEW.answerCoding.system = qEW.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
                             canAdd = true
                         }
-
-
                     }
-
-
 
                     //need to determine the path to the question. For now, assume that
                     //qEW.question = `${parent.linkId}.${ew.source}` //linkId of source is relative to the parent (DG)
@@ -273,7 +269,7 @@ angular.module("pocApp")
 
                                          }
 
-                                         console.log(`The element ${ed.title} had neither ValueSet not options defined`)
+                                        // console.log(`The element ${ed.title} had neither ValueSet not options defined`)
                                          break
 
                                  }
@@ -972,7 +968,7 @@ angular.module("pocApp")
                                 section.item.push(group)
                             } else {
                                 log.push({msg:`DID NOT add group ${group.text}`,item:angular.copy(group)})
-                                console.log(`not adding ${group.linkId}`)
+                                //console.log(`not adding ${group.linkId}`)
                             }
 
 

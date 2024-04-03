@@ -188,7 +188,7 @@ angular.module("pocApp")
                 //retrieve the expanded VS from the server and add to hashExpanded
                 //ignore any errors - mostly 404
                 function addToHash(url,hash) {
-                    console.log(url)
+                    //console.log(url)
                     let defer = $q.defer()
                     let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=en-x-sctlang-23162100-0210105`
                     let encodedQry = encodeURIComponent(qry)
@@ -196,7 +196,7 @@ angular.module("pocApp")
 
                     $http.get(call).then(
                         function (response) {
-                            console.log(`${url} success`)
+                            //console.log(`${url} success`)
                             if (response.data && response.data.expansion && response.data.expansion.contains) {
 
                                 let ar = []
@@ -218,7 +218,7 @@ angular.module("pocApp")
                         },
                         function (err) {
                             //ignore any errors
-                            console.log(`${url} fail`)
+                            //console.log(`${url} fail`)
                             defer.resolve()
                         }
                     )

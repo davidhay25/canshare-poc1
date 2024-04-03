@@ -2,7 +2,7 @@
 //https://www.joelonsoftware.com/2000/04/06/things-you-should-never-do-part-i/
 angular.module("pocApp")
     .controller('modelsCtrl',
-        function ($scope,$http,$localStorage,modelsSvc,modelsDemoSvc,modelCompSvc,$window,makeQSvc,orderingSvc,
+        function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,makeQSvc,orderingSvc,makeCompQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
 
@@ -1469,12 +1469,14 @@ angular.module("pocApp")
 
             $scope.selectComposition = function(comp){
                 clearB4Select()
-                //$scope.selectedModel = comp
-                let vo1 =  modelCompSvc.allDGsInComp(comp,$scope.hashAllDG)
-                $scope.lstUsedDG = vo1.lstUsedDG //hashUsedDG
-
-
                 $scope.selectedComposition = comp
+
+                /* - don't think this is useful - but don't delete yet...
+                    let vo1 =  modelCompSvc.allDGsInComp(comp,$scope.hashAllDG)
+                    $scope.lstUsedDG = vo1.lstUsedDG //hashUsedDG
+                */
+
+
 
                 $scope.$broadcast("compSelected")   //for the profiling
 
@@ -1492,29 +1494,70 @@ angular.module("pocApp")
                         } else {
                             alert(`Composition ${name} not found in the local storage`)
                         }
-
                     }
                 )
 
+                // - original list let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
 
-                let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
+                //a bit of an experiment here. Given that we are using a single DG as the 'section' DG
+                //we should be able to use that to generate the full list - rather than the recursive modelCompSvc.makeFullList
+                //and it means the re-ordering should work...]
+                //AND we're re-using the DG generation code...
+/*
+                vo.allElements.forEach(function (item) {
+                    console.log(item.ed.path)
+                })
+                */
 
-                $scope.allCompElements = vo.allElements
-                $scope.hashCompElements = vo.hashAllElements
+                //note that this excludes mult 0..0
+                let vo = modelCompSvc.makeFullListv2(comp,$scope.input.types,$scope.hashAllDG)      //overites the previou slist
+
+                $scope.allCompElements = vo.allElements     //used by the Table and Q generation (at least)
+
+                //generate the Q
+                makeCompQSvc.makeQ($scope.allCompElements,function (Q) {
+
+                   // console.log("Q created and copied to clipboard!")
+
+                    $scope.fullQ = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+                    //$scope.Qlog = voQ.log   //the log of activity that occurred as the Q was created
+                    //this is a version structured for tabs.
+                    $scope.fullQTab = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+
+/*
+
+                        console.log(Q)
+                    navigator.clipboard.writeText(angular.toJson(Q)).then(
+                        () => {
+                            //alert(`Link: ${host} \ncopied to clipBoard`);
+                        },
+                        () => {
+                            //alert(`Link is ${host}`);
+                        },
+                    )
+                    */
+
+                })
+
+                //$scope.hashCompElements = vo.hashAllElements
+
+
 
                 let download = modelCompSvc.makeTSVDownload(vo.allElements)
-                //console.log(download)
-
 
                 $scope.downloadLinkCompTsv = window.URL.createObjectURL(new Blob([download ],{type:"text/tsv;charset=utf-8;"}))
                 $scope.downloadLinkCompTsvName = `comp-${comp.name}.tsv`
+
 
                 let rootNodeId = $scope.allCompElements[0].path
                 let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
                 makeCompTree(treeData,rootNodeId)
 
+
+
                 //generates the FSH representation of the Composition as a Logical Model
-                $scope.compFsh = igSvc.makeFshForComp(comp,$scope.allCompElements,$scope.hashCompElements)
+                //$scope.compFsh = igSvc.makeFshForComp(comp,$scope.allCompElements,$scope.hashCompElements)
+                $scope.compFsh = igSvc.makeFshForComp(comp,$scope.allCompElements)
 
             }
 
@@ -1878,8 +1921,8 @@ angular.module("pocApp")
                     $(this).jstree("open_node",id);
                     let treeObject = $(this).jstree(true).get_json('#', { 'flat': false })
 
-                    asyncCall(treeObject,$scope.selectedComposition,
-                        $localStorage.qStrategy)
+                //temp - don't do this here any nore    asyncCall(treeObject,$scope.selectedComposition,
+                      //  $localStorage.qStrategy)
 
                     /* temp while working out async
                     $scope.fullQ =  makeQSvc.makeQFromTree(treeObject,$scope.selectedComposition,
@@ -1893,8 +1936,8 @@ angular.module("pocApp")
 
             //making async to deal with needing to get ValueSets from server.
             //not sure if it is working property yet...
-            async function asyncCall(treeObject,comp,strategy) {
-                console.log('calling');
+            async function asyncCallDEP(treeObject,comp,strategy) {
+                //console.log('calling');
                 console.time('q')
 
 

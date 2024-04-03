@@ -1,7 +1,7 @@
 
 
 angular.module("formsApp")
-    .service('renderFormsSvc', function($q,$http,moment,utilsSvc) {
+    .service('renderFormsSvc', function($q,$http,moment,utilsSvc,vsSvc) {
 
         let arExpandedVsCache = {}
 
@@ -887,11 +887,17 @@ angular.module("formsApp")
             //section has rows array where a row has
             //pass in the formdata to allow  values to be set....
 
-            makeFormTemplate : function(Q,formData) {
+            makeFormTemplate : function(inQ,formData) {
                 //let that = this
-                if (!Q) {
+                if (!inQ) {
                     return
                 }
+
+                //as we may be modifying the
+                let Q = angular.copy(inQ)
+
+
+
                 let that = this;
                 let hiddenFields = {}
                 let hiddenSections = []
@@ -936,7 +942,7 @@ angular.module("formsApp")
                         //now look at the items below the section level.
                         if (sectionItem.item) {
                             sectionItem.item.forEach(function (item) {
-console.log('processing ',item.text)
+//console.log('processing ',item.text)
                                 let meta = that.getMetaInfoForItem(item)
 
 
@@ -962,7 +968,8 @@ console.log('processing ',item.text)
                                             //if there's a column count, then fill rows left -> right
                                             let col = 1
 
-                                            item.item.forEach(function (child,inx) {
+                                            item.item.forEach(function (inChild,cnx) {
+                                                //let child = angular.copy(inChild)
                                                 let childMeta = that.getMetaInfoForItem(child)
                                                 //console.log('processing ',child.text, child.answerValueSet,child)
                                                 //hidden items don't apper in the form at all.
@@ -970,7 +977,7 @@ console.log('processing ',item.text)
                                                     hashItem[child.linkId] = {item:child,meta:childMeta}
 
                                                     let side = 'col' + col
-                                                    let cell = {item:child,meta:childMeta}
+                                                    let cell = {child,meta:childMeta}
                                                     fillFromValueSet(cell,termServer)
                                                     setDecoration(cell,child)
                                                     setDefaultValue(child,formData)
@@ -1003,7 +1010,7 @@ console.log('processing ',item.text)
                                             //this is to make it easier to have the 'control' item in the left column and the others in th eright
                                             //Note changed in this version - if columnCount is not specified then everything is in a single column
                                             item.item.forEach(function (child,inx) {
-
+                                                //let child = angular.copy(inChild)
                                                 let childMeta = that.getMetaInfoForItem(child)
                                                 hashItem[child.linkId] = {item:child,meta:childMeta}
                                                 if (childMeta.hidden) {
@@ -1066,7 +1073,7 @@ console.log('processing ',item.text)
                                         let row = {}   //will have a single entry - left
                                         row.item = item
                                         row.meta = meta
-                                        console.log(item.text,item.answerValueSet)
+                                        //console.log(item.text,item.answerValueSet)
                                         let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
                                         fillFromValueSet(cell,termServer)
                                         setDecoration(cell,item)
@@ -1201,38 +1208,62 @@ console.log('processing ',item.text)
                     //console.log('fill from valueset ',cell.item.answerValueSet)
                     //console.log(cell)
 
-                    if (cell.item.answerValueSet) {
-                        //todo: if there is a VS, then check the displayhint. If it's a lookup, then do nothing here - when
-                        //todo the control renders it will have the typeahead
+                    if (cell.item.type == 'choice') {
 
+                        if (cell.item.answerValueSet) {
+                            //todo: if there is a VS, then check the displayhint. If it's a lookup, then do nothing here - when
+                            //todo the control renders it will have the typeahead
 
-                        //if there's a vakueset then replace the item.answerOption with the expanded vs. todo - this is just a forst step...
+                            let concepts = vsSvc.getOneVS(cell.item.answerValueSet)
+                            console.log(concepts)
+                            cell.item.answerOption = []
+                            if (concepts) {
 
-                        //console.log(cell.item.answerValueSet)
-
-                        let qry = `ValueSet/$expand?url=${cell.item.answerValueSet}&displayLanguage=en-x-sctlang-23162100-0210105`
-                        //console.log(qry)
-                        let encodedQry = encodeURIComponent(qry)
-
-                        $http.get(`nzhts?qry=${encodedQry}`).then(
-                            function (data) {
-                                let expandedVS = data.data
-                                if (expandedVS && expandedVS.expansion && expandedVS.expansion.contains) {
-                                    cell.item.answerOption = []
-
-                                    expandedVS.expansion.contains.forEach(function (concept) {
-                                        cell.item.answerOption.push({valueCoding:concept})
-                                    })
-                                }
-                                console.log(data.data)
-                            }, function (err) {
-
+                                concepts.forEach(function (concept) {
+                                    cell.item.answerOption.push({valueCoding:concept})
+                                })
+                            } else {
+                                cell.item.answerOption.push({valueCoding:{display:"ValueSet not found"}})
                             }
-                        )
 
+                            /*
 
+                                                    //if there's a vakueset then replace the item.answerOption with the expanded vs. todo - this is just a forst step...
+
+                                                    //console.log(cell.item.answerValueSet)
+
+                                                    let qry = `ValueSet/$expand?url=${cell.item.answerValueSet}&displayLanguage=en-x-sctlang-23162100-0210105`
+                                                    //console.log(qry)
+                                                    let encodedQry = encodeURIComponent(qry)
+
+                                                    $http.get(`nzhts?qry=${encodedQry}`).then(
+                                                        function (data) {
+                                                            let expandedVS = data.data
+                                                            if (expandedVS && expandedVS.expansion && expandedVS.expansion.contains) {
+                                                                cell.item.answerOption = []
+
+                                                                expandedVS.expansion.contains.forEach(function (concept) {
+                                                                    cell.item.answerOption.push({valueCoding:concept})
+                                                                })
+                                                            }
+                                                            console.log(data.data)
+                                                        }, function (err) {
+
+                                                        }
+                                                    )
+
+                            */
+
+                        } else if (cell.item.answerOption) {
+                            //if there are answerOptions then we can just continue
+                            //console.log(cell.item.answerOption)
+                        } else  {
+
+                            cell.item.answerOption = [{valueCoding:{display:"Neither ValueSet nor options defined"}}]
+                        }
 
                     }
+
 
                 }
 

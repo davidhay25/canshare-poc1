@@ -441,7 +441,7 @@ angular.module("pocApp")
                             break
                         default:
                             //contents of the DG (and any z elements). Add to the current array
-                            item.ed.path = adjustPath(item.ed.path)  //remove the first 2 segments from the path
+                            clone.ed.path = adjustPath(item.ed.path)  //remove the first 2 segments from the path
                             currentDG.push(item)
                     }
 

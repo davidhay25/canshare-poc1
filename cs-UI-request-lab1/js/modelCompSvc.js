@@ -1,19 +1,88 @@
 angular.module("pocApp")
 
-    .service('modelCompSvc', function($q,$http,modelsSvc,$filter) {
+    .service('modelCompSvc', function($q,$http,modelsSvc,$filter,orderingSvc) {
 
         let config = {}
 
 
         return {
-            makeHISOReport : function (treeData) {
-                //generate the HISO report. Use the treeData array as that is what the user
-                //will see, so if there are errors they will be most apparent there
+            makeFullListv2 : function (inComp,inTypes,inHashAllDG) {
+                //Generate the full list by iterating over the sections. Assume each section has a single 'sectionDG'
 
+                let fullList = []
+
+                let compName = inComp.name
+
+                //the composition name needs to be first
+                fullList.push({ed:{path:compName},name:compName})
+
+                inComp.sections.forEach(function (sect) {
+                    let sectName = sect.name
+                    let item = sect.items[0]        //actually, could iterate over multiple dg if needed....
+                    //section may not have items...
+                    if (item) {
+                        let dgName = item.name
+                        let dg = inHashAllDG[dgName]
+                        let vo = modelsSvc.getFullListOfElements(dg,inTypes,inHashAllDG)
+                        let allElements = vo.allElements
+
+                        orderingSvc.sortFullListByInsertAfter(allElements,dg,inHashAllDG)
+                        let ar = allElements.filter(item => item.ed.mult !== '0..0')
+
+                        //each section needs an entry
+                        //todo - is more detail needed in the ed???
+                        fullList.push({ed:{path:`${compName}.${sectName}`,title:sect.title,mult:sect.mult}})
+
+                        //fullList.push({ed:{path:`${compName}.${sectName}.${dgName}`}})
+
+                        ar.forEach(function (item){
+                            let ed = angular.copy(item.ed)
+                            //ed.path = `${compName}.${sectName}.${dgName}.${ed.path}`
+                            ed.path = `${compName}.${sectName}.${ed.path}`
+                            fullList.push({ed:ed})
+
+
+                        })
+                    }
+
+
+
+                })
+
+                return {allElements: fullList}
+
+
+/*
+
+                let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
+                if (vo.log && vo.log.length > 0) {
+                    $scope.errorLog = vo.log
+                }
+
+
+                $scope.graphData = vo.graphData
+                $scope.relationshipsSummary = vo.relationshipsSummary   //all the relationships - parent and reference - for this type
+
+                //sort the elements list to better display slicing
+                $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
+                $scope.fullElementHash = {}         //I seem to need this quite a lot. Though memory usage is getting high...
+                //create the list of all paths in the DG. Used by the 'ordering'
+                $scope.allPaths = []
+                $scope.fullElementList.forEach(function (item) {
+                    $scope.fullElementHash[item.ed.path] = item.ed
+                    if (item.ed.mult !== '0..0') {
+                        $scope.allPaths.push(item.ed.path)
+                    }
+                })
+
+
+                orderingSvc.sortFullListByInsertAfter($scope.fullElementList,dg,$scope.hashAllDG)   //adjust according to 'insertAfter' values
+                $scope.dgReferencesOrdering = orderingSvc.getOrderingForReferences($scope.fullElementList,dg,$scope.hashAllDG)
+*/
 
             },
 
-            allDGsInComp: function(comp,hashAllDG){
+            allDGsInCompDEP: function(comp,hashAllDG){
                 //return a list of all DG's used in a given composition
 
                 let hashUsedDG = {}
@@ -255,6 +324,9 @@ angular.module("pocApp")
 
                         let vo = modelsSvc.getFullListOfElements(model,types,hashAllDG)
                         let allElementsThisDG = modelsSvc.makeOrderedFullList(vo.allElements)     //orders the list and removes group original children
+
+                        //todo >>>> here is where the 'insertAfter' re-ordering should go..
+
 
 
                         //The first element in this list is actually the DG - not an element.

@@ -653,7 +653,7 @@ angular.module("pocApp")
                 }
 
                 //orderingSvc.sortDGTree(treeData)    //adjust the order in the tree
-                console.log(treeData)
+                //console.log(treeData)
 
                 return treeData
 
@@ -730,7 +730,7 @@ angular.module("pocApp")
                     if (item.ed && item.ed.type) {
                         let type = item.ed.type[0]
                         if (type == 'Group' && item.ed.originalType) {  //presence of originalType indicates this element was sliced
-                            console.log("Group!",item.ed)
+                            //console.log("Group!",item.ed)
                             arHiddenElements.push(item.ed.path)
                             //if there are any elements that
                         } else{
@@ -757,7 +757,7 @@ angular.module("pocApp")
 
             //get the complete list of elements for a DG
             getFullListOfElements(inModel,inTypes,hashAllDG) {
-                console.log('getFullListOfElements for '+ inModel.name)
+                //console.log('getFullListOfElements for '+ inModel.name)
                 if (! inModel) {
                     return
                 }
@@ -863,12 +863,24 @@ angular.module("pocApp")
                     let path = ed.path
 
                     let pos = -1
+                    let found = false
+                    for (const element of  allElements){
+                        pos ++
+                        // if (element.path == path) {   //changed Jul-29
+                        if (element.ed.path == path) {     //should only be one (unless there are duplicate names in the model
+                            found = true
+                            break
+                        }
+                    }
+
+                    /* April 3 - more efficitnt iterator
                     allElements.forEach(function (element,inx) {
                         // if (element.path == path) {   //changed Jul-29
                         if (element.ed.path == path) {     //should only be one (unless there are duplicate names in the model
                             pos = inx
                         }
                     })
+                    */
 
                     let itemToInsert = {ed:ed,host}
                     if (host) {     //todo not sure if this is still used...
@@ -903,8 +915,10 @@ angular.module("pocApp")
 */
 
 
-                    if (pos > -1) {
+                    if (found) {
+                        //if (pos > -1) {
                         //replace the existing path
+                       // console.log('replacing ' + path)
                         allElements.splice(pos,1,itemToInsert)
                     } else {
                         allElements.push(itemToInsert)          //this is what was working - just at the end
@@ -960,17 +974,7 @@ angular.module("pocApp")
 
                         //console.log(model.name, model.parent)
 
-/*
 
-                        if (hashParents[model.parent]) {
-                            //oops - we've seen this DG before! It's an error
-                            alert (`Processing ${inModel.name} and the parent ${model.parent} has appeared more than once. This is an error`)
-                            return
-                        } else {
-                            console.log(model.parent)
-                            hashParents[model.parent] = true
-                        }
-*/
 
                         if (types[model.parent]) {
                             //this is called whenever there is a DG to be expanded

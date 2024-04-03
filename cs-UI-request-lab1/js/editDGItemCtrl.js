@@ -284,7 +284,7 @@ angular.module("pocApp")
                         $scope.qControlOptions =  ["string","text"]
                         break
                     case "CodeableConcept" :
-                        $scope.qControlOptions =  ["drop-down","autocomplete","lookup"]
+                        $scope.qControlOptions =  ["drop-down","autocomplete","lookup","radio"]
                         break
                 }
 
@@ -638,7 +638,7 @@ angular.module("pocApp")
             //lookup from the TS
             $scope.lookupFSN = function (code) {
 
-                let qry = `CodeSystem/$lookup?system=${snomed}&code=${code}`
+                let qry = `CodeSystem/$lookup?system=${snomed}&code=${code}&displayLanguage=en-x-sctlang-23162100-0210105`
 
                 let encodedQry = encodeURIComponent(qry)
                 $scope.showWaiting = true
