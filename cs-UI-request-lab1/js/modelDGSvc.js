@@ -337,9 +337,6 @@ angular.module("pocApp")
 
                 //sort by
 
-
-
-
                 console.log(sectionTreeData)
 
                 return {treeData:treeData,sectionTreeData : sectionTreeData}
@@ -370,14 +367,10 @@ angular.module("pocApp")
                             }
                         }
 
-
-
-
                     })
                 } catch (ex) {
                     alert(ex)
                 }
-
 
 
                 return {treeData: sectionTreeData}
@@ -389,15 +382,18 @@ angular.module("pocApp")
                     let ctr = 0
 
                     while (tmpDG.parent) {
+                        let parent = tmpDG.parent
                         let dgTitle = tmpDG.title
                         tmpDG = hashAllDG[tmpDG.parent]
                         if (! tmpDG) {
-                            throw new Error(`DG ${tmpDG.parent} was not found. Referenced in ${dgTitle}`)
+                            throw new Error(`DG ${parent} was not found. Referenced in ${dgTitle}`)
+                            return
                         }
 
                         ctr++
                         if (ctr > 100) {
                             throw new Error(`Error finding ultimate parent of ${dgName}`)
+                            return
                         }
 
                     }

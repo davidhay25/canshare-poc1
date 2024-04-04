@@ -6,6 +6,9 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
 
+            //whether to automatically generate a Q
+            let autoQ = false
+
             $scope.version = utilsSvc.getVersion()
             $scope.input = {}
             $scope.input.showFullModel = true
@@ -63,8 +66,6 @@ angular.module("pocApp")
                 }
             }
 
-
-
             //look for DG errors like repeating parents in the hierarchy tree
             if (Object.keys($scope.hashAllDG).length > 0) {         //There are DG's stored locally
                 modelDGSvc.checkAllDG($scope.hashAllDG)
@@ -100,8 +101,6 @@ angular.module("pocApp")
 
             }
 
-
-            //
 
 
             //a handler that will re-draw the list and tree views of the DGs.
@@ -338,7 +337,7 @@ angular.module("pocApp")
             }
 
             //all the questionnaire objects (not actual Q)
-            $scope.allQObject = $localStorage.allQObject
+            //$scope.allQObject = $localStorage.allQObject
 
             $scope.showTrace = function () {
                 $uibModal.open({
@@ -386,7 +385,7 @@ angular.module("pocApp")
                             return $scope.hashAllCompositions
                         },
                         allQObject : function () {
-                            return $scope.allQObject
+                            return {} //$scope.allQObject
                         },
                         user : function () {
                             return $scope.user
@@ -1514,30 +1513,34 @@ angular.module("pocApp")
 
                 $scope.allCompElements = vo.allElements     //used by the Table and Q generation (at least)
 
-                //generate the Q
-                makeCompQSvc.makeQ($scope.allCompElements,function (Q) {
 
-                   // console.log("Q created and copied to clipboard!")
+                if (autoQ) {
+                    //generate the Q
+                    makeCompQSvc.makeQ($scope.allCompElements,function (Q) {
 
-                    $scope.fullQ = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
-                    //$scope.Qlog = voQ.log   //the log of activity that occurred as the Q was created
-                    //this is a version structured for tabs.
-                    $scope.fullQTab = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+                        // console.log("Q created and copied to clipboard!")
 
-/*
+                        $scope.fullQ = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+                        //$scope.Qlog = voQ.log   //the log of activity that occurred as the Q was created
+                        //this is a version structured for tabs.
+                        $scope.fullQTab = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
 
-                        console.log(Q)
-                    navigator.clipboard.writeText(angular.toJson(Q)).then(
-                        () => {
-                            //alert(`Link: ${host} \ncopied to clipBoard`);
-                        },
-                        () => {
-                            //alert(`Link is ${host}`);
-                        },
-                    )
-                    */
+                        /*
 
-                })
+                                                console.log(Q)
+                                            navigator.clipboard.writeText(angular.toJson(Q)).then(
+                                                () => {
+                                                    //alert(`Link: ${host} \ncopied to clipBoard`);
+                                                },
+                                                () => {
+                                                    //alert(`Link is ${host}`);
+                                                },
+                                            )
+                                            */
+
+                    })
+                }
+
 
                 //$scope.hashCompElements = vo.hashAllElements
 
@@ -1579,17 +1582,34 @@ angular.module("pocApp")
                 $scope.graphData = vo.graphData
                 $scope.relationshipsSummary = vo.relationshipsSummary   //all the relationships - parent and reference - for this type
 
+
+                if (modelsSvc.fixDgDiff(dg,vo.allElements)) {
+                    //there were issues that were fixed - need to re-generate the full list
+                    vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
+
+                    if (vo.log && vo.log.length > 0) {
+                        $scope.errorLog = vo.log
+                    }
+                }
+
                 //sort the elements list to better display slicing
                 $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
                 $scope.fullElementHash = {}         //I seem to need this quite a lot. Though memory usage is getting high...
                 //create the list of all paths in the DG. Used by the 'ordering'
                 $scope.allPaths = []
+                let cntHidden = 0, cntVisible=0
                 $scope.fullElementList.forEach(function (item) {
                     $scope.fullElementHash[item.ed.path] = item.ed
                     if (item.ed.mult !== '0..0') {
+                        cntVisible ++
                         $scope.allPaths.push(item.ed.path)
+                    } else {
+                        cntHidden++
                     }
                 })
+                $scope.hiddenSummary = `${cntVisible}/${cntHidden}`
+
+                console.log(`Visible: ${cntVisible}  Hidden:${cntHidden}`)
 
 
                 orderingSvc.sortFullListByInsertAfter($scope.fullElementList,dg,$scope.hashAllDG)   //adjust according to 'insertAfter' values
@@ -1610,9 +1630,12 @@ angular.module("pocApp")
 
                 //a Q representation of the DG
 
-                let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
-                console.log(voQ.Q)
-                $scope.dgQ = voQ.Q
+                if (autoQ) {
+                    let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
+                    console.log(voQ.Q)
+                    $scope.dgQ = voQ.Q
+                }
+
 
 
                 //The DG element tree

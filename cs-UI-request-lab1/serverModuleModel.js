@@ -182,10 +182,10 @@ async function setup(app) {
     //get the DG index for the IG
     //todo >>>>>>> not currently used
     app.get('/model/dgIndex', async function(req,res) {
-        //retrieve all the DG
+        //retrieve all the active DGs
         let query = {active:true} // active: { $lt: 15 } };
 
-        console.log('query',query)
+        //console.log('query',query)
         const colDG = database.collection("dg");
 
         try {

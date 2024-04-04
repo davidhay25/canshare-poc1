@@ -41,10 +41,11 @@ angular.module("pocApp")
                 let ctr = 0
 
                 while (tmpDG.parent) {
+                    let parent = tmpDG.parent
                     let dgTitle = tmpDG.title
                     tmpDG = hashAllDG[tmpDG.parent]
                     if (! tmpDG) {
-                        alert(`DG ${tmpDG.parent} was not found. Referenced in ${dgTitle}`)
+                        alert(`DG ${parent} was not found. Referenced in ${dgTitle}`)
                         return
                     }
 

@@ -1,12 +1,10 @@
 angular.module("pocApp")
 
-    .service('modelsSvc', function($q,$filter,$http,makeQSvc) {
+    .service('modelsSvc', function($q,$filter,$http,makeQSvc,$timeout) {
         let cache = {}
 
         this.fhir = {}
         this.user
-
-
 
         return {
 
@@ -48,7 +46,6 @@ angular.module("pocApp")
 
             },
 
-
             getSizeOfObject : function( object ) {
                 //the memory usage of an obect - from https://stackoverflow.com/questions/1248302/how-to-get-the-size-of-a-javascript-object#11900218
                 var objectList = [];
@@ -80,7 +77,6 @@ angular.module("pocApp")
                 }
                 return bytes;
             },
-
 
             getConceptMapHashDEP : function () {
                 let idOfConceptMap = "canshare-tnm-vs"
@@ -277,7 +273,7 @@ angular.module("pocApp")
             },
 
             //create a bundle of LogicalModels
-            createLMBundle : function (world) {
+            createLMBundleDEP : function (world) {
                 let fhirDataTypes = this.fhirDataTypes()
                 let urlBase = "http://canshare.co.nz/fhir/StructureDefinition"
                 let bundle = {resourceType:"Bundle",type:"transaction",entry:[]}
@@ -335,162 +331,12 @@ angular.module("pocApp")
                 return bundle
             },
 
-            makeQforDGDEP : function (fullElementList) {
-                //make the items object a Q for a DG
-                //todo - use by Composition Q eventually
-
-
-                function createObjectFromPathList(pathValueList) {
-                    const result = {};
-
-                    pathValueList.forEach(item => {
-                        const { path, value } = item;
-                        const pathArray = path.split('.');
-                        let currentObj = result;
-
-                        for (let i = 0; i < pathArray.length - 1; i++) {
-                            const key = pathArray[i];
-                            if (!currentObj[key]) {
-                                currentObj[key] = {};
-                            }
-                            currentObj = currentObj[key];
-                        }
-
-                        currentObj[pathArray[pathArray.length - 1]] = value;
-                    });
-
-                    return result;
-                }
-
-// Example list of items with paths and values
-
-                let pathValueList = []
-                fullElementList.forEach(function (item) {
-                    let ed = item.ed
-                    let path = item.ed.path
-                    pathValueList.push({path:path,value:ed})
-                })
-
-                /*
-                const pathValueList = [
-                    { path: 'parent.child.grandchild', value: 42 },
-                    { path: 'parent.anotherChild', value: 'hello' },
-                    { path: 'something', value: [1, 2, 3] }
-                ];
-*/
-                const resultObject = createObjectFromPathList(pathValueList);
-                console.log(resultObject);
-
-                return resultObject
-
-
-                //-------------
-
-                let currentItem = {item:[]}     //the item that currently has the ed
-                let currentDepth = 0
-                let pathRoot = "test"
-                let hash = {}
-
-                fullElementList.forEach(function (item) {
-                    let ed = item.ed
-                    let path = item.ed.path
-                    let ar = path.split('.')
-                    let leaf = ar[ar.length-1]   //the name od the element
-
-
-
-
-                    let depth = path.split('.').length
-                    if (depth !== currentDepth) {
-                        //this is a nested entry
-                        let previousItem = currentItem
-                        let currentItem = {}
-
-                    } else {
-
-                    }
-
-
-                    
-                })
-
-                return rootItem
-
-
-            },
-
-            makeQfromModelDEP : function(model, types) {
-                //make a Q that represents a model
-                //all the top level elements on the model are a section
-                //if an element below that has childre it is a group
-                //todo - doesn't follow parent chain...
-
-                let Q = {title:model.title,name:model.name,status:'draft',item:[]}         //an object that will become a Q
-
-                //process an ed
-                function processSection(item,DG,pathRoot) {
-                    //add all the children of the DG to the item. If a child has children, call recursively
-                    if (DG.diff) {
-                        DG.diff.forEach(function (ed) {
-                            //find the ed in the set of types
-                            if (ed.type) {
-                                let type = ed.type[0]
-                                let m = types[type]
-                                if (m) {
-                                    if (m.diff) {
-                                        //there are child elements
-                                        let nextPathRoot = `${pathRoot}.${ed.path}`
-                                        let groupItem = {linkId:nextPathRoot,text:ed.title,type:'group'}
-                                        item.item = item.item || []
-                                        item.item.push(groupItem)
-                                        processSection(groupItem,m,nextPathRoot)
-
-
-                                    } else {
-                                        //add the item
-                                        let itemToAdd = {linkId:`${pathRoot}.${ed.path}` ,text:ed.title}
-                                        itemToAdd.type = 'string'
-                                        item.item = item.item || []
-                                        item.item.push(itemToAdd)
-                                    }
-                                }
-
-                            } else {
-                                console.log(`Type ${type} not found`)
-                            }
-
-                        })
-                    }
-                }
-
-                //iterate through the top level. These will be sections in the Q
-                //for now, assume that all of the top level entries in a model are
-                //references to DG / compositions. Perhaps any 'non types' could be in an 'other' section
-                if (model.diff) {
-                    model.diff.forEach(function (ed) {
-                        let section = {linkId:`section-${ed.path}`,text:ed.title}
-                        Q.item.push(section)
-                        let type = ed.type[0]
-                        let childModel = types[type]
-                        if (childModel) {
-                            processSection(section,childModel,ed.path)
-                        } else {
-                            console.log(`Type ${type} not found`)
-                        }
-
-                    })
-                }
-
-                return Q
-
-            },
-
             analyseWorld : function(world,types) {
                 //find references between structures
                 let that = this
                 let merged = angular.copy({...world.compositions, ...world.dataGroups})     //all EDs
 
-                if (! cache.analysis) {
+                if (! cache.analysis) {     //cache is defined on the service directly
                     cache.analysis = {}     //hash of references by target
                     //create the anaysis
                     Object.keys(merged).forEach(function (key) {
@@ -507,6 +353,7 @@ angular.module("pocApp")
                     })
                 }
 
+                delete merged
                 //console.log(cache.analysis)
                 return cache.analysis
 
@@ -661,6 +508,11 @@ angular.module("pocApp")
             },
 
             makeOrderedFullList : function (elements) {
+                //this routine will crash under some circumstances - specifically if there
+                //is a missing element that has 'children' below it. I don't know why this is happenning.
+                //The safest is to delete this DG and re-enter it. If the same error persists, then that might help figure out what is going on.
+                let errors = []
+
                 if (! elements || elements.length == 0) {
                     return []
                 }
@@ -682,9 +534,19 @@ angular.module("pocApp")
                     let ar = ed.path.split('.')
                     if (ar.length > 1) {
                         ar.pop()
+                        //note that 'parent' is not the DG parent but the previous path segment
                         let parentPath = ar.join('.')
                         if (!hash[parentPath]) {
-                            alert(`The paths in DG ${dgName} have become corrupted. The path ${parentPath} could not be found. You'll need to remove the element with the path ${ed.path | dropFirstInPath} from the diff tab.`)
+
+                            errors.push(parentPath)
+                            //alert(`The paths in DG ${dgName} have become corrupted. The path ${parentPath} could not be found. You'll need to remove the element with the path ${ed.path } from the diff tab.`)
+
+                            //there's been an issue - an element has been dropped. not sure why...
+                            //for now, add it into the hash  todo - need a more definitive solution later
+                            //temp let dummyEd = {path:parentPath,title:"Inserted element",description:"Issue here",type:['Group'],mult:'0..1'}
+                           // temp hash[parentPath] = {ed : dummyEd,children:[]}
+                           // temp hash[parentPath].children.push(hash[path])
+
                         } else {
                             hash[parentPath].children.push(hash[path])
                         }
@@ -694,6 +556,10 @@ angular.module("pocApp")
                         rootPath = ar[0]
                     }
                 })
+
+                if (errors.length > 0) {
+                    alert("There were missing elements in the DG. The safest course is to abandon this DG and re-create it. You could try reverting and checking out to see if there is a good copy in the library.")
+                }
 
                 // now we can build the ordered list
 
@@ -719,7 +585,7 @@ angular.module("pocApp")
                 processNode(arLines,hash[rootPath],"")
 
                 //There's a particular issue in that slicing changes the datatype for the 'parent' element to Group
-                //but parents of that element may still persist (they get added as the parents are processed first
+                //but parents of that element may still persist (they get added as the parents are processed first)
                 //so create a list of all elements with a type of Group. Then, from the originalType we can create
                 // a list of elements that came directly from the type and remove them (or set mult = 0..0)
                 //only do this if the element was sliced (originalType present).
@@ -752,17 +618,84 @@ angular.module("pocApp")
 
             },
 
+            fixDgDiff : function (dg,fullList) {
+                //remove any elements from the dg.diff where there is a missing 'parent path'
 
+                let errors = []
+                let hash = {}
+                fullList.forEach(function (item,inx) {
+                    let ed = item.ed
+                    let path = ed.path
+                    hash[path] = {ed:ed,children:[]}  //add to the hash in case it is a parent...
+
+                    //add the ed to the parent
+                    let ar = ed.path.split('.')
+                    if (ar.length > 1) {
+                        ar.pop()
+                        //note that 'parent' is not the DG parent but the previous path segment
+                        let parentPath = ar.join('.')
+                        if (!hash[parentPath]) {
+
+                            errors.push($filter('dropFirstInPath')(parentPath))
+                            //alert(`The paths in DG ${dgName} have become corrupted. The path ${parentPath} could not be found. You'll need to remove the element with the path ${ed.path } from the diff tab.`)
+
+                            //there's been an issue - an element has been dropped. not sure why...
+                            //for now, add it into the hash  todo - need a more definitive solution later
+                            let dummyEd = {path:parentPath,title:"Inserted element",description:"Issue here",type:['Group'],mult:'0..1'}
+                            hash[parentPath] = {ed : dummyEd,children:[]}
+                            hash[parentPath].children.push(hash[path])
+
+                        } else {
+                            hash[parentPath].children.push(hash[path])
+                        }
+                    }
+                })
+
+                if (errors.length > 0) {
+                    if (confirm(`There were ${errors.length} missing paths. Shall I fix this by removing all child elements`)) {
+                        let lst = []
+                        dg.diff.forEach(function (diff) {
+                            let path = diff.path
+                            let ok = true
+                            errors.forEach(function (missing) {
+                                if (path.startsWith(missing)) {
+                                    ok = false
+                                }
+
+                            })
+                            if (ok) {
+                                lst.push(diff)
+                            } else {
+                                console.log(`Will remove ${path}`)
+                            }
+
+                        })
+
+                        dg.diff = lst
+                        return true
+                        /*
+                        //a timeout to allow the dg change to
+                        $timeout(function () {
+
+                        },100)
+                        */
+                    }
+
+                } else {
+                    //alert("No issues found")
+                    return false
+                }
+
+            },
 
 
             //get the complete list of elements for a DG
-            getFullListOfElements(inModel,inTypes,hashAllDG) {
+            getFullListOfElementsNEW(inModel,inTypes,hashAllDG) {
                 //console.log('getFullListOfElements for '+ inModel.name)
                 if (! inModel) {
                     return
                 }
                 let iterationCount = 0      //a counter to detect excessive iterations (indicates a circular reference)
-               // console.log(`Processing ${inModel.name}`)
                 //create a complete list of elements for a DG (Compositions have a separate function)
 
                 //processing the DG hierarchy is destructive (the parent element is removed after processing
@@ -918,9 +851,10 @@ angular.module("pocApp")
                     if (found) {
                         //if (pos > -1) {
                         //replace the existing path
-                       // console.log('replacing ' + path)
+                        console.log('replacing ' + path + " (" + sourceModel.name + ")")
                         allElements.splice(pos,1,itemToInsert)
                     } else {
+                        console.log('inserting ' + path + " (" + sourceModel.name + ")")
                         allElements.push(itemToInsert)          //this is what was working - just at the end
                     }
                 }
@@ -928,6 +862,340 @@ angular.module("pocApp")
                 //add graph node to the node list, replacing any with the same id
                 function addNodeToList(node) {
                     let pos = -1
+
+                    arNodes.forEach(function (iNode,inx) {
+                        if (iNode.id == node.id) {
+                            pos = inx
+                        }
+                    })
+
+                    if (pos > -1) {
+                        //there is already an element with this id - replace it
+                        arNodes.splice(pos,1,node)
+                    } else {
+                        arNodes.push(node);
+                    }
+                }
+
+                //process a single element at the root of the DG
+                function extractElements(model,pathRoot,type) {
+                    arLog.push({dg: model.name,path:pathRoot,type:type})
+                    if (model.name == inModel.name) {
+                        //alert(`Processing ${model.name}, path: ${pathRoot} and it has a reference to ${inModel.name} which is a circular reference! This should be fixed.`)
+                        //return
+                    }
+
+                    iterationCount++
+                    if (iterationCount > 1000) {
+                        alert(`Excessive iteration count for DG ${inModel.name}. The tree view will be incorrect. The processing steps are shown in an errors tab.`)
+                        throw new Error(`Excessive iteration count for DG ${inModel.name}`)
+                    }
+
+                    //add to nodes list
+
+                    let node = {id: model.name, label: model.name,shape: 'box'}
+                    node.data = {model:model}
+                    if (model.name == inModel.name) {
+                        node.color = '#ff8080'
+                    } else if (model.kind == "comp") {
+                        node.color = '#FFFFCC'
+                    }
+
+                    addNodeToList(node)
+
+                    //console.log('extractElements ' + model.name)
+                    //do parents first.
+                    if (model.parent ) {
+
+                        //console.log(model.name, model.parent)
+
+
+
+                        if (types[model.parent]) {
+                            //this is called whenever there is a DG to be expanded
+                            if (pathRoot.split('.').length == 1) {
+                                //if there is no '.' then this must be a DG parent
+                                relationshipsSummary.parents.splice(0,0,model.parent)         //the name of the parent
+                            } else {
+                                //this must be a DG referenced by an element within the DG (or one of its ancestors)
+                                relationshipsSummary.references.push({path:pathRoot,type:model.name})
+                            }
+
+                            //to prevent infinite recursion
+                            let parentName = model.parent
+
+                            // temp! delete model.parent
+
+                            //create the 'parent' link  todo - graph needs to add parent
+                            let edge = {id: 'e' + arEdges.length +1,
+                                from: model.name,
+                                //to: model.parent,
+                                to: parentName,
+                                color: 'red',
+                                width: 4,
+                                label: 'specializes',arrows : {to:true}}
+                            arEdges.push(edge)
+
+                            extractElements(types[parentName],pathRoot,"parent")
+
+
+                        } else {
+                            errors.push(`missing type name ${model.parent}`)
+                            console.log(`missing type name ${model.parent}`)
+                        }
+                    }
+
+                    if (model.diff) {
+                        model.diff.forEach(function (ed) {
+
+                            if (ed.type && ed.type.length > 0) {
+                                let type = ed.type[0]   //only look at the first code
+                                if (types[type]) {
+                                    //this is a known type. Is there a definition for this type (ie do we need to expand it)
+                                    //a fhir datatype will not have a diff...
+                                    let childDefinition = types[type]
+
+                                    if (childDefinition.diff ) {
+                                        //if there is a diff element in the type, then it is a DG that can be expanded
+
+                                        let relativePath =  $filter('dropFirstInPath')(`${pathRoot}.${ed.path}`)
+
+                                        relationshipsSummary.references.push({path:relativePath,type:childDefinition.name})
+
+                                        //avoid duplicates. eg where one DG refers to Observation multiple times, each results in Observation -> HCP
+                                        let refHash = `${model.name}-${childDefinition.name}-${ed.path}`
+                                        //only add an edge for a given source / target / path once
+                                        if (! hashEdges[refHash]) {
+                                            hashEdges[refHash] = true
+                                            //create an edge. todo This is to ALL elements, so may want to filter
+                                            let label = `${ed.path} ${ed.mult}`
+                                            let edge = {id: 'e' + arEdges.length +1,
+                                                from: model.name,
+                                                to: childDefinition.name,
+                                                color : 'blue',
+                                                dashes : true,
+                                                label: label,
+                                                arrows : {to:true}}
+                                            arEdges.push(edge)
+                                        }
+
+
+                                        //console.log('expanding child: ' + childDefinition.name)
+                                        let clone = angular.copy(ed)
+                                        clone.path = pathRoot + "." + ed.path
+
+                                        //add to the list of elements
+                                        addToList(clone,ed,model) //model will be the source
+
+                                        extractElements(childDefinition,pathRoot + "." + ed.path,"element")
+
+                                    } else {
+                                        //list add the ed to the list
+                                        //this is a fhir dt
+                                        let clone = angular.copy(ed,null,model) //include the model so the source of the ed is known
+
+                                        clone.path = pathRoot + '.' + ed.path
+                                        // function addToList(ed,host,sourceModel) {
+                                        addToList(clone,null,model)
+
+                                    }
+
+
+                                } else {
+                                    errors.push(`missing type ${model.name}`)
+                                    alert(`The type ${type} could not be found looking at DG ${model.name}`)
+                                }
+
+
+                            } else {
+                                alert(`ed ${model.name} ${ed.path} is missing the type `)
+                                errors.push(`ed ${model.name} ${ed.path} is missing the type `)
+                            }
+                        })
+                    }
+
+
+
+                }
+
+
+
+            },
+
+            getFullListOfElements(inModel,inTypes,hashAllDG) {
+                //console.log('getFullListOfElements for '+ inModel.name)
+                if (! inModel) {
+                    return
+                }
+                let iterationCount = 0      //a counter to detect excessive iterations (indicates a circular reference)
+                // console.log(`Processing ${inModel.name}`)
+                //create a complete list of elements for a DG (Compositions have a separate function)
+
+                //processing the DG hierarchy is destructive (the parent element is removed after processing
+                //to avoid infinite recursion - update: not any more.
+                let types = angular.copy(inTypes)
+                //ensure the types hash has the FHIR dts as well
+                let fdt = this.fhirDataTypes()
+                fdt.forEach(function (dt) {
+                    types[dt] = dt
+                })
+
+
+                let hashHidden = {}     //ed's with mult = 0..0
+
+                let relationshipsSummary = {parents:[],references:[],children:[]}       //all the relationships for this DG (reference 1 level only)
+
+                let model = angular.copy(inModel)
+                let topModel = angular.copy(model)
+                let allElements = []
+                let errors = []
+                let arLog = []  //a processing log of
+
+                let hashEdges = {}      //a has to track edges between nodes to adoid duplication
+
+                let arNodes = []      //for the graph
+                let arEdges = []      //for the graph
+
+                //first follow the parental hierarchy to populate the initial list
+                //updates allElements as it extracts
+                //as it moves up the hierarchy, add the element to the list (based on the path) unless there is
+                //already one there (so it replaced the parental one)
+
+                //create as ed to act as the root
+                let edRoot = {ed:{path:model.name,title:model.title,description:model.description}}
+                allElements.push(edRoot)
+
+                //a hash of all parents examined as the DG is inflated.
+                //If a DG is processed more than once, the process terminates with an error - this could be recursive
+                let hashParents = {}
+
+                try {
+                    //udpates allElements
+                    extractElements(model,model.name,'root')   //the guts of the function
+
+                    arLog.length = 0        //don't return the log contents if all was OK
+                } catch (ex) {
+                    //thrown when the number of iterations is excessive (>300 ATM).
+                    //usually a circular reference
+                    console.log(arLog)
+
+                    //alert(`Unable to inflate DG: ${model.name}. Error: ${angular.toJson(ex)}` )
+                    //return {allElements: allElements,graphData:{},relationshipsSummary:relationshipsSummary}
+
+                    //return {allElements: [],graphData:{},relationshipsSummary:relationshipsSummary}
+
+                }
+
+
+                //set the mult to 0..0 for any element where an ancestor (ie path in a parent) is 0..0
+                //this doesn't change the ED stored in the browser - it's only the memory copy
+                allElements.forEach(function (item) {
+                    //item.ed.mult = '0..0'
+                    for (const key of Object.keys(hashHidden)) {
+                        //if (item.ed.path.startsWith(key +'.')) {
+                        if (item.ed.path.isChildPath(key)) {
+                            item.ed.mult = '0..0'
+                            break
+                        }
+                    }
+                })
+
+
+
+                let nodes = new vis.DataSet(arNodes)
+                let edges = new vis.DataSet(arEdges);
+
+                // provide the data in the vis format
+                let graphData = {
+                    nodes: nodes,
+                    edges: edges
+                };
+
+                //now populate the children array - ie models that have this dg as a parent
+                Object.keys(hashAllDG).forEach(function (key) {
+                    if (hashAllDG[key].parent == inModel.name) {
+                        relationshipsSummary.children.push(key)
+                    }
+                })
+
+
+
+                return {allElements: allElements,graphData:graphData,relationshipsSummary:relationshipsSummary,log:arLog,hashHidden:hashHidden}
+
+                // add to list of elements, replacing any with the same path (as it has been overwritten)
+                //todo - what was 'host' for?
+                function addToList(ed,host,sourceModel) {
+                    //is there already an entry with this path
+                    let path = ed.path
+
+                    let pos = -1
+                    let found = false
+                    for (const element of  allElements){
+                        pos ++
+                        // if (element.path == path) {   //changed Jul-29
+                        if (element.ed.path == path) {     //should only be one (unless there are duplicate names in the model
+                            found = true
+                            break
+                        }
+                    }
+
+                    /* April 3 - more efficitnt iterator
+                    allElements.forEach(function (element,inx) {
+                        // if (element.path == path) {   //changed Jul-29
+                        if (element.ed.path == path) {     //should only be one (unless there are duplicate names in the model
+                            pos = inx
+                        }
+                    })
+                    */
+
+                    let itemToInsert = {ed:ed,host}
+                    if (host) {     //todo not sure if this is still used...
+                        itemToInsert.host = host
+                    }
+
+                    //record the sourceModel - ie where in the hierarchy this element came from
+                    if (sourceModel) {
+                        itemToInsert.ed.sourceModelName = sourceModel.name
+                    }
+
+                    //jan16
+                    if (ed.mult == '0..0') {
+                        //this one is hidden. Add it to the hash
+                        hashHidden[ed.path] = true
+                    }
+
+                    /*
+                                        //added Jan16 - set mult 0..0 if parent is hidden
+                                        if (ed.mult == '0..0') {
+                                            //this one is hidden. Add it to the hash
+                                            hashHidden[ed.path] = true
+                                        } else {
+                                            //are any of the ancestors hidden?
+                                            for (const key of Object.keys(hashHidden)) {
+                                                if (ed.path.startsWith(key)) {
+                                                    ed.mult = '0..0'
+                                                    break
+                                                }
+                                            }
+                                        }
+                    */
+
+
+                    if (found) {
+                        //if (pos > -1) {
+                        //replace the existing path
+                        //console.log('replacing ' + path + " (" + sourceModel.name + ")")
+                        allElements.splice(pos,1,itemToInsert)
+                    } else {
+                        //console.log('inserting ' + path + " (" + sourceModel.name + ")")
+                        allElements.push(itemToInsert)          //this is what was working - just at the end
+                    }
+                }
+
+                //add graph node to the node list, replacing any with the same id
+                function addNodeToList(node) {
+                    let pos = -1
+
                     arNodes.forEach(function (iNode,inx) {
                         if (iNode.id == node.id) {
                             pos = inx
@@ -1120,7 +1388,6 @@ angular.module("pocApp")
                             errors.push({msg:`Unknown parent type ${model.parent} in model ${model.name}`,model:model})
                         }
                     }
-
 
                     //validations that are specifically for Compositions & datagroup
                     if (model.diff) {

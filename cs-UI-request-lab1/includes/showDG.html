@@ -89,6 +89,11 @@
 
       <button class="btn btn-link" ng-click="showLink('dg')">Link</button>
 
+
+
+
+
+
       <div class="pull-right">
         <div ng-show="user.email">
 
@@ -1050,7 +1055,7 @@
 
 
     <uib-tab>
-      <uib-tab-heading>Full element list <span class="badge">{{fullElementList.length -1}}</span></uib-tab-heading>
+      <uib-tab-heading>Full element list <span class="badge">{{hiddenSummary}}</span></uib-tab-heading>
       <!--
       <em class="pull-right">Expanded. Includes items with a Cardinality of 0..0</em>
 -->
@@ -1171,26 +1176,33 @@
       <uib-tab-heading>Elements (diff) <span class="badge">{{selectedModel.diff.length}}</span> </uib-tab-heading>
       <em>The element definitions in the .diff element. ie directly defined in the DG. The Json has the complete model.</em>
       <br/><br/>
-      <table class="table-condensed table table-bordered">
-        <thead style="position:sticky;top:0">
-        <tr><th>Path</th><th>Title</th><th>Description</th><th>Card.</th><th>Type</th><th></th></tr>
-        </thead>
-        <tbody>
-        <tr ng-repeat="ed in selectedModel.diff">
-          <td>{{ed.path}}</td>
-          <td>{{ed.title}}</td>
-          <td>{{ed.description}}</td>
-          <td>{{ed.mult}}</td>
-          <td>{{ed.type[0]}}</td>
-          <td>
-            <i ng-show="canEdit(selectedModel)" class="btn btn-link glyphicon glyphicon-remove clickable"
-               ng-click="deleteDGDiff($index)"></i>
-          </td>
-        </tr>
-        </tbody>
 
 
-      </table>
+
+          <table class="table-condensed table table-bordered">
+            <thead style="position:sticky;top:0">
+            <tr><th>Path</th><th>Title</th><th>Description</th><th>Card.</th><th>Type</th><th></th></tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="ed in selectedModel.diff">
+              <td>{{ed.path}}</td>
+              <td>{{ed.title}}</td>
+              <td>{{ed.description}}</td>
+              <td>{{ed.mult}}</td>
+              <td>{{ed.type[0]}}</td>
+              <td>
+                <i ng-show="canEdit(selectedModel)" class="btn btn-link glyphicon glyphicon-remove clickable"
+                   ng-click="deleteDGDiff($index)"></i>
+              </td>
+            </tr>
+            </tbody>
+
+
+          </table>
+
+
+
+
     </uib-tab>
 
     <uib-tab ng-show="false" heading="Audit">

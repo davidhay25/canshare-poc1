@@ -335,7 +335,6 @@ angular.module("pocApp")
 
                 ed.insertAfter = $scope.input.insertAfter
 
-
                 if ($scope.input.fsh || $scope.input.fhirPath || $scope.input.extUrl || $scope.input.isReference) {
                     ed.profile = {}
                     ed.profile.fsh = $scope.input.fsh
@@ -343,11 +342,6 @@ angular.module("pocApp")
                     ed.profile.extUrl = $scope.input.extUrl
                     ed.profile.isReference = $scope.input.isReference
                 }
-
-
-
-
-
 
                 //There's a
                 //$scope.fixed.elName is set by the modal - fixedCoding or fixedQuantity etc.
