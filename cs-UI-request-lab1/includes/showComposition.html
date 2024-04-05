@@ -14,12 +14,14 @@
 
   <div ng-show="selectedComposition">
 
-  <div class="modelInfo row">
-    <div class="col-md-7">
-
+  <div ng-class="modelInfoClass">
+    <div class=" row">
+      <div class="col-md-7">
+<!--
         <strong>{{selectedComposition.title}}
           <span class="pull-right"><em>version:{{selectedComposition.version}}</em> </span>
         </strong>
+        -->
 
       ({{selectedComposition.name}})
         <div><em>{{selectedComposition.description}}</em></div>
@@ -50,7 +52,7 @@
       </div>
 
     </div>
-    <div class="col-md-5">
+      <div class="col-md-5">
 
       <button class="btn btn-link" ng-click="showLink('comp')">Link</button>
 
@@ -91,7 +93,7 @@
         <tr><td></td><td><em>Set these in the Metadata tab</em></td></tr>
       </table>
     </div>
-
+    </div>
 
   </div>
 

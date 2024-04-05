@@ -28,6 +28,25 @@
     border-radius: 5px;
 }
 
+.modelInfoTest {
+    background-color: lightcyan;
+    border: 1px solid gainsboro;
+    padding : 3px;
+    margin: 3px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.modelInfoLocal {
+    background-color:#dff0d8;
+    border: 1px solid gainsboro;
+    padding : 3px;
+    margin: 3px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
 
 .clickable {
     color: rgb(79, 155, 214);

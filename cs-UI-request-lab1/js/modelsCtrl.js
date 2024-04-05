@@ -7,7 +7,19 @@ angular.module("pocApp")
 
 
             //whether to automatically generate a Q
-            let autoQ = false
+            let autoQ = true
+
+            $scope.modelInfoClass = 'modelInfo'
+            let host = $location.absUrl()
+            if (host.indexOf('local') > -1) {
+                $scope.modelInfoClass = 'modelInfoLocal'
+            } else if ( host.indexOf('test.') > -1 ) {
+                $scope.modelInfoClass = 'modelInfoTest'
+            }
+
+
+            console.log($location.absUrl())
+
 
             $scope.version = utilsSvc.getVersion()
             $scope.input = {}
@@ -1502,6 +1514,7 @@ angular.module("pocApp")
                 //we should be able to use that to generate the full list - rather than the recursive modelCompSvc.makeFullList
                 //and it means the re-ordering should work...]
                 //AND we're re-using the DG generation code...
+                //oops - there are actually multiple DGs in a section - but updated...
 /*
                 vo.allElements.forEach(function (item) {
                     console.log(item.ed.path)

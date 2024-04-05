@@ -15,84 +15,78 @@
 
   </style>
 
-  <div class="modelInfo row">
-    <div class="col-md-6">
-      <strong>{{selectedModel.title}} </strong> ({{selectedModel.name}}) <em>{{selectedModel.description}}</em>
-      <div>
-        <div ng-show="selectedModel.sourceReference">
-          <strong>Source reference</strong>: {{selectedModel.sourceReference}}
+  <div ng-class="modelInfoClass">
+    <div class="row">
+      <div class="col-md-6">
+        <strong>{{selectedModel.title}} </strong> ({{selectedModel.name}}) <em>{{selectedModel.description}}</em>
+        <div>
+          <div ng-show="selectedModel.sourceReference">
+            <strong>Source reference</strong>: {{selectedModel.sourceReference}}
+          </div>
         </div>
-      </div>
 
-      <div ng-show="user.email">
-        <span class="clickable" ng-click="cloneDG(selectedModel)">Make a copy</span>
+        <div ng-show="user.email">
+          <span class="clickable" ng-click="cloneDG(selectedModel)">Make a copy</span>
 
-          <span class=" clickable spacer" ng-show = "canEdit(selectedModel)"
-               ng-click="editModel(selectedModel)">Edit</span>
+            <span class=" clickable spacer" ng-show = "canEdit(selectedModel)"
+                 ng-click="editModel(selectedModel)">Edit</span>
 
-          <span class=" clickable spacer"
-               ng-click="newModel('dg',selectedModel)">New child</span>
-      </div>
+            <span class=" clickable spacer"
+                 ng-click="newModel('dg',selectedModel)">New child</span>
+        </div>
 
-      <br/>
-      <div>
+        <br/>
+        <div>
 
-        <div class="row">
-          <div class="col-md-6">
-            <div ng-show="selectedModel.parent">
-              <strong>Parents</strong>
+          <div class="row">
+            <div class="col-md-6">
+              <div ng-show="selectedModel.parent">
+                <strong>Parents</strong>
 
-              <div ng-repeat = "parent in relationshipsSummary.parents">
-                <span class="clickable" style="margin-left: 8px"
-                      ng-click="termSelectDG({DGName:parent},selectedModel.name)">
-                  {{hashAllDG[parent].title}}  <!--  ({{parent}}) -->
-                </span>
+                <div ng-repeat = "parent in relationshipsSummary.parents">
+                  <span class="clickable" style="margin-left: 8px"
+                        ng-click="termSelectDG({DGName:parent},selectedModel.name)">
+                    {{hashAllDG[parent].title}}  <!--  ({{parent}}) -->
+                  </span>
+                </div>
+
+
               </div>
 
-
             </div>
 
-          </div>
-
-          <div class="col-md-6">
-            <strong>Direct children</strong> ({{relationshipsSummary.children.length}})
-            <span ng-show="relationshipsSummary.children.length > 0"
-                    class="clickable" ng-click="input.showDGChildren = ! input.showDGChildren">
-              <span ng-show="input.showDGChildren">Hide</span>
-               <span ng-hide="input.showDGChildren">Show</span>
-            </span>
-            <div ng-show="input.showDGChildren"
-                    ng-repeat = "child in relationshipsSummary.children">
-                <span class="clickable" style="margin-left: 8px"
-                      ng-click="termSelectDG({DGName:child},selectedModel.name)">
-                  {{hashAllDG[child].title}}  <!--  ({{parent}}) -->
-                </span>
+            <div class="col-md-6">
+              <strong>Direct children</strong> ({{relationshipsSummary.children.length}})
+              <span ng-show="relationshipsSummary.children.length > 0"
+                      class="clickable" ng-click="input.showDGChildren = ! input.showDGChildren">
+                <span ng-show="input.showDGChildren">Hide</span>
+                 <span ng-hide="input.showDGChildren">Show</span>
+              </span>
+              <div ng-show="input.showDGChildren"
+                      ng-repeat = "child in relationshipsSummary.children">
+                  <span class="clickable" style="margin-left: 8px"
+                        ng-click="termSelectDG({DGName:child},selectedModel.name)">
+                    {{hashAllDG[child].title}}  <!--  ({{parent}}) -->
+                  </span>
+              </div>
             </div>
-          </div>
 
+
+          </div>
 
         </div>
 
+        <br/>
+
+
       </div>
-
-      <br/>
-
-
-    </div>
-
-
-    <div class="col-md-6">
+      <div class="col-md-6">
 
       <button class="btn btn-link" ng-click="deleteDG(selectedModel.name)">Delete</button>
 
       <a class="btn" ng-href="modelReview.html?{{selectedModel.name}}" target="_blank">Review</a>
 
       <button class="btn btn-link" ng-click="showLink('dg')">Link</button>
-
-
-
-
-
 
       <div class="pull-right">
         <div ng-show="user.email">
@@ -177,6 +171,7 @@
       </div>
 
     </div>
+  </div>
   </div>
 
 

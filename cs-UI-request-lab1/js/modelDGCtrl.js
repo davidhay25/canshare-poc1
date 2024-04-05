@@ -3,6 +3,10 @@ angular.module("pocApp")
     .controller('modelDGCtrl',
         function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc,$timeout,librarySvc,traceSvc) {
 
+
+
+
+
             $scope.dependencySourceDisplay = function (ed) {
                 return `${ed.path} (${ed.title})`
             }

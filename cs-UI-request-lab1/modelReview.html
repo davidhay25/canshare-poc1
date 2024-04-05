@@ -327,197 +327,207 @@
 
                 <div class="col-md-4">
 
-
-                    <div ng-show="showAllCommentSummary">
-                        Show help
-<!--
-                        <table class="table-condensed table-bordered table">
-                            <tr><th>Path</th><th>Comment</th><th>Disposition</th></tr>
-                            <tr ng-repeat="comment in allComments">
-                                <td>{{comment.path | lastInPath}}</td>
-                                <td>{{comment.comment}}</td>
-                                <td>{{comment.disposition}}</td>
-                            </tr>
-                        </table>
-                        -->
-
-
-
-                    </div>
+                    <uib-tabset>
+                        <uib-tab heading="Details">
+                            <div ng-show="showAllCommentSummary">
+                                Show help
+                                <!--
+                                                        <table class="table-condensed table-bordered table">
+                                                            <tr><th>Path</th><th>Comment</th><th>Disposition</th></tr>
+                                                            <tr ng-repeat="comment in allComments">
+                                                                <td>{{comment.path | lastInPath}}</td>
+                                                                <td>{{comment.comment}}</td>
+                                                                <td>{{comment.disposition}}</td>
+                                                            </tr>
+                                                        </table>
+                                                        -->
 
 
-                    <div ng-show="selectedCompositionNode && ! showAllCommentSummary">
 
-                        <div class="banner">Details</div>
-
-
-                        <div ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
-
-                            <div class="row">
-                                <div class="col-md-3">
-                                    Title
-                                </div>
-                                <div class="col-md-9">
-                                    {{selectedCompositionNode.data.ed.title}}
-                                </div>
                             </div>
+                            <div ng-show="selectedCompositionNode && ! showAllCommentSummary">
 
-                            <div class="row">
-                                <div class="col-md-3">
-                                    Description
-                                </div>
-                                <div class="col-md-9">
-                                    {{selectedCompositionNode.data.ed.description}}
-                                </div>
-                            </div>
+                                <div class="banner">Details</div>
 
-                            <div class="row">
-                                <div class="col-md-3">
-                                    Type
-                                </div>
-                                <div class="col-md-9">
-                                    <div ng-repeat="type in selectedCompositionNode.data.ed.type">
-                                        <div ng-show="fhirDataTypes.indexOf(type) > -1" class="pull-right">
-                                            <a target = "_blank" ng-href="{{fhirRoot}}datatypes.html#{{type}}">Details in spec</a>
+
+                                <div ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
+
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            Title
                                         </div>
-                                        {{type}}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-3">
-                                    Cardinality
-                                </div>
-                                <div class="col-md-9">
-                                    <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
-
-                                    <div ng-show = "selectedCompositionNode.data.host">Host:{{selectedCompositionNode.data.host.mult}}</div>
-                                    <div ng-hide = "selectedCompositionNode.data.host">{{selectedCompositionNode.data.ed.mult}}</div>
-
-                                </div>
-                            </div>
-
-                            <div class="row" ng-show="selectedCompositionNode.data.ed.options">
-                                <div class="col-md-3">
-                                    Options
-                                </div>
-                                <div class="col-md-9">
-                                    <ul>
-                                        <li ng-repeat="option in selectedCompositionNode.data.ed.options">
-                                            {{option.display}}
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <div class="row" >
-                                <div class="col-md-3">
-                                    Full Path
-                                </div>
-                                <div class="col-md-9">
-
-                                    <div ng-repeat="segment in getPathSegments(selectedCompositionNode.data.ed.path) track by $index">
-                                        <div ng-show="$index > 0"> {{segment}}</div>
-                                    </div>
-
-
-
-                                </div>
-                            </div>
-
-                            <div class="row" ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept' ">
-                                <div class="col-md-3">
-                                    ValueSet
-                                </div>
-                                <div class="col-md-9">
-                                    <div><em>{{selectedCompositionNode.data.ed.valueSet}}</em>
-
-                                        <div ng-hide="selectedCompositionNode.data.ed.valueSet">
-                                            No ValueSet specified
+                                        <div class="col-md-9">
+                                            {{selectedCompositionNode.data.ed.title}}
                                         </div>
+                                    </div>
 
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            Description
+                                        </div>
+                                        <div class="col-md-9">
+                                            {{selectedCompositionNode.data.ed.description}}
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            Type
+                                        </div>
+                                        <div class="col-md-9">
+                                            <div ng-repeat="type in selectedCompositionNode.data.ed.type">
+                                                <div ng-show="fhirDataTypes.indexOf(type) > -1" class="pull-right">
+                                                    <a target = "_blank" ng-href="{{fhirRoot}}datatypes.html#{{type}}">Details in spec</a>
+                                                </div>
+                                                {{type}}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            Cardinality
+                                        </div>
+                                        <div class="col-md-9">
+                                            <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
+
+                                            <div ng-show = "selectedCompositionNode.data.host">Host:{{selectedCompositionNode.data.host.mult}}</div>
+                                            <div ng-hide = "selectedCompositionNode.data.host">{{selectedCompositionNode.data.ed.mult}}</div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="row" ng-show="selectedCompositionNode.data.ed.options">
+                                        <div class="col-md-3">
+                                            Options
+                                        </div>
+                                        <div class="col-md-9">
+                                            <ul>
+                                                <li ng-repeat="option in selectedCompositionNode.data.ed.options">
+                                                    {{option.display}}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" >
+                                        <div class="col-md-3">
+                                            Full Path
+                                        </div>
+                                        <div class="col-md-9">
+
+                                            <div ng-repeat="segment in getPathSegments(selectedCompositionNode.data.ed.path) track by $index">
+                                                <div ng-show="$index > 0"> {{segment}}</div>
+                                            </div>
+
+
+
+                                        </div>
+                                    </div>
+
+                                    <div class="row" ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept' ">
+                                        <div class="col-md-3">
+                                            ValueSet
+                                        </div>
+                                        <div class="col-md-9">
+                                            <div><em>{{selectedCompositionNode.data.ed.valueSet}}</em>
+
+                                                <div ng-hide="selectedCompositionNode.data.ed.valueSet">
+                                                    No ValueSet specified
+                                                </div>
+
+
+                                            </div>
+                                            <div>
+                                                <button ng-show="selectedCompositionNode.data.ed.valueSet"
+                                                        ng-click="viewVS(selectedCompositionNode.data.ed.valueSet)"
+                                                        class="btn-link btn">View VS</button>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" ng-show="selectedCompositionNode.data.ed.enableWhen">
+                                        <div class="col-md-3">
+                                            Conditional
+                                        </div>
+                                        <div class="col-md-9">
+                                            <table class="table">
+                                                <tr><th>Source</th><th>Op.</th><th>Value</th></tr>
+                                                <tr ng-repeat="ew in selectedCompositionNode.data.ed.enableWhen">
+                                                    <td>{{ew.source}}</td>
+                                                    <td>{{ew.operator}}</td>
+                                                    <td>{{ew.value.code}} | {{ew.value.display}}</td>
+                                                </tr>
+                                            </table>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="row" ng-show="selectedCompositionNode.data.ed.sourceReference">
+                                        <div class="col-md-3">
+                                            Source Ref
+                                        </div>
+                                        <div class="col-md-9">
+                                            {{selectedCompositionNode.data.ed.sourceReference}}
+
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="row" ng-show = "selectedCompositionNode.data.ed.zElement">
+                                    <div class="col-md-3">
 
                                     </div>
-                                    <div>
-                                        <button ng-show="selectedCompositionNode.data.ed.valueSet"
-                                                ng-click="viewVS(selectedCompositionNode.data.ed.valueSet)"
-                                                class="btn-link btn">View VS</button>
-
+                                    <div class="col-md-9">
+                                        <em>This element has been added directly (a 'Z' element)</em>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="row" ng-show="selectedCompositionNode.data.ed.enableWhen">
-                                <div class="col-md-3">
-                                    Conditional
+
+                                <div class="banner">Comments</div>
+
+                                <table class="table table-condensed" ng-show="commentsThisPath.length > 0">
+                                    <tr><th>Comment</th><th>Disposition</th></tr>
+                                    <tr ng-repeat = "com in commentsThisPath">
+                                        <td>{{com.comment}}</td>
+                                        <td>{{com.disposition.display}}
+                                            <div><em>{{com.dispositionNote}}</em></div>
+
+                                        </td>
+                                    </tr>
+
+                                </table>
+
+                                <strong>New comment</strong>
+
+                                <textarea class="form-control" ng-model="input.comment"></textarea>
+                                <br/>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" ng-model="input.author" placeholder="Your name"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button ng-show="input.comment"
+                                                class="btn btn-link pull-right" ng-click="addComment(input.comment)">Add comment</button>
+                                    </div>
+
                                 </div>
-                                <div class="col-md-9">
-                                    <table class="table">
-                                        <tr><th>Source</th><th>Op.</th><th>Value</th></tr>
-                                        <tr ng-repeat="ew in selectedCompositionNode.data.ed.enableWhen">
-                                            <td>{{ew.source}}</td>
-                                            <td>{{ew.operator}}</td>
-                                            <td>{{ew.value.code}} | {{ew.value.display}}</td>
-                                        </tr>
-                                    </table>
-
-                                </div>
-                            </div>
-
-                            <div class="row" ng-show="selectedCompositionNode.data.ed.sourceReference">
-                                <div class="col-md-3">
-                                    Source Ref
-                                </div>
-                                <div class="col-md-9">
-                                    {{selectedCompositionNode.data.ed.sourceReference}}
-
-                                </div>
-                            </div>
-
-
-                        </div>
-
-                        <div class="row" ng-show = "selectedCompositionNode.data.ed.zElement">
-                            <div class="col-md-3">
 
                             </div>
-                            <div class="col-md-9">
-                                <em>This element has been added directly (a 'Z' element)</em>
-                            </div>
-                        </div>
+
+                        </uib-tab>
+                        <uib-tab heading="Form">
+                            The rendered version of the form (from the POC)
+                        </uib-tab>
+                    </uib-tabset>
 
 
-                        <div class="banner">Comments</div>
 
-                        <table class="table table-condensed" ng-show="commentsThisPath.length > 0">
-                            <tr><th>Comment</th><th>Disposition</th></tr>
-                            <tr ng-repeat = "com in commentsThisPath">
-                                <td>{{com.comment}}</td>
-                                <td>{{com.disposition.display}}
-                                    <div><em>{{com.dispositionNote}}</em></div>
 
-                                </td>
-                            </tr>
 
-                        </table>
-
-                        <strong>New comment</strong>
-
-                        <textarea class="form-control" ng-model="input.comment"></textarea>
-                        <br/>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <input type="text" class="form-control" ng-model="input.author" placeholder="Your name"/>
-                            </div>
-                            <div class="col-md-6">
-                                <button ng-show="input.comment"
-                                        class="btn btn-link pull-right" ng-click="addComment(input.comment)">Add comment</button>
-                            </div>
-
-                        </div>
-
-                    </div>
 
                 </div>
 
@@ -610,6 +620,23 @@
         <uib-tab ng-show="false" heading="Json">
             <pre>{{selectedComp | json}}</pre>
         </uib-tab>
+
+        <uib-tab heading="Model">
+            <br/>
+            <div class="row">
+
+                <div class="col-md-4">
+                    <em>Stuff about the model</em>
+                </div>
+                <div class="col-md-8">
+                    <img width="100%" src="images/LIM-org.png" usemap="#image_map"/>
+                </div>
+            </div>
+
+
+
+        </uib-tab>
+
     </uib-tabset>
 
 

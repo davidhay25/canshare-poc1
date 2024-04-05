@@ -14,38 +14,60 @@ angular.module("pocApp")
                 let compName = inComp.name
 
                 //the composition name needs to be first
-                fullList.push({ed:{path:compName},name:compName})
+                fullList.push({ed:{path:compName},name:compName,title:compName})
 
                 inComp.sections.forEach(function (sect) {
                     let sectName = sect.name
-                    let item = sect.items[0]        //actually, could iterate over multiple dg if needed....
-                    //section may not have items...
-                    if (item) {
-                        let dgName = item.name
-                        let dg = inHashAllDG[dgName]
-                        let vo = modelsSvc.getFullListOfElements(dg,inTypes,inHashAllDG)
-                        let allElements = vo.allElements
+                    //let item = sect.items[0]        //actually, could iterate over multiple dg if needed....
 
-                        orderingSvc.sortFullListByInsertAfter(allElements,dg,inHashAllDG)
-                        let ar = allElements.filter(item => item.ed.mult !== '0..0')
+                    fullList.push({
+                        ed: {
+                            path: `${compName}.${sectName}`,
+                            title: sect.title,
+                            mult: sect.mult
+                        }
+                    })
 
-                        //each section needs an entry
-                        //todo - is more detail needed in the ed???
-                        fullList.push({ed:{path:`${compName}.${sectName}`,title:sect.title,mult:sect.mult}})
+                    for (const item of sect.items) {
 
-                        //fullList.push({ed:{path:`${compName}.${sectName}.${dgName}`}})
+                        //section may not have items...
+                        if (item) {
+                            let dgName = item.name
+                            let dg = inHashAllDG[dgName]
+                            if (!dg) {
+                                alert(`The DG ${dgName} could not be found.`)
+                            } else {
+                                let vo = modelsSvc.getFullListOfElements(dg, inTypes, inHashAllDG)
 
-                        ar.forEach(function (item){
-                            let ed = angular.copy(item.ed)
-                            //ed.path = `${compName}.${sectName}.${dgName}.${ed.path}`
-                            ed.path = `${compName}.${sectName}.${ed.path}`
-                            fullList.push({ed:ed})
+                                let allElements = vo.allElements
+
+                                orderingSvc.sortFullListByInsertAfter(allElements, dg, inHashAllDG)
+                                let ar = allElements.filter(item => item.ed.mult !== '0..0')
+/*
+                                //each section needs an entry
+                                //todo - is more detail needed in the ed???
+                                fullList.push({
+                                    ed: {
+                                        path: `${compName}.${sectName}`,
+                                        title: sect.title,
+                                        mult: sect.mult
+                                    }
+                                })
+*/
+                                fullList.push({ed:{path:`${compName}.${sectName}.${dgName}`}})
+
+                                ar.forEach(function (item) {
+                                    let ed = angular.copy(item.ed)
+                                    ed.path = `${compName}.${sectName}.${dgName}.${ed.path}`
+                                    //ed.path = `${compName}.${sectName}.${ed.path}`
+                                    fullList.push({ed: ed})
 
 
-                        })
+                                })
+                            }
+                        }
+
                     }
-
-
 
                 })
 
