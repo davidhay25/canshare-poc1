@@ -51,10 +51,10 @@ angular.module("pocApp")
                         //this is the first element - just the composition
                         break
                     case 2 :
-                        //the section DG. I don't think there is anything in here we need...
+                        //the section item. I don't think there is anything in here we need...
                         break
                     case 3 :
-                        //the section element. This marks a new section
+                        //the section DG element. This marks a new section
                         sectionItem = {text: ed.title + " group", linkId: ed.path, type: 'group', extension:[],item: []}
 
                         //Add the tab container extension as well
@@ -73,7 +73,10 @@ angular.module("pocApp")
 
 
                     case 4 :
-                        //the DG within the section. I don't think there is anything in here we need...
+
+                        //the DG within the section DG. I don't think there is anything in here we need...
+                        //let groupItem = {text: ed.title + " group", linkId: ed.path, type: 'display', extension:[],item: []}
+                        //sectionItem.item.push(groupItem)
                         break
                     default :
                         //contents of the section DG. Add to the current section
@@ -89,13 +92,10 @@ angular.module("pocApp")
                             sectionItem.item.push(controlItem)
                         } else {
                             let vo = getControlDetails(ed)  // return {controlType:controlType,controlHint:controlHint}
-//console.log(vo.controlHint)
+
 
                             let controlItem = {text: ed.title, linkId: ed.path, type: vo.controlType}
                             applyControlHint(controlItem,vo.controlHint)
-
-
-
 
                             //add a ValueSet or answerOptions - but not both
                             if (ed.valueSet) {

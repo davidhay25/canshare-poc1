@@ -187,8 +187,11 @@
                     <td class="detailName">Type</td>
                     <td>
                       <div>
-                        <span class="clickable" ng-click="termSelectDG({DGName:selectedCompositionNode.data.ed.name})">{{selectedCompositionNode.data.ed.name}}</span>
-                        {{selectedCompositionNode.data.ed.type[0]}}
+                        <span class="clickable" ng-click="termSelectDG({DGName:selectedCompositionNode.data.ed.type[0]})">
+                          <!--{{selectedCompositionNode.data.ed.name}} -->
+                          {{selectedCompositionNode.data.ed.type[0]}}
+                        </span>
+
                       </div>
 
                     </td>
@@ -437,7 +440,7 @@
               <pre>{{selectedCompositionNode.data | json}}</pre>
             </uib-tab>
 
-            <uib-tab heading="Full form processing Log">
+            <uib-tab ng-show="false" heading="Full form processing Log">
               <div class="row">
                 <div class="col-md-8">
                   <div class="myScroll">

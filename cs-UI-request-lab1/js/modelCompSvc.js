@@ -18,20 +18,25 @@ angular.module("pocApp")
 
                 inComp.sections.forEach(function (sect) {
                     let sectName = sect.name
-                    //let item = sect.items[0]        //actually, could iterate over multiple dg if needed....
 
+
+                    //this represents the section item. It's not really an ED - but we make one up for display
                     fullList.push({
                         ed: {
                             path: `${compName}.${sectName}`,
                             title: sect.title,
-                            mult: sect.mult
+                            mult: sect.mult,
+                            type: ['Section']       //we are assuming that thta' what the type is. Does it matter?
                         }
                     })
 
+                    //there can be multiple items within a single section. Each item is a DG - generally a section DG
                     for (const item of sect.items) {
 
-                        //section may not have items...
+                        //section may have multiple DG's - or none...
+
                         if (item) {
+                            //item has the DG name. {kind:'section, name: title: items:[]}
                             let dgName = item.name
                             let dg = inHashAllDG[dgName]
                             if (!dg) {
@@ -42,6 +47,7 @@ angular.module("pocApp")
                                 let allElements = vo.allElements
 
                                 orderingSvc.sortFullListByInsertAfter(allElements, dg, inHashAllDG)
+
                                 let ar = allElements.filter(item => item.ed.mult !== '0..0')
 /*
                                 //each section needs an entry
@@ -54,11 +60,18 @@ angular.module("pocApp")
                                     }
                                 })
 */
-                                fullList.push({ed:{path:`${compName}.${sectName}.${dgName}`}})
+                                //This represents the ED
+
+                                //trmp
+                                //let itemEd = {path:`${compName}.${sectName}.${dgName}`,title:item.title}
+                                //itemEd.type = [dgName]
+                                //fullList.push({ed:itemEd})
+
 
                                 ar.forEach(function (item) {
                                     let ed = angular.copy(item.ed)
-                                    ed.path = `${compName}.${sectName}.${dgName}.${ed.path}`
+                                    ed.path = `${compName}.${sectName}.${ed.path}`
+                                    //ed.path = `${compName}.${sectName}.${dgName}.${ed.path}`
                                     //ed.path = `${compName}.${sectName}.${ed.path}`
                                     fullList.push({ed: ed})
 
@@ -103,7 +116,7 @@ angular.module("pocApp")
 */
 
             },
-
+/*
             allDGsInCompDEP: function(comp,hashAllDG){
                 //return a list of all DG's used in a given composition
 
@@ -161,7 +174,7 @@ angular.module("pocApp")
                 return {hashUsedDG:hashUsedDG,lstUsedDG : lst}
 
             },
-
+*/
             filterList : function(lst,removeFirst) {
                 //return a list removing all elements with a mult of 0..0 or a parent with that mult
                 //lst is array of {ed:}

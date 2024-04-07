@@ -6,8 +6,12 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
 
-            //whether to automatically generate a Q
-            let autoQ = true
+            //https://web.dev/articles/monitor-total-page-memory-usage
+            //console.log(performance.measureUserAgentSpecificMemory())
+
+
+            let autoQ = true   //whether to automatically generate a Q
+            let removeZeroedOut = true  //when creating the full element list, remove mult = 0..0
 
             $scope.modelInfoClass = 'modelInfo'
             let host = $location.absUrl()
@@ -18,7 +22,7 @@ angular.module("pocApp")
             }
 
 
-            console.log($location.absUrl())
+            //console.log($location.absUrl())
 
 
             $scope.version = utilsSvc.getVersion()
@@ -1596,6 +1600,7 @@ angular.module("pocApp")
                 $scope.relationshipsSummary = vo.relationshipsSummary   //all the relationships - parent and reference - for this type
 
 
+                //there's currently an issue with the DG assembly in some cases. Looking into it, but for now this will at least stop a crash
                 if (modelsSvc.fixDgDiff(dg,vo.allElements)) {
                     //there were issues that were fixed - need to re-generate the full list
                     vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
@@ -1605,8 +1610,16 @@ angular.module("pocApp")
                     }
                 }
 
+                if (removeZeroedOut) {
+
+                    $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements.filter(item => item.ed.mult !== '0..0') )
+                } else {
+                    $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
+                }
+
                 //sort the elements list to better display slicing
-                $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
+                //$scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
+
                 $scope.fullElementHash = {}         //I seem to need this quite a lot. Though memory usage is getting high...
                 //create the list of all paths in the DG. Used by the 'ordering'
                 $scope.allPaths = []

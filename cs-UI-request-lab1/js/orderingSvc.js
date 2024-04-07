@@ -47,26 +47,21 @@ angular.module("pocApp")
 
                 lstOrdering.forEach(function (item) {
                     let insertPointFound = false
-                    /*
-                    let ar = preceding.split('.')
 
-                    //the
-                    ar.splice(0,1)
-                    let endOfPath = ar.join('.')     //the path without the datatype name
-
-                    //set the first segment to the DG name
-                    ar[0] = dgName
-                    preceding = ar.join('.')
-*/
 
                     //remove the first segment in the path - this is the DG name
                     let toMove = $filter('dropFirstInPath')(item.toMove)
                     let insertAfter = $filter('dropFirstInPath')(item.insertAfter)
 
                     //find the number of elements that start with the item to moves path
-                    let cnt = 0  //-- will be the number to move
+                    //todo - can't use 'startswith' - has to be segment aware (BodySite.bodypart)
+                    let cnt = 1  //-- will be the number to move, including the actual toMove (assuming it's found)
                     lst.forEach(function (item1) {
-                        if ($filter('dropFirstInPath')(item1.ed.path).startsWith(toMove)) {
+                        //is item1 a child of the element to move
+                        let pth = $filter('dropFirstInPath')(item1.ed.path)
+                        if (pth.isChildPath(toMove)) {
+
+                        //if ($filter('dropFirstInPath')(item1.ed.path).startsWith(toMove)) {
                             cnt++
                         }
                     })
@@ -75,6 +70,7 @@ angular.module("pocApp")
                     let currentPos = findCurrentPositionInList(toMove)
 
                     if (currentPos > -1) {
+                        //cnt++   //the cnt does not include the element to move.
                         //remove the items and save in array for insertion later
                         let itemsToMove = lst.splice(currentPos,cnt)
 
