@@ -1186,6 +1186,10 @@ angular.module("pocApp")
                         //replace the existing path
                         //console.log('replacing ' + path + " (" + sourceModel.name + ")")
 
+                        if (itemToInsert.ed.sourceModelName == inModel.name) {
+                            allElements.splice(pos,1,itemToInsert)
+                        }
+
                         //If it's already there, don't replace it as new elements are processed first...
                         //april 8 allElements.splice(pos,1,itemToInsert)
                     } else {
