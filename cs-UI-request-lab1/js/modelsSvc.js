@@ -886,7 +886,7 @@ angular.module("pocApp")
                     }
 
                     iterationCount++
-                    if (iterationCount > 2000) {
+                    if (iterationCount > 4000) {
                         alert(`Excessive iteration count for DG ${inModel.name}. The tree view will be incorrect. The processing steps are shown in an errors tab.`)
                         throw new Error(`Excessive iteration count for DG ${inModel.name}`)
                     }
@@ -1185,7 +1185,9 @@ angular.module("pocApp")
                         //if (pos > -1) {
                         //replace the existing path
                         //console.log('replacing ' + path + " (" + sourceModel.name + ")")
-                        allElements.splice(pos,1,itemToInsert)
+
+                        //If it's already there, don't replace it as new elements are processed first...
+                        //april 8 allElements.splice(pos,1,itemToInsert)
                     } else {
                         //console.log('inserting ' + path + " (" + sourceModel.name + ")")
                         allElements.push(itemToInsert)          //this is what was working - just at the end
@@ -1219,7 +1221,7 @@ angular.module("pocApp")
                     }
 
                     iterationCount++
-                    if (iterationCount > 1000) {
+                    if (iterationCount > 2000) {
                         alert(`Excessive iteration count for DG ${inModel.name}. The tree view will be incorrect. The processing steps are shown in an errors tab.`)
                         throw new Error(`Excessive iteration count for DG ${inModel.name}`)
                     }

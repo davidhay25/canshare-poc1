@@ -2,7 +2,7 @@
 //https://www.joelonsoftware.com/2000/04/06/things-you-should-never-do-part-i/
 angular.module("pocApp")
     .controller('modelsCtrl',
-        function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,makeQSvc,orderingSvc,makeCompQSvc,
+        function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,makeQSvc,orderingSvc,makeCompQSvc,dgInflaterSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
 
@@ -11,7 +11,9 @@ angular.module("pocApp")
 
 
             let autoQ = true   //whether to automatically generate a Q
-            let removeZeroedOut = true  //when creating the full element list, remove mult = 0..0
+            let removeZeroedOut = false  //when creating the full element list, remove mult = 0..0
+
+            let newInflater = false  //running the new inflater
 
             $scope.modelInfoClass = 'modelInfo'
             let host = $location.absUrl()
@@ -1587,6 +1589,13 @@ angular.module("pocApp")
             $scope.refreshFullList = function (dg) {
 
 
+
+
+
+
+
+
+
                 delete $scope.errorLog
                 //determine all the elements in this DG by recursing up the inheritance hierarchy
                 //and 'across' elements that are referenced DGs. Note that a referenced DG may have its own hierarchy
@@ -1610,12 +1619,27 @@ angular.module("pocApp")
                     }
                 }
 
+                if (newInflater) {
+                    console.log('------------')
+                    vo.allElements = dgInflaterSvc.getFullListOfDGElements(dg,$scope.input.types,$scope.hashAllDG).allElements
+                    console.log('------------')
+                } else {
+
+                }
+
+
                 if (removeZeroedOut) {
 
                     $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements.filter(item => item.ed.mult !== '0..0') )
                 } else {
                     $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
                 }
+
+
+
+
+
+
 
                 //sort the elements list to better display slicing
                 //$scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
