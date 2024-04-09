@@ -1186,6 +1186,7 @@ angular.module("pocApp")
                         //replace the existing path
                         //console.log('replacing ' + path + " (" + sourceModel.name + ")")
 
+                        //if the item comes from the current model then it always overrides any other elements...
                         if (itemToInsert.ed.sourceModelName == inModel.name) {
                             allElements.splice(pos,1,itemToInsert)
                         }

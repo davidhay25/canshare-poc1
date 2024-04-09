@@ -413,10 +413,18 @@
                       {{selectedNode.data.ed.rules}}
                     </td>
                   </tr>
+
                   <tr>
                     <td class="detailName">Placeholder</td>
                     <td>
                       {{selectedNode.data.ed.placeholder}}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td ng-show="selectedNode.data.ed.autoPop" class="detailName">Auto populated</td>
+                    <td>
+                      Auto pop
                     </td>
                   </tr>
 
@@ -1169,18 +1177,22 @@
 
     <uib-tab>
       <uib-tab-heading>Elements (diff) <span class="badge">{{selectedModel.diff.length}}</span> </uib-tab-heading>
-      <em>The element definitions in the .diff element. ie directly defined in the DG. The Json has the complete model.</em>
+      <em>The element definitions in the .diff element. ie directly defined in the DG. The Json has the complete model.
+      Clicking on an element in the table, selects it in the list (to see details)</em>
       <br/><br/>
 
 
-
+      <uib-tabset>
+        <uib-tab heading="Table">
           <table class="table-condensed table table-bordered">
             <thead style="position:sticky;top:0">
             <tr><th>Path</th><th>Title</th><th>Description</th><th>Card.</th><th>Type</th><th></th></tr>
             </thead>
             <tbody>
             <tr ng-repeat="ed in selectedModel.diff">
-              <td>{{ed.path}}</td>
+              <td>
+                <div class="clickableDotted" ng-click="input.selectedDiff = ed">{{ed.path}}</div>
+              </td>
               <td>{{ed.title}}</td>
               <td>{{ed.description}}</td>
               <td>{{ed.mult}}</td>
@@ -1194,6 +1206,30 @@
 
 
           </table>
+        </uib-tab>
+        <uib-tab heading="List">
+          <div class="row">
+            <div class="col-md-6">
+              <input class="form-control" placeholder="Filter on path" ng-model="input.diffFilter"/>
+
+              <div class="list-group myScroll">
+                <div ng-class="{'list-group-item':true,listItemSelected:input.selectedDiff.path == ed.path}" ng-click="input.selectedDiff = ed"
+                     ng-show="showDiff(input.diffFilter,ed.path)"
+                     ng-repeat="ed in selectedModel.diff">
+                  {{ed.path}}
+                </div>
+              </div>
+
+            </div>
+            <div class="col-md-6">
+              <pre>{{input.selectedDiff | json}}</pre>
+            </div>
+          </div>
+
+        </uib-tab>
+      </uib-tabset>
+
+
 
 
 

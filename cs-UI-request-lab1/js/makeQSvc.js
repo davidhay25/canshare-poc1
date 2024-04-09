@@ -559,6 +559,7 @@ angular.module("pocApp")
 
                         }
                         let item = {text:ed.title,linkId:ed.path,type:'string'}
+                        if (ed.autoPop) {item.text += ' (AP)'}
                         item.definition = ed.path
 
 

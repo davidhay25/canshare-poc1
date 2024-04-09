@@ -7,6 +7,13 @@ angular.module("pocApp")
 
 
 
+            $scope.showDiff = function(filter,path) {
+                if (! filter || ! path) {return true}
+                let p = path.toLowerCase()
+                if (p.indexOf(filter.toLowerCase()) > -1) {return true}
+
+            }
+
             $scope.dependencySourceDisplay = function (ed) {
                 return `${ed.path} (${ed.title})`
             }

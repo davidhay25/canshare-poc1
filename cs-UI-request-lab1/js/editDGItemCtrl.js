@@ -93,6 +93,7 @@ angular.module("pocApp")
                 $scope.input.placeholder =  item.ed.placeholder
 
                 $scope.input.hideInQ =  item.ed.hideInQ
+                $scope.input.autoPop =  item.ed.autoPop
 
                 $scope.input.selectedType = item.ed.type[0]
                 setControlOptions($scope.input.selectedType)
@@ -317,6 +318,7 @@ angular.module("pocApp")
                 ed.mult = $scope.input.mult
                 ed.valueSet = $scope.input.valueSet
                 ed.hideInQ = $scope.input.hideInQ
+                ed.autoPop = $scope.input.autoPop
                 ed.placeholder = $scope.input.placeholder
                 if ($scope.input.controlHint) {
                     ed.controlHint = $scope.input.controlHint

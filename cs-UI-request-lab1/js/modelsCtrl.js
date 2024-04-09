@@ -688,7 +688,7 @@ angular.module("pocApp")
                         //--------- build the tree with all DG
                         //todo - this call is duplicated...
                         let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
-                        showAllDGTree(vo1.treeData)
+                        showAllDGTree(vo1.treeData)         //this is the inheritance
                         try {
                             //the tree data for the sections branch of DG
                             let sections = modelDGSvc.makeSectionsTree($scope.hashAllDG)
@@ -1046,6 +1046,7 @@ angular.module("pocApp")
                                 ed1.controlHint = ed.controlHint
                                 ed1.otherType = ed.otherType
                                 ed1.hideInQ = ed.hideInQ
+                                ed1.autoPop = ed.autoPop
 
                                 if (ed.profile) {
                                     ed1.profile = {}
@@ -1456,23 +1457,9 @@ angular.module("pocApp")
                 $scope.selectedModelFromTypeUsage = model
             }
 
-            $scope.addElementDEP = function (name,type) {
-                traceSvc.addAction({action:'add-element',model:$scope.hashAllDG[dgName]})
-                //add a new element to the current model
-                $scope.selectedModel.diff = $scope.selectedModel.diff || []
-                $scope.selectedModel.diff.push({path:name,title:name,type:[type]})
-                $scope.selectModel($scope.selectedModel)
 
-            }
 
-            $scope.updateFullModelShowDEP = function () {
-                //when the 'show full model' checkbox is checked
-                delete $scope.selectedNode
-                $timeout(function(){
-                    $scope.selectModel($scope.selectedModel)
-                },100)
 
-            }
 
             function clearB4Select() {
                 delete $scope.selectedModel
@@ -1589,13 +1576,6 @@ angular.module("pocApp")
             $scope.refreshFullList = function (dg) {
 
 
-
-
-
-
-
-
-
                 delete $scope.errorLog
                 //determine all the elements in this DG by recursing up the inheritance hierarchy
                 //and 'across' elements that are referenced DGs. Note that a referenced DG may have its own hierarchy
@@ -1629,7 +1609,6 @@ angular.module("pocApp")
 
 
                 if (removeZeroedOut) {
-
                     $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements.filter(item => item.ed.mult !== '0..0') )
                 } else {
                     $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
@@ -1994,38 +1973,13 @@ angular.module("pocApp")
                     $(this).jstree("open_node",id);
                     let treeObject = $(this).jstree(true).get_json('#', { 'flat': false })
 
-                //temp - don't do this here any nore    asyncCall(treeObject,$scope.selectedComposition,
-                      //  $localStorage.qStrategy)
-
-                    /* temp while working out async
-                    $scope.fullQ =  makeQSvc.makeQFromTree(treeObject,$scope.selectedComposition,
-                        $localStorage.qStrategy)
-*/
 
                     $scope.$digest();
                 });
 
             }
 
-            //making async to deal with needing to get ValueSets from server.
-            //not sure if it is working property yet...
-            async function asyncCallDEP(treeObject,comp,strategy) {
-                //console.log('calling');
-                console.time('q')
 
-
-                if (true) {
-                    //performance test
-                    let voQ = await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
-
-                    //$scope.fullQ = await makeQSvc.makeQFromTree(treeObject,comp,strategy)
-                    $scope.fullQ = voQ.Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
-                    $scope.Qlog = voQ.log   //the log of activity that occurred as the Q was created
-                    //this is a version structured for tabs.
-                    $scope.fullQTab = voQ.Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
-                }
-
-            }
 
 
 

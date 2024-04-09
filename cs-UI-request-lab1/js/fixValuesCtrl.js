@@ -40,7 +40,9 @@ angular.module("pocApp")
 
 
 
-                let qry = `CodeSystem/$lookup?system=${$scope.input.system}&code=${$scope.input.code}`
+                //let qry = `CodeSystem/$lookup?system=${snomed}&code=${code}&displayLanguage=en-x-sctlang-23162100-0210105`
+
+                let qry = `CodeSystem/$lookup?system=${$scope.input.system}&code=${$scope.input.code}&displayLanguage=en-x-sctlang-23162100-0210105`
                 $scope.tsQuery = qry
 
                 let encodedQry = encodeURIComponent(qry)

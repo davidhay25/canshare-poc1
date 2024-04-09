@@ -316,8 +316,6 @@ angular.module("pocApp")
                     ar.push(dg)
                 })
 
-
-
                 //now sort by name for the full DG tree
                 ar.sort(function (a,b) {
                     let aTitle = a.title || a.name
@@ -344,13 +342,51 @@ angular.module("pocApp")
             },
 
             makeSectionsTree : function(hashAllDG) {
-                //oMake a tree that contains only the sections branch - ie all DG wheere the ultimate parent is "Section"
+                //oMake a tree that contains only the sections branch - ie all DG where the ultimate parent is "Section"
 
                 let branchName = "Section"        //we want all DG's whose ultimate paretn is this one
                 let sectionTreeData = []
                 let sectionRoot = {id:"Section",text: "Sections tree",parent:'#',data:{}}
                 sectionTreeData.push(sectionRoot)
 
+
+                //create an alphabetized ;lis of DG
+                let lst = []
+                Object.keys(hashAllDG).forEach(function (key) {
+                    lst.push(hashAllDG[key])
+                })
+
+                lst.sort(function (a,b) {
+                    if (a.title > b.title) {
+                        return 1
+                    } else {
+                        return -1
+                    }
+                })
+
+                try {
+                    lst.forEach(function (dg) {
+                        if (dg.name !== branchName) {
+
+                            //findUltimateParent can throw an exception if the parental hierarchy is incorrect - let it bubble up and alert
+                            let ultimateParent = findUltimateParent(dg)
+
+                            if (ultimateParent.name == branchName) {
+
+                                let sectionNode = {id:dg.name,
+                                    text:dg.title,
+                                    parent:dg.parent,data:{dg:dg}}
+                                sectionTreeData.push(sectionNode)
+                            }
+                        }
+
+                    })
+                } catch (ex) {
+                    alert(ex)
+                }
+
+
+/*
                 try {
                     Object.keys(hashAllDG).forEach(function (key) {
                         if (key !== branchName) {
@@ -360,6 +396,7 @@ angular.module("pocApp")
                             let ultimateParent = findUltimateParent(dgToFindUltimateParent)
 
                             if (ultimateParent.name == branchName) {
+
                                 let sectionNode = {id:dgToFindUltimateParent.name,
                                     text:dgToFindUltimateParent.title,
                                     parent:dgToFindUltimateParent.parent,data:{dg:dgToFindUltimateParent}}
@@ -371,7 +408,7 @@ angular.module("pocApp")
                 } catch (ex) {
                     alert(ex)
                 }
-
+*/
 
                 return {treeData: sectionTreeData}
 
@@ -398,9 +435,6 @@ angular.module("pocApp")
 
                     }
                     return tmpDG
-                   // if (! dg.parent) {
-                       // return dg
-                  //  }
 
                 }
 
