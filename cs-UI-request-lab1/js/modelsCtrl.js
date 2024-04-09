@@ -2,7 +2,8 @@
 //https://www.joelonsoftware.com/2000/04/06/things-you-should-never-do-part-i/
 angular.module("pocApp")
     .controller('modelsCtrl',
-        function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,makeQSvc,orderingSvc,makeCompQSvc,dgInflaterSvc,
+        function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,makeQSvc,orderingSvc,makeCompQSvc,
+                  dgInflaterSvc,snapshotSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
 
@@ -46,6 +47,9 @@ angular.module("pocApp")
             //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
             $scope.hashAllDG = $localStorage.world.dataGroups
 
+
+            //snapshotSvc.makeSnapshots($localStorage.world.dataGroups)
+            //console.log(snapshotSvc.getFullElementList('ECOGStatus'))
 
             let size = modelsSvc.getSizeOfObject($scope.world)
             console.log(`Size of world: ${size/1024} K`)
