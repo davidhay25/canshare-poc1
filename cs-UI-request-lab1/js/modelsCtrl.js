@@ -14,7 +14,7 @@ angular.module("pocApp")
             let autoQ = true   //whether to automatically generate a Q
             let removeZeroedOut = false  //when creating the full element list, remove mult = 0..0
 
-            let newInflater = false  //running the new inflater
+            $scope.newInflater = true  //running the new inflater
 
             $scope.modelInfoClass = 'modelInfo'
             let host = $location.absUrl()
@@ -48,7 +48,39 @@ angular.module("pocApp")
             $scope.hashAllDG = $localStorage.world.dataGroups
 
 
-            //snapshotSvc.makeSnapshots($localStorage.world.dataGroups)
+            // -------------------------------------
+            //snapshot generator functions
+            let voSs = snapshotSvc.makeSnapshots($localStorage.world.dataGroups,true)
+            $scope.snapshotLog = voSs.log
+            $scope.lstAllDGSS = snapshotSvc.getDGList()     //all datagroups
+
+            $scope.getLogDG = function (row) {
+                $scope.selectedLogDg = snapshotSvc.getDG(row.dgName)
+                $scope.selectedLogRow = row
+            }
+
+            //get a single DG
+            $scope.getDGSS = function (dg) {
+                $scope.selectedLogDg = dg
+            }
+
+            $scope.showSSLogRow = function (row) {
+                if (! $scope.input.ssFilter) {return true}
+
+                if (row.dgName == $scope.input.ssFilter.name) {
+                    return true
+                }
+
+                /*
+                let filter = $scope.input.ssFilter.toLowerCase()
+                let msg = row.msg.toLowerCase()
+                if (msg.indexOf(filter) > -1) {
+                    return true
+                }
+*/
+            }
+            //------------
+
             //console.log(snapshotSvc.getFullElementList('ECOGStatus'))
 
             let size = modelsSvc.getSizeOfObject($scope.world)
@@ -235,16 +267,19 @@ angular.module("pocApp")
 
             $scope.fhirRoot = "http://hl7.org/fhir/R4/"
 
-            //allows a specific tab in the mail UI to be selected
+            //allows a specific tab in the main UI to be selected
             $scope.ui = {}
             $scope.ui.tabDG = 1;
             $scope.ui.tabComp = 0;
-            $scope.ui.tabQ = 2;
+            $scope.ui.tabSnapshot = 2;
             $scope.ui.tabTerminology = 3;
+            $scope.ui.tabProfiling = 4;
+            $scope.ui.tabSnapshot = 5;
 
             //remember the initial opening tab
             $localStorage.initialModelTab = $localStorage.initialModelTab || $scope.ui.tabComp
             $scope.input.mainTabActive = $localStorage.initialModelTab
+
             $scope.setInitialTab = function (inx) {
                 $localStorage.initialModelTab = inx
             }
@@ -1581,47 +1616,54 @@ angular.module("pocApp")
 
 
                 delete $scope.errorLog
+
+
+
+
+                let vo = {}
+
+                /* todo - will need to generate the graph and relationships in thw new way...
+
                 //determine all the elements in this DG by recursing up the inheritance hierarchy
                 //and 'across' elements that are referenced DGs. Note that a referenced DG may have its own hierarchy
                 let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
-                if (vo.log && vo.log.length > 0) {
-                    $scope.errorLog = vo.log
-                }
-
-
                 $scope.graphData = vo.graphData
                 $scope.relationshipsSummary = vo.relationshipsSummary   //all the relationships - parent and reference - for this type
+*/
 
-
+                /*
                 //there's currently an issue with the DG assembly in some cases. Looking into it, but for now this will at least stop a crash
                 if (modelsSvc.fixDgDiff(dg,vo.allElements)) {
                     //there were issues that were fixed - need to re-generate the full list
                     vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
 
                     if (vo.log && vo.log.length > 0) {
-                        $scope.errorLog = vo.log
+                      //  $scope.errorLog = vo.log
                     }
                 }
 
-                if (newInflater) {
+                */
+
+                if ($scope.newInflater) {
                     console.log('------------')
-                    vo.allElements = dgInflaterSvc.getFullListOfDGElements(dg,$scope.input.types,$scope.hashAllDG).allElements
+
+                    vo.allElements = snapshotSvc.getFullListOfElements(dg.name)
+
+                    //vo.allElements = dgInflaterSvc.getFullListOfDGElements(dg,$scope.input.types,$scope.hashAllDG).allElements
                     console.log('------------')
                 } else {
 
                 }
 
-
-                if (removeZeroedOut) {
-                    $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements.filter(item => item.ed.mult !== '0..0') )
+                if (! $scope.newInflater) {
+                    if (removeZeroedOut) {
+                        $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements.filter(item => item.ed.mult !== '0..0'))
+                    } else {
+                        $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
+                    }
                 } else {
-                    $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
+                    $scope.fullElementList = vo.allElements
                 }
-
-
-
-
-
 
 
                 //sort the elements list to better display slicing
@@ -1640,6 +1682,7 @@ angular.module("pocApp")
                         cntHidden++
                     }
                 })
+
                 $scope.hiddenSummary = `${cntVisible}/${cntHidden}`
 
                 console.log(`Visible: ${cntVisible}  Hidden:${cntHidden}`)

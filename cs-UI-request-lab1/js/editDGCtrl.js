@@ -328,45 +328,6 @@ angular.module("pocApp")
                 }
             }
 
-            $scope.updateElementFromListDEP = function () {
-
-
-
-                if ($scope.selectedElementFromList.title !== $scope.edit.title) {
-                    $scope.model.changes = $scope.model.changes || []
-                    msg = `Title changed from '${$scope.selectedElementFromList.title}' to '${$scope.edit.title}'`
-                    $scope.model.changes.push({edPath: $scope.selectedElementFromList.path, msg:msg})
-
-                }
-
-                if ($scope.selectedElementFromList.mult !== $scope.edit.mult) {
-                    $scope.model.changes = $scope.model.changes || []
-                    msg = `Cardinality changed from '${$scope.selectedElementFromList.mult}' to '${$scope.edit.mult}'`
-                    $scope.model.changes.push({edPath: $scope.selectedElementFromList.path, msg:msg})
-                }
-
-
-                $scope.selectedElementFromList.title = $scope.edit.title
-                $scope.selectedElementFromList.mult = $scope.edit.mult
-                $scope.selectedElementFromList.status = 'changed'
-                if ($scope.edit.code) {
-
-                    if ($scope.selectedElementFromList.code !== $scope.edit.code) {
-                        $scope.model.changes = $scope.model.changes || []
-                        msg = `Code changed from '${$scope.selectedElementFromList.code}' to '${$scope.edit.code}'`
-                        $scope.model.changes.push({edPath: $scope.selectedElementFromList.path, msg:msg})
-                    }
-
-                    $scope.selectedElementFromList.code = [{code:$scope.edit.code}]
-                }
-
-                delete $scope.edit.title
-                delete $scope.edit.code
-                delete $scope.edit.mult
-                delete $scope.selectedElementFromList
-                alert('Model has been updated')
-            }
-
 
             //select an element from the expanded elements list
             $scope.selectElement = function (element) {
@@ -454,7 +415,7 @@ angular.module("pocApp")
             //add a new item
             $scope.add = function () {
                 let element = {}
-                element.status = 'new'
+                //element.status = 'new'
                 //$scope.model.status = 'changed'
                 element.path = $scope.input.path
                 element.title = $scope.input.title
@@ -473,11 +434,11 @@ angular.module("pocApp")
                 element.mult = $scope.input.card
                 $scope.model.diff = $scope.model.diff || []
                 $scope.model.diff.push(element)
-
+/*
                 $scope.model.changes = $scope.model.changes || []
                 msg = `Added new element`
                 $scope.model.changes.push({edPath: element.path, msg:msg})
-
+*/
                 delete $scope.input.path
                 delete $scope.input.title
                 delete $scope.input.type
@@ -490,11 +451,11 @@ angular.module("pocApp")
 
             $scope.remove = function (inx) {
                 if (confirm("Are you sure you wish to remove this element")) {
-
+/*
                     $scope.model.changes = $scope.model.changes || []
                     msg = `remove element`
                     $scope.model.changes.push({edPath: $scope.model.diff[inx].path, msg:msg})
-
+*/
                     $scope.model.diff.splice(inx,1)
                     getFullElementList()
                 }
@@ -517,7 +478,7 @@ angular.module("pocApp")
                 $scope.model.type = $scope.input.type
                 if (isNew) {
                     if ($scope.isUnique) {
-                        $scope.model.status = 'new'
+                        //$scope.model.status = 'new'
                         $scope.model.diff = $scope.model.diff || []
 
                         $scope.$close($scope.model)

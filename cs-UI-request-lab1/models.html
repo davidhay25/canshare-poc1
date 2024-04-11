@@ -452,13 +452,102 @@
 
         </uib-tab>
 
-        <!--
-        <uib-tab ng-show="false" heading="Q builder"  select="setInitialTab(2)">
-            <div ng-controller="makeQCtrl">
-                <ng-include src="'/includes/makeQ.html'"></ng-include>
+        <uib-tab heading="Snapshot log" select="setInitialTab(2)">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <select class="form-control" ng-model="input.ssFilter"
+                                    ng-options="dg.title for dg in lstAllDGSS"></select>
+<!--
+                            <input type="text" ng-model="input.ssFilter" class="form-control" placeholder="Filter"/>
+-->
+                        </div>
+                    </div>
+
+                    <uib-tabset>
+                        <uib-tab heading="Log">
+                            <div class="myScroll">
+
+                                <table class="table-bordered table table-condensed">
+                                    <tr ng-repeat = "row in snapshotLog"
+                                        ng-show="showSSLogRow(row)">
+                                        <td>{{row.index}}</td>
+                                        <td>
+                                            <div ng-class="{listItemSelected:selectedLogRow.index == row.index}"
+                                                 ng-click="getLogDG(row)">{{row.msg}}</div>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                            </div>
+                        </uib-tab>
+                        <uib-tab heading="DG">
+                            <div class="myScroll">
+
+                                <table class="table-bordered table table-condensed">
+                                    <tr ng-repeat = "dg in lstAllDGSS">
+                                        <td>
+                                            <div ng-class="{clickableDotted:true}"
+                                                 ng-click="getDGSS(dg)">{{dg.title}}</div>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                            </div>
+                        </uib-tab>
+                    </uib-tabset>
+
+
+                </div>
+                <div class="col-md-6">
+                    <div class="banner">{{selectedLogDg.name}}</div>
+                    <uib-tabset>
+                        <uib-tab heading="DG">
+                            <em>.diff is from stored DG</em>
+                            <div class="myScroll">
+                                <pre>{{selectedLogDg | json}}</pre>
+                            </div>
+                        </uib-tab>
+                        <uib-tab heading="DG Diff">
+                            <div class="myScroll">
+                                <pre>{{selectedLogDg.diff | json}}</pre>
+                            </div>
+                        </uib-tab>
+                        <uib-tab heading="DG full diff">
+                            <div class="myScroll">
+                                <pre>{{selectedLogDg.fullDiff | json}}</pre>
+                            </div>
+                        </uib-tab>
+                        <uib-tab heading="Snapshot">
+                            <div class="myScroll">
+                                <pre>{{selectedLogDg.snapshot | json}}</pre>
+                            </div>
+                        </uib-tab>
+                        <uib-tab heading="Snapshot paths">
+                            <div class="myScroll">
+                                <table class="table table-condensed table-bordered">
+                                    <tr ng-repeat="ed in selectedLogDg.snapshot">
+                                        <td>{{ed.path}}</td>
+                                        <td>{{ed.type[0]}}</td>
+                                    </tr>
+                                </table>
+
+
+
+                            </div>
+                        </uib-tab>
+                    </uib-tabset>
+
+                </div>
             </div>
+
+
+
+
+
         </uib-tab>
-        -->
+
 
         <uib-tab heading="Reports"  select="setInitialTab(3)">
             <ng-include src="'/includes/terminology.html'"></ng-include>
@@ -472,41 +561,8 @@
         </uib-tab>
 
 
-        <uib-tab heading="Errors" ng-show="errorLog.length > 0">
-            <em>This table shows the steps take by the DG 'inflater' as it creates the complete list of elements
-            for a DG by examining the parents of the DG and the elements that are DGs themselves. The DG name is the
-            DG that is being processed in that step, the path is being created by the inflater as it goes and the type indicates
-                whether it's a parent or an element that is being examined. When there's a cyclic dependency
-                you see the path getting longer and longer with a repeated DG name of some sort. This gives a clue which is
-                the DG that has the cyclic dependency (which may well be different to the one being inflated)..
-            </em>
-           <table class="table-bordered table">
-               <tr><th>DG name</th><th>Path</th><th>Type</th></tr>
-               <tr ng-repeat="log in errorLog">
-                   <td>{{log.dg}}</td>
-                   <td>{{log.path}}</td>
-                   <td>{{log.type}}</td>
-               </tr>
-           </table>
-        </uib-tab>
 
 
-
-
-        <uib-tab ng-show="false" >
-            <uib-tab-heading>DG updates <span class="badge">{{dgUpdates.length}}</span> </uib-tab-heading>
-            <span class="pull-right">
-                <span class="clickable" ng-click="refreshUpdates()">Refresh</span>
-            </span>
-            <em>Changes made to DataGroups</em>
-
-            <ng-include src="'/includes/dgReport.html'"></ng-include>
-
-
-
-
-
-        </uib-tab>
 
         <uib-tab ng-show="errors.length > 0">
             <uib-tab-heading>
@@ -529,62 +585,6 @@
             </div>
 
 
-
-        </uib-tab>
-
-        <uib-tab ng-show = 'false' heading="Full model">
-            <uib-tabset>
-                <br/>
-                <uib-tab heading="Type usage summary">
-
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="myScroll">
-                                <table class="table-bordered table">
-                                    <tr><th>Type</th>
-                                        <th>
-                                            <div class="row">
-                                                <div class="col-md-3">
-                                                    Source type
-                                                </div>
-                                                <div class="col-md-9">
-                                                    Path in source
-                                                </div>
-                                            </div>
-                                        </th></tr>
-                                    <tr ng-repeat="(k,v) in analysis">
-                                        <td>{{k}}</td>
-                                        <td>
-                                            <div ng-repeat="item in v">
-                                                <div class="row">
-                                                    <div class="col-md-3">
-                                                        <div class="clickable"
-                                                             ng-click="selectModelFromTypeUsage(item.model)">{{item.model.name}}</div>
-                                                    </div>
-                                                    <div class="col-md-9">
-                                                        {{item.path}}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-
-                        </div>
-                        <div class="col-md-4">
-                            <pre>{{selectedModelFromTypeUsage | json}}</pre>
-                        </div>
-                    </div>
-
-
-
-
-                </uib-tab>
-                <uib-tab heading="Json">
-                    <pre>{{world | json}}</pre>
-                </uib-tab>
-            </uib-tabset>
 
         </uib-tab>
 
@@ -619,90 +619,6 @@
         </uib-tab>
 
 
-        <uib-tab ng-show="false" heading="LM StructureDefinitions">
-            <button class="btn-link btn pull-right" ng-click="makeBundle()">Make Bundle</button>
-            <button ng-show="lmBundle" class="btn-link btn pull-right" ng-click="validateBundle(lmBundle)">Validate</button>
-
-            <div class="clearfix"></div>
-
-            <uib-tabset>
-
-                <uib-tab heading="Bundle">
-                    <pre>{{lmBundle | json}}</pre>
-                </uib-tab>
-
-                <uib-tab heading="Validation" ng-show="lmValidateSummary">
-
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="list-group">
-                                <div ng-class="{'list-group-item':true,listItemSelected:input.selectedValidationResource == resource}"
-                                     ng-click="input.selectedValidationResource = resource"
-                                     style="cursor: pointer"
-                                     ng-repeat="resource in lmValidateSummary.resources">
-                                    <div class="pull-right badge"> {{resource.issues.length}}</div>
-                                    {{resource.resource.name}}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-9">
-                            <pre ng-show="input.selectedValidationResource.issues.length > 0">{{input.selectedValidationResource.issues | json}}</pre>
-                            <pre ng-show="input.selectedValidationResource.resource">{{input.selectedValidationResource.resource | json}}</pre>
-                        </div>
-                    </div>
-                </uib-tab>
-
-
-
-
-
-            </uib-tabset>
-
-<!--
-            <div class="row">
-                <div class="col-md-5">
-                    <button class="btn-link btn pull-right" ng-click="makeBundle()">Make Bundle</button>
-                    <div class="clearfix"></div>
-                    <pre>{{lmBundle | json}}</pre>
-                </div>
-                <div class="col-md-7">
-                    <div ng-show="lmBundle">
-                        <button class="btn-link btn pull-right" ng-click="validateBundle(lmBundle)">Validate</button>
-                        <div class="clearfix"></div>
-
-                        <div class="row">
-                            <div class="col-md-5">
-                                <div class="list-group">
-                                    <div class="list-group-item"
-                                         ng-click="input.selectedIssues = resource.issues"
-                                         ng-repeat="resource in lmValidateSummary.resources">
-                                        <div class="pull-right badge"> {{resource.issues.length}}</div>
-                                        {{resource.resource.name}}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-7">
-                                <pre>{{input.selectedIssues | json}}</pre>
-
-                            </div>
-                        </div>
-
-
-
-
-<hr/>
-                        {{lmValidateSummary}}
-                        <pre>{{lmValidate | json}}</pre>
-                    </div>
-
-
-                </div>
-            </div>
-
--->
-
-
-        </uib-tab>
 
     </uib-tabset>
 
