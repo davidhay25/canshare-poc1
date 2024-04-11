@@ -452,98 +452,10 @@
 
         </uib-tab>
 
-        <uib-tab heading="Snapshot log" select="setInitialTab(2)">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <select class="form-control" ng-model="input.ssFilter"
-                                    ng-options="dg.title for dg in lstAllDGSS"></select>
-<!--
-                            <input type="text" ng-model="input.ssFilter" class="form-control" placeholder="Filter"/>
--->
-                        </div>
-                    </div>
+        <uib-tab heading="Snapshot generation log" select="setInitialTab(2)">
+            <br/>
 
-                    <uib-tabset>
-                        <uib-tab heading="Log">
-                            <div class="myScroll">
-
-                                <table class="table-bordered table table-condensed">
-                                    <tr ng-repeat = "row in snapshotLog"
-                                        ng-show="showSSLogRow(row)">
-                                        <td>{{row.index}}</td>
-                                        <td>
-                                            <div ng-class="{listItemSelected:selectedLogRow.index == row.index}"
-                                                 ng-click="getLogDG(row)">{{row.msg}}</div>
-                                        </td>
-                                    </tr>
-                                </table>
-
-                            </div>
-                        </uib-tab>
-                        <uib-tab heading="DG">
-                            <div class="myScroll">
-
-                                <table class="table-bordered table table-condensed">
-                                    <tr ng-repeat = "dg in lstAllDGSS">
-                                        <td>
-                                            <div ng-class="{clickableDotted:true}"
-                                                 ng-click="getDGSS(dg)">{{dg.title}}</div>
-                                        </td>
-                                    </tr>
-                                </table>
-
-                            </div>
-                        </uib-tab>
-                    </uib-tabset>
-
-
-                </div>
-                <div class="col-md-6">
-                    <div class="banner">{{selectedLogDg.name}}</div>
-                    <uib-tabset>
-                        <uib-tab heading="DG">
-                            <em>.diff is from stored DG</em>
-                            <div class="myScroll">
-                                <pre>{{selectedLogDg | json}}</pre>
-                            </div>
-                        </uib-tab>
-                        <uib-tab heading="DG Diff">
-                            <div class="myScroll">
-                                <pre>{{selectedLogDg.diff | json}}</pre>
-                            </div>
-                        </uib-tab>
-                        <uib-tab heading="DG full diff">
-                            <div class="myScroll">
-                                <pre>{{selectedLogDg.fullDiff | json}}</pre>
-                            </div>
-                        </uib-tab>
-                        <uib-tab heading="Snapshot">
-                            <div class="myScroll">
-                                <pre>{{selectedLogDg.snapshot | json}}</pre>
-                            </div>
-                        </uib-tab>
-                        <uib-tab heading="Snapshot paths">
-                            <div class="myScroll">
-                                <table class="table table-condensed table-bordered">
-                                    <tr ng-repeat="ed in selectedLogDg.snapshot">
-                                        <td>{{ed.path}}</td>
-                                        <td>{{ed.type[0]}}</td>
-                                    </tr>
-                                </table>
-
-
-
-                            </div>
-                        </uib-tab>
-                    </uib-tabset>
-
-                </div>
-            </div>
-
-
-
+            <ng-include src="'/includes/snapshot.html'"></ng-include>
 
 
         </uib-tab>

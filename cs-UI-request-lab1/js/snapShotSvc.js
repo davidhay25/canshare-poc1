@@ -6,19 +6,24 @@ angular.module("pocApp")
         fhirDataTypes = ['boolean','code','date','dateTime','decimal','integer','string','Address','Attachment','CodeableConcept','ContactPoint','Group','HumanName','Identifier','Period','Quantity','Ratio']
 
         allDgSnapshot = {}      //a hash of all DGs with snapshots
-        lstAllDG = []           //an alphebetical list of all DGs
+        lstAllDG = []           //an alphabetical list of all DGs
         logToConsole = false    //whether to log to console. Passed in the makeSnapshots call
-        log = []
-        errors = []
-        logIndex=0
+        log = []                //the main log
+        //errors = []
+        logIndex=0              //An incremental index for log entries
+        hashHierarchy = {}      //the hierarchy for each dg
+        hashReferences = {}     //references by DG
+        hashHistory = {}        //history if changes as tge dg hierarchy is traverser
 
         function logger(msg,dgName,isError,details) {
             if (logToConsole) {
                 console.log(dgName,msg)
             }
+            /*
             if (isError) {
                 errors.push({msg:msg,dgName:dgName})
             }
+            */
             let logEntry = {msg:msg,dgName:dgName,isError:isError,index:logIndex++}
             if (details) {
                 logEntry.details = details
@@ -26,26 +31,30 @@ angular.module("pocApp")
             log.push(logEntry)
         }
 
-
         //create the hierarchy of DG that lead to this one and save in .fullDiff
         //also add them to the snapshot
         function makeFullDiff(dg,allDg) {
 
-            let arHierarchy = makeDgHierarchy(dg,allDg)
+            let arHierarchy = makeDgHierarchy(dg,allDg)     //the list of DG's that are parents of this one
 
             //now, create a diff array that has all elements
             let arFullDiffPath = []     //will contain paths
             let hashEdPath = {}         //a hash, keyed by path than has the DG at that path
+            let arHx = []               //history of changes made by each DG. will contain {dhName: changes:[]}
+            hashHistory[dg.name] = arHx //
 
             //move down the hierarchy, parent first
             for (let i=arHierarchy.length-1;i > -1;--i) {
                 let dgName = arHierarchy[i]
 
+                let changesThisDg = []      //changes made by diffs in this parental DG
+                arHx.push({dgName:dgName,changes:changesThisDg})
+
                 let cDg = allDg[dgName]  //cDg = component Dg.
                 for (const ed of cDg.diff) {
 
                     //if the datatype is not a FHIR datatype - it's another DG - then it will need to have the members inserted
-                    //into the target DG immediately after this element...
+                    //into the target DG immediately after this element - once it's been inflated...
                     let type = ed.type[0]
                     if (fhirDataTypes.indexOf(type) == -1) {
                         ed.dgToBeInserted = type   //this is the type (same as DG name) to be inserted here. We clear the flag when inserting
@@ -59,6 +68,9 @@ angular.module("pocApp")
                         if (ed.mult !== '0..0') {
                             arFullDiffPath.push(path)
                             hashEdPath[path] = ed   //and store the ed in the hash
+                            changesThisDg.push({msg:`Added ${ed.path}`,ed:ed })
+                        } else {
+                            changesThisDg.push({msg:`Ignored ${cDg.name}.${ed.path} as it is 0..0 and wasn't in the running list`,ed:ed })
                         }
 
                     } else {
@@ -66,9 +78,11 @@ angular.module("pocApp")
                         if (ed.mult == '0..0') {
                             //It's hidden. remove it from the array
                             arFullDiffPath.splice(pos,1)
+                            changesThisDg.push({msg:`Removed ${ed.path}`,ed:ed })
                         } else {
                             //it's just been replaced by a new one...
                             hashEdPath[path] = ed
+                            changesThisDg.push({msg:`Replaced ${ed.path}`,ed:ed })
                         }
 
                     }
@@ -80,24 +94,43 @@ angular.module("pocApp")
 
             dg.fullDiff = []        //this is a complete list of diffs from the entire hierarchy ordered from the ultimate parent down
             dg.snapshot = []        //the definitive snapshot of all elements in order
+
+            hashReferences[dg.name] = []    //the list of all references from this dg to another
+
+            let arElements = []     //for the log
             arFullDiffPath.forEach(function (path) {
 
                 //if we don't use a clone, then it's a reference to a common ed so if it's used more than
                 //once, it won't get updated in some cases...
-                let clone = angular.copy(hashEdPath[path])
+                let edClone = angular.copy(hashEdPath[path])
 
-                dg.fullDiff.push(clone)
-                dg.snapshot.push(clone)
+                dg.fullDiff.push(edClone)
+                dg.snapshot.push(edClone)       //other elements are added to the snapshot as referenced DGs are inflated
+                arElements.push(edClone)
+
+                if (edClone.dgToBeInserted) {
+                    //This is a reference to another dg
+                    hashReferences[dg.name].push(edClone)
+                }
+
+
 
                 //dg.fullDiff.push(hashEdPath[path])
                 //dg.snapshot.push(hashEdPath[path])
             })
+
+            let msg = `${dg.name}: Creating initial snapshot with ${arElements.length} elements`
+            logger(msg,dg.name,false,arElements)
+
+
         }
 
 
         //create a
         function makeDgHierarchy(dg,allDg) {
-            //create hierarchy for DG
+            //create parental hierarchy for DG
+
+            hashHierarchy[dg.name] = []
 
             let dgName = dg.name
             let arHierarchy = [dgName]
@@ -108,6 +141,7 @@ angular.module("pocApp")
             while (tmpDG.parent) {
                 let parent = tmpDG.parent
                 arHierarchy.push(parent)
+                hashHierarchy[dg.name].splice(0,0,parent)
                 let dgTitle = tmpDG.title
 
                 tmpDG = allDg[tmpDG.parent]
@@ -124,10 +158,6 @@ angular.module("pocApp")
 
             }
             return arHierarchy
-
-
-
-
         }
 
         //insert a set of ed's into the snapshot of a DG at a given path
@@ -196,7 +226,7 @@ angular.module("pocApp")
                                         })
 
                                         //the log entry. Include the elements that are being inserted
-                                        let msg = `Inserting ${arElements.length} elements into ${dg.name}.${ed.path}`
+                                        let msg = `Inserting ${arElements.length} elements into ${dg.name}.${ed.path} from ${dgToInsert.name} (${dgToInsert.title})`
                                         logger(msg,dg.name,false,arElements)
 
                                         //now insert the list of ed's from referenced DG into the snapshot
@@ -233,20 +263,16 @@ angular.module("pocApp")
                             })
 
                             dg.snapshot.forEach(function (ed) {
-                                //item.ed.mult = '0..0'
+
                                 for (const key of Object.keys(hashHidden)) {
-                                    //if (item.ed.path.startsWith(key +'.')) {
                                     if (ed.path.isChildPath(key)) {
                                         ed.mult = '0..0'
+                                        let msg = `DG: ${dg.name} has directly hidden ${key}`
+                                        logger(msg,dg.name,true)
                                         break
                                     }
                                 }
                             })
-
-
-
-
-
 
                             dg.snapshotComplete = true
                         } else {
@@ -272,19 +298,17 @@ angular.module("pocApp")
 
                 allDgSnapshot = angular.copy(hashAllDG) //this will be a local clone
 
-
-
                 //construct a complete diff for each dg including the hierarchy
                 Object.keys(allDgSnapshot).forEach(function (dgName) {
                     let dg = allDgSnapshot[dgName]
                     makeFullDiff(dg, allDgSnapshot)
-                    //console.log(angular.toJson(allDgSnapshot))
-                    //logger(`${dg.name}, ${dg.fullDiff.length}`)
-                    //console.log(angular.copy(dg))
+
                 })
 
                 //perform the 'inflation' of DG's that results in the snapshot
                 processDataGroups()
+
+                console.log(hashHistory)
 
                 //console.log(utilsSvc.getSizeOfObject(allDgSnapshot))
 
@@ -317,6 +341,16 @@ angular.module("pocApp")
             getDG: function (dgName) {
                 return allDgSnapshot[dgName]
             },
+            getHierarchy : function (dgName) {
+                return hashHierarchy[dgName]
+            },
+            getReferences : function (dgName) {
+                return hashReferences[dgName]
+            },
+            getChangeHistory : function (dgName) {
+                return hashHistory[dgName]
+            },
+
             getFullListOfElements: function (dgName) {
                 //return the full list of elements for a DG
                 let lst = []

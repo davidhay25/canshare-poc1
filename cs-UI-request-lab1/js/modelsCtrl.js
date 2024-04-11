@@ -50,6 +50,7 @@ angular.module("pocApp")
 
             // -------------------------------------
             //snapshot generator functions
+            $scope.snapshotSvc = snapshotSvc    //so the web pages can call it directly
             let voSs = snapshotSvc.makeSnapshots($localStorage.world.dataGroups,true)
             $scope.snapshotLog = voSs.log
             $scope.lstAllDGSS = snapshotSvc.getDGList()     //all datagroups
@@ -59,8 +60,14 @@ angular.module("pocApp")
                 $scope.selectedLogRow = row
             }
 
+            $scope.showSSLog = function (dgName) {
+                $scope.selectedLogDg = snapshotSvc.getDG(dgName)
+                $scope.input.ssFilter = $scope.selectedLogDg
+                $scope.input.mainTabActive = $scope.ui.tabSnapshot
+            }
+
             //get a single DG
-            $scope.getDGSS = function (dg) {
+            $scope.setDGSS = function (dg) {
                 $scope.selectedLogDg = dg
             }
 
@@ -71,17 +78,10 @@ angular.module("pocApp")
                     return true
                 }
 
-                /*
-                let filter = $scope.input.ssFilter.toLowerCase()
-                let msg = row.msg.toLowerCase()
-                if (msg.indexOf(filter) > -1) {
-                    return true
-                }
-*/
             }
             //------------
 
-            //console.log(snapshotSvc.getFullElementList('ECOGStatus'))
+
 
             let size = modelsSvc.getSizeOfObject($scope.world)
             console.log(`Size of world: ${size/1024} K`)
@@ -274,7 +274,9 @@ angular.module("pocApp")
             $scope.ui.tabSnapshot = 2;
             $scope.ui.tabTerminology = 3;
             $scope.ui.tabProfiling = 4;
-            $scope.ui.tabSnapshot = 5;
+
+
+
 
             //remember the initial opening tab
             $localStorage.initialModelTab = $localStorage.initialModelTab || $scope.ui.tabComp

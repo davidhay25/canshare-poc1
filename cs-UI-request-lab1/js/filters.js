@@ -1,5 +1,19 @@
 angular.module("pocApp")
 
+    .filter('dtMetaData',function () {
+        return function(ed) {
+            if (ed) {
+                let clone = angular.copy(ed)
+                delete clone.fullDiff
+                delete clone.diff
+                delete clone.snapshot
+                delete clone.snapshotComplete
+                return clone
+            }
+
+        }
+    })
+
     .filter('compositionSummaryPath',function(){
         //return a version of the path removing unneeded segments (for display)
         return function(path) {
