@@ -79,6 +79,24 @@ angular.module("pocApp")
                 }
 
             }
+
+            $scope.ssLogPanel = 'col-md-6'
+            $scope.ssDisplayPanel = 'col-md-6'
+            let ssLogShown = true
+
+            $scope.toggleLog = function(){
+                if (ssLogShown) {
+                    $scope.ssLogPanel = 'hidden'
+                    $scope.ssDisplayPanel = 'col-md-12'
+                } else {
+                    $scope.ssLogPanel = 'col-md-6'
+                    $scope.ssDisplayPanel = 'col-md-6'
+                }
+                ssLogShown = ! ssLogShown
+
+            }
+
+
             //------------
 
 

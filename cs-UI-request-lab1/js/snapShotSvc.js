@@ -53,6 +53,8 @@ angular.module("pocApp")
                 let cDg = allDg[dgName]  //cDg = component Dg.
                 for (const ed of cDg.diff) {
 
+                    delete ed.sourceModelName   //the previous version saved this in the DG. I prefer to add it here.
+
                     //if the datatype is not a FHIR datatype - it's another DG - then it will need to have the members inserted
                     //into the target DG immediately after this element - once it's been inflated...
                     let type = ed.type[0]
@@ -66,6 +68,7 @@ angular.module("pocApp")
                     if (pos == -1) {
                         //no it doesn't. Add it to the list - unless the mult is set to 0..0
                         if (ed.mult !== '0..0') {
+                            ed.sourceModelName = dgName     //the DG where this ed was added.
                             arFullDiffPath.push(path)
                             hashEdPath[path] = ed   //and store the ed in the hash
                             changesThisDg.push({msg:`Added ${ed.path}`,ed:ed })
@@ -262,8 +265,30 @@ angular.module("pocApp")
                                 }
                             })
 
-                            dg.snapshot.forEach(function (ed) {
 
+                            //create a new snapshot list that excludes 0..0 elemenets
+                            let newSnapshot = []
+                            dg.snapshot.forEach(function (ed) {
+                                let canInclude = true
+                                for (const key of Object.keys(hashHidden)) {
+                                    if (ed.path == key || ed.path.isChildPath(key)) {
+                                        canInclude = false
+
+                                        let msg = `Directly removed ${ed.path}`
+                                        logger(msg,dg.name,true)
+                                        break
+                                    }
+                                }
+                                if (canInclude) {
+                                    newSnapshot.push(ed)
+                                }
+                            })
+                            dg.snapshot = newSnapshot
+
+
+                            /*
+                            A version that uses 0..0 to hide the elements. Keep for the moment
+                            dg.snapshot.forEach(function (ed) {
                                 for (const key of Object.keys(hashHidden)) {
                                     if (ed.path.isChildPath(key)) {
                                         ed.mult = '0..0'
@@ -273,6 +298,8 @@ angular.module("pocApp")
                                     }
                                 }
                             })
+                            */
+
 
                             dg.snapshotComplete = true
                         } else {
@@ -285,6 +312,7 @@ angular.module("pocApp")
                 //just to terminate the loop. todo need to check that all DG's have a completed snapshot
                 if (ctr > 100) {
                     moreToGo = false
+
                 }
 
             }
@@ -320,7 +348,7 @@ angular.module("pocApp")
                 })
 
                 lstAllDG.sort(function (a,b) {
-                    if (a.title > b.title) {
+                    if (a.name > b.name) {
                         return 1
                     } else {
                         return -1

@@ -1,13 +1,22 @@
 <div>
 
   <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-3">
       <select class="form-control" ng-model="input.ssFilter"
               ng-change="getLogDG({dgName:input.ssFilter.name})"
-              ng-options="dg.title for dg in lstAllDGSS"></select>
+              ng-options="dg.name for dg in lstAllDGSS"></select>
       <!--
                                   <input type="text" ng-model="input.ssFilter" class="form-control" placeholder="Filter"/>
       -->
+    </div>
+    <div class="col-md-2">
+      <!--
+      <input type="text" ng-model="selected"
+             uib-typeahead="dg.title for dg in lstAllDGSS | filter:$viewValue | limitTo:20" class="form-control">
+      -->
+    </div>
+    <div class="col-md-1">
+      <div class="btn btn-link pull-right" ng-click="toggleLog()">Toggle Log display</div>
     </div>
     <div class="col-md-4">
       <button class="btn btn-link pull-right" ng-show="input.ssFilter"
@@ -19,21 +28,11 @@
 
 
   <div class="row">
-    <div class="col-md-6">
-      <div ng-show = "false" class="row">
-        <div class="col-md-8">
-          <select class="form-control" ng-model="input.ssFilter"
-                  ng-change="getLogDG({dgName:input.ssFilter.name})"
-                  ng-options="dg.title for dg in lstAllDGSS"></select>
-          <!--
-                                      <input type="text" ng-model="input.ssFilter" class="form-control" placeholder="Filter"/>
-          -->
-        </div>
-        <div class="col-md-4">
-          <button class="btn btn-link pull-right" ng-show="input.ssFilter"
-                  ng-click="termSelectDG({DGName:input.ssFilter.name})">Show DG</button>
-        </div>
-      </div>
+    <div ng-class="ssLogPanel">
+
+      <em>Build log.</em>
+
+
 
       <br/>
       <div class="myScroll">
@@ -53,7 +52,7 @@
 
 
     </div>
-    <div  ng-show="selectedLogDg" class="col-md-6">
+    <div ng-show="selectedLogDg" ng-class="ssDisplayPanel">
       <div class="banner">
         {{selectedLogDg.title}}
         <div><em>{{selectedLogDg.name}}</em></div>
@@ -176,6 +175,7 @@
                       {{ed.path}}
                     </li>
                   </ul>
+                  <em>Excludes all elements with Cardinality = 0..0</em>
                 </div>
                 <div class="col-md-6">
                   <pre>{{input.ssFullDiff | json}}</pre>
@@ -187,16 +187,22 @@
               <div class="row">
                 <div class="col-md-6">
 
+                  <div class="myScroll">
                     <div ng-repeat="item in snapshotSvc.getChangeHistory(selectedLogDg.name)"
-                        >
+                    >
                       <strong>{{item.dgName}}</strong>
-                      <div ng-repeat="change in item.changes"
-                           style="cursor: pointer;padding-left: 8px"
+                      <ul>
+                        <li ng-repeat="change in item.changes"
+                            style="cursor: pointer;padding-left: 8px"
 
-                           ng-click="input.ssChangeItemEd = change.ed">
-                        {{change.msg}}
-                      </div>
+                            ng-click="input.ssChangeItemEd = change.ed">
+                          {{change.msg}}
+                        </li>
+                      </ul>
+
                     </div>
+                  </div>
+
 
                 </div>
                 <div class="col-md-6">
