@@ -102,6 +102,8 @@ angular.module("pocApp")
                         action:"delete-diff",
                         model:$scope.selectedModel})
 
+                    $scope.makeSnapshots()
+
                     $scope.refreshFullList($scope.selectedModel)
                     $scope.termSelectDG({DGName:$scope.selectedModel.name})
                 }
@@ -583,6 +585,8 @@ angular.module("pocApp")
                             })
                             dg.diff = ar1
 
+
+
                             //rebuild fullList and re-draw the tree
                             $scope.refreshFullList($scope.selectedModel)
                         }
@@ -654,6 +658,10 @@ angular.module("pocApp")
                     traceSvc.addAction({action:'delete-element',model:$scope.selectedModel,
                         path:pathToDelete,description:'add diff'})
                 }
+
+
+                $scope.makeSnapshots()
+
 
                 //rebuild fullList and re-draw the tree
                 $scope.refreshFullList($scope.selectedModel)

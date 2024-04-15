@@ -181,7 +181,28 @@
                   <pre>{{input.ssFullDiff | json}}</pre>
                 </div>
               </div>
+              <em>This contains elements added in this DG and it's parents but not overrides</em>
             </uib-tab>
+
+            <uib-tab heading="Overrides">
+              <div class="row">
+                <div class="col-md-6">
+                  <ul>
+                    <li ng-repeat="(k,v) in selectedLogDg.overrides"
+                        style="cursor: pointer"
+                        ng-click="input.ssOverride = v">
+                      {{k}}
+                    </li>
+                  </ul>
+
+                </div>
+                <div class="col-md-6">
+                  <pre>{{input.ssOverride | json}}</pre>
+                </div>
+              </div>
+              <em>Diff elements that override others</em>
+            </uib-tab>
+
             <uib-tab heading="History of changes">
 
               <div class="row">
@@ -229,7 +250,7 @@
           <div class="row">
             <div class="col-md-6">
               <ul>
-                <li ng-repeat="ed in selectedLogDg.snapshot"
+                <li ng-repeat="ed in selectedLogDg.snapshot track by $index"
                     style="cursor: pointer"
                     ng-click="input.ssSnapshotEd = ed">
                   {{ed.path}}
@@ -255,7 +276,7 @@
           <em>Only the paths in the snapshot</em>
           <div class="myScroll">
             <table class="table table-condensed table-bordered">
-              <tr ng-repeat="ed in selectedLogDg.snapshot">
+              <tr ng-repeat="ed in selectedLogDg.snapshot track by $index">
                 <td>{{ed.path}}</td>
                 <td>{{ed.type[0]}}</td>
               </tr>

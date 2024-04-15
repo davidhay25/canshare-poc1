@@ -7,15 +7,12 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
 
-            //https://web.dev/articles/monitor-total-page-memory-usage
-            //console.log(performance.measureUserAgentSpecificMemory())
-
-
             let autoQ = true   //whether to automatically generate a Q
             let removeZeroedOut = false  //when creating the full element list, remove mult = 0..0
 
             $scope.newInflater = true  //running the new inflater
 
+            //change the background colour of the DG summary according to the environment
             $scope.modelInfoClass = 'modelInfo'
             let host = $location.absUrl()
             if (host.indexOf('local') > -1) {
@@ -25,7 +22,6 @@ angular.module("pocApp")
             }
 
 
-            //console.log($location.absUrl())
 
 
             $scope.version = utilsSvc.getVersion()
@@ -51,9 +47,18 @@ angular.module("pocApp")
             // -------------------------------------
             //snapshot generator functions
             $scope.snapshotSvc = snapshotSvc    //so the web pages can call it directly
-            let voSs = snapshotSvc.makeSnapshots($localStorage.world.dataGroups,true)
-            $scope.snapshotLog = voSs.log
-            $scope.lstAllDGSS = snapshotSvc.getDGList()     //all datagroups
+
+
+            $scope.makeSnapshots = function() {
+                //let voSs = snapshotSvc.makeSnapshots($localStorage.world.dataGroups,true)
+                let voSs = snapshotSvc.makeSnapshots($scope.hashAllDG,true)
+                $scope.snapshotLog = voSs.log
+                $scope.lstAllDGSS = snapshotSvc.getDGList()     //all datagroups
+                console.log('-------->   building snapshots...')
+            }
+            $scope.makeSnapshots()
+
+
 
             $scope.getLogDG = function (row) {
                 $scope.selectedLogDg = snapshotSvc.getDG(row.dgName)
@@ -107,7 +112,7 @@ angular.module("pocApp")
             $scope.localStorage = $localStorage
 
             //>>>>>>>> this examines the entire model.
-            function validateModel() {
+            function validateModelDEP() {
                 // validate the model. This retruns a hash of all types defined in the model as well as errors
                 let vo1 = modelsSvc.validateModel($localStorage.world)
                 $scope.errors = vo1.errors
@@ -264,20 +269,6 @@ angular.module("pocApp")
                 $scope.localCopyToClipboard (host)
                 alert(`Link: ${host} \ncopied to clipBoard`);
 
-                /*
-                navigator.clipboard.writeText(host).then(
-                    () => {
-                        alert(`Link: ${host} \ncopied to clipBoard`);
-                    },
-                    () => {
-                        alert(`Link is ${host}`);
-                    },
-                )
-                */
-
-
-
-
             }
 
             $scope.leftPanel = 'col-md-3'
@@ -292,9 +283,6 @@ angular.module("pocApp")
             $scope.ui.tabSnapshot = 2;
             $scope.ui.tabTerminology = 3;
             $scope.ui.tabProfiling = 4;
-
-
-
 
             //remember the initial opening tab
             $localStorage.initialModelTab = $localStorage.initialModelTab || $scope.ui.tabComp
@@ -508,35 +496,6 @@ angular.module("pocApp")
                     $scope.rightPanel = 'col-md-9'
                 }
             }
-
-
-
-            //whether the current user can edit. Will set up the back end logic later
-            //$scope.input.canEdit = true
-
-            $scope.mCodeGroupPage = {}
-            $scope.mCodeGroupPage.disease = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-disease.html"
-            $scope.mCodeGroupPage.patient = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-patient.html"
-            $scope.mCodeGroupPage.assessment = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-assessment.html"
-            $scope.mCodeGroupPage.treatment = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-treatment.html"
-            $scope.mCodeGroupPage.genomics = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-genomics.html"
-            $scope.mCodeGroupPage.outcome = "https://build.fhir.org/ig/HL7/fhir-mCODE-ig/group-outcome.html"
-
-
-
-
-
-
-/* - leave until we figure out dependencies
-            //download the Concept map and generate the hash that lists conditional refsets by code
-            modelsSvc.getConceptMapHash().then(
-                function (map) {
-                    $scope.conceptMap = map
-                    console.log(map)
-                }
-            )
-*/
-
 
 
             $scope.export = function () {
@@ -772,8 +731,6 @@ angular.module("pocApp")
                     }
 
 
-
-
                 },500)
 
 
@@ -821,8 +778,6 @@ angular.module("pocApp")
                 }).bind("loaded.jstree", function (event, data) {
                     let id = treeData[0].id
 
-                   // let treeObject = $(this).jstree(true).get_json('#', { 'flat': true })
-
 
                     $(this).jstree("open_node",id);
 
@@ -830,9 +785,6 @@ angular.module("pocApp")
                         $(this).jstree("open_node",$scope.selectedModel.name);
                         $(this).jstree("select_node",$scope.selectedModel.name);
                     }
-
-
-
 
                     $scope.$digest();
                 });
@@ -858,20 +810,6 @@ angular.module("pocApp")
                 }).bind("loaded.jstree", function (event, data) {
                     let id = treeData[0].id
                     $(this).jstree("open_node",id);
-
-
-
-                    /*.bind("loaded.jstree", function (event, data) {
-                        console.log('loaded')
-                        $(this).jstree("open_node","root");
-                        if ($scope.selectedQNode) {
-                            $(this).jstree("select_node",$scope.selectedQNode.id);
-                            $(this).jstree("open_node",$scope.selectedQNode.id);
-                            console.log('node populated: ' + $scope.selectedQNode.id)
-                           // $(this).jstree("open_node",$scope.selectedQNode.id);
-                        }
-                    })*/
-
 
                     $scope.$digest();
                 });
@@ -1146,15 +1084,17 @@ angular.module("pocApp")
 
                         }
 
+                        //rebuild the snapshots
+
+
+
                         $scope.updateTermSummary()
                     }
-/*
 
-                    //record that changes were made
-                    modelDGSvc.updateChanges($scope.selectedModel,
-                        {edPath:ed.path,
-                            msg:changes},$scope)
-*/
+
+
+                    $scope.makeSnapshots()
+
                     //rebuild fullList and re-draw the tree
                     $scope.refreshFullList($scope.selectedModel)
 

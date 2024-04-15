@@ -1225,7 +1225,8 @@
               <input class="form-control" placeholder="Filter on path" ng-model="input.diffFilter"/>
 
               <div class="list-group myScroll">
-                <div ng-class="{'list-group-item':true,listItemSelected:input.selectedDiff.path == ed.path}" ng-click="input.selectedDiff = ed"
+                <div ng-class="{'list-group-item':true,listItemSelected:input.selectedDiff.path == ed.path}"
+                     ng-click="input.selectedDiff = ed"
                      ng-show="showDiff(input.diffFilter,ed.path)"
                      ng-repeat="ed in selectedModel.diff">
                   {{ed.path}}
