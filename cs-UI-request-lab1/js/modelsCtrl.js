@@ -1610,6 +1610,10 @@ angular.module("pocApp")
                     vo.allElements = snapshotSvc.getFullListOfElements(dg.name)
 
 
+                    $scope.relationshipsSummary = snapshotSvc.getRelationshipsSummary(dg.name)
+
+
+
                     console.log('------------')
                 } else {
 

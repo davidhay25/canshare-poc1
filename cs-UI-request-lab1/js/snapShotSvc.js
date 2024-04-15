@@ -13,7 +13,8 @@ angular.module("pocApp")
         logIndex=0              //An incremental index for log entries
         hashHierarchy = {}      //the hierarchy for each dg
         hashReferences = {}     //references by DG. This is used for the summary - not in processing...
-        hashHistory = {}        //history if changes as tge dg hierarchy is traverser
+        hashHistory = {}        //history of changes as the dg hierarchy is traversed
+        hashChildren = {}       //all direct children for a DG - used for the summary
 
 
         //Before creating the snapshots
@@ -25,8 +26,9 @@ angular.module("pocApp")
             //errors = []
             logIndex=0              //An incremental index for log entries
             hashHierarchy = {}      //the hierarchy for each dg
+            hashChildren = {}       //all direct children for a DG - used for the summary
             hashReferences = {}     //references by DG. This is used for the summary - not in processing...
-            hashHistory = {}
+            hashHistory = {}        ////history of changes as the dg hierarchy is traversed
         }
 
 
@@ -235,12 +237,19 @@ angular.module("pocApp")
             //create parental hierarchy for DG
 
             hashHierarchy[dg.name] = []
+            //hashChildren[dg.name] = []
 
             let dgName = dg.name
             let arHierarchy = [dgName]
 
             let tmpDG = dg
             let ctr = 0
+
+            //we only want immediate children. This is for reporting only
+            if (tmpDG.parent) {
+                hashChildren[tmpDG.parent] = hashChildren[tmpDG.parent] || []
+                hashChildren[tmpDG.parent].push(dgName)
+            }
 
             while (tmpDG.parent) {
                 let parent = tmpDG.parent
@@ -516,7 +525,17 @@ angular.module("pocApp")
             getChangeHistory : function (dgName) {
                 return hashHistory[dgName]
             },
+            getRelationshipsSummary : function (dgName) {
+                //summarizes the parents, direct children & references
+                let summary = {}
+                summary.parents = hashHierarchy[dgName]
+                summary.references = hashReferences[dgName]
+                summary.children = hashChildren[dgName]
 
+
+
+                return summary
+            },
             getFullListOfElements: function (dgName) {
                 //return the full list of elements for a DG. In the format of the existing full element list.
                 let lst = []
