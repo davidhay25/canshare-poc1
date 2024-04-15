@@ -8,6 +8,8 @@ angular.module("pocApp")
                 delete clone.diff
                 delete clone.snapshot
                 delete clone.snapshotComplete
+                delete clone.changes
+                delete clone.overrides
                 return clone
             }
 

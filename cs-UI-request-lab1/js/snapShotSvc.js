@@ -16,6 +16,7 @@ angular.module("pocApp")
         hashHistory = {}        //history if changes as tge dg hierarchy is traverser
 
 
+        //Before creating the snapshots
         function clearInternalCaches() {
             allDgSnapshot = {}      //a hash of all DGs with snapshots
             lstAllDG = []           //an alphabetical list of all DGs
@@ -27,6 +28,7 @@ angular.module("pocApp")
             hashReferences = {}     //references by DG. This is used for the summary - not in processing...
             hashHistory = {}
         }
+
 
         function logger(msg,dgName,isError,details) {
             if (logToConsole) {
@@ -53,13 +55,13 @@ angular.module("pocApp")
 
         //When a DG overrides an imported reference, the element will duplicate as it will be brought in
         //with the references DG as well as present as the override diff. We remove them here into a separate
-        //element on the DG and apply them once the snapshot has been completely created
+        //element on the DG (as a hash) and apply them once the snapshot has been completely created
+        //note that the override only contains overrides for references.
         function createDgOverride(dg) {
 
-            //so we first create a hash with the first segment of the references, then check that before inserting
+            //so we first create a hash containing all references
             let hashReferenceEds = {}
             dg.fullDiff.forEach(function (ed) {
-                //let ed = hashEdPath[path]
                 let type = ed.type[0]
                 if (fhirDataTypes.indexOf(type) == -1) {
                     //this is a reference to a DG
@@ -70,12 +72,12 @@ angular.module("pocApp")
                 }
             })
 
-            //now create the override list, and remove the overrides from the
+            //now create the override list, and remove the overrides from the full Diff
 
             let newFullDiff = []        //this will be a full diff with the overrides removed
             dg.fullDiff.forEach(function (ed) {
 
-                //check each one against the hash of refernce elements.
+                //check each one against the hash of reference elements.
                 let isOverride = false
                 for (const key of Object.keys(hashReferenceEds)) {
                     if (ed.path.isChildPath(key)) {
@@ -88,8 +90,6 @@ angular.module("pocApp")
                 }
 
 
-
-
                 //it wasn't an override, so it stays in the fulldiff
                 if (! isOverride) {
                     newFullDiff.push(ed)
@@ -98,8 +98,6 @@ angular.module("pocApp")
 
             })
             dg.fullDiff = newFullDiff
-
-
         }
 
 
@@ -114,7 +112,7 @@ angular.module("pocApp")
 
             //now, create a diff array that has all elements
             let arFullDiffPath = []     //will contain paths of all elements in the expanded DG
-            let hashEdPath = {}         //a hash, keyed by path than has the DG at that path
+            let hashEdPath = {}         //a hash, keyed by path than has the DG at that path. This may be replaced by subsequent DG's in the hierarchy
             let arHx = []               //history of changes made by each DG. will contain {dhName: changes:[]}
             hashHistory[dg.name] = arHx //
 
@@ -141,8 +139,7 @@ angular.module("pocApp")
                     let path = ed.path
                     let pos = arFullDiffPath.indexOf(path)
                     if (pos == -1) {
-                        //no it doesn't. Add it to the list - unless the mult is set to 0..0
-                        //add it to the list. Even if it is 0..0 - it could be removing part of a referenced DG so we need it for later
+                        //no it doesn't add it to the list. Even if it is 0..0 - it could be removing part of a referenced DG so we need it for later
 
                         ed.sourceModelName = dgName     //the DG where this ed was added.
                         arFullDiffPath.push(path)
@@ -163,7 +160,7 @@ angular.module("pocApp")
 
                     } else {
                         //yes, it already exists
-                        //alway add it to the diff
+                        //update the hash with the new ed
 
                         hashEdPath[path] = ed
                         changesThisDg.push({msg:`Replaced ${ed.path}`,ed:ed })
@@ -184,7 +181,7 @@ angular.module("pocApp")
                 }
             }
 
-            //now arFullDiffPath has the list of all elements in the expanded diff and hashEdPath has the eds
+            //now arFullDiffPath has the ordered list of all elements in the expanded diff and hashEdPath has the eds
 
             //now we can assemble the full diff and the start of the snapshot.
             //they start the same, but as the elements in fullDiff that are DG's are processed later, the contents are added
@@ -193,73 +190,32 @@ angular.module("pocApp")
 
             hashReferences[dg.name] = []    //the list of all references from this dg to another. For the summary
 
-            /*
-            This won't work as the 'original' diff may have come from a parent
 
-            //If an element starts with the same segment as one that is a reference, then it is intended
-            //to overwite the elements brought into the DG by the reference. We don't want to insert them
-            //into the fullDiff / snapshot as they will be duplications - and in the wrong place. We'll apply
-            //them once the DG has been completely assembled, but ignore them before then.
+            //hashReferenceEds = {}   //temp, debugging
 
-
-            */
-
-
-            hashReferenceEds = {}   //temp, debugging
-
-            //now we can create the fullDiff / snapshot
-            //let arElements = []     //for the log
+            //now we can create the fullDiff
             arFullDiffPath.forEach(function (path) {
 
                 //if we don't use a clone, then it's a reference to a common ed so if it's used more than
                 //once, it won't get updated in some cases...
                 let edClone = angular.copy(hashEdPath[path])
 
-
+                //we always add it to the full diff. If it has been overridden, then the most recent value will be at the path
                 dg.fullDiff.push(edClone)
-                //dg.snapshot.push(edClone)       //other elements are added to the snapshot as referenced DGs are inflated
-                //arElements.push(edClone)
 
                 if (edClone.dgToBeInserted) {
-                    //This is a reference to another dg
+                    //This is a reference to another dg. For the reporting
                     hashReferences[dg.name].push(edClone)
                 }
 
-/*
-                //we need to determine if this ed is an override to the contents of a reference
-                let firstSegment = getFirstPathSegment(path)
-
-
-                if (path !== firstSegment && hashReferenceEds[firstSegment]) { //otherwise it matches the element defining the reference
-                    //this is an ed that is an override to a reference element. We add it to a separate
-                    //collection on the DG, but not to the fullDiff or snapshot. It will be applied
-                    //once all referenced DG's have been imported into the DG
-                    dg.overrides = dg.overrides || []
-                    dg.overrides.push(edClone)
-                } else {
-                    dg.fullDiff.push(edClone)
-                    dg.snapshot.push(edClone)       //other elements are added to the snapshot as referenced DGs are inflated
-                    arElements.push(edClone)
-
-                    if (edClone.dgToBeInserted) {
-                        //This is a reference to another dg
-                        hashReferences[dg.name].push(edClone)
-                    }
-                }
-*/
-
-
-
-
-                //dg.fullDiff.push(hashEdPath[path])
-                //dg.snapshot.push(hashEdPath[path])
             })
 
 
-            //create the override collection and remove overrides from the full diff
+            //create the override hash on the DG and remove override elements on referenced elements from the full diff
+            //into the overrides note that this does not includes Groups - they remain in the fullDifs and are processed
             createDgOverride(dg)
 
-            //now we can create the initial snapshot (override DG's will have been removed from the fullDiff
+            //now we can create the initial snapshot (override DG's will have been removed from the fullDiff)
             let arElements = []     //for the log
 
             dg.snapshot = []
@@ -270,7 +226,6 @@ angular.module("pocApp")
 
             let msg = `${dg.name}: Created initial snapshot with ${arElements.length} elements`
             logger(msg,dg.name,false,arElements)
-
 
         }
 
@@ -337,7 +292,8 @@ angular.module("pocApp")
                         //there is an override
                         let overrideEd = dg.overrides[ed.path]
                         if (overrideEd.mult !== '0..0') {
-                            //if the cardinality is 0..0 just drop it. Otherwise the override ed goes into the snapshot
+                            //if the cardinality is 0..0 just drop it. Otherwise, the override ed goes into the snapshot
+                            //todo - do we need to look at element children as well here - I don't think so
                             newSnapshot.push(overrideEd)
                         }
                     } else {
@@ -346,11 +302,12 @@ angular.module("pocApp")
                     }
                 })
 
-            dg.snapshot = newSnapshot
+                dg.snapshot = newSnapshot
             }
         }
 
-        //fill in all the datatypes/dgs
+        //examine all the referenced dgs and import the elements from the referenced DG. We need multiple cycles
+        //to allow dgs to be progressively completed. Once a DG snapshot has been completed, the overrides (includeing groups) can be applied
         function processDataGroups() {
 
             let moreToGo = true     //wil keep on going until all DGs have had their snapshot created done (or can't go any further)
@@ -365,35 +322,35 @@ angular.module("pocApp")
 
                     if (! dg.snapshotComplete) {            //the snapshot is not yet complete
                         //the fullDiff is the set of diff elements created by traversing the hierarchy from ultimate parent
-                        //down to the DG.
+                        //down to the DG. Overrides to referenced dgs are removed into the dg.overrides hash (but not groups)
 
                         //moreRefsToInsert will be set true if we find a reference to a DG that doesn't yet have a complete snapshot.
                         // If it remains false after examining all elements in the fullDiff then
                         //it means that all DG references have been inserted into the snapshot and the DG snapshot is complete
+                        //at that point the overrides can be applied.
+
                         let moreRefsToInsert = false
                         dg.fullDiff.forEach(function (ed) {
                             //the .dgToBeInserted flag is set when creating the fullDiff element to indicate that this element
-                            //is a DG whose snapshot needs to be inserted
+                            //is a reference to a DG whose snapshot needs to be inserted
 
                             if (ed.dgToBeInserted) {
                                 let msg1 = `Checking ${dg.name}.${ed.path} to insert ${ed.dgToBeInserted}`
                                 logger(msg1,dg.name)
                                 let insertPath = ed.path        //the path in the dg where the elements from the referenced DG are to be inserted
 
-                                //let dgToInsert = angular.copy(allDgSnapshot[ed.dgToBeInserted])
                                 let dgToInsert = allDgSnapshot[ed.dgToBeInserted]
                                 if (dgToInsert) {
                                     //does the DG to insert have a completed snapshot? (In which case it is ready to be inserted)
                                     if (dgToInsert.snapshotComplete) {
-                                        //yes it does! We can add the snapnsho contents at the indicated path
+                                        //yes it does! We can add the snapshot contents at the indicated path
                                         //first, create the array to insert into the snapshot (we have to update the path)
                                         let arElements = []
-                                       // let details = []    //details for the log
+
                                         dgToInsert.snapshot.forEach(function (edToInsert) {
                                             let ed1 = angular.copy(edToInsert)  //as we're updating the path...
                                             let path = `${insertPath}.${edToInsert.path}`
                                             ed1.path = path
-                                            //details.push(path)
                                             arElements.push(ed1)
                                         })
 
@@ -406,6 +363,7 @@ angular.module("pocApp")
 
                                         ed.dgToBeInserted = false   //mark this dg as having been inserted (false let's us know it was processed)
                                     } else {
+                                        //no, the referenced DG has yet to be fully expanded.
                                         let msg = `${ed.dgToBeInserted} not yet complete at ${dg.name}.${ed.path}`
                                         logger(msg,dg.name,true)
                                         moreRefsToInsert = true //we found an ed to insert, but it didn't have a completed snapshot
@@ -417,8 +375,7 @@ angular.module("pocApp")
                             }
                         })
 
-                        //if moreRefsToInsert is true, it means that there arereference elements in the DG that haven't been completed yet
-                        //snapshot from the referenced element
+                        //if moreRefsToInsert is true, it means that there are reference elements in the DG to other DGs that haven't been completed yet
                         if (! moreRefsToInsert) {
                             logger(`DG: ${dg.name} has a completed snapshot !`,dg.name)
                             //todo - remove any specific elements from the diff
@@ -426,14 +383,16 @@ angular.module("pocApp")
 
                             //now that the DG is complete, remove those where references have been 'zeroed out' in the diff and
                             //replace those changed in the diff
-                            //we can't do that before as the snapshot needs to be created first
-                             applyOverrides(dg)
+                            //we can't do that before as the full needs to be created first
+                             applyOverrides(dg)     //todo the applyOverrides may also need to be applied
 
 
-                            //but there are also Groups which may have hidden elements.
+                            //but there are also Groups which may have hidden elements or overrides.
                             //these are being treated separately - but in a similar way to references
+                            //they
 
                             //create a hash of all hidden paths
+                            //todo - should we be iterating over fulldiff?
                             let hashHidden = {}
                             dg.diff.forEach(function (ed) {  //from the DG diff
                                 if (ed.mult == '0..0') {
@@ -457,16 +416,6 @@ angular.module("pocApp")
                                     }
                                 }
 
-                                //if it can be included (c=mult !== 0..0) then see if it matches one already
-                                //in the DG - eg from a referenced element. If there is then the one from the
-                                //diff needs to replace the imported one. eg a value may have been fixed or
-                                //valueset changed
-                                if (canInclude) {
-
-                                }
-
-
-
                                 if (canInclude) {
                                     newSnapshot.push(ed)
                                 }
@@ -489,7 +438,7 @@ angular.module("pocApp")
                             })
                             */
 
-
+                            logger(`DG: ${dg.name} snapshot has been completed`,dg.name)
                             dg.snapshotComplete = true
                         } else {
                             logger(`DG: ${dg.name} not yet completed`,dg.name)
@@ -501,7 +450,6 @@ angular.module("pocApp")
                 //just to terminate the loop. todo need to check that all DG's have a completed snapshot
                 if (ctr > 100) {
                     moreToGo = false
-
                 }
 
             }
@@ -526,13 +474,13 @@ angular.module("pocApp")
                 //perform the 'inflation' of DG's that results in the snapshot
                 processDataGroups()
 
-                console.log(hashHistory)
+                //console.log(hashHistory)
 
                 //console.log(utilsSvc.getSizeOfObject(allDgSnapshot))
 
                 console.log(`Size of SnapShots: ${utilsSvc.getSizeOfObject(allDgSnapshot)/1024} K`)
 
-                //construct an alphabetical list of DGs
+                //construct an alphabetical list of DGs for the UI
                 Object.keys(allDgSnapshot).forEach(function (dgName) {
                     lstAllDG.push(allDgSnapshot[dgName])
                 })
@@ -570,7 +518,7 @@ angular.module("pocApp")
             },
 
             getFullListOfElements: function (dgName) {
-                //return the full list of elements for a DG
+                //return the full list of elements for a DG. In the format of the existing full element list.
                 let lst = []
                 let root = {path:dgName,title:dgName,kind:"root"}
                 lst.push({ed:root})

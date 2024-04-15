@@ -141,6 +141,7 @@
             <div class="col-md-6">
               <ul>
                 <li ng-repeat="ed in selectedLogDg.diff"
+                    ng-class="{listItemSelected: ed.path == input.ssDiff.path}"
                     style="cursor: pointer"
                   ng-click="input.ssDiff = ed">
                   {{ed.path}} ({{ed.mult}})
@@ -171,17 +172,18 @@
                   <ul>
                     <li ng-repeat="ed in selectedLogDg.fullDiff"
                         style="cursor: pointer"
+                        ng-class="{listItemSelected: ed.path == input.ssFullDiff.path}"
                         ng-click="input.ssFullDiff = ed">
-                      {{ed.path}}
+                      {{ed.path}} ({{ed.mult}})
                     </li>
                   </ul>
-                  <em>Excludes all elements with Cardinality = 0..0</em>
+                  <em>Excludes all elements that override referenced DGs (see overrides tab)</em>
                 </div>
                 <div class="col-md-6">
                   <pre>{{input.ssFullDiff | json}}</pre>
                 </div>
               </div>
-              <em>This contains elements added in this DG and it's parents but not overrides</em>
+              <em>This contains elements added in this DG and it's parents.</em>
             </uib-tab>
 
             <uib-tab heading="Overrides">
@@ -190,6 +192,7 @@
                   <ul>
                     <li ng-repeat="(k,v) in selectedLogDg.overrides"
                         style="cursor: pointer"
+                        ng-class="{listItemSelected: v.path == input.ssOverride.path}"
                         ng-click="input.ssOverride = v">
                       {{k}}
                     </li>
@@ -253,7 +256,7 @@
                 <li ng-repeat="ed in selectedLogDg.snapshot track by $index"
                     style="cursor: pointer"
                     ng-click="input.ssSnapshotEd = ed">
-                  {{ed.path}}
+                  {{ed.path}} ({{ed.mult}})
                 </li>
               </ul>
             </div>

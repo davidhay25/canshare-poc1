@@ -59,16 +59,25 @@ angular.module("pocApp")
             $scope.makeSnapshots()
 
 
+            function clearSsDetails() {
+                delete $scope.input.ssDiff
+                delete $scope.input.ssFullDiff
+                delete $scope.input.ssOverride
+                delete $scope.input.ssChangeItemEd
+
+            }
 
             $scope.getLogDG = function (row) {
                 $scope.selectedLogDg = snapshotSvc.getDG(row.dgName)
                 $scope.selectedLogRow = row
+                clearSsDetails()
             }
 
             $scope.showSSLog = function (dgName) {
                 $scope.selectedLogDg = snapshotSvc.getDG(dgName)
                 $scope.input.ssFilter = $scope.selectedLogDg
                 $scope.input.mainTabActive = $scope.ui.tabSnapshot
+                clearSsDetails()
             }
 
             //get a single DG
@@ -316,8 +325,14 @@ angular.module("pocApp")
                 $scope.allFsh = ""
                 Object.keys($scope.hashAllDG).forEach(function (key) {
                     let dg = $scope.hashAllDG[key]
-                    let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
-                    let fsh = igSvc.makeFshForDG(dg,vo.allElements)
+
+
+                    let allElements = snapshotSvc.getFullListOfElements(dg.name)
+                    let fsh = igSvc.makeFshForDG(dg,allElements)
+
+                    //let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
+                    //let fsh = igSvc.makeFshForDG(dg,vo.allElements)
+
                     $scope.allFsh += fsh
                     $scope.allFsh += '\n\n'
 
@@ -1584,32 +1599,17 @@ angular.module("pocApp")
 
                 /* todo - will need to generate the graph and relationships in thw new way...
 
-                //determine all the elements in this DG by recursing up the inheritance hierarchy
-                //and 'across' elements that are referenced DGs. Note that a referenced DG may have its own hierarchy
-                let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
-                $scope.graphData = vo.graphData
-                $scope.relationshipsSummary = vo.relationshipsSummary   //all the relationships - parent and reference - for this type
+
 */
 
-                /*
-                //there's currently an issue with the DG assembly in some cases. Looking into it, but for now this will at least stop a crash
-                if (modelsSvc.fixDgDiff(dg,vo.allElements)) {
-                    //there were issues that were fixed - need to re-generate the full list
-                    vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
 
-                    if (vo.log && vo.log.length > 0) {
-                      //  $scope.errorLog = vo.log
-                    }
-                }
-
-                */
 
                 if ($scope.newInflater) {
                     console.log('------------')
 
                     vo.allElements = snapshotSvc.getFullListOfElements(dg.name)
 
-                    //vo.allElements = dgInflaterSvc.getFullListOfDGElements(dg,$scope.input.types,$scope.hashAllDG).allElements
+
                     console.log('------------')
                 } else {
 
