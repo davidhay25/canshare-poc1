@@ -6,7 +6,8 @@ angular.module("pocApp")
         fhirDataTypes = ['boolean','code','date','dateTime','decimal','integer','string','Address','Attachment','CodeableConcept','ContactPoint','Group','HumanName','Identifier','Period','Quantity','Ratio']
 
         allDgSnapshot = {}      //a hash of all DGs with snapshots
-        lstAllDG = []           //an alphabetical list of all DGs
+        lstAllDG = []           //an alphabetical list of all DGs by name
+        lstAllDGTitle = []      //an alphabetical list by title
         logToConsole = false    //whether to log to console. Passed in the makeSnapshots call
         log = []                //the main log
         //errors = []
@@ -21,6 +22,7 @@ angular.module("pocApp")
         function clearInternalCaches() {
             allDgSnapshot = {}      //a hash of all DGs with snapshots
             lstAllDG = []           //an alphabetical list of all DGs
+            lstAllDGTitle = []      //an alphabetical list by title
             logToConsole = false    //whether to log to console. Passed in the makeSnapshots call
             log = []                //the main log
             //errors = []
@@ -126,9 +128,10 @@ angular.module("pocApp")
                 arHx.push({dgName:dgName,changes:changesThisDg})
 
                 let cDg = allDg[dgName]  //cDg = component Dg.
+                //let cDg = angular.copy(allDg[dgName])  //cDg = component Dg.
                 for (const ed of cDg.diff) {
 
-                    delete ed.sourceModelName   //the previous version saved this in the DG. I prefer to add it here.
+                    //temp delete ed.sourceModelName   //the previous version saved this in the DG. I prefer to add it here.
 
                     //if the datatype is not a FHIR datatype - it's another DG - then it will need to have the members inserted
                     //into the target DG immediately after this element - once it's been inflated...
@@ -141,24 +144,14 @@ angular.module("pocApp")
                     let path = ed.path
                     let pos = arFullDiffPath.indexOf(path)
                     if (pos == -1) {
-                        //no it doesn't add it to the list. Even if it is 0..0 - it could be removing part of a referenced DG so we need it for later
+                        //no it doesn't  - add it to the list.
+                        // Even if it is 0..0 - it could be removing part of a referenced DG so we need it for later
 
                         ed.sourceModelName = dgName     //the DG where this ed was added.
                         arFullDiffPath.push(path)
                         hashEdPath[path] = ed   //and store the ed in the hash
                         changesThisDg.push({msg:`Added ${ed.path}`,ed:ed })
 
-                        /*
-                                                if (ed.mult !== '0..0') {
-                                                    ed.sourceModelName = dgName     //the DG where this ed was added.
-                                                    arFullDiffPath.push(path)
-                                                    hashEdPath[path] = ed   //and store the ed in the hash
-                                                    changesThisDg.push({msg:`Added ${ed.path}`,ed:ed })
-                                                } else {
-
-                                                    changesThisDg.push({msg:`Ignored ${cDg.name}.${ed.path} as it is 0..0 and wasn't in the running list`,ed:ed })
-                                                }
-                                                */
 
                     } else {
                         //yes, it already exists
@@ -167,17 +160,6 @@ angular.module("pocApp")
                         hashEdPath[path] = ed
                         changesThisDg.push({msg:`Replaced ${ed.path}`,ed:ed })
 
-                        /*
-                        if (ed.mult == '0..0') {
-                            //It's hidden. remove it from the array
-                            arFullDiffPath.splice(pos,1)
-                            changesThisDg.push({msg:`Removed ${ed.path}`,ed:ed })
-                        } else {
-                            //it's just been replaced by a new one...
-                            hashEdPath[path] = ed
-                            changesThisDg.push({msg:`Replaced ${ed.path}`,ed:ed })
-                        }
-                        */
 
                     }
                 }
@@ -190,11 +172,6 @@ angular.module("pocApp")
             //to the snapshot
 
 
-          //  hashReferences[dg.name] = []    //the list of all references from this dg to another. For the summary
-
-
-            //hashReferenceEds = {}   //temp, debugging
-
             //now we can create the fullDiff
             arFullDiffPath.forEach(function (path) {
 
@@ -205,10 +182,6 @@ angular.module("pocApp")
                 //we always add it to the full diff. If it has been overridden, then the most recent value will be at the path
                 dg.fullDiff.push(edClone)
 
-               // if (edClone.dgToBeInserted) {
-                    //This is a reference to another dg. For the reporting
-                  //  hashReferences[dg.name].push(edClone)
-               // }
 
             })
 
@@ -300,8 +273,7 @@ angular.module("pocApp")
                 let newSnapshot = []
 
                 dg.snapshot.forEach(function (ed) {
-                    let processedInOverride  = false  //if the ed is an override or child of an override then it will be processed in the hanndler. If not, then add it
-
+                    let processedInOverride  = false  //if the ed is an override or child of an override then it will be processed in the handler. If not, then add it
 
                     for (const key of Object.keys(dg.overrides)) {
                         if (ed.path == key || ed.path.isChildPath(key)) {
@@ -430,15 +402,14 @@ angular.module("pocApp")
                              applyOverrides(dg)     //todo the applyOverrides may also need to be applied
 
 
-                            //but there are also Groups which may have hidden elements or overrides.
+                            //but there are also hierarchical Groups which may have hidden elements or overrides.
                             //these are being treated separately - but in a similar way to references
-                            //they
 
                             //create a hash of all hidden paths
                             //todo - should we be iterating over fulldiff?
                             let hashHidden = {}
                             //dg.diff.forEach(function (ed) {  //from the DG diff
-                            //I'm pretty sure that anything 0..0 in the original diff is also present in the snapshot at this point
+                            //Anything 0..0 in the original diff is also present in the snapshot at this point
                             //unless it's a reference
                             dg.snapshot.forEach(function (ed) {  //from the DG diff
                                 if (ed.mult == '0..0') {
@@ -466,7 +437,7 @@ angular.module("pocApp")
                                 if (canInclude) {
                                     let type = ed.type[0]
                                     if (fhirDataTypes.indexOf(type) == -1) {
-                                        hashReferences[dg.name].push({path:ed.path,dgName: type})
+                                        hashReferences[dg.name].push({path:ed.path,dgName: type,ed:ed})
                                     }
 
                                     finalSnapshot.push(ed)
@@ -475,22 +446,7 @@ angular.module("pocApp")
                             dg.snapshot = finalSnapshot
 
 
-
-                            /*
-                            A version that uses 0..0 to hide the elements. Keep for the moment
-                            dg.snapshot.forEach(function (ed) {
-                                for (const key of Object.keys(hashHidden)) {
-                                    if (ed.path.isChildPath(key)) {
-                                        ed.mult = '0..0'
-                                        let msg = `DG: ${dg.name} has directly hidden ${key}`
-                                        logger(msg,dg.name,true)
-                                        break
-                                    }
-                                }
-                            })
-                            */
-
-                            logger(`DG: ${dg.name} snapshot has been completed`,dg.name)
+                            logger(`DG: ${dg.name} snapshot has been finalised`,dg.name)
                             dg.snapshotComplete = true
                         } else {
                             logger(`DG: ${dg.name} not yet completed`,dg.name)
@@ -516,34 +472,49 @@ angular.module("pocApp")
 
                 allDgSnapshot = angular.copy(hashAllDG) //this will be a local clone
 
-                //construct a complete diff for each dg including the hierarchy
-                Object.keys(allDgSnapshot).forEach(function (dgName) {
-                    let dg = allDgSnapshot[dgName]
-                    makeFullDiff(dg, allDgSnapshot)
+                try {
+                    //construct a complete diff for each dg including the hierarchy
+                    Object.keys(allDgSnapshot).forEach(function (dgName) {
+                        let dg = allDgSnapshot[dgName]
+                        makeFullDiff(dg, allDgSnapshot)
 
-                })
+                    })
 
-                //perform the 'inflation' of DG's that results in the snapshot
-                processDataGroups()
+                    //perform the 'inflation' of DG's that results in the snapshot
+                    processDataGroups()
 
-                //console.log(hashHistory)
 
-                //console.log(utilsSvc.getSizeOfObject(allDgSnapshot))
+                    console.log(`Size of SnapShots: ${utilsSvc.getSizeOfObject(allDgSnapshot)/1024} K`)
 
-                console.log(`Size of SnapShots: ${utilsSvc.getSizeOfObject(allDgSnapshot)/1024} K`)
+                    //construct an alphabetical list of DGs for the UI
+                    Object.keys(allDgSnapshot).forEach(function (dgName) {
+                        lstAllDG.push(allDgSnapshot[dgName])
+                        lstAllDGTitle.push(allDgSnapshot[dgName])
+                    })
 
-                //construct an alphabetical list of DGs for the UI
-                Object.keys(allDgSnapshot).forEach(function (dgName) {
-                    lstAllDG.push(allDgSnapshot[dgName])
-                })
+                    lstAllDG.sort(function (a,b) {
+                        if (a.name > b.name) {
+                            return 1
+                        } else {
+                            return -1
+                        }
+                    })
 
-                lstAllDG.sort(function (a,b) {
-                    if (a.name > b.name) {
-                        return 1
-                    } else {
-                        return -1
-                    }
-                })
+                    lstAllDGTitle.sort(function (a,b) {
+                        if (a.title > b.title) {
+                            return 1
+                        } else {
+                            return -1
+                        }
+                    })
+
+
+
+                } catch (ex) {
+                    alert(`There was an exception during processing. You should revert your latest update. ${angular.toJson(ex)}`)
+                }
+
+
 
                 return {log:log}
 
@@ -553,8 +524,12 @@ angular.module("pocApp")
                 return allDgSnapshot
             },
             getDGList : function () {
-                //return an alphabetical list of DG
+                //return an alphabetical list of DG by name
                 return lstAllDG
+            },
+            getDGListTitle : function () {
+                //return an alphabetical list of DG by title
+                return lstAllDGTitle
             },
             getDG: function (dgName) {
                 return allDgSnapshot[dgName]

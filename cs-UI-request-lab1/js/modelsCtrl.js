@@ -3,7 +3,7 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,makeQSvc,orderingSvc,makeCompQSvc,
-                  dgInflaterSvc,snapshotSvc,
+                  snapshotSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
 
@@ -50,11 +50,12 @@ angular.module("pocApp")
 
 
             $scope.makeSnapshots = function() {
-                //let voSs = snapshotSvc.makeSnapshots($localStorage.world.dataGroups,true)
+                console.log('-------->   building snapshots...')
                 let voSs = snapshotSvc.makeSnapshots($scope.hashAllDG,true)
                 $scope.snapshotLog = voSs.log
-                $scope.lstAllDGSS = snapshotSvc.getDGList()     //all datagroups
-                console.log('-------->   building snapshots...')
+                $scope.lstAllDGSS = snapshotSvc.getDGList()     //all datagroups by name
+                $scope.lstAllDGSSTitle = snapshotSvc.getDGListTitle()
+
             }
             $scope.makeSnapshots()
 
@@ -1191,7 +1192,6 @@ angular.module("pocApp")
                 $scope.codeSummary = modelTermSvc.makeCodeSummary($scope.hashAllDG)
 
             }
-
             $scope.updateTermSummary()
 
             $scope.viewVS = function (item,refsetId) {
@@ -1254,13 +1254,6 @@ angular.module("pocApp")
             }
             $scope.refreshUpdates()
 
-            /*
-            $scope.$on('dgUpdated',function(ev,obj){
-
-                $scope.refreshUpdates()
-            })
-
-*/
 
 
             //used in the DG list filtering
@@ -1470,9 +1463,6 @@ angular.module("pocApp")
             $scope.selectModelFromTypeUsage = function (model) {
                 $scope.selectedModelFromTypeUsage = model
             }
-
-
-
 
 
             function clearB4Select() {
@@ -1880,9 +1870,7 @@ angular.module("pocApp")
                 console.log('redraw')
                 $scope.refreshFullList($scope.selectedModel)
 
-              //  orderingSvc.sortFullListByInsertAfter($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
-              //  let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
-              //  makeDGTree(treeData)
+
             })
 
             $(document).on('dnd_stop.vakata', function (e, data) {

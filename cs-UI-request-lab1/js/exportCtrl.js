@@ -41,7 +41,15 @@ angular.module("pocApp")
 
                     if (obj.dg) {
                         //allDG = obj.dg
+
+
                         $scope.uploadedDG = obj.dg
+                        /* - todo need to think about consequences of this - and what ti do about the library
+                        for (key of Object.keys($scope.uploadedDG)) {
+                            let dg = $scope.uploadedDG[key]
+                            delete dg.checkedOut
+                        }
+*/
 
                     }
 

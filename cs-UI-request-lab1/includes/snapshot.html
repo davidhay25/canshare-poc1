@@ -2,18 +2,24 @@
 
   <div class="row">
     <div class="col-md-3">
+      <div>DG by name</div>
       <select class="form-control" ng-model="input.ssFilter"
               ng-change="getLogDG({dgName:input.ssFilter.name})"
               ng-options="dg.name for dg in lstAllDGSS"></select>
+
+
       <!--
                                   <input type="text" ng-model="input.ssFilter" class="form-control" placeholder="Filter"/>
       -->
     </div>
-    <div class="col-md-2">
-      <!--
-      <input type="text" ng-model="selected"
-             uib-typeahead="dg.title for dg in lstAllDGSS | filter:$viewValue | limitTo:20" class="form-control">
-      -->
+    <div class="col-md-3">
+      <div>DG by title</div>
+      <select class="form-control" ng-model="input.ssFilter"
+              ng-change="getLogDG({dgName:input.ssFilter.name})"
+              ng-options="dg.title for dg in lstAllDGSSTitle"></select>
+    </div>
+
+    <div class="col-md-1">
     </div>
     <div class="col-md-1">
       <div class="btn btn-link pull-right" ng-click="toggleLog()">Toggle Log display</div>
@@ -59,7 +65,7 @@
       </div>
       <uib-tabset>
         <uib-tab heading="Summary">
-
+          <br/>
           <strong>MetaData</strong>
           <pre>{{selectedLogDg | dtMetaData | json}}</pre>
 
@@ -80,41 +86,19 @@
 -->
           <table class="table table-bordered">
             <tr><th>Title/Path</th><th>Card.</th><th>Type</th><th>Description</th></tr>
-            <tr ng-repeat="ed in snapshotSvc.getReferences(selectedLogDg.name)">
+            <tr ng-repeat="item in snapshotSvc.getReferences(selectedLogDg.name)">
               <td>
-                {{ed.title}}
-                <div><em>{{ed.path}}</em></div>
+                {{item.ed.title}}
+                <div><em>{{item.path}}</em></div>
               </td>
-              <td>{{ed.mult}}</td>
-              <td>{{ed.type[0]}}</td>
-              <td>{{ed.description}}</td>
+              <td>{{item.ed.mult}}</td>
+              <td>{{item.ed.type[0]}}</td>
+              <td>{{item.ed.description}}</td>
+
             </tr>
           </table>
 
-          <!--
-          <div class="row">
-            <div class="col-md-6">
-              <strong>Parents</strong>
-              <ul>
-                <li ng-repeat="parent in snapshotSvc.getHierarchy(selectedLogDg.name)">
-                  {{parent}}
-                </li>
-              </ul>
 
-
-            </div>
-            <div class="col-md-6">
-              <strong>DG references</strong>
-              <ul>
-                <li ng-repeat="ed in snapshotSvc.getReferences(selectedLogDg.name)">
-                  {{ed.title}} ({{ed.name}}) -> {{ed.type[0]}}
-                </li>
-              </ul>
-            </div>
-
-          </div>
-
-          -->
 
           <div><strong>Fixed values</strong></div>
           <em>to come</em>
@@ -127,16 +111,12 @@
           <em>to come</em>
 
 
-<!--
-          <em>The Json of the completely rendered DG</em>
-          <div class="myScroll">
-            <pre>{{selectedLogDg | json}}</pre>
-          </div>
-          -->
+
 
         </uib-tab>
         <uib-tab heading="DG Diff">
           <em>The diff element in the DG</em>
+          <br/><br/>
           <div class="row">
             <div class="col-md-6">
               <ul>
@@ -161,8 +141,8 @@
           -->
         </uib-tab>
         <uib-tab heading="DG full diff">
-          <em>The 'full' diff - including from parents - after applying cardinality changes</em>
-
+          <em>The 'full' diff - after processing the parental hierarchy</em>
+          <br/><br/>
 
 
           <uib-tabset>
@@ -217,6 +197,7 @@
                       <strong>{{item.dgName}}</strong>
                       <ul>
                         <li ng-repeat="change in item.changes"
+                            ng-class="{listItemSelected: change.path == input.ssChangeItemEd.path}"
                             style="cursor: pointer;padding-left: 8px"
 
                             ng-click="input.ssChangeItemEd = change.ed">
@@ -249,11 +230,12 @@
         </uib-tab>
         <uib-tab heading="Snapshot">
           <em>Equivalent of the full element list.</em>
-          <br/>
+          <br/><br/>
           <div class="row">
             <div class="col-md-6">
               <ul>
                 <li ng-repeat="ed in selectedLogDg.snapshot track by $index"
+                    ng-class="{listItemSelected: ed.path == input.ssSnapshotEd.path}"
                     style="cursor: pointer"
                     ng-click="input.ssSnapshotEd = ed">
                   {{ed.path}} ({{ed.mult}})
@@ -277,10 +259,12 @@
 
         <uib-tab heading="Snapshot paths">
           <em>Only the paths in the snapshot</em>
+          <br/><br/>
           <div class="myScroll">
             <table class="table table-condensed table-bordered">
               <tr ng-repeat="ed in selectedLogDg.snapshot track by $index">
                 <td>{{ed.path}}</td>
+                <td>{{ed.mult}}</td>
                 <td>{{ed.type[0]}}</td>
               </tr>
             </table>
@@ -288,14 +272,32 @@
 
           </div>
         </uib-tab>
-        <uib-tab ng-show = "selectedLogRow.details" heading="Details">
+        <uib-tab ng-show = "selectedLogRow.details" heading="Details (1 step)">
           <em>Generally the elements that are inserted into the snapshot during this step.</em>
+          <br/><br/>
+
+          <div class="row">
+            <div class="col-md-6">
+              <ul>
+                <li ng-repeat="ed in selectedLogRow.details track by $index"
+                    style="cursor: pointer"
+                    ng-click="input.ssDetailsEd = ed">
+                  {{ed.path}} ({{ed.mult}})
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <pre>{{input.ssDetailsEd | json}}</pre>
+            </div>
+          </div>
+          <!--
           <ul class="list-unstyled">
-            <li ng-repeat="dg in selectedLogRow.details">
-              {{dg.path}}
+            <li ng-repeat="ed in selectedLogRow.details">
+              {{ed.path}} ({{ed.mult}})
             </li>
           </ul>
           <pre>{{selectedLogRow.details | json}}</pre>
+          -->
         </uib-tab>
       </uib-tabset>
 
