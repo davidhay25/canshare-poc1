@@ -478,8 +478,13 @@ angular.module("pocApp")
                 $scope.setCommentsThisModel()   //retrieve comments for this model
 
 
-                let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
-                $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
+
+                $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)
+
+                //let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
+                //$scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
+
+
 
                 let voQ = makeQSvc.makeQFromDG(vo.allElements,$scope.hashAllDG)
                 $scope.fullQ = voQ.Q

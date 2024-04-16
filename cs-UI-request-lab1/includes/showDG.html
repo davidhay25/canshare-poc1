@@ -746,7 +746,7 @@
               </div>
               <div><em class="clickable" ng-click="viewVS(element.ed.valueSet)">{{element.ed.valueSet}}</em></div>
 
-              <div ng-show="element.ed.options">
+              <div ng-show="element.ed.options.length > 0" >
                 <em class="clickable"
                     ng-click = "editDGOptionsList(element.ed)">View {{element.ed.options.length}} options
                 </em> </div>
@@ -952,6 +952,20 @@
         <div class="col-md-6">
           <strong>References directly from this DG</strong>
           <br/>
+
+
+          <table class="table table-bordered">
+            <tr><th>Path</th><th>Type</th></tr>
+            <tr ng-repeat="reference in relationshipsSummary.references">
+              <td>{{reference.path}}</td>
+              <td>
+                <div class = 'clickable' ng-click="termSelectDG({DGName:reference.dgName},selectedModel.name)">
+                  {{reference.dgName}}
+                </div>
+              </td>
+            </tr>
+          </table>
+<!--
           <table class="table table-bordered">
             <tr><th>Path</th><th>Type</th></tr>
             <tr ng-repeat="reference in relationshipsSummary.references">
@@ -963,6 +977,8 @@
               </td>
             </tr>
           </table>
+
+          -->
 
         </div>
       </div>

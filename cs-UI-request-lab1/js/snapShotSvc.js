@@ -85,7 +85,7 @@ angular.module("pocApp")
                     if (ed.path.isChildPath(key)) {
                         isOverride = true
 
-                        dg.overrides = dg.override || {}
+                        dg.overrides = dg.overrides || {}
                         dg.overrides[ed.path] = angular.copy(ed)
                         break
                     }
@@ -190,7 +190,7 @@ angular.module("pocApp")
             //to the snapshot
 
 
-            hashReferences[dg.name] = []    //the list of all references from this dg to another. For the summary
+          //  hashReferences[dg.name] = []    //the list of all references from this dg to another. For the summary
 
 
             //hashReferenceEds = {}   //temp, debugging
@@ -205,10 +205,10 @@ angular.module("pocApp")
                 //we always add it to the full diff. If it has been overridden, then the most recent value will be at the path
                 dg.fullDiff.push(edClone)
 
-                if (edClone.dgToBeInserted) {
+               // if (edClone.dgToBeInserted) {
                     //This is a reference to another dg. For the reporting
-                    hashReferences[dg.name].push(edClone)
-                }
+                  //  hashReferences[dg.name].push(edClone)
+               // }
 
             })
 
@@ -241,6 +241,7 @@ angular.module("pocApp")
 
             let dgName = dg.name
             let arHierarchy = [dgName]
+            //let arHierarchy = []
 
             let tmpDG = dg
             let ctr = 0
@@ -270,6 +271,8 @@ angular.module("pocApp")
                 }
 
             }
+           // arHierarchy.push(dgName)
+
             return arHierarchy
         }
 
@@ -297,18 +300,49 @@ angular.module("pocApp")
                 let newSnapshot = []
 
                 dg.snapshot.forEach(function (ed) {
+                    let processedInOverride  = false  //if the ed is an override or child of an override then it will be processed in the hanndler. If not, then add it
+
+
+                    for (const key of Object.keys(dg.overrides)) {
+                        if (ed.path == key || ed.path.isChildPath(key)) {
+                            //this is an override or child of an override
+                            processedInOverride = true      //we'll process it here
+
+                            let overrideEd = dg.overrides[key]
+                            //if it's 0..0 then drop it - otherwise add it
+                            if (overrideEd.mult !== '0..0') {
+                                newSnapshot.push(overrideEd)
+                            }
+                            break
+
+                        }
+                    }
+
+                    //if not processed by the override, then add it to the snapshot
+                    if (! processedInOverride) {
+                        newSnapshot.push(ed)
+                    }
+
+                    /*
                     if (dg.overrides[ed.path]){
                         //there is an override
                         let overrideEd = dg.overrides[ed.path]
-                        if (overrideEd.mult !== '0..0') {
+
+
+
+
+                        if (canInclude) {
+                        //if (overrideEd.mult !== '0..0') {
                             //if the cardinality is 0..0 just drop it. Otherwise, the override ed goes into the snapshot
                             //todo - do we need to look at element children as well here - I don't think so
+
                             newSnapshot.push(overrideEd)
                         }
                     } else {
                         //no override - keep in the snapshot
                         newSnapshot.push(ed)
                     }
+                    */
                 })
 
                 dg.snapshot = newSnapshot
@@ -403,7 +437,10 @@ angular.module("pocApp")
                             //create a hash of all hidden paths
                             //todo - should we be iterating over fulldiff?
                             let hashHidden = {}
-                            dg.diff.forEach(function (ed) {  //from the DG diff
+                            //dg.diff.forEach(function (ed) {  //from the DG diff
+                            //I'm pretty sure that anything 0..0 in the original diff is also present in the snapshot at this point
+                            //unless it's a reference
+                            dg.snapshot.forEach(function (ed) {  //from the DG diff
                                 if (ed.mult == '0..0') {
                                     hashHidden[ed.path] = true
                                 }
@@ -411,7 +448,8 @@ angular.module("pocApp")
 
                             //create a new snapshot list that excludes 0..0 elements
                             //also need to accomodate overrides from the main DG - eg fixing a value
-                            let newSnapshot = []
+                            hashReferences[dg.name] = []  ////now that we are building the definitive snapshot, we can build the references hash
+                            let finalSnapshot = []
 
                             dg.snapshot.forEach(function (ed) {
                                 let canInclude = true
@@ -426,10 +464,15 @@ angular.module("pocApp")
                                 }
 
                                 if (canInclude) {
-                                    newSnapshot.push(ed)
+                                    let type = ed.type[0]
+                                    if (fhirDataTypes.indexOf(type) == -1) {
+                                        hashReferences[dg.name].push({path:ed.path,dgName: type})
+                                    }
+
+                                    finalSnapshot.push(ed)
                                 }
                             })
-                            dg.snapshot = newSnapshot
+                            dg.snapshot = finalSnapshot
 
 
 

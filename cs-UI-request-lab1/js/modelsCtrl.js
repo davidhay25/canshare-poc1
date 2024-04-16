@@ -1637,6 +1637,7 @@ angular.module("pocApp")
                 //create the list of all paths in the DG. Used by the 'ordering'
                 $scope.allPaths = []
                 let cntHidden = 0, cntVisible=0
+
                 $scope.fullElementList.forEach(function (item) {
                     $scope.fullElementHash[item.ed.path] = item.ed
                     if (item.ed.mult !== '0..0') {
