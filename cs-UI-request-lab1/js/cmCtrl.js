@@ -255,7 +255,7 @@ angular.module("pocApp")
 
                 //rules engine takes:
                 //
-                let vo = cmSvc.rulesEngine($scope.input.cmProperty,$scope.local.cm.property,
+                let vo = cmSvc.rulesEngine($scope.local.cm.property,
                     $scope.selectedElement,$scope.hashExpandedVs)
 
                 $scope.matchingVS = vo.lstVS
@@ -480,7 +480,7 @@ angular.module("pocApp")
 
 
                 //now, apply the rules engine to this element and set of codes
-                let vo = cmSvc.rulesEngine(null,$scope.uiHashValues,cmElement,$scope.hashExpandedVs)
+                let vo = cmSvc.rulesEngine($scope.uiHashValues,cmElement,$scope.hashExpandedVs)
 
                 $scope.uiMatchingVS = vo.lstVS                //The valuesets from all rules that were matched
                 //$scope.uiMmatchedRules = vo.lstMatches         //the actual targets that matched
@@ -550,7 +550,7 @@ angular.module("pocApp")
             }
 
             //called when a property option in the UI changes
-            $scope.cmLookup = function (inputProp,v,propKey) {
+            $scope.cmLookupDEP = function (inputProp,v,propKey) {
                 //propKey is the property name = eg cancer-service
 
 
@@ -593,7 +593,7 @@ angular.module("pocApp")
 
                 //let vo = cmSvc.getOptionsOneProperty($scope.input.cmProperty,$scope.local.cm.property,$scope.selectedElement)
 
-                let vo = cmSvc.rulesEngine(nextProperty,params,$scope.selectedElement)
+                let vo = cmSvc.rulesEngine(params,$scope.selectedElement)
                 //$scope.matchingVS = vo.lstVS
 
 

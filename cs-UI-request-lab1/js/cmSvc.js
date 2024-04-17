@@ -11,12 +11,13 @@ angular.module("pocApp")
 
 
         return {
-            rulesEngine :  function (propertyDEP,hashInput,element,hashExpandedVs) {
-                //get the options for a property.
+            rulesEngine :  function (hashInput,element,hashExpandedVs) {
+                //get the options for a property. The actual property is not needed as we're just looking in the element
                 //parameters:
-                //  property - the property name for which concepts are sought - eg cancer-stream
+
                 //  hashInput - a hash keyed by property name that has all the properties where the user has selected a value. format {code: display:}
-                //  element -  has all the possible targets for that property (each property has one element in the CM)
+                //  element -  has all the possible targets for the property under search(each property has one element in the CM)
+                //          we don't need to specify the property - we just need all matching targets (from hashInput) in th eelement
                 //  hashExpandedVs - all the valueSets needed for the 'in-valueset' rule
 
 
@@ -49,13 +50,14 @@ angular.module("pocApp")
                         lstVs.push(target.code)
                     } else {
 
-                        let hashPropertiesExamined = {}     //a hash for all the properties in the DON
+                        //let hashPropertiesExamined = {}     //a hash for all the properties in the DON
 
                         //there is at least dependsOn. All must match for the target VS to be included
-                        let ar = []     //the list of candidate VS
+                        //let ar = []     //the list of candidate VS
                         let include = true
                         target.dependsOn.forEach(function(don){
-                            hashPropertiesExamined[don.property] = true
+                            //hashPropertiesExamined[don.property] = true
+
                             if (don.value == '0') {
                                 //there should be no input with this property - or an input with a code of '0'
                                 if (hashInput[don.property]) {
@@ -79,7 +81,9 @@ angular.module("pocApp")
                                     }
                                 } else  if (don['x-operator'] == "in-vs" ) {
                                     //need to see if the code in hashInput[don.property] is a member of the VS don.value
-                                    include = false
+                                    let isInVs = false      //set to true if a match is found. If not found, the include is false
+
+                                    //include = false
 
                                     console.log(don)
                                     let arCodes = hashExpandedVs[don.value.trim()]     //the set of codes in the indicated valueset
@@ -91,11 +95,21 @@ angular.module("pocApp")
                                             for (const concept of arCodes) {
                                                 //console.log(concept)
                                                 if (concept.code == value.code) {
-                                                    include = true
+                                                    // can't just do this as any vs match would then select the rule include = true
+                                                    isInVs = true
                                                     break
                                                 }
                                             }
                                         }
+                                        if (! isInVs) {
+                                            //if the value could not be found in the VS then the rule fails
+                                            include = false
+                                        }
+
+
+                                    } else {
+                                        //if there's no value for this condition, then the whole rule fails
+                                        include = false
                                     }
 
                                 }
