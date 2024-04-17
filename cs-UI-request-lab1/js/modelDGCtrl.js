@@ -653,7 +653,8 @@ angular.module("pocApp")
                     //Need to create an 'override' element and add to the DG
 
                     //set the minimum required elements..
-                    let ed = {path:pathToDelete,mult:"0..0",type:['string']}
+                    let ed = {path:pathToDelete,mult:"0..0",type:item.type,title:item.title}
+                    //let ed = {path:pathToDelete,mult:"0..0",type:['string'],title:item.titl}}
                     $scope.selectedModel.diff.push(ed)
                     traceSvc.addAction({action:'delete-element',model:$scope.selectedModel,
                         path:pathToDelete,description:'add diff'})

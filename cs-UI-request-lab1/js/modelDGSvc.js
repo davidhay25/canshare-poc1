@@ -550,7 +550,7 @@ angular.module("pocApp")
 
 
 
-            makeUpdateList: function (allDG,xref) {
+            makeUpdateListDEP: function (allDG,xref) {
                 //create a list of all DG updates
                 //let report = {newDG:[],newElement:[],changedElement:[]}
                 let report = []

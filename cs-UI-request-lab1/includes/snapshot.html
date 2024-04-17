@@ -69,21 +69,45 @@
           <strong>MetaData</strong>
           <pre>{{selectedLogDg | dtMetaData | json}}</pre>
 
-          <strong>Parents</strong>
-          <ul>
-            <li ng-repeat="parent in snapshotSvc.getHierarchy(selectedLogDg.name)">
-              {{parent}}
-            </li>
-          </ul>
+          <div class="row">
+            <div class="col-md-6">
+              <strong>Parents</strong>
+              <ul>
+                <li ng-repeat="parent in snapshotSvc.getHierarchy(selectedLogDg.name)"
+                    class="clickable"
+                  ng-click="ssGetDG(parent)">
+                  {{parent}}
+                </li>
+              </ul>
+            </div>
+
+            <div class="col-md-6">
+
+
+              <span class="pull-right" ng-show="ssHx.length > 1">
+                <i class="glyphicon glyphicon-backward clickable"
+                   ng-click="ssBack()"></i>
+                </span>
+
+
+
+              <strong>Direct Children</strong>
+              <ul>
+                <li ng-repeat="child in snapshotSvc.getRelationshipsSummary(selectedLogDg.name).children"
+                    class="clickable"
+                    ng-click="ssGetDG(child)">
+                  {{child}}
+                </li>
+              </ul>
+            </div>
+          </div>
+
+
+
+
 
           <strong>References to other DataGroups</strong>
-          <!--
-          <ul>
-            <li ng-repeat="ed in snapshotSvc.getReferences(selectedLogDg.name)">
-              {{ed.title}} ({{ed.path}}) -> {{ed.type[0]}}
-            </li>
-          </ul>
--->
+
           <table class="table table-bordered">
             <tr><th>Title/Path</th><th>Card.</th><th>Type</th><th>Description</th></tr>
             <tr ng-repeat="item in snapshotSvc.getReferences(selectedLogDg.name)">
@@ -92,7 +116,9 @@
                 <div><em>{{item.path}}</em></div>
               </td>
               <td>{{item.ed.mult}}</td>
-              <td>{{item.ed.type[0]}}</td>
+              <td>
+                <div class="clickable" ng-click="ssGetDG(item.ed.type[0])">{{item.ed.type[0]}}</div>
+              </td>
               <td>{{item.ed.description}}</td>
 
             </tr>

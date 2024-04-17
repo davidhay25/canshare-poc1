@@ -300,10 +300,26 @@
                             ng-click="termSelectDG({DGName:selectedNode.data.ed.sourceModelName},selectedModel.name)">
                         <em>{{selectedNode.data.ed.sourceModelName}}</em></div>
 
-                      <!-- {{getSourceModelName(selectedNode.data.ed)}}-->
 
                     </td>
                   </tr>
+
+                  <tr>
+                    <td class="detailName" style="width : 20%">Present in diff</td>
+                    <td>
+
+                      <div ng-show="presentInDiff(selectedNode.data.ed.path)">
+                        There is an entry in the diff for this path
+                      </div>
+
+                      <div ng-hide ="presentInDiff(selectedNode.data.ed.path)">
+                        There is no diff entry
+                      </div>
+
+
+                    </td>
+                  </tr>
+
 
                   <tr><td class="detailName" style="width : 20%">Title</td>
                     <td>

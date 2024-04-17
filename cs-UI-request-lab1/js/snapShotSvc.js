@@ -559,11 +559,16 @@ angular.module("pocApp")
                 let lst = []
                 let root = {path:dgName,title:dgName,kind:"root"}
                 lst.push({ed:root})
-                allDgSnapshot[dgName].snapshot.forEach(function(ed) {
-                    let clone = angular.copy(ed)
-                    clone.path = `${dgName}.${clone.path}`
-                    lst.push({ed:clone})
-                })
+                if (allDgSnapshot[dgName] && allDgSnapshot[dgName].snapshot) {
+                    allDgSnapshot[dgName].snapshot.forEach(function(ed) {
+                        let clone = angular.copy(ed)
+                        clone.path = `${dgName}.${clone.path}`
+                        lst.push({ed:clone})
+                    })
+                } else {
+                    console.error(`No DG called ${dgName} found`)
+                }
+
 
                 return lst
             }

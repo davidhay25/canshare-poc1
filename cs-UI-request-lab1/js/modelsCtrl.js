@@ -48,6 +48,7 @@ angular.module("pocApp")
             //snapshot generator functions
             $scope.snapshotSvc = snapshotSvc    //so the web pages can call it directly
 
+            $scope.ssHx = []
 
             $scope.makeSnapshots = function() {
                 console.log('-------->   building snapshots...')
@@ -68,9 +69,16 @@ angular.module("pocApp")
 
             }
 
+
+
+
             $scope.getLogDG = function (row) {
+
+
+                //$scope.input.ssFilter = row.dgName
                 $scope.selectedLogDg = snapshotSvc.getDG(row.dgName)
                 $scope.selectedLogRow = row
+                //$scope.ssRelationshipsSummary = snapshotSvc.getRelationshipsSummary(row.dgName)
                 clearSsDetails()
             }
 
@@ -81,6 +89,30 @@ angular.module("pocApp")
                 clearSsDetails()
             }
 
+            //when a parent or child is clicked
+            $scope.ssGetDG = function(dgName) {
+                $scope.ssHx.push(dgName)
+                clearSsDetails()
+                $scope.selectedLogDg = snapshotSvc.getDG(dgName)
+                $scope.selectedLogRow = {}
+
+
+                for (const dg of $scope.lstAllDGSS) {
+                    if (dg.name == dgName) {
+                        $scope.input.ssFilter = dg
+                    }
+                }
+
+            }
+
+            $scope.ssBack = function () {
+                $scope.ssHx.pop()  //the last one is the current dg
+                let dgName = $scope.ssHx.pop()
+                if (dgName) {
+                    $scope.ssGetDG(dgName)
+                }
+            }
+            
             //get a single DG
             $scope.setDGSS = function (dg) {
                 $scope.selectedLogDg = dg
@@ -120,6 +152,20 @@ angular.module("pocApp")
             console.log(`Size of world: ${size/1024} K`)
 
             $scope.localStorage = $localStorage
+
+            //return true if the path is present in the local diff
+            $scope.presentInDiff = function (inPath) {
+                let path = $filter('dropFirstInPath')(inPath)
+                if ($scope.selectedModel && $scope.selectedModel.diff) {
+                    for (const ed of $scope.selectedModel.diff) {
+                        if (ed.path == path) {
+                            return true
+                            break
+                        }
+                    }
+                }
+
+            }
 
             //>>>>>>>> this examines the entire model.
             function validateModelDEP() {
@@ -1437,22 +1483,24 @@ angular.module("pocApp")
                         $scope.input.types[newModel.name] = newModel    //todo - this is a duplicate of hashAllDG
 
                         //a hash by type of all elements that reference it
-                        $scope.analysis = modelsSvc.analyseWorld($localStorage.world,$scope.input.types)
+                        //$scope.analysis = modelsSvc.analyseWorld($localStorage.world,$scope.input.types)
 
                         $scope.makeAllDTList()      //updated
-
+                        $scope.makeSnapshots()
                         $scope.selectModel(newModel)
 
                     } else {
                         //the model may have been updated - select it to refresh the various tabs
                         //note this is the model passed in for editing
                         traceSvc.addAction({action:'edit-model',model:model})
+                        $scope.makeSnapshots()
                         $scope.selectModel(model)
                     }
 
 
 
-                    $scope.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG, $scope.xref )
+
+                   // $scope.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG, $scope.xref )
 
                 })
 
