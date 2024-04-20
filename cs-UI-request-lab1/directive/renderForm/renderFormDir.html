@@ -68,8 +68,8 @@
 
             <!-- 1 columns  - Aug-18-->
 
-            <div ng-if = "row.meta.columnCount == 1 ">
-              <div class="col-md-12">
+            <div ng-if = "row.meta.columnCount == 1 || ! row.meta.columnCount">
+              <div class="col-md-offset-2 col-md-8">
 
                 <div ng-repeat="cell in row.col1 track by $index">
                   <div style="margin-bottom: 8px">
@@ -81,7 +81,7 @@
             </div>
 
             <!-- 2 columns  - was the default 24-Apr- was 2 cols of 6 - cganges temporarily to get drawing working-->
-            <div ng-if = "row.meta.columnCount == 2 || ! row.meta.columnCount">
+            <div ng-if = "row.meta.columnCount == 2 ">
 
               <div class="col-md-6">
                 <div ng-repeat="cell in row.col1 track by $index">

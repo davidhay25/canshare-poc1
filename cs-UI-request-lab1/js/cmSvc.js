@@ -8,8 +8,6 @@ angular.module("pocApp")
 
         }
 
-
-
         return {
             rulesEngine :  function (hashInput,element,hashExpandedVs) {
                 //get the options for a property. The actual property is not needed as we're just looking in the element
@@ -36,6 +34,11 @@ angular.module("pocApp")
                     return {}
                 }
 
+                if (! hashExpandedVs) {
+                    alert("Sorry, the valueSets have not completely loaded. Please try again.")
+                    return
+                }
+
                 //console.log(hashExpandedVs)
 
                 let lstVs = []          //this will be a list of valueSets whose contents are in the list of possible values
@@ -55,6 +58,8 @@ angular.module("pocApp")
                         //there is at least dependsOn. All must match for the target VS to be included
                         //let ar = []     //the list of candidate VS
                         let include = true
+
+
                         target.dependsOn.forEach(function(don){
                             //hashPropertiesExamined[don.property] = true
 
@@ -85,7 +90,7 @@ angular.module("pocApp")
 
                                     //include = false
 
-                                    console.log(don)
+                                   // console.log(don)
                                     let arCodes = hashExpandedVs[don.value.trim()]     //the set of codes in the indicated valueset
                                     let value = hashInput[don.property]         //the value of the property we're looking at
 
@@ -137,6 +142,96 @@ angular.module("pocApp")
 
 
             },
+            reverseRulesEngine : function (element,concept,hashExpandedVs) {
+                //check all the targets in the element for conditions where the concept would be a match
+
+
+                //the list of targets that, if the dependsOn are met, would return a vs containing the concept
+                //or the concept itself (target.code is the concept)
+                let lstTargets = []
+                for (const target of element.target) {
+
+                    if (isMatch(target.code,concept)) {
+                        lstTargets.push(target)
+                    }
+
+                }
+
+                //now, we can assemble the list of property values
+                let hashProperty = {}
+                for (const target of lstTargets) {
+                    if (target.dependsOn) {
+                        for (const don of target.dependsOn) {
+                            let property = don.property
+                            let value = don.value
+                            if (value !== '0') {
+                                hashProperty[property] = hashProperty[property] || []
+
+                                let ar = hashProperty[property].filter(concept => value == don.value )
+
+                                if (ar.length == 0) {
+                                    let concept = {code:value,display:don.display}
+                                    hashProperty[property].push(concept)
+                                }
+                            }
+
+                        }
+                    }
+                }
+                console.log(hashProperty)
+
+
+                return {targets:lstTargets,element: element,hashProperty:hashProperty}
+
+
+                function isMatch(code,concept) {
+                    //is the concept in the code attribute
+                    if (code == concept.code) {
+                        //the concept IS the code
+                        return true
+                    }
+                    if (hashExpandedVs[code]) {
+                        //the code is actually a url in the expanded VS todo ?need to check for when there is no expanded vs
+                        let arCodes = hashExpandedVs[code]
+                        //let isInVs = false
+
+                        let ar = arCodes.filter(item => item.code == concept.code)
+                        if (ar.length > 0) {
+                            return true
+                        }
+                        /*
+                        for (const vsConcept of arCodes) {
+                            //console.log(concept)
+                            if (concept.code == vsConcept.code) {
+                               return true
+                              //  isInVs = true
+                                break
+                            }
+                        }
+                        */
+                    }
+
+
+                }
+
+            },
+            saveInCache : function (window,key,object) {
+                let deferred = $q.defer()
+                //save the supplied object in an indexedDb cache
+                const request = window.indexedDB.open("cmData", 3)
+
+                request.onerror = (event) => {
+                    deferred.reject(request.errorCode)
+                    // Do something with request.errorCode!
+                };
+                request.onsuccess = (event) => {
+
+                    // Do something with request.result!
+                };
+
+                return deferred.promise
+
+            } ,
             getVSContentsHash : function (lst) {
                 let deferred = $q.defer()
                 console.log('getting hash')

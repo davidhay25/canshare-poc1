@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('modelReviewCtrl',
-        function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$timeout, $uibModal,makeQSvc,utilsSvc,$window) {
+        function ($scope,$http,modelsSvc,modelCompSvc,$timeout, $uibModal,makeQSvc,utilsSvc,$window) {
 
             $scope.input = {}
 
@@ -26,6 +26,9 @@ angular.module("pocApp")
                     data.data.forEach(function (dg) {
                         $scope.hashAllDG[dg.name] = dg
 
+                        //has both dgs & fhir dta
+                        $scope.input.types = modelsSvc.getAllTypes($scope.hashAllDG)
+
                     })
 
                     $http.get('/model/allCompositions').then(
@@ -37,14 +40,15 @@ angular.module("pocApp")
 
                             })
 
-                            //now we have both DG's and compositions we can build the hash of all types
 
+                            /*
+                            //now we have both DG's and compositions we can build the hash of all types
                             let world = {dataGroups:$scope.hashAllDG,compositions:$scope.hashAllCompositions}
                             let vo1 = modelsSvc.validateModel(world)
                             $scope.input.types = vo1.types      //a hash keyed by name
 
                             console.log(vo1.errors)
-
+*/
                             //now that we have all the DG & Compositions, was a modelName passed in?
 
                             if (modelName) {
@@ -73,6 +77,23 @@ angular.module("pocApp")
 
                 }
             )
+
+            //the equivalent of the cardinality
+            $scope.getObligation = function (ed) {
+                if (ed) {
+                    if (ed.mult.startsWith('1')) {
+                        return "Mandatory"
+                    }
+
+                    if (ed.enableWhen && ed.enableWhen.length > 0) {
+                        return "Conditional"
+                    }
+
+                    return "Optional"
+                }
+
+
+            }
 
             //show a comment line in one of the 'allcomments' displays
             $scope.showCommentLine = function (comment) {

@@ -32,7 +32,248 @@
     </div>
 
   <uib-tabset active="local.conceptMapTab">
-    <uib-tab heading="Rules">
+
+    <uib-tab heading="UI">
+
+
+          <div class="row">
+              <div class="col-md-5">
+                  <table class="table table-bordered">
+                      <tr ng-repeat = "(k,v) in cmProperties">
+                          <td width = "30%">
+                              <div class = 'clickable' ng-click="populateUIControl(k,true)">{{k}}</div>
+                          </td>
+                          <td>
+
+
+                              <div ng-show="v.noMatches">
+                                  There were no matching ValueSets or Concepts
+                              </div>
+
+                              <div ng-show="v.singleConcept">
+                                  <input type="text" class="form-control" disabled="disabled" value="{{v.singleConcept.display}}"/>
+                              </div>
+
+                              <div ng-show="v.options.length > 0">
+                                  <select class="form-control" ng-model="local.cmOptions[k]"
+                                          ng-change="uiValueSelected(k,local.cmOptions[k])"
+                                          ng-options="v.display for (k,v) in v.options">
+                                  </select>
+                              </div>
+
+
+
+                          </td>
+                      </tr>
+                  </table>
+
+
+                  <button class="btn-primary btn" ng-click="resetUI()">Reset</button>
+
+              </div>
+              <div class="col-md-7">
+                  <div ng-show="input.showHelp" class="alert-info alert">
+                      <p>Select the values from the top, heading down. </p>
+                      <p>When a property value is selected in a control,
+                          the next property control in order will be automatically populated. </p>
+                      <p>If the matched option is a single concept (rather than a ValueSet) then it is
+                          shown but is disabled.
+                      <p>Clicking on the property name will get the options for that property WITHOUT
+                          populating the next control.</p>
+
+                      </p>
+                  </div>
+
+                  <h3>{{local.uiTitle}}</h3>
+
+                  <uib-tabset>
+                      <uib-tab heading="Options">
+
+                          <div ng-show="singleConcept">
+                              <h4>A single concept was returned</h4>
+                              {{singleConcept.display}} {{singleConcept.code}} {{singleConcept.system}}
+                          </div>
+                          <div ng-hide="singleConcept">
+                              <h4>Matching ValueSet/s</h4>
+                              <ul class="list-unstyled">
+                                  <li ng-repeat="url in uiMatchingVS">{{url}}</li>
+                              </ul>
+
+
+                              <h4>Possible values</h4>
+
+
+                              <div class="tableFixHead">
+                                  <table class="table table-bordered table-condensed">
+                                      <thead>
+                                      <tr><th>Display</th><th>Code</th><th>System</th></tr>
+                                      </thead>
+                                      <tbody>
+                                      <tr ng-repeat="concept in lstMatchingConceptsForUI">
+                                          <td>{{concept.display}}</td>
+                                          <td>
+                                              <div class="clickable" ng-click="lookup(concept.code)">
+                                                  {{concept.code}}
+                                              </div>
+
+                                          </td>
+                                          <td>{{concept.system}}</td>
+                                      </tr>
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+
+                      </uib-tab>
+                      <uib-tab heading="Review">
+                          all reviews this combination of properties
+                          Add new review
+                          VS for this combination correct
+                          Add comment
+
+
+                      </uib-tab>
+
+                      <uib-tab heading="Engine details">
+                          <h4>Property values used by engine when locating matching targets</h4>
+                          <table class="table table-condensed table-bordered">
+                              <tr><th>Property</th><th>Display</th><th>Code</th><th>System</th></tr>
+                              <tr ng-repeat="(k,v) in uiHashValues">
+                                  <td>{{k}}</td>
+                                  <td>{{v.display}}</td>
+                                  <td>
+                                      <div class="clickable" ng-click="lookup(v.code)">
+                                          {{v.code}}
+                                      </div>
+
+                                  </td>
+                                  <td>{{v.system}}</td>
+                              </tr>
+                          </table>
+
+                          <uib-tabset>
+                              <uib-tab heading="Matched targets">
+                                  <pre>{{uiMatchingTargets | json}}</pre>
+                              </uib-tab>
+                              <uib-tab heading="Lookup target by row number">
+                                  <div class="row">
+                                      <div class="col-md-2">
+                                          <input type="text" class="form-control" ng-model="input.rowNumber">
+                                          <div><button class="btn btn-link" ng-click="lookupByRowNumber(input.rowNumber)">Get target</button> </div>
+                                      </div>
+                                      <div class="col-md-10">
+                                          <pre>{{singleTargetByRow | json}}</pre>
+
+                                      </div>
+                                  </div>
+
+                              </uib-tab>
+                          </uib-tabset>
+
+
+                      </uib-tab>
+                      <uib-tab heading="Reverse Lookup">
+                          <div class="banner">
+                              <div>{{reverseLookup.element.display}} ({{reverseLookup.element.code}})</div>
+                          </div>
+
+
+                          <uib-tabset>
+
+
+                              <uib-tab heading = "Prior property values">
+
+                                  <table class="table table-bordered">
+                                      <tr ng-repeat = "(k,v) in reverseLookup.hashProperty">
+                                          <td>{{k}}</td>
+                                          <td>
+                                              <ul class="list-unstyled" ng-repeat="concept in v">
+                                                  <li>{{concept.display}}  (
+
+                                                      <span ng-show="concept.code.startsWith('http')">
+                                                          <span class="clickable" ng-click="viewVS(concept.code)">{{concept.code}}</span>
+                                                      </span>
+                                                      <span ng-hide="concept.code.startsWith('http')">
+                                                          <span class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</span>
+                                                      </span>
+
+
+
+
+                                                      )</li>
+                                              </ul>
+
+                                          </td>
+                                      </tr>
+                                  </table>
+
+
+                                  <pre>{{hashProperty | json}}</pre>
+                              </uib-tab>
+
+
+                              <uib-tab heading = "Table">
+                                  <div ng-repeat="target in reverseLookup.targets">
+                                      <div>
+                                          <strong class="clickable" ng-click="viewVS(target.code)">{{target.display}}</strong>
+                                          ({{target.comment}})
+                                      </div>
+
+                                      <table class="table-bordered table">
+                                          <tr ng-repeat="don in target.dependsOn">
+                                              <td style="width: 20%">{{don.property}}</td>
+                                              <td style="width: 10%">{{don['x-operator']}}</td>
+                                              <td style="width: 15%">
+                                                  <div ng-show="don['x-operator'] == 'in-vs'">
+                                                      <div class="clickable" ng-click="viewVS(don.value)">{{don.value}}</div>
+                                                  </div>
+                                                  <div ng-show="don['x-operator'] == '='">
+                                                      <div class="clickable" ng-click="lookup(don.value)">{{don.value}}</div>
+                                                  </div>
+
+
+                                              </td>
+                                              <td>{{don.display}}</td>
+                                          </tr>
+                                      </table>
+                                  </div>
+
+
+                              </uib-tab>
+
+
+                              <uib-tab heading = "List">
+                                  <div class="row">
+                                      <div class="col-md-3">
+                                          <div class="list-group">
+                                              <div class="list-group-item"
+                                                   ng-click="selectTarget(target)"
+                                                   ng-repeat = "target in reverseLookup.targets" >
+                                                  {{target.display}}
+                                              </div>
+
+                                          </div>
+                                      </div>
+
+
+                                      <div class="col-md-9">
+                                          <pre>{{selectedTarget | json}}</pre>
+                                      </div>
+                                  </div>
+                              </uib-tab>
+
+                          </uib-tabset>
+
+
+                      </uib-tab>
+                  </uib-tabset>
+
+              </div>
+          </div>
+
+      </uib-tab>
+
+    <uib-tab ng-show="false" heading="Rules">
       <br/>
 
         <div ng-show="input.showHelp" class="alert-info alert">
@@ -423,151 +664,8 @@
       </uib-tab>
 
 
-    <uib-tab heading="UI">
 
 
-      <div class="row">
-        <div class="col-md-4">
-          <table class="table table-bordered">
-            <tr ng-repeat = "(k,v) in cmProperties">
-              <td width = "30%">
-                <div class = 'clickable' ng-click="populateUIControl(k,true)">{{k}}</div>
-              </td>
-              <td>
-
-
-                  <div ng-show="v.noMatches">
-                      There were no matching ValueSets or Concepts
-                  </div>
-
-                  <div ng-show="v.singleConcept">
-                      <input type="text" class="form-control" disabled="disabled" value="{{v.singleConcept.display}}"/>
-                  </div>
-
-                  <div ng-show="v.options.length > 0">
-                      <select class="form-control" ng-model="local.cmOptions[k]"
-                              ng-change="uiValueSelected(k)"
-                              ng-options="v.display for (k,v) in v.options">
-                      </select>
-                  </div>
-
-
-
-              </td>
-            </tr>
-          </table>
-
-
-            <button class="btn-primary btn" ng-click="resetUI()">Reset</button>
-
-        </div>
-        <div class="col-md-8">
-            <div ng-show="input.showHelp" class="alert-info alert">
-                <p>Select the values from the top, heading down. </p>
-                <p>When a property value is selected in a control,
-                    the next property control in order will be automatically populated. </p>
-                <p>If the matched option is a single concept (rather than a ValueSet) then it is
-                    shown but is disabled.
-                <p>Clicking on the property name will get the options for that property WITHOUT
-                populating the next control.</p>
-
-                </p>
-            </div>
-
-            <h3>{{local.uiTitle}}</h3>
-
-            <uib-tabset>
-                <uib-tab heading="Options">
-
-                    <div ng-show="singleConcept">
-                        <h4>A single concept was returned</h4>
-                        {{singleConcept.display}} {{singleConcept.code}} {{singleConcept.system}}
-                    </div>
-                    <div ng-hide="singleConcept">
-                        <h4>Matching ValueSet/s</h4>
-                        <ul class="list-unstyled">
-                            <li ng-repeat="url in uiMatchingVS">{{url}}</li>
-                        </ul>
-
-
-                        <h4>Possible values</h4>
-
-
-                        <div class="tableFixHead">
-                            <table class="table table-bordered table-condensed">
-                                <thead>
-                                <tr><th>Display</th><th>Code</th><th>System</th></tr>
-                                </thead>
-                                <tbody>
-                                <tr ng-repeat="concept in lstMatchingConceptsForUI">
-                                    <td>{{concept.display}}</td>
-                                    <td>
-                                        <div class="clickable" ng-click="lookup(concept.code)">
-                                            {{concept.code}}
-                                        </div>
-
-                                    </td>
-                                    <td>{{concept.system}}</td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                </uib-tab>
-                <uib-tab heading="Review">
-                    all reviews this combination of properties
-                    Add new review
-                        VS for this combination correct
-                        Add comment
-
-
-                </uib-tab>
-
-                <uib-tab heading="Engine details">
-                    <h4>Property values used by engine when locating matching targets</h4>
-                    <table class="table table-condensed table-bordered">
-                        <tr><th>Property</th><th>Display</th><th>Code</th><th>System</th></tr>
-                        <tr ng-repeat="(k,v) in uiHashValues">
-                            <td>{{k}}</td>
-                            <td>{{v.display}}</td>
-                            <td>
-                                <div class="clickable" ng-click="lookup(v.code)">
-                                    {{v.code}}
-                                </div>
-
-                            </td>
-                            <td>{{v.system}}</td>
-                        </tr>
-                    </table>
-
-                    <uib-tabset>
-                        <uib-tab heading="Matched targets">
-                            <pre>{{uiMatchingTargets | json}}</pre>
-                        </uib-tab>
-                        <uib-tab heading="Lookup target by row number">
-                            <div class="row">
-                                <div class="col-md-2">
-                                    <input type="text" class="form-control" ng-model="input.rowNumber">
-                                    <div><button class="btn btn-link" ng-click="lookupByRowNumber(input.rowNumber)">Get target</button> </div>
-                                </div>
-                                <div class="col-md-10">
-                                    <pre>{{singleTargetByRow | json}}</pre>
-
-                                </div>
-                            </div>
-
-                        </uib-tab>
-                    </uib-tabset>
-
-
-                </uib-tab>
-            </uib-tabset>
-
-        </div>
-      </div>
-
-    </uib-tab>
   </uib-tabset>
 
 

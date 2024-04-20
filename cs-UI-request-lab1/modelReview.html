@@ -19,6 +19,18 @@
     <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
     <script src="js/libs/jstree.min.js"></script>
 
+    <style>
+        .form-background  {
+            background-color: #f7f7f7;
+            border: 1px solid gainsboro;
+            padding : 5px;
+            margin: 4px;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+        }
+    </style>
+
     <script>
         angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage']).config(function($locationProvider) {
 
@@ -144,6 +156,15 @@
 
                     <uib-tabset>
                         <br/>
+                        <uib-tab heading="Form"  select="tabSelect('form')">
+                            <div class="pull-right"><em>This form is only to assist with reviewing and does not represent what a 'real' form might look like.</em></div>
+                            <div class="form-background">
+                                <renderform q="fullQ" qr="{}"></renderform>
+                            </div>
+
+
+                        </uib-tab>
+
                         <uib-tab select="tabSelect('summary')">
                             <uib-tab-heading>
                                 <span ng-show="selectedComp.kind == 'dg'">Data Group Summary</span>
@@ -308,10 +329,7 @@
 
 
 
-                        <uib-tab heading="Form"  select="tabSelect('form')">
-                            <div class="pull-right"><em>This form is only to assist with reviewing and does not represent what a 'real' form might look like.</em></div>
-                            <renderform q="fullQ" qr="{}"></renderform>
-                        </uib-tab>
+
                         <uib-tab heading="Tree"  select="tabSelect('tree')">
                             <div class="pull-right clickable" ng-click="expandCompTree()">Expand all ({{allCompElements.length}})</div>
                             <div class="myScroll">
@@ -370,7 +388,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="row">
+                                    <div ng-show = "false" class="row">
                                         <div class="col-md-3">
                                             Type
                                         </div>
@@ -386,13 +404,24 @@
 
                                     <div class="row">
                                         <div class="col-md-3">
-                                            Cardinality
+                                            Obligation
                                         </div>
                                         <div class="col-md-9">
                                             <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
 
-                                            <div ng-show = "selectedCompositionNode.data.host">Host:{{selectedCompositionNode.data.host.mult}}</div>
-                                            <div ng-hide = "selectedCompositionNode.data.host">{{selectedCompositionNode.data.ed.mult}}</div>
+
+
+                                            <div ng-show = "selectedCompositionNode.data.host">
+                                                <!-- for now, just hide it if a section is selected todo - check this logic
+                                                Host:{{selectedCompositionNode.data.host.mult}}
+                                                -->
+                                            </div>
+                                            <div ng-hide = "selectedCompositionNode.data.host">
+                                                {{getObligation(selectedCompositionNode.data.ed)}}
+
+                                                <!--{{selectedCompositionNode.data.ed.mult}}-->
+
+                                            </div>
 
                                         </div>
                                     </div>
@@ -410,7 +439,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="row" >
+                                    <div ng-show = "false" class="row" >
                                         <div class="col-md-3">
                                             Full Path
                                         </div>
@@ -425,7 +454,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="row" ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept' ">
+                                    <div ng-show = "false" class="row" ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept' ">
                                         <div class="col-md-3">
                                             ValueSet
                                         </div>

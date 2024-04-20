@@ -4,7 +4,7 @@ angular.module("pocApp")
 
 
             $scope.input = {}
-            //$scope.input.mainTabActive = 1      //just while developing - selects that conceptmap tab
+            $scope.input.mainTabActive = 1      //just while developing - selects that conceptmap tab
 
 
             $scope.localStorage = $localStorage
@@ -81,11 +81,6 @@ angular.module("pocApp")
                 } else {
                     url = `http://snomed.info/sct?fhir_vs=refset/${code}`
                 }
-
-
-
-
-
 
                 $scope.input.showParams = false
                 delete $scope.expandedCMVS
@@ -189,7 +184,7 @@ console.log($scope.allTargets)
 
             }
 
-
+/* no longer used
             querySvc.getConceptMaps().then(
                 function (data) {
                     $scope.allConceptMaps = data
@@ -198,7 +193,9 @@ console.log($scope.allTargets)
                     console.log(err)
                 }
             )
+*/
 
+            //load a concept map then expand all the ValueSets used.
             $scope.selectCMItem = function (item,expand) {
                 $scope.selectedCM = item.cm
                 delete $scope.fullSelectedCM
@@ -214,28 +211,42 @@ console.log($scope.allTargets)
 
                 $scope.loadingCM = true
 
-                if ($scope.input.loadComplete) {
-                    expand = true
-                }
+               // if ($scope.input.loadComplete) {
+               //     expand = true
+               // }
 
-                querySvc.getOneConceptMap(item.cm.url,expand).then(
+                $scope.showWaiting = true
+
+                //get the expanded concept map (include the group elements)
+                querySvc.getOneConceptMap(item.cm.url,true).then(
                     function (ar) {
                         $scope.fullSelectedCM = ar[0]       //todo what of there's > 1
-
+                        console.log(`ConceptMap size: ${utilsSvc.getSizeOfObject($scope.fullSelectedCM)/1024} K `)
                         //add the operator to the DependsOn element from the extension (makes UI processing easier
                         let lstVsUrl = []   //list of all ValueSets that are used by 'in-vs' rules
                         $scope.targetByRow = {}    //a hash of targets by row number
                         //add the VS with all topography. used for the primary-site-laterality
+
                         lstVsUrl.push('https://nzhts.digital.health.nz/fhir/ValueSet/canshare-topography')
                         $scope.fullSelectedCM.group.forEach(function (group) {
                             group.element.forEach(function (element) {
+
                                 element.target.forEach(function (target) {
 
+                                    //if the target code is a url then we need to expand that - needed for reverse lookup
+                                    if (target.code.startsWith('http')) {
+                                        let v = target.code.trim()
+                                        if (lstVsUrl.indexOf(v) == -1) {
+                                            lstVsUrl.push(v)
+                                        }
+                                    }
+
+                                    //used to allow a target to be selected by spreadsheet row number
                                     $scope.targetByRow[target.comment] = target
 
                                     if (target.dependsOn) {
                                         target.dependsOn.forEach(function (dep) {
-                                            dep['x-operator'] = "="
+                                            dep['x-operator'] = "="     //default to =
                                             if (dep.extension) {
                                                 dep.extension.forEach(function (ext) {
                                                     if (ext.url == 'http://canshare.co.nz/fhir/StructureDefinition/do-operator') {
@@ -249,19 +260,12 @@ console.log($scope.allTargets)
                                                                     lstVsUrl.push(v)
                                                                 }
                                                             }
-
-
-
                                                         }
-
                                                     }
                                                 })
                                             }
-
                                         })
                                     }
-
-
                                 })
                             })
 
@@ -271,8 +275,9 @@ console.log($scope.allTargets)
                         if (lstVsUrl.length > 0) {
                             cmSvc.getVSContentsHash(lstVsUrl).then(
                                 function (data) {
-                                    console.log(data)
+                                    console.log(`Expanded vs size: ${utilsSvc.getSizeOfObject(data)/1024} K `)
                                     $scope.$broadcast('hashExpandedVs',data)    //the list is processed by cmCtrl
+                                    $scope.showWaiting = false
                                 },
                                 function (err) {
                                     alert(err)
@@ -289,6 +294,7 @@ console.log($scope.allTargets)
                         let treeData = querySvc.makeTree($scope.fullSelectedCM)
                         showCmTree(treeData)
 
+                        /* I thnk all these functions are used by the rules tab which is no longer used
 
                         //now get the set of 'dependsOn' properties (if any)
                         let vo = querySvc.getCMProperties($scope.fullSelectedCM)
@@ -302,6 +308,8 @@ console.log($scope.allTargets)
 
                         //decide whether to show 'canshare' tab
                         $scope.showTranslate = Object.keys($scope.doProperties).length > 0
+
+                        */
 
                     }, function (err) {
 

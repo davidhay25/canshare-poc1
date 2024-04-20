@@ -1,15 +1,94 @@
 angular.module("pocApp")
     .controller('cmCtrl',
-        function ($scope,$http,$q,querySvc,cmSvc,$uibModal) {
+        function ($scope,$http,$q,querySvc,cmSvc,$uibModal,utilsSvc) {
 
-            let snomed = "http://snomed.info/sct"
             $scope.local = {cmOptions : {},cm:{property:{}}}
 
             $scope.cmProperties = {}
 
-            $scope.local.conceptMapTab = 3      //select the UI tab while developing
+            // $scope.local.conceptMapTab = 3      //select the UI tab while developing
             $scope.local.uiValues = {}          //a hash of values selected in the UI
             //$scope.input.showHelp = true
+
+            let snomed = "http://snomed.info/sct"
+
+         //   $scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"}})
+
+
+            //functions to get ConceptMap & expanded ValueSet..
+            
+            //localforage is defined by the library script
+            //https://localforage.github.io/localForage/#data-api-getitem
+            $scope.fromCache = false
+            localforage.getItem('cmData').then(function(value) {
+                // This code runs once the value has been loaded
+                // from the offline store.
+                if (value) {
+                    //if there's a value then the data was already in the cache
+                    $scope.fromCache = true
+                    $scope.fullSelectedCM = value.cm
+                    $scope.hashExpandedVs = value.vs
+                    $scope.cacheDate = value.when
+                    console.log('retrieved cm & vs from cache')
+
+                   // let vo = {cm:$scope.fullSelectedCM,vs:$scope.hashExpandedVs}
+                } else {
+                    //retrieve cs & vs from the terninology server. when complete the function
+                    //fires the hashExpandedVs event which is trapped below and will save in the cache.
+                    console.log('cache empty. Retrieving from TS.')
+                    $scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"}})
+                }
+
+
+                console.log(value);
+            }).catch(function(err) {
+                // This code runs if there were any errors
+                console.log(err);
+            });
+
+            $scope.refreshCache = function () {
+                //just need to re-read from the TS
+                $scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"}})
+                /*
+                localforage.removeItem('cmData').then(function() {
+                    // Run this code once the key has been removed.
+                    $scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"}})
+                    console.log('Key is cleared!');
+                }).catch(function(err) {
+                    // This code runs if there were any errors
+                    console.log(err);
+                });
+                */
+                
+            }
+            //as the expansion is performed by a child controller, I use this event to get the hash
+            $scope.$on('hashExpandedVs',function (event,data) {
+                $scope.hashExpandedVs = data
+
+
+                //save the conceptMap and VS in the db
+                let vo = {cm:$scope.fullSelectedCM,vs:$scope.hashExpandedVs,when:new Date()}
+                $scope.cacheDate = vo.when
+                //https://localforage.github.io/localForage/#data-api-setitem
+                localforage.setItem('cmData', vo).then(function (value) {
+                    // Do other things once the value has been saved.
+                    console.log(value);
+                    alert("Cache has been updated from the Terminology Server.")
+                }).catch(function(err) {
+                    // This code runs if there were any errors
+                    console.log(err);
+                });
+
+
+
+                //alert('hash')
+                console.log(data)
+            })
+
+
+            //-------------
+
+
 
             $scope.showTarget = function (target) {
                 if ($scope.selectedTarget && target.code == $scope.selectedTarget.code) {
@@ -20,13 +99,9 @@ angular.module("pocApp")
 
             }
 
-            //as the expansion is performed by a child controller, I use this event to get the hash
-            $scope.$on('hashExpandedVs',function (event,data) {
-                $scope.hashExpandedVs = data
-                //alert('hash')
-                console.log(data)
-            })
-
+            $scope.selectTarget = function (target) {
+                $scope.selectedTarget = target
+            }
 
             $scope.selectCMItemDEP = function (item,expand) {
                 $scope.selectedCM = item.cm
@@ -92,7 +167,8 @@ angular.module("pocApp")
                         if (lstVsUrl.length > 0) {
                             cmSvc.getVSContentsHash(lstVsUrl).then(
                                 function (data) {
-                                    console.log(data)
+                                    console.log('vs size',utilsSvc.getSizeOfObject(data)/1024 )
+
                                     $scope.$broadcast('hashExpandedVs',data)    //the list is processed by cmCtrl
                                 },
                                 function (err) {
@@ -133,10 +209,28 @@ angular.module("pocApp")
 
             }
 
+            $scope.viewVS = function (url) {
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/viewVS.html',
+                    backdrop: 'static',
+                    size : 'lg',
+                    controller: 'viewVSCtrl',
+
+                    resolve: {
+                        url: function () {
+                            return url
+                        }, refsetId : function () {
+                            return null
+                        }
+                    }
+
+                })
+            }
 
             //load the CM
             //$scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-scripted-dec"}})
-            $scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"}})
+          //  $scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"}})
 
 
 
@@ -297,6 +391,7 @@ angular.module("pocApp")
                 setup()
                 delete $scope.selectedElement
                 $scope.local.cm.property = {}
+                delete $scope.reverseLookup
 
             }
 
@@ -391,9 +486,32 @@ angular.module("pocApp")
             }
 
 
+            function performReverseLookup(propKey,value) {
+                delete $scope.reverseLookup
+                //the property is referenced as the
+                let elementCode = $scope.cmProperties[propKey].concept
+
+                let cmElement = {}
+                for (const element of $scope.fullSelectedCM.group[0].element) {
+                    if (element.code == elementCode.code) {     //this is the set of targets which could match this code
+                        cmElement = element
+                        break
+                    }
+                }
+
+                $scope.reverseLookup = cmSvc.reverseRulesEngine(cmElement,value, $scope.hashExpandedVs)
+
+               // console.log(vo)
+            }
+
             //when a selection is made in the UI. We want to select options for the next one...
-            $scope.uiValueSelected = function (propKey) {
-                //console.log(propKey)
+            $scope.uiValueSelected = function (propKey,value) {
+              //  console.log(propKey,value)
+
+
+                //this is the reverse lookup stuff.
+                performReverseLookup(propKey,value)
+
 
                 //when a value is selected, then clear all the subsequent entries
                 let clear = false
@@ -404,7 +522,7 @@ angular.module("pocApp")
                         $scope.cmProperties[key].options = []  //optios for the property. Used by the rules rather than lookup
                         delete $scope.cmProperties[key].singleConcept //flag that the option is a single concept
                         delete $scope.cmProperties[key].noMatches  //flag that no options were found
-                        delete $scope.local.uiValues[key]  //data enterd for that property
+                        delete $scope.local.uiValues[key]  //data entered for that property
                         delete $scope.local.cmOptions[key]  //list of options for that property
                     }
                     if (key == propKey) {
@@ -415,7 +533,8 @@ angular.module("pocApp")
 
                 let def = $scope.cmProperties[propKey]
                 if (def && def.next) {
-                    $scope.populateUIControl(def.next)
+                    //def.next is the next control in the order
+                    $scope.populateUIControl(def.next)  //populate the UI with the set of possible values
                 }
 
             }
@@ -425,7 +544,7 @@ angular.module("pocApp")
                 delete $scope.lstMatchingConceptsForUI
                 delete $scope.uiMatchingVS
                 delete $scope.uiHashValues
-
+                delete $scope.reverseLookup
                 $scope.local.cmOptions = {}     //the data entered
 /*
                 Object.keys($scope.cmProperties).forEach(function (key) {
@@ -447,6 +566,7 @@ angular.module("pocApp")
                 delete $scope.lstMatchingConceptsForUI
                 delete $scope.uiMatchingVS
                 delete $scope.singleConcept     //if a single concept is returned (rather than a VS)
+                //delete $scope.reverseLookup
 
                 $scope.local.uiTitle = `Looking for possible values for ${propKey}`
                 //propKey is the property we're wanting to populate

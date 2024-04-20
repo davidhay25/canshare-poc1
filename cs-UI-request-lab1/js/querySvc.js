@@ -382,7 +382,7 @@ angular.module("pocApp")
 
                     //let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&status=active&_sort=title`
 
-                    let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&_sort=title`
+                    let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&_sort=title&_count=2000`
 
 console.log(qry)
                     let encodedQry = encodeURIComponent(qry)

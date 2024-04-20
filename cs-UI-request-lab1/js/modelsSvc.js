@@ -272,6 +272,14 @@ angular.module("pocApp")
                 return ['boolean','code','date','dateTime','decimal','integer','string','Address','Attachment','CodeableConcept','ContactPoint','Group','HumanName','Identifier','Period','Quantity','Ratio']
             },
 
+            getAllTypes : function (hashAllDG) {
+                let types = angular.copy(hashAllDG)
+                for (const dt of this.fhirDataTypes()) {
+                    types[dt] = true
+                }
+                return types
+            },
+
             //create a bundle of LogicalModels
             createLMBundleDEP : function (world) {
                 let fhirDataTypes = this.fhirDataTypes()

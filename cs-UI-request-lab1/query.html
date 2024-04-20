@@ -57,6 +57,14 @@
     <script src="directive/renderForm/renderFormDir.js"></script>
     <script src="directive/renderForm/renderFormSvc.js"></script>
     <script src="js/utilsSvc.js"></script>
+
+    <!-- https://localforage.github.io/localForage/ -->
+    <script src="js/libs/localforage.min.js"></script>
+
+    <script src="js/vsSvc.js"></script>
+    <script src="js/viewVSCtrl.js"></script>
+
+
     <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
 
 
@@ -218,7 +226,9 @@
                             <br/>
 
 
-                            <button class="btn btn-link pull-right" ng-click="refreshVsQList(selectedVS.url)">Refresh</button>
+                            <button class="btn btn-link pull-right"
+
+                                    ng-click="refreshVsQList(selectedVS.url)">Refresh</button>
 
 
                             <div class="row">
@@ -259,11 +269,25 @@
             <div ng-controller="cmCtrl">
 
                 <div class="pull-right">
-                    <a target="_blank" href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653">Spreadsheet</a></div>
+                    <button class="btn btn-link" ng-click="refreshCache()"
+                            uib-popover="Last updated: {{cacheDate | date : 'MMM dd  HH:mm:ss'}}"
+                            popover-placement="left"
+                            popover-trigger="'mouseenter'"
+
+
+
+                    >Refresh cache</button>
+                </div>
 
 
                 <div class="pull-right">
-                    <a style="padding-right: 8px"  target="_blank" href="https://docs.google.com/document/d/1stRV8lUzL4Tl8yNEt0cvvwMBuVlS-9_8rWOGbvsEclw/edit">Documentation</a></div>
+                    <a class="btn btn-link" target="_blank" href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653">Spreadsheet</a></div>
+
+
+                <div class="pull-right">
+                    <a class="btn btn-link" style="padding-right: 8px"  target="_blank" href="https://docs.google.com/document/d/1stRV8lUzL4Tl8yNEt0cvvwMBuVlS-9_8rWOGbvsEclw/edit">Documentation</a></div>
+
+
 
 
                 <ng-include src = "'./includes/cmUI.html'"></ng-include>
