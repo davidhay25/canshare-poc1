@@ -142,7 +142,7 @@ angular.module("pocApp")
 
             //when an element is selected in a form
             $scope.$on('elementSelected',function(event,vo) {
-                // selectedCompositionNode.data.ed
+
 
                 let linkId = vo.cell.item.linkId
 
@@ -492,6 +492,7 @@ angular.module("pocApp")
 
             }
 
+            //todo - ? disable select capability
             $scope.selectDG = function (dg) {
                 console.log(dg)
                 //todo just for dev atm - not sure if
@@ -572,6 +573,8 @@ angular.module("pocApp")
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
                 $scope.allCompElements = vo.allElements
                 $scope.hashCompElements = vo.hashAllElements
+
+
 
 
                 //get the set of all paths to ignore. These are those where the DG type is in  DGsToHideInCompTable

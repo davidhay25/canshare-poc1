@@ -18,6 +18,12 @@
     <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
     <script src="js/libs/jstree.min.js"></script>
 
+    <style>
+        .inactive {
+            background-color: #f2dede;
+        }
+    </style>
+
     <script>
         angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage']).config(function($locationProvider) {
             $locationProvider.html5Mode(true);
@@ -147,7 +153,7 @@
                     <br/>
                     <div class="myScroll">
                         <div class="list-group">
-                            <div ng-class="{'list-group-item':true,listItemSelected:selectedItem==item}"
+                            <div ng-class="{'list-group-item':true,listItemSelected:selectedItem==item,inactive:item.vs.status == 'retired'}"
                                  ng-show="showVS(item)"
                                  style="cursor: pointer" ng-repeat="item in allVSItem" ng-click="selectVSItem(item)">
                                 {{item.display}}
@@ -272,11 +278,7 @@
                     <button class="btn btn-link" ng-click="refreshCache()"
                             uib-popover="Last updated: {{cacheDate | date : 'MMM dd  HH:mm:ss'}}"
                             popover-placement="left"
-                            popover-trigger="'mouseenter'"
-
-
-
-                    >Refresh cache</button>
+                            popover-trigger="'mouseenter'">Refresh cache</button>
                 </div>
 
 
