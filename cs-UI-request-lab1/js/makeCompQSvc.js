@@ -8,7 +8,7 @@ angular.module("pocApp")
         //this is the function that actually generates the Q
         function generateQ(allElements) {
             console.log('generate Q')
-            let qName = allElements[0].name
+            let qName = allElements[0].ed.path
             let id = "cs-" + qName
             Q = {resourceType: "Questionnaire", id: id, status: "draft", name: qName, item: []}
             Q.url = `http://canshare.co.nz/fhir/Questionnaire/${id}`

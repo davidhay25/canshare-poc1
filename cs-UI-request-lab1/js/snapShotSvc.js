@@ -511,7 +511,8 @@ angular.module("pocApp")
 
 
                 } catch (ex) {
-                    alert(`There was an exception during processing. You should revert your latest update. ${angular.toJson(ex)}`)
+                    console.log(ex)
+                    alert(`There was an exception during Snapshot generation processing. You should revert your latest update. ${angular.toJson(ex)}`)
                 }
 
 

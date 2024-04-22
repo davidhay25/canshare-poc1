@@ -1,8 +1,10 @@
 angular.module("pocApp")
     .controller('modelReviewCtrl',
-        function ($scope,$http,modelsSvc,modelCompSvc,$timeout, $uibModal,makeQSvc,utilsSvc,$window) {
+        function ($scope,$http,modelsSvc,modelCompSvc,$timeout, $uibModal,makeQSvc,utilsSvc,$window,makeCompQSvc, snapshotSvc) {
 
             $scope.input = {}
+
+
 
             //in the table view, hide common DG like HCP as the details are not relevant to reviewers
             $scope.input.hideSomeDG = true
@@ -29,8 +31,23 @@ angular.module("pocApp")
                         //has both dgs & fhir dta
                         $scope.input.types = modelsSvc.getAllTypes($scope.hashAllDG)
 
+
+
+
+
                     })
 
+                    //need to generate the snapshot for all DG. This is needed for the Q generation
+                    //the snapshots are all held within the service...
+
+                    snapshotSvc.makeSnapshots($scope.hashAllDG,true)
+
+                    //assign the snapshot svc to the modelSvc so that it can read the snapshots of DGs
+                    modelCompSvc.setSnapshotSvc(snapshotSvc)
+
+
+                    //todo - if we decide that this app won't have the ability to select dg/comp
+                    //then we don't need to get all the composiitons (will always need all the DGs)
                     $http.get('/model/allCompositions').then(
                         function (data) {
                             //console.log(data.data)
@@ -570,23 +587,20 @@ angular.module("pocApp")
 
 
 
+
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
                 $scope.allCompElements = vo.allElements
                 $scope.hashCompElements = vo.hashAllElements
 
 
-
-
                 //get the set of all paths to ignore. These are those where the DG type is in  DGsToHideInCompTable
                 //when rendering the table, any paths starting with any of this set will be ignored
+                //this is to avoid cluttering the table view
                 $scope.allCompElements.forEach(function (item) {
-
                     if (item.ed.type && DGsToHideInCompTable.indexOf(item.ed.type[0]) > -1) {
                         $scope.pathsToIgnore[item.ed.path] = true
 
                     }
-
-
                 })
                 console.log($scope.pathsToIgnore)
 
@@ -600,6 +614,11 @@ angular.module("pocApp")
                 makeCompTree(treeData,rootNodeId)
 
                 $scope.setCommentsThisModel()
+
+                //generate the Q for the composition
+                makeCompQSvc.makeQ($scope.allCompElements,function (Q) {
+                    $scope.fullQ = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+                })
 
             }
 
@@ -661,8 +680,7 @@ angular.module("pocApp")
 
 
                     let strategy = null
-                    asyncCall(treeObject,$scope.selectedComp,
-                        strategy)
+                    //asyncCall(treeObject,$scope.selectedComp,                        strategy)
 
 
                     //$scope.$digest();
@@ -670,7 +688,7 @@ angular.module("pocApp")
 
             }
 
-            async function asyncCall(treeObject,comp,strategy) {
+            async function asyncCallDEP(treeObject,comp,strategy) {
                 console.log('calling');
                 console.time('q')
 

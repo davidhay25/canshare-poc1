@@ -341,7 +341,7 @@ angular.module("pocApp")
             },
 
 
-            getVSContentsHashOriginal : function (lst) {
+            getVSContentsHashOriginalDEP : function (lst) {
                 console.trace('getting hash')
                 //given a list of urls, expand all of them
                 //if a given expansion fails, just do the others. The assumption is that

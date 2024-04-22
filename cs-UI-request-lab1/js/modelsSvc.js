@@ -273,6 +273,7 @@ angular.module("pocApp")
             },
 
             getAllTypes : function (hashAllDG) {
+                //return a list of all types
                 let types = angular.copy(hashAllDG)
                 for (const dt of this.fhirDataTypes()) {
                     types[dt] = true
@@ -339,7 +340,7 @@ angular.module("pocApp")
                 return bundle
             },
 
-            analyseWorld : function(world,types) {
+            analyseWorldDEP : function(world,types) {
                 //find references between structures
                 let that = this
                 let merged = angular.copy({...world.compositions, ...world.dataGroups})     //all EDs

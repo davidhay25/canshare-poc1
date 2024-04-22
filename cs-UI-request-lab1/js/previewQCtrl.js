@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('previewQCtrl',
-        function ($scope,Q,makeQSvc,$timeout,$http,$localStorage,Qtab) {
+        function ($scope,Q,makeQSvc,$timeout,$http,$localStorage) {
 
 
 
@@ -8,7 +8,7 @@ angular.module("pocApp")
             //https://hackweek.fhirpath-lab.com/Questionnaire?id={url to Q}
 
             $scope.input = {}
-            $scope.Q = Q // Qtab //Q
+            $scope.Q = Q
             $scope.QR = {}
 
             //todo Just for the ak demo -

@@ -57,7 +57,11 @@ angular.module("pocApp")
                 $scope.lstAllDGSS = snapshotSvc.getDGList()     //all datagroups by name
                 $scope.lstAllDGSSTitle = snapshotSvc.getDGListTitle()
 
+                //assign the snapshot svc to the modelSvc so that it can read the snapshots of DGs
+                modelCompSvc.setSnapshotSvc(snapshotSvc)
+
             }
+
             $scope.makeSnapshots()
 
 
@@ -454,10 +458,6 @@ angular.module("pocApp")
                     resolve: {
                         Q: function () {
                             return Q
-                        },
-                        Qtab : function () {
-                            //the tab version of the Q
-                            return $scope.fullQTab
                         }
                     }
                 })
@@ -1553,21 +1553,12 @@ angular.module("pocApp")
                     }
                 )
 
-                // - original list let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
-
-                //a bit of an experiment here. Given that we are using a single DG as the 'section' DG
-                //we should be able to use that to generate the full list - rather than the recursive modelCompSvc.makeFullList
-                //and it means the re-ordering should work...]
-                //AND we're re-using the DG generation code...
-                //oops - there are actually multiple DGs in a section - but updated...
-/*
-                vo.allElements.forEach(function (item) {
-                    console.log(item.ed.path)
-                })
-                */
 
                 //note that this excludes mult 0..0
-                let vo = modelCompSvc.makeFullListv2(comp,$scope.input.types,$scope.hashAllDG)      //overites the previou slist
+                //uses the snapshot svc
+                let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)      //overites the previou slist
+
+
 
                 $scope.allCompElements = vo.allElements     //used by the Table and Q generation (at least)
 
@@ -1579,22 +1570,8 @@ angular.module("pocApp")
                         // console.log("Q created and copied to clipboard!")
 
                         $scope.fullQ = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
-                        //$scope.Qlog = voQ.log   //the log of activity that occurred as the Q was created
-                        //this is a version structured for tabs.
-                        $scope.fullQTab = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+                       // $scope.fullQTab = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
 
-                        /*
-
-                                                console.log(Q)
-                                            navigator.clipboard.writeText(angular.toJson(Q)).then(
-                                                () => {
-                                                    //alert(`Link: ${host} \ncopied to clipBoard`);
-                                                },
-                                                () => {
-                                                    //alert(`Link is ${host}`);
-                                                },
-                                            )
-                                            */
 
                     })
                 }

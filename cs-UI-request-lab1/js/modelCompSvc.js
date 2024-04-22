@@ -4,9 +4,14 @@ angular.module("pocApp")
 
         let config = {}
 
+        let snapshotSvc
 
         return {
-            makeFullListv2 : function (inComp,inTypes,inHashAllDG) {
+            setSnapshotSvc : function (inSnapshotSvc) {
+                //assign the snapshot service. This allows the Q generation to access the snapshots
+                snapshotSvc = inSnapshotSvc
+            },
+            makeFullListv2DEP : function (inComp,inTypes,inHashAllDG) {
                 //Generate the full list by iterating over the sections. Assume each section has a single 'sectionDG'
 
                 let fullList = []
@@ -237,17 +242,8 @@ angular.module("pocApp")
                     lne += "\t" + getValue(item.ed.valueSet)
                     lne += "\t" + getValue(item.ed.mult)
 
-                    /*
-                    if (item.ed.type) {
-                        lne += "\t" + item.ed.type[0]
-                        //lne += "," + item.ed.type[0]
-                    } else {
-                        lne += "\t"
-                    }
-
-                    */
                     lne += "\r\n"
-                    //console.log(lne)\
+
                     if (item.ed.mult !== '0..0') {
                         lst.push(lne)
                     }
@@ -270,7 +266,41 @@ angular.module("pocApp")
 
             },
 
+            makeFullListNEW: function (inComp,inTypes,inHashAllDG) {
+                //may not need this
+                let lst = []
+
+                let hashAllElements = {}        //keyed on path
+
+                //create as ed to act as the root
+                let edRoot = {path:comp.name,title:comp.title}
+                hashAllElements[comp.name] = {ed:edRoot}
+
+                inComp.sections.forEach(function (section) {
+
+                    //let pathRoot = `${comp.name}.section-${section.name}`   //section root is model name + section name
+                    let pathRoot = `${comp.name}.${section.name}`   //section root is model name + section name
+                    hashAllElements[pathRoot] = {ed:section}
+                    //each item is assumed to be a DG - think about others (Z & override) later
+                    section.items.forEach(function (item) {
+                        //{name: title: type: mult:}
+
+                        processSectionItem(item,pathRoot)
+
+
+                    })
+
+                    //let DG = types[section.name]
+
+
+                })
+
+            },
+
+
             makeFullList: function (inComp,inTypes,inHashAllDG) {
+
+                console.log(snapshotSvc.getDGList())
 
                 //shouldn't happen
                 if (!inComp) {
@@ -303,7 +333,7 @@ angular.module("pocApp")
                 //allElements.push(edRoot)
 
                 //processes a single DG, adding child elements (recursively) to the hash
-                function processDG(DG,pathRoot) {
+                function processDGDEP(DG,pathRoot) {
 
                 //    console.log("ProcessDG:" + DG.name)
                     if (DG.parent) {
@@ -356,9 +386,12 @@ angular.module("pocApp")
                         model.kind = "dg"   //<<<<<<<<< oct 2
                         hashAllElements[childPathRoot] = {ed:model,host:sectionItem}
 
+                        // vo.allElements = snapshotSvc.getFullListOfElements(dg.name)
+                        let allElementsThisDG = snapshotSvc.getFullListOfElements(model.name)
 
-                        let vo = modelsSvc.getFullListOfElements(model,types,hashAllDG)
-                        let allElementsThisDG = modelsSvc.makeOrderedFullList(vo.allElements)     //orders the list and removes group original children
+                        //the old way...
+                       // let vo = modelsSvc.getFullListOfElements(model,types,hashAllDG)
+                        //let allElementsThisDG = modelsSvc.makeOrderedFullList(vo.allElements)     //orders the list and removes group original children
 
                         //todo >>>> here is where the 'insertAfter' re-ordering should go..
 

@@ -1,3 +1,5 @@
+//deprecated
+
 angular.module("pocApp")
     .controller('makeQCtrl',
         function ($scope,modelCompSvc,$timeout,$localStorage,$uibModal,$http,modelsSvc,makeQSvc) {

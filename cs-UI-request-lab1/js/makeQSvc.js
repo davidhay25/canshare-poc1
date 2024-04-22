@@ -686,7 +686,7 @@ angular.module("pocApp")
 
             //this is used by the composition to build the Q
             //this has the structure needed for tabs
-            makeQFromTreeTab :  async function (treeObject,comp,strategy) {
+            makeQFromTreeTabDEP :  async function (treeObject,comp,strategy) {
                 //this is a version I'm using during connectathon to implemnet the tabs extensions
                 //the Q that are created won't be able to be used in my renderer...
 
@@ -1213,167 +1213,8 @@ angular.module("pocApp")
 
 
             },
-/*
 
-            makeQDEP: function(treeObject) {
-                //construct a Questionnaire resource - called by the makeQ controller - will be deprecated probably
-                //treeObject comes from the jstree control - it's actually an array
-                let qName = treeObject[0].id
-                Q = {resourceType:"Questionnaire",status:"draft",name:qName,item:[]}
-
-                function addChild(parent,node) {
-                    let data = node.data
-
-                    let item = {text:node.text}     //this is the Q item element
-                    item.linkId = node.id
-
-                    if (data.ed && data.ed.enableWhen) {
-                        console.log(data.ed,'has ew')
-                        item.enableWhen = []
-                        data.ed.enableWhen.forEach(function (ew) {
-                            let qEW = {operator:ew.operator,answerCoding:ew.value}
-                            qEW.question = `${parent.linkId}.${ew.source}` //linkId of source is relative to the parent (DG)
-                            item.enableWhen.push(qEW)
-                        })
-
-                    }
-
-                    //if the node is a section or group, then the type must also be 'group. Only 'element' types can be different
-
-                    if (node.data.level == 'element') {
-                        item.type = data.controlType    //the 'official' type for the item
-
-                        //Add the hint instruction
-                        if (data.controlType !== data.controlHint)  {
-                            //console.log(item.text,data.controlType,data.controlHint)
-                            //the hint is the extension that gives more options to the renderer
-                            item.extension = item.extension || []
-                            let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
-                            ext.valueCodeableConcept = {coding:[{code:data.controlHint,system:"http://hl7.org/fhir/questionnaire-item-control"}]}
-                            item.extension.push(ext)
-                        }
-
-
-                        switch (data.controlHint) {
-                            case 'drop-down' :
-                                //populate the answerOption. For now, get it from 'options, but later:
-                                item.answerOption = []
-
-
-                                //do the options first...
-                                if (data.ed.options) {
-                                    for (const option of data.ed.options) {
-                                        item.answerOption.push({valueCoding:{code:option.code,display:option.display}})
-                                    }
-                                } else if (data.ed.valueSet) {
-                                    //if there's a valueSet, then tru to expand it
-
-                                    //let url = `https://nzhts.digital.health.nz/fhir/ValueSet/${targetVSName}`
-
-                                    //don't expand it - just add the VS to the Q (but keep the code)
-                                    let vs = data.ed.valueSet
-                                    if (vs.indexOf('http:') == -1) {
-                                        vs = `https://nzhts.digital.health.nz/fhir/ValueSet/${vs}`
-                                    }
-                                    //item.answerValueSet = vs
-
-
-                                    if (false) {
-                                        let qry = `ValueSet/$expand?url=${data.ed.valueSet}&_summary=false`
-                                        let encodedQry = encodeURIComponent(qry)
-
-                                        $http.get(`nzhts?qry=${encodedQry}`).then(
-                                            function (data) {
-                                                let expandedVS = data.data
-                                                for (const concept of expandedVS.expansion.contains) {
-                                                    item.answerOption.push(
-                                                        {valueCoding:{system:concept.system, code:concept.code, display:concept.display}})
-                                                }
-                                                console.log(data.data)
-
-
-
-
-                                            }, function (err) {
-                                                item.answerOption.push({valueCoding:{display:"VS not found"}})
-                                                console.log(`There was no ValueSet with the url:${data.ed.valueSet}`)
-                                            }
-                                        )
-                                    }
-
-
-
-
-
-                                }
-
-
-
-
-
-
-
-                                break
-                        }
-
-
-
-                    } else {
-                        item.type = 'group'
-                        //console.log(data.cols)
-                        //are there multi columns set
-
-                        //default to 2 columns
-                        data.cols = data.cols || 2
-
-                        if (data.cols) {
-                            item.extension = item.extension || []
-                            let ext = {url:"http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"}
-                            ext.valueInteger = data.cols
-                            item.extension.push(ext)
-                        }
-                    }
-
-                    //item.linkId = node.id
-                    parent.item = parent.item || []
-                    parent.item.push(item)
-
-                    //If 'other allowed' is set, then add a text box
-                    if (data.ed && data.ed.otherAllowed) {
-                        let itemOther = {text:`${node.text} (Other)`}     //this is the Q item element
-                        itemOther.linkId = `${node.id}.other`
-                        itemOther.type = 'string'
-                        parent.item.push(itemOther)
-                    }
-
-
-                    if (node.children && node.children.length > 0) {
-                        node.children.forEach(function (childNode) {
-
-                            addChild(item,childNode)
-                        })
-                    }
-
-                }
-
-
-                treeObject[0].children.forEach(function (section) {
-                    //only add a section if it has children
-                    if (section.children && section.children.length > 0) {
-                        addChild(Q,section)
-                    }
-
-                })
-
-                //console.log(Q)
-                return Q
-
-
-        },
-
-*/
-
-            moveDown : function (node,treeData) {
+            moveDownDEP : function (node,treeData) {
                 //move up within the parent
                 let parent = node.parent
                 let bottomThisParent = -1  //the topmost item that has this parent
@@ -1401,7 +1242,7 @@ angular.module("pocApp")
                 }
 
             },
-            moveUp : function (node,treeData) {
+            moveUpDEP : function (node,treeData) {
                 //move up within the parent
                 let parent = node.parent
                 let topThisParent = -1  //the topmost item that has this parent
@@ -1430,7 +1271,7 @@ angular.module("pocApp")
 
             },
 
-            isADG : function (ed, hashAllDG) {
+            isADGDEP : function (ed, hashAllDG) {
                 let isADG = false
                 if (ed.kind == 'dg') {
                     isADG = true
@@ -1486,7 +1327,7 @@ angular.module("pocApp")
 
             },
 
-            getAllChildNodes: function (parentId,ed,hashAllDG,allElementsThisSection) {
+            getAllChildNodesDEP: function (parentId,ed,hashAllDG,allElementsThisSection) {
 
                 //create an array of tree nodes that are children (direct or indirect) of the ed
                 //the ed will refer to a DG (the responsibility of the caller)
