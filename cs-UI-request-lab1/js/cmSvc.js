@@ -164,11 +164,14 @@ angular.module("pocApp")
                         for (const don of target.dependsOn) {
                             let property = don.property
                             let value = don.value
+
                             if (value !== '0') {
                                 hashProperty[property] = hashProperty[property] || []
 
-                                let ar = hashProperty[property].filter(concept => value == don.value )
+                                //see if the code is already in the accumulated list...
+                                let ar = hashProperty[property].filter(concept => concept.code == don.value )
 
+                                //... and ignore if it is
                                 if (ar.length == 0) {
                                     let concept = {code:value,display:don.display}
                                     hashProperty[property].push(concept)
@@ -181,7 +184,7 @@ angular.module("pocApp")
                 console.log(hashProperty)
 
 
-                return {targets:lstTargets,element: element,hashProperty:hashProperty}
+                return {targets:lstTargets,element: element,hashProperty:hashProperty,sourceConcept:concept}
 
 
                 function isMatch(code,concept) {

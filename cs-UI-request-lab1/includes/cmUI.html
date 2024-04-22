@@ -174,8 +174,17 @@
                       </uib-tab>
                       <uib-tab heading="Reverse Lookup">
                           <div class="banner">
-                              <div>{{reverseLookup.element.display}} ({{reverseLookup.element.code}})</div>
+                              <div>Property: {{reverseLookup.element.display}}
+
+                                  ( <span class="clickable" ng-click="lookup(reverseLookup.element.code)">
+                                      {{reverseLookup.element.code}}
+                                  </span> )
+                              </div>
+                              <div>Selected value: {{reverseLookup.sourceConcept.display}}
+                                  (<span class="clickable" ng-click="lookup(reverseLookup.sourceConcept.code)">
+                                  {{reverseLookup.sourceConcept.code}})</span></div>
                           </div>
+
 
 
                           <uib-tabset>
