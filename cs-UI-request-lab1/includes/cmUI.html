@@ -31,44 +31,97 @@
         </div>
     </div>
 
+
+    <br/>
   <uib-tabset active="local.conceptMapTab">
 
     <uib-tab heading="UI">
+        <br/>
 
 
           <div class="row">
               <div class="col-md-5">
-                  <table class="table table-bordered">
-                      <tr ng-repeat = "(k,v) in cmProperties">
-                          <td width = "30%">
-                              <div class = 'clickable' ng-click="populateUIControl(k,true)">{{k}}</div>
-                          </td>
-                          <td>
+
+                  <uib-tabset>
+                      <uib-tab heading="Progressive">
+                          <br/>
+                          <table class="table table-bordered">
+                              <tr ng-repeat = "(k,v) in cmProperties">
+                                  <td width = "30%">
+                                      <div class = 'clickable' ng-click="populateUIControl(k,true)">{{k}}</div>
+                                  </td>
+                                  <td>
+
+                                      <div ng-show="v.noMatches">
+                                          There were no matching ValueSets or Concepts
+                                      </div>
+
+                                      <div ng-show="v.singleConcept">
+                                          <input type="text" class="form-control" disabled="disabled" value="{{v.singleConcept.display}}"/>
+                                      </div>
+
+                                      <div ng-show="v.options.length > 0">
+                                          <select class="form-control" ng-model="local.cmOptions[k]"
+                                                  ng-change="uiValueSelected(k,local.cmOptions[k])"
+                                                  ng-options="v.display for (k,v) in v.options">
+                                          </select>
+                                      </div>
+
+                                  </td>
+                              </tr>
+                          </table>
 
 
-                              <div ng-show="v.noMatches">
-                                  There were no matching ValueSets or Concepts
-                              </div>
+                          <button class="btn-primary btn" ng-click="resetUI()">Reset</button>
+                      </uib-tab>
+                      <uib-tab heading="Histology">
+                          <br/>
+                          <table class="table table-bordered">
 
-                              <div ng-show="v.singleConcept">
-                                  <input type="text" class="form-control" disabled="disabled" value="{{v.singleConcept.display}}"/>
-                              </div>
+                              <tr>
+                                  <td>Histology</td>
+                                  <td>
+                                      <input type="text" class="form-control" ng-model="local.cmOptions['histologic-type-primary']"
 
-                              <div ng-show="v.options.length > 0">
-                                  <select class="form-control" ng-model="local.cmOptions[k]"
-                                          ng-change="uiValueSelected(k,local.cmOptions[k])"
-                                          ng-options="v.display for (k,v) in v.options">
-                                  </select>
-                              </div>
+                                             typeahead-editable = "false
+"                                            typeahead-on-select = "histoSelected($item)"
+                                             uib-typeahead="concept.display for concept in histology | filter:$viewValue | limitTo:8" >
+                                  </td>
+                              </tr>
+
+                              <tr ng-repeat = "(k,v) in cmProperties"
+                                ng-hide="k=='histologic-type-primary'">
+                                  <td width = "30%">
+                                      <div>{{k}}</div>
+                                  </td>
+                                  <td>
+
+                                      <div ng-show="v.options.length == 1">
+                                          {{v.options[0].display}}
+                                      </div>
+
+                                      <div ng-show="v.options.length >1 && v.options.length < 5">
+                                          <div ng-repeat = "concept in v.options">
+                                              <input type="radio" ng-model="local.cmOptions[k]" value="{{concept.code}}" /> {{concept.display}}
+                                          </div>
+
+                                      </div>
+
+                                      <div ng-show="v.options.length > 4">
+                                          <select class="form-control" ng-model="local.cmOptions[k]"
+                                                  ng-options="v1.display for v1 in v.options">
+                                          </select>
+
+                                      </div>
+                                  </td>
+                              </tr>
+                          </table>
 
 
-
-                          </td>
-                      </tr>
-                  </table>
+                      </uib-tab>
+                  </uib-tabset>
 
 
-                  <button class="btn-primary btn" ng-click="resetUI()">Reset</button>
 
               </div>
               <div class="col-md-7">
@@ -597,7 +650,7 @@
                     In some cases
                     the .code might be a single code rather than a refset code. This can be determined by
                     examining the format of the <span class="elementName">.code</span> entry. If it starts
-                    with 'http' then is is a ValueSet url. Otherwise it is a SNOMED-CT concept id.
+                    with 'http' then it is a ValueSet url. Otherwise it is a SNOMED-CT concept id.
 
                     <br>
                     <uib-tabset>
@@ -637,9 +690,9 @@
                     Within a target, all properties must match for the target to be included in the set. Only
                     a single target should match any given combination of properties.
 
-                    <br>
+                    <br/>
                     <div ng-repeat = "dep in selectedCmTreeTarget.data.dependsOn">
-                        <div class="clickable" ng-click="lookup(dep.value)">Lookup {{dep.value}}</div>
+                        <div ng-show="dep.value !== '0'"  class="clickable" ng-click="lookup(dep.value)">Lookup {{dep.value}}</div>
 
                     </div>
 

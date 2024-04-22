@@ -34,6 +34,8 @@ angular.module("pocApp")
                     console.log(`Size of ConceptMap: ${utilsSvc.getSizeOfObject($scope.fullSelectedCM)/1000} Kb`)
                     console.log(`Size of ValueSets : ${utilsSvc.getSizeOfObject($scope.hashExpandedVs)/1000} Kb`)
                     //can setup as the service vs will be present
+
+
                     setup()
 
                    // let vo = {cm:$scope.fullSelectedCM,vs:$scope.hashExpandedVs}
@@ -90,6 +92,110 @@ angular.module("pocApp")
 
             //-------------
 
+            $scope.selectCMItem = function (item,expand) {
+                $scope.selectedCM = item.cm
+                delete $scope.fullSelectedCM
+                delete $scope.resultParameters
+                delete $scope.resultParametersList
+                delete $scope.translateParameters
+                delete $scope.doProperties
+                delete $scope.input.cmOptions
+                delete $scope.cmSources
+                delete $scope.myResult
+                delete $scope.translateError
+                delete $scope.expandedCMVS
+
+                $scope.loadingCM = true
+
+                if ($scope.input.loadComplete) {
+                    expand = true
+                }
+
+                querySvc.getOneConceptMap(item.cm.url,expand).then(
+                    function (ar) {
+                        $scope.fullSelectedCM = ar[0]       //todo what of there's > 1
+
+                        //add the operator to the DependsOn element from the extension (makes UI processing easier
+                        let lstVsUrl = []   //list of all ValueSets that are used by 'in-vs' rules
+                        //add the VS with all topography. used for the primary-site-laterality
+                        lstVsUrl.push('https://nzhts.digital.health.nz/fhir/ValueSet/canshare-topography')
+                        $scope.fullSelectedCM.group.forEach(function (group) {
+                            group.element.forEach(function (element) {
+                                element.target.forEach(function (target) {
+                                    if (target.dependsOn) {
+                                        target.dependsOn.forEach(function (dep) {
+                                            dep['x-operator'] = "="
+                                            if (dep.extension) {
+                                                dep.extension.forEach(function (ext) {
+                                                    if (ext.url == 'http://canshare.co.nz/fhir/StructureDefinition/do-operator') {
+                                                        dep['x-operator'] = ext.valueCode
+
+                                                        if (ext.valueCode == 'in-vs') {
+                                                            //dep.value is a ValueSet url. We will need the contents of this valueset for rules processing
+                                                            if (lstVsUrl.indexOf(dep.value) == -1) {
+                                                                lstVsUrl.push(dep.value)
+                                                            }
+
+                                                        }
+
+                                                    }
+                                                })
+                                            }
+
+                                        })
+                                    }
+
+
+                                })
+                            })
+
+                        })
+
+                        //expand all the valuesets
+                        if (lstVsUrl.length > 0) {
+                            cmSvc.getVSContentsHash(lstVsUrl).then(
+                                function (data) {
+                                    console.log('vs size',utilsSvc.getSizeOfObject(data)/1024 )
+
+                                    $scope.$broadcast('hashExpandedVs',data)    //the list is processed by cmCtrl
+                                },
+                                function (err) {
+                                    alert(err)
+                                }
+                            )
+                        }
+
+
+
+                        //make the download link
+                        // $scope.downloadLinkMap = window.URL.createObjectURL(new Blob([angular.toJson($scope.fullSelectedCM,true) ],{type:"application/json"}))
+                        // $scope.downloadLinkMapName = `ConceptMap-${$scope.fullSelectedCM.id}.json`
+
+                        let treeData = querySvc.makeTree($scope.fullSelectedCM)
+                        showCmTree(treeData)
+
+
+                        //now get the set of 'dependsOn' properties (if any)
+                        let vo = querySvc.getCMProperties($scope.fullSelectedCM)
+                        $scope.doProperties = vo.hashProperties // querySvc.getCMProperties($scope.fullSelectedCM)
+                        $scope.cmSources = vo.arSources
+                        $scope.input.selectedCmSource = $scope.cmSources[0]
+
+                        //actually, we need to set the doProperties for this particular source
+                        let vo1 = querySvc.getCMProperties($scope.fullSelectedCM,$scope.input.selectedCmSource.code)
+                        $scope.doProperties = vo1.hashProperties //
+
+                        //decide whether to show 'canshare' tab
+                        //$scope.showTranslate = Object.keys($scope.doProperties).length > 0
+
+                    }, function (err) {
+
+                    }
+                ).finally(function () {
+                    $scope.loadingCM = false
+                })
+
+            }
 
 
             $scope.showTarget = function (target) {
@@ -190,6 +296,28 @@ angular.module("pocApp")
                 )
             }
 
+            function showCmTree(treeData) {
+                $('#cmTree').jstree('destroy');
+
+                let x = $('#cmTree').jstree(
+                    {'core': {'multiple': false, 'data': treeData,
+                            'themes': {name: 'proton', responsive: true}}}
+                ).on('changed.jstree', function (e, data) {
+                    if (data.node) {
+                        $scope.selectedCmTreeTarget = data.node.data;
+                        console.log(data.node)
+                        delete $scope.expandedCMVS
+                    }
+
+                    $scope.$digest();       //as the event occurred outside of angular...
+                }).bind("loaded.jstree", function (event, data) {
+                    let id = treeData[0].id
+                    $(this).jstree("open_node",id);
+                    //$(this).jstree("open_all");  //open all nodes
+                    $scope.$digest();
+                });
+
+            }
 
             function setup() {
                 $scope.local.cmOptions = {}
@@ -236,9 +364,49 @@ angular.module("pocApp")
                 $scope.cmProperties['cancer-service'].options.push({code:"0",display:"No service"})
 */
 
+                let treeData = querySvc.makeTree($scope.fullSelectedCM)
+                showCmTree(treeData)
+
+                //stuff for the histology UI
+                $scope.histology = $scope.hashExpandedVs['https://nzhts.digital.health.nz/fhir/ValueSet/canshare-who-histology']
+
             }
 
-            // have to do this after all the vs have been loaded as that is where the service are setup()
+            //when a concept is selected from the histology typeahead in the histology UI
+            $scope.histoSelected = function (concept) {
+
+
+                performReverseLookup('histologic-type-primary',concept)
+                console.log($scope.reverseLookup)
+
+                //populate the data from reverse todo ?move to seperate fuction
+                for (const prop of Object.keys($scope.reverseLookup.hashProperty)) {
+
+                    $scope.cmProperties[prop].options = $scope.reverseLookup.hashProperty[prop]
+
+                    //set the default values is between 1 and 3 (will be rendered as radios in the UI
+                    if ($scope.cmProperties[prop].options && $scope.cmProperties[prop].options.length < 4) {
+                        $scope.local.cmOptions[prop] = $scope.cmProperties[prop].options[0].code
+
+
+
+                    }
+
+                    //$scope.local.cmOptions[prop] = $scope.reverseLookup.hashProperty[prop]
+                }
+
+                console.log($scope.cmProperties)
+
+
+
+            }
+
+            $scope.getFirstValue = function (lst) {
+                if (lst && lst.length > 0) {
+                    return lst[0].code
+                }
+
+            }
 
             $scope.showConcept = function(c) {
                 return `${c.display} (${c.code})`
@@ -396,6 +564,9 @@ angular.module("pocApp")
                 }
             }
 
+
+            //locate all values for other properties which could result in this value
+            //value is a concept
 
             function performReverseLookup(propKey,value) {
                 delete $scope.reverseLookup
@@ -783,111 +954,6 @@ angular.module("pocApp")
 
             }
 
-            $scope.selectCMItemDEP = function (item,expand) {
-                $scope.selectedCM = item.cm
-                delete $scope.fullSelectedCM
-                delete $scope.resultParameters
-                delete $scope.resultParametersList
-                delete $scope.translateParameters
-                delete $scope.doProperties
-                delete $scope.input.cmOptions
-                delete $scope.cmSources
-                delete $scope.myResult
-                delete $scope.translateError
-                delete $scope.expandedCMVS
-
-                $scope.loadingCM = true
-
-                if ($scope.input.loadComplete) {
-                    expand = true
-                }
-
-                querySvc.getOneConceptMap(item.cm.url,expand).then(
-                    function (ar) {
-                        $scope.fullSelectedCM = ar[0]       //todo what of there's > 1
-
-                        //add the operator to the DependsOn element from the extension (makes UI processing easier
-                        let lstVsUrl = []   //list of all ValueSets that are used by 'in-vs' rules
-                        //add the VS with all topography. used for the primary-site-laterality
-                        lstVsUrl.push('https://nzhts.digital.health.nz/fhir/ValueSet/canshare-topography')
-                        $scope.fullSelectedCM.group.forEach(function (group) {
-                            group.element.forEach(function (element) {
-                                element.target.forEach(function (target) {
-                                    if (target.dependsOn) {
-                                        target.dependsOn.forEach(function (dep) {
-                                            dep['x-operator'] = "="
-                                            if (dep.extension) {
-                                                dep.extension.forEach(function (ext) {
-                                                    if (ext.url == 'http://canshare.co.nz/fhir/StructureDefinition/do-operator') {
-                                                        dep['x-operator'] = ext.valueCode
-
-                                                        if (ext.valueCode == 'in-vs') {
-                                                            //dep.value is a ValueSet url. We will need the contents of this valueset for rules processing
-                                                            if (lstVsUrl.indexOf(dep.value) == -1) {
-                                                                lstVsUrl.push(dep.value)
-                                                            }
-
-
-                                                        }
-
-                                                    }
-                                                })
-                                            }
-
-                                        })
-                                    }
-
-
-                                })
-                            })
-
-                        })
-
-                        //expand all the valuesets
-                        if (lstVsUrl.length > 0) {
-                            cmSvc.getVSContentsHash(lstVsUrl).then(
-                                function (data) {
-                                    console.log('vs size',utilsSvc.getSizeOfObject(data)/1024 )
-
-                                    $scope.$broadcast('hashExpandedVs',data)    //the list is processed by cmCtrl
-                                },
-                                function (err) {
-                                    alert(err)
-                                }
-                            )
-                        }
-
-
-
-                        //make the download link
-                        // $scope.downloadLinkMap = window.URL.createObjectURL(new Blob([angular.toJson($scope.fullSelectedCM,true) ],{type:"application/json"}))
-                        // $scope.downloadLinkMapName = `ConceptMap-${$scope.fullSelectedCM.id}.json`
-
-                        let treeData = querySvc.makeTree($scope.fullSelectedCM)
-                        showCmTree(treeData)
-
-
-                        //now get the set of 'dependsOn' properties (if any)
-                        let vo = querySvc.getCMProperties($scope.fullSelectedCM)
-                        $scope.doProperties = vo.hashProperties // querySvc.getCMProperties($scope.fullSelectedCM)
-                        $scope.cmSources = vo.arSources
-                        $scope.input.selectedCmSource = $scope.cmSources[0]
-
-                        //actually, we need to set the doProperties for this particular source
-                        let vo1 = querySvc.getCMProperties($scope.fullSelectedCM,$scope.input.selectedCmSource.code)
-                        $scope.doProperties = vo1.hashProperties //
-
-                        //decide whether to show 'canshare' tab
-                        $scope.showTranslate = Object.keys($scope.doProperties).length > 0
-
-                    }, function (err) {
-
-                    }
-                ).finally(function () {
-                    $scope.loadingCM = false
-                })
-
-            }
 
             //called when a property option in the UI changes
             $scope.cmLookupDEP = function (inputProp,v,propKey) {

@@ -36,7 +36,7 @@ angular.module("pocApp")
 
 
             //display the tree view of a ConceptMap
-            function showCmTree(treeData) {
+            function showCmTreeDEP(treeData) {
                 $('#cmTree').jstree('destroy');
 
                 let x = $('#cmTree').jstree(
@@ -291,8 +291,8 @@ console.log($scope.allTargets)
                         $scope.downloadLinkMap = window.URL.createObjectURL(new Blob([angular.toJson($scope.fullSelectedCM,true) ],{type:"application/json"}))
                         $scope.downloadLinkMapName = `ConceptMap-${$scope.fullSelectedCM.id}.json`
 
-                        let treeData = querySvc.makeTree($scope.fullSelectedCM)
-                        showCmTree(treeData)
+                       // let treeData = querySvc.makeTree($scope.fullSelectedCM)
+                      //  showCmTree(treeData)
 
                         /* I thnk all these functions are used by the rules tab which is no longer used
 

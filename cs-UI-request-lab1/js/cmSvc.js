@@ -173,14 +173,43 @@ angular.module("pocApp")
 
                                 //... and ignore if it is
                                 if (ar.length == 0) {
-                                    let concept = {code:value,display:don.display}
-                                    hashProperty[property].push(concept)
+
+                                    if (value.startsWith('http')) {
+                                        //this is a valueset
+                                        let arConcepts = hashExpandedVs[value]
+                                        if (arConcepts) {
+                                            hashProperty[property] = hashProperty[property] || []
+
+                                            for (const concept of arConcepts) {
+                                                let ar = hashProperty[property].filter(c =>c.code == concept.code)
+                                                if (ar.length == 0) {
+                                                    hashProperty[property].push(concept)
+                                                }
+                                                //hashProperty[property]
+                                            }
+
+
+
+
+                                        } else {
+                                            alert(`ValueSet ${value} not found`)
+                                        }
+
+                                    } else {
+                                        let concept = {code:value,display:don.display}
+                                        hashProperty[property].push(concept)
+                                    }
+
+
+
                                 }
                             }
 
                         }
                     }
                 }
+
+
                 console.log(hashProperty)
 
 
