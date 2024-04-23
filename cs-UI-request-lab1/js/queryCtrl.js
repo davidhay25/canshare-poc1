@@ -614,7 +614,11 @@ console.log($scope.allTargets)
                 $scope.expandQry = qry
                 let encodedQry = encodeURIComponent(qry)
                 $scope.showWaiting = true
-                $http.get(`nzhts?qry=${encodedQry}`).then(
+
+
+                let config = {headers:{'x-ts-instance':$scope.input.tsInstance}}
+
+                $http.get(`nzhts?qry=${encodedQry}`,config).then(
                     function (data) {
                         $scope.expandedVS = data.data
                     }, function (err) {
