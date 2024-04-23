@@ -120,9 +120,18 @@ angular.module("pocApp")
                         let lstVsUrl = []   //list of all ValueSets that are used by 'in-vs' rules
                         //add the VS with all topography. used for the primary-site-laterality
                         lstVsUrl.push('https://nzhts.digital.health.nz/fhir/ValueSet/canshare-topography')
+                        lstVsUrl.push('https://nzhts.digital.health.nz/fhir/ValueSet/canshare-cancer-service')
+
                         $scope.fullSelectedCM.group.forEach(function (group) {
                             group.element.forEach(function (element) {
                                 element.target.forEach(function (target) {
+
+                                    if (target.code && target.code.startsWith('http')) {
+                                        lstVsUrl.push(target.code)
+                                    }
+
+
+
                                     if (target.dependsOn) {
                                         target.dependsOn.forEach(function (dep) {
                                             dep['x-operator'] = "="
@@ -154,6 +163,7 @@ angular.module("pocApp")
 
                         //expand all the valuesets
                         if (lstVsUrl.length > 0) {
+                            $scope.showWaiting = true
                             cmSvc.getVSContentsHash(lstVsUrl).then(
                                 function (data) {
                                     console.log('vs size',utilsSvc.getSizeOfObject(data)/1024 )
@@ -163,7 +173,9 @@ angular.module("pocApp")
                                 function (err) {
                                     alert(err)
                                 }
-                            )
+                            ).finally(function () {
+                                $scope.showWaiting = false
+                            })
                         }
 
 
@@ -345,7 +357,7 @@ angular.module("pocApp")
                 $scope.cmProperties['patient-sex'].options.push({code:"F",display:"Female"})
                 $scope.cmProperties['patient-sex'].options.push({code:"M",display:"Male"})
 
-                /*
+
 
                 let serviceUrl = "https://nzhts.digital.health.nz/fhir/ValueSet/canshare-cancer-service"
                 let serviceConcepts = $scope.hashExpandedVs[serviceUrl]
@@ -357,15 +369,15 @@ angular.module("pocApp")
                 } else {
                     alert(`The service ValueSet ${serviceUrl} was not found`)
                 }
-*/
 
+/*
                 //cancer service options are fixed - todo get from CM
                 $scope.cmProperties['cancer-service'].options.push({code:"394803006",display:"Clinical haematology"})
                 $scope.cmProperties['cancer-service'].options.push({code:"394593009",display:"Medical oncology"})
                 $scope.cmProperties['cancer-service'].options.push({code:"418002000",display:"Paediatric oncology"})
                 $scope.cmProperties['cancer-service'].options.push({code:"419815003",display:"Radiation oncology"})
                 $scope.cmProperties['cancer-service'].options.push({code:"0",display:"No service"})
-
+*/
 
                 let treeData = querySvc.makeTree($scope.fullSelectedCM)
                 showCmTree(treeData)

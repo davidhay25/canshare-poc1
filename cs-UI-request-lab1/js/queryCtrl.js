@@ -218,7 +218,7 @@ console.log($scope.allTargets)
                 $scope.showWaiting = true
 
                 //get the expanded concept map (include the group elements)
-                querySvc.getOneConceptMap(item.cm.url,true).then(
+                querySvc.getOneConceptMap(item.cm.url,true,$scope.input.tsInstance).then(
                     function (ar) {
                         $scope.fullSelectedCM = ar[0]       //todo what of there's > 1
                         console.log(`ConceptMap size: ${utilsSvc.getSizeOfObject($scope.fullSelectedCM)/1024} K `)
@@ -437,7 +437,7 @@ console.log($scope.allTargets)
             }
 
             //refresh the list of Q that use a specific VS
-            $scope.refreshVsQList = function(url) {
+            $scope.refreshVsQListDEP = function(url) {
                 let qry = `/term/findQusingVS?url=${url}`
                 $scope.showWaiting = true
                 $http.get(qry).then(function (data) {

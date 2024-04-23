@@ -309,7 +309,7 @@ angular.module("pocApp")
 
                 },
 
-                getOneConceptMap : function(url,expand) {
+                getOneConceptMap : function(url,expand,tsInstance) {
                     let deferred = $q.defer()
 
                     let qry = `ConceptMap?url=${url}`  //?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c`
@@ -320,8 +320,8 @@ angular.module("pocApp")
 
                     console.log(qry)
                     let encodedQry = encodeURIComponent(qry)
-
-                    $http.get(`nzhts?qry=${encodedQry}`).then(
+                    let config = {headers:{'x-ts-instance':tsInstance}}
+                    $http.get(`nzhts?qry=${encodedQry}`,config).then(
                         function (data) {
 
                             let bundle = data.data
@@ -345,15 +345,15 @@ angular.module("pocApp")
 
                     return deferred.promise
                 },
-                getConceptMaps : function(){
+                getConceptMapsDEP : function(tsInstance){
 //return a list of subsetted canshare valuesets
                     let deferred = $q.defer()
 
                     let qry = `ConceptMap`  //?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c`
                     console.log(qry)
                     let encodedQry = encodeURIComponent(qry)
-
-                    $http.get(`nzhts?qry=${encodedQry}`).then(
+                    let config = {headers:{'x-ts-instance':tsInstance}}
+                    $http.get(`nzhts?qry=${encodedQry}`,config).then(
                         function (data) {
                             let bundle = data.data
                             if (bundle && bundle.entry) {

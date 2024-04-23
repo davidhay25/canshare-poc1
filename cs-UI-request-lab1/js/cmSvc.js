@@ -251,7 +251,7 @@ angular.module("pocApp")
                 }
 
             },
-            saveInCache : function (window,key,object) {
+            saveInCacheDEP : function (window,key,object) {
                 let deferred = $q.defer()
                 //save the supplied object in an indexedDb cache
                 const request = window.indexedDB.open("cmData", 3)
@@ -276,7 +276,6 @@ angular.module("pocApp")
                 //the VS is not available
 
                 let hashExpanded = {}
-              //  let deferred = $q.defer()
                 let promises = []
 
                 lst.forEach(function (url) {
@@ -290,34 +289,6 @@ angular.module("pocApp")
                 $q.all(promises).then(function(results) {
                     // All promises resolved successfully
 
-                    //let hashExpanded = {}
-/*
-                    // Process each response
-                    angular.forEach(results, function(response) {
-
-                        console.log(response)
-                        if (response.data && response.data.expansion && response.data.expansion.contains) {
-
-                            let ar = []
-                            response.data.expansion.contains.forEach(function (concept) {
-                                ar.push(concept)
-                            })
-
-                            ar.sort(function (a,b) {
-                                if (a.display > b.display) {
-                                    return 1
-                                } else {
-                                    return -1
-                                }
-                            })
-
-                            hashExpanded[response.data.url] = ar
-                        }
-
-                    });
-*/
-
-                    console.log(hashExpanded)
                     deferred.resolve(hashExpanded)
 
                 }).catch(function(error) {
