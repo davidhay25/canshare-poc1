@@ -35,6 +35,7 @@ angular.module("pocApp")
                     console.log(`Size of ValueSets : ${utilsSvc.getSizeOfObject($scope.hashExpandedVs)/1000} Kb`)
                     //can setup as the service vs will be present
 
+                    console.log($scope.hashExpandedVs)
 
                     setup()
 
