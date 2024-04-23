@@ -145,6 +145,10 @@ angular.module("pocApp")
             reverseRulesEngine : function (element,concept,hashExpandedVs) {
                 //check all the targets in the element for conditions where the concept would be a match
 
+                if (! element && ! element.target) {
+                    return
+                }
+
 
                 //the list of targets that, if the dependsOn are met, would return a vs containing the concept
                 //or the concept itself (target.code is the concept)

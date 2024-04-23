@@ -344,6 +344,8 @@ angular.module("pocApp")
                 $scope.cmProperties['patient-sex'].options.push({code:"F",display:"Female"})
                 $scope.cmProperties['patient-sex'].options.push({code:"M",display:"Male"})
 
+                /*
+
                 let serviceUrl = "https://nzhts.digital.health.nz/fhir/ValueSet/canshare-cancer-service"
                 let serviceConcepts = $scope.hashExpandedVs[serviceUrl]
 
@@ -354,15 +356,15 @@ angular.module("pocApp")
                 } else {
                     alert(`The service ValueSet ${serviceUrl} was not found`)
                 }
+*/
 
-/*
                 //cancer service options are fixed - todo get from CM
                 $scope.cmProperties['cancer-service'].options.push({code:"394803006",display:"Clinical haematology"})
                 $scope.cmProperties['cancer-service'].options.push({code:"394593009",display:"Medical oncology"})
                 $scope.cmProperties['cancer-service'].options.push({code:"418002000",display:"Paediatric oncology"})
                 $scope.cmProperties['cancer-service'].options.push({code:"419815003",display:"Radiation oncology"})
                 $scope.cmProperties['cancer-service'].options.push({code:"0",display:"No service"})
-*/
+
 
                 let treeData = querySvc.makeTree($scope.fullSelectedCM)
                 showCmTree(treeData)
