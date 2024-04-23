@@ -77,7 +77,7 @@ angular.module("pocApp")
 
                 let deferred = $q.defer()
 
-                let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&_sort=title`
+                let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&_sort=title&_count=5000`
 
                 let encodedQry = encodeURIComponent(qry)
 
