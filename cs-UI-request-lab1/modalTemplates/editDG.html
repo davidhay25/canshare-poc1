@@ -44,7 +44,7 @@
                     <div class="col-md-2">
                         Name
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <input type="text"
                                ng-disabled = "! isNew"
                                ng-change="checkName(input.newModelName)"
@@ -55,7 +55,7 @@
                         <div style="color: red "ng-show="isNew && input.newModelName && ! isUnique">Name already in use</div>
 
                     </div>
-                    <div class="col-md-7">
+                    <div class="col-md-6">
                         The model name will serve as the 'type' of the model should others
                         reference it, so must be a single word (no spaces) and unique. This will be validated.
 
@@ -66,12 +66,12 @@
                     <div class="col-md-2">
                         Title
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <input type="text"
                                ng-change="setModelAttribute('title',input.newModelTitle)"
                                class = "form-control" ng-model="input.newModelTitle"/>
                     </div>
-                    <div class="col-md-7">
+                    <div class="col-md-6">
                         The model title describes what the model is about. Keep it short 2-4 words.
                     </div>
                 </div>
@@ -85,7 +85,11 @@
                                 ng-change="setModelAttribute('parent',input.newModelParent)"
                                 ng-options = "parent for parent in input.possibleParents"></select>
                     </div>
-                    <div class="col-md-7">
+                    <div class="col-md-1">
+                        <button ng-show="input.newModelParent" class="btn btn-link"
+                                ng-click="deleteParent()">Delete</button>
+                    </div>
+                    <div class="col-md-6">
                         If a parent is assigned to the model, then it will inherit all the elements
                         in that parent - and the parent's parent's as well. Individual elements can be
                         removed or altered if needed.
@@ -96,10 +100,10 @@
                     <div class="col-md-2">
                         Resource Type
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <input type="text" placeholder="eg Observation" class="form-control" ng-model="input.type">
                     </div>
-                    <div class="col-md-7">
+                    <div class="col-md-6">
                         The FHIR resource type that a profile for this DataGroup is based on
 
                     </div>
@@ -109,7 +113,7 @@
                     <div class="col-md-2">
                         Source reference
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <textarea ng-change="setModelAttribute('sourceReference',input.sourceReference)"
                                   class = "form-control" ng-model="input.sourceReference">
 
@@ -120,7 +124,7 @@
                                class = "form-control" ng-model="input.sourceReference"/>
                         -->
                     </div>
-                    <div class="col-md-7">
+                    <div class="col-md-6">
                         The source of the information that defined the contents of this Data Group.
                     </div>
                 </div>

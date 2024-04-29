@@ -602,10 +602,86 @@ angular.module("pocApp")
                // console.log(vo)
             }
 
+            $scope.applyReverse = function () {
+                //apply the information from the reverse lookup to the properties prior to this one. Algorithm to apply from top down (excl. gender):
+                //if the result is empty, then apply the options from the reverse object {targets:,element:,hashProperty, sourceConcept:}
+                //      hashProperty is list of possible concepts for a property keyed by property
+                //If there is alread a value, then see if that value is in the property[propertyname].
+                //      if it is, then leave it alone
+                //      if not, then clear that value
+
+
+
+                let propertyCode = $scope.reverseLookup.element.code    //the snomed code for this property (it's help in the element, the property name is defined above)
+
+
+
+                let canApply = true
+                Object.keys($scope.cmProperties).forEach(function (propName) {
+
+                    //are we past the property that had the reverse lookup yet?
+                    let cmProperty = $scope.cmProperties[propName]
+                    if (cmProperty.concept.code == propertyCode) {
+                        canApply = false        //turn off the application process. properties after this one will not have their options set
+
+                        //A flag so that we can customize behaviour depending on whether the reverse has been applied
+                        $scope.appliedFromReverse = propName
+                    }
+
+                    if (canApply) {
+                        //set false  when we're past the current property
+                        //cmProperties[propname].options is the list of options
+                        let arNewOptions = $scope.reverseLookup.hashProperty[propName]       //an array of possible concepts
+                        console.log(propName,arNewOptions)
+
+                        if (arNewOptions) {
+                            if (arNewOptions.length == 1) {
+                                cmProperty.singleConcept = arNewOptions[0]
+                                cmProperty.options.length = 0
+                            } else {
+                                cmProperty.options = arNewOptions
+                                delete cmProperty.singleConcept
+
+                                //now set the default value to the first in the list
+                                $scope.local.cmOptions[propName] = cmProperty.options[0]
+
+                            }
+                        } else {
+                            //if there are no options from the reverse lookup to apply, then do the usual forward lookup
+
+                            $scope.populateUIControl(propName)  //populate the UI with the set of possible values
+
+                            /*
+                            let def = $scope.cmProperties[propKey]
+                            if (def && def.next) {
+                                //def.next is the next control in the order
+                                $scope.populateUIControl(def.next)  //populate the UI with the set of possible values
+                            }
+*/
+                        }
+
+
+                    }
+
+                })
+
+
+
+            }
+
             //when a selection is made in the UI. We want to select options for the next one...
             $scope.uiValueSelected = function (propKey,value) {
               //  console.log(propKey,value)
 
+                //if values derived from a reverse lookup have been applied, then don't do the 'forward' lookuo
+                //logic where we determine the options for the next property from previously entered data
+                if ($scope.appliedFromReverse) {
+
+
+
+
+                    return
+                }
 
                 //this is the reverse lookup stuff.
                 //sets $scope.reverseLookup which {targets:[],element: {},hashProperty:{}}
@@ -646,6 +722,7 @@ angular.module("pocApp")
                 delete $scope.uiMatchingVS
                 delete $scope.uiHashValues
                 delete $scope.reverseLookup
+                delete $scope.appliedFromReverse        //if true, then the reverse stuff was applied to previous properties
                 $scope.local.cmOptions = {}     //the data entered
 
 
@@ -677,10 +754,15 @@ angular.module("pocApp")
                     }
                 }
 
-                if (! cmElement) {
-                    alert(`An element in the Concept map for the code ${propertyCode} could not be located`)
+                if (! cmElement.code) {
+                    console.log(`An element in the Concept map for the code ${propertyCode} could not be located`)
                     return
                 }
+
+               // if (! cmElement) {
+                //    alert(`An element in the Concept map for the code ${propertyCode} could not be located`)
+                //    return
+             //   }
 
                 //a hash of all the data entered - but only those 'before' this element
 

@@ -29,53 +29,16 @@ angular.module("pocApp")
             })
             $scope.input.possibleParents.sort()
 
+            $scope.deleteParent = function () {
+                if (confirm("Are you sure you wish to remove the parent?")) {
 
-            
-            $scope.importDEP = function (data) {
-                $scope.model.diff == $scope.model.diff || []
-                let ar = data.split(/\r?\n/)
-                ar.forEach(function (row) {
-                    let arData = row.split(/\t/)
-                    let ed = {}
-                    ed.path = arData[0]
-                    ed.title = arData[3]
-                    ed.description = arData[8]
-                    ed.mult = arData[9]
-                    let type = arData[10] || 'string'
+                    delete $scope.model.parent      //delete on the model
+                    delete $scope.input.newModelParent //update the UI
 
-                    switch (type) {
-                        case "Codeable" :
-                            type = "CodeableConcept"
-                            break
-
-                    }
-                    ed.type = [type]
-
-                    if (arData[11]) {
-                        ed.valueSet = arData[11]
-                    }
-
-                    //options (S)
-                    if (arData[18]) {
-                        let ar = arData[18].split(',')
-                        ed.options = []
-                        ar.forEach(function (opt) {
-                            let opt1 = opt.replace(/["]/g, '')
-                            ed.options.push({pt:opt1})
-                        })
-                    }
-
-                    //fixed value (T)
-                    if (arData[19]) {
-                        let ar = arData[19].split('|')
-                        ed.fixedCoding = {code:ar[0],display:ar[1]}
-
-                    }
-                    console.log(ed)
-                    $scope.model.diff.push(ed)
-
-                })
+                    getFullElementList()    //update the full element list
+                }
             }
+            
 
             //check that there isn't a circular loop. Each DG should only once in the hierarchy
             function checkParentalHierarchy(parentName) {
@@ -85,24 +48,7 @@ angular.module("pocApp")
 
                 return ! modelDGSvc.hasDuplicatedParent(model,hashTypes)
 
-               // if (model)
-/*
-                while (model) {
-                    if (model.parent) {
-                        if (hashParent[model.parent]) {
-                            alert(`The DG ${model.parent} is already a parent in this chain. It cannot appear more than once`)
-                            return false
-                        } else {
-                            hashParent[model.parent] = true
 
-                        }
-                    } else {
-                        model = null
-                    }
-                }
-
-                return true
-*/
 
             }
             //leave at the top as called when creating a new DG with a parent
@@ -449,13 +395,11 @@ angular.module("pocApp")
                 getFullElementList()
             }
 
+
+
             $scope.remove = function (inx) {
                 if (confirm("Are you sure you wish to remove this element")) {
-/*
-                    $scope.model.changes = $scope.model.changes || []
-                    msg = `remove element`
-                    $scope.model.changes.push({edPath: $scope.model.diff[inx].path, msg:msg})
-*/
+
                     $scope.model.diff.splice(inx,1)
                     getFullElementList()
                 }
@@ -478,7 +422,6 @@ angular.module("pocApp")
                 $scope.model.type = $scope.input.type
                 if (isNew) {
                     if ($scope.isUnique) {
-                        //$scope.model.status = 'new'
                         $scope.model.diff = $scope.model.diff || []
 
                         $scope.$close($scope.model)

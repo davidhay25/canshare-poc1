@@ -15,9 +15,11 @@
 
   </style>
 
+  <!--
   <div class="banner" style="background-color: #ef8fbe" ng-show="newInflater">
     Using new snapshot generator
   </div>
+  -->
 
   <div ng-class="modelInfoClass">
     <div class="row">
@@ -729,72 +731,200 @@
     </uib-tab>
 
 
-    <uib-tab heading="Table">
+    <uib-tab heading="View">
+      <br/>
+      <uib-tabset>
+        <uib-tab heading="Logical Model">
+          The FHIR shorthand that represents this DataGroup as a FHIR Logical Model.
+          <span class="pull-right">
+       <i class="glyphicon glyphicon-paperclip pull-right clickable"
+          ng-click="copyFshToClipboard(dgFshLM)"></i>
+      </span>
+          <br/>
+          <pre>{{dgFshLM}}</pre>
+        </uib-tab>
 
+        <uib-tab heading="Table">
+          <br/>
+          <div class="tableFixHead">
+            <table class="table-bordered table">
+              <thead>
+              <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Fixed value</th><th>Source</th></tr>
+              </thead>
+              <tbody>
+              <!---     <tr ng-repeat="element in fullElementList">-->
+              <tr ng-repeat="element in fullElementList"
+                  ng-hide="$index==0 || (element.ed.mult.indexOf('..0') > -1)">
+                <td>
+                  <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
+                    <div ng-hide="input.showFullModel">
+                      {{element.ed.path | dropFirstInPath}}
+                    </div>
+                    <div ng-show="input.showFullModel">
+                      {{element.ed.path | lastInPath}}
+                    </div>
+                  </div>
+
+
+                </td>
+                <td>{{element.ed.title}}</td>
+                <td>
+
+                  {{element.ed.description}}
+                </td>
+                <td>
+                  <div ng-repeat="type in element.ed.type">
+                    {{type}}
+                  </div>
+                  <div><em class="clickable" ng-click="viewVS(element.ed.valueSet)">{{element.ed.valueSet}}</em></div>
+
+                  <div ng-show="element.ed.options.length > 0" >
+                    <em class="clickable"
+                        ng-click = "editDGOptionsList(element.ed)">View {{element.ed.options.length}} options
+                    </em> </div>
+
+                </td>
+                <td>{{element.ed.mult}}</td>
+                <!--
+                    <td>
+                      <div ng-repeat="code in element.ed.code">
+                        {{code.code}}
+                      </div>
+
+                    </td>
+                -->
+                <td>
+                  {{element.ed.fixedCode}}{{element.ed.fixedCoding}}{{element.ed.fixedDecimal}}{{element.ed.fixedString}}
+                </td>
+                <td>{{element.ed.sourceModelName}}</td>
+
+
+
+
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </uib-tab>
+        <uib-tab heading="Graph" select="fitGraph()">
+
+          <em class="pull-right">DT inheritance hierarchy and referenced DTs</em>
+          <br/>
+          <div class="row">
+            <div class="col-md-6">
+              <div id="graph"></div>
+            </div>
+            <div class="col-md-6">
+
+
+              <uib-tabset ng-show="selectedModelFromGraph">
+
+                <uib-tab heading="Table">
+
+                  <div class="row">
+                    <div class="col-md-2">Name:</div>
+                    <div class="col-md-10">
+                      {{selectedModelFromGraph.name}}
+
+                      <div class="clickable pull-right"
+                           ng-show="selectedModelFromGraph.name !== selectedModel.name"
+                           ng-click="termSelectDG({DGName:selectedModelFromGraph.name},selectedModel.name)">Load
+                      </div>
+
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-2">Title:</div>
+                    <div class="col-md-10">{{selectedModelFromGraph.title}}</div>
+                  </div>
+
+
+                  <br/>
+
+                  <uib-tabset>
+                    <uib-tab heading="Directly defined">
+                      <table class="table-bordered table table-condensed">
+                        <tr><th>Path</th><th>Type</th><th>Card.</th></tr>
+                        <tr ng-repeat="ed in selectedModelFromGraph.diff">
+                          <td>
+                            <div class="clickableDotted" uib-popover="{{ed.description}}"
+                                 popover-placement="right"
+                                 popover-trigger="'mouseenter'">{{ed.path}}</div>
+
+                            <!--
+                            <div style="padding-left: 8px"><em >{{ed.description}}</em></div>
+    -->
+                          </td>
+                          <td>{{ed.type[0]}}
+                            <div class="clickable"><em>{{ed.valueSet}}</em></div>
+                            <div><em>{{ed.fixedCoding}}</em></div>
+                          </td>
+                          <!--
+                          <td>
+                              <div ng-repeat="code in code">
+                                  {{code}}
+                              </div>
+                          </td>
+                          -->
+                          <td>{{ed.mult}}</td>
+                        </tr>
+                      </table>
+                      <em>This is only elements directly defined in the DG, including overrides</em>
+
+                    </uib-tab>
+                    <uib-tab heading="Full list">
+
+                      <table class="table-bordered table table-condensed">
+                        <tr><th>Path</th><th>Type</th><th>Card.</th></tr>
+                        <tr ng-repeat="item in selectedModelFromGraphFull">
+                          <td>
+                            <div class="clickableDotted" uib-popover="{{item.ed.description}}"
+                                 popover-placement="right"
+                                 popover-trigger="'mouseenter'">{{item.ed.path | dropFirstInPath}}</div>
+                            <!--
+                            {{item.ed.path}}
+                            <div style="padding-left: 8px"><em >{{item.ed.description}}</em></div> -->
+                          </td>
+                          <td>{{item.ed.type[0]}}
+                            <div class="clickable"><em>{{item.ed.valueSet}}</em></div>
+                            <div><em>{{item.ed.fixedCoding}}</em></div>
+                          </td>
+                          <!--
+                          <td>
+                              <div ng-repeat="code in code">
+                                  {{code}}
+                              </div>
+                          </td>
+                          -->
+                          <td>{{item.ed.mult}}</td>
+                        </tr>
+                      </table>
+                      <em>These are all elements, including inherited</em>
+
+                    </uib-tab>
+                  </uib-tabset>
+
+
+                </uib-tab>
+                <uib-tab heading="DG Json">
+                  <pre>{{selectedModelFromGraph | json}}</pre>
+                </uib-tab>
+              </uib-tabset>
+
+
+            </div>
+          </div>
+
+
+        </uib-tab>
+
+
+      </uib-tabset>
       <em class="pull-right">Expanded. Excludes items with a Cardinality of 0..0</em>
 
 
 
-      <br/>
-      <div class="tableFixHead">
-        <table class="table-bordered table">
-          <thead>
-          <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Fixed value</th><th>Source</th></tr>
-          </thead>
-          <tbody>
-          <!---     <tr ng-repeat="element in fullElementList">-->
-      <tr ng-repeat="element in fullElementList"
-          ng-hide="$index==0 || (element.ed.mult.indexOf('..0') > -1)">
-            <td>
-              <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
-                <div ng-hide="input.showFullModel">
-                  {{element.ed.path | dropFirstInPath}}
-                </div>
-                <div ng-show="input.showFullModel">
-                  {{element.ed.path | lastInPath}}
-                </div>
-              </div>
-
-
-            </td>
-            <td>{{element.ed.title}}</td>
-            <td>
-
-              {{element.ed.description}}
-            </td>
-            <td>
-              <div ng-repeat="type in element.ed.type">
-                {{type}}
-              </div>
-              <div><em class="clickable" ng-click="viewVS(element.ed.valueSet)">{{element.ed.valueSet}}</em></div>
-
-              <div ng-show="element.ed.options.length > 0" >
-                <em class="clickable"
-                    ng-click = "editDGOptionsList(element.ed)">View {{element.ed.options.length}} options
-                </em> </div>
-
-            </td>
-            <td>{{element.ed.mult}}</td>
-        <!--
-            <td>
-              <div ng-repeat="code in element.ed.code">
-                {{code.code}}
-              </div>
-
-            </td>
-        -->
-            <td>
-              {{element.ed.fixedCode}}{{element.ed.fixedCoding}}{{element.ed.fixedDecimal}}{{element.ed.fixedString}}
-            </td>
-            <td>{{element.ed.sourceModelName}}</td>
-
-
-
-
-          </tr>
-          </tbody>
-        </table>
-      </div>
 
     </uib-tab>
 

@@ -6,7 +6,7 @@ angular.module("pocApp")
         return {
 
             sortFullListByInsertAfter(lst,dg,hashAllDG) {
-
+                //perform the actual re-ordering. update lst
                 let lstOrdering = []
 
                 if (dg.ordering && dg.ordering.length >0) {
@@ -85,6 +85,10 @@ angular.module("pocApp")
                         }
                         if (! insertPointFound) {
                             console.log(`Insert point ${item.insertAfter} not found, no re-ordering occurred`)
+                            //we need to put them back
+                            for (let i = itemsToMove.length-1; i > -1; i--) {
+                                lst.splice(currentPos,0,itemsToMove[i])
+                            }
                         }
                     }
 
@@ -108,6 +112,21 @@ angular.module("pocApp")
 
             },
 
+            getOrderingByToMove(dg) {
+                //create a hash by source path for elements that are moved.
+                let hash = {}
+
+                if (dg && dg.ordering) {
+                    dg.ordering.forEach(function (ord) {
+                        hash[ord.toMove] = hash[ord.toMove] || []
+                        hash[ord.toMove].push(ord.insertAfter)
+
+
+
+                    })
+                }
+                return hash
+            },
             getOrderingForReferences(lst,dg,hashAllDG) {
                 let ar = []
                 //get the ordering info for referenced datagroups - if they are not in the dg

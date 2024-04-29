@@ -648,13 +648,19 @@ angular.module("pocApp")
                 traceSvc.addAction({action:'remove-tag',model:$scope.selectedModel})
                 //remove from the DG (if present)
                 let ctr = -1
-                for (const tag of $scope.selectedModel.tags) {
-                    ctr ++
-                    if (tag.system == tagSystem.bespoke.code && tag.code == tagName) {
-                        $scope.selectedModel.tags.splice(ctr,1)
-                        break
+                if ($scope.selectedModel.tags) {
+                    for (const tag of $scope.selectedModel.tags) {
+                        ctr ++
+                        if (tag.system == tagSystem.bespoke.code && tag.code == tagName) {
+                            $scope.selectedModel.tags.splice(ctr,1)
+                            break
+                        }
                     }
                 }
+
+
+
+
                 //remove from the tags object
                 ctr = -1
                 for (const dg of $scope.tags[tagName]) {
@@ -1071,7 +1077,6 @@ angular.module("pocApp")
                         //if a new element, then the string 'new' will have been pre-pended to the path...
                         let ar = ed.path.split('.')
                         ar.splice(0,1)
-                        //ed.path = ar.join('.')
 
                         ed.path = `${pathOfCurrentElement}${ar.join('.')}`
                         $scope.selectedModel.diff.push(ed)
@@ -1084,7 +1089,7 @@ angular.module("pocApp")
                         displayPath = $filter('dropFirstInPath')(ed.path)
 
                         let found = false
-                        //let changes = []    //this is the list of changes
+
                         //is the path in the DG diff?
                         for (const ed1 of $scope.selectedModel.diff) {
                             if (ed1.path == displayPath) {
@@ -1493,8 +1498,11 @@ angular.module("pocApp")
                         //the model may have been updated - select it to refresh the various tabs
                         //note this is the model passed in for editing
                         traceSvc.addAction({action:'edit-model',model:model})
+                        $scope.makeAllDTList()      //as a parent may have been udpated or deleted
+
                         $scope.makeSnapshots()
                         $scope.selectModel(model)
+
                     }
 
 
@@ -1617,22 +1625,22 @@ angular.module("pocApp")
 
 */
 
+                //$scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)
+                //$scope.relationshipsSummary = snapshotSvc.getRelationshipsSummary(dg.name)
+
 
 
                 if ($scope.newInflater) {
                     console.log('------------')
 
                     vo.allElements = snapshotSvc.getFullListOfElements(dg.name)
-
-
                     $scope.relationshipsSummary = snapshotSvc.getRelationshipsSummary(dg.name)
-
-
 
                     console.log('------------')
                 } else {
 
                 }
+
 
                 if (! $scope.newInflater) {
                     if (removeZeroedOut) {
@@ -1643,6 +1651,7 @@ angular.module("pocApp")
                 } else {
                     $scope.fullElementList = vo.allElements
                 }
+
 
 
                 //sort the elements list to better display slicing
@@ -1670,6 +1679,7 @@ angular.module("pocApp")
 
                 orderingSvc.sortFullListByInsertAfter($scope.fullElementList,dg,$scope.hashAllDG)   //adjust according to 'insertAfter' values
                 $scope.dgReferencesOrdering = orderingSvc.getOrderingForReferences($scope.fullElementList,dg,$scope.hashAllDG)
+                $scope.orderingByToMove = orderingSvc.getOrderingByToMove(dg) // elements with multiple move instructions {dupsExist:dupsExist,hash:hash}
 
                 //create the list of potential enableWhen sources
                 $scope.ewSources = []
@@ -1844,7 +1854,10 @@ angular.module("pocApp")
                         plugins:['dnd'],
                         dnd: {
                             'is_draggable' : function(nodes,e) {
-                                return true
+
+                                return $scope.canEdit($scope.selectedModel)
+
+                               // return true
                                 /* could inhibit certain groups
                                let node = nodes[0]
                                $scope.dndSource = node.data.ed
@@ -1913,6 +1926,11 @@ angular.module("pocApp")
 
                         //re-order the full list & re-draw the tree
                         orderingSvc.sortFullListByInsertAfter($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
+
+                        $scope.dgReferencesOrdering = orderingSvc.getOrderingForReferences($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
+                        $scope.orderingByToMove = orderingSvc.getOrderingByToMove($scope.selectedModel) // elements with multiple move instructions {dupsExist:dupsExist,hash:hash}
+
+
                         let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
                         makeDGTree(treeData)
 

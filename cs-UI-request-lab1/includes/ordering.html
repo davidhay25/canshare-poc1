@@ -5,6 +5,9 @@
       display: inline-block;
       width: 20px;
     }
+    .multiple {
+      background-color: #f2dede;
+    }
   </style>
 
   <button class="btn-link btn pull-right"
@@ -13,11 +16,12 @@
 
   <h4>Ordering</h4>
 
+  <h5>Move instructions in execution order</h5>
 
   <table class="table-bordered table">
     <tr><th>Insert this element...</th><th>After this element</th><th></th></tr>
 
-    <tr ng-repeat="order in selectedModel.ordering">
+    <tr ng-repeat="order in selectedModel.ordering track by $index">
       <td>
         {{getElementEd(order.toMove).title}} <div><em>({{order.toMove}})</em></div>
       </td>
@@ -43,7 +47,6 @@
       </td>
     </tr>
 
-
     <tr>
       <td>
         <select class="form-control" ng-model="local.toMove"
@@ -63,11 +66,21 @@
     </tr>
   </table>
 
+  <h5>Move instructions by 'toMove' element</h5>
+  <table class="table-bordered table">
+    <tr><th>Element</th><th>Move after</th></tr>
+    <tr ng-repeat = "(k,v) in orderingByToMove track by $index"
+      ng-class="{multiple:v.length > 1}">
+      <td>{{k}}</td>
+      <td><div ng-repeat="moveAfter in v track by $index">{{moveAfter}}</div></td>
+    </tr>
+  </table>
+
   <div ng-show="dgReferencesOrdering.length > 0">
     <h5>Referenced DG ordering (direct references only)</h5>
     <table class="table table-bordered">
       <tr><th>Path</th><th>Insert this element...</th><th>After this element</th><th></th></tr>
-      <tr ng-repeat="ord in dgReferencesOrdering">
+      <tr ng-repeat="ord in dgReferencesOrdering  track by $index">
         <td>{{ord.path}}</td>
         <td>{{ord.toMove}}</td>
         <td>{{ord.insertAfter}}</td>

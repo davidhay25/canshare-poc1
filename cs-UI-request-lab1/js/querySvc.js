@@ -380,11 +380,10 @@ angular.module("pocApp")
                     //ts instance is 'authoring' or 'prod' and determines which instance of the TS is used for the query
                     let deferred = $q.defer()
 
-                    //let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&status=active&_sort=title`
 
-                    let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&_sort=title&_count=2000`
+                    let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&_sort=title&_count=5000`
 
-console.log(qry)
+                    //console.log(qry)
                     let encodedQry = encodeURIComponent(qry)
                     let config = {headers:{'x-ts-instance':tsInstance}}
 

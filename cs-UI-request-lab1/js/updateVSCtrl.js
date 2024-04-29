@@ -28,6 +28,12 @@ angular.module("pocApp")
             updateVSSvc.getCodeSystem(csId,systemPrePub).then(
                 function (cs) {
                     $scope.prePubCS = cs
+
+                    //there was a validation issue with the CodeSystem so we're fixing them here.
+                    //$scope.prePubCS.name = "Canshare_unpublished_concepts"
+                    //$scope.prePubCS.caseSensitive = true
+
+
                 }, function (err) {
                     alert(err)
                 }

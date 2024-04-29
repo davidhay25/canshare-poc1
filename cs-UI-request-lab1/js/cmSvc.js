@@ -268,6 +268,9 @@ angular.module("pocApp")
                 return deferred.promise
 
             } ,
+            applyReverseResults : function () {
+
+            },
             getVSContentsHash : function (lst) {
                 let deferred = $q.defer()
                 console.log('getting hash')

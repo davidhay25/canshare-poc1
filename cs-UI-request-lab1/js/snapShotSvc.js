@@ -558,7 +558,15 @@ angular.module("pocApp")
             getFullListOfElements: function (dgName) {
                 //return the full list of elements for a DG. In the format of the existing full element list.
                 let lst = []
-                let root = {path:dgName,title:dgName,kind:"root"}
+
+                let title = dgName
+                let dg = allDgSnapshot[dgName]
+                if (dg) {       //not sure what to do if null - shouldn;t happen!
+                    title = dg.title
+                }
+
+
+                let root = {path:dgName,title:title,kind:"root"}
                 lst.push({ed:root})
                 if (allDgSnapshot[dgName] && allDgSnapshot[dgName].snapshot) {
                     allDgSnapshot[dgName].snapshot.forEach(function(ed) {

@@ -468,7 +468,7 @@ angular.module("pocApp")
 
 
                 switch ($scope.input.selectedType) {
-                //switch (ed.type[0]) {
+
                     case "code" :
                         type = 'code'
                         current = ed.fixedCode

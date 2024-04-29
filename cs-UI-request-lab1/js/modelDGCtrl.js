@@ -595,8 +595,6 @@ angular.module("pocApp")
                 }
 
 
-
-
                 //check that there aren't any child elements off this one
                 let canDelete = true
                 let dg = $scope.hashAllDG[dgName]
@@ -642,9 +640,12 @@ angular.module("pocApp")
 
                 if (inx > -1) {
                     //set the mult to 0..0
-                    //$scope.selectedModel.diff[inx].mult = '0..0'
 
-                    $scope.selectedModel.diff.splice(inx,1)
+
+                    //don't delete any more - set the mult.
+                    //$scope.selectedModel.diff.splice(inx,1)
+                    $scope.selectedModel.diff[inx].mult = '0..0'
+
                     traceSvc.addAction({action:'delete-element',model:$scope.selectedModel,
                         path:pathToDelete,description:'edit diff'})
                     //$scope.selectedModel.diff.splice(inx,1)

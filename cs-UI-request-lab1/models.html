@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <title>Logical Model</title>
 
+    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
+
+
     <style>
         #graph {
             width: 100%;
@@ -45,6 +49,16 @@
         modal-xlg {
             width : 1200px
         }
+
+        /* change the selected colour as the text is hard to read*/
+        .jstree-proton .jstree-clicked {
+            background: #dedede;
+            /*background: #3392e3;*/
+            color: #ffffff;
+            border-radius: 3px;
+            box-shadow: inset 0 0 1px #3392e3;
+        }
+
     </style>
 
     <!-- Note that all scripts are at the bottom-->
@@ -614,8 +628,7 @@
 
 <script src="js/libs/angular-bootstrap-checkbox.js"></script>
 
-<link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
-<link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
+
 
 <link rel="stylesheet" type="text/css" href="css/codemirror.css"/>
 <link rel="stylesheet" type="text/css" href="css/foldgutter.css"/>

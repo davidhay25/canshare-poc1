@@ -480,6 +480,10 @@ angular.module("pocApp")
 
                 //let hashEW = {}
 
+                if (! lstElements || lstElements.length == 0) {
+                    return {}
+                }
+
                 let dgName = lstElements[0].ed.path
 
                 //construct a list of paths to hide
