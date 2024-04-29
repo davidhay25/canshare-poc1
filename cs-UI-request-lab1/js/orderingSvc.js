@@ -175,6 +175,31 @@ angular.module("pocApp")
                 return ar
             },
 
+            applyMoveFromReferences(lst,dg,hashAllDG) {
+                //create a set of move instructions based on all the ordering in the referenced DGs
+                for (const item of lst) {
+                    let ed = item.ed
+                    let path = ed.path
+                    if (ed.type) {
+                        let type = ed.type[0]
+                        let referencedEd = hashAllDG[type]
+                        if (referencedEd) {
+                            console.log(referencedEd)
+                            if (referencedEd.ordering) {
+                                console.log(path,referencedEd.ordering)
+                                for (const item of referencedEd.ordering) {
+
+                                }
+                            }
+                        }
+                    }
+
+
+
+                }
+
+            },
+
             sortFullListByInsertAfterDEP(lst) {
                 console.log(lst)
                 let dgName = lst[0].ed.path     //the DGName is the first element

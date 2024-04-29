@@ -4,6 +4,10 @@ angular.module("pocApp")
 
             $scope.local = {}
 
+            $scope.applyMoveFromReferences = function () {
+                orderingSvc.applyMoveFromReferences($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
+            }
+
             //add the move instruction from a referenced dg
             $scope.addToDG = function (ord,inx) {
                 let pathInDg = ord.path

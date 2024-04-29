@@ -5,6 +5,11 @@ angular.module("pocApp")
             $scope.allTypes = allTypes
             $scope.input = {}
 
+
+            //need a default base for editing
+            $scope.fixed = {}
+            $scope.default = {}
+
             //set the initial tab displayed
             if (initialTab == 'profile') {
                 $scope.input.mainTabActive = 3
@@ -461,27 +466,45 @@ angular.module("pocApp")
                     ed = item.ed
                 }
 
+                //the current value should be in the $scope.fixed && $scope.default elements
+                //these are set if the DG has them before the edit, and when they are changed in the UI
+                //format is {edName: value: } where value is a datatype
 
-                //figure out the type from the ed
+
+                //figure out the fixed / default type from the ed
                 let type
-                let current
 
+                //this is the current value to be passed into the editor
+
+                let current = $scope.fixed.value
+                if (kind == 'default') {
+                    current = $scope.default.value
+                }
+
+                type = $scope.input.selectedType
+                if (type == 'CodeableConcept') {
+                    type = "Coding"
+                }
+                /*
 
                 switch ($scope.input.selectedType) {
 
                     case "code" :
                         type = 'code'
                         current = ed.fixedCode
+
                         if (kind == 'default') {
                             current = ed.defaultCode
+
                         }
 
                         break
                     case "CodeableConcept" :
                         type = 'Coding'
-                        current = ed.fixedCoding
+                        current = $scope.fixed.value   //ed.fixedCoding
+
                         if (kind == 'default') {
-                            current = ed.defaultCoding
+                            current = $scope.default.value //ed.defaultCoding
                         }
 
                         break
@@ -503,6 +526,8 @@ angular.module("pocApp")
 
                 }
 
+
+*/
 
                 $uibModal.open({
                     templateUrl: 'modalTemplates/fixValues.html',
