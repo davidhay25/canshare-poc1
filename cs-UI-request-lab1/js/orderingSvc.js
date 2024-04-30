@@ -127,7 +127,7 @@ angular.module("pocApp")
                 }
                 return hash
             },
-            getOrderingForReferences(lst,dg,hashAllDG) {
+            getOrderingForReferencesDEP(lst,dg,hashAllDG) {
                 let ar = []
                 //get the ordering info for referenced datagroups - if they are not in the dg
                 //directly referenced only
@@ -175,19 +175,65 @@ angular.module("pocApp")
                 return ar
             },
 
-            applyMoveFromReferences(lst,dg,hashAllDG) {
+            createMoveFromReferences(lst,dg,hashAllDG) {
                 //create a set of move instructions based on all the ordering in the referenced DGs
+                //iterate over the full list of elements. If the element refers to a DG (ie the type is found in the hashAllDG)
+                //then look for any move instructions on the referenced DG. If any are found, then adjustthe paths and add them
+                //to the main DG
+
+                //create a hash of the current move instructions keyed on 'toMove'
+                let hashCurrentMoves = {}
+                if (dg.ordering) {
+                    for (const move of dg.ordering){
+                        hashCurrentMoves[move.toMove] = move.insertAfter
+                    }
+                }
+
+                let arMove = []     //will be a list of move instructions extracted from referenced DGs
                 for (const item of lst) {
                     let ed = item.ed
                     let path = ed.path
                     if (ed.type) {
                         let type = ed.type[0]
-                        let referencedEd = hashAllDG[type]
-                        if (referencedEd) {
+                        let referencedEd = hashAllDG[type]  //is this a reference to a DG?
+                        if (referencedEd) {                 //yes, it is
                             console.log(referencedEd)
-                            if (referencedEd.ordering) {
+                            if (referencedEd.ordering) {    //does it have any ordering
                                 console.log(path,referencedEd.ordering)
-                                for (const item of referencedEd.ordering) {
+                                for (const item of referencedEd.ordering) { //iterate over them and add to the list
+                                    console.log('path',path)
+                                    console.log(item)
+                                    let toMove = item.toMove            //includes the DG name in the path
+                                    let insertAfter = item.insertAfter  //includes the DG name in the path unless moving to the top (will only have DG name)
+                                    let adjustedToMove
+                                    let adjustedInsertAfter
+                                    let moveInstruction = {toMove:toMove, insertAfter:insertAfter,dgName:type}
+                                    if (insertAfter == type) {
+                                        //if insertAfter is the referenced DG name, then it means the element is being moved to the top
+                                        //the adjusted insertAfter becomes the path
+                                        moveInstruction.iaType = 'top'
+                                        console.log('insertAfter = type (move to top)')
+                                        adjustedToMove = `${path}.${$filter('dropFirstInPath')(toMove)}`
+                                        //adjustedInsertAfter = `${path}.${insertAfter}`
+                                        adjustedInsertAfter = `${path}`
+                                    } else {
+                                        console.log('insertAfter = element')
+                                        moveInstruction.iaType = 'element'
+                                        //otherwise, the insert after is another element withing the referenced DG
+                                        adjustedToMove = `${path}.${$filter('dropFirstInPath')(toMove)}`
+                                        adjustedInsertAfter = `${path}.${$filter('dropFirstInPath')(insertAfter)}`
+                                    }
+                                    moveInstruction.adjToMove = adjustedToMove
+                                    moveInstruction.adjInsertAfter = adjustedInsertAfter
+                                    if (hashCurrentMoves[adjustedToMove] == adjustedInsertAfter) {
+                                        moveInstruction.alreadyInDG = true
+                                    }
+
+
+
+
+                                    arMove.push(moveInstruction)
+
 
                                 }
                             }
@@ -196,7 +242,11 @@ angular.module("pocApp")
 
 
 
+
+
                 }
+                console.log(arMove)
+                return arMove
 
             },
 

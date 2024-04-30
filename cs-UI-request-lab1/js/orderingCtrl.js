@@ -4,8 +4,20 @@ angular.module("pocApp")
 
             $scope.local = {}
 
-            $scope.applyMoveFromReferences = function () {
-                orderingSvc.applyMoveFromReferences($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
+
+            $scope.addReferencedMove = function (move) {
+                //console.log(toMove,insertAfter)
+                $scope.selectedModel.ordering = $scope.selectedModel.ordering || []
+                $scope.selectedModel.ordering.push({toMove:move.adjToMove,insertAfter:move.adjInsertAfter})
+
+
+
+                $scope.$emit('redrawTree')
+            }
+
+            $scope.applyMoveFromReferencesDEP = function () {
+
+                orderingSvc.createMoveFromReferences($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
             }
 
             //add the move instruction from a referenced dg

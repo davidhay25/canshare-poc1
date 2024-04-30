@@ -335,7 +335,7 @@ angular.module("pocApp")
 
                 //sort by
 
-                console.log(sectionTreeData)
+
 
                 return {treeData:treeData,sectionTreeData : sectionTreeData}
 

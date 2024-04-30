@@ -617,7 +617,7 @@ angular.module("pocApp")
 
 
                 let canApply = true
-                Object.keys($scope.cmProperties).forEach(function (propName) {
+                Object.keys($scope.cmProperties).forEach(function (propName) {  //assume this is ordered...
 
                     //are we past the property that had the reverse lookup yet?
                     let cmProperty = $scope.cmProperties[propName]
@@ -625,7 +625,7 @@ angular.module("pocApp")
                         canApply = false        //turn off the application process. properties after this one will not have their options set
 
                         //A flag so that we can customize behaviour depending on whether the reverse has been applied
-                        $scope.appliedFromReverse = propName
+                       //temp  $scope.appliedFromReverse = propName
                     }
 
                     if (canApply) {
@@ -638,6 +638,7 @@ angular.module("pocApp")
                             if (arNewOptions.length == 1) {
                                 cmProperty.singleConcept = arNewOptions[0]
                                 cmProperty.options.length = 0
+                                $scope.local.cmOptions[propName] = arNewOptions[0]      //set the value
                             } else {
                                 cmProperty.options = arNewOptions
                                 delete cmProperty.singleConcept
@@ -649,7 +650,7 @@ angular.module("pocApp")
                         } else {
                             //if there are no options from the reverse lookup to apply, then do the usual forward lookup
 
-                            $scope.populateUIControl(propName)  //populate the UI with the set of possible values
+                           //30 Apr - no, don't... $scope.populateUIControl(propName)  //populate the UI with the set of possible values
 
                             /*
                             let def = $scope.cmProperties[propKey]
@@ -671,21 +672,13 @@ angular.module("pocApp")
 
             //when a selection is made in the UI. We want to select options for the next one...
             $scope.uiValueSelected = function (propKey,value) {
-              //  console.log(propKey,value)
-
-                //if values derived from a reverse lookup have been applied, then don't do the 'forward' lookuo
-                //logic where we determine the options for the next property from previously entered data
-                if ($scope.appliedFromReverse) {
-
-
-
-
-                    return
-                }
 
                 //this is the reverse lookup stuff.
                 //sets $scope.reverseLookup which {targets:[],element: {},hashProperty:{}}
                 performReverseLookup(propKey,value)
+
+                //now apply the reverse lookup stuff. Only populate empty values
+                $scope.applyReverse()
 
 
                 //when a value is selected, then clear all the subsequent entries

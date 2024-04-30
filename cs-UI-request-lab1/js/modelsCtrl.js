@@ -1618,7 +1618,7 @@ angular.module("pocApp")
 
 
 
-                let vo = {}
+               // let vo = {}
 
                 /* todo - will need to generate the graph and relationships in thw new way...
 
@@ -1628,15 +1628,19 @@ angular.module("pocApp")
                 //$scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)
                 //$scope.relationshipsSummary = snapshotSvc.getRelationshipsSummary(dg.name)
 
+               // let vo = snapshotSvc.getFullListOfElements(dg.name)
+                $scope.relationshipsSummary = snapshotSvc.getRelationshipsSummary(dg.name)
+                $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)// vo.allElements
 
+                /*
 
                 if ($scope.newInflater) {
-                    console.log('------------')
+
 
                     vo.allElements = snapshotSvc.getFullListOfElements(dg.name)
                     $scope.relationshipsSummary = snapshotSvc.getRelationshipsSummary(dg.name)
 
-                    console.log('------------')
+
                 } else {
 
                 }
@@ -1652,7 +1656,7 @@ angular.module("pocApp")
                     $scope.fullElementList = vo.allElements
                 }
 
-
+*/
 
                 //sort the elements list to better display slicing
                 //$scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
@@ -1676,10 +1680,16 @@ angular.module("pocApp")
 
                 console.log(`Visible: ${cntVisible}  Hidden:${cntHidden}`)
 
+                //adjust according to 'insertAfter' values
+                orderingSvc.sortFullListByInsertAfter($scope.fullElementList,dg,$scope.hashAllDG)
 
-                orderingSvc.sortFullListByInsertAfter($scope.fullElementList,dg,$scope.hashAllDG)   //adjust according to 'insertAfter' values
-                $scope.dgReferencesOrdering = orderingSvc.getOrderingForReferences($scope.fullElementList,dg,$scope.hashAllDG)
-                $scope.orderingByToMove = orderingSvc.getOrderingByToMove(dg) // elements with multiple move instructions {dupsExist:dupsExist,hash:hash}
+                //this is intended to allow a DG to apply the ordering to referenced DGs - but it's confusing. working on a better solution
+                //$scope.dgReferencesOrdering = orderingSvc.getOrderingForReferences($scope.fullElementList,dg,$scope.hashAllDG)
+
+                // ordering move instructions by element to move. So we can have a display to detect elements with multiple move instructions {dupsExist:dupsExist,hash:hash}
+                $scope.orderingByToMove = orderingSvc.getOrderingByToMove(dg)
+                $scope.referencedDGOrdering = orderingSvc.createMoveFromReferences($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
+
 
                 //create the list of potential enableWhen sources
                 $scope.ewSources = []
@@ -1690,8 +1700,8 @@ angular.module("pocApp")
                     }
                 })
 
-                $scope.dgFshLM = igSvc.makeFshForDG(dg,vo.allElements)
-
+                $scope.dgFshLM = igSvc.makeFshForDG(dg,$scope.fullElementList)
+                //$scope.dgFshLM = igSvc.makeFshForDG(dg,vo.allElements)
                 makeGraph()
 
                 //a Q representation of the DG
@@ -1927,7 +1937,7 @@ angular.module("pocApp")
                         //re-order the full list & re-draw the tree
                         orderingSvc.sortFullListByInsertAfter($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
 
-                        $scope.dgReferencesOrdering = orderingSvc.getOrderingForReferences($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
+                        //$scope.dgReferencesOrdering = orderingSvc.getOrderingForReferences($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
                         $scope.orderingByToMove = orderingSvc.getOrderingByToMove($scope.selectedModel) // elements with multiple move instructions {dupsExist:dupsExist,hash:hash}
 
 

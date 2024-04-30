@@ -6,7 +6,7 @@ angular.module("pocApp")
 
         return {
             addAction : function (action) {
-                console.log(action)
+
                 //add an action that a user has done. Format can vary, but can be:
                 //description: - what the user was doing
                 //model: - the value of the model (DG or Comp) after the action occurred
