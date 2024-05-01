@@ -689,11 +689,36 @@ angular.module("pocApp")
 
                     if (clear) {
                         //clear is set when we're past the current property
+                        //if there is a value, then check to see if it is in local.cmOptions.
+                            //if it is then leave it
+                            //if not then clear the value (not not the options)
+                            //(this supports the reverse lookup)
+
+                        //cmProperties[key].options has the list of options
+                        //local.cmOptions[key] has the current value
+                        //cmProperties[key].singleConcept has the value if there is only 1
+
+                        if ($scope.local.cmOptions[key]) {
+                            //there is a value here
+                            let currentValue = $scope.local.cmOptions[key]
+                            let ar = $scope.cmProperties[key].options.filter(concept => concept.code == currentValue.code )
+
+                           // console.log()
+
+                            if (ar.length == 0) {
+                                //the current value is not in the set of possible values. clear it
+                                delete $scope.local.cmOptions[key]
+                                delete $scope.cmProperties[key].singleConcept
+                            }
+                        }
+
+                        /*
                         $scope.cmProperties[key].options = []  //optios for the property. Used by the rules rather than lookup
                         delete $scope.cmProperties[key].singleConcept //flag that the option is a single concept
                         delete $scope.cmProperties[key].noMatches  //flag that no options were found
                         delete $scope.local.uiValues[key]  //data entered for that property
                         delete $scope.local.cmOptions[key]  //list of options for that property
+                        */
                     }
                     if (key == propKey) {
                         clear = true
@@ -729,6 +754,9 @@ angular.module("pocApp")
                 delete $scope.lstMatchingConceptsForUI
                 delete $scope.uiMatchingVS
                 delete $scope.singleConcept     //if a single concept is returned (rather than a VS)
+
+                delete $scope.cmProperties[propKey].singleConcept
+
                 //delete $scope.reverseLookup
 
                 $scope.local.uiTitle = `Looking for possible values for ${propKey}`

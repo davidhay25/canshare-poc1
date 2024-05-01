@@ -162,7 +162,7 @@ angular.module("pocApp")
 
                             })
 
-                            console.log(ed.path,type, hashAllDG[type].ordering)
+                            //console.log(ed.path,type, hashAllDG[type].ordering)
 
 
 
@@ -197,12 +197,11 @@ angular.module("pocApp")
                         let type = ed.type[0]
                         let referencedEd = hashAllDG[type]  //is this a reference to a DG?
                         if (referencedEd) {                 //yes, it is
-                            console.log(referencedEd)
+                            //console.log(referencedEd)
                             if (referencedEd.ordering) {    //does it have any ordering
-                                console.log(path,referencedEd.ordering)
+                               // console.log(path,referencedEd.ordering)
                                 for (const item of referencedEd.ordering) { //iterate over them and add to the list
-                                    console.log('path',path)
-                                    console.log(item)
+
                                     let toMove = item.toMove            //includes the DG name in the path
                                     let insertAfter = item.insertAfter  //includes the DG name in the path unless moving to the top (will only have DG name)
                                     let adjustedToMove
@@ -212,12 +211,12 @@ angular.module("pocApp")
                                         //if insertAfter is the referenced DG name, then it means the element is being moved to the top
                                         //the adjusted insertAfter becomes the path
                                         moveInstruction.iaType = 'top'
-                                        console.log('insertAfter = type (move to top)')
+                                       // console.log('insertAfter = type (move to top)')
                                         adjustedToMove = `${path}.${$filter('dropFirstInPath')(toMove)}`
                                         //adjustedInsertAfter = `${path}.${insertAfter}`
                                         adjustedInsertAfter = `${path}`
                                     } else {
-                                        console.log('insertAfter = element')
+                                       // console.log('insertAfter = element')
                                         moveInstruction.iaType = 'element'
                                         //otherwise, the insert after is another element withing the referenced DG
                                         adjustedToMove = `${path}.${$filter('dropFirstInPath')(toMove)}`
@@ -245,13 +244,13 @@ angular.module("pocApp")
 
 
                 }
-                console.log(arMove)
+                //console.log(arMove)
                 return arMove
 
             },
 
             sortFullListByInsertAfterDEP(lst) {
-                console.log(lst)
+                //console.log(lst)
                 let dgName = lst[0].ed.path     //the DGName is the first element
 
                 //get the list of elements that need to be ordered. todo - may need to think of some kind of precedence if there are multiple

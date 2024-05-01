@@ -51,7 +51,7 @@ angular.module("pocApp")
             $scope.ssHx = []
 
             $scope.makeSnapshots = function() {
-                console.log('-------->   building snapshots...')
+               // console.log('-------->   building snapshots...')
                 let voSs = snapshotSvc.makeSnapshots($scope.hashAllDG,true)
                 $scope.snapshotLog = voSs.log
                 $scope.lstAllDGSS = snapshotSvc.getDGList()     //all datagroups by name
@@ -219,7 +219,7 @@ angular.module("pocApp")
                     let qry = '/model/allDG'
                     $http.get(qry).then(
                         function (data) {
-                            //console.log(data)
+
 
                             let arDG = data.data
                             arDG.forEach(function (dg) {
@@ -243,15 +243,12 @@ angular.module("pocApp")
             //a handler that will re-draw the list and tree views of the DGs.
 
             $scope.$on('updateDGList',function(ev,vo) {
-                //console.log(vo)
+
                 sortDG()    //update the sorted list of DG
 
-
-                //--------- build the tree with all DG
-               // if ($scope.hashAllDG) {
                     let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
                     showAllDGTree(vo1.treeData)
-               // }
+
                 if (vo && vo.name) {
                     $scope.selectModel($scope.hashAllDG[vo.name] )
                 }
@@ -276,10 +273,10 @@ angular.module("pocApp")
             //was the page called with a DG name?
             let search = $window.location.search;
             if (search) {
-//console.log($location.absUrl())
+
                 let srch = search.substr(1)
                 let ar = srch.split('=')
-                //console.log(srch,ar)
+
                 if (ar.length == 2) {
                     if (ar[0] == 'dg') {
                          let initialDG = ar[1]
@@ -381,13 +378,12 @@ angular.module("pocApp")
                     let allElements = snapshotSvc.getFullListOfElements(dg.name)
                     let fsh = igSvc.makeFshForDG(dg,allElements)
 
-                    //let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
-                    //let fsh = igSvc.makeFshForDG(dg,vo.allElements)
+
 
                     $scope.allFsh += fsh
                     $scope.allFsh += '\n\n'
 
-                    //console.log(fsh)
+
 
                 })
             }
@@ -396,7 +392,7 @@ angular.module("pocApp")
             //--------- login stuff
             //called whenever the auth state changes - eg login/out, initial load, create user etc.
             firebase.auth().onAuthStateChanged(function(user) {
-               // console.log('auth state change')
+
                 if (user) {
                     $scope.user = {email:user.email,displayName : user.displayName}
 
@@ -1176,7 +1172,7 @@ angular.module("pocApp")
             //when a specific DG is selected in the term summary
             //used by updates list as well = hence moved to main controller
             $scope.termSelectDG = function (item,previous) {
-                //console.log(item)
+
 
                 //set the tab to the DG tab
                 $scope.input.mainTabActive = $scope.ui.tabDG;
@@ -1209,7 +1205,7 @@ angular.module("pocApp")
             //used by updates list as well -- and others -  hence moved to main controller
             //item = {hiddenDGName:, path:}  (path doesn't have leading dg name
             $scope.termSelectDGItem = function (item) {
-                 //console.log(item)
+
 
                 //set the tab to the DG tab
                 $scope.input.mainTabActive = $scope.ui.tabDG;
@@ -1227,11 +1223,9 @@ angular.module("pocApp")
             }
 
 
-
-
             //update
             $scope.updateTermSummary = function () {
-                //console.log('Updating term summary')
+
 
                 $scope.termSummary = modelTermSvc.makeDGSummary($scope.hashAllDG).list
                 $scope.compTermSummary = modelTermSvc.makeCompOverrideSummary($scope.hashAllCompositions).list
@@ -1575,10 +1569,10 @@ angular.module("pocApp")
                     //generate the Q
                     makeCompQSvc.makeQ($scope.allCompElements,function (Q) {
 
-                        // console.log("Q created and copied to clipboard!")
+
 
                         $scope.fullQ = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
-                       // $scope.fullQTab = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+
 
 
                     })
@@ -1690,7 +1684,7 @@ angular.module("pocApp")
                 $scope.orderingByToMove = orderingSvc.getOrderingByToMove(dg)
                 $scope.referencedDGOrdering = orderingSvc.createMoveFromReferences($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
 
-
+                /* - enable when is now a separate dialog
                 //create the list of potential enableWhen sources
                 $scope.ewSources = []
                 $scope.fullElementList.forEach(function (item) {
@@ -1700,6 +1694,8 @@ angular.module("pocApp")
                     }
                 })
 
+                */
+
                 $scope.dgFshLM = igSvc.makeFshForDG(dg,$scope.fullElementList)
                 //$scope.dgFshLM = igSvc.makeFshForDG(dg,vo.allElements)
                 makeGraph()
@@ -1708,7 +1704,7 @@ angular.module("pocApp")
 
                 if (autoQ) {
                     let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
-                    console.log(voQ.Q)
+
                     $scope.dgQ = voQ.Q
                 }
 
@@ -1743,15 +1739,6 @@ angular.module("pocApp")
                     clearB4Select()
                     $scope.selectedModel = dg
 
-                    /* - not really using version count at present.
-                    //get the count of the  versions. May not need this.
-                    let url = `/model/DG/${dg.name}/history/count`
-                    $http.get(url).then(
-                        function (data) {
-                            $scope.historyCount = data.data
-                        }
-                    )
-                    */
 
                     //get the profile FSH for this DG
                     delete $scope.input.dgFsh
@@ -1760,7 +1747,7 @@ angular.module("pocApp")
                         function (data) {
                             $scope.input.dgFsh = data.data
                             $scope.$broadcast('dgSelected')     //so the FSH can be re-drawn
-                            //console.log(data.data)
+
                         }, function (err) {
                             //why do this on error??? $scope.$broadcast('dgSelected')
                             console.log(err.data)
@@ -1867,22 +1854,7 @@ angular.module("pocApp")
 
                                 return $scope.canEdit($scope.selectedModel)
 
-                               // return true
-                                /* could inhibit certain groups
-                               let node = nodes[0]
-                               $scope.dndSource = node.data.ed
-                               console.log($scope.dndSource)
 
-
-                               delete $scope.dndSource
-                               let node = nodes[0]
-                               if (node.data && node.data.item && node.data.item.type == 'group') {
-                                   return false
-                               } else {
-                                   $scope.dndSource = node.data.item
-                                   return true
-                               }
-                               */
 
                             }
                         }
@@ -1915,7 +1887,7 @@ angular.module("pocApp")
             }
 
             $scope.$on('redrawTree',function(){
-                console.log('redraw')
+
                 $scope.refreshFullList($scope.selectedModel)
 
 

@@ -22,7 +22,7 @@ angular.module('formsApp')
                     delete clone.item
                     $scope.$emit('itemDetail',{item:clone,meta:meta})
 
-                  //  console.log(item,meta)
+
                 }
 
                 $scope.$on('commentsUpdated',function(ev,vo) {
@@ -59,7 +59,7 @@ angular.module('formsApp')
                 //for some reason when the q changes, the change doesn't ripple through to the directive, so $scope.$broadcast is needed
                 //this is used by the designer...
                 $scope.$on("q-updated",function(){
-                   // console.log("q updated broadcast")
+
                     if ($scope.q) {
                         $timeout(function(){
 
@@ -120,17 +120,17 @@ angular.module('formsApp')
                 $scope.$watch(
                     function() {return $scope.q},
                     function() {
-                      // console.log('Q updated')
+
                         setupQ()
                                            }
                 );
 
 
                 function setupQ () {
-                    console.log('renderForm setup')
+
                     delete $scope.selectedSection       //c;ears the current section display
                     if ($scope.q) {
-                        console.log('create form temaplte')
+
                         let vo = renderFormsSvc.makeFormTemplate($scope.q,$scope.input.form)
                         if (vo) {
                             $scope.input.formTemplate = vo.template     //an array of sections
@@ -144,7 +144,7 @@ angular.module('formsApp')
 
                 //called when the element receives focus. Emits an event so the host can display stuff
                 $scope.onFocus = function (cell) {
-                    //console.log(cell)
+
                     $scope.$emit('elementSelected',{cell:cell})
 
                 }
@@ -218,8 +218,7 @@ angular.module('formsApp')
                     }
 
                     canvas.addEventListener('mousedown', function(event) {
-                        //console.log('dn',event.offsetX,event.offsetY)
-                        // isDrawing = true;
+
                         startX = event.offsetX;
                         startY = event.offsetY;
                         context.beginPath();
@@ -251,8 +250,7 @@ angular.module('formsApp')
                     let copyItem = angular.copy(cell.item)
                     let show = renderFormsSvc.checkConditional(copyItem,form)
 
-                    //console.log(show)
-                    //return true  //<<<<<<<<<<<,
+
 
                     //if it isn't to be shown, clear any content  (Aug31)
 

@@ -213,7 +213,7 @@ angular.module("pocApp")
 
 
             $scope.addEWNew = function () {
-                //create a new function to add an EW is a separate modal
+                //create a new function to add an EW is now a separate modal
                 $uibModal.open({
                     templateUrl: 'modalTemplates/addEW.html',
                     backdrop: 'static',
@@ -235,6 +235,12 @@ angular.module("pocApp")
 
                 }).result.then(function (vo) {
                     $scope.addEnableWhen({ed:vo.ed},vo.value,vo.op)
+
+                    //need to re-build the key elements
+                    $scope.makeSnapshots()
+                    $scope.refreshFullList($scope.selectedModel)
+                    let path = $filter('dropFirstInPath')($scope.selectedNode.data.ed.path)
+                    $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:path})
 
                 })
             }
@@ -275,15 +281,18 @@ angular.module("pocApp")
                     traceSvc.addAction({action:'add-enablewhen',model:$scope.selectedModel,path:targetPath,description:'add diff'})
                 }
 
-                delete $scope.input.ewSourceValue
-                delete $scope.input.ewSource
+                //delete $scope.input.ewSourceValue
+                //delete $scope.input.ewSource
                 //in modelsCtrl
 
-                $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:targetPath})
+                //$scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:targetPath})
 
             }
 
             $scope.removeEnableWhen = function (inx,path) {
+                if (! confirm("Are you sure you wish to remove this Conditional show")) {
+                    return
+                }
                 //the path is the full path (incl. DGName) of the element where the EW is to be removed from.
                 //inx is the position within the array of EW
                 //let path = $filter('dropFirstInPath')($scope.selectedNode.data.ed.path)
@@ -292,6 +301,7 @@ angular.module("pocApp")
                     if (ed.path == pathInDG) {
                         if (ed.enableWhen && ed.enableWhen.length > inx) {
                             let ew = ed.enableWhen.splice(inx,1)
+                            //selectedNode.data.ed.enableWhen
 
                             traceSvc.addAction({action:'remove-enablewhen',model:$scope.selectedModel,
                                 path:path,description:angular.toJson(ew[0])})
@@ -302,6 +312,11 @@ angular.module("pocApp")
 
                     }
                 }
+
+                //need to re-build the key elements
+                $scope.makeSnapshots()
+                $scope.refreshFullList($scope.selectedModel)
+                $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:path})
 
 
             }

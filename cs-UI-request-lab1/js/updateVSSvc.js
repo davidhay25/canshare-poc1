@@ -39,6 +39,8 @@ angular.module("pocApp")
                 //deferred.reject({msg:"CodeSystem update disabled"})
                 //return
 
+                cs.version = "1"
+
                 let qry = '/nzhts/CodeSystem'
                 $http.put(qry,cs).then(
                     function (data) {
