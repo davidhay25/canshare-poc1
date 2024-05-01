@@ -127,7 +127,7 @@ angular.module('formsApp')
 
 
                 function setupQ () {
-
+                    console.log($scope.q)
                     delete $scope.selectedSection       //c;ears the current section display
                     if ($scope.q) {
 

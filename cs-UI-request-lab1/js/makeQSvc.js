@@ -38,13 +38,16 @@ angular.module("pocApp")
                         controlType = "dateTime"
                         break
                     case 'CodeableConcept' :
-                        //  if (ed.valueSet) {
-                        //todo - need to check for type-ahead
+                        //  controltype is always choice. May want typeahead later
+
+                        controlHint = "drop-down"
+                        controlType = "choice"
+
                         if (ed.controlHint ) {
                             controlHint = ed.controlHint
                         } else {
-                            controlHint = "drop-down"
-                            controlType = "choice"
+                           // controlHint = "drop-down"
+                           // controlType = "choice"
                         }
 
 
@@ -165,7 +168,7 @@ angular.module("pocApp")
                  //config = config || {maxFromValueSet : 500}
 
                  let vo = getControlDetails(ed) //get the control details from the ed
-                 item.type = vo.controlType    //the 'official' type for the item
+                 item.type = vo.controlType    //the 'official' type for the item (from the spec)
 
                  //Add the hint instruction
                  if (vo.controlType !== vo.controlHint) {
@@ -193,7 +196,7 @@ angular.module("pocApp")
                      //todo seems to be an issue where despite the VS, the answeroptions are being added...
                      //todo - need to think through the strategy for answeOption population
                      // todo temp - just while debugging
-                     //item.answerValueSet = vs
+                     item.answerValueSet = vs
                      //delete item.answerOption   //if there's a valueset, then no options - mar 21
                  }
 
@@ -300,6 +303,8 @@ angular.module("pocApp")
             //this is used by the DG form creation
             makeQFromDG : function (lstElements,hashAllDG) {
                 //generate a Q based on the list of elements that represents a DG
+
+
 
 
                 if (! lstElements || lstElements.length == 0) {

@@ -323,7 +323,8 @@ angular.module("pocApp")
                 //generate the Q from the list of all elements. hidden (mult = 0..0) have been removed
 
                 let lstElements = removeHiddenElements(allElements)     //where hideInQ is set
-                getAllVS(lstElements, function () {
+                vsSvc.getAllVS(lstElements, function () {
+                //getAllVS(lstElements, function () {
                     let Q = generateQ(lstElements)
 
                     cb(Q)

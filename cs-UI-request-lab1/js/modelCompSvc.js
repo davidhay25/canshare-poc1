@@ -300,7 +300,7 @@ angular.module("pocApp")
 
             makeFullList: function (inComp,inTypes,inHashAllDG) {
 
-                console.log(snapshotSvc.getDGList())
+                //console.log(snapshotSvc.getDGList())
 
                 //shouldn't happen
                 if (!inComp) {

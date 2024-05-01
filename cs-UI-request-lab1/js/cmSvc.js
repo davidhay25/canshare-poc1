@@ -251,26 +251,7 @@ angular.module("pocApp")
                 }
 
             },
-            saveInCacheDEP : function (window,key,object) {
-                let deferred = $q.defer()
-                //save the supplied object in an indexedDb cache
-                const request = window.indexedDB.open("cmData", 3)
 
-                request.onerror = (event) => {
-                    deferred.reject(request.errorCode)
-                    // Do something with request.errorCode!
-                };
-                request.onsuccess = (event) => {
-
-                    // Do something with request.result!
-                };
-
-                return deferred.promise
-
-            } ,
-            applyReverseResults : function () {
-
-            },
             getVSContentsHash : function (lst) {
                 let deferred = $q.defer()
                 console.log('getting hash')
@@ -282,10 +263,6 @@ angular.module("pocApp")
                 let promises = []
 
                 lst.forEach(function (url) {
-                    //let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=en-x-sctlang-23162100-0210105`
-                    //let encodedQry = encodeURIComponent(qry)
-                    //let call = `nzhts?qry=${encodedQry}`
-                    //promises.push($http.get(call))
                     promises.push(addToHash(url,hashExpanded))
                 })
 

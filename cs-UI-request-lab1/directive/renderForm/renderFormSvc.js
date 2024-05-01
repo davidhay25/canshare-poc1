@@ -1215,10 +1215,10 @@ angular.module("formsApp")
                             //todo the control renders it will have the typeahead
 
                             let concepts = vsSvc.getOneVS(cell.item.answerValueSet)
-                            console.log(concepts)
+
                             cell.item.answerOption = []
                             if (concepts) {
-
+                                console.log(`${cell.item.linkId} - ${concepts.length} concepts`)
                                 concepts.forEach(function (concept) {
                                     cell.item.answerOption.push({valueCoding:concept})
                                 })

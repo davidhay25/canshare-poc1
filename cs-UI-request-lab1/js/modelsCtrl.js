@@ -3,7 +3,7 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,makeQSvc,orderingSvc,makeCompQSvc,
-                  snapshotSvc,
+                  snapshotSvc,vsSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
 
@@ -1566,14 +1566,10 @@ angular.module("pocApp")
 
 
                 if (autoQ) {
-                    //generate the Q
+                    //generate the Q and also retrieve all the ValueSets
                     makeCompQSvc.makeQ($scope.allCompElements,function (Q) {
 
-
-
                         $scope.fullQ = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
-
-
 
                     })
                 }
@@ -1703,9 +1699,21 @@ angular.module("pocApp")
                 //a Q representation of the DG
 
                 if (autoQ) {
-                    let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
 
-                    $scope.dgQ = voQ.Q
+                    //we first gather all the Valuesets from the Term sever then make the Q
+                    //note that in the composition this is part of the makeQ function - so a different patters
+
+
+                    vsSvc.getAllVS($scope.fullElementList, function () {
+                        let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
+                        $scope.dgQ = voQ.Q
+
+                    })
+
+
+
+
+
                 }
 
 
