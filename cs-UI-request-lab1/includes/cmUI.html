@@ -52,9 +52,18 @@
                                   </td>
                                   <td>
 
+                                      <!-- Allows us to explicitely decide when to show the message - not just
+                                      when the set of values has not been determined -->
                                       <div ng-show="v.noMatches">
                                           There were no matching ValueSets or Concepts
                                       </div>
+
+<!--
+                                      <div ng-show="v.options.length == 0">
+                                          There were no matching ValueSets or Concepts
+                                      </div>
+                                      -->
+
 
                                       <div ng-show="v.singleConcept">
                                           <input type="text" class="form-control" disabled="disabled" value="{{v.singleConcept.display}}"/>
@@ -140,6 +149,25 @@
                   <h3>{{local.uiTitle}}</h3>
 
                   <uib-tabset>
+                      <uib-tab heading="Log">
+                          <div class="row">
+                              <div class="col-md-6">
+                                  <div class="myScrollSmall">
+                                      <table class="table table-bordered">
+                                          <tr ng-repeat="entry in log"
+                                              ng-class="{clickable:entry.obj}"
+                                              ng-click="local.logEntry = entry">
+                                              <td>{{entry.msg}}</td>
+                                          </tr>
+                                      </table>
+                                  </div>
+
+                              </div>
+                              <div class="col-md-6">
+                                  <pre ng-show="local.logEntry.obj">{{local.logEntry.obj | json}}</pre>
+                              </div>
+                          </div>
+                      </uib-tab>
 
                       <uib-tab heading="Reverse Lookup">
                           <div class="banner">

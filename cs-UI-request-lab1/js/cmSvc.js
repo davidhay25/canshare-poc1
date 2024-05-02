@@ -159,7 +159,18 @@ angular.module("pocApp")
                     //is the concept either the same as target.code or, is target.code a ValueSet url
                     //and the concept is part of that Valueset
                     if (isMatch(target.code,concept)) {
-                        lstTargets.push(target)
+
+                        //now check the dependsOn. If any of them have the value '0' then the target is not included
+                        if (target.dependsOn) {
+                            let ar = target.dependsOn.filter(don => don.value == '0' )
+                            if (ar.length == 0) {
+                                lstTargets.push(target)
+                            }
+                        }
+
+
+
+
                     }
 
                 }
@@ -175,7 +186,7 @@ angular.module("pocApp")
                             if (value !== '0') {
                                 hashProperty[property] = hashProperty[property] || []
 
-                                //see if the code is already in the accumulated list...
+                                //see if the code is already in the accumulated list (actually a hash)...
                                 let ar = hashProperty[property].filter(concept => concept.code == don.value )
 
                                 //... and ignore if it is
