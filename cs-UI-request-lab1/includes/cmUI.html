@@ -140,6 +140,7 @@
                   <h3>{{local.uiTitle}}</h3>
 
                   <uib-tabset>
+
                       <uib-tab heading="Reverse Lookup">
                           <div class="banner">
                               <div>Property: {{reverseLookup.element.display}}
@@ -328,6 +329,18 @@
                           </uib-tabset>
 
 
+                      </uib-tab>
+                      <uib-tab heading="Internals">
+                          <div class="row">
+                              <div class="col-md-6">
+                                  <strong>cmProperties</strong>
+                                  <pre>{{cmProperties | json}}</pre>
+                              </div>
+                              <div class="col-md-6">
+                                  <strong>local.cmOptions</strong>
+                                  <pre>{{local.cmOptions | json}}</pre>
+                              </div>
+                          </div>
                       </uib-tab>
 
                   </uib-tabset>

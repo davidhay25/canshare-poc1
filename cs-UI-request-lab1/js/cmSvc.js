@@ -144,17 +144,20 @@ angular.module("pocApp")
             },
             reverseRulesEngine : function (element,concept,hashExpandedVs) {
                 //check all the targets in the element for conditions where the concept would be a match
-
+                //element is the element from the ConceptMap
+                //concept is the selected value (target.code) from all the targets in the element
                 if (! element && ! element.target) {
                     return
                 }
 
 
-                //the list of targets that, if the dependsOn are met, would return a vs containing the concept
+                //the list of targets that, if the dependsOn were met, would return a vs containing the concept
                 //or the concept itself (target.code is the concept)
                 let lstTargets = []
                 for (const target of element.target) {
 
+                    //is the concept either the same as target.code or, is target.code a ValueSet url
+                    //and the concept is part of that Valueset
                     if (isMatch(target.code,concept)) {
                         lstTargets.push(target)
                     }
@@ -213,19 +216,19 @@ angular.module("pocApp")
                     }
                 }
 
-
                 console.log(hashProperty)
-
-
                 return {targets:lstTargets,element: element,hashProperty:hashProperty,sourceConcept:concept}
 
 
+                //does the target.code value either match the concept.code or is the
+                //code actually a valueSet that has the concept with it
                 function isMatch(code,concept) {
                     //is the concept in the code attribute
                     if (code == concept.code) {
                         //the concept IS the code
                         return true
                     }
+                    //now see if target.code is a valueset, and the concept is in that valueset
                     if (hashExpandedVs[code]) {
                         //the code is actually a url in the expanded VS todo ?need to check for when there is no expanded vs
                         let arCodes = hashExpandedVs[code]

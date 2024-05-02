@@ -610,34 +610,34 @@ angular.module("pocApp")
                 //      if it is, then leave it alone
                 //      if not, then clear that value
 
-
-
-                let propertyCode = $scope.reverseLookup.element.code    //the snomed code for this property (it's help in the element, the property name is defined above)
-
-
+                let propertyCode = $scope.reverseLookup.element.code    //the snomed code for this property (it's held in the element, the property name is defined above)
 
                 let canApply = true
                 Object.keys($scope.cmProperties).forEach(function (propName) {  //assume this is ordered...
+
 
                     //are we past the property that had the reverse lookup yet?
                     let cmProperty = $scope.cmProperties[propName]
                     if (cmProperty.concept.code == propertyCode) {
                         canApply = false        //turn off the application process. properties after this one will not have their options set
-
-                        //A flag so that we can customize behaviour depending on whether the reverse has been applied
-                       //temp  $scope.appliedFromReverse = propName
                     }
+                    console.log(propName,canApply)
 
                     if (canApply) {
                         //set false  when we're past the current property
                         //cmProperties[propname].options is the list of options
                         let arNewOptions = $scope.reverseLookup.hashProperty[propName]       //an array of possible concepts
-                        console.log(propName,arNewOptions)
+
 
                         if (arNewOptions) {
+                            console.log(propName,arNewOptions.length)
+                            //there are options for this element fromthe reverse lookup
                             if (arNewOptions.length == 1) {
+                                //if there's only 1 value, then set it
                                 cmProperty.singleConcept = arNewOptions[0]
                                 cmProperty.options.length = 0
+                                delete cmProperty.noMatches
+
                                 $scope.local.cmOptions[propName] = arNewOptions[0]      //set the value
                             } else {
                                 cmProperty.options = arNewOptions
@@ -647,10 +647,19 @@ angular.module("pocApp")
                                 $scope.local.cmOptions[propName] = cmProperty.options[0]
 
                             }
+
                         } else {
-                            //if there are no options from the reverse lookup to apply, then do the usual forward lookup
+                            //if there are no options from the reverse lookup to apply, then delete any existing value
+                            //that might be there, and set the .noMatches flag on cmProperties (? todo couldn't we just look at the length of options)
+                      /*      cmProperty.options = []
+                            cmProperty.noMatches = true
+                            delete cmProperty.singleConcept
+
+                            $scope.local.cmOptions[propName] = null
+*/
 
                            //30 Apr - no, don't... $scope.populateUIControl(propName)  //populate the UI with the set of possible values
+                            //If there is nothing from the
 
                             /*
                             let def = $scope.cmProperties[propKey]
@@ -673,11 +682,18 @@ angular.module("pocApp")
             //when a selection is made in the UI. We want to select options for the next one...
             $scope.uiValueSelected = function (propKey,value) {
 
+                if (! value) {
+                    //I think this is being triggerred when a value is being updated after reverse lookup
+                    return
+                }
+
                 //this is the reverse lookup stuff.
                 //sets $scope.reverseLookup which {targets:[],element: {},hashProperty:{}}
+                console.log(`${propKey} - reverse lookup`)
                 performReverseLookup(propKey,value)
 
                 //now apply the reverse lookup stuff. Only populate empty values
+
                 $scope.applyReverse()
 
 
@@ -726,6 +742,8 @@ angular.module("pocApp")
                 })
 
 
+
+                //---------------- process the next property in the sequence
                 let def = $scope.cmProperties[propKey]
                 if (def && def.next) {
                     //def.next is the next control in the order
@@ -748,7 +766,7 @@ angular.module("pocApp")
 
             }
 
-            //called to populate the UI control for a single property
+            //called to populate the UI control for a single property. Called when click on the property name in the UI
             //if noNext
             $scope.populateUIControl = function (propKey,noNext) {
                 delete $scope.lstMatchingConceptsForUI
@@ -758,6 +776,12 @@ angular.module("pocApp")
                 delete $scope.cmProperties[propKey].singleConcept
 
                 //delete $scope.reverseLookup
+
+                //if there is already a value for this property then leave it alone and don't
+                //progress further.
+                if ($scope.local.cmOptions[propKey]) {
+                   return
+                }
 
                 $scope.local.uiTitle = `Looking for possible values for ${propKey}`
                 //propKey is the property we're wanting to populate
@@ -780,10 +804,7 @@ angular.module("pocApp")
                     return
                 }
 
-               // if (! cmElement) {
-                //    alert(`An element in the Concept map for the code ${propertyCode} could not be located`)
-                //    return
-             //   }
+
 
                 //a hash of all the data entered - but only those 'before' this element
 
@@ -883,6 +904,8 @@ angular.module("pocApp")
                     if (next && ! noNext) {
                         $scope.populateUIControl(next)
                     }
+
+
 
                    // alert(`There were no matching ValueSets found for ${propKey}`)
 
