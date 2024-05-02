@@ -643,8 +643,13 @@ angular.module("pocApp")
                                 cmProperty.options = arNewOptions
                                 delete cmProperty.singleConcept
 
-                                //now set the default value to the first in the list
-                                $scope.local.cmOptions[propName] = cmProperty.options[0]
+                                //applyIfNotEmpty(propName,$scope.cmProperties[key].options)
+
+                                //If empty, set the default value to the first in the list
+                                if (! $scope.local.cmOptions[propName]) {
+                                    $scope.local.cmOptions[propName] = cmProperty.options[0]
+                                }
+
 
                             }
 
@@ -677,6 +682,22 @@ angular.module("pocApp")
 
 
 
+            }
+
+            function applyIfNotEmpty(propName,options) {
+                if ($scope.local.cmOptions[propName]) {
+                    //there is a value here
+                    let currentValue = $scope.local.cmOptions[key]
+                    let ar = options.filter(concept => concept.code == currentValue.code )
+
+                    // console.log()
+
+                    if (ar.length == 0) {
+                        //the current value is not in the set of possible values. clear it
+                        delete $scope.local.cmOptions[key]                  //the data value
+                        delete $scope.cmProperties[key].singleConcept       //if a single value
+                    }
+                }
             }
 
             //when a selection is made in the UI. We want to select options for the next one...
@@ -749,6 +770,22 @@ angular.module("pocApp")
                     //def.next is the next control in the order
                     $scope.populateUIControl(def.next)  //populate the UI with the set of possible values
                 }
+
+                //so the dropdowns work, make sure the value (local.cmOptions) is from the list cmProperties[k].options
+                //Otherwise angular doesn't set the drop down correctly
+                Object.keys($scope.cmProperties).forEach(function (propName) {
+                    if ($scope.local.cmOptions[propName] && $scope.cmProperties[propName].options) {
+                        let code = $scope.local.cmOptions[propName].code
+                        for (const c of $scope.cmProperties[propName].options) {
+                            if (c.code == code) {
+                                $scope.local.cmOptions[propName] = c
+                                break
+                            }
+                        }
+                    }
+                })
+
+
 
             }
 
@@ -857,8 +894,9 @@ angular.module("pocApp")
                         }
 
                     } else {
-                        //now expand the valuesets to get the actual concepts
+                        //now expand the valuesets to get the actual concepts. There may be more than one...
                         $scope.cmProperties[propKey].options = []
+
                         //actually, we now have all the expanded VS in memory (after implementing the reverseengine
                         for (const url of $scope.uiMatchingVS) {
                             let arConcepts = $scope.hashExpandedVs[url]
@@ -878,20 +916,18 @@ angular.module("pocApp")
                             }
                         }
 
-                        /*
-                        let qry = `/nzhts/expandMultipleVs`
-                        $http.post(qry,$scope.uiMatchingVS).then(
-                            function (data) {
-                                console.log(data)
-
-                                $scope.cmProperties[propKey].options = data.data
-
-                                $scope.lstMatchingConceptsForUI = data.data
-                            }, function (err) {
-                                console.log(err)
+                        //now that we've updated the list of options, we have to update the value as well (for angular)
+                        if ($scope.local.cmOptions[propKey]) {
+                            let currentCode = $scope.local.cmOptions[propKey].code
+                            for (const v of $scope.cmProperties[propKey].options ) {
+                                if (v.code == currentCode) {
+                                    $scope.local.cmOptions[propKey] = v
+                                    break
+                                }
                             }
-                        )
-                        */
+                        }
+
+
                     }
 
 
