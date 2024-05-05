@@ -75,7 +75,7 @@ angular.module("pocApp")
                     case 4 :
 
                         //the DG within the section DG. I don't think there is anything in here we need...
-                        //let groupItem = {text: ed.title + " group", linkId: ed.path, type: 'display', extension:[],item: []}
+                       // let groupItem = {text: ed.title + " group", linkId: ed.path, type: 'display', extension:[],item: []}
                         //sectionItem.item.push(groupItem)
                         break
                     default :
