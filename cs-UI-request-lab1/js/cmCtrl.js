@@ -294,7 +294,7 @@ angular.module("pocApp")
                         }
 
                     } else {
-                        //now expand the valuesets to get the actual concepts. There may be more than one...
+                        //now examine the valueset expansions to get the actual concepts. There may be more than one...
                         $scope.cmProperties[propKey].options = []
 
                         //actually, we now have all the expanded VS in memory (after implementing the reverseengine
@@ -317,7 +317,7 @@ angular.module("pocApp")
                         }
 
 
-
+/*
 
                         //now that we've updated the list of options, we have to update the value as well (for angular)
                         if ($scope.local.cmOptions[propKey]) {
@@ -329,26 +329,43 @@ angular.module("pocApp")
                                 }
                             }
                         }
-
+*/
 
                     }
 
+/* - not too sure I like this happenning all the time...
+
                 //we still have to check all the lower ones as well
-
-
-
-
-
-
+                let next = $scope.cmProperties[propKey].next
+                if (next && ! noNext) {
+                    $scope.populateUIControl(next)
+                }
+*/
 
                 } else {
+                    //If there are no applicable values for this property...
                     $scope.cmProperties[propKey].noMatches = true
+                    $scope.cmProperties[propKey].options = []
+                    delete $scope.cmProperties[propKey].singleConcept
 
                     let next = $scope.cmProperties[propKey].next
                     if (next && ! noNext) {
                         $scope.populateUIControl(next)
                     }
 
+                }
+
+
+                //now that we've updated the list of options, we have to update the value as well (for angular)
+                //otherwise the dropdowns won't be correctly displayed
+                if ($scope.local.cmOptions[propKey]) {
+                    let currentCode = $scope.local.cmOptions[propKey].code
+                    for (const v of $scope.cmProperties[propKey].options ) {
+                        if (v.code == currentCode) {
+                            $scope.local.cmOptions[propKey] = v
+                            break
+                        }
+                    }
                 }
 
             }
@@ -380,7 +397,7 @@ angular.module("pocApp")
 
 
             $scope.applyReverse = function () {
-                //apply the information from the reverse lookup to the properties prior to this one. Algorithm to apply from top down (excl. gender):
+                //apply the information from the reverse lookup to all the properties prior to this one. Algorithm to apply from top down (excl. gender):
                 //if the result is empty, then apply the options from the reverse object {targets:,element:,hashProperty, sourceConcept:}
                 //      hashProperty is list of possible concepts for a property keyed by property
                 //If there is alread a value, then see if that value is in the property[propertyname].
@@ -426,7 +443,10 @@ angular.module("pocApp")
 
 
 
-                                //If empty, set the default value to the first in the list
+                                //Check that any current value is still in the list of options ($scope.cmProperties[propName].options)
+                                checkCurrentValue(propName,arNewOptions)
+
+                                /*
                                 if (! $scope.local.cmOptions[propName]) {
                                     $scope.log.push({msg:`No existing data, setting options`,obj:arNewOptions})
                                     $scope.local.cmOptions[propName] = cmProperty.options[0]
@@ -441,6 +461,7 @@ angular.module("pocApp")
                                         delete $scope.local.cmOptions[propName]
                                     }
                                 }
+                                */
 
 
                             }
@@ -458,6 +479,27 @@ angular.module("pocApp")
                     }
                 })
 
+            }
+
+
+            //checks that ant current value for the property is in the options ($scope.cmProperties[propName].options)
+            //if not, then set it to the first value
+            // $scope.cmProperties[propName].options must have been set first
+            function checkCurrentValue(propName) {
+                if (! $scope.local.cmOptions[propName]) {
+                    $scope.log.push({msg:`No existing data, setting options`,obj:$scope.cmProperties[propName]})
+                    $scope.local.cmOptions[propName] = $scope.cmProperties[propName].options[0]
+                } else {
+                    //see if the current value is in the set of concepts.
+                    //If it is then all good - otherwise set it to the first
+                    let currentValue = $scope.local.cmOptions[propName]
+                    let ar = $scope.cmProperties[propName].options.filter(concept => concept.code == currentValue.code )
+                    if (ar.length == 0) {
+                        $scope.log.push({msg:`Existing value not in set. Removing.`,obj:currentValue})
+                        //there is a current value, and it's not in the set of options. clear it
+                        delete $scope.local.cmOptions[propName]
+                    }
+                }
             }
 
 
