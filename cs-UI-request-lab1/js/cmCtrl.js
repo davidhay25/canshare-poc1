@@ -54,8 +54,13 @@ angular.module("pocApp")
             });
 
             $scope.refreshCache = function () {
-                //just need to re-read from the TS. Will populate forage cache
-                $scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"}})
+                let msg = "This will re-load all the artifacts from the terminology server. It will take several seconds (10-20) to complete. Are you sure?"
+                if (confirm(msg)) {
+                    //$scope.refreshingCache = true
+                    //just need to re-read from the TS. Will populate forage cache
+                    $scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"}})
+                }
+
 
             }
 
@@ -71,6 +76,7 @@ angular.module("pocApp")
                 localforage.setItem('cmData', vo).then(function (value) {
                     // Do other things once the value has been saved.
                     console.log(value);
+                   // delete $scope.refreshingCache
                     alert("Cache has been updated from the Terminology Server.")
                     setup()
                 }).catch(function(err) {
@@ -200,6 +206,7 @@ angular.module("pocApp")
                 delete $scope.uiMatchingVS
                 delete $scope.singleConcept     //if a single concept is returned (rather than a VS)
                 delete $scope.cmProperties[propKey].singleConcept
+                delete $scope.cmProperties[propKey].noMatches
 
                 //delete $scope.reverseLookup
 
@@ -333,14 +340,15 @@ angular.module("pocApp")
 
                     }
 
-/* - not too sure I like this happenning all the time...
+
 
                 //we still have to check all the lower ones as well
+                    // todo - not completely sure this is right. If so, then we can re-factor the code to alwqys do it (duplicated code ATM)
                 let next = $scope.cmProperties[propKey].next
                 if (next && ! noNext) {
                     $scope.populateUIControl(next)
                 }
-*/
+
 
                 } else {
                     //If there are no applicable values for this property...
