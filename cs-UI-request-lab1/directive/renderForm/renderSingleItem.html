@@ -93,6 +93,7 @@
 
 
             <div ng-switch-when="display">
+
                 <em>{{cell.item.text}}</em>
 
             </div>
@@ -133,7 +134,6 @@
             <div ng-switch-when="choice">
 
                 <div ng-show="cell.displayHint == 'lookup'">
-
                     A lookup dialog from the TS
                 </div>
 
@@ -145,7 +145,11 @@
                            ng-model="input.form[cell.item.linkId]" class="form-control"/>
                 </div>
 
-                <div ng-show = "cell.item.answerOption">
+                <div ng-show="cell.meta.fixedCoding">
+                   <input type="text" class="form-control" disabled="disabled" value="{{cell.meta.fixedCoding.display}}"/>
+                </div>
+
+                <div ng-show = "cell.item.answerOption && ! cell.meta.fixedCoding">
 
                     <div ng-show="cell.displayHint == 'radio-button' || cell.displayHint == 'radio'">
 

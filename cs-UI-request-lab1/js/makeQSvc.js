@@ -2,7 +2,7 @@
 
 angular.module("pocApp")
 
-    .service('makeQSvc', function($http,codedOptionsSvc) {
+    .service('makeQSvc', function($http,codedOptionsSvc,QutilitiesSvc) {
 
         //let config = {}
         //let nzHTSPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/"
@@ -304,9 +304,6 @@ angular.module("pocApp")
             makeQFromDG : function (lstElements,hashAllDG) {
                 //generate a Q based on the list of elements that represents a DG
 
-
-
-
                 if (! lstElements || lstElements.length == 0) {
                     return {}
                 }
@@ -398,6 +395,9 @@ angular.module("pocApp")
 
                         addEnableWhen(ed,item)  //If there are any contitionals
                         setControlType(ed,item)  //set the control type to use - also expands any ValueSet
+                        QutilitiesSvc.setFixedValue(ed,item)
+
+
 
                         //have to check here to ensure 'other' item is after main one
                         if (ed.otherType) {

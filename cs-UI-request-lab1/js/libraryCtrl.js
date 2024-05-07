@@ -1,11 +1,22 @@
 //seversync is actually the main library interface
 angular.module("pocApp")
     .controller('libraryCtrl',
-        function ($scope,$rootScope,$http,allDG,allComp,$sce,allQObject,user,librarySvc,$timeout,traceSvc,$uibModal) {
+        function ($scope,$rootScope,$http,allDG,allComp,$sce,allQObject,user,librarySvc,$timeout,traceSvc,$uibModal,$window) {
 
             $scope.input = {}
             $scope.user = user
             //$scope.input.mainTabActive = 1
+
+            $scope.canBulkUpdateDGLibrary = function () {
+                //a function to copy all the DG to the libraray. Only for me running locally.
+                //for use after importing a json file.
+                if (! user) {return false}
+                if (user.email == 'david.hay25@gmail.com' && $window.location.hostname == 'localhost') {
+                    return true
+                }
+            }
+
+            console.log($window.location)
 
             $scope.input.filter = {}
 
@@ -14,6 +25,7 @@ angular.module("pocApp")
             $scope.clearFilter = function () {
                 $scope.input.filter = {}
             }
+
 
 
             //whether a composition is shown.
@@ -111,6 +123,23 @@ angular.module("pocApp")
                     alert(angular.toJson(err.data))
                 })
 */
+
+            $scope.updateRepo = function () {
+                if (confirm("This will update all DGs in the Library with the loacal ones. Are you sure you wish to do this?")) {
+
+                    Object.keys(allDG).forEach(function (key) {
+                        let localDG = allDG[key]
+
+                        librarySvc.checkIn(localDG,user)
+
+                    })
+
+                    alert("Update complete.")
+                    $scope.$close()
+
+                }
+            }
+
 
             //local comp and library comp
             function makeCompSummary(allComp,libraryComp) {

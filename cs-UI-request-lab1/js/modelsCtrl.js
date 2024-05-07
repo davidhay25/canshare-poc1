@@ -837,8 +837,13 @@ angular.module("pocApp")
                         }
 
                     }
+                    try {
+                        $scope.$digest();       //as the event occurred outside of angular...
+                    } catch (ex) {
 
-                    $scope.$digest();       //as the event occurred outside of angular...
+                    }
+
+
                 }).bind("loaded.jstree", function (event, data) {
                     let id = treeData[0].id
 
@@ -1180,6 +1185,16 @@ angular.module("pocApp")
                 //locate the DG with this name and set it active. This will select it in the DG tab
                 $scope.selectedModel = $scope.hashAllDG[item.DGName]
                 $scope.selectModel($scope.selectedModel)
+
+                $("#allDGTree").jstree().deselect_all(true);
+                $('#allDGTree').jstree('select_node', item.DGName);
+
+                $("#sectionDGTree").jstree().deselect_all(true);
+                $('#sectionDGTree').jstree('select_node', item.DGName);
+
+
+
+
 
 
                 //$scope.selectModel
@@ -1558,19 +1573,16 @@ angular.module("pocApp")
 
                 //note that this excludes mult 0..0
                 //uses the snapshot svc
+                //return {allElements:ar,hashAllElements:hashAllElements}
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)      //overites the previou slist
 
-
-
-                $scope.allCompElements = vo.allElements     //used by the Table and Q generation (at least)
+                $scope.allCompElements = vo.allElements     //list of all elements. used by the Table and Q generation (at least)
 
 
                 if (autoQ) {
                     //generate the Q and also retrieve all the ValueSets
                     makeCompQSvc.makeQ($scope.allCompElements,function (Q) {
-
-                        $scope.fullQ = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
-
+                        $scope.fullQ = Q
                     })
                 }
 
@@ -1606,54 +1618,17 @@ angular.module("pocApp")
                 delete $scope.errorLog
 
 
-
-
-               // let vo = {}
-
-                /* todo - will need to generate the graph and relationships in thw new way...
-
-
-*/
-
-                //$scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)
-                //$scope.relationshipsSummary = snapshotSvc.getRelationshipsSummary(dg.name)
-
-               // let vo = snapshotSvc.getFullListOfElements(dg.name)
                 $scope.relationshipsSummary = snapshotSvc.getRelationshipsSummary(dg.name)
-                $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)// vo.allElements
+                //by supplying the dg in the call, the eds will be annotatded with 'definedOnDG' for those in the diff
+                $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name,dg)// vo.allElements
 
-                /*
-
-                if ($scope.newInflater) {
-
-
-                    vo.allElements = snapshotSvc.getFullListOfElements(dg.name)
-                    $scope.relationshipsSummary = snapshotSvc.getRelationshipsSummary(dg.name)
-
-
-                } else {
-
-                }
-
-
-                if (! $scope.newInflater) {
-                    if (removeZeroedOut) {
-                        $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements.filter(item => item.ed.mult !== '0..0'))
-                    } else {
-                        $scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
-                    }
-                } else {
-                    $scope.fullElementList = vo.allElements
-                }
-
-*/
-
-                //sort the elements list to better display slicing
-                //$scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
+console.log($scope.fullElementList)
 
                 $scope.fullElementHash = {}         //I seem to need this quite a lot. Though memory usage is getting high...
                 //create the list of all paths in the DG. Used by the 'ordering'
-                $scope.allPaths = []
+                $scope.allPaths = []  //used for the manual re-ordering
+
+                // hidden elements no longed in fullelement list
                 let cntHidden = 0, cntVisible=0
 
                 $scope.fullElementList.forEach(function (item) {
@@ -1666,7 +1641,10 @@ angular.module("pocApp")
                     }
                 })
 
+
                 $scope.hiddenSummary = `${cntVisible}/${cntHidden}`
+
+
 
                 console.log(`Visible: ${cntVisible}  Hidden:${cntHidden}`)
 
@@ -1710,17 +1688,13 @@ angular.module("pocApp")
 
                     })
 
-
-
-
-
                 }
 
 
 
                 //The DG element tree
                 let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
-                makeDGTree(treeData)
+                drawDGTree(treeData)
                 
                 //all the dependencies (enableWhen)
                 $scope.allDependencies = modelDGSvc.getAllEW($scope.fullElementList,$scope.selectedModel.name)
@@ -1846,7 +1820,7 @@ angular.module("pocApp")
                 }
             }
 
-            function makeDGTree(treeData) {
+            function drawDGTree(treeData) {
                 //enable drag / drop for re-ordering
                 $('#dgTree').jstree('destroy');
 
@@ -1861,8 +1835,6 @@ angular.module("pocApp")
                             'is_draggable' : function(nodes,e) {
 
                                 return $scope.canEdit($scope.selectedModel)
-
-
 
                             }
                         }
@@ -1905,7 +1877,6 @@ angular.module("pocApp")
                 let sourceId = getId(data.element.id)
                 let targetId = getId(data.event.target.id)
 
-
                 if (sourceId && targetId) {
                     let sourceTitle = getElement(sourceId).title || sourceId
                     let targetTitle = getElement(targetId).title || targetId
@@ -1921,8 +1892,15 @@ angular.module("pocApp")
                         $scope.orderingByToMove = orderingSvc.getOrderingByToMove($scope.selectedModel) // elements with multiple move instructions {dupsExist:dupsExist,hash:hash}
 
 
+
                         let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
-                        makeDGTree(treeData)
+                        drawDGTree(treeData)
+                        //re-create the Questionnaire
+                        vsSvc.getAllVS($scope.fullElementList, function () {
+                            let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
+                            $scope.dgQ = voQ.Q
+
+                        })
 
                         $scope.$digest()
 

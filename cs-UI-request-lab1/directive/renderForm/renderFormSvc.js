@@ -305,9 +305,18 @@ angular.module("formsApp")
 
             getMetaInfoForItem : function(item) {
                 //populate meta info - like resource extraction. Basically pull all extensions into a VO
+                //we don't use much of this in the LIM...
                 var that = this
                 let meta = {}
 
+                //fixed coding
+                if (item.initial) {
+                    for (const init of item.initial) {
+                        if (init.valueCoding && item.readOnly) {
+                            meta.fixedCoding = init.valueCoding
+                        }
+                    }
+                }
 
 
                 //update the Observationextract
@@ -942,7 +951,7 @@ angular.module("formsApp")
                         //now look at the items below the section level.
                         if (sectionItem.item) {
                             sectionItem.item.forEach(function (item) {
-//console.log('processing ',item.text)
+
                                 let meta = that.getMetaInfoForItem(item)
 
 
@@ -1029,31 +1038,6 @@ angular.module("formsApp")
                                                 row[side].push(cell)
 
 
-/*
-                                                if (inx == 0) {
-                                                    //this is the first item in the group - it goes in the left
-                                                    let cell = {item:child,meta:childMeta}      //to allow for ither elements like control type...
-                                                    fillFromValueSet(cell,termServer)
-                                                    setDecoration(cell,child)        //sets things like control type
-                                                    setDefaultValue(child,formData)
-                                                    //row.left = [cell]
-                                                    row['col1'] = [cell]
-                                                } else {
-                                                    //this is a subsequent item - it will go in the right col by default
-                                                    //let side = "right"
-                                                    let side = 'col2'
-
-
-
-                                                    let cell = {item:child,meta:childMeta}
-                                                    fillFromValueSet(cell,termServer)
-                                                    //,that.getMetaInfoForItem(child)
-                                                    setDecoration(cell,child)
-                                                    setDefaultValue(child,formData)
-                                                    row[side] = row[side] || []
-                                                    row[side].push(cell)
-                                                }
-                                                */
                                             })
                                             //section.rows.push(row)   //assume that the whole group fits in a single row...
                                         }
@@ -1083,10 +1067,6 @@ angular.module("formsApp")
                                         section.rows.push(row)
 
                                     }
-
-
-
-
 
                                 }
 
@@ -1226,33 +1206,7 @@ angular.module("formsApp")
                                 cell.item.answerOption.push({valueCoding:{display:"ValueSet not found"}})
                             }
 
-                            /*
 
-                                                    //if there's a vakueset then replace the item.answerOption with the expanded vs. todo - this is just a forst step...
-
-                                                    //console.log(cell.item.answerValueSet)
-
-                                                    let qry = `ValueSet/$expand?url=${cell.item.answerValueSet}&displayLanguage=en-x-sctlang-23162100-0210105`
-                                                    //console.log(qry)
-                                                    let encodedQry = encodeURIComponent(qry)
-
-                                                    $http.get(`nzhts?qry=${encodedQry}`).then(
-                                                        function (data) {
-                                                            let expandedVS = data.data
-                                                            if (expandedVS && expandedVS.expansion && expandedVS.expansion.contains) {
-                                                                cell.item.answerOption = []
-
-                                                                expandedVS.expansion.contains.forEach(function (concept) {
-                                                                    cell.item.answerOption.push({valueCoding:concept})
-                                                                })
-                                                            }
-                                                            console.log(data.data)
-                                                        }, function (err) {
-
-                                                        }
-                                                    )
-
-                            */
 
                         } else if (cell.item.answerOption) {
                             //if there are answerOptions then we can just continue
@@ -1264,11 +1218,10 @@ angular.module("formsApp")
 
                     }
 
-
                 }
 
                 //this is the original funciotn. superceeded.
-                function fillFromValueSetOriginal(cell,termServer) {
+                function fillFromValueSetOriginalDEP(cell,termServer) {
                     // console.log('fillFromVS',cell)
                     if (cell.item.answerOption) {
                         //ATM there can be both answerOption and answerValueSet as an artifact of authoring (strictly incorrect).

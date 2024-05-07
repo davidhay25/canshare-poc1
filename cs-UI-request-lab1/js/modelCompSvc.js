@@ -322,7 +322,7 @@ angular.module("pocApp")
                 //to avoid infinite recursion
                 let types = angular.copy(inTypes)
 
-                let allElements = []
+                //let allElements = []
 
                 let hashAllElements = {}        //keyed on path
 
@@ -367,33 +367,24 @@ angular.module("pocApp")
 
                 //process a single section item. Create and add the section to the hash, then call processDG to get the child elements of the DG
                 function processSectionItem(sectionItem,pathRoot) {
-                   // console.log("ProcessSectionItem:"+sectionItem.name)
                     //extract all the elements in the DG,
                     let localPath = sectionItem.name         //the path in the section. Often the DG name
                     let type = sectionItem.type[0]   //one type only
-                    //let mult = sectionItem.mult     //how many times this item (DT, DG) can appear in the section
 
-                    //let type = DG.name   //one type only
                     let model = types[type]    //this could be a FHIR DT or a DG. A DG will have a name, a DT will not
 
                     if (model && model.name) {
-                        //This is a DG. todo need to think about DG inheritance
+                        //This is a DG.
 
                         let childPathRoot
-                        //let childPathRoot = `${pathRoot}.${model.name}`
 
                         childPathRoot = `${pathRoot}.${localPath}`
-                        model.kind = "dg"   //<<<<<<<<< oct 2
+                        //model.kind = "dg"   //<<<<<<<<< oct 2
+                        model.kind = "section-dg"   //<<<<<<<<< oct 2
                         hashAllElements[childPathRoot] = {ed:model,host:sectionItem}
 
-                        // vo.allElements = snapshotSvc.getFullListOfElements(dg.name)
                         let allElementsThisDG = snapshotSvc.getFullListOfElements(model.name)
-
-                        //the old way...
-                       // let vo = modelsSvc.getFullListOfElements(model,types,hashAllDG)
-                        //let allElementsThisDG = modelsSvc.makeOrderedFullList(vo.allElements)     //orders the list and removes group original children
-
-                        //todo >>>> here is where the 'insertAfter' re-ordering should go..
+                        orderingSvc.sortFullListByInsertAfter(allElementsThisDG,model,hashAllDG)
 
 
 
@@ -420,13 +411,7 @@ angular.module("pocApp")
 
                                 }
 
-                                //ed.kind = 'element'
-                               //jan 16 ed.kind = ed.kind ||  'no kind set'  //'element'  //<<< aded oct 2
                                 let shortPath = $filter('dropFirstInPath')(ed.path)
-
-                                //jan 16 let p
-                                //jan 16if (ed.type) { p = ed.type[0]}
-                                //console.log(shortPath,ed.path,ed.mult,p)
 
                                 let path = `${childPathRoot}.${shortPath}`
                                 hashAllElements[path] = {ed:ed}
@@ -438,11 +423,9 @@ angular.module("pocApp")
                     } else {
                         console.log('missing name: ',model)
                         //this is a Z element - ie a FHIR DT directly attached to the section
-                        // or a missing DG
+                        //I think we've decided to not use Z elements any more...
 
                         arLog.push(`Missing type: ${type} path: ${localPath}`)
-
-                       // alert(`Missing type: ${type} (may be a z element - will need fixing if so)`)
                     }
 
                 }
@@ -455,9 +438,9 @@ angular.module("pocApp")
 
                         comp.sections.forEach(function (section) {
 
-                            //let pathRoot = `${comp.name}.section-${section.name}`   //section root is model name + section name
                             let pathRoot = `${comp.name}.${section.name}`   //section root is model name + section name
                             hashAllElements[pathRoot] = {ed:section}
+
                             //each item is assumed to be a DG - think about others (Z & override) later
                             section.items.forEach(function (item) {
                                //{name: title: type: mult:}
@@ -474,22 +457,26 @@ angular.module("pocApp")
 
                 }
 
+                //perfrom the actual composiution processing. After this, hashAllElements will have been created
+
                 processComp(comp)
 
-                //Now process any overrides
+
+                //Now process any overrides todo - are we still doing this - or is everything in the section DG
                 if (comp.override) {
                     Object.keys(comp.override).forEach(function (path) {
                         hashAllElements[path] = {ed:comp.override[path]}
                     })
                 }
 
+
+                //now generate the list of elements from the hash. Although not guaranteed, the order seems to be that of update...
                 let ar = []
                 Object.keys(hashAllElements).forEach(function (key) {
                     let item = hashAllElements[key]         // {ed: sectionItem: }
                     delete item.ed.diff //don't think the diff is needed here...
                     let clone = angular.copy(item)        //don't want to update the actual model
                     clone.ed.path = key
-
                     ar.push(clone)
                 })
 
@@ -500,6 +487,8 @@ angular.module("pocApp")
                     }
                     alert(msg)
                 }
+
+
 
 
                 return {allElements:ar,hashAllElements:hashAllElements}

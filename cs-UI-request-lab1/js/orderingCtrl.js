@@ -15,6 +15,23 @@ angular.module("pocApp")
                 $scope.$emit('redrawTree')
             }
 
+            $scope.removeReferencedMove = function (move) {
+                if ($scope.selectedModel.ordering) {
+                    let toDelete = -1
+                     $scope.selectedModel.ordering.forEach(function(mo,inx) {
+                        if (mo.toMove == move.adjToMove && mo.insertAfter == move.adjInsertAfter) {
+                            toDelete = inx
+                        }
+                    })
+                    if (toDelete > -1) {
+                        $scope.selectedModel.ordering.splice(toDelete,1)
+                        $scope.$emit('redrawTree')
+                    }
+                }
+
+
+            }
+
             $scope.applyMoveFromReferencesDEP = function () {
 
                 orderingSvc.createMoveFromReferences($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)

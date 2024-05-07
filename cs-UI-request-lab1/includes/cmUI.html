@@ -65,7 +65,7 @@
                                       -->
 
                                       <div ng-show="v.singleConcept">
-                                          <input type="text" class="form-control" disabled="disabled" value="{{v.singleConcept.display}}"/>
+                                          <input type="text" class="form-control"  value="{{v.singleConcept.display}}"/>
                                       </div>
 
                                       <div ng-show="v.options.length > 0">
@@ -148,6 +148,18 @@
                   <h3>{{local.uiTitle}}</h3>
 
                   <uib-tabset>
+                      <uib-tab heading="Internals">
+                          <div class="row">
+                              <div class="col-md-6">
+                                  <strong>cmProperties (Property definition)</strong>
+                                  <pre>{{cmProperties | json}}</pre>
+                              </div>
+                              <div class="col-md-6">
+                                  <strong>local.cmOptions (Property values)</strong>
+                                  <pre>{{local.cmOptions | json}}</pre>
+                              </div>
+                          </div>
+                      </uib-tab>
                       <uib-tab heading="Log">
                           <div class="row">
                               <div class="col-md-6">
@@ -357,18 +369,7 @@
 
 
                       </uib-tab>
-                      <uib-tab heading="Internals">
-                          <div class="row">
-                              <div class="col-md-6">
-                                  <strong>cmProperties</strong>
-                                  <pre>{{cmProperties | json}}</pre>
-                              </div>
-                              <div class="col-md-6">
-                                  <strong>local.cmOptions</strong>
-                                  <pre>{{local.cmOptions | json}}</pre>
-                              </div>
-                          </div>
-                      </uib-tab>
+
 
                   </uib-tabset>
 

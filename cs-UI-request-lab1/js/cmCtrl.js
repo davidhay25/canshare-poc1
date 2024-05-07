@@ -43,6 +43,7 @@ angular.module("pocApp")
                     //retrieve cs & vs from the terninology server. when complete the function
                     //fires the hashExpandedVs event which is trapped below and will save in the cache.
                     console.log('cache empty. Retrieving from TS.')
+                    alert("Need to build the terminology cache. This will take around 20 seconds, please wait.")
                     $scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"}})
                 }
 
@@ -621,7 +622,7 @@ angular.module("pocApp")
                         // $scope.downloadLinkMap = window.URL.createObjectURL(new Blob([angular.toJson($scope.fullSelectedCM,true) ],{type:"application/json"}))
                         // $scope.downloadLinkMapName = `ConceptMap-${$scope.fullSelectedCM.id}.json`
 
-                        let treeData = querySvc.makeTree($scope.fullSelectedCM)
+                        let treeData = querySvc.makeTree($scope.fullSelectedCM,$scope.cmProperties)
                         showCmTree(treeData)
 
 
@@ -790,6 +791,7 @@ angular.module("pocApp")
 
 
 
+                //get the list of services from the ConceptMap
                 let serviceUrl = "https://nzhts.digital.health.nz/fhir/ValueSet/canshare-cancer-service"
                 let serviceConcepts = $scope.hashExpandedVs[serviceUrl]
 
@@ -810,7 +812,7 @@ angular.module("pocApp")
                 $scope.cmProperties['cancer-service'].options.push({code:"0",display:"No service"})
 */
 
-                let treeData = querySvc.makeTree($scope.fullSelectedCM)
+                let treeData = querySvc.makeTree($scope.fullSelectedCM,$scope.cmProperties)
                 showCmTree(treeData)
 
                 //stuff for the histology UI

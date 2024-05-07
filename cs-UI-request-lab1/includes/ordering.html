@@ -10,8 +10,10 @@
     }
   </style>
 
+
+
   <button class="btn-link btn pull-right"
-          ng-show="! selectedModel.ordering || selectedModel.ordering.length < 1"
+          ng-show="canEdit(selectedModel) && (! selectedModel.ordering || selectedModel.ordering.length < 1)"
           ng-click="lookupParents()">Fill from parent</button>
 
   <uib-tabset>
@@ -31,25 +33,27 @@
             {{getElementEd(order.insertAfter).title}} <div><em>({{order.insertAfter | dropFirstInPath}})</em></div>
 
           </td>
-          <td width="15%">
+          <td width="15%" >
+            <div ng-show="canEdit(selectedModel)">
+               <span class="fixed-width">
+                <i  ng-show="$index > 0" class="glyphicon glyphicon-arrow-up clickable"
+                    ng-click="moveUp($index)"></i>
+            </span>
 
-        <span class="fixed-width">
-            <i  ng-show="$index > 0" class="glyphicon glyphicon-arrow-up clickable"
-                ng-click="moveUp($index)"></i>
-        </span>
+              <span  class="fixed-width" >
+                <i ng-show="$index < selectedModel.ordering.length -1" class="glyphicon glyphicon-arrow-down clickable"
+                   ng-click="moveDn($index)"></i>
+            </span>
 
-            <span  class="fixed-width" >
-            <i ng-show="$index < selectedModel.ordering.length -1" class="glyphicon glyphicon-arrow-down clickable"
-               ng-click="moveDn($index)"></i>
-        </span>
+              <i class="glyphicon glyphicon-remove  clickable fixed-width"
+                 ng-click="removeInsertAfter($index)"></i>
 
-            <i class="glyphicon glyphicon-remove  clickable fixed-width"
-               ng-click="removeInsertAfter($index)"></i>
+            </div>
 
           </td>
         </tr>
 
-        <tr>
+        <tr  ng-show="canEdit(selectedModel)">
           <td>
             <select class="form-control" ng-model="local.toMove"
                     ng-options="path for path in allPaths"></select>
@@ -98,14 +102,14 @@
     <uib-tab heading="Move instructions from referenced DG">
 
       <table class="table-bordered table">
-        <tr><th>Move instructions</th><th>Currently in DG</th><th>Action</th></tr>
+        <tr><th>Move instructions</th><th>Currently in DG</th><th ng-show="canEdit(selectedModel)">Action</th></tr>
         <tr ng-repeat="item in referencedDGOrdering">
           <td>
             <div><strong>Move:</strong> {{item.adjToMove}}</div>
             <div><strong>After: </strong>{{item.adjInsertAfter}}</div>
           </td>
           <td>{{item.alreadyInDG ? 'Yes' : 'No'}}</td>
-          <td>
+          <td ng-show="canEdit(selectedModel)">
             <div class='clickable' ng-hide="item.alreadyInDG" ng-click="addReferencedMove(item)">Add to DG</div>
             <div class='clickable' ng-show="item.alreadyInDG" ng-click="removeReferencedMove(item)">Remove from DG</div>
 
@@ -115,9 +119,11 @@
 
       </table>
 
-      <pre>{{referencedDGOrdering | json}}</pre>
 
       <!--
+       <pre>{{referencedDGOrdering | json}}</pre>
+
+
       <button class="btn-link btn pull-right"
               ng-show="true"
               ng-click="applyMoveFromReferences()">Apply move</button>

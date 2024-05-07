@@ -1,6 +1,9 @@
+
+//utilities for the Q builder - both DG and Composition
+
 angular.module("pocApp")
 
-    .service('QutilitiesSvc', function(modelsSvc) {
+    .service('QutilitiesSvc', function() {
         let cache = {}
 
         this.fhir = {}
@@ -10,7 +13,19 @@ angular.module("pocApp")
 
         return {
 
-            makeQfromComposition : function (comp,hashAllElements) {
+            setFixedValue : function (ed,item) {
+                //if a fixed value, set the Q elements
+                if (ed.fixedCoding) {   //todo - need to look for other dts we can fix
+                    let coding = {system:ed.fixedCoding.system,code:ed.fixedCoding.code,display:ed.fixedCoding.display}
+                    item.initial = [{valueCoding:coding}]
+                    item.readOnly = true
+
+                    //can't have answerOption if there is a fixed value...
+                    delete item.answerOption
+                }
+            },
+
+            makeQfromCompositionDEP : function (comp,hashAllElements) {
 
 
                 //first, construct a model of sections, and top level items within that section
@@ -61,7 +76,7 @@ console.log(hashAllElements)
             },
 
 
-            makeItemFromDG: function (fullElementList,hashAllDG) {
+            makeItemFromDGDEP: function (fullElementList,hashAllDG) {
                 //create a Q item representing a DG
                 //Rooted in a group item, can have:
                 //  a child that is a single item (representing a FHIR dt)

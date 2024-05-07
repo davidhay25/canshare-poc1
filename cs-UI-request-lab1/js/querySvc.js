@@ -18,7 +18,7 @@ angular.module("pocApp")
         }
 
             return {
-                makeTree : function (cm) {
+                makeTree : function (cm,cmProperties) {
                     //generate a tree view of the conceptmap
                     //assume only 1 group
                     //assume that the cm is valid - all elements / targets have a code & display
@@ -27,10 +27,34 @@ angular.module("pocApp")
                     let root = {id:'root',text: "CanShare ConceptMap",parent:'#',data:{}}
                     treeData.push(root)
 
+                    //add all the property level nodes so it's in the same order as the UI
+                    if (cmProperties) {
+                        let hash = {}
+                        cm.group[0].element.forEach(function (element) {
+                            hash[element.code] = element
+                        })
+
+
+
+                        Object.keys(cmProperties).forEach(function (propName) {
+                            let cmProperty = cmProperties[propName]
+                            let code = cmProperty.concept.code
+
+                            let elementNode = {id:code,text:propName,parent:'root',data:{type:'source',data:hash[code]}}
+                            treeData.push(elementNode)
+                        })
+                    }
+
+
+
+
                     cm.group[0].element.forEach(function (element) {
 
-                        let elementNode = {id:element.code,text:element.display,parent:'root',data:{type:'source',data:element}}
-                        treeData.push(elementNode)
+                        if (! cmProperties) {
+                            let elementNode = {id:element.code,text:element.display,parent:'root',data:{type:'source',data:element}}
+                            treeData.push(elementNode)
+                        }
+
 
                         element.target.forEach(function (target) {
 
@@ -38,8 +62,8 @@ angular.module("pocApp")
 
                             let id = commonSvc.createUUID()
 
-
-                            let targetNode = {id:id,text:target.display,parent:elementNode.id,data:{type:'target',data:target}}
+                            let targetNode = {id:id,text:target.display,parent:element.code,data:{type:'target',data:target}}
+                            //let targetNode = {id:id,text:target.display,parent:elementNode.id,data:{type:'target',data:target}}
                             treeData.push(targetNode)
 
                             if (target.dependsOn) {

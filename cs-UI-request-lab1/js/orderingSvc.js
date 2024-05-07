@@ -20,9 +20,10 @@ angular.module("pocApp")
                     let ctr = 0         // a counter to trap any infinate recursion error. probably unneeded
                     while (tmpDG.parent && keepGoing) {
                         let dgTitle = tmpDG.title
-                        tmpDG = hashAllDG[tmpDG.parent]
+                        let parent = tmpDG.parent
+                        tmpDG = hashAllDG[parent]
                         if (! tmpDG) {
-                            alert(`DG ${tmpDG.parent} was not found. Referenced in ${dgTitle}`)
+                            alert(`DG ${parent} was not found. Referenced in ${dgTitle}`)
                             return
                         }
 

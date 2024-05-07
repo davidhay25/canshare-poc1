@@ -427,15 +427,7 @@ angular.module("pocApp")
                             node.icon = `icons/${treeIcons[ed.kind]}`
                         }
 
-                        //todo - don't think we're using this...
-                        /*
-                        switch (ed.kind) {
-                            case 'slice' :
-                                node['a_attr'] = { "style": "color : purple" }
-                                break
-                        }
 
-                        */
 
                     }
 
@@ -455,9 +447,11 @@ angular.module("pocApp")
                     }
 
                     //this element was defined on a parent. This will superceed the fixed value
-                    if (ed.sourceModelName && ed.sourceModelName !== rootEd.path) {
+                    if (ed.sourceModelName && (ed.sourceModelName !== rootEd.path) && (! ed.definedOnDG)) {
                         arStyle.push("color : #999999")
                     }
+
+
 
 
                     //required
@@ -474,7 +468,6 @@ angular.module("pocApp")
                         if (ed.mult.indexOf('..*') > -1) {
                             node.text += " *"
                         }
-
                     }
 
                     if (ed.hideInQ) {

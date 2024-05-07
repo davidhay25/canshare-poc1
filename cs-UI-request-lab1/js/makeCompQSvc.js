@@ -1,7 +1,7 @@
 //a new service (please let it be the last) that generates a Q from a composition
 //uses the list of composition elements
 angular.module("pocApp")
-    .service('makeCompQSvc', function($http,codedOptionsSvc,cmSvc,utilsSvc,vsSvc) {
+    .service('makeCompQSvc', function($http,codedOptionsSvc,cmSvc,utilsSvc,vsSvc,QutilitiesSvc) {
 
         //let hashVS = {}             //a hash containing the concepts from the VS
 
@@ -75,7 +75,7 @@ angular.module("pocApp")
                     case 4 :
 
                         //the DG within the section DG. I don't think there is anything in here we need...
-                       // let groupItem = {text: ed.title + " group", linkId: ed.path, type: 'display', extension:[],item: []}
+                        //let groupItem = {text: ed.title + " group", linkId: ed.path, type: 'display', extension:[],item: []}
                         //sectionItem.item.push(groupItem)
                         break
                     default :
@@ -109,6 +109,10 @@ angular.module("pocApp")
                                 })
                             }
                             checkEnableWhen(ed,controlItem,pathPrefix1)
+
+                            QutilitiesSvc.setFixedValue(ed,controlItem)
+
+
                             sectionItem.item.push(controlItem)
                         }
 
@@ -168,7 +172,7 @@ angular.module("pocApp")
         }
 
 
-        function getAllVS(allElements, cb) {
+        function getAllVSDEP(allElements, cb) {
 
             //cb()        //term server not working
 

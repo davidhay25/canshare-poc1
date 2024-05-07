@@ -296,6 +296,7 @@ angular.module("pocApp")
                 //the path is the full path (incl. DGName) of the element where the EW is to be removed from.
                 //inx is the position within the array of EW
                 //let path = $filter('dropFirstInPath')($scope.selectedNode.data.ed.path)
+                let updated = false
                 let pathInDG = $filter('dropFirstInPath')(path) //the path in the DG doesn't have the DF type name in front
                 for (const ed of $scope.selectedModel.diff) {
                     if (ed.path == pathInDG) {
@@ -307,10 +308,23 @@ angular.module("pocApp")
                                 path:path,description:angular.toJson(ew[0])})
                             //in modelsCtrl
                             $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:pathInDG})
+                            updated = true
                             break
                         }
 
                     }
+                }
+
+                if (! updated) {
+                    //the EW must be inherited. We need to add a diff to take it out.
+                    let ed = angular.copy($scope.selectedNode.data.ed)
+                    if (ed.enableWhen && ed.enableWhen.length > inx) {
+                        //can't imagine why it wouldn't be...
+                        ed.enableWhen.splice(inx, 1)
+                    }
+
+                    ed.path = $filter('dropFirstInPath')(ed.path)
+                    $scope.selectedModel.diff.push(ed)
                 }
 
                 //need to re-build the key elements

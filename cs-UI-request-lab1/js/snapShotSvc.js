@@ -131,6 +131,8 @@ angular.module("pocApp")
                 //let cDg = angular.copy(allDg[dgName])  //cDg = component Dg.
                 for (const ed of cDg.diff) {
 
+
+
                     //temp delete ed.sourceModelName   //the previous version saved this in the DG. I prefer to add it here.
 
                     //if the datatype is not a FHIR datatype - it's another DG - then it will need to have the members inserted
@@ -551,13 +553,20 @@ angular.module("pocApp")
                 summary.references = hashReferences[dgName]
                 summary.children = hashChildren[dgName]
 
-
-
                 return summary
             },
-            getFullListOfElements: function (dgName) {
+            getFullListOfElements: function (dgName,dgRef) {
                 //return the full list of elements for a DG. In the format of the existing full element list.
                 let lst = []
+                let hash = {}
+                //if dgRef was passed in, then decorate the ones that were defined on the DG (not a parent).
+                //used for the tree to show loclly updated elements
+                if (dgRef && dgRef.diff) {
+                    dgRef.diff.forEach(function (ed) {
+                        hash[ed.path] = true
+                    })
+                }
+
 
                 let title = dgName
                 let dg = allDgSnapshot[dgName]
@@ -571,6 +580,9 @@ angular.module("pocApp")
                 if (allDgSnapshot[dgName] && allDgSnapshot[dgName].snapshot) {
                     allDgSnapshot[dgName].snapshot.forEach(function(ed) {
                         let clone = angular.copy(ed)
+                        if (hash[ed.path]) {
+                            clone.definedOnDG = true
+                        }
                         clone.path = `${dgName}.${clone.path}`
                         lst.push({ed:clone})
                     })
