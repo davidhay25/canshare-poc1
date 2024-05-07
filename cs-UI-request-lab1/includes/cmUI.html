@@ -64,8 +64,14 @@
                                       </div>
                                       -->
 
-                                      <div ng-show="v.singleConcept">
+                                      <div ng-show="v.singleConcept && v.options.length == 0">
+                                          <!--
                                           <input type="text" class="form-control"  value="{{v.singleConcept.display}}"/>
+                                          -->
+                                          <select class="form-control">
+                                              <option>{{v.singleConcept.display}}</option>
+                                          </select>
+
                                       </div>
 
                                       <div ng-show="v.options.length > 0">
