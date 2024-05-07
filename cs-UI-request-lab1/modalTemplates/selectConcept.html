@@ -1,0 +1,58 @@
+
+<div>
+  <!--<div ng-controller="newResourceCtrl">-->
+
+  <style>
+    .conceptScroll {
+      height: 200px;
+      overflow-y: scroll;
+
+    }
+  </style>
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-8">
+        <h3 class="modal-title">
+          Select concept
+        </h3>
+      </div>
+
+
+      <div class="col-md-4">
+        <button class="btn btn-primary pull-right"
+                ng-show="local.selectedConcept"
+                ng-click="select()">Select</button>
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
+
+
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-body">
+
+    <div class="conceptScroll">
+      <div class="list-group">
+        <div style="cursor: pointer" ng-repeat="concept in options">
+          <div ng-show="canShow(concept)"
+               ng-class="{listItemSelected:concept == local.selectedConcept}"
+               ng-dblclick="select()"
+               ng-click="selectConcept(concept)">
+            {{concept.display}}</div>
+        </div>
+      </div>
+
+    </div>
+    <br/>
+
+    <input type="text" class="form-control" autofocus
+           ng-change = filterList(filter)
+           ng-model="filter"/>
+
+
+  </div>
+  <div class="modal-header">
+    <em ng-show = "local.selectedConcept">Double click or click the Select button to select this concept</em>
+  </div>
+</div>

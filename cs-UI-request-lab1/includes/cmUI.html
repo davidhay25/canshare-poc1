@@ -40,7 +40,7 @@
 
 
           <div class="row">
-              <div class="col-md-5">
+              <div class="col-md-6">
 
                   <uib-tabset>
                       <uib-tab heading="Progressive">
@@ -51,6 +51,11 @@
                                       <div class = 'clickable' ng-click="populateUIControl(k,true)">{{k}}</div>
                                   </td>
                                   <td>
+                                      <div class="row">
+                                          <div class="col-md-11">
+
+
+
 
                                       <!-- Allows us to explicitely decide when to show the message - not just
                                       when the set of values has not been determined -->
@@ -79,8 +84,23 @@
                                                   ng-change="uiValueSelected(k,local.cmOptions[k])"
                                                   ng-options="v.display for (k,v) in v.options">
                                           </select>
-                                      </div>
+<!--
+                                          <input type="text" ng-model="test"
+                                                 typeahead-editable = "false"
+                                                 typeahead-on-select="selectFromTA($item, k,k)"
 
+                                                 uib-typeahead="concept.display for concept in v.options | filter:$viewValue"
+                                                 class="form-control" />
+
+-->
+                                      </div>
+                                      </div>
+                                      <div class="col-md-1">
+                                          <i class="btn btn-link glyphicon glyphicon-search clickable pull-right"
+                                             ng-show="v.options.length > 10"
+                                             ng-click="selectConcept(k,v)"></i>
+                                      </div>
+                                      </div>
                                   </td>
                               </tr>
                           </table>
@@ -138,7 +158,7 @@
 
 
               </div>
-              <div class="col-md-7">
+              <div class="col-md-6">
                   <div ng-show="input.showHelp" class="alert-info alert">
                       <p>Select the values from the top, heading down. </p>
                       <p>When a property value is selected in a control,

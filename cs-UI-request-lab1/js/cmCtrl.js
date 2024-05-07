@@ -15,6 +15,9 @@ angular.module("pocApp")
             let snomed = "http://snomed.info/sct"
 
 
+
+
+
             //functions to get ConceptMap & expanded ValueSet..
             //localforage is defined by the library script. uses indexedDb as the local storage...
             //https://localforage.github.io/localForage/#data-api-getitem
@@ -98,6 +101,45 @@ angular.module("pocApp")
 
             //$scope.local.cmOptions[key] - the actual value (a concept) for the property
 
+
+            $scope.selectFromTADEP = function(concept, propKey, $label) {
+                console.log(concept, propKey, $label)
+                if (concept) {
+                    $scope.uiValueSelected( propKey,concept)
+                }
+
+
+            }
+
+
+            //called when the 'select concept' icon is clicked
+            $scope.selectConcept = function (propKey,propDef) {
+
+                $uibModal.open({
+                    backdrop: 'static',      //means can't close by clicking on the backdrop.
+                    keyboard: false,       //same as above.
+                    //size : 'lg',
+                    templateUrl: 'modalTemplates/selectConcept.html',
+
+                    controller: 'selectConceptCtrl',
+
+                    resolve: {
+                        propDef: function () {
+                            return propDef
+                        }
+                    }
+
+                }).result.then(function (concept) {
+                    console.log(concept)
+
+                    //need to set the value of the dropdown as well
+                    $scope.local.cmOptions[propKey] = concept
+
+                    $scope.uiValueSelected(propKey,concept)
+                })
+
+
+            }
 
             //called when a selection is made for a property in the UI.
             //first perform the reverse lookup to ensure the preceeding values are correct
@@ -424,7 +466,7 @@ angular.module("pocApp")
                     if (cmProperty.concept.code == propertyCode) {
                         canApply = false        //turn off the application process. properties after this one will not have their options set
                     }
-                    console.log(propName,canApply)
+                    //console.log(propName,canApply)
 
                     if (canApply) {
                         //set false when we're past the current property and stop setting the value
@@ -435,7 +477,7 @@ angular.module("pocApp")
                         let arNewOptions = $scope.reverseLookup.hashProperty[propName]       //an array of possible concepts from the reverse engine
 
                         if (arNewOptions) {
-                            console.log(propName,arNewOptions.length)
+                            //console.log(propName,arNewOptions.length)
                             //there are options for this element fromthe reverse lookup
                             if (arNewOptions.length == 1) {
                                 //if there's only 1 value, then set it
