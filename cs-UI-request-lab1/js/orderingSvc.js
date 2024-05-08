@@ -5,6 +5,49 @@ angular.module("pocApp")
 
         return {
 
+            adjustGroupOrdering(dg) {
+                //ensure that the 'children' of group elements are immediately after the 'parent'. The tree is OK, but the lists are wrong...
+                //NOTE: assume only a single level of group elements
+                //first create a new diff list that excludes group children
+                let hash = {}       //will have all the group children
+                let lst = []        //will be the new diff
+                for (const ed of dg.diff) {
+
+                    let ar = ed.path.split('.')
+                    if (ar.length == 1) {
+                        //this is an 'ordinary' element
+                        lst.push(ed)
+                    } else {
+                        //this is a group child
+                        let root = ar[0]
+                        hash[root] = hash[root] || []
+                        hash[root].push(ed)
+                    }
+                }
+
+                //now we can insert all the group children
+                for (const groupName of Object.keys(hash)) {
+                    let itemsToInsert = hash[groupName]
+                    //find the location of the group parent
+                    for (let i=0; i< lst.length; i++) {
+                        let tEd = lst[i]
+                        if (tEd.path == groupName) {
+                            Array.prototype.splice.apply(lst, [i+1, 0].concat(itemsToInsert));
+                            //insertPointFound = true
+                            break
+                        }
+                    }
+
+                }
+
+                return lst
+
+
+
+            },
+
+
+
             sortFullListByInsertAfter(lst,dg,hashAllDG) {
                 //perform the actual re-ordering. update lst
                 let lstOrdering = []

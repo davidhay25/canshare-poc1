@@ -929,14 +929,14 @@
 
     </uib-tab>
 
-
+<!--
     <uib-tab ng-show="false" heading="Graph" select="fitGraph()">
 
       <em class="pull-right">DT inheritance hierarchy and referenced DTs</em>
       <br/>
       <div class="row">
         <div class="col-md-6">
-          <div id="graph"></div>
+          <div id="graphXXX"></div>
         </div>
         <div class="col-md-6">
 
@@ -975,21 +975,13 @@
                              popover-placement="right"
                              popover-trigger="'mouseenter'">{{ed.path}}</div>
 
-                        <!--
-                        <div style="padding-left: 8px"><em >{{ed.description}}</em></div>
--->
+
                       </td>
                       <td>{{ed.type[0]}}
                         <div class="clickable"><em>{{ed.valueSet}}</em></div>
                         <div><em>{{ed.fixedCoding}}</em></div>
                       </td>
-                      <!--
-                      <td>
-                          <div ng-repeat="code in code">
-                              {{code}}
-                          </div>
-                      </td>
-                      -->
+
                       <td>{{ed.mult}}</td>
                     </tr>
                   </table>
@@ -1005,21 +997,13 @@
                         <div class="clickableDotted" uib-popover="{{item.ed.description}}"
                              popover-placement="right"
                              popover-trigger="'mouseenter'">{{item.ed.path | dropFirstInPath}}</div>
-                        <!--
-                        {{item.ed.path}}
-                        <div style="padding-left: 8px"><em >{{item.ed.description}}</em></div> -->
+
                       </td>
                       <td>{{item.ed.type[0]}}
                         <div class="clickable"><em>{{item.ed.valueSet}}</em></div>
                         <div><em>{{item.ed.fixedCoding}}</em></div>
                       </td>
-                      <!--
-                      <td>
-                          <div ng-repeat="code in code">
-                              {{code}}
-                          </div>
-                      </td>
-                      -->
+
                       <td>{{item.ed.mult}}</td>
                     </tr>
                   </table>
@@ -1041,6 +1025,9 @@
 
 
     </uib-tab>
+    -->
+
+
 
    <!--
 <uib-tab ng-show="false" heading="Fixed values">
@@ -1372,6 +1359,7 @@
       <br/><br/>
 
 
+      <button class="btn-link btn pull-right" ng-click="fixGroups()">Fix groups order in Diff</button>
       <uib-tabset>
         <uib-tab heading="Table">
           <table class="table-condensed table table-bordered">
@@ -1418,6 +1406,7 @@
           </div>
 
         </uib-tab>
+
       </uib-tabset>
 
 

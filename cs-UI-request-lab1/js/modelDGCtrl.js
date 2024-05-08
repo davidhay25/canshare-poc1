@@ -1,10 +1,20 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('modelDGCtrl',
-        function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc,$timeout,librarySvc,traceSvc) {
+        function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc,$timeout,librarySvc,traceSvc,orderingSvc) {
 
 
 
+
+            $scope.fixGroups = function () {
+                //run the fixit routine to make sure group children immediately follow the group
+                //$scope.newDgDiff = orderingSvc.adjustGroupOrdering($scope.selectedModel)
+                $scope.selectedModel.diff = orderingSvc.adjustGroupOrdering($scope.selectedModel)
+
+                $scope.makeSnapshots()
+                $scope.refreshFullList($scope.selectedModel)
+
+            }
 
 
             $scope.showDiff = function(filter,path) {
@@ -103,8 +113,8 @@ angular.module("pocApp")
                         model:$scope.selectedModel})
 
                     $scope.makeSnapshots()
-
                     $scope.refreshFullList($scope.selectedModel)
+
                     $scope.termSelectDG({DGName:$scope.selectedModel.name})
                 }
             }

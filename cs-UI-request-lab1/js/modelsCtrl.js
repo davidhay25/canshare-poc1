@@ -21,9 +21,6 @@ angular.module("pocApp")
                 $scope.modelInfoClass = 'modelInfoTest'
             }
 
-
-
-
             $scope.version = utilsSvc.getVersion()
             $scope.input = {}
             $scope.input.showFullModel = true
@@ -64,17 +61,12 @@ angular.module("pocApp")
 
             $scope.makeSnapshots()
 
-
             function clearSsDetails() {
                 delete $scope.input.ssDiff
                 delete $scope.input.ssFullDiff
                 delete $scope.input.ssOverride
                 delete $scope.input.ssChangeItemEd
-
             }
-
-
-
 
             $scope.getLogDG = function (row) {
 
@@ -246,8 +238,8 @@ angular.module("pocApp")
 
                 sortDG()    //update the sorted list of DG
 
-                    let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
-                    showAllDGTree(vo1.treeData)
+                let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
+                showAllDGTree(vo1.treeData)
 
                 if (vo && vo.name) {
                     $scope.selectModel($scope.hashAllDG[vo.name] )
@@ -1001,6 +993,7 @@ angular.module("pocApp")
                 delete $scope.selectedModel
                 $scope.input.mainTabActive = $scope.ui.tabDG;
             }
+
 
 
 

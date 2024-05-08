@@ -268,7 +268,7 @@ angular.module("pocApp")
             },
 
             fhirDataTypes : function(){
-                //theres also a list in snapShot Svc
+                //theres also a list in snapShot Svc and utilsSvc todo: rationalize
                 return ['boolean','code','date','dateTime','decimal','integer','string','Address','Attachment','CodeableConcept','ContactPoint','Group','HumanName','Identifier','Period','Quantity','Ratio']
             },
 

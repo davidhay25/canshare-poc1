@@ -364,6 +364,7 @@ angular.module("pocApp")
                     let type = ed.type[0]
                     if (hashAllDG[type]) {
                         //console.log('new group',ed)
+                        //this is not a group datatype - slightly confusing...
                         group = makeGroup(ed)
 
                         addEnableWhen(ed,group)  //If there are any contitionals
@@ -389,13 +390,23 @@ angular.module("pocApp")
                             }
 
                         }
+
                         let item = {text:ed.title,linkId:ed.path,type:'string'}
+
+
+
+
                         if (ed.autoPop) {item.text += ' (Auto populated)'}
                         item.definition = ed.path
 
                         addEnableWhen(ed,item)  //If there are any contitionals
                         setControlType(ed,item)  //set the control type to use - also expands any ValueSet
                         QutilitiesSvc.setFixedValue(ed,item)
+
+
+                        if (type == 'Group') {
+                            item.type = "display"
+                        }
 
 
 

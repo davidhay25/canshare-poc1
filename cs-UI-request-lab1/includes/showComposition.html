@@ -167,7 +167,7 @@
                       </td>
                     </tr>
 
-                    <tr ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
+                    <tr >
                       <td class="detailName">
                         Appears in Q
                       </td>
@@ -660,7 +660,7 @@
           <tbody>
           <tr
                   ng-style="{ 'background-color': getRowColour(item.ed) }"
-                  ng-show="item.ed.mult !== '0..0'"
+                  ng-showXXX="item.ed.mult !== '0..0'"
                   ng-repeat="item in allCompElements track by $index">
             <td>
               <div ng-style="{ 'padding-left': (item.ed.path | pathindent) }">

@@ -560,7 +560,7 @@ angular.module("pocApp")
                 let lst = []
                 let hash = {}
                 //if dgRef was passed in, then decorate the ones that were defined on the DG (not a parent).
-                //used for the tree to show loclly updated elements
+                //used for the tree to show locally updated elements
                 if (dgRef && dgRef.diff) {
                     dgRef.diff.forEach(function (ed) {
                         hash[ed.path] = true

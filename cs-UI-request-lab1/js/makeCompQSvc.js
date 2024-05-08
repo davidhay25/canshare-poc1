@@ -81,13 +81,17 @@ angular.module("pocApp")
                     default :
                         //contents of the section DG. Add to the current section
                         let type = ed.type[0]
+                        let isDG = false
+                        if (utilsSvc.fhirDataTypes().indexOf(type) == -1) {
+                            isDG = true
+                        }
 
                         let ar1 = ed.path.split('.')
                         //let pathPrefix1 = `${ar1[0]}.${ar1[1]}.${ar1[2]}.`
                         let pathPrefix1 = `${ar1[0]}.${ar1[1]}.`
 
                         //if it's a group, then add a label - not a control
-                        if (type == "Group") {
+                        if (type == "Group" || isDG) {
                             let controlItem = {text: ed.title, linkId: ed.path, type: "display"}
                             sectionItem.item.push(controlItem)
                         } else {
@@ -306,6 +310,7 @@ angular.module("pocApp")
                     for (const path of pathsToHide) {
                         //if (node.data.ed.path.startsWith(path)) {
                         if (ed.path.isChildPath(path)) {
+                            console.log(`Removing ${ed.path}`)
                             canAdd = false
                             break
                         }
@@ -327,6 +332,7 @@ angular.module("pocApp")
                 //generate the Q from the list of all elements. hidden (mult = 0..0) have been removed
 
                 let lstElements = removeHiddenElements(allElements)     //where hideInQ is set
+
                 vsSvc.getAllVS(lstElements, function () {
                 //getAllVS(lstElements, function () {
                     let Q = generateQ(lstElements)

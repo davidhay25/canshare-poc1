@@ -6,6 +6,10 @@ angular.module("pocApp")
             getVersion : function(){
                 return "0.8.9"
             },
+            fhirDataTypes : function(){
+                //theres also a list in snapShot Svc
+                return ['boolean','code','date','dateTime','decimal','integer','string','Address','Attachment','CodeableConcept','ContactPoint','Group','HumanName','Identifier','Period','Quantity','Ratio']
+            },
 
             getSizeOfObject : function( object ) {
                 //the memory usage of an object - from https://stackoverflow.com/questions/1248302/how-to-get-the-size-of-a-javascript-object#11900218
