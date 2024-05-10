@@ -1,0 +1,190 @@
+<div>
+  <div class="row">
+    <div class="col-md-3">
+
+      <div>
+        <h4>Sections</h4>
+        <div class="list-group">
+          <div ng-class="{'list-group-item':true,'listItemSelected':selectedSection.linkId==section.linkId}"
+               ng-click = "selectSection(section)"
+               style="cursor: pointer"
+               ng-show="showConditional(section,input.form)"
+               ng-repeat="section in input.formTemplate">
+
+            {{section.text}}
+
+            <span class = "badge pull-right" ng-show="section.item.repeats"> Mult</span>
+
+          </div>
+        </div>
+
+        <br/>
+
+        <div ng-show = "objFormTemplate.hiddenSections.length > 0">
+          <checkbox ng-model="input.showHidden"></checkbox>
+          Show hidden sections
+        </div>
+
+        <div ng-show = "objFormTemplate.hiddenFields[selectedSection.linkId].length > 0">
+          <checkbox ng-model="input.showHidden"></checkbox>
+          Show hidden fields ({{objFormTemplate.hiddenFields[selectedSection.linkId].length}})
+        </div>
+
+        <div ng-show="objFormTemplate.attachments.length > 0">
+          <h4>Attachments</h4>
+
+          <div ng-repeat ="att in objFormTemplate.attachments">
+            <a ng-href="{{att.url}}" target="_blank">{{att.title}}</a>
+          </div>
+
+          <br/>
+          <em>Attachments open in a new tab</em>
+
+        </div>
+
+      </div>
+
+
+      <br/>
+      <button class="btn btn-link" ng-click="resetForm()">Reset</button>
+
+    </div>
+
+    <div class="{{formPane}}">
+
+      <br/>
+      <div class="myScroll">
+        <div ng-repeat="row in selectedSection.rows track by $index">
+
+        <!-- This is a check for group level showhide. If not a group then will be shown (but each item is checked as well)
+        Note that each row created from the group (eg if col count is used) has the group attached to the row
+        so that it can be checked -->
+        <div ng-show="showConditionalGroup(row.group,input.form)">
+
+
+          <span ng-class="{bold:true,required:row.group.required}">{{row.text}}</span>
+
+          <div class="row">
+
+            <!-- 1 columns  - Aug-18-->
+
+            <div ng-if = "row.meta.columnCount == 1 || ! row.meta.columnCount">
+              <div class="col-md-offset-2 col-md-8">
+
+                <div ng-repeat="cell in row.col1 track by $index">
+                  <div style="margin-bottom: 8px">
+                    <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- 2 columns  - was the default 24-Apr- was 2 cols of 6 - cganges temporarily to get drawing working-->
+            <div ng-if = "row.meta.columnCount == 2 ">
+
+              <div class="col-md-6">
+                <div ng-repeat="cell in row.col1 track by $index">
+                  <div style="margin-bottom: 8px">
+                    <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div ng-repeat="cell in row.col2 track by $index">
+                  <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                </div>
+              </div>
+
+              <!-- This is for the image. This is just for dev - we'll have another 'columnCount' for sections with drawings later-->
+              <!--
+              <div class="col-md-4">
+                <canvas id="canvasDir" width="200" height="100" style="border: #c9302c" ></canvas>
+
+              </div>
+              -->
+
+
+
+            </div>
+
+            <!-- 3 columns -->
+            <div ng-if = "row.meta.columnCount == 3">
+              <div class="col-md-4">
+                <div ng-repeat="cell in row.col1  track by $index">
+                  <div style="margin-bottom: 8px">
+                    <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div ng-repeat="cell in row.col2 track by $index">
+                  <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div ng-repeat="cell in row.col3 track by $index">
+                  <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4 columns -->
+            <div ng-if = "row.meta.columnCount == 4">
+              <div class="col-md-3">
+                <div ng-repeat="cell in row.col1 track by $index">
+                  <div style="margin-bottom: 8px">
+                    <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <div ng-repeat="cell in row.col2 track by $index">
+                  <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <div ng-repeat="cell in row.col3 track by $index">
+                  <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <div ng-repeat="cell in row.col4 track by $index">
+                  <ng-include src = "'directive/renderForm/renderSingleItem.html'"></ng-include>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+
+      </div>
+      </div>
+
+    </div>
+
+
+
+    <div class="{{drawingPane}}">
+      <canvas id="drawingCanvas" width="200" height="200" style="border: #c9302c" ></canvas>
+
+      <button class="btn btn-link" ng-show="selectedSection.imageDetails" ng-click="resetDrawing()">Reset</button>
+
+
+    </div>
+
+
+  </div>
+
+</div>

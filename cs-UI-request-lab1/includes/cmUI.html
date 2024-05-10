@@ -48,32 +48,32 @@
                           <table class="table table-bordered">
                               <tr ng-repeat = "(k,v) in cmProperties">
                                   <td width = "30%">
-                                      <div class = 'clickable' ng-click="populateUIControl(k,true)">{{k}}</div>
+                                      <div class = 'clickable' ng-click="populateUIControl(k,true,true)">{{k}}</div>
                                   </td>
                                   <td>
                                       <div class="row">
-                                          <div class="col-md-11">
+                                          <div class="col-md-10">
 
 
 
 
                                       <!-- Allows us to explicitely decide when to show the message - not just
-                                      when the set of values has not been determined -->
+                                      when the set of values has not been determined
+
+                                       probably not needed now - which means we can remove the 'noMatches' flag-->
                                       <div ng-show="v.noMatches">
-                                          There were no matching ValueSets or Concepts
+                                          <!-- There were no matching ValueSets or Concepts -->
+
                                       </div>
 
-<!--
-                                      <div ng-show="v.options.length == 0">
-                                          There were no matching ValueSets or Concepts
-                                      </div>
-                                      -->
+
 
                                       <div ng-show="v.singleConcept && v.options.length == 0">
                                           <!--
                                           <input type="text" class="form-control"  value="{{v.singleConcept.display}}"/>
                                           -->
                                           <select class="form-control">
+
                                               <option>{{v.singleConcept.display}}</option>
                                           </select>
 
@@ -83,6 +83,7 @@
                                           <select class="form-control" ng-model="local.cmOptions[k]"
                                                   ng-change="uiValueSelected(k,local.cmOptions[k])"
                                                   ng-options="v.display for (k,v) in v.options">
+
                                           </select>
 <!--
                                           <input type="text" ng-model="test"
@@ -95,10 +96,14 @@
 -->
                                       </div>
                                       </div>
-                                      <div class="col-md-1">
-                                          <i class="btn btn-link glyphicon glyphicon-search clickable pull-right"
+                                      <div class="col-md-2">
+                                          <i class=" glyphicon glyphicon-search clickable"
                                              ng-show="v.options.length > 10"
                                              ng-click="selectConcept(k,v)"></i>
+<!--
+                                          <i ng-show="local.cmOptions[k]" class=" glyphicon glyphicon-remove clickable"
+                                             ng-click="clearProperty(k)"></i>
+-->
                                       </div>
                                       </div>
                                   </td>
@@ -174,18 +179,7 @@
                   <h3>{{local.uiTitle}}</h3>
 
                   <uib-tabset>
-                      <uib-tab heading="Internals">
-                          <div class="row">
-                              <div class="col-md-6">
-                                  <strong>cmProperties (Property definition)</strong>
-                                  <pre>{{cmProperties | json}}</pre>
-                              </div>
-                              <div class="col-md-6">
-                                  <strong>local.cmOptions (Property values)</strong>
-                                  <pre>{{local.cmOptions | json}}</pre>
-                              </div>
-                          </div>
-                      </uib-tab>
+
                       <uib-tab heading="Log">
                           <div class="row">
                               <div class="col-md-6">
@@ -201,12 +195,17 @@
 
                               </div>
                               <div class="col-md-6">
-                                  <pre ng-show="local.logEntry.obj">{{local.logEntry.obj | json}}</pre>
+                                    <h4>{{local.logEntry.objTitle}}</h4>
+                                  <div class="myScroll">
+                                      <pre ng-show="local.logEntry.obj">{{local.logEntry.obj | json}}</pre>
+                                  </div>
+
+
                               </div>
                           </div>
                       </uib-tab>
 
-                      <uib-tab heading="Reverse Lookup">
+                      <uib-tab heading="Reverse Lookup details">
                           <div class="banner">
                               <div>Property: {{reverseLookup.element.display}}
 
@@ -219,13 +218,13 @@
                                   {{reverseLookup.sourceConcept.code}})</span></div>
                           </div>
 
-
+<!--
                           <div class="pull-right clickable" ng-click="applyReverse()">Apply</div>
-
+-->
                           <uib-tabset>
 
 
-                              <uib-tab heading = "Prior property values">
+                              <uib-tab heading = "Options by property">
 
                                   <table class="table table-bordered">
                                       <tr ng-repeat = "(k,v) in reverseLookup.hashProperty">
@@ -256,7 +255,7 @@
                               </uib-tab>
 
 
-                              <uib-tab heading = "Table">
+                              <uib-tab heading = "Targets (table)">
                                   <div ng-repeat="target in reverseLookup.targets">
                                       <div>
                                           <strong class="clickable" ng-click="viewVS(target.code)">{{target.display}}</strong>
@@ -286,7 +285,7 @@
                               </uib-tab>
 
 
-                              <uib-tab heading = "List">
+                              <uib-tab heading = "Targets (list)">
                                   <div class="row">
                                       <div class="col-md-3">
                                           <div class="list-group">
@@ -310,6 +309,20 @@
 
 
                       </uib-tab>
+
+                      <uib-tab heading="Internals">
+                          <div class="row">
+                              <div class="col-md-6">
+                                  <strong>cmProperties (Property definition)</strong>
+                                  <pre>{{cmProperties | json}}</pre>
+                              </div>
+                              <div class="col-md-6">
+                                  <strong>local.cmOptions (Property values)</strong>
+                                  <pre>{{local.cmOptions | json}}</pre>
+                              </div>
+                          </div>
+                      </uib-tab>
+
                       <uib-tab heading="Options">
 
                           <div ng-show="singleConcept">
@@ -348,16 +361,9 @@
                           </div>
 
                       </uib-tab>
-                      <uib-tab heading="Review">
-                          all reviews this combination of properties
-                          Add new review
-                          VS for this combination correct
-                          Add comment
 
 
-                      </uib-tab>
-
-                      <uib-tab heading="Engine details">
+                      <uib-tab heading="Forward engine details">
                           <h4>Property values used by engine when locating matching targets</h4>
                           <table class="table table-condensed table-bordered">
                               <tr><th>Property</th><th>Display</th><th>Code</th><th>System</th></tr>

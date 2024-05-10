@@ -4,7 +4,6 @@ angular.module("pocApp")
 
         let config= {}
 
-
         async function fillListFromValueSet(lst,vsUrl) {
 
         }
@@ -143,135 +142,93 @@ angular.module("pocApp")
 
 
             },
-            reverseRulesEngine : function (element,concept,hashExpandedVs,currentValues) {
+            reverseRulesEngine : function (element,concept,hashExpandedVs) {
                 //check all the targets in the element for conditions where the concept would be a match
-                //  ie target.value = concept.code or target.value is a ValueSet Url and the concept is a member of that VS
-
-                //element is the element from the ConceptMap that corresponds to the property for which concept is the value
-                //concept is the user selected value
-                //hashExpandedVs has all the expanded concepts of all the ValueSets
-                //currentValues is the hash[property] value that was selected
-
+                //element is the element from the ConceptMap
+                //concept is the selected value (target.code) from all the targets in the element
                 if (! element && ! element.target) {
                     return
                 }
 
-                let snomed = "http://snomed.info/sct"
 
                 //the list of targets that, if the dependsOn were met, would return a vs containing the concept
                 //or the concept itself (target.code is the concept)
                 let lstTargets = []
                 for (const target of element.target) {
 
-                    //is the target code either the same as the concept.code or, is target.code a ValueSet url, and if so it the concept.code a member
+                    //is the concept either the same as target.code or, is target.code a ValueSet url
                     //and the concept is part of that Valueset
                     if (isMatch(target.code,concept)) {
 
                         //now check the dependsOn. If any of them have the value '0' then the target is not included
-                        //if there are no dependsOn, then don't include
-
                         if (target.dependsOn) {
-
                             let ar = target.dependsOn.filter(don => don.value == '0' )
                             if (ar.length == 0) {
-                                //OK, none of the dependsOn have the value 0
-                                //now check the other depends on. If there is a dependsOn for a property, then
-                                //the property (in currentValues) must have the correct value (which is either equal or in-vs)
-
-                                let canInclude = true   //start by assuming it can be included, and take it out if not.
-
-                                if (true) {         //this just allows the extended logic to be turned on or off
-                                    for (const don of target.dependsOn) {
-                                        let propKey = don.property
-                                        if (! currentValues[propKey]) {
-                                            //there is no entered value for this property, therefore the target is not included
-                                            canInclude = true
-                                            //canInclude = false
-                                        } else {
-                                            let userSelectedConcept = currentValues[propKey]    //what the user selected - might be null
-                                            //there is a user entered value for this property - does it match the don.value?
-                                            if (don['x-operator' == 'in-vs']) {
-                                                //the depends on value is a valueset url. The user entered value must be in that vs
-
-                                                let arCodes = hashExpandedVs[don.value] || []     //the codes in the valueset - don.value is the vs url
-                                                let ar = arCodes.filter(item => item.code == userSelectedConcept.code)  //is the previous value in the VS?
-                                                if (ar.length == 0) {
-                                                    //nope.
-                                                    canInclude = false
-                                                }
-                                            } else {
-                                                //this is an equality check - the user entered value must be the same
-                                                if (userSelectedConcept.code !== don.value) {
-                                                    //no, it is different.
-                                                    canInclude = false
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                }
-
-                                //finally, if all the checks match we can add the target to the list
-                                if (canInclude) {
-                                    lstTargets.push(target)
-                                }
+                                lstTargets.push(target)
                             }
                         }
+
+
+
+
                     }
+
                 }
 
-                //now, we have all the matching targets (ie where target.code is the concept code or a VS with the concept as a member
-                // now we can assemble the list of property values from the dependsOn values
-                //idea is that if the target was matched, then all the values for all the properties are the
-                //options for that property. eg if a target.dependsOn has the property 'cancer-stream' and the value '93744007' then
-                //  93744007 must be added to the list of possible options for cancer-stream
-                let hashProperty = {}   //a hash keyed by property with all the permissable values for that property
+                //now, we can assemble the list of property values
+                let hashProperty = {}
                 for (const target of lstTargets) {
                     if (target.dependsOn) {
                         for (const don of target.dependsOn) {
                             let property = don.property
                             let value = don.value
 
-                            hashProperty[property] = hashProperty[property] || []
+                            if (value !== '0') {
+                                hashProperty[property] = hashProperty[property] || []
 
-                            if (value.startsWith('http')) {
-                                //this is a valueset
-                                let arConcepts = hashExpandedVs[value]
-                                if (arConcepts) {       //there are some concepts
-                                    hashProperty[property] = hashProperty[property] || []
+                                //see if the code is already in the accumulated list (actually a hash)...
+                                let ar = hashProperty[property].filter(concept => concept.code == don.value )
 
-                                    for (const concept of arConcepts) {
-                                        //add the concept, unless it is already there
-                                        let ar = hashProperty[property].filter(c =>c.code == concept.code)
-                                        if (ar.length == 0) {
-                                            hashProperty[property].push(concept)
+                                //... and ignore if it is
+                                if (ar.length == 0) {
+
+                                    if (value.startsWith('http')) {
+                                        //this is a valueset
+                                        let arConcepts = hashExpandedVs[value]
+                                        if (arConcepts) {
+                                            hashProperty[property] = hashProperty[property] || []
+
+                                            for (const concept of arConcepts) {
+                                                let ar = hashProperty[property].filter(c =>c.code == concept.code)
+                                                if (ar.length == 0) {
+                                                    hashProperty[property].push(concept)
+                                                }
+                                                //hashProperty[property]
+                                            }
+
+
+
+
+                                        } else {
+                                            alert(`ValueSet ${value} not found`)
                                         }
-                                        //hashProperty[property]
+
+                                    } else {
+                                        let concept = {code:value,display:don.display}
+                                        hashProperty[property].push(concept)
                                     }
 
-                                } else {
-                                    alert(`ValueSet ${value} not found`)
-                                }
 
-                            } else {
-                                //the value is a snomed code
 
-                                let concept = {code:value,display:don.display,system:snomed}
-                                let ar = hashProperty[property].filter(c =>c.code == concept.code)
-                                if (ar.length == 0) {
-                                    hashProperty[property].push(concept)
                                 }
-                                //hashProperty[property].push(concept)
                             }
 
                         }
                     }
                 }
 
-                //todo - remove duplications from hashProperty
-
-                //console.log(hashProperty)
-                return {targets:lstTargets,currentValues:currentValues,  element: element,hashProperty:hashProperty,sourceConcept:concept}
+                console.log(hashProperty)
+                return {targets:lstTargets,element: element,hashProperty:hashProperty,sourceConcept:concept}
 
 
                 //does the target.code value either match the concept.code or is the
@@ -292,7 +249,16 @@ angular.module("pocApp")
                         if (ar.length > 0) {
                             return true
                         }
-
+                        /*
+                        for (const vsConcept of arCodes) {
+                            //console.log(concept)
+                            if (concept.code == vsConcept.code) {
+                               return true
+                              //  isInVs = true
+                                break
+                            }
+                        }
+                        */
                     }
 
 
