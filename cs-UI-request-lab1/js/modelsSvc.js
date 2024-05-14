@@ -51,10 +51,11 @@ angular.module("pocApp")
                            // arParent[cnt] = ed.path //save the id at this level for children
                             break
                         case 4:
-                            //a child DG off the section
-                         //   let itemNode = {id:ed.path,parent:sectionNode.id,text:ed.title,data:{ed:ed}}
-                          //  treeData.push(itemNode)
-                            //arParent[cnt] = ed.path //save the id at this level for children
+                            //a child DG off the section. We do need to kep this for SectionDGs with multiple child DGs...
+                            //the title in the composiiton is often significant...
+                            let itemNode = {id:ed.path,parent:sectionNode.id,text:ed.title,data:{ed:ed}}
+                            treeData.push(itemNode)
+                            arParent[cnt] = ed.path //save the id at this level for children
                             console.log(cnt,ed.path)
                             break
                         default:
