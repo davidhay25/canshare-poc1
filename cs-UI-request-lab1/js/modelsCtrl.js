@@ -37,6 +37,7 @@ angular.module("pocApp")
             //This is the browser cache object.
             $localStorage.world = $localStorage.world || {dataGroups:{},compositions:{}}
             $scope.world = $localStorage.world
+
             //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
             $scope.hashAllDG = $localStorage.world.dataGroups
 
@@ -454,7 +455,7 @@ angular.module("pocApp")
             //all the questionnaire objects (not actual Q)
             //$scope.allQObject = $localStorage.allQObject
 
-            $scope.showTrace = function () {
+            $scope.showTraceDEP = function () {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/trace.html',
                     backdrop: 'static',
@@ -1106,6 +1107,10 @@ angular.module("pocApp")
                                 ed1.hideInQ = ed.hideInQ
                                 ed1.autoPop = ed.autoPop
 
+                                ed1.hideLabel = ed.hideLabel
+                                ed1.labelText = ed.labelText
+
+
                                 if (ed.profile) {
                                     ed1.profile = {}
                                     ed1.profile.fsh = ed.profile.fsh
@@ -1574,7 +1579,8 @@ angular.module("pocApp")
 
                 if (autoQ) {
                     //generate the Q and also retrieve all the ValueSets
-                    makeCompQSvc.makeQ($scope.allCompElements,function (Q) {
+
+                    makeCompQSvc.makeQ($scope.allCompElements, $scope.hashAllDG, function (Q) {
                         $scope.fullQ = Q
                     })
                 }

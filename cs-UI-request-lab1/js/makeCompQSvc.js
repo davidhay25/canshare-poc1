@@ -1,12 +1,201 @@
 //a new service (please let it be the last) that generates a Q from a composition
 //uses the list of composition elements
 angular.module("pocApp")
-    .service('makeCompQSvc', function($http,codedOptionsSvc,cmSvc,utilsSvc,vsSvc,QutilitiesSvc) {
+    .service('makeCompQSvc', function($http,codedOptionsSvc,cmSvc,utilsSvc,vsSvc,QutilitiesSvc,makeQSvc,snapshotSvc) {
 
         //let hashVS = {}             //a hash containing the concepts from the VS
 
         //this is the function that actually generates the Q
-        function generateQ(allElements) {
+        function generateQ(allElements,hashAllDG) {
+            console.log('generate Q')
+            let qName = allElements[0].ed.path
+            let id = "cs-" + qName
+            Q = {resourceType: "Questionnaire", id: id, status: "draft", name: qName, item: []}
+            Q.url = `http://canshare.co.nz/fhir/Questionnaire/${id}`
+            let extTS = {url: "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-preferredTerminologyServer"}
+            extTS.valueUrl = "https://nzhts.digital.health.nz/fhir/"
+            Q.extension = [extTS]
+
+
+            //create a top level item to represent a tab container
+            //all of the sections are added to that item
+            let containerSection = {text: "tabContainer", linkId: qName, extension: [], type: 'group', item: []}
+
+            let ext = {url: "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+            ext.valueCodeableConcept = {
+                coding: [{
+                    code: "tab-container",
+                    system: "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
+                }]
+            }
+            containerSection.extension.push(ext)
+
+
+            //log.push({msg:`Added container section`,item:angular.copy(containerSection)})
+
+            Q.item.push(containerSection)
+
+            let sectionItem   //
+
+
+            //Now iterate over the elements in the list. The number of segments in the path indicates the 'type' of element
+            allElements.forEach(function (item) {
+                let ed = item.ed
+                let path = ed.path
+                let ar = path.split('.')
+
+                //console.log(path)
+
+                switch (ar.length) {
+                    case 1 :
+                        //this is the first element - just the composition
+                        break
+                    case 2 :
+                        //the section item. I don't think there is anything in here we need...
+                        break
+                    case 3 :
+                        //the section DG element. This marks a new section
+                        sectionItem = {text: ed.title + " group", linkId: ed.path, type: 'group', extension:[],item: []}
+
+                        //Add the tab container extension as well
+                        let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+                        ext.valueCodeableConcept = {coding:[{code:"page",system:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}]}
+                        sectionItem.extension.push(ext)
+
+                        //the path prefix is the path to the DG in the composition - {compname}.{section name}.
+                        //this is the first 2 segments in the node id (which is the full path)
+                        let ar = ed.path.split('.')
+                        let pathPrefix = `${ar[0]}.${ar[1]}.${ar[2]}.`
+                        checkEnableWhen(ed,sectionItem,pathPrefix)
+
+                        containerSection.item.push(sectionItem)
+
+
+
+                        //get the Q for this DG and add to the comp DG. This should be all we need
+                        //note it assumes we are no longer doing Z elements...
+                        //todo - do we need to adjust path [refixes???
+
+                        let dgName = ed.name
+                        let allDgElements = snapshotSvc.getFullListOfElements(dgName)
+                        let vo = makeQSvc.makeQFromDG(allDgElements,hashAllDG)
+
+                        sectionItem.item = vo.section.item[0].item
+
+
+
+                        break
+
+
+                    case 4 :
+
+
+                        //the DG within the section DG. I don't think there is anything in here we need...
+                        //let groupItem = {text: ed.title + " group", linkId: ed.path, type: 'display', extension:[],item: []}
+                        //sectionItem.item.push(groupItem)
+                        break
+                    default :
+
+                        break       //for now ignore the rest of the processing
+                        //contents of the section DG. Add to the current section
+                        let type = ed.type[0]
+                        let isDG = false
+                        if (utilsSvc.fhirDataTypes().indexOf(type) == -1) {
+                            isDG = true
+                        }
+
+                        let ar1 = ed.path.split('.')
+                        //let pathPrefix1 = `${ar1[0]}.${ar1[1]}.${ar1[2]}.`
+                        let pathPrefix1 = `${ar1[0]}.${ar1[1]}.`
+
+                        //if it's a group, then add a label - not a control
+                        if (type == "Group" || isDG) {
+                            let controlItem = {text: ed.title, linkId: ed.path, type: "display"}
+                            sectionItem.item.push(controlItem)
+                        } else {
+                            let vo = getControlDetails(ed)  // return {controlType:controlType,controlHint:controlHint}
+
+
+                            let controlItem = {text: ed.title, linkId: ed.path, type: vo.controlType}
+                            applyControlHint(controlItem,vo.controlHint)
+
+                            //add a ValueSet or answerOptions - but not both
+                            if (ed.valueSet) {
+                                controlItem.answerValueSet = ed.valueSet
+                            } else if (ed.options && ed.options.length > 0) {
+                                controlItem.answerOption = []
+                                ed.options.forEach(function (opt) {
+                                    let concept = {code:opt.code,display:opt.display}
+                                    concept.system = opt.system || 'http://example.com/fhir/CodeSystem/example'
+                                    controlItem.answerOption.push({valueCoding:concept})
+                                })
+                            }
+                            checkEnableWhen(ed,controlItem,pathPrefix1)
+
+                            QutilitiesSvc.setFixedValue(ed,controlItem)
+
+
+                            sectionItem.item.push(controlItem)
+                        }
+
+                        break
+                }
+
+            })
+
+
+            //console.log(Q)
+            return (Q)
+
+            //add any 'enableWhen' instructions
+            function checkEnableWhen(ed,item,pathPrefix) {
+                pathPrefix = pathPrefix || ""
+                if (ed.enableWhen && ed.enableWhen.length > 0) {
+                    ed.enableWhen.forEach(function (ew) {
+                        let qEW = {}
+                        qEW.question = `${pathPrefix}${ew.source}` //linkId of source is relative to the parent (DG)
+                        qEW.operator = ew.operator
+                        //if the ew.value is an object then assume a Coding. Otherwise a boolean (we only support these 2)
+
+                        let canAdd = false
+                        if (typeof ew.value == 'boolean') {
+                            //this is a boolean
+                            qEW.answerBoolean = ew.value
+                            canAdd = true
+                        } else {
+                            //let qEW = {operator:ew.operator,answerCoding:ew.value}
+                            if (ew.value && ew.value.code) {        //must have a code
+                                qEW.answerCoding = ew.value
+                                delete qEW.answerCoding.pt  //the preferred term...
+                                delete qEW.answerCoding.fsn  //the preferred term...
+                                qEW.answerCoding.system = qEW.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
+                                canAdd = true
+                            }
+                        }
+
+                        //need to determine the path to the question. For now, assume that
+                        //qEW.question = `${parent.linkId}.${ew.source}` //linkId of source is relative to the parent (DG)
+                        // qEW.question = `${pathPrefix}${ew.source}` //linkId of source is relative to the parent (DG)
+                        if (canAdd) {
+                            item.enableWhen = item.enableWhen || []
+                            item.enableWhen.push(qEW)
+
+                            if (item.enableWhen.length == 2) {
+                                //if there are 2 EW then set the EW behaviour. More than 2 and it will already be set...
+                                item.enableBehavior = 'any'    //todo - may need to specify this
+                            }
+                        }
+
+                    })
+
+                }
+            }
+
+        }
+
+
+
+        function generateQSAVE(allElements) {
             console.log('generate Q')
             let qName = allElements[0].ed.path
             let id = "cs-" + qName
@@ -176,6 +365,7 @@ angular.module("pocApp")
         }
 
 
+
         function getAllVSDEP(allElements, cb) {
 
             //cb()        //term server not working
@@ -327,7 +517,7 @@ angular.module("pocApp")
 
 
         return {
-            makeQ: function (allElements, cb) {
+            makeQ: function (allElements, hashAllDG, cb) {
                 console.log('invoking make')
                 //generate the Q from the list of all elements. hidden (mult = 0..0) have been removed
 
@@ -335,7 +525,7 @@ angular.module("pocApp")
 
                 vsSvc.getAllVS(lstElements, function () {
                 //getAllVS(lstElements, function () {
-                    let Q = generateQ(lstElements)
+                    let Q = generateQ(lstElements,hashAllDG)
 
                     cb(Q)
 

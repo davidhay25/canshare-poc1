@@ -616,7 +616,7 @@ angular.module("pocApp")
                 $scope.setCommentsThisModel()
 
                 //generate the Q for the composition
-                makeCompQSvc.makeQ($scope.allCompElements,function (Q) {
+                makeCompQSvc.makeQ($scope.allCompElements,$scope.hashAllDG,function (Q) {
                     $scope.fullQ = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
                 })
 

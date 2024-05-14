@@ -97,6 +97,14 @@ angular.module("pocApp")
                 $scope.input.otherType =  item.ed.otherType
                 $scope.input.placeholder =  item.ed.placeholder
 
+                $scope.input.hideLabel =  item.ed.hideLabel
+                $scope.input.labelText =  item.ed.labelText
+
+
+
+
+
+
                 $scope.input.hideInQ =  item.ed.hideInQ
                 $scope.input.autoPop =  item.ed.autoPop
 
@@ -329,6 +337,13 @@ angular.module("pocApp")
                     ed.controlHint = $scope.input.controlHint
                 }
 
+                ed.hideLabel = $scope.input.hideLabel
+                ed.labelText = $scope.input.labelText
+
+
+
+
+
                 if ($scope.input.otherType) {
                     ed.otherType = $scope.input.otherType
 
@@ -381,11 +396,13 @@ angular.module("pocApp")
 
             $scope.clearFixedValue = function (kind) {
                 if (kind == 'default') {
-                    delete $scope.default
+                    //delete $scope.default
+                    $scope.default = {}
                     delete $scope.defaultDisplay
 
                 } else if (kind == 'fixed') {
-                    delete $scope.fixed
+                    //delete $scope.fixed
+                    $scope.fixed = {}
                     delete $scope.fixedDisplay
                 }
 

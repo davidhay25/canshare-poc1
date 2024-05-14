@@ -178,8 +178,10 @@ angular.module('formsApp')
                 //when a section is selected
                 $scope.selectSection = function(section) {
 
+
                     //section.imageDetails = {imageName:"left-breast.png",linkId:"image"}        //temp
                     $scope.selectedSection = section
+
                     if (section && section.imageDetails) {
                         //the section has an associated image. load and display it
 
@@ -192,6 +194,8 @@ angular.module('formsApp')
                         $scope.drawingPane = "col-md-0"
                         clearDrawing()
                     }
+
+
                 }
 
                 $scope.resetDrawing = function(){

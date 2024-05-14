@@ -333,9 +333,6 @@ angular.module("pocApp")
 
                 })
 
-                //sort by
-
-
 
                 return {treeData:treeData,sectionTreeData : sectionTreeData}
 

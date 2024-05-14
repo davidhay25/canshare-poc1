@@ -5,7 +5,7 @@ angular.module("pocApp")
 
         return {
 
-            adjustGroupOrdering(dg) {
+            adjustGroupOrderingDEP(dg) {
                 //ensure that the 'children' of group elements are immediately after the 'parent'. The tree is OK, but the lists are wrong...
                 //NOTE: assume only a single level of group elements
                 //first create a new diff list that excludes group children

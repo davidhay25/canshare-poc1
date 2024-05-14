@@ -6,7 +6,7 @@ angular.module("pocApp")
 
 
 
-            $scope.fixGroups = function () {
+            $scope.fixGroupsDEP = function () {
                 //run the fixit routine to make sure group children immediately follow the group
                 //$scope.newDgDiff = orderingSvc.adjustGroupOrdering($scope.selectedModel)
                 $scope.selectedModel.diff = orderingSvc.adjustGroupOrdering($scope.selectedModel)

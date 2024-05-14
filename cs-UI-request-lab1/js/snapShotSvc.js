@@ -50,14 +50,14 @@ angular.module("pocApp")
             log.push(logEntry)
         }
 
-        function getFirstPathSegment(path) {
+        function getFirstPathSegmentDEP(path) {
             let ar = path.split('.')
             let firstSegment = ar[0]
             return firstSegment
         }
 
 
-        //When a DG overrides an imported reference, the element will duplicate as it will be brought in
+        //When a DG overrides an element in an imported reference, the element will duplicate as it will be brought in
         //with the references DG as well as present as the override diff. We remove them here into a separate
         //element on the DG (as a hash) and apply them once the snapshot has been completely created
         //note that the override only contains overrides for references.
@@ -111,13 +111,18 @@ angular.module("pocApp")
 
             let arHierarchy = makeDgHierarchy(dg,allDg)     //the list of DG's that are parents of this one
 
+            //the ultimate parent is the last one...
+            dg.ultimateParent = arHierarchy[arHierarchy.length-1]
+
             dg.fullDiff = []        //this is a complete list of diffs from the entire hierarchy ordered from the ultimate parent down
             dg.snapshot = []        //the definitive snapshot of all elements in order
+
+
 
             //now, create a diff array that has all elements
             let arFullDiffPath = []     //will contain paths of all elements in the expanded DG
             let hashEdPath = {}         //a hash, keyed by path than has the DG at that path. This may be replaced by subsequent DG's in the hierarchy
-            let arHx = []               //history of changes made by each DG. will contain {dhName: changes:[]}
+            let arHx = []               //history of changes made by each DG. will contain {dgName: changes:[]}
             hashHistory[dg.name] = arHx //
 
             //move down the hierarchy, parent first
@@ -447,6 +452,9 @@ angular.module("pocApp")
                             })
                             dg.snapshot = finalSnapshot
 
+                            //ensure that the children of groups are contiguous
+                            adjustGroupOrdering(dg)
+
 
                             logger(`DG: ${dg.name} snapshot has been finalised`,dg.name)
                             dg.snapshotComplete = true
@@ -466,7 +474,52 @@ angular.module("pocApp")
 
 
         }
-        
+
+
+        function adjustGroupOrdering(dg) {
+            //ensure that the 'children' of group elements are immediately after the 'parent'. The tree is OK, but the lists are wrong...
+            //NOTE: assume only a single level of group elements
+            //first create a new diff list that excludes group children
+            let hash = {}       //will have all the group children
+            let lst = []        //will be the new diff
+            for (const ed of dg.snapshot) {
+
+                let ar = ed.path.split('.')
+                if (ar.length == 1) {
+                    //this is an 'ordinary' element
+                    lst.push(ed)
+                } else {
+                    //this could be a group child todo need to check that the DT is a group??
+                    let root = ar[0]
+                    hash[root] = hash[root] || []
+                    hash[root].push(ed)
+                }
+            }
+
+            //now we can insert all the group children
+            for (const groupName of Object.keys(hash)) {
+                let itemsToInsert = hash[groupName]
+                //find the location of the group parent
+                for (let i=0; i< lst.length; i++) {
+                    let tEd = lst[i]
+                    if (tEd.path == groupName) {
+                        Array.prototype.splice.apply(lst, [i+1, 0].concat(itemsToInsert));
+                        //insertPointFound = true
+                        break
+                    }
+                }
+
+            }
+
+            dg.snapshot = lst
+
+
+
+        }
+
+
+
+
         return {
             makeSnapshots: function (hashAllDG,inLogToConsole) {
                 clearInternalCaches()
@@ -526,6 +579,8 @@ angular.module("pocApp")
                 //return the hash of all DGs with snapshots
                 return allDgSnapshot
             },
+
+
             getDGList : function () {
                 //return an alphabetical list of DG by name
                 return lstAllDG

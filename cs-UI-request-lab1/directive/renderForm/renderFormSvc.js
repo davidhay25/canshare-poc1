@@ -623,178 +623,6 @@ angular.module("formsApp")
 
                         //---------------------
 
-/*
-                //todo - working on multiple values for a single linkId.
-                //the form var is a hash keyed by the linkId containing the value (if any).
-                // For now, make that an array = and only take the first value when processing. Later - allow more than one
-
-                let hashFormValues = {}
-                Object.keys(form).forEach(function (key) {
-                    let value = form[key]       //the value entered. if this item can have multiple values, then the linkId will have a sufffix separated by -- - eg linkId--1 and linkId--2
-                    let ar = key.split('--')
-                    let realKey = ar[0]  //strip off any suffix - eg linkid--1 will become just linkid
-                    hashFormValues[realKey] = hashFormValues[realKey] || []
-                    hashFormValues[realKey].push(value)
-
-                })
-
-
-                //make the QuestionnaireResponse from the form data
-                //hash is items from the Q keyed by linkId - not used any more!
-                //form is the data entered keyed by linkId
-                let qrId = this.createUUID()
-                let err = false
-
-                let QR = {resourceType:'QuestionnaireResponse',id:qrId,status:'in-progress'}
-                QR.text = {status:'generated'}
-                QR.text.div="<div xmlns='http://www.w3.org/1999/xhtml'>QR resource</div>"
-                QR.questionnaire = Q.url
-                QR.authored = new Date().toISOString()
-
-                QR.item = []
-
-                //the top level items - sections - directly off the Q root...
-                Q.item.forEach(function (section) {
-                    let parentItem = null
-
-                    if (section.item) {
-                        section.item.forEach(function (child) {
-                            //items off the section. they will either be data elements, or groups
-
-                            let itemToAdd = {linkId : child.linkId,text:child.text}
-                            //let itemToAdd = {linkId : child.linkId,answer:[],text:child.text}
-                            let key = child.linkId  //the key for this Q item
-                            let value = form[key]
-
-                            let arValues = hashFormValues[key]
-
-                            //mar 27 check the show
-                            //let canShow = that.checkConditional(child,)
-
-                            if (arValues !== undefined && arValues.length > 0) {        //is there a value for this item. Won't be if this is a group...
-
-                                arValues.forEach(function (value) {
-                                    let result = getValue(child,value)
-                                    if (result ) {
-
-                                        if (! parentItem) {
-                                            parentItem = {linkId : section.linkId,text:section.text,item: []}
-                                            QR.item.push(parentItem)
-                                        }
-                                        itemToAdd.answer = itemToAdd.answer || []
-                                        itemToAdd.answer.push(result)
-                                    }
-
-                                })
-                                //if parentItem is not set, that implies there is no child data
-                                if (parentItem) {
-                                    parentItem.item = parentItem.item || []
-                                    parentItem.item.push(itemToAdd)
-                                }
-
-                            }
-
-
-
-                            //Are there any grandchildren? If so, they will be conditional items...
-                            //the immediate child is of type group, with the actual data items as grandchildren below that
-                            if (child.item) {
-                                //so this will be the groups - with child items
-                                //the first is the 'main' item that goes in the left pane,
-                                // others are in the right pane. May have conditionals (but do we care here? )
-                                //but all are at the some level in the QR - on an item off the parent
-                                //with the conditional statements on it, and child items (great granschild) below that
-                                let gcRootItem     //the item in the QR that any conditional values get added
-                                child.item.forEach(function (gcItem) {      //gc is grandChild...
-                                    //is there data for this iyem
-                                    //todo - not checking whether the item has conditions - should we?
-                                    //let gcValue = form[gcItem.linkId]
-
-                                    let arValues = hashFormValues[gcItem.linkId]
-
-                                    if (arValues !== undefined) {
-
-                                        //the parent (off the section) may not have been created yet
-                                        if (! parentItem) {
-                                            parentItem = {linkId : section.linkId,text:section.text,item: []}
-                                            QR.item.push(parentItem)
-                                        }
-
-                                        if (! gcRootItem) {
-                                            //the root hasn't been created
-                                            gcRootItem = {linkId:child.linkId,text:child.text,item:[]}
-                                            parentItem.item = parentItem.item || []
-                                            parentItem.item.push(gcRootItem)
-                                        }
-
-
-                                        //let gcItemToInsert = {linkId:gcItem.linkId,text:gcItem.text,answer:[]}
-                                        let gcItemToInsert = {linkId:gcItem.linkId,text:gcItem.text}
-
-                                        arValues.forEach(function (v) {
-                                            let result = getValue(gcItem,v)
-                                            if (result) {
-
-
-                                                gcItemToInsert.answer = gcItemToInsert.answer ||[]
-                                                gcItemToInsert.answer.push(result)
-                                            }
-
-                                        })
-
-                                        gcRootItem.item = gcRootItem.item || []
-                                        gcRootItem.item.push(gcItemToInsert)
-
-
-                                        //
-                                    }
-
-
-
-                                    //is the conditional met?
-                                    if (false && that.checkConditional(conditionalItem,form)) {
-                                        //yes! Not check all the items off this item for data
-                                        if (conditionalItem.item) {
-                                            let ggcRootItem     //the item in the QR that any conditional values get added
-                                            conditionalItem.item.forEach(function (ggcItem) {
-                                                //ggc = great grand child!
-
-                                                let ggcValue = form[ggcItem.linkId]
-                                                if (ggcValue) {
-                                                    //if there's a value, then ensure that the QR structure is complete
-                                                    let ggcAnswer = getValue(ggcItem,ggcValue)
-
-                                                    if (! ggcRootItem) {
-                                                        //the root hasn't been created
-                                                        ggcRootItem = {linkId:conditionalItem.linkId,text:conditionalItem.text,item:[]}
-                                                        itemToAdd.item = itemToAdd.item || []
-                                                        itemToAdd.item.push(ggcRootItem)
-                                                    }
-                                                    let ggcItemToInsert = {linkId:ggcItem.linkId,text:ggcItem.text,answer:[]}
-                                                    ggcItemToInsert.answer.push(ggcAnswer)
-                                                    ggcRootItem.item.push(ggcItemToInsert)
-
-                                                }
-
-                                            })
-                                        }
-
-
-
-                                    }
-
-                                })
-                            }
-
-                        })
-                    }
-
-                })
-
-                return QR
-
-                */
-
                 function getValue(item,value) {
                     if (value == undefined) {       //can't just use 'if value' as booleans can be false
                         return
@@ -895,6 +723,7 @@ angular.module("formsApp")
             //template is an array of section objects
             //section has rows array where a row has
             //pass in the formdata to allow  values to be set....
+            //now only support single column
 
             makeFormTemplate : function(inQ,formData) {
                 //let that = this
@@ -935,7 +764,6 @@ angular.module("formsApp")
                     }
 
 
-                    //let rootItem = Q.item[0].item        //for the tab view
 
                     rootItem.forEach(function (sectionItem) {
                         //Q.item.forEach(function (sectionItem) {
@@ -946,6 +774,7 @@ angular.module("formsApp")
                         if (section.meta.hidden) {
                             hiddenSections.push(section)
                         }
+
                         template.push(section)
 
                         //now look at the items below the section level.
@@ -955,18 +784,21 @@ angular.module("formsApp")
                                 let meta = that.getMetaInfoForItem(item)
 
 
-                                delete meta.columnCount     //Mar26 2004 - force single column
+                                delete meta.columnCount     //Mar26 2024 - force single column
 
 
                                 hashItem[item.linkId] = {item:item,meta:meta}
                                 if (meta.hidden) {
                                     hiddenFields[sectionItem.linkId] = hiddenFields[sectionItem.linkId] || []
                                     hiddenFields[sectionItem.linkId].push(item)
-                                    // hiddenFields.push(item)
+
                                 }
                                 if (item.type == 'group') {
+                                    //if it's a group then iterate through the child elements. We know there is only 1 level
 
                                     let row = {}    //will have multiple columns
+
+                                    row.isGroup = true
 
                                     row.meta = meta   //this is the meta for the group item...
                                     row.text = item.text
@@ -1018,7 +850,10 @@ angular.module("formsApp")
                                             //when the columnCount is not present or 0, use the strategy first in left, others in right
                                             //this is to make it easier to have the 'control' item in the left column and the others in th eright
                                             //Note changed in this version - if columnCount is not specified then everything is in a single column
+
+                                            //updated: push them all into cell.col1
                                             item.item.forEach(function (child,inx) {
+
                                                 //let child = angular.copy(inChild)
                                                 let childMeta = that.getMetaInfoForItem(child)
                                                 hashItem[child.linkId] = {item:child,meta:childMeta}
@@ -1030,6 +865,7 @@ angular.module("formsApp")
                                                 let side = 'col1'
 
                                                 let cell = {item:child,meta:childMeta}
+                                                cell.side = 'right'         //so it is displayed in the right col
                                                 fillFromValueSet(cell,termServer)
 
                                                 setDecoration(cell,child)
@@ -1059,9 +895,11 @@ angular.module("formsApp")
                                         row.meta = meta
                                         //console.log(item.text,item.answerValueSet)
                                         let cell = {item:item,meta:meta}      //to allow for ither elements like control type...
+
                                         fillFromValueSet(cell,termServer)
                                         setDecoration(cell,item)
                                         setDefaultValue(item,formData)
+
                                         row['col1'] = [cell] //make it an array to match the group
 
                                         section.rows.push(row)
@@ -1198,7 +1036,7 @@ angular.module("formsApp")
 
                             cell.item.answerOption = []
                             if (concepts) {
-                                console.log(`${cell.item.linkId} - ${concepts.length} concepts`)
+                                //console.log(`${cell.item.linkId} - ${concepts.length} concepts`)
                                 concepts.forEach(function (concept) {
                                     cell.item.answerOption.push({valueCoding:concept})
                                 })

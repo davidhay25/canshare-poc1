@@ -498,12 +498,64 @@ angular.module("pocApp")
                     }
                 }
 
-                //the sex field has no element...
-                if (cmElement.target) {
-                    $scope.reverseLookup = cmSvc.reverseRulesEngine(cmElement,value, $scope.hashExpandedVs,$scope.local.cmOptions)
+                let result
 
-                    $scope.log.push({msg:`Performed reverse lookup from ${propKey} value ${value.code}`,
-                        obj:$scope.reverseLookup,objTitle:"Reverse engine response"})
+                if (cmElement.target) {
+                    //found the CM element to check
+
+                    //create the values object with all values 'before' this one
+                    let propKeyToExamine = propKey
+
+
+
+
+
+
+
+                      //  = angular.copy($scope.local.cmOptions)  //all the values entered so far (if any)
+
+
+                    while (propKeyToExamine) {
+                        let hashValues = getHashValues(propKeyToExamine)
+
+                        $scope.log.push({msg:`Performing reverse lookup from ${propKey} value ${value.code}`,
+                            obj:hashValues,objTitle:"Values passed to reverse engine"})
+
+                        let result = cmSvc.reverseRulesEngine(cmElement,value, $scope.hashExpandedVs,hashValues)
+                        if (result.targets.length == 0) {
+                            //look at the previous propkey
+                            propKeyToExamine = $scope.cmProperties[propKeyToExamine].previous
+                        } else {
+                            propKeyToExamine = null
+                            $scope.reverseLookup = result
+                            $scope.log.push({msg:`Performed reverse lookup from ${propKey} value ${value.code}`,
+                                obj:$scope.reverseLookup,objTitle:"Reverse engine response"})
+                        }
+                    }
+
+
+
+
+                    /*
+
+                    while (propKeyToExamine) {
+                        let result = cmSvc.reverseRulesEngine(cmElement,value, $scope.hashExpandedVs,$scope.local.cmOptions)
+                        //if there are no matches then remove the previous value and try again.
+
+                    }
+*/
+
+
+
+                    function getHashValues(propKey) {
+                        let hash = {}
+                        let propKeyToGet = $scope.cmProperties[propKey].previous
+                        while (propKeyToGet) {
+                            hash[propKeyToGet] = $scope.local.cmOptions[propKeyToGet]
+                            propKeyToGet = $scope.cmProperties[propKeyToGet].previous
+                        }
+                        return hash
+                    }
 
                 }
 
@@ -880,16 +932,17 @@ angular.module("pocApp")
                 $scope.cmProperties['cancer-service'] = {concept: {code:"299801000210106"},
                     next:'cancer-stream',options:[]}
                 $scope.cmProperties['cancer-stream'] = {concept:{code:"299811000210108",display:"Cancer Stream",system:snomed},
-                    next:'cancer-substream', options : []}
+                    next:'cancer-substream',previous:'cancer-service', options : []}
                 $scope.cmProperties['cancer-substream'] = {concept: {code:"299821000210103"},
-                    next:'cancer-type',options:[]}
+                    next:'cancer-type',previous:'cancer-stream',options:[]}
                 $scope.cmProperties['cancer-type'] = {concept: {code:"299831000210101"},
-                    next:'primary-site',options:[]}
+                    next:'primary-site',previous:'cancer-substream',options:[]}
                 $scope.cmProperties['primary-site'] = {concept: {code:"399687005"},
-                    next:'primary-site-laterality',options:[]}
+                    next:'primary-site-laterality',previous:'cancer-type',options:[]}
                 $scope.cmProperties['primary-site-laterality'] = {concept: {code:"297561000210100"},
-                    next:'histologic-type-primary',options:[]}
-                $scope.cmProperties['histologic-type-primary'] = {concept: {code:"512001000004108"},options:[]}
+                    next:'histologic-type-primary',previous:'primary-site',options:[]}
+                $scope.cmProperties['histologic-type-primary'] = {concept: {code:"512001000004108"},options:[],
+                    previous:'primary-site-laterality'}
 
                 $scope.cmProperties['patient-sex'].options.push({code:"U",display:"Unknown"})
                 $scope.cmProperties['patient-sex'].options.push({code:"O",display:"Other"})

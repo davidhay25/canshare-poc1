@@ -24,11 +24,13 @@
   <div class="modal-body">
     <uib-tabset active="input.mainTabActive">
       <uib-tab heading="Details">
+        <br/>
         <table class="table-bordered table table-condensed">
           <tr>
-            <td>Path</td>
+            <td  width="20%">Path</td>
 
-            <td><input type="text" ng-blur="setTitle(input.path)"
+            <td>
+              <input type="text" ng-blur="setTitle(input.path)"
                        ng-disabled="! isNew" class="form-control" ng-model="input.path"/> </td>
 
           </tr>
@@ -104,10 +106,6 @@
             </td>
           </tr>
 
-          <tr>
-            <td>Placeholder</td>
-            <td><input type="text" class="form-control" ng-model="input.placeholder"/> </td>
-          </tr>
 
 
           <tr>
@@ -162,19 +160,6 @@
             </td>
           </tr>
 
-
-
-          <tr>
-            <td>Hide in Q</td>
-            <td><checkbox ng-model="input.hideInQ"> </td>
-          </tr>
-
-          <tr>
-            <td>Set auto populate flag</td>
-            <td><checkbox ng-model="input.autoPop"/> </td>
-          </tr>
-
-
           <tr>
             <td>Source reference</td>
             <td><input type="text" class="form-control" ng-model="input.sourceReference"/> </td>
@@ -184,10 +169,58 @@
 
       </uib-tab>
 
+      <uib-tab heading="Questionnaire">
+        <br/>
+        <table class="table-bordered table table-condensed">
+          <tr>
+            <td  style="width: 20%;">Hide in Q</td>
+            <td><checkbox ng-model="input.hideInQ"> </td>
+          </tr>
+
+          <tr>
+            <td>Set auto populate flag</td>
+            <td><checkbox ng-model="input.autoPop"/>
+              <div><em>If checked, an '(Auto populated) will appear in the Questionnaire</em></div>
+            </td>
+          </tr>
+
+
+
+          <tr>
+            <td>Placeholder text</td>
+            <td><input type="text" class="form-control" ng-model="input.placeholder"/> </td>
+          </tr>
+
+          <tr>
+            <td>Hide label text</td>
+            <td><checkbox ng-model="input.hideLabel"/>
+              <div><em>If checked, there will be no label displayed for this item</em></div>
+            </td>
+          </tr>
+
+
+          <tr ng-hide = "true || input.hideLabel">
+            <td>Questionnaire label</td>
+            <td>
+              <input type="text"
+                     placeholder="Element label if not the text. XHTML supported."
+                     class="form-control" ng-model="input.labelText"/> </td>
+          </tr>
+
+
+
+
+        </table>
+
+
+      </uib-tab>
+
+
       <uib-tab ng-show="input.selectedType == 'CodeableConcept'">
         <uib-tab-heading>Options <span class="badge">{{options.length}}</span> </uib-tab-heading>
 
         <uib-tabset>
+          <br/>
           <uib-tab heading="Current List">
 
             <div class="row">
@@ -268,6 +301,7 @@
 
       <uib-tab ng-show="input.selectedType == 'Quantity'">
         <uib-tab-heading>Units <span class="badge">{{units.length}}</span> </uib-tab-heading>
+        <br/>
 
           <table class="table-bordered">
             <tr ng-repeat = "unit in units track by $index">
@@ -356,6 +390,7 @@
       </uib-tab>
 
       <uib-tab ng-show="false" heading="Layout">
+        <br/>
         <table class="table-bordered table table-condensed">
           <tr>
             <td>Insert after</td>
@@ -383,6 +418,7 @@
       </uib-tab>
 
       <uib-tab heading="Json">
+        <br/>
         <pre>{{item | json}}</pre>
       </uib-tab>
 
