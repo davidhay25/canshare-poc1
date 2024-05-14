@@ -146,7 +146,7 @@
     </nav>
 
 
-    <uib-tabset  ng-show="selectedComp">
+    <uib-tabset ng-show="selectedComp">
         <uib-tab>
             <uib-tab-heading>
                 <span ng-show="selectedComp.kind == 'dg'">Data Group</span>
@@ -160,6 +160,26 @@
 
                     <uib-tabset>
                         <br/>
+
+                        <uib-tab heading="Tree"  select="tabSelect('tree')">
+                            <div class="pull-right clickable" ng-click="expandCompTree()">Expand all ({{allCompElements.length}})</div>
+                            <div class="myScroll">
+                                <div id="compositionTree"></div>
+                            </div>
+                        </uib-tab>
+
+                        <uib-tab heading = "comp list">
+                            <div class="myScroll">
+                                <table class="table-bordered table">
+                                    <tr ng-repeat = "row in allCompElements">
+                                        <td>{{row.ed.path.split('.').length}}</td>
+                                        <td>{{row.ed.path}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                        </uib-tab>
+
                         <uib-tab heading="Form"  select="tabSelect('form')">
                             <div class="pull-right"><em>This form is only to assist with reviewing and does not represent what a 'real' form might look like.</em></div>
                             <div class="form-background">
@@ -334,12 +354,7 @@
 
 
 
-                        <uib-tab heading="Tree"  select="tabSelect('tree')">
-                            <div class="pull-right clickable" ng-click="expandCompTree()">Expand all ({{allCompElements.length}})</div>
-                            <div class="myScroll">
-                                <div id="compositionTree"></div>
-                            </div>
-                        </uib-tab>
+
 
 
                     </uib-tabset>
@@ -351,6 +366,10 @@
 
                     <uib-tabset>
                         <uib-tab heading="Details">
+
+                            {{selectedCompositionNode.data.ed.path}}
+
+
                             <div ng-show="showAllCommentSummary">
                                 Show help
                                 <!--

@@ -8,13 +8,129 @@ angular.module("pocApp")
 
         return {
 
+            makeCompTree : function (arElements) {
+                //generate a simplified tree view for the review...
+                let treeData = []
+                //let compElements = []
+
+
+                let rootEd = arElements[0].ed
+                rootEd.kind = 'root'
+
+                let rootNode = {id:rootEd.path,text: rootEd.title,parent:'#',data:{ed:rootEd}}
+                treeData.push(rootNode)
+
+
+                //first create a simplified list by reducing the degree of nesting
+                //let rootNode = {}
+                let arParent = []      //track the element that is a parent at a given level
+                let sectionNode     //the section node with DG elements directly attached
+                arElements.forEach(function (item) {
+                    let ed = item.ed
+                    let arSegments = ed.path.split('.')
+                    let cnt = arSegments.length //
+
+                    switch (cnt) {
+                        case 1:
+                            //the composition name
+                            break
+                        case 2:
+                            //a new section
+                            sectionNode = {id:ed.path,parent:rootNode.id,text:ed.title,data:{ed:ed}}
+                            treeData.push(sectionNode)
+                            //arParent[cnt] = ed.path //save the id at this level for children
+                            break
+                        case 3:
+                            //the section dg
+                            //arParent[cnt] = ed.path //save the id at this level for children
+
+                            //sectionDGNode = {id:ed.path,parent:rootNode.id,text:ed.title,data:{ed:ed}}
+                           // treeData.push(sectionDGNode)
+
+
+                           // arParent[cnt] = ed.path //save the id at this level for children
+                            break
+                        case 4:
+                            //a child DG off the section
+                         //   let itemNode = {id:ed.path,parent:sectionNode.id,text:ed.title,data:{ed:ed}}
+                          //  treeData.push(itemNode)
+                            //arParent[cnt] = ed.path //save the id at this level for children
+                            console.log(cnt,ed.path)
+                            break
+                        default:
+                            //an element within the DG
+                            //we do want to preserve the indentation within the DG
+
+                            console.log(cnt,ed.path)
+
+                            arParent[cnt] = ed.path //save the id at this level for children
+                            //the parent will be the element with 1 less segment...
+                            let parentId = arParent[cnt-1]
+                            console.log(parentId)
+                            if (parentId) {
+                                let itemNode = {id:ed.path,parent:parentId,text:ed.title,data:{ed:ed}}
+                                treeData.push(itemNode)
+                            } else {
+                                console.log('adding to section')
+                                //if null then add to the section
+                                let itemNode = {id:ed.path,parent:sectionNode.id,text:ed.title,data:{ed:ed}}
+                                treeData.push(itemNode)
+                            }
+
+
+
+                            break
+
+
+
+                    }
+
+                })
+
+
+                return treeData
+
+/*
+
+                let rootEd = compElements[0].ed
+                rootEd.kind = 'root'
+
+                let root = {id:rootEd.path,text: rootEd.title,parent:'#',data:{ed:rootEd}}
+                treeData.push(root)
+
+                for (let i=1; i < compElements.length; i++) {          //skip the root
+                    let ed = compElements[i].ed
+                    let host = compElements[i].host         //will only be present in a composition section
+                    //console.log(ed.path)
+                    let ar = ed.path.split('.')
+                    let leafPath = ar.pop()     // the name is the last item.
+                    let parent = ar.join(".")  //the
+                    let id = ed.path
+
+                    //create the tree text
+                    let text
+                    if (host && host.title) {
+                        text = host.title
+                    }
+
+                    text = text || ed.title || leafPath
+
+
+                    let node = {id: id, text: text, parent: parent, data: {ed: ed, host: host}}
+
+                    treeData.push(node)
+                }
+                return treeData
+                */
+
+            },
+
             setUser : function (user) {
                 this.user = user
             },
             getuser : function () {
                 return this.user
             },
-
             isUniqueNameOnLibrary : function (name, modelType) {
                 let deferred = $q.defer()
                 //check that the name is unique for the modelType (comp, dt) Case sensitive.
@@ -45,7 +161,6 @@ angular.module("pocApp")
                 return deferred.promise
 
             },
-
             getSizeOfObject : function( object ) {
                 //the memory usage of an obect - from https://stackoverflow.com/questions/1248302/how-to-get-the-size-of-a-javascript-object#11900218
                 var objectList = [];
@@ -77,40 +192,6 @@ angular.module("pocApp")
                 }
                 return bytes;
             },
-
-            getConceptMapHashDEP : function () {
-                let idOfConceptMap = "canshare-tnm-vs"
-                let deferred = $q.defer()
-
-                let qry = `ConceptMap/${idOfConceptMap}`
-                let encodedQry = encodeURIComponent(qry)
-
-                $http.get(`nzhts?qry=${encodedQry}`).then(
-                    function (data) {
-                        let cm = data.data
-                        let hashMaps = {}
-                        cm.group.forEach(function (group) {
-                            group.element.forEach(function (element) {
-                                let coding = {code:element.code,display:element.display}
-                                hashMaps[element.code] = {coding:coding,targets:element.target}
-
-                            })
-
-                        })
-
-                       // console.log(data.data)
-                        deferred.resolve(hashMaps)
-
-                    },function (err) {
-                        //todo what to do?
-                        deferred.reject({})
-                    }
-                )
-
-                return deferred.promise
-
-            },
-
             getReferencedModels : function (hashDG,hashComp) {
                 //create a hash showing references between models
 
@@ -178,7 +259,6 @@ angular.module("pocApp")
                 return hashReferences
 
             },
-
             updateOrAddElement : function(model,element) {
                 //if there's already an overide in the model, then update it.
                 //note sepecific elements only, ie: valueSet
@@ -198,7 +278,6 @@ angular.module("pocApp")
                     model.diff.push(newElement)
                 }
             },
-
             summarizeValidation : function(OO,bundle) {
                 //todo - do we need this???
                 //present the validation issues in the OO with the bundle entry
@@ -266,12 +345,10 @@ angular.module("pocApp")
 
 
             },
-
             fhirDataTypes : function(){
                 //theres also a list in snapShot Svc and utilsSvc todo: rationalize
                 return ['boolean','code','date','dateTime','decimal','integer','string','Address','Attachment','CodeableConcept','ContactPoint','Group','HumanName','Identifier','Period','Quantity','Ratio']
             },
-
             getAllTypes : function (hashAllDG) {
                 //return a list of all types
                 let types = angular.copy(hashAllDG)
@@ -280,97 +357,6 @@ angular.module("pocApp")
                 }
                 return types
             },
-
-            //create a bundle of LogicalModels
-            createLMBundleDEP : function (world) {
-                let fhirDataTypes = this.fhirDataTypes()
-                let urlBase = "http://canshare.co.nz/fhir/StructureDefinition"
-                let bundle = {resourceType:"Bundle",type:"transaction",entry:[]}
-                let merged = angular.copy({...world.compositions, ...world.dataGroups})     //all EDs
-                Object.keys(merged).forEach(function (key) {
-                    let model = merged[key]
-                    let SD = {resourceType:"StructureDefinition"}
-
-                    SD.text = {status:'generated'}
-                    SD.text.div = `<div xmlns="http://www.w3.org/1999/xhtml">Logical model for ${model.title}</div>`
-
-                    SD.id = `canshare-${model.name}`
-                    SD.url = `${urlBase}/${model.name}`
-
-                    SD.identifier = [{system:"http://canshare.co.nz/fhir/NamingSystem/logicalModels",value:model.name}]
-                    SD.kind = "logical"
-                    SD.status = "active"
-                    SD.name = model.name
-                    SD.type = `${urlBase}/${model.name}`
-                    SD.fhirVersion = "4.0.1"
-                    SD.abstract = false
-                    //SD.baseDefinition = "http://hl7.org/fhir/StructureDefinition/Base"
-                    SD.baseDefinition = "http://hl7.org/fhir/StructureDefinition/Element"
-                    SD.derivation = "specialization"
-                    SD.differential = {element:[]}
-
-                    let elBase = {id:model.name,path:model.name,short:model.title}
-                    elBase.definition = model.title     //todo - ?description in model
-                    SD.differential.element.push(elBase)
-
-                    if (model.diff) {
-                        model.diff.forEach(function (ed) {
-                            let path = `${model.name}.${ed.path}`  //assume flat structure ATM
-                            let element = {id:path,path:path, short:ed.name}
-                            element.min = 0
-                            element.max = "1"
-                            //assume only a single DT
-                            if (fhirDataTypes.indexOf(ed.type[0].code) > -1) {
-                                //this is a fhir data type
-                                element.type = [{code:ed.type[0].code}]
-                            } else {
-                                element.type = [{code:"Reference"}]
-                            }
-
-                            SD.differential.element.push(element)
-
-                        })
-                    }
-                    let entry = {resource: SD}
-                    entry.request = {method:'PUT',url:`StructureDefinition/${SD.id}`}
-
-                    bundle.entry.push(entry)
-
-                })
-                return bundle
-            },
-
-            analyseWorldDEP : function(world,types) {
-                //find references between structures
-                let that = this
-                let merged = angular.copy({...world.compositions, ...world.dataGroups})     //all EDs
-
-                if (! cache.analysis) {     //cache is defined on the service directly
-                    cache.analysis = {}     //hash of references by target
-                    //create the anaysis
-                    Object.keys(merged).forEach(function (key) {
-                        let model = merged[key]
-                        let vo = that.getFullListOfElements(model,types,true)
-                        vo.allElements.forEach(function (ed) {
-                            //console.log(model.name,ed)
-                            if (ed.type) {
-                                let type = ed.type[0]
-                                cache.analysis[type] = cache.analysis[type] || []
-                                cache.analysis[type].push({display:`from ${model.name} path ${ed.path}`,model:model,path:ed.path})
-                            }
-                        })
-                    })
-                }
-
-                delete merged
-                //console.log(cache.analysis)
-                return cache.analysis
-
-
-
-            },
-
-
             makeTreeFromElementList : function(arElements){
                 //construct a DG and composition tree assuming that arElements is in path order
                 let that = this
@@ -620,7 +606,7 @@ angular.module("pocApp")
 
             },
 
-            fixDgDiff : function (dg,fullList) {
+            fixDgDiffDEP : function (dg,fullList) {
                 //remove any elements from the dg.diff where there is a missing 'parent path'
 
                 let errors = []

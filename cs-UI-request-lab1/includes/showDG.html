@@ -531,10 +531,16 @@
                       <span ng-show="selectedNode.data.ed.fixedCoding ||
                         selectedNode.data.ed.fixedQuantity || selectedNode.data.ed.fixedRatio"
                             class="pull-right">
-
+<!--
                         <span ng-show="getSourceModelName(selectedNode.data.ed) !== selectedModel.name">
                           set on {{getSourceModelName(selectedNode.data.ed)}}
                         </span>
+                        -->
+
+                        <span ng-hide ="presentInDiff(selectedNode.data.ed.path)">
+                          set on {{getSourceModelName(selectedNode.data.ed)}}
+                        </span>
+
 
                       </span>
 
@@ -1353,7 +1359,7 @@
 
 
     <uib-tab>
-      <uib-tab-heading>Elements (diff) <span class="badge">{{selectedModel.diff.length}}</span> </uib-tab-heading>
+      <uib-tab-heading>Diff <span class="badge">{{selectedModel.diff.length}}</span> </uib-tab-heading>
       <em>The element definitions in the .diff element. ie directly defined in the DG. The Json has the complete model.
       Clicking on an element in the table, selects it in the list (to see details)</em>
       <br/><br/>

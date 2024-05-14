@@ -150,11 +150,13 @@ angular.module("pocApp")
                     //does this ed already exist in the full diff (based on the path)
                     let path = ed.path
                     let pos = arFullDiffPath.indexOf(path)
+
+                    ed.sourceModelName = dgName     //the DG where this ed was added.
                     if (pos == -1) {
                         //no it doesn't  - add it to the list.
                         // Even if it is 0..0 - it could be removing part of a referenced DG so we need it for later
 
-                        ed.sourceModelName = dgName     //the DG where this ed was added.
+                        //ed.sourceModelName = dgName     //the DG where this ed was added.
                         arFullDiffPath.push(path)
                         hashEdPath[path] = ed   //and store the ed in the hash
                         changesThisDg.push({msg:`Added ${ed.path}`,ed:ed })
@@ -163,7 +165,7 @@ angular.module("pocApp")
                     } else {
                         //yes, it already exists
                         //update the hash with the new ed
-
+                       // ed.sourceModelName = dgName     //the DG where this ed was added.
                         hashEdPath[path] = ed
                         changesThisDg.push({msg:`Replaced ${ed.path}`,ed:ed })
 

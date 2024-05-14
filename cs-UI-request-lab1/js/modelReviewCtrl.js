@@ -161,6 +161,10 @@ angular.module("pocApp")
             $scope.$on('elementSelected',function(event,vo) {
 
 
+                console.log('ignoring selection - hash does not align with id')
+                return
+
+
                 let linkId = vo.cell.item.linkId
 
                 //need to get the selectedED (to add to the comment)
@@ -589,6 +593,9 @@ angular.module("pocApp")
 
 
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
+
+
+
                 $scope.allCompElements = vo.allElements
                 $scope.hashCompElements = vo.hashAllElements
 
@@ -605,12 +612,20 @@ angular.module("pocApp")
                 console.log($scope.pathsToIgnore)
 
 
+                //try a custom tree view for the reviewer
+
+
+
 
                 let rootNodeId = $scope.allCompElements[0].path
-                let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
+                //let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
+
+
+                let treeData = modelsSvc.makeCompTree($scope.allCompElements)
+
                 $scope.treeData = treeData      //used in the Q builder
 
-                console.log(treeData)
+                //console.log(treeData)
                 makeCompTree(treeData,rootNodeId)
 
                 $scope.setCommentsThisModel()

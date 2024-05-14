@@ -574,6 +574,7 @@ console.log($scope.allTargets)
             $scope.changeInstance = function (tsInstance) {
                 delete $scope.allVSItem
                 delete $scope.selectedVS
+                delete $scope.expansionError
 
                 //$scope.showWaiting = true
                 querySvc.getValueSets(tsInstance).then(
@@ -602,6 +603,7 @@ console.log($scope.allTargets)
 
             $scope.expandVSInTS = function (vs) {
                 delete $scope.expandedVS
+                delete $scope.expansionError
                 let qry = `ValueSet/$expand?url=${vs.url}&_summary=false&displayLanguage=${nzDisplayLanguage}`
 
                 if ($scope.input.selectedLanguage && $scope.input.selectedLanguage.code) {
@@ -622,7 +624,7 @@ console.log($scope.allTargets)
                     function (data) {
                         $scope.expandedVS = data.data
                     }, function (err) {
-
+                        $scope.expansionError = err
                     }
                 ).finally(
                     function () {
@@ -641,6 +643,7 @@ console.log($scope.allTargets)
                 delete $scope.expandQry
                 delete $scope.qUsingVS
                 delete $scope.dummyQR
+                delete $scope.expansionError
 
 
                 let qry = `ValueSet?url=${item.vs.url}&_summary=false`

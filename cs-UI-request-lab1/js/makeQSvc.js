@@ -373,11 +373,6 @@ angular.module("pocApp")
 
                 let dgName = lstElements[0].ed.path
 
-                //retrieve the full DG from the snapshotSvc. This will give us the ultimate parent.
-                //We treat section DG's slightly differently - the
-
-
-
                 //construct a list of paths to hide
                 let basePathsToHide = []    //a list of all paths where hideInQ is set. Any elements starting with this path are also set
                 lstElements.forEach(function (thing) {
@@ -459,8 +454,6 @@ angular.module("pocApp")
                         checkEd(ed)
                     }
 
-
-
                     if (false) {
 
 
@@ -528,8 +521,6 @@ angular.module("pocApp")
                     }
 
                 })
-
-
 
                 //the section is just the first item in the Q - maybe remove
                 return {Q:Q,section:section}

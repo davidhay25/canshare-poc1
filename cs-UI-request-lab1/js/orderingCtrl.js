@@ -90,7 +90,7 @@ angular.module("pocApp")
                         $scope.selectedModel.ordering.push(newItem)
                     })
                 } else {
-                    alert("No parents with ordering defined was found.")
+                    alert("No parents with ordering defined were found.")
                 }
 
                 function updatePath(path) {

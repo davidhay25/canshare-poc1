@@ -152,6 +152,8 @@ angular.module("pocApp")
                 //hashExpandedVs has all the expanded concepts of all the ValueSets
                 //currentValues is the hash[property] value that was selected
 
+                let that = this
+
                 if (! element && ! element.target) {
                     return
                 }
@@ -270,6 +272,12 @@ angular.module("pocApp")
 
                 //todo - remove duplications from hashProperty
 
+                //sort the concept alphabetically, placing anythig with 'other' at the bottom
+                for (key of Object.keys(hashProperty)) {
+                    hashProperty[key] = that.sortConceptList(hashProperty[key])
+                }
+
+
                 //console.log(hashProperty)
                 return {targets:lstTargets,currentValues:currentValues,  element: element,hashProperty:hashProperty,sourceConcept:concept}
 
@@ -300,6 +308,49 @@ angular.module("pocApp")
 
             },
 
+            sortConceptList : function (lst) {
+                //sort a list of concepts alphabetically, placing anuthing starting with 'other' at th ebottom
+
+                //first split into 2 lists
+                let lstMain = []
+                let lstOther = []
+
+                lst.forEach(function (concept) {
+                    if (concept.display) {
+                        let disp = concept.display.toLowerCase()
+                        if (disp.startsWith('other')) {
+                            lstOther.push(concept)
+                        } else {
+                            lstMain.push(concept)
+                        }
+                    } else {
+                        //shouldn't really happen...
+                        concept.display = "Code with no display"
+                        lstMain.push(concept)
+                    }
+
+                })
+
+                //now sort each list
+                lstMain.sort(function (a,b) {
+                    if (a.display > b.display) {
+                        return 1
+                    } else {
+                        return -1
+                    }
+                })
+
+                lstOther.sort(function (a,b) {
+                    if (a.display > b.display) {
+                        return 1
+                    } else {
+                        return -1
+                    }
+                })
+                //return the concatenated list
+                return lstMain.concat(lstOther)
+
+            },
             getVSContentsHash : function (lst) {
                 let deferred = $q.defer()
                 console.log('getting hash')
