@@ -277,6 +277,7 @@ angular.module("pocApp")
 
         //Once the snapshot has been completed, the overrides from the DG can be applied.
         //This can be removing elements or replacing one in the snapshot by the appropriate override
+
         function applyOverrides(dg) {
             if (dg.overrides) {
                 let newSnapshot = []
@@ -294,6 +295,11 @@ angular.module("pocApp")
                             if (overrideEd.mult !== '0..0') {
                                 newSnapshot.push(overrideEd)
                             }
+
+                            //added May15 - once an override has been processed, remove it from the list
+
+                            delete dg.overrides[key]       // <<<<<<<<<
+
                             break
 
                         }
@@ -407,8 +413,9 @@ angular.module("pocApp")
 
                             //now that the DG is complete, remove those where references have been 'zeroed out' in the diff and
                             //replace those changed in the diff
-                            //we can't do that before as the full needs to be created first
-                             applyOverrides(dg)     //todo the applyOverrides may also need to be applied
+                            //we can't do that before as the full snapshot needs to be created first
+                            //note that after this function has executed, overrides is cleared...
+                             applyOverrides(dg)
 
 
                             //but there are also hierarchical Groups which may have hidden elements or overrides.
@@ -418,7 +425,7 @@ angular.module("pocApp")
                             //todo - should we be iterating over fulldiff?
                             let hashHidden = {}
                             //dg.diff.forEach(function (ed) {  //from the DG diff
-                            //Anything 0..0 in the original diff is also present in the snapshot at this point
+                            //Anything 0..0 in the original full diff is also present in the snapshot at this point
                             //unless it's a reference
                             dg.snapshot.forEach(function (ed) {  //from the DG diff
                                 if (ed.mult == '0..0') {
@@ -426,7 +433,7 @@ angular.module("pocApp")
                                 }
                             })
 
-                            //create a new snapshot list that excludes 0..0 elements
+                            //create a new snapshot list that excludes 0..0 elements (and any children)
                             //also need to accomodate overrides from the main DG - eg fixing a value
                             hashReferences[dg.name] = []  ////now that we are building the definitive snapshot, we can build the references hash
                             let finalSnapshot = []
@@ -513,6 +520,9 @@ angular.module("pocApp")
 
             }
 
+
+
+
             dg.snapshot = lst
 
 
@@ -581,6 +591,7 @@ angular.module("pocApp")
                 //return the hash of all DGs with snapshots
                 return allDgSnapshot
             },
+
 
 
             getDGList : function () {

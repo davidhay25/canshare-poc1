@@ -570,7 +570,18 @@ angular.module("pocApp")
                         {edPath:newPath,
                             msg:`Sliced ${ed.path}`},
                         $scope)
+
+                        $scope.makeSnapshots()
+
+                    //rebuild fullList and re-draw the tree
+                    $scope.refreshFullList($scope.selectedModel)
+
+                    $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:displayPath})
+
 */
+
+                    $scope.makeSnapshots()
+
                     //rebuild fullList and re-draw the tree
                     $scope.refreshFullList($scope.selectedModel)
 

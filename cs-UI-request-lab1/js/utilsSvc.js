@@ -4,7 +4,7 @@ angular.module("pocApp")
 
         return {
             getVersion : function(){
-                return "0.8.11"
+                return "0.8.12"
             },
             fhirDataTypes : function(){
                 //theres also a list in snapShot Svc
