@@ -136,8 +136,6 @@ angular.module("pocApp")
                 //let cDg = angular.copy(allDg[dgName])  //cDg = component Dg.
                 for (const ed of cDg.diff) {
 
-
-
                     //temp delete ed.sourceModelName   //the previous version saved this in the DG. I prefer to add it here.
 
                     //if the datatype is not a FHIR datatype - it's another DG - then it will need to have the members inserted
@@ -278,19 +276,82 @@ angular.module("pocApp")
         //Once the snapshot has been completed, the overrides from the DG can be applied.
         //This can be removing elements or replacing one in the snapshot by the appropriate override
 
+
+
         function applyOverrides(dg) {
+
             if (dg.overrides) {
+
+                //use a copy of overrides so the original list remains visible in the UI
+                let overrides = angular.copy(dg.overrides)
+
+
                 let newSnapshot = []
 
                 dg.snapshot.forEach(function (ed) {
                     let processedInOverride  = false  //if the ed is an override or child of an override then it will be processed in the handler. If not, then add it
 
-                    for (const key of Object.keys(dg.overrides)) {
+                    //check all the overrides for the path.
+                    //An override element will effect children if the mult is 0..0 - ie it is zeroing it out
+                    for (const key of Object.keys(overrides)) {
+
+
+                        if (ed.path == key) {
+                            //this override directly matches an element in the snapshot
+                            processedInOverride = true      //we'll process it here
+                            let overrideEd = overrides[key]
+                            //if it's 0..0 then drop it - otherwise add it
+                            if (overrideEd.mult !== '0..0') {
+                                newSnapshot.push(overrideEd)
+                            }
+                            break
+                        } else if (ed.path.isChildPath(key)) {
+                            //this is a child in the snapshot of the override. If the override has mult = 0..0
+                            //then drop it. Otherwise it remains in the snapshot
+                            processedInOverride = true      //we'll process it here
+                            let overrideEd = overrides[key]
+                            if (overrideEd.mult !== '0..0') {
+                                newSnapshot.push(ed) //note that we examine the override ed, but add the actual ed
+                            }
+                            break
+                        }
+                        
+
+                    }
+
+                    //if not processed by the override, then add it to the snapshot
+                    if (! processedInOverride) {
+                        newSnapshot.push(ed)
+                    }
+
+
+                })
+
+                dg.snapshot = newSnapshot
+            }
+        }
+
+
+
+        function applyOverridesORIGINAL(dg) {
+
+            if (dg.overrides) {
+
+                //use a copy of overrides so the original list remains visible in the UI
+                let overrides = angular.copy(dg.overrides)
+
+
+                let newSnapshot = []
+
+                dg.snapshot.forEach(function (ed) {
+                    let processedInOverride  = false  //if the ed is an override or child of an override then it will be processed in the handler. If not, then add it
+
+                    for (const key of Object.keys(overrides)) {
                         if (ed.path == key || ed.path.isChildPath(key)) {
                             //this is an override or child of an override
                             processedInOverride = true      //we'll process it here
 
-                            let overrideEd = dg.overrides[key]
+                            let overrideEd = overrides[key]
                             //if it's 0..0 then drop it - otherwise add it
                             if (overrideEd.mult !== '0..0') {
                                 newSnapshot.push(overrideEd)
@@ -298,7 +359,9 @@ angular.module("pocApp")
 
                             //added May15 - once an override has been processed, remove it from the list
 
-                            delete dg.overrides[key]       // <<<<<<<<<
+                            //todo - not quite correct.
+                            //sectionPatientDetails not working
+                            //delete overrides[key]       // <<<<<<<<<
 
                             break
 
@@ -395,7 +458,7 @@ angular.module("pocApp")
                                     } else {
                                         //no, the referenced DG has yet to be fully expanded.
                                         let msg = `${ed.dgToBeInserted} not yet complete at ${dg.name}.${ed.path}`
-                                        logger(msg,dg.name,true)
+                                        logger(msg,dg.name,)
                                         moreRefsToInsert = true //we found an ed to insert, but it didn't have a completed snapshot
                                     }
                                 } else {
@@ -445,7 +508,7 @@ angular.module("pocApp")
                                         //this is an excluded or child-of excluded element so don't include it
                                         canInclude = false
                                         let msg = `Directly removed ${ed.path}`
-                                        logger(msg,dg.name,true)
+                                        logger(msg,dg.name,)
                                         break
                                     }
                                 }
@@ -464,6 +527,8 @@ angular.module("pocApp")
                             //ensure that the children of groups are contiguous
                             adjustGroupOrdering(dg)
 
+                            //look for business related issues - eg a ValueSet and options - in the dg. Doesn't alter the DG.
+                            auditDG(dg)
 
                             logger(`DG: ${dg.name} snapshot has been finalised`,dg.name)
                             dg.snapshotComplete = true
@@ -530,6 +595,33 @@ angular.module("pocApp")
         }
 
 
+        //loook for non-error issues with a DG
+        function auditDG(dg) {
+            let hashEd = {}     //has by path
+            for (const ed of dg.snapshot) {
+                hashEd[ed.path] = ed
+                //eds with both valueSet and options
+                if (ed.valueSet && (ed.options && ed.options.length > 0)) {
+                    let msg1 = `ERROR: Element ${ed.path} has both a ValueSet and options`
+                    logger(msg1,dg.name,"vs and options")
+                }
+            }
+            //elements with no parent
+
+            for (const ed of dg.snapshot) {
+                let ar = ed.path.split('.')
+                if (ar.length > 1) {
+                    ar.pop()
+                    let parent = ar.join('.')
+                    if (! hashEd[parent]) {
+                        let msg1 = `ERROR: Element ${ed.path} is missing their parent ${parent} in the DG`
+                        logger(msg1,dg.name,"missing parent")
+                    }
+                }
+            }
+
+
+        }
 
 
         return {

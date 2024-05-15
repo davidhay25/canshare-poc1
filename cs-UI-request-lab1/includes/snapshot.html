@@ -1,87 +1,90 @@
 <div>
 
-  <div class="row">
-    <div class="col-md-3">
-      <div>DG by name</div>
-      <select class="form-control" ng-model="input.ssFilter"
-              ng-change="getLogDG({dgName:input.ssFilter.name})"
-              ng-options="dg.name for dg in lstAllDGSS"></select>
+
+  <uib-tabset>
+    <uib-tab heading = "Generation log">
+      <div class="row">
+        <div class="col-md-3">
+          <div>DG by name</div>
+          <select class="form-control" ng-model="input.ssFilter"
+                  ng-change="getLogDG({dgName:input.ssFilter.name})"
+                  ng-options="dg.name for dg in lstAllDGSS"></select>
 
 
-      <!--
-                                  <input type="text" ng-model="input.ssFilter" class="form-control" placeholder="Filter"/>
-      -->
-    </div>
-    <div class="col-md-3">
-      <div>DG by title</div>
-      <select class="form-control" ng-model="input.ssFilter"
-              ng-change="getLogDG({dgName:input.ssFilter.name})"
-              ng-options="dg.title for dg in lstAllDGSSTitle"></select>
-    </div>
+          <!--
+                                      <input type="text" ng-model="input.ssFilter" class="form-control" placeholder="Filter"/>
+          -->
+        </div>
+        <div class="col-md-3">
+          <div>DG by title</div>
+          <select class="form-control" ng-model="input.ssFilter"
+                  ng-change="getLogDG({dgName:input.ssFilter.name})"
+                  ng-options="dg.title for dg in lstAllDGSSTitle"></select>
+        </div>
 
-    <div class="col-md-1">
-    </div>
-    <div class="col-md-1">
-      <div class="btn btn-link pull-right" ng-click="toggleLog()">Toggle Log display</div>
-    </div>
-    <div class="col-md-4">
-      <button class="btn btn-link pull-right" ng-show="input.ssFilter"
-              ng-click="termSelectDG({DGName:input.ssFilter.name})">Show DG</button>
-    </div>
-  </div>
-
-  <br/>
-
-
-  <div class="row">
-    <div ng-class="ssLogPanel">
-
-      <em>Build log.</em>
-
-
+        <div class="col-md-1">
+        </div>
+        <div class="col-md-1">
+          <div class="btn btn-link pull-right" ng-click="toggleLog()">Toggle Log display</div>
+        </div>
+        <div class="col-md-4">
+          <button class="btn btn-link pull-right" ng-show="input.ssFilter"
+                  ng-click="termSelectDG({DGName:input.ssFilter.name})">Show DG</button>
+        </div>
+      </div>
 
       <br/>
-      <div class="myScroll">
-
-        <table class="table-bordered table table-condensed">
-          <tr ng-repeat = "row in snapshotLog"
-              ng-show="showSSLogRow(row)">
-            <td>{{row.index}}</td>
-            <td>
-              <div ng-class="{listItemSelected:selectedLogRow.index == row.index}"
-                   ng-click="getLogDG(row)">{{row.msg}}</div>
-            </td>
-          </tr>
-        </table>
-
-      </div>
 
 
-    </div>
-    <div ng-show="selectedLogDg" ng-class="ssDisplayPanel">
-      <div class="banner">
-        {{selectedLogDg.title}}
-        <div><em>{{selectedLogDg.name}}</em></div>
-      </div>
-      <uib-tabset>
-        <uib-tab heading="Summary">
+      <div class="row">
+        <div ng-class="ssLogPanel">
+
+          <em>Build log.</em>
+
+
+
           <br/>
-          <strong>MetaData</strong>
-          <pre>{{selectedLogDg | dtMetaData | json}}</pre>
+          <div class="myScroll">
 
-          <div class="row">
-            <div class="col-md-6">
-              <strong>Parents</strong>
-              <ul>
-                <li ng-repeat="parent in snapshotSvc.getHierarchy(selectedLogDg.name)"
-                    class="clickable"
-                  ng-click="ssGetDG(parent)">
-                  {{parent}}
-                </li>
-              </ul>
-            </div>
+            <table class="table-bordered table table-condensed">
+              <tr ng-repeat = "row in snapshotLog"
+                  ng-show="showSSLogRow(row)">
+                <td>{{row.index}}</td>
+                <td>
+                  <div ng-class="{listItemSelected:selectedLogRow.index == row.index}"
+                       ng-click="getLogDG(row)">{{row.msg}}</div>
+                </td>
+              </tr>
+            </table>
 
-            <div class="col-md-6">
+          </div>
+
+
+        </div>
+        <div ng-show="selectedLogDg" ng-class="ssDisplayPanel">
+          <div class="banner">
+            {{selectedLogDg.title}}
+            <div><em>{{selectedLogDg.name}}</em></div>
+          </div>
+          <uib-tabset>
+            <uib-tab heading="Summary">
+              <br/>
+              <strong>MetaData</strong>
+              <pre>{{selectedLogDg | dtMetaData | json}}</pre>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <strong>Parents</strong>
+                  <ul>
+                    <li ng-repeat="parent in snapshotSvc.getHierarchy(selectedLogDg.name)"
+                        class="clickable"
+                        ng-click="ssGetDG(parent)">
+                      {{parent}}
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="col-md-6">
 
 
               <span class="pull-right" ng-show="ssHx.length > 1">
@@ -91,244 +94,263 @@
 
 
 
-              <strong>Direct Children</strong>
-              <ul>
-                <li ng-repeat="child in snapshotSvc.getRelationshipsSummary(selectedLogDg.name).children"
-                    class="clickable"
-                    ng-click="ssGetDG(child)">
-                  {{child}}
-                </li>
-              </ul>
-            </div>
-          </div>
+                  <strong>Direct Children</strong>
+                  <ul>
+                    <li ng-repeat="child in snapshotSvc.getRelationshipsSummary(selectedLogDg.name).children"
+                        class="clickable"
+                        ng-click="ssGetDG(child)">
+                      {{child}}
+                    </li>
+                  </ul>
+                </div>
+              </div>
 
 
 
 
 
-          <strong>References to other DataGroups</strong>
+              <strong>References to other DataGroups</strong>
 
-          <table class="table table-bordered">
-            <tr><th>Title/Path</th><th>Card.</th><th>Type</th><th>Description</th></tr>
-            <tr ng-repeat="item in snapshotSvc.getReferences(selectedLogDg.name)">
-              <td>
-                {{item.ed.title}}
-                <div><em>{{item.path}}</em></div>
-              </td>
-              <td>{{item.ed.mult}}</td>
-              <td>
-                <div class="clickable" ng-click="ssGetDG(item.ed.type[0])">{{item.ed.type[0]}}</div>
-              </td>
-              <td>{{item.ed.description}}</td>
+              <table class="table table-bordered">
+                <tr><th>Title/Path</th><th>Card.</th><th>Type</th><th>Description</th></tr>
+                <tr ng-repeat="item in snapshotSvc.getReferences(selectedLogDg.name)">
+                  <td>
+                    {{item.ed.title}}
+                    <div><em>{{item.path}}</em></div>
+                  </td>
+                  <td>{{item.ed.mult}}</td>
+                  <td>
+                    <div class="clickable" ng-click="ssGetDG(item.ed.type[0])">{{item.ed.type[0]}}</div>
+                  </td>
+                  <td>{{item.ed.description}}</td>
 
-            </tr>
-          </table>
-
-
-
-          <div><strong>Fixed values</strong></div>
-          <em>to come</em>
-
-          <div><strong>Terminology</strong></div>
-          <em>to come</em>
-
-
-          <div><strong>Graph</strong></div>
-          <em>to come</em>
+                </tr>
+              </table>
 
 
 
+              <div><strong>Fixed values</strong></div>
+              <em>to come</em>
 
-        </uib-tab>
-        <uib-tab heading="DG Diff">
-          <em>The diff element in the DG</em>
-          <br/><br/>
-          <div class="row">
-            <div class="col-md-6">
-              <ul>
-                <li ng-repeat="ed in selectedLogDg.diff"
-                    ng-class="{listItemSelected: ed.path == input.ssDiff.path}"
-                    style="cursor: pointer"
-                  ng-click="input.ssDiff = ed">
-                  {{ed.path}} ({{ed.mult}})
-                </li>
-              </ul>
-            </div>
-            <div class="col-md-6">
-              <pre>{{input.ssDiff | json}}</pre>
-            </div>
-          </div>
+              <div><strong>Terminology</strong></div>
+              <em>to come</em>
 
 
-<!--
-          <div class="myScroll">
-            <pre>{{selectedLogDg.diff | json}}</pre>
-          </div>
-          -->
-        </uib-tab>
-        <uib-tab heading="DG full diff">
-          <em>The 'full' diff - after processing the parental hierarchy</em>
-          <br/><br/>
+              <div><strong>Graph</strong></div>
+              <em>to come</em>
 
 
-          <uib-tabset>
-            <uib-tab heading="Final complete diff">
+
+
+            </uib-tab>
+            <uib-tab heading="DG Diff">
+              <em>The diff element in the DG</em>
+              <br/><br/>
               <div class="row">
                 <div class="col-md-6">
                   <ul>
-                    <li ng-repeat="ed in selectedLogDg.fullDiff"
+                    <li ng-repeat="ed in selectedLogDg.diff"
+                        ng-class="{listItemSelected: ed.path == input.ssDiff.path}"
                         style="cursor: pointer"
-                        ng-class="{listItemSelected: ed.path == input.ssFullDiff.path}"
-                        ng-click="input.ssFullDiff = ed">
+                        ng-click="input.ssDiff = ed">
                       {{ed.path}} ({{ed.mult}})
                     </li>
                   </ul>
-                  <em>Excludes all elements that override referenced DGs (see overrides tab)</em>
                 </div>
                 <div class="col-md-6">
-                  <pre>{{input.ssFullDiff | json}}</pre>
-                </div>
-              </div>
-              <em>This contains elements added in this DG and it's parents.</em>
-            </uib-tab>
-
-            <uib-tab heading="Overrides">
-              <div class="row">
-                <div class="col-md-6">
-                  <ul>
-                    <li ng-repeat="(k,v) in selectedLogDg.overrides"
-                        style="cursor: pointer"
-                        ng-class="{listItemSelected: v.path == input.ssOverride.path}"
-                        ng-click="input.ssOverride = v">
-                      {{k}}
-                    </li>
-                  </ul>
-
-                </div>
-                <div class="col-md-6">
-                  <pre>{{input.ssOverride | json}}</pre>
+                  <pre>{{input.ssDiff | json}}</pre>
                 </div>
               </div>
-              <em>Diff elements that override others</em>
+
+
+              <!--
+                        <div class="myScroll">
+                          <pre>{{selectedLogDg.diff | json}}</pre>
+                        </div>
+                        -->
             </uib-tab>
+            <uib-tab heading="DG full diff">
+              <em>The 'full' diff - after processing the parental hierarchy</em>
+              <br/><br/>
 
-            <uib-tab heading="History of changes">
 
-              <div class="row">
-                <div class="col-md-6">
-
-                  <div class="myScroll">
-                    <div ng-repeat="item in snapshotSvc.getChangeHistory(selectedLogDg.name)"
-                    >
-                      <strong>{{item.dgName}}</strong>
+              <uib-tabset>
+                <uib-tab heading="Final complete diff">
+                  <div class="row">
+                    <div class="col-md-6">
                       <ul>
-                        <li ng-repeat="change in item.changes"
-                            ng-class="{listItemSelected: change.path == input.ssChangeItemEd.path}"
-                            style="cursor: pointer;padding-left: 8px"
+                        <li ng-repeat="ed in selectedLogDg.fullDiff"
+                            style="cursor: pointer"
+                            ng-class="{listItemSelected: ed.path == input.ssFullDiff.path}"
+                            ng-click="input.ssFullDiff = ed">
+                          {{ed.path}} ({{ed.mult}})
+                        </li>
+                      </ul>
+                      <em>Excludes all elements that override referenced DGs (see overrides tab)</em>
+                    </div>
+                    <div class="col-md-6">
+                      <pre>{{input.ssFullDiff | json}}</pre>
+                    </div>
+                  </div>
+                  <em>This contains elements added in this DG and it's parents.</em>
+                </uib-tab>
 
-                            ng-click="input.ssChangeItemEd = change.ed">
-                          {{change.msg}}
+                <uib-tab heading="Overrides">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <ul>
+                        <li ng-repeat="(k,v) in selectedLogDg.overrides"
+                            style="cursor: pointer"
+                            ng-class="{listItemSelected: v.path == input.ssOverride.path}"
+                            ng-click="input.ssOverride = v">
+                          {{k}}
                         </li>
                       </ul>
 
                     </div>
+                    <div class="col-md-6">
+                      <pre>{{input.ssOverride | json}}</pre>
+                    </div>
+                  </div>
+                  <em>Diff elements that override others</em>
+                </uib-tab>
+
+                <uib-tab heading="History of changes">
+
+                  <div class="row">
+                    <div class="col-md-6">
+
+                      <div class="myScroll">
+                        <div ng-repeat="item in snapshotSvc.getChangeHistory(selectedLogDg.name)"
+                        >
+                          <strong>{{item.dgName}}</strong>
+                          <ul>
+                            <li ng-repeat="change in item.changes"
+                                ng-class="{listItemSelected: change.path == input.ssChangeItemEd.path}"
+                                style="cursor: pointer;padding-left: 8px"
+
+                                ng-click="input.ssChangeItemEd = change.ed">
+                              {{change.msg}}
+                            </li>
+                          </ul>
+
+                        </div>
+                      </div>
+
+
+                    </div>
+                    <div class="col-md-6">
+                      <pre>{{input.ssChangeItemEd | json}}</pre>
+                    </div>
                   </div>
 
 
+                </uib-tab>
+              </uib-tabset>
+
+
+
+              <!--
+              <div class="myScroll">
+                <pre>{{selectedLogDg.fullDiff | json}}</pre>
+              </div>
+              -->
+
+            </uib-tab>
+            <uib-tab heading="Snapshot">
+              <em>Equivalent of the full element list.</em>
+              <br/><br/>
+              <div class="row">
+                <div class="col-md-6">
+                  <ul>
+                    <li ng-repeat="ed in selectedLogDg.snapshot track by $index"
+                        ng-class="{listItemSelected: ed.path == input.ssSnapshotEd.path}"
+                        style="cursor: pointer"
+                        ng-click="input.ssSnapshotEd = ed">
+                      {{ed.path}} ({{ed.mult}})
+                    </li>
+                  </ul>
                 </div>
                 <div class="col-md-6">
-                  <pre>{{input.ssChangeItemEd | json}}</pre>
+                  <pre>{{input.ssSnapshotEd | json}}</pre>
                 </div>
               </div>
-              
 
+
+              <!--
+               <div class="myScroll">
+                 <pre>{{selectedLogDg.snapshot | json}}</pre>
+               </div>
+               -->
+            </uib-tab>
+
+
+
+            <uib-tab heading="Snapshot paths">
+              <em>Only the paths in the snapshot</em>
+              <br/><br/>
+              <div class="myScroll">
+                <table class="table table-condensed table-bordered">
+                  <tr ng-repeat="ed in selectedLogDg.snapshot track by $index">
+                    <td>{{ed.path}}</td>
+                    <td>{{ed.mult}}</td>
+                    <td>{{ed.type[0]}}</td>
+                  </tr>
+                </table>
+
+
+              </div>
+            </uib-tab>
+            <uib-tab ng-show = "selectedLogRow.details" heading="Details (1 step)">
+              <em>Generally the elements that are inserted into the snapshot during this step.</em>
+              <br/><br/>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <ul>
+                    <li ng-repeat="ed in selectedLogRow.details track by $index"
+                        style="cursor: pointer"
+                        ng-click="input.ssDetailsEd = ed">
+                      {{ed.path}} ({{ed.mult}})
+                    </li>
+                  </ul>
+                </div>
+                <div class="col-md-6">
+                  <pre>{{input.ssDetailsEd | json}}</pre>
+                </div>
+              </div>
+              <!--
+              <ul class="list-unstyled">
+                <li ng-repeat="ed in selectedLogRow.details">
+                  {{ed.path}} ({{ed.mult}})
+                </li>
+              </ul>
+              <pre>{{selectedLogRow.details | json}}</pre>
+              -->
             </uib-tab>
           </uib-tabset>
 
+        </div>
+      </div>
 
 
-          <!--
-          <div class="myScroll">
-            <pre>{{selectedLogDg.fullDiff | json}}</pre>
-          </div>
-          -->
+    </uib-tab>
+    <uib-tab heading = "Issues">
+      <table class="table table-bordered">
+        <tr><th>Error type</th><th>DG</th><th>Description</th></tr>
+        <tr ng-show="log.isError" ng-repeat="log in snapshotLog">
+          <td>{{log.isError}}</td>
+          <td>
+            <div class="btn btn-link"
+                       ng-click="termSelectDG({DGName:log.dgName})">{{log.dgName}}</div></td>
+          <td>
+            {{log.msg}}
+          </td>
+        </tr>
+      </table>
 
-        </uib-tab>
-        <uib-tab heading="Snapshot">
-          <em>Equivalent of the full element list.</em>
-          <br/><br/>
-          <div class="row">
-            <div class="col-md-6">
-              <ul>
-                <li ng-repeat="ed in selectedLogDg.snapshot track by $index"
-                    ng-class="{listItemSelected: ed.path == input.ssSnapshotEd.path}"
-                    style="cursor: pointer"
-                    ng-click="input.ssSnapshotEd = ed">
-                  {{ed.path}} ({{ed.mult}})
-                </li>
-              </ul>
-            </div>
-            <div class="col-md-6">
-              <pre>{{input.ssSnapshotEd | json}}</pre>
-            </div>
-          </div>
-
-
-         <!--
-          <div class="myScroll">
-            <pre>{{selectedLogDg.snapshot | json}}</pre>
-          </div>
-          -->
-        </uib-tab>
-
-
-
-        <uib-tab heading="Snapshot paths">
-          <em>Only the paths in the snapshot</em>
-          <br/><br/>
-          <div class="myScroll">
-            <table class="table table-condensed table-bordered">
-              <tr ng-repeat="ed in selectedLogDg.snapshot track by $index">
-                <td>{{ed.path}}</td>
-                <td>{{ed.mult}}</td>
-                <td>{{ed.type[0]}}</td>
-              </tr>
-            </table>
-
-
-          </div>
-        </uib-tab>
-        <uib-tab ng-show = "selectedLogRow.details" heading="Details (1 step)">
-          <em>Generally the elements that are inserted into the snapshot during this step.</em>
-          <br/><br/>
-
-          <div class="row">
-            <div class="col-md-6">
-              <ul>
-                <li ng-repeat="ed in selectedLogRow.details track by $index"
-                    style="cursor: pointer"
-                    ng-click="input.ssDetailsEd = ed">
-                  {{ed.path}} ({{ed.mult}})
-                </li>
-              </ul>
-            </div>
-            <div class="col-md-6">
-              <pre>{{input.ssDetailsEd | json}}</pre>
-            </div>
-          </div>
-          <!--
-          <ul class="list-unstyled">
-            <li ng-repeat="ed in selectedLogRow.details">
-              {{ed.path}} ({{ed.mult}})
-            </li>
-          </ul>
-          <pre>{{selectedLogRow.details | json}}</pre>
-          -->
-        </uib-tab>
-      </uib-tabset>
-
-    </div>
-  </div>
+    </uib-tab>
+  </uib-tabset>
 
 
 
