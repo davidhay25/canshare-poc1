@@ -69,7 +69,7 @@ angular.module("pocApp")
                 //let url = `validateBundle?type=${domain}`
 
                 //let url = "http://localhost:8087/fhir/Bundle/$validate"
-                let url = "http://localhost:8080/fhir/Bundle/$validate"
+                let url = "http://test.canshare.co.nz:8080/fhir/Bundle/$validate"
 
                 //let url = "http://actnow.canshare.co.nz:9092/baseR4/Bundle/$validate"
 
