@@ -113,13 +113,13 @@
 
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="navbar-text">
-
+<!--
                     <select class="form-control" ng-model="selectedComp" ng-hide="selectedFromUrl"
                         ng-change="selectComposition(selectedComp)"
                             ng-options = "v.title for (k,v) in hashAllCompositions"></select>
-
+-->
                     <div ng-show="selectedFromUrl">{{selectedComp.title}}</div>
                 </div>
             </div>
@@ -135,6 +135,13 @@
                     {{version}}
                 </div>
             </div>
+
+            <div class="col-md-2">
+                <div class="navbar-text">
+                    <checkbox ng-model="input.technical"></checkbox> Technical view
+                </div>
+            </div>
+
             <div class="col-md-2">
                 <a href="https://teaho.govt.nz/" target="_blank">
                     <img width="150" height="auto" class="pull-right"
@@ -310,7 +317,10 @@
                                         <td>{{item.ed.description}}
 
                                         </td>
+
+
                                         <td>
+
 
                                             <div ng-show="item.ed.type[0] == 'CodeableConcept'">
                                                 <button ng-show="item.ed.valueSet"
@@ -476,7 +486,7 @@
                                         </div>
                                     </div>
 
-                                    <div ng-show = "false" class="row" ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept' ">
+                                    <div ng-show = "true" class="row" ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept' ">
                                         <div class="col-md-3">
                                             ValueSet
                                         </div>

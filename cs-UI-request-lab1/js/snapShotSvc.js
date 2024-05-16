@@ -315,7 +315,7 @@ angular.module("pocApp")
                             }
                             break
                         }
-                        
+
 
                     }
 
@@ -604,6 +604,8 @@ angular.module("pocApp")
                 if (ed.valueSet && (ed.options && ed.options.length > 0)) {
                     let msg1 = `ERROR: Element ${ed.path} has both a ValueSet and options`
                     logger(msg1,dg.name,"vs and options")
+                    ed.issue = ed.issue || []
+                    ed.issue.push('vs and options')
                 }
             }
             //elements with no parent
@@ -615,6 +617,8 @@ angular.module("pocApp")
                     let parent = ar.join('.')
                     if (! hashEd[parent]) {
                         let msg1 = `ERROR: Element ${ed.path} is missing their parent ${parent} in the DG`
+                        ed.issue = ed.issue || []
+                        ed.issue.push('missingParent')
                         logger(msg1,dg.name,"missing parent")
                     }
                 }

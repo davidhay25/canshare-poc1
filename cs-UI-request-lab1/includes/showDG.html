@@ -11,6 +11,10 @@
       background-color: mistyrose;
     }
 
+    .edIssue {
+      background-color: mistyrose;
+    }
+
 
 
   </style>
@@ -1240,101 +1244,17 @@
       <hr/>
     </uib-tab>
 
-    <uib-tab>
-      <uib-tab-heading>Full element list <span class="badge">{{hiddenSummary}}</span></uib-tab-heading>
-      <!--
-      <em class="pull-right">Expanded. Includes items with a Cardinality of 0..0</em>
--->
-      <div class="pull-right">
-        <div style="padding-top: 8px">
-          <checkbox ng-model="input.showHiddenDGElement"></checkbox> Show hidden (0..0)
-        </div>
 
-      </div>
+    <uib-tab heading="Form">
 
+      <button class="btn-link btn pull-right" ng-click="previewQ(dgQ)">Examine Q</button>
 
-      <uib-tabset>
-        <uib-tab heading="List">
-          <div class="tableFixHead">
-            <table class="table-bordered table">
-              <thead>
-              <tr><th ng-show="canEdit(selectedModel)"><span >Edit</span></th><th>Path</th><th>Title</th>
-                <th>Description</th><th>Type</th><th>Mult.</th><th>Fixed value</th><th>Source</th>
-                </tr>
-              </thead>
-              <tbody>
-              <!---     <tr ng-repeat="element in fullElementList">-->
-              <tr ng-repeat="element in fullElementList"
-                  ng-class="{hideElement: element.ed.mult == '0..0'}"
-                  ng-show="canShowDGElement(element,$index)"
-                  ng-hideX="$index==0">
+      <renderform q="dgQ" qr="{}" form="{}"></renderform>
 
-                <td ng-show="canEdit(selectedModel)">
-                  <i   class="glyphicon glyphicon-edit pull-right clickable"
-                     ng-click="editDGItem(element)"></i>
-                </td>
-
-                <td>
-                  <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
-
-                    <!-- {{element.path | dropFirstInPath}} -->
-                    <div ng-hide="input.showFullModel">
-                      {{element.ed.path | dropFirstInPath}}
-                    </div>
-                    <div ng-show="input.showFullModel">
-                      {{element.ed.path | lastInPath}}
-
-                    </div>
-
-
-
-                  </div>
-
-
-                </td>
-                <td>{{element.ed.title}}</td>
-                <td>
-
-                  {{element.ed.description}}
-                </td>
-                <td>
-                  <div ng-repeat="type in element.ed.type">
-                    {{type}}
-                  </div>
-                  <div><em class="clickable" ng-click="viewVS(element.ed.valueSet)">{{element.ed.valueSet}}</em></div>
-                </td>
-                <td>{{element.ed.mult}}</td>
-                <!--
-                    <td>
-                      <div ng-repeat="code in element.ed.code">
-                        {{code.code}}
-                      </div>
-
-                    </td>
-                -->
-                <td>
-                  <div>{{element.ed.fixedCoding.code}}</div>
-                  <div>{{element.ed.fixedCoding.system}}</div>
-                  <div>{{element.ed.fixedCoding.display}}</div>
-                </td>
-                <td>{{element.sourceModelName}}</td>
-
-
-
-
-
-              </tr>
-              </tbody>
-            </table>
-          </div>
-
-        </uib-tab>
-        <uib-tab heading="Json">
-          <pre>{{fullElementList | json}}</pre>
-        </uib-tab>
-      </uib-tabset>
 
     </uib-tab>
+
+
 
     <uib-tab heading="Profiling">
       <br/>
@@ -1346,16 +1266,6 @@
     </uib-tab>
 
 
-
-
-    <uib-tab heading="Form">
-
-      <button class="btn-link btn pull-right" ng-click="previewQ(dgQ)">Examine Q</button>
-
-      <renderform q="dgQ" qr="{}" form="{}"></renderform>
-
-
-    </uib-tab>
 
 
     <uib-tab>
@@ -1423,6 +1333,120 @@
 
 
     </uib-tab>
+
+
+    <uib-tab>
+      <uib-tab-heading>Snapshot <span class="badge">{{fullElementList.length}}</span></uib-tab-heading>
+      <!--
+      <em class="pull-right">Expanded. Includes items with a Cardinality of 0..0</em>
+-->
+
+      <!--
+           <div class="pull-right">
+             <div style="padding-top: 8px">
+               <em>This is the DG snapshot</em>
+
+               <checkbox ng-model="input.showHiddenDGElement"></checkbox> Show hidden (0..0)
+
+        </div>
+
+      </div>
+
+ -->
+
+
+      <uib-tabset>
+        <uib-tab heading="List">
+          <div class="tableFixHead">
+            <table class="table-bordered table">
+              <thead>
+              <tr><th ng-show="canEdit(selectedModel)"><span >Edit</span></th><th>Path</th><th>Title</th>
+                <th>Description</th><th>Type</th><th>Mult.</th><th>Source</th>
+              </tr>
+              </thead>
+              <tbody>
+
+              <!---     <tr ng-repeat="element in fullElementList">-->
+              <tr ng-repeat="element in fullElementList"
+                  ng-class="{edIssue: element.ed.issue.length > 0}"
+                  ng-classX="{hideElement: element.ed.mult == '0..0'}"
+                  ng-showX="canShowDGElement(element,$index)"
+                  ng-hideX="$index==0">
+
+                <td ng-show="canEdit(selectedModel)">
+                  <i   class="glyphicon glyphicon-edit pull-right clickable"
+                       ng-click="editDGItem(element)"></i>
+                </td>
+
+
+                <td>
+
+                  <div ng-repeat = "segment in element.ed.path.split('.') track by $index">
+                    {{segment}}
+                  </div>
+
+                  <div ng-repeat="issue in element.ed.issue track by $index">
+                    <em>{{issue}}</em>
+                  </div>
+
+                  <!--
+                                    <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
+
+                                      <div ng-hide="input.showFullModel">
+                                        {{element.ed.path | dropFirstInPath}}
+                                      </div>
+                                      <div ng-show="input.showFullModel">
+                                        {{element.ed.path | lastInPath}}
+
+                                      </div>
+                                    </div>
+                                    -->
+
+
+
+
+                </td>
+
+
+                <td>{{element.ed.title}}</td>
+                <td>
+
+                  {{element.ed.description}}
+                </td>
+                <td>
+                  <div ng-repeat="type in element.ed.type">
+                    {{type}}
+                  </div>
+                  <div><em class="clickable" ng-click="viewVS(element.ed.valueSet)">{{element.ed.valueSet}}</em></div>
+                </td>
+                <td>{{element.ed.mult}}</td>
+<!--
+                <td>
+                  <div>{{element.ed.fixedCoding.code}}</div>
+                  <div>{{element.ed.fixedCoding.system}}</div>
+                  <div>{{element.ed.fixedCoding.display}}</div>
+                </td>
+                -->
+                <td>
+                  {{getSourceModelName(element.ed)}}
+
+
+                </td>
+
+
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </uib-tab>
+        <uib-tab heading="Json">
+          <pre>{{fullElementList | json}}</pre>
+        </uib-tab>
+      </uib-tabset>
+
+    </uib-tab>
+
 
     <uib-tab ng-show="false" heading="Audit">
       <!-- Audit only looks at hierarchy - not referenced DG-->

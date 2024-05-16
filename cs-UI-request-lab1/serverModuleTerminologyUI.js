@@ -491,7 +491,8 @@ function setup(app) {
             let qry = `${nzhtsconfig.serverBase}CodeSystem/${cs.id}`
 
             let result = await putResource(qry,cs)
-            console.log('>>', result)
+
+           // console.log('>>', result)
             if (result) {
                 //A result is returned if there is an error
                 res.status(400).json({msg:result})
@@ -578,6 +579,36 @@ function setup(app) {
     })
 }
 
+
+async function setSyndicationStatus(resource,token) {
+
+    const csOptions = {
+        method: 'POST',
+        url: `${nzhtsconfig.serverBase}synd/setSyndicationStatus`,
+        params: {resourceType: resource.resourceType, id: resource.id, syndicate: 'true'},
+        headers: {'Content-Type': 'application/json', authorization: 'Bearer ' + token},
+
+    }
+
+    try {
+        console.log('setting syndication status')
+        let result = await axios.request(csOptions);
+        console.log('ok')
+        return true
+    } catch (ex) {
+
+        if (ex.response) {
+            console.log("Status code:", ex.response.status)
+            console.log("err", ex.response.data)
+            return ex.response.data
+        } else {
+            return {msg: "Undefined error"}
+        }
+    }
+
+}
+
+
 //put a single resource. Returns any error
 async function putResource(qry,resource) {
 
@@ -593,7 +624,14 @@ async function putResource(qry,resource) {
             console.log('put',qry,JSON.stringify(resource,null,2))
             let result = await axios.put(qry,resource,config)
             console.log('ok')
-            return
+
+            //we always want to set the syndication status
+            //just temp copied out for now
+          //  let response = await setSyndicationStatus(cs,token)
+           // return response
+
+
+
         } catch (ex) {
 
             if (ex.response) {

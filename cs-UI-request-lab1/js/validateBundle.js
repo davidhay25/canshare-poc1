@@ -66,7 +66,13 @@ angular.module("pocApp")
             //$scope.input.mainTabActive = 1 // $scope.ui.tabTrack;
 
             $scope.validate = function(domain) {
-                let url = `validateBundle?type=${domain}`
+                //let url = `validateBundle?type=${domain}`
+
+                //let url = "http://localhost:8087/fhir/Bundle/$validate"
+                let url = "http://localhost:8080/fhir/Bundle/$validate"
+
+                //let url = "http://actnow.canshare.co.nz:9092/baseR4/Bundle/$validate"
+
                 let bundle= angular.fromJson($scope.input.bundle)
 
                 $scope.inputtedBundle = bundle
@@ -77,82 +83,81 @@ angular.module("pocApp")
                     function (data) {
 
                         $scope.oo = data.data
-
-                        //parse the validation response into a lis
-                        $scope.arIssues = []
-
-                        $scope.oo.issue.forEach(function (iss) {
-
-                            let item = {issue : iss}
-                            $scope.arIssues.push(item)
-
-                            if (iss.location) {
-                                let loc = iss.location[0]
-                                let ar = loc.split('[')
-                                if (ar.length > 1) {
-                                    let l = ar[1]   // 2].resource
-                                    let g = l.indexOf(']')
-                                    let pos = l.slice(0,g)
-                                    //console.log(pos,loc)
-
-                                    //let item = {severity:iss.severity,location:loc,pos:pos,diagnostics:iss.diagnostics}
-                                  //  if (iss.severity == 'error') {
-                                   //     totalErrors++
-                                   //     enhancedErrors.push(makeEnhancedError(iss.diagnostics,hashQItem))
-                                 //  }
-
-                                    item.entry = bundle.entry[pos]
-
-                                  //  let resourceAtIndex = lstResources[pos]
-                                  //  if (resourceAtIndex) {
-                                    //    resourceAtIndex.issues.push(item)
-                                  //  }
-
-
-
-                                } else {
-                                    //unknownIssues.push(iss)
-                                }
-
-
-                            } else {
-                                //this is an OO with no location. I didn't think this should happen & we don't know which resource caused it...
-                                //unknownIssues.push(iss)
-                            }
-
-                            //see if there are any hints that apply
-                            let ar = hints.filter(m =>   iss.diagnostics.indexOf(m.match) > -1)
-                            if (ar.length > 0) {
-                                item.hint = ar[0]
-                            } else {
-                                //there is no specific hint
-                                switch (iss.severity) {
-                                    case 'error' :
-                                        item.hint = {comment:"This error must be corrected"}
-                                        break
-                                    case 'warning' :
-                                        item.hint = {comment:"A warning. It should be fixed, but the resource can still be processed"}
-                                        break
-                                    case 'information' :
-                                        item.hint = {comment:"Informational. Generally means a particular validation cannot be performed for some reason"}
-                                        break
-                                    default :
-                                        item.hint = {comment:iss.severity}
-                                        break
-
-                                }
-                            }
-//console.log(ar,iss.diagnostics)
-                        })
+                        parseOO()
 
                         //select the list view
                         $scope.input.mainTabActive = $scope.ui.tabList
 
 
                     }, function (err) {
-                        console.log(err.data)
+                        $scope.oo = err.data
+                        parseOO()
+
+                        //select the list view
+                        $scope.input.mainTabActive = $scope.ui.tabList
                     }
                 )
+
+
+                function parseOO(oo) {
+                    //parse the validation response into a lis
+                    $scope.arIssues = []
+
+                    $scope.oo.issue.forEach(function (iss) {
+
+                        let item = {issue : iss}
+                        $scope.arIssues.push(item)
+
+                        if (iss.location) {
+                            let loc = iss.location[0]
+                            let ar = loc.split('[')
+                            if (ar.length > 1) {
+                                let l = ar[1]   // 2].resource
+                                let g = l.indexOf(']')
+                                let pos = l.slice(0,g)
+
+
+                                item.entry = bundle.entry[pos]
+
+
+
+
+                            } else {
+                                //unknownIssues.push(iss)
+                            }
+
+
+                        } else {
+                            //this is an OO with no location. I didn't think this should happen & we don't know which resource caused it...
+                            //unknownIssues.push(iss)
+                        }
+
+                        //see if there are any hints that apply
+                        let ar = hints.filter(m =>   iss.diagnostics.indexOf(m.match) > -1)
+                        if (ar.length > 0) {
+                            item.hint = ar[0]
+                        } else {
+                            //there is no specific hint
+                            switch (iss.severity) {
+                                case 'error' :
+                                    item.hint = {comment:"This error must be corrected"}
+                                    break
+                                case 'warning' :
+                                    item.hint = {comment:"A warning. It should be fixed, but the resource can still be processed"}
+                                    break
+                                case 'information' :
+                                    item.hint = {comment:"Informational. Generally means a particular validation cannot be performed for some reason"}
+                                    break
+                                default :
+                                    item.hint = {comment:iss.severity}
+                                    break
+
+                            }
+                        }
+//console.log(ar,iss.diagnostics)
+                    })
+
+                }
             }
 
         }

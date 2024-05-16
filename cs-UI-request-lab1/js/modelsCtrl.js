@@ -52,6 +52,17 @@ angular.module("pocApp")
                // console.log('-------->   building snapshots...')
                 let voSs = snapshotSvc.makeSnapshots($scope.hashAllDG,true)
                 $scope.snapshotLog = voSs.log
+                $scope.ssErrorTypes = ['All']
+                for (let log of voSs.log) {
+                    if (log.isError) {
+                        if ($scope.ssErrorTypes.indexOf(log.isError) == -1) {
+                            $scope.ssErrorTypes.push(log.isError)
+                        }
+                    }
+
+                }
+
+
                 $scope.lstAllDGSS = snapshotSvc.getDGList()     //all datagroups by name
                 $scope.lstAllDGSSTitle = snapshotSvc.getDGListTitle()
 
@@ -140,6 +151,20 @@ angular.module("pocApp")
 
             }
 
+
+            $scope.showSsErrorItem = function(log,type){
+                if (log.isError) {
+                    if (! type || type == 'All') {
+                        return true
+                    } else {
+                        if (log.isError == type) {
+                            return true
+                        }
+                    }
+                }
+
+
+            }
 
             //------------
 
@@ -1621,31 +1646,31 @@ angular.module("pocApp")
                 //by supplying the dg in the call, the eds will be annotatded with 'definedOnDG' for those in the diff
                 $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name,dg)// vo.allElements
 
-console.log($scope.fullElementList)
+//console.log($scope.fullElementList)
 
                 $scope.fullElementHash = {}         //I seem to need this quite a lot. Though memory usage is getting high...
                 //create the list of all paths in the DG. Used by the 'ordering'
                 $scope.allPaths = []  //used for the manual re-ordering
 
                 // hidden elements no longed in fullelement list
-                let cntHidden = 0, cntVisible=0
+               // let cntHidden = 0, cntVisible=0
 
                 $scope.fullElementList.forEach(function (item) {
                     $scope.fullElementHash[item.ed.path] = item.ed
                     if (item.ed.mult !== '0..0') {
-                        cntVisible ++
+                       // cntVisible ++
                         $scope.allPaths.push(item.ed.path)
                     } else {
-                        cntHidden++
+                       // cntHidden++
                     }
                 })
 
 
-                $scope.hiddenSummary = `${cntVisible}/${cntHidden}`
+                //$scope.hiddenSummary = `${cntVisible}/${cntHidden}`
 
 
 
-                console.log(`Visible: ${cntVisible}  Hidden:${cntHidden}`)
+               // console.log(`Visible: ${cntVisible}  Hidden:${cntHidden}`)
 
                 //adjust according to 'insertAfter' values
                 orderingSvc.sortFullListByInsertAfter($scope.fullElementList,dg,$scope.hashAllDG)

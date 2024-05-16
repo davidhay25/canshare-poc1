@@ -30,7 +30,7 @@ angular.module("pocApp")
 
 
             //whether to show an element in the full element list.
-            $scope.canShowDGElement = function(element,inx) {
+            $scope.canShowDGElementDEP = function(element,inx) {
                 if (inx ==0) {
                     return false
                 }

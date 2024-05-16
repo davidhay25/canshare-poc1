@@ -336,9 +336,23 @@
 
     </uib-tab>
     <uib-tab heading = "Issues">
+
+      <div class="row">
+        <div class="col-md-9">
+
+        </div>
+        <div class="col-md-3">
+          <select class="form-control" ng-model="input.ssErrorType"
+                  ng-options = "type for type in ssErrorTypes">
+
+          </select>
+        </div>
+      </div>
+
+
       <table class="table table-bordered">
         <tr><th>Error type</th><th>DG</th><th>Description</th></tr>
-        <tr ng-show="log.isError" ng-repeat="log in snapshotLog">
+        <tr ng-show="showSsErrorItem(log,input.ssErrorType)" ng-repeat="log in snapshotLog">
           <td>{{log.isError}}</td>
           <td>
             <div class="btn btn-link"
