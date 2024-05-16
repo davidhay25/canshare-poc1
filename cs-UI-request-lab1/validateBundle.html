@@ -102,7 +102,11 @@
                 <uib-tabset active="input.mainTabActive">
 
                     <uib-tab heading = "Bundle">
+
+                        <a href="https://build.fhir.org/ig/davidhay25/actnow/branches/main/index.html" target="_blank">IG</a>
+                        <!--
                         <button ng-hide="input.bundle" class="btn btn-link pull-right" ng-click="loadSample()">Load sample</button>
+                        -->
                         <button ng-show="input.bundle" class="btn btn-link pull-right" ng-click="validate('an')">Validate ACT-NOW</button>
 
                         <textarea ng-model = "input.bundle" placeholder="Paste Bundle here" class="form-control" rows="25">
