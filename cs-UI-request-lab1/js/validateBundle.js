@@ -104,7 +104,6 @@ angular.module("pocApp")
                     $scope.arIssues = []
 
                     $scope.oo.issue.forEach(function (iss) {
-
                         let item = {issue : iss}
                         $scope.arIssues.push(item)
 
@@ -116,11 +115,7 @@ angular.module("pocApp")
                                 let g = l.indexOf(']')
                                 let pos = l.slice(0,g)
 
-
                                 item.entry = bundle.entry[pos]
-
-
-
 
                             } else {
                                 //unknownIssues.push(iss)
@@ -140,7 +135,7 @@ angular.module("pocApp")
                             //there is no specific hint
                             switch (iss.severity) {
                                 case 'error' :
-                                    item.hint = {comment:"This error must be corrected"}
+                                    item.hint = {comment:"In general, this error should be corrected"}
                                     break
                                 case 'warning' :
                                     item.hint = {comment:"A warning. It should be fixed, but the resource can still be processed"}

@@ -1,7 +1,7 @@
 [
   {
     "match":"does not match any known slice",
-    "comment":"This simply means that there additional elements in a sliced element (eg category) and can generally be ignored."
+    "comment":"This simply means that there additional elements in a sliced element (eg category) and can generally be ignored, though the resource should be manually checked."
   },
   {
     "match" : "minimum required = 1, but only found 0",
@@ -14,6 +14,16 @@
   {
     "match" : "codings provided are in the value",
     "comment" : "The value for this element is not in the ValueSet. If the binding is required, then this an error - otherwise a warning."
+  },
+  {
+    "match" : "end date of a period must be greater than or equal to the start date",
+    "comment" : "If there is no end date then this can be ignored"
+
+  },
+  {
+    "match" : "nable to find a match for profile",
+    "comment":"Means the reference should be to a specific profile. Can be a false positive"
   }
+
 
 ]
