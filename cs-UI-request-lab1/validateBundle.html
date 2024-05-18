@@ -124,34 +124,47 @@
                             tab (once a bundle has been validated) including a list of the resources, issues for each resource
                                 and a graph showing the references between resources.</p>
 
-                            <a target="_blank" href="https://docs.google.com/document/d/1Dt1d65UJGvnBsn4vrWTVjXrbIujEtcLehyswMiwtpFc/edit?usp=sharing" >This document </a> has some tips on using the validator.
+                            <a target="_blank" href="https://docs.google.com/document/d/1Dt1d65UJGvnBsn4vrWTVjXrbIujEtcLehyswMiwtpFc/edit?usp=sharing" >This document </a> has some tips on using the visualizer.
+
+                            <br/> <br/>
+
+                            <uib-tabset>
+                                <uib-tab heading = "Library">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h4>Last 20 bundles saved in Library</h4>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <em style="margin-top: 10px" class="pull-right">Click the Library button for other entries</em>
+                                        </div>
+                                    </div>
+                                    <table class="table table-bordered table-condensed">
+                                        <tr ng-repeat="entry in libraryResultBundle.entry">
+                                            <td>
+                                                <div class="clickable" ng-click="loadFromLibrary(entry)">{{entry.resource.id}}</div>
+                                            </td>
+                                            <td>{{entry.resource.description}}</td>
 
 
+                                        </tr>
+                                    </table>
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h4>Last 20 bundles saved in Library</h4>
-                                </div>
-                                <div class="col-md-6">
-                                    <em style="margin-top: 10px" class="pull-right">Click the Library button for other entries</em>
-                                </div>
-                            </div>
+                                </uib-tab>
+                                <uib-tab heading = "Query">
 
+                                    <textarea class="form-control" ng-model="input.query" rows="3"
+                                        placeholder = "Enter the REST query here, excluding the server. eg Patient?identifier=ZDY4805"
+                                    ></textarea>
 
+                                    <button class="btn btn-link" ng-click="executeQuery(input.query)">Execute</button>
 
+                                </uib-tab>
+                                <uib-tab heading = "Local">
 
-
-
-                            <table class="table table-bordered table-condensed">
-                                <tr ng-repeat="entry in libraryResultBundle.entry">
-                                    <td>
-                                        <div class="clickable" ng-click="loadFromLibrary(entry)">{{entry.resource.id}}</div>
-                                    </td>
-                                    <td>{{entry.resource.description}}</td>
+                                </uib-tab>
+                            </uib-tabset>
 
 
-                                </tr>
-                            </table>
 
 <!--
                             <div class="list-group">

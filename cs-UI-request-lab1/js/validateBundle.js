@@ -24,6 +24,30 @@ angular.module("pocApp")
                 alert("Under development")
             }
 
+
+            $scope.executeQuery = function (query) {
+                let qry = `${$scope.server}/${query}`
+                $http.get(qry).then(
+                    function (data) {
+                        let bundle = data.data
+
+
+                        $scope.input.bundle = angular.toJson(bundle,true)
+
+
+                       // $scope.validate()
+
+
+                        console.log(bundle)
+
+
+
+                    }, function (err) {
+                        alert(`Error: ${angular.toJson(err.data)}`)
+                    }
+                )
+            }
+
             $scope.saveFhirPath = function (fhirPath) {
                 //load DocRef, update data and save
                 //start with fixed DocRef id - add other templates later
@@ -153,9 +177,7 @@ angular.module("pocApp")
 
             $scope.selectIssue = function(issue) {
                 $scope.input.selectedIssue = issue
-
             }
-
 
             $scope.applyBundle = function () {
                 if (confirm("Are you sure you wish to apply this bundle as a transaction bundle to the FHIR server")) {
@@ -177,7 +199,7 @@ angular.module("pocApp")
             }
 
             $scope.loadLibrary = function () {
-                let url = `${$scope.server}/DocumentReference?_sort=-date&_summary=true&_count=20`
+                let url = `${$scope.server}/DocumentReference?type=bundle&_sort=-date&_summary=true&_count=20`
                 $http.get(url).then(
                     function (data) {
                         $scope.libraryResultBundle = data.data
