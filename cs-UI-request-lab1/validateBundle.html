@@ -3,7 +3,7 @@
 <head>
     <base href="/">
     <meta charset="UTF-8">
-    <title>Bundle validator</title>
+    <title>Canshare Bundle Visualizer</title>
 
     <script src="js/libs/jquery-1.9.0.min.js"></script>
     <script src="js/libs/angular.min1-5.js"></script>
@@ -50,6 +50,7 @@
     <script src="js/libs/vis.min.js"></script>
     <script src="directive/viewBundle/viewBundleDir.js"></script>
     <script src="directive/viewBundle/viewBundleSvc.js"></script>
+    <script src="js/libs/fhirpath.min.js"></script>
 </head>
 <body style="padding: 8px;padding-top: 80px">
     <div ng-app="topApp" ng-controller="validateBundleCtrl" class="container-fluid">
@@ -57,23 +58,19 @@
         <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
             <div class="container-fluid">
-                <div class="col-md-2 col-sm-2">
+                <div class="col-md-4 col-sm-4">
                         <span>
                             <a class="navbar-brand" href="#">
-                                Validate Bundle
+                                Bundle Visualizer (v2)
                             </a>
                         </span>
 
                 </div>
 
-                <div class="col-md-1 col-sm-1">
 
-                </div>
-                <div class="col-md-2">
 
-                </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3">
 
                 </div>
 
@@ -84,6 +81,11 @@
                     </form>
                 </div>
 
+                <div class="col-md-2">
+                    <div class="navbar-text">
+                        <button class="btn btn-success" ng-click="library()">Library</button>
+                    </div>
+                </div>
 
 
                 <div class="col-md-2">
@@ -96,86 +98,291 @@
             </div>
         </nav>
 
-        <div class="row">
 
-            <div class="col-md-12">
-                <uib-tabset active="input.mainTabActive">
+            <uib-tabset active="input.mainTabActive">
 
-                    <uib-tab heading = "Bundle">
+                <uib-tab heading = "Bundle">
+                    <a class="btn btn-link pull-right"
+                       href="https://build.fhir.org/ig/davidhay25/actnow/branches/main/index.html" target="_blank">ACT-NOW Implementation Guide</a>
 
-                        <a ng-class="btn" class = "pull-right" href="https://build.fhir.org/ig/davidhay25/actnow/branches/main/index.html" target="_blank">Implementation Guide</a>
+                    <!--
+                    <button ng-hide="input.bundle" class="btn btn-link pull-right" ng-click="loadSample()">Load sample</button>
+                    -->
+                    <button ng-show="input.bundle" class="btn btn-link pull-right" ng-click="validate('an')">Validate</button>
 
-                        <!--
-                        <button ng-hide="input.bundle" class="btn btn-link pull-right" ng-click="loadSample()">Load sample</button>
-                        -->
-                        <button ng-show="input.bundle" class="btn btn-link pull-right" ng-click="validate('an')">Validate ACT-NOW</button>
 
-                        <textarea ng-model = "input.bundle" placeholder="Paste Bundle here" class="form-control" rows="25">
+                    <div class="row">
+                        <div class="col-md-6">
 
-                        </textarea>
-                    </uib-tab>
+                            <h4>Instructions</h4>
+                            <p>
+                                To validate a bundle, paste the Json into the textbox and click the Validate link.
+                                The bundle will be passed to the validator and the results displayed in the Issues list tab.
+                            </p>
 
-                    <uib-tab>
-                        <uib-tab-heading>Issues list <span class="badge">{{arIssues.length}}</span> </uib-tab-heading>
-                        <h4>Issues from validator</h4>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="myScroll">
-                                    <div class="list-group">
-                                        <div ng-class="{'list-group-item':true,listItemSelected: issue == input.selectedIssue}"
-                                             style="cursor: pointer;padding: 8px"
-                                             ng-click = "selectIssue(issue)"
-                                             ng-repeat="issue in arIssues">
-                                            <div uib-popover="{{issue.hint.comment}}"
-                                                    popover-placement="left"
-                                                    popover-trigger="'mouseenter'"
-                                                    ng-class="{'pull-right':true, badge:true ,error:issue.issue.severity == 'error',warning:issue.issue.severity == 'warning'}">
-                                                {{issue.issue.severity.substring(0,1)}}
-                                            </div>
+                            <p>There are a number of different visualizations shown in the Visualization
+                            tab (once a bundle has been validated) including a list of the resources, issues for each resource
+                                and a graph showing the references between resources.</p>
 
-                                            {{issue.issue.diagnostics}}
+                            <a target="_blank" href="https://docs.google.com/document/d/1Dt1d65UJGvnBsn4vrWTVjXrbIujEtcLehyswMiwtpFc/edit?usp=sharing" >This document </a> has some tips on using the validator.
+
+
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h4>Last 20 bundles saved in Library</h4>
+                                </div>
+                                <div class="col-md-6">
+                                    <em style="margin-top: 10px" class="pull-right">Click the Library button for other entries</em>
+                                </div>
+                            </div>
+
+
+
+
+
+
+                            <table class="table table-bordered table-condensed">
+                                <tr ng-repeat="entry in libraryResultBundle.entry">
+                                    <td>
+                                        <div class="clickable" ng-click="loadFromLibrary(entry)">{{entry.resource.id}}</div>
+                                    </td>
+                                    <td>{{entry.resource.description}}</td>
+
+
+                                </tr>
+                            </table>
+
 <!--
-                                            <div class="pull-right" ng-show="issue.hint">
-                                                <i class=" glyphicon glyphicon-info-sign hint"
-                                                   uib-popover="{{issue.hint.comment}}"
-                                                   popover-placement="left"
-                                                   popover-trigger="'mouseenter'"></i>
+                            <div class="list-group">
+                                <div class="list-group-item" ng-repeat="entry in libraryResultBundle.entry">
+                                    {{entry.resource.id}} {{entry.resource.description}}
+
+                                </div>
+                            </div>
+                        -->
+                        </div>
+
+                        <div class="col-md-6">
+                            <textarea ng-model = "input.bundle" placeholder="Paste Bundle here" class="form-control" rows="20">
+
+                            </textarea>
+                        </div>
+
+                    </div>
+
+
+
+
+
+                </uib-tab>
+
+                <uib-tab ng-show="input.bundle">
+
+                    <uib-tab-heading>Validation results <span class="badge">{{arIssues.length}}</span> </uib-tab-heading>
+
+                    <div class="pull-right">
+
+
+                        <button class="btn btn-link" ng-click="applyBundle()">Apply bundle to server</button>
+
+                        <button class="btn btn-link" ng-click="saveBundle()">Save bundle in Library</button>
+                    </div>
+
+
+                    <uib-tabset>
+                        <uib-tab heading="Validator">
+                            <h4>Issues from validator</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="myScroll">
+                                        <div class="list-group">
+                                            <div ng-class="{'list-group-item':true,listItemSelected: issue == input.selectedIssue}"
+                                                 style="cursor: pointer;padding: 8px"
+                                                 ng-click = "selectIssue(issue)"
+                                                 ng-repeat="issue in arIssues">
+                                                <div uib-popover="{{issue.hint.comment}}"
+                                                     popover-placement="left"
+                                                     popover-trigger="'mouseenter'"
+                                                     ng-class="{'pull-right':true, badge:true ,error:issue.issue.severity == 'error',warning:issue.issue.severity == 'warning'}">
+                                                    {{issue.issue.severity.substring(0,1)}}
+                                                </div>
+
+                                                {{issue.issue.diagnostics}}
+                                                <!--
+                                                                                            <div class="pull-right" ng-show="issue.hint">
+                                                                                                <i class=" glyphicon glyphicon-info-sign hint"
+                                                                                                   uib-popover="{{issue.hint.comment}}"
+                                                                                                   popover-placement="left"
+                                                                                                   popover-trigger="'mouseenter'"></i>
+
+                                                                                            </div>
+                                                                                            -->
+                                                <div><em>{{issue.issue.location[0]}}</em></div>
 
                                             </div>
-                                            -->
-                                            <div><em>{{issue.issue.location[0]}}</em></div>
-
                                         </div>
+                                    </div>
+
+
+
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Entry</strong>
+                                    <pre>{{input.selectedIssue.entry | json}}</pre>
+                                    <strong>Full issue</strong>
+                                    <pre>{{input.selectedIssue.issue | json}}</pre>
+
+                                </div>
+                            </div>
+                        </uib-tab>
+                        <uib-tab heading="Conditional update">
+                            <h4>issues checking Conditional update</h4>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-condensed table-bordered">
+                                        <tr ng-repeat="item in conditionalValidation track by $index">
+                                            <td>{{item.entry.resource.resourceType}}
+                                                <div><em>{{item.entry.resource.id}}</em></div>
+                                            </td>
+
+                                            <td>{{item.msg}}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                </div>
+                            </div>
+
+
+
+
+                        </uib-tab>
+
+
+
+
+                    </uib-tabset>
+
+
+
+
+<!--
+                    <pre>{{arIssues | json}}</pre>
+-->
+                </uib-tab>
+
+                <uib-tab  ng-show="input.bundle" heading="Visualizations">
+                    <viewbundle bundle="inputtedBundle" validationoo = "oo"></viewbundle>
+                </uib-tab>
+
+                <uib-tab heading="FHIRPath query" ng-show="inputtedBundle">
+
+                    <a class = "pull-right" href="https://hl7.org/fhirpath/" target="_blank">FHIRPath spec</a>
+
+                    <div class="clearfix"></div>
+
+                    <uib-tabset>
+                        <uib-tab heading="Saved queries">
+
+
+                            <table class="table table-bordered">
+                                <tr ng-repeat="item in input.template.items">
+                                    <td>{{item.title}}</td>
+                                    <td>
+                                        <pre>{{executeFhirPathForTemplate(item.fp) | json}}</pre>
+                                        <em>{{item.fp}}</em>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!--
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="list-group">
+                                        <div class="list-group-item"
+                                             ng-repeat = "item in input.template.items">
+                                            {{item.fp}}
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-9">
+
+                                </div>
+                            </div>
+                            -->
+
+
+                            where a template is a set of fhirpath expressions that could, for example,
+                            generate a csv file or just download json
+
+                            functions to
+                            create template
+                            add / delete / move expressions
+
+                            execute template against bundle
+
+                        </uib-tab>
+                        <uib-tab heading="New query">
+                            <div class="row">
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control"
+                                           placeholder="Enter the fhirPath query then click Execute"
+                                           ng-model="input.fhirPath">
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="pull-right">
+                                        <button class="btn-link btn" ng-click="executeFhirPath(input.fhirPath)">Execute</button>
+
+                                        <button class="btn-link btn" ng-click="saveFhirPath(input.fhirPath)">Add to template</button>
+
+                                        <button class="btn-link btn" ng-click="selectFhirPath(input.fhirPath)">Select</button>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <br/>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>Bundle</h5>
+
+                                    <div class="myScroll">
+                                        <pre>{{inputtedBundle | json}}</pre>
+                                    </div>
+
+
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Result</h5>
+                                    <div class="myScroll">
+                                        <pre>{{fhirPathResult | json}}</pre>
                                     </div>
                                 </div>
 
-
-
                             </div>
-                            <div class="col-md-6">
-                                <strong>Entry</strong>
-                                <pre>{{input.selectedIssue.entry | json}}</pre>
-                                <strong>Full issue</strong>
-                                <pre>{{input.selectedIssue.issue | json}}</pre>
 
-                            </div>
-                        </div>
 
-<!--
-                        <pre>{{arIssues | json}}</pre>
--->
-                    </uib-tab>
 
-                    <uib-tab heading="Graph of resources">
-                        <viewbundle bundle="inputtedBundle" validationoo = "oo"></viewbundle>
-                    </uib-tab>
+                        </uib-tab>
 
-                    <uib-tab heading="OO Json">
-                        <pre>{{oo | json}}</pre>
-                    </uib-tab>
-                </uib-tabset>
+                    </uib-tabset>
+
+
+                </uib-tab>
+
+                <uib-tab ng-show="false" heading="OO Json">
+                    <pre>{{oo | json}}</pre>
+                </uib-tab>
+            </uib-tabset>
 
             </div>
+
+
+
         </div>
 
 

@@ -1,7 +1,6 @@
 angular.module("pocApp")
     .controller('validateBundleCtrl',
-        function ($scope,$http,$sce) {
-
+        function ($scope,$http,$uibModal) {
 
             //indexes for the main tabs to allow tabs to be selected from code
             $scope.ui = {}
@@ -9,17 +8,10 @@ angular.module("pocApp")
             $scope.ui.tabList = 1;
             $scope.ui.tabOO = 1;
 
-
+            $scope.server = "http://test.canshare.co.nz:8080/fhir/"
             $scope.input = {}
 
-            $scope.loadSample = function () {
-                $http.get('/sampleAN').then(
-                    function (data) {
-                        $scope.input.bundle = angular.toJson(data.data)
-                    }
-
-                )
-            }
+            //$scope.input.mainTabActive = 1 // $scope.ui.tabTrack;
 
             let hints
             $http.get('validatorHints').then(
@@ -27,57 +19,287 @@ angular.module("pocApp")
                     hints=data.data
                 }
             )
-/*
-            var trusted = {};
-            $scope.getSeverityMessage = function (severity) {
-                let msg
-                switch (severity) {
-                    case "error" :
-                        msg = "This is a fatal error. The Bundle will be rejected"
-                        break
-                    case "warning" :
-                        msg = "The bundle will be accepted, but this should really be fixed"
-                        break
-                    case "information" :
-                        msg = "This generally means something that can be ignored"
-                        break
 
-                }
-                console.log(msg)
-                msg = `<div>${msg}</div>`
-                return trusted[msg] || (trusted[msg] = $sce.trustAsHtml(msg));
-              //  return msg
-                //return $sce.trustAsHtml(msg)
+            $scope.library = function () {
+                alert("Under development")
+            }
+
+            $scope.saveFhirPath = function (fhirPath) {
+                //load DocRef, update data and save
+                //start with fixed DocRef id - add other templates later
+
+                //todo add a dialog to get description etc
+
+
+                $uibModal.open({
+                    backdrop: 'static',      //means can't close by clicking on the backdrop.
+                    keyboard: false,       //same as above.
+                    size : 'lg',
+                    templateUrl: 'modalTemplates/saveFp.html',
+
+                    controller: function ($scope,fp) {
+                        $scope.input = {}
+
+                        $scope.save = function () {
+                            let vo = {title:$scope.input.title}
+                            $scope.$close(vo)
+                        }
+
+                    },
+                    resolve: {
+                        fp: function () {
+                            return fhirPath
+                        }
+                    }
+
+                }).result.then(function (vo) {
+
+                    let item = {fp:fhirPath}
+                    item.title = vo.title
+                    $scope.input.template.items.push(item)      //for the UI
+                    //todo update dr
+
+                    //load the template then update it
+                    $scope.loadTemplate(function (dr,template) {
+                        template.items = template.items || []
+                        template.items.push(item)
+                        let att = dr.content[0].attachment
+                        let json = angular.toJson(template)
+                        att.data = btoa(json)
+                        let qry = `${$scope.server}/DocumentReference/fpTemplate`
+
+                        $http.put(qry,dr).then(
+                            function (data) {
+                                alert('updated')
+                            }, function (err) {
+                                alert(angular.toJson(err.data))
+                            }
+                        )
+                    })
+
+                })
+
+
+
+
+
+
+
+
+
+            }
+            $scope.loadTemplate = function (cb) {
+                //load a template from the Decref
+                //start with fixedid
+
+                let qry = `${$scope.server}/DocumentReference/fpTemplate`
+                $http.get(qry).then(
+                    function (data) {
+
+                        let dr = data.data
+                        console.log(dr)
+                        let att = dr.content[0].attachment
+                        let json = atob(att.data)
+                        let template = angular.fromJson(json)
+
+                        $scope.input.template = template     //     {items:[{fp}]}
+                        if (cb) {
+                            cb(dr,template)
+                        }
+
+                    }, function (err) {
+                        //alert(angular.toJson(err))
+                        console.log(err)
+                        if (err.status == 404 || err.status == 410) {
+                            //the default template wasn't found - create it
+                            $scope.input.template = {items:[]}
+                            if (cb) {
+                                let dr = {resourceType:"DocumentReference",status:"current"}
+                                dr.id = "fpTemplate"
+                                dr.type = {coding:[{system:"http://canshare.co.nz/fhir/NamingSystem/bv",code:"fhirpath"}]}
+                                dr.description = "fhirPath queries for default template"
+                                dr.date = new Date().toISOString()
+
+                                let json = angular.toJson($scope.input.template)
+
+                                let att = {data:btoa(json)}
+
+
+
+                                dr.content=[{attachment:att}]
+                                cb(dr,$scope.input.template)
+                            }
+                        } else {
+                            alert(angular.toJson(err.data))
+                        }
+
+
+
+
+
+                    }
+                )
 
             }
 
-            */
-/*
-            let hint1 = {match:"does not match any known slice", comment:"This simply means that there additional elements in a sliced element (eg catagory)"}
+            $scope.loadTemplate()   //load the default template
 
-            let hints = []
-            hints.push(hint1)
-*/
+            $scope.selectFhirPath = function () {
+
+                alert("select a saved fp from the library. ? connection to templates")
+            }
+
+
+
             $scope.selectIssue = function(issue) {
                 $scope.input.selectedIssue = issue
+
             }
 
 
-            //$scope.input.mainTabActive = 1 // $scope.ui.tabTrack;
+            $scope.applyBundle = function () {
+                if (confirm("Are you sure you wish to apply this bundle as a transaction bundle to the FHIR server")) {
 
-            $scope.validate = function(domain) {
-                //let url = `validateBundle?type=${domain}`
+                    let url = `${$scope.server}`
 
-                //let url = "http://localhost:8087/fhir/Bundle/$validate"
-                let url = "http://test.canshare.co.nz:8080/fhir/Bundle/$validate"
 
-                //let url = "http://actnow.canshare.co.nz:9092/baseR4/Bundle/$validate"
+                    $http.post(url,$scope.inputtedBundle).then(
+                        function (data) {
+                            alert("Processed OK")
 
-                let bundle= angular.fromJson($scope.input.bundle)
+                        },
+                        function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+                }
 
+            }
+
+            $scope.loadLibrary = function () {
+                let url = `${$scope.server}/DocumentReference?_sort=-date&_summary=true&_count=20`
+                $http.get(url).then(
+                    function (data) {
+                        $scope.libraryResultBundle = data.data
+
+                    },
+                    function (err) {
+
+                    }
+                )
+
+                //http://test.canshare.co.nz:8080/fhir/DocumentReference?_sort=-date&_summary=true
+            }
+            $scope.loadLibrary()
+
+
+
+
+            //update the default template
+
+
+
+            //load a single DR from the library
+            $scope.loadFromLibrary = function (entry) {
+                console.log(entry)
+                let resource = entry.resource
+                let qry = `${$scope.server}/DocumentReference/${resource.id}`
+                $http.get(qry).then(
+                    function (data) {
+                        let dr = data.data
+                        console.log(dr)
+                        let att = dr.content[0].attachment
+                        let bundle = atob(att.data)
+                        $scope.input.bundle = bundle
+
+
+                        $scope.validate()
+
+
+                        console.log(bundle)
+
+
+
+                    }, function (err) {
+                        alert(`Error: ${angular.toJson(err.data)}`)
+                    }
+                )
+            }
+
+            $scope.saveBundle = function () {
+                let description = window.prompt("Enter a description of this bundle")
+                if (description) {
+                    let dr = {resourceType:"DocumentReference",status:"current"}
+                    dr.description = description
+                    dr.type = {coding:[{system:"http://canshare.co.nz/fhir/NamingSystem/bv",code:"bundle"}]}
+                    dr.date = new Date().toISOString()
+
+                    let att = {data:btoa($scope.input.bundle)}
+                    dr.content=[{attachment:att}]
+
+                    let url = `${$scope.server}/DocumentReference`
+                    $http.post(url,dr).then(
+                        function (data) {
+console.log(data)
+                            let location = data.headers('Content-Location')
+                            alert(`Bundle saved as ${location}`)
+
+
+                        }, function (err) {
+                            alert(`Error: ${angular.toJson(err.data)}`)
+                        }
+                    )
+
+
+
+                } else {
+                    alert("No message entered. Bundle not saved.")
+                }
+            }
+
+
+
+            //exceute a fhirPath against the bundle and return the result
+            $scope.executeFhirPathForTemplate = function (fhirPath) {
+                try {
+                    return fhirpath.evaluate($scope.inputtedBundle, fhirPath)
+                } catch (ex) {
+                    return ex
+                }
+            }
+
+
+            $scope.executeFhirPath = function (fhirPath) {
+                try {
+                    $scope.fhirPathResult = fhirpath.evaluate($scope.inputtedBundle, fhirPath)
+                } catch (ex) {
+                    alert(ex)
+
+                }
+
+                console.log()
+            }
+
+            //
+            $scope.validate = function() {
+                let url = `${$scope.server}/Bundle/$validate`
+
+                let bundle
+                try {
+                    bundle= angular.fromJson($scope.input.bundle)
+                } catch (e) {
+                    alert("Not valid Json. Try again.")
+                    return
+                }
+
+
+                //the bundle parsed as an object
                 $scope.inputtedBundle = bundle
-                //parse the bundle into an array so it can
 
+                //validate that all entries have a conditional on identifier
+                validateConditional(bundle)
+
+                $scope.showWaiting = true
 
                 $http.post(url,bundle).then(
                     function (data) {
@@ -95,6 +317,10 @@ angular.module("pocApp")
 
                         //select the list view
                         $scope.input.mainTabActive = $scope.ui.tabList
+                    }
+                ).finally(
+                    function () {
+                        $scope.showWaiting = false
                     }
                 )
 
@@ -153,6 +379,58 @@ angular.module("pocApp")
                     })
 
                 }
+            }
+
+            function validateConditional(bundle) {
+                $scope.conditionalValidation = []
+                bundle.entry.forEach(function (entry) {
+                    let resource = entry.resource
+                    let item = {entry:entry}
+                    let request = entry.request
+                    let isError = false
+
+                    //todo need to check resource has identifier
+
+                    if (request) {
+                        let msg = ""
+                        if (request.method !== 'PUT') {
+                            isError = true
+                            msg = "entry.request.method should be 'PUT' "
+                        }
+                        let url = request.url
+                        if (url) {
+                            let str = `${resource.resourceType}?identifier=`
+                            if (! url.startsWith(str)) {
+                                isError = true
+                                msg += ` entry.request.url should start with ${str}`
+                            }
+                            if (url.indexOf('|') == -1) {
+                                isError = true
+                                msg += "The identifier should also have the system"
+                            }
+                            item.msg = msg
+                            $scope.conditionalValidation.push(item)
+                        } else {
+                            isError = true
+                            msg += "Missing entry.request.url"
+                            item.msg = msg
+                            $scope.conditionalValidation.push(item)
+                        }
+
+                        if (! isError) {
+                            item.msg = "No issues"
+                            $scope.conditionalValidation.push(item)
+                        }
+
+                    } else {
+                        item.msg = "Missing request parameter in entry"
+                        $scope.conditionalValidation.push(item)
+                    }
+
+
+
+                })
+
             }
 
         }
