@@ -85,8 +85,17 @@
             <td>ValueSet</td>
 
             <td>
-              <input type="text"
-                       class="form-control" ng-model="input.valueSet"/>
+              <div class="row">
+                <div class="col-sm-10">
+                  <input type="text"
+                         class="form-control" ng-model="input.valueSet"/>
+                </div>
+                <div class="col-sm-2">
+                  <button ng-show="input.valueSet" class="btn-link btn" ng-click="viewVS(input.valueSet)">View VS</button>
+
+                </div>
+              </div>
+
             </td>
 
 

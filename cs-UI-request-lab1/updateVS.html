@@ -40,6 +40,8 @@
     <script src="js/loginCtrl.js"></script>
     <script src="js/utilsSvc.js"></script>
 
+    <script src="js/filters.js"></script>
+
     <script src="js/libs/firebase.js"></script>
     <script src="js/libs/angularfire.min.js"></script>
 
@@ -131,324 +133,353 @@
         </div>
     </nav>
 
-
-    <div class="row">
-        <div class="col-md-3">
-
-            <div class="row">
-
-                <div class="col-md-6">
-                    <checkbox ng-model="input.onlyRetired"></checkbox> Only retired
-                </div>
-
-                <div class="col-md-6">
-                    <button class="btn-link btn pull-right" ng-click="createNew()">New</button>
-                </div>
-            </div>
+    <uib-tabset>
+        <uib-tab heading="Edit VS">
+            <br/>
 
             <div class="row">
-                <div class="col-md-12">
-                    <input placeholder="Filter" type="text" class="form-control" ng-model="input.filterlist"/>
-                    <br/>
-                    <div class="myScroll">
-                        <div class="list-group">
-                            <div ng-class="{'list-group-item':true,listItemSelected:selectedItem==item,retired:item.vs.status == 'retired'}"
-                                 ng-show="showVS(item)"
-                                 style="cursor: pointer" ng-repeat="item in allVSItem" ng-click="selectVSItem(item)">
-                                {{item.display}}
+                <div class="col-md-3">
 
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <checkbox ng-model="input.onlyRetired"></checkbox> Only retired
+                        </div>
+
+                        <div class="col-md-6">
+                            <button class="btn-link btn pull-right" ng-click="createNew()">New</button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <input placeholder="Filter" type="text" class="form-control" ng-model="input.filterlist"/>
+                            <br/>
+                            <div class="myScroll">
+                                <div class="list-group">
+                                    <div ng-class="{'list-group-item':true,listItemSelected:selectedItem==item,retired:item.vs.status == 'retired'}"
+                                         ng-show="showVS(item)"
+                                         style="cursor: pointer" ng-repeat="item in allVSItem" ng-click="selectVSItem(item)">
+                                        {{item.display}}
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
 
-        <div ng-show="selectedVS" class="col-md-9">
-            <div class="alert-info alert" ng-hide="user">
-                Update and Create operations on the publishing Server can only be done by
-                logged in users
-            </div>
+                <div ng-show="selectedVS" class="col-md-9">
+                    <div class="alert-info alert" ng-hide="user">
+                        Update and Create operations on the publishing Server can only be done by
+                        logged in users
+                    </div>
 
-            <div class="banner">
-                {{selectedVS.title}}
-            </div>
+                    <div class="banner">
+                        {{selectedVS.title}}
+                    </div>
 
-            <div>
+                    <div>
 
-                <button ng-show = "user && user.email && canSave()" class="btn btn-danger pull-right">
-                    <span ng-show="isNew" ng-click="newVS()">Save new VS</span>
-                    <span ng-hide="isNew" ng-click="updateVS(selectedVS)">Update VS</span>
-                </button>
+                        <button ng-show = "user && user.email && canSave()" class="btn btn-danger pull-right">
+                            <span ng-show="isNew" ng-click="newVS()">Save new VS</span>
+                            <span ng-hide="isNew" ng-click="updateVS(selectedVS)">Update VS</span>
+                        </button>
 
-                <div style = "padding: 8px " class="pull-right" ng-show="csDirty"><em>Pre-publication CodeSystem will be NOT updated</em></div>
+                        <div style = "padding: 8px " class="pull-right" ng-show="csDirty"><em>Pre-publication CodeSystem will be NOT updated</em></div>
 
-            </div>
+                    </div>
 
 
 
-            <uib-tabset>
+                    <uib-tabset>
 
-                <uib-tab heading="Edit ValueSet">
-                    <table class="table">
-                        <tr>
-                            <td>Id</td>
-                            <td>
-                                <input type="text"
-                                       ng-disabled="! isNew"
-                                       ng-blur = checkNewVS(input.id)
-                                       class="form-control" ng-model="input.id"/>
-                            </td>
-                        </tr>
+                        <uib-tab heading="Edit ValueSet">
+                            <table class="table">
+                                <tr>
+                                    <td>Id</td>
+                                    <td>
+                                        <input type="text"
+                                               ng-disabled="! isNew"
+                                               ng-blur = checkNewVS(input.id)
+                                               class="form-control" ng-model="input.id"/>
+                                    </td>
+                                </tr>
 
-                        <tr>
-                            <td>Status</td>
-                            <td>
-                                <select ng-model="input.status" class="form-control" ng-change = makeVS()>
-                                    <option value="active">Active</option>
-                                    <option value="retired">Retired</option>
-                                </select>
-                            </td>
-                        </tr>
+                                <tr>
+                                    <td>VS Status</td>
+                                    <td>
+                                        <select ng-model="input.status" class="form-control" ng-change = makeVS()>
+                                            <option value="active">Active</option>
+                                            <option value="retired">Retired</option>
+                                        </select>
+                                    </td>
+                                </tr>
 
-                        <tr>
-                            <td>Title</td>
-                            <td>
-                                <input type="text" class="form-control" ng-change = makeVS() ng-model="input.title"/>
-                            </td>
-                        </tr>
+                                <tr>
+                                    <td>Syndication Status</td>
+                                    <td>
+                                        {{syndicationStatus}}
+                                    </td>
+                                </tr>
 
-                        <tr>
-                            <td>Description</td>
-                            <td>
-                                <textarea class="form-control" ng-change = makeVS() ng-model="input.description"></textarea>
-                            </td>
-                        </tr>
 
-                        <tr>
-                            <td>ECL</td>
-                            <td>
-                                <div class="row">
-                                    <div class="col-md-10">
-                                        <textarea class="form-control" ng-change = makeVS() ng-model="input.ecl"></textarea>
 
-                                    </div>
-                                    <div class="col-md-2">
-                                        <button class="btn btn-link" ng-click="testECL(input.ecl)">Test ECL</button>
-                                    </div>
+
+
+                                <tr>
+                                    <td>Title</td>
+                                    <td>
+                                        <input type="text" class="form-control" ng-change = makeVS() ng-model="input.title"/>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Description</td>
+                                    <td>
+                                        <textarea class="form-control" ng-change = makeVS() ng-model="input.description"></textarea>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>ECL</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-md-10">
+                                                <textarea class="form-control" ng-change = makeVS() ng-model="input.ecl"></textarea>
+
+                                            </div>
+                                            <div class="col-md-2">
+                                                <button class="btn btn-link" ng-click="testECL(input.ecl)">Test ECL</button>
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                </tr>
+
+
+
+                                <tr>
+                                    <td  width = "20%">Display concepts
+                                        <div><br/><em>Published concepts where the description is incorrect</em></div>
+                                    </td>
+                                    <td>
+
+                                        <table class="table table-bordered">
+                                            <tr><th>Code</th><th>Display</th><th></th></tr>
+                                            <tr ng-repeat="concept in input.displayConcepts">
+                                                <td>
+                                                    {{concept.code}}
+                                                </td>
+                                                <td>{{concept.display}}</td>
+                                                <td><i style="color: red" class="glyphicon glyphicon-remove clickable"
+                                                       ng-click="removeDisplayConcept($index)"></i></td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="row">
+                                                        <div class="col-md-10">
+                                                            <input ng-model="input.newDisplayCode" type="text" class="form-control"/>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <i style="color: orange" class="glyphicon glyphicon-question-sign clickable"
+                                                               ng-show="input.newDisplayCode"
+                                                               ng-click="getDisplay(input.newDisplayCode,'newDisplayDisplay')"></i>
+                                                        </div>
+                                                    </div>
+
+                                                </td>
+                                                <td><input ng-model="input.newDisplayDisplay" type="text" class="form-control"/> </td>
+                                                <td>
+
+
+                                                    <i style="color: green" class="glyphicon glyphicon-ok clickable"
+                                                       ng-show="input.newDisplayCode && input.newDisplayDisplay"
+                                                       ng-click="addDisplayConcept()"></i>
+
+                                                </td>
+                                            </tr>
+
+                                        </table>
+                                    </td>
+                                </tr>
+
+
+
+
+
+                                <tr>
+                                    <td>Unpublished concepts
+                                        <div><em><br/>Concepts created but not yet published. They are in a separate CodeSystem</em></div>
+                                    </td>
+                                    <td>
+
+                                        <table class="table table-bordered">
+                                            <tr><th>Code</th><th>Display</th><th></th></tr>
+                                            <tr ng-repeat="concept in input.prePubConcepts">
+                                                <td>
+                                                    {{concept.code}}
+                                                </td>
+                                                <td>{{concept.display}}</td>
+                                                <td><i style="color: red" class="glyphicon glyphicon-remove clickable"
+                                                       ng-click="removePPConcept($index)"></i></td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="row">
+                                                        <div class="col-md-10">
+                                                            <input ng-model="input.newPPCode" type="text" class="form-control"/>
+                                                        </div>
+                                                        <!--
+                                                        <div class="col-md-2">
+                                                            <i style="color: orange" class="glyphicon glyphicon-question-sign clickable"
+                                                               ng-show="input.newPPCode"
+                                                               ng-click="getDisplay(input.newPPCode,'newPPDisplay')"></i>
+                                                        </div>
+                                                        -->
+                                                    </div>
+
+
+
+
+                                                </td>
+                                                <td><input ng-model="input.newPPDisplay" type="text" class="form-control"/> </td>
+                                                <td>
+
+
+                                                    <i style="color: green" class="glyphicon glyphicon-ok clickable"
+                                                       ng-show="input.newPPCode && input.newPPDisplay"
+                                                       ng-click="addPPConcept()"></i>
+
+                                                </td>
+                                            </tr>
+
+                                        </table>
+                                    </td>
+                                </tr>
+
+
+                            </table>
+
+                            <div ng-show="textEclVS">
+                                <strong>ECL result</strong>
+                                <table class="table table-bordered table-condensed">
+                                    <tr><th>Display</th><th>Code</th><th>System</th></tr>
+                                    <tr ng-repeat="concept in textEclVS.expansion.contains">
+                                        <td>{{concept.display}}</td>
+                                        <td>
+                                            <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
+                                        <td>{{concept.system}}</td>
+                                    </tr>
+                                </table>
+
+                            </div>
+
+
+                        </uib-tab>
+
+                        <uib-tab heading="Expand">
+                            <br/>
+                            <div class="row">
+
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" ng-model="input.filter" placeholder="Filter text"/>
+                                </div>
+                                <div class="col-md-3">
+                                    <div ng-show="expandedVS.expansion.contains">{{expandedVS.expansion.contains.length}} concepts</div>
                                 </div>
 
-                            </td>
-                        </tr>
-
-
-
-                        <tr>
-                            <td  width = "20%">Display concepts
-                                <div><br/><em>Published concepts where the description is incorrect</em></div>
-                            </td>
-                            <td>
-
-                                <table class="table table-bordered">
-                                    <tr><th>Code</th><th>Display</th><th></th></tr>
-                                    <tr ng-repeat="concept in input.displayConcepts">
-                                        <td>
-                                            {{concept.code}}
-                                        </td>
-                                        <td>{{concept.display}}</td>
-                                        <td><i style="color: red" class="glyphicon glyphicon-remove clickable"
-                                               ng-click="removeDisplayConcept($index)"></i></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="row">
-                                                <div class="col-md-10">
-                                                    <input ng-model="input.newDisplayCode" type="text" class="form-control"/>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <i style="color: orange" class="glyphicon glyphicon-question-sign clickable"
-                                                       ng-show="input.newDisplayCode"
-                                                       ng-click="getDisplay(input.newDisplayCode,'newDisplayDisplay')"></i>
-                                                </div>
-                                            </div>
-
-                                        </td>
-                                        <td><input ng-model="input.newDisplayDisplay" type="text" class="form-control"/> </td>
-                                        <td>
-
-
-                                            <i style="color: green" class="glyphicon glyphicon-ok clickable"
-                                               ng-show="input.newDisplayCode && input.newDisplayDisplay"
-                                               ng-click="addDisplayConcept()"></i>
-
-                                        </td>
-                                    </tr>
-
-                                </table>
-                            </td>
-                        </tr>
-
-
-
-
-
-                        <tr>
-                            <td>Unpublished concepts
-                                <div><em><br/>Concepts created but not yet published. They are in a separate CodeSystem</em></div>
-                            </td>
-                            <td>
-
-                                <table class="table table-bordered">
-                                    <tr><th>Code</th><th>Display</th><th></th></tr>
-                                    <tr ng-repeat="concept in input.prePubConcepts">
-                                        <td>
-                                            {{concept.code}}
-                                        </td>
-                                        <td>{{concept.display}}</td>
-                                        <td><i style="color: red" class="glyphicon glyphicon-remove clickable"
-                                               ng-click="removePPConcept($index)"></i></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="row">
-                                                <div class="col-md-10">
-                                                    <input ng-model="input.newPPCode" type="text" class="form-control"/>
-                                                </div>
-                                                <!--
-                                                <div class="col-md-2">
-                                                    <i style="color: orange" class="glyphicon glyphicon-question-sign clickable"
-                                                       ng-show="input.newPPCode"
-                                                       ng-click="getDisplay(input.newPPCode,'newPPDisplay')"></i>
-                                                </div>
-                                                -->
-                                            </div>
-
-
-
-
-                                        </td>
-                                        <td><input ng-model="input.newPPDisplay" type="text" class="form-control"/> </td>
-                                        <td>
-
-
-                                            <i style="color: green" class="glyphicon glyphicon-ok clickable"
-                                               ng-show="input.newPPCode && input.newPPDisplay"
-                                               ng-click="addPPConcept()"></i>
-
-                                        </td>
-                                    </tr>
-
-                                </table>
-                            </td>
-                        </tr>
-
-
-                    </table>
-
-                    <div ng-show="textEclVS">
-                        <strong>ECL result</strong>
-                        <table class="table table-bordered table-condensed">
-                            <tr><th>Display</th><th>Code</th><th>System</th></tr>
-                            <tr ng-repeat="concept in textEclVS.expansion.contains">
-                                <td>{{concept.display}}</td>
-                                <td>
-                                    <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
-                                <td>{{concept.system}}</td>
-                            </tr>
-                        </table>
-
-                    </div>
-
-
-                </uib-tab>
-
-                <uib-tab heading="Expand">
-                    <br/>
-                    <div class="row">
-
-                        <div class="col-md-3">
-                            <input type="text" class="form-control" ng-model="input.filter" placeholder="Filter text"/>
-                        </div>
-                        <div class="col-md-3">
-                            <div ng-show="expandedVS.expansion.contains">{{expandedVS.expansion.contains.length}} concepts</div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <button class="btn btn-primary pull-right" ng-click="expandVSInTS(selectedVS)">Expand</button>
-                        </div>
-                    </div>
-                    <br/>
-                    <div ng-show="expandQry">Query: {{expandQry}}</div>
-                    <br/>
-
-
-
-                    <uib-tabset ng-show="expandedVS">
-                        <uib-tab heading="Concepts">
-                            <table class="table table-bordered table-condensed">
-                                <tr><th>Display</th><th>Code</th><th>System</th></tr>
-                                <tr ng-repeat="concept in expandedVS.expansion.contains">
-                                    <td>{{concept.display}}</td>
-                                    <td>
-                                        <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
-                                    <td>{{concept.system}}</td>
-                                </tr>
-                            </table>
-                        </uib-tab>
-                        <uib-tab heading="Json">
-                            <pre>{{expandedVS | json}}</pre>
-                        </uib-tab>
-                    </uib-tabset>
-
-
-
-
-
-
-                </uib-tab>
-
-                <uib-tab heading="Json">
-                    <pre>{{selectedVS | json}}</pre>
-                </uib-tab>
-
-                <uib-tab heading="Unpublished concepts">
-                    <br/>
-                    <em>This is the custom ValueSet for unpublished concepts. These are concepts that have been defined
-                    in SNOMED but not yet published. They have a different system url (as they don't yet exist in the
-                    Terminology Server). If they are used by an implementer, then they will be responsible for making
-                    any changes required once the concepts are formally published. </em>
-                    <uib-tabset>
-                        <uib-tab heading="Table">
+                                <div class="col-md-6">
+                                    <button class="btn btn-primary pull-right" ng-click="expandVSInTS(selectedVS)">Expand</button>
+                                </div>
+                            </div>
                             <br/>
-                            <table class="table table-bordered">
-                                <tr><th>Code</th><th>Display</th></tr>
-                                <tr ng-repeat="concept in prePubCS.concept">
-                                    <td>{{concept.code}}</td>
-                                    <td>{{concept.display}}</td>
+                            <div ng-show="expandQry">Query: {{expandQry}}</div>
+                            <br/>
 
-                                </tr>
-                            </table>
+
+
+                            <uib-tabset ng-show="expandedVS">
+                                <uib-tab heading="Concepts">
+                                    <table class="table table-bordered table-condensed">
+                                        <tr><th>Display</th><th>Code</th><th>System</th></tr>
+                                        <tr ng-repeat="concept in expandedVS.expansion.contains">
+                                            <td>{{concept.display}}</td>
+                                            <td>
+                                                <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
+                                            <td>{{concept.system}}</td>
+                                        </tr>
+                                    </table>
+                                </uib-tab>
+                                <uib-tab heading="Json">
+                                    <pre>{{expandedVS | json}}</pre>
+                                </uib-tab>
+                            </uib-tabset>
+
+
+
+
+
 
                         </uib-tab>
+
                         <uib-tab heading="Json">
-                            <pre>{{prePubCS | json}}</pre>
+                            <pre>{{selectedVS | json}}</pre>
+                        </uib-tab>
+
+                        <uib-tab heading="Unpublished concepts">
+                            <br/>
+                            <em>This is the custom ValueSet for unpublished concepts. These are concepts that have been defined
+                                in SNOMED but not yet published. They have a different system url (as they don't yet exist in the
+                                Terminology Server). If they are used by an implementer, then they will be responsible for making
+                                any changes required once the concepts are formally published. </em>
+                            <uib-tabset>
+                                <uib-tab heading="Table">
+                                    <br/>
+                                    <table class="table table-bordered">
+                                        <tr><th>Code</th><th>Display</th></tr>
+                                        <tr ng-repeat="concept in prePubCS.concept">
+                                            <td>{{concept.code}}</td>
+                                            <td>{{concept.display}}</td>
+
+                                        </tr>
+                                    </table>
+
+                                </uib-tab>
+                                <uib-tab heading="Json">
+                                    <pre>{{prePubCS | json}}</pre>
+
+                                </uib-tab>
+                            </uib-tabset>
+
+
+
 
                         </uib-tab>
+
                     </uib-tabset>
 
 
 
-
-                </uib-tab>
-
-            </uib-tabset>
+                </div>
+            </div>
 
 
+        </uib-tab>
+        <uib-tab heading="List by date modified">
+            <table class="table-bordered table">
+                <tr ng-repeat = "item in sortedVS">
+                    <td>{{item.vs.meta.lastUpdated | date : "MMM d, h:mm a y"}} </td>
+                    <td>{{item.vs.meta.lastUpdated | ageSeconds}}</td>
+                    <td>{{item.display}}</td>
 
-        </div>
-    </div>
 
+                </tr>
+            </table>
+
+        </uib-tab>
+    </uib-tabset>
 
 
 

@@ -193,6 +193,25 @@ angular.module("pocApp")
                 $scope.isNew = true         //allows cancel
             }
 
+
+            $scope.viewVS = function (vsName) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/viewVS.html',
+                    backdrop: 'static',
+                    size : 'lg',
+                    controller: 'viewVSCtrl',
+
+                    resolve: {
+                        url: function () {
+                            return vsName
+                        }, refsetId : function () {
+                            return null
+                        }
+                    }
+
+                })
+            }
+
             //return true if the datatype can have a fixed value
             $scope.isFixedType = function (type) {
 

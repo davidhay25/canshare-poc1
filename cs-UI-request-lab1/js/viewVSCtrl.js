@@ -1,6 +1,7 @@
 angular.module("pocApp")
     .controller('viewVSCtrl',
         function ($scope,url,refsetId,$http,$uibModal) {
+            //refsetId no longer used - todo go through codebase and edit...
 
             $scope.url = url
             $scope.input = {}

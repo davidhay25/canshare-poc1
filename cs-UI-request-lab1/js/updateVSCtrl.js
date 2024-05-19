@@ -95,9 +95,10 @@ angular.module("pocApp")
                             bundle.entry.forEach(function (entry) {
                                 let item = {vs:entry.resource}
                                 item.display = entry.resource.title || entry.resource.name
-
+                                //item.lastUpdated = new Date(entry.resource.meta.lastUpdated)
                                 ar.push(item)
                             })
+
                             deferred.resolve(ar)
                         }
                     }, function (err) {
@@ -114,6 +115,43 @@ angular.module("pocApp")
                     $scope.allVSItem = ar
                     //console.log(ar)
                     delete $scope.showLoadingMessage
+
+                    //create sorted list by last update
+                    $scope.sortedVS = angular.copy(ar)
+
+                    $scope.sortedVS.sort(function (a,b) {
+                        if (a.vs.meta.lastUpdated > b.vs.meta.lastUpdated) {
+                            return -1
+                        } else {
+                            return 1
+                        }
+
+                    })
+
+                    /*
+
+                   for (const item of $scope.sortedVS) {
+                       let age =  moment().diff(moment(item.vs.meta.lastUpdated),'days');
+
+                       if (age < 7) {
+                           let qry = `/nzhts/syndStatus?resourceType=ValueSet&id=${item.vs.id}`
+                           $http.get(qry).then(
+                               function (data) {
+                                   console.log(data.data)
+
+
+
+                               }
+                           )
+
+                       }
+
+
+                   }
+
+ */
+
+
                 }
             )
 
@@ -302,7 +340,19 @@ angular.module("pocApp")
 
             $scope.testECL = function (ecl) {
 
-                let encodedEcl = encodeURIComponent(ecl)
+                //let encodedEcl = encodeURIComponent(ecl)
+                let vo = {ecl:ecl}
+
+
+                $http.post(`nzhts/ecl`,vo).then(
+                    function (data) {
+                        $scope.textEclVS = data.data
+
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    })
+
+                /*
                 $http.get(`nzhts/ecl?qry=${encodedEcl}`).then(
                     function (data) {
                         $scope.textEclVS = data.data
@@ -310,7 +360,7 @@ angular.module("pocApp")
                     }, function (err) {
                         console.log(err)
                     })
-
+*/
 
                 //fhir_vs=ecl/[ecl] - all concept ids that match the supplied (URI-encoded) expression constraint
             }
@@ -466,6 +516,30 @@ angular.module("pocApp")
                         $scope.showWaiting = false
                     }
                 )
+
+                delete $scope.syndicationStatus
+                let syndQry = `/nzhts/syndStatus?resourceType=ValueSet&id=${item.vs.id}`
+                $http.get(syndQry).then(
+                    function (data) {
+                        let param = data.data
+                        param.parameter.forEach(function (p) {
+                            if (p.name == 'isSyndicated') {
+                                $scope.syndicationStatus = "Syndicated"
+                            } else {
+                                $scope.syndicationStatus = "Not syndicated"
+                            }
+                        })
+                        console.log(data.data)
+
+
+
+                    }
+                )
+
+
+
+
+
             }
 
             $scope.makeVS = function () {

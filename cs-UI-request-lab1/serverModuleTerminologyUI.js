@@ -184,8 +184,6 @@ function setup(app) {
 
                 res.json(lstConcepts)
 
-
-
             } catch (ex) {
                 if (ex.response) {
                     res.status(ex.response.status).json(ex.response.data)
@@ -194,9 +192,6 @@ function setup(app) {
                 }
 
             }
-
-
-
 
         }
 
@@ -210,8 +205,7 @@ function setup(app) {
         let id = req.query.id
 
         let qry = `https://authoring.nzhts.digital.health.nz/synd/getSyndicationStatus?id=${id}&resourceType=${resourceType}`
-
-
+                                   //let qry = `${serverHost}synd/getSyndicationStatus?id=${vs.id}&resourceType=ValueSet`
 
         let token = await getNZHTSAccessToken()
         if (token) {
@@ -243,31 +237,44 @@ function setup(app) {
     })
 
     //make an ECL query
-    app.get('/nzhts/ecl',async function(req,res){
+    app.post('/nzhts/eclNEW',async function(req,res){
+
+        let ecl = req.body.ecl      //raw ecl
+
+        console.log(ecl,ecl.length)
+
+        let encodedEcl =encodeURIComponent(ecl)
+
+        let qry = `${nzhtsconfig.serverBase}ValueSet/$expand`// ?url=http://snomed.info/sct?fhir_vs=ecl/${encodedEcl}`
+        //qry += "&displayLanguage=en-x-sctlang-23162100-0210105"
+
+        let param = {resourceType:'Parameters',parameter:[]}
+
+        let vo = {}// {url:"http://snomed.info/sct?fhir_vs=ecl"}
+        vo["fhir_vs"] = `ecl/${encodedEcl}`
+        param.parameter.push(vo)
+
+       // param.parameter.push({url:"http://snomed.info/sct?fhir_vs=ecl"})
+        //param.parameter.push({"fhir_vs":`ecl/${ecl}`})
 
 
-        let encodedEcl =encodeURIComponent(req.query.qry)
-
-        let qry = `${nzhtsconfig.serverBase}ValueSet/$expand?url=http://snomed.info/sct?fhir_vs=ecl/${encodedEcl}`
-
-        qry += "&displayLanguage=en-x-sctlang-23162100-0210105"
-
-        //console.log(qry)
+        console.log(param)
 
         let token = await getNZHTSAccessToken()
         if (token) {
 
-            var decoded = jwt_decode(token);
+            //var decoded = jwt_decode(token);
             // let timeToExpire = decoded.exp * 1000 - Date.now()       //exp is in seconds
             // console.log(timeToExpire / (1000 * 60 *60 ));
 
             let config = {headers:{authorization:'Bearer ' + token}}
             config['content-type'] = "application/fhir+json"
 
-            axios.get(qry,config).then(function(data) {
+            axios.post(qry,param,config).then(function(data) {
                 res.json(data.data)
             }).catch(function(ex) {
                 if (ex.response) {
+                    console.log(ex.response.data)
                     res.status(ex.response.status).json(ex.response.data)
                 } else {
                     res.status(500).json(ex)
@@ -278,7 +285,49 @@ function setup(app) {
             res.status(500).json({msg:"Unable to get Access Token."})
         }
     })
-/*
+
+
+    app.post('/nzhts/ecl',async function(req,res){
+
+        let ecl = req.body.ecl      //raw ecl
+
+        //console.log(ecl)
+
+        let encodedEcl =encodeURIComponent(ecl)
+
+        let qry = `${nzhtsconfig.serverBase}ValueSet/$expand?url=http://snomed.info/sct?fhir_vs=ecl/${encodedEcl}`
+        qry += "&displayLanguage=en-x-sctlang-23162100-0210105"
+
+        //console.log(qry)
+
+        let token = await getNZHTSAccessToken()
+        if (token) {
+
+            //var decoded = jwt_decode(token);
+            // let timeToExpire = decoded.exp * 1000 - Date.now()       //exp is in seconds
+            // console.log(timeToExpire / (1000 * 60 *60 ));
+
+            let config = {headers:{authorization:'Bearer ' + token}}
+            config['content-type'] = "application/fhir+json"
+
+            axios.get(qry,config).then(function(data) {
+                res.json(data.data)
+            }).catch(function(ex) {
+                if (ex.response) {
+                    console.log(ex.response.data)
+                    res.status(ex.response.status).json(ex.response.data)
+                } else {
+                    res.status(500).json(ex)
+                }
+
+            })
+        } else {
+            res.status(500).json({msg:"Unable to get Access Token."})
+        }
+    })
+
+
+    /*
     app.post('/nzhts/emptycache',function (req,res) {
         vsCache = {}
         vsCacheStats = {hit:0,miss:0}
@@ -621,13 +670,14 @@ async function putResource(qry,resource) {
 
 
         try {
-            console.log('put',qry,JSON.stringify(resource,null,2))
+            //console.log('put',qry,JSON.stringify(resource,null,2))
             let result = await axios.put(qry,resource,config)
-            console.log('ok')
+            //console.log('ok')
 
             //we always want to set the syndication status
             //just temp copied out for now
-          //  let response = await setSyndicationStatus(cs,token)
+            //if it fails will trigger an exception
+            // let response = await setSyndicationStatus(resource,token)
            // return response
 
 

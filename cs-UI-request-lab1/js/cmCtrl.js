@@ -166,11 +166,7 @@ angular.module("pocApp")
                     //I think this is being triggered when a value is being updated after reverse lookup
                     //but in any case, if there is no value then don't do anything
                     $scope.log.push({msg:`uiValueSelected() called with no value. Property value ${propKey} deleted`})
-
                     delete $scope.local.cmOptions[propKey]
-
-
-
                     return
                 }
 
@@ -374,14 +370,24 @@ angular.module("pocApp")
 
                         let target = $scope.uiMatchingTargets[0]
                         $scope.singleConcept = {code:target.code,display:target.display,system:target.system}
+
                         $scope.cmProperties[propKey].singleConcept = {code:target.code,display:target.display,system:target.system}
 
                         $scope.log.push({msg:`A single concept for ${propKey} was returned`,obj:$scope.uiMatchingVS[0],objTitle:"Concept"})
 
                         //set the value of the fixed element
                         //todo - there are multiple objects storing this value - need to be refactored
+
                         $scope.uiHashValues[propKey] = $scope.singleConcept
                         $scope.local.cmOptions[propKey] = $scope.singleConcept
+
+                        //if the singleConcept isn't in the list of options then it won't display
+                        //??? why should this happen?
+                        $scope.cmProperties[propKey].options = [$scope.singleConcept]
+
+
+
+
 
                         //$//scope.uiHashValues[prop] = $scope.local.cmOptions[prop] //$scope.local.cmOptions has the data entered thus far.
 
@@ -422,8 +428,8 @@ angular.module("pocApp")
                         }
 
 
-/*
 
+/*
                         //now that we've updated the list of options, we have to update the value as well (for angular)
                         if ($scope.local.cmOptions[propKey]) {
                             let currentCode = $scope.local.cmOptions[propKey].code
@@ -434,7 +440,8 @@ angular.module("pocApp")
                                 }
                             }
                         }
-*/
+                        */
+
 
                     }
 
@@ -505,15 +512,6 @@ angular.module("pocApp")
 
                     //create the values object with all values 'before' this one
                     let propKeyToExamine = propKey
-
-
-
-
-
-
-
-                      //  = angular.copy($scope.local.cmOptions)  //all the values entered so far (if any)
-
 
                     while (propKeyToExamine) {
                         let hashValues = getHashValues(propKeyToExamine)
