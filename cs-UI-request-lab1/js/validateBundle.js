@@ -266,6 +266,8 @@ console.log(data)
                             let location = data.headers('Content-Location')
                             alert(`Bundle saved as ${location}`)
 
+                            $scope.loadLibrary()
+
 
                         }, function (err) {
                             alert(`Error: ${angular.toJson(err.data)}`)
@@ -293,7 +295,7 @@ console.log(data)
 
             $scope.executeFhirPath = function (fhirPath) {
                 try {
-                    $scope.fhirPathResult = fhirpath.evaluate($scope.inputtedBundle, fhirPath)
+                    $scope.fhirPathResult = fhirpath.evaluate($scope.inputtedBundle, fhirPath, null, fhirpath_r4_model)
                 } catch (ex) {
                     alert(ex)
 
@@ -405,6 +407,7 @@ console.log(data)
 
             function validateConditional(bundle) {
                 $scope.conditionalValidation = []
+
                 bundle.entry.forEach(function (entry) {
                     let resource = entry.resource
                     let item = {entry:entry}
@@ -430,8 +433,8 @@ console.log(data)
                                 isError = true
                                 msg += "The identifier should also have the system"
                             }
-                            item.msg = msg
-                            $scope.conditionalValidation.push(item)
+                            //item.msg = msg
+                          //  $scope.conditionalValidation.push(item)
                         } else {
                             isError = true
                             msg += "Missing entry.request.url"

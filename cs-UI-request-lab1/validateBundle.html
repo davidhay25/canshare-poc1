@@ -51,6 +51,10 @@
     <script src="directive/viewBundle/viewBundleDir.js"></script>
     <script src="directive/viewBundle/viewBundleSvc.js"></script>
     <script src="js/libs/fhirpath.min.js"></script>
+    <script src="js/libs/fhirpath.r4.min.js"></script>
+
+
+
 </head>
 <body style="padding: 8px;padding-top: 80px">
     <div ng-app="topApp" ng-controller="validateBundleCtrl" class="container-fluid">
@@ -150,7 +154,7 @@
                                     </table>
 
                                 </uib-tab>
-                                <uib-tab heading = "Query">
+                                <uib-tab heading = "RESTful API">
 
                                     <textarea class="form-control" ng-model="input.query" rows="3"
                                         placeholder = "Enter the REST query here, excluding the server. eg Patient?identifier=ZDY4805"
@@ -292,7 +296,11 @@
 
                 <uib-tab heading="FHIRPath query" ng-show="inputtedBundle">
 
-                    <a class = "pull-right" href="https://hl7.org/fhirpath/" target="_blank">FHIRPath spec</a>
+                    <a style="padding: 8px" class = "pull-right" href="https://hl7.org/fhirpath/" target="_blank">FHIRPath spec</a>
+                    <a style="padding: 8px" class = "pull-right" href="https://fhirpath-lab.com/FhirPath" target="_blank">FHIRPath Lab tool</a>
+
+
+
 
                     <div class="clearfix"></div>
 
