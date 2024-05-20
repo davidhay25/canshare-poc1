@@ -27,7 +27,10 @@ angular.module("pocApp")
 
             $scope.executeQuery = function (query) {
                 let qry = `${$scope.server}/${query}`
-                $http.get(qry).then(
+                let encodedQry = encodeURIComponent(qry)
+                $http.get(`/proxy?qry=${encodedQry}`).then(
+
+                //$http.get(qry).then(
                     function (data) {
                         let bundle = data.data
 
@@ -117,7 +120,10 @@ angular.module("pocApp")
                 //start with fixedid
 
                 let qry = `${$scope.server}/DocumentReference/fpTemplate`
-                $http.get(qry).then(
+
+                let encodedQry = encodeURIComponent(qry)
+                $http.get(`/proxy?qry=${encodedQry}`).then(
+                //$http.get(qry).then(
                     function (data) {
 
                         let dr = data.data
@@ -199,8 +205,14 @@ angular.module("pocApp")
             }
 
             $scope.loadLibrary = function () {
+
                 let url = `${$scope.server}/DocumentReference?type=bundle&_sort=-date&_summary=true&_count=20`
-                $http.get(url).then(
+
+                //let url = `Patient/${patient.id}/$everything`
+                let encodedQry = encodeURIComponent(url)
+                $http.get(`/proxy?qry=${encodedQry}`).then(
+
+                //$http.get(url).then(
                     function (data) {
                         $scope.libraryResultBundle = data.data
 
@@ -226,7 +238,10 @@ angular.module("pocApp")
                 console.log(entry)
                 let resource = entry.resource
                 let qry = `${$scope.server}/DocumentReference/${resource.id}`
-                $http.get(qry).then(
+                let encodedQry = encodeURIComponent(qry)
+                $http.get(`/proxy?qry=${encodedQry}`).then(
+
+                //$http.get(qry).then(
                     function (data) {
                         let dr = data.data
                         console.log(dr)
@@ -306,7 +321,8 @@ console.log(data)
 
             //
             $scope.validate = function() {
-                let url = `${$scope.server}/Bundle/$validate`
+                //let url = `${$scope.server}/Bundle/$validate`
+                let url =  "validator/validateBundle"
 
                 let bundle
                 try {
@@ -324,6 +340,7 @@ console.log(data)
                 validateConditional(bundle)
 
                 $scope.showWaiting = true
+
 
                 $http.post(url,bundle).then(
                     function (data) {

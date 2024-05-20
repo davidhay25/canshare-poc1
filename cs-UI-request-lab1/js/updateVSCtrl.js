@@ -390,9 +390,6 @@ angular.module("pocApp")
                     }
                 }
 
-
-
-
             }
 
 
@@ -432,29 +429,7 @@ angular.module("pocApp")
                                     $scope.input.prePubConcepts.push(concept)
                                 }
 
-/*
 
-                                let type = updateVSSvc.getConceptType(concept)  //
-
-                                type = type || 'display'    //<<< todo as can't remove otherwise
-
-                                switch (type) {
-                                    case 'prepub' :
-                                        //a concept not yet published
-                                        $scope.input.prePubConcepts = $scope.input.prePubConcepts || []
-                                        $scope.input.prePubConcepts.push(concept)
-                                        break
-                                    case 'display' :
-                                        //included so a different display can be added
-                                        $scope.input.displayConcepts = $scope.input.displayConcepts || []
-                                        $scope.input.displayConcepts.push(concept)
-                                        break
-                                    default :
-                                        alert(`Unknown concept type: ${type}`)
-
-
-                                }
-                                */
 
                             })
                         } else {
@@ -524,9 +499,7 @@ angular.module("pocApp")
                         let param = data.data
                         param.parameter.forEach(function (p) {
                             if (p.name == 'isSyndicated') {
-                                $scope.syndicationStatus = "Syndicated"
-                            } else {
-                                $scope.syndicationStatus = "Not syndicated"
+                                $scope.syndicationStatus = p.valueBoolean ? "Syndicated" : "Not syndicated"
                             }
                         })
                         console.log(data.data)

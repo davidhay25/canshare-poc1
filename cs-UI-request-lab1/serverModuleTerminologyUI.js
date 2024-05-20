@@ -206,11 +206,12 @@ function setup(app) {
 
         let qry = `https://authoring.nzhts.digital.health.nz/synd/getSyndicationStatus?id=${id}&resourceType=${resourceType}`
                                    //let qry = `${serverHost}synd/getSyndicationStatus?id=${vs.id}&resourceType=ValueSet`
+//console.log(qry)
 
         let token = await getNZHTSAccessToken()
         if (token) {
 
-            var decoded = jwt_decode(token);
+            //var decoded = jwt_decode(token);
             // let timeToExpire = decoded.exp * 1000 - Date.now()       //exp is in seconds
             // console.log(timeToExpire / (1000 * 60 *60 ));
 
@@ -251,8 +252,14 @@ function setup(app) {
         let param = {resourceType:'Parameters',parameter:[]}
 
         let vo = {}// {url:"http://snomed.info/sct?fhir_vs=ecl"}
-        vo["fhir_vs"] = `ecl/${encodedEcl}`
-        param.parameter.push(vo)
+        let p1 = {name:'url',valueUri:`http://snomed.info/sct/`}
+        let p = {name:'fhir_vs',valueString:`ecl/${encodedEcl}`}
+        let p3 = {name:'displayLanguage',valueString:`en-x-sctlang-23162100-0210105t`}
+
+        //vo["fhir_vs"] = `ecl/${encodedEcl}`
+        param.parameter.push(p1)
+        param.parameter.push(p)
+        param.parameter.push(p3)
 
        // param.parameter.push({url:"http://snomed.info/sct?fhir_vs=ecl"})
         //param.parameter.push({"fhir_vs":`ecl/${ecl}`})
@@ -269,6 +276,8 @@ function setup(app) {
 
             let config = {headers:{authorization:'Bearer ' + token}}
             config['content-type'] = "application/fhir+json"
+
+            //let temp = JSON.stringify(param)
 
             axios.post(qry,param,config).then(function(data) {
                 res.json(data.data)
@@ -631,9 +640,13 @@ function setup(app) {
 
 async function setSyndicationStatus(resource,token) {
 
+    //        let qry = `https://authoring.nzhts.digital.health.nz/synd/getSyndicationStatus?id=${id}&resourceType=${resourceType}`
+
     const csOptions = {
         method: 'POST',
-        url: `${nzhtsconfig.serverBase}synd/setSyndicationStatus`,
+
+        url: `https://authoring.nzhts.digital.health.nz/synd/setSyndicationStatus`,
+
         params: {resourceType: resource.resourceType, id: resource.id, syndicate: 'true'},
         headers: {'Content-Type': 'application/json', authorization: 'Bearer ' + token},
 
@@ -677,7 +690,7 @@ async function putResource(qry,resource) {
             //we always want to set the syndication status
             //just temp copied out for now
             //if it fails will trigger an exception
-            // let response = await setSyndicationStatus(resource,token)
+            await setSyndicationStatus(resource,token)
            // return response
 
 

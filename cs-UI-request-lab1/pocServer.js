@@ -25,6 +25,7 @@ const clinicalViewerModule = require("./serverModuleClinicalViewerUI")
 const terminologyModule = require("./serverModuleTerminologyUI")
 const modelModule = require("./serverModuleModel")
 const reviewModule = require("./serverModuleReview")
+const validatorModule = require("./serverModuleValidator")
 
 //let config = require("./config.json")
 
@@ -50,6 +51,7 @@ clinicalViewerModule.setup(app)
 terminologyModule.setup(app)
 modelModule.setup(app)
 reviewModule.setup(app)
+validatorModule.setup(app)
 
 //common calls (not specifically related to requester or lab. ?move to separate module
 
@@ -62,6 +64,7 @@ app.get('/validatorHints',function (req,res) {
     let fle = require("./validatorHints.json")
     res.json(fle)
 })
+
 
 //validation.
 app.post('/validateBundle', async function (req,res) {

@@ -1,0 +1,89 @@
+<div>
+  Custom code system
+
+
+  <div class="row">
+
+    <div class="col-md-3">
+      List of non-SNOMED codesystems
+    </div>
+
+    <div class="col-md-4">
+      <table class="table table-bordered">
+        <!--
+        <tr>
+          <td>ValueSet Url</td>
+          <td><input type="text"
+                     placeholder="The full url of the ValueSet url"
+                     ng-blur="$scope.generateResources()" class="form-control" ng-model="input.vsUrl"/> </td>
+        </tr>
+
+        <tr>
+          <td>CodeSystem Url</td>
+          <td><input type="text"
+                     placeholder="The full url of the CodeSystem url"
+                     ng-blur="generateResources()" class="form-control" ng-model="input.csUrl"/> </td>
+        </tr>
+-->
+        <tr>
+          <td>Name</td>
+          <td><input type="text"
+                     placeholder="Name of the CS & VS - no spaces. eg my-laterality"
+                     ng-blur="generateResources()" class="form-control" ng-model="input.name"/> </td>
+        </tr>
+
+        <tr>
+          <td>Title</td>
+          <td><input type="text"  ng-blur="generateResources()" class="form-control" ng-model="input.title"/> </td>
+        </tr>
+
+        <tr>
+          <td>Description</td>
+          <td><textarea type="text" ng-blur="generateResources()" class="form-control" ng-model="input.description"> </textarea></td>
+        </tr>
+
+
+
+      </table>
+
+      <table class="table table-bordered">
+        <tr ng-repeat="concept in model.concepts">
+          <td>{{concept.code}}</td>
+          <td>{{concept.display}}</td>
+          <td>
+            <i style="color: red" class="glyphicon glyphicon-remove clickable"
+                 ng-click="removeCustomConcept($index)"></i>
+          </td>
+        </tr>
+        <tr>
+          <td><input type="text" class="form-control" ng-model="input.newCode"/> </td>
+          <td><input type="text" class="form-control" ng-model="input.newDisplay"/> </td>
+          <td>
+            <i style="color: green" class="glyphicon glyphicon-ok clickable"
+               ng-show="input.newCode && input.newDisplay"
+               ng-click="addCustomConcept()"></i>
+          </td>
+
+        </tr>
+      </table>
+
+
+    </div>
+
+
+    <div class="col-md-4">
+
+      <pre>{{vs | json}}</pre>
+
+      <pre>{{cs | json}}</pre>
+
+
+
+    </div>
+
+
+  </div>
+
+
+
+</div>
