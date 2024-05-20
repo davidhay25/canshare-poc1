@@ -95,13 +95,19 @@ angular.module("pocApp")
                         att.data = btoa(json)
                         let qry = `${$scope.server}/DocumentReference/fpTemplate`
 
-                        $http.put(qry,dr).then(
+                        let vo = {}
+                        vo.content = dr
+                        vo.qry = $scope.server //only the server root is needed. The server will construct the PUT url from that
+
+                        $http.put('/validator/proxy',vo).then(
+                        //$http.put(qry,dr).then(
                             function (data) {
                                 alert('updated')
                             }, function (err) {
                                 alert(angular.toJson(err.data))
                             }
                         )
+
                     })
 
                 })
@@ -131,7 +137,7 @@ angular.module("pocApp")
                         let att = dr.content[0].attachment
                         let json = atob(att.data)
                         let template = angular.fromJson(json)
-
+                        console.log(template)
                         $scope.input.template = template     //     {items:[{fp}]}
                         if (cb) {
                             cb(dr,template)
@@ -188,10 +194,11 @@ angular.module("pocApp")
             $scope.applyBundle = function () {
                 if (confirm("Are you sure you wish to apply this bundle as a transaction bundle to the FHIR server")) {
 
-                    let url = `${$scope.server}`
+                    let vo = {}
+                    vo.qry = `${$scope.server}`
+                    vo.content = $scope.inputtedBundle
 
-
-                    $http.post(url,$scope.inputtedBundle).then(
+                    $http.post('/validator/proxy',vo).then(
                         function (data) {
                             alert("Processed OK")
 
@@ -215,6 +222,7 @@ angular.module("pocApp")
                 //$http.get(url).then(
                     function (data) {
                         $scope.libraryResultBundle = data.data
+                       // console.log($scope.libraryResultBundle)
 
                     },
                     function (err) {
@@ -225,6 +233,7 @@ angular.module("pocApp")
                 //http://test.canshare.co.nz:8080/fhir/DocumentReference?_sort=-date&_summary=true
             }
             $scope.loadLibrary()
+
 
 
 
@@ -274,11 +283,19 @@ angular.module("pocApp")
                     let att = {data:btoa($scope.input.bundle)}
                     dr.content=[{attachment:att}]
 
-                    let url = `${$scope.server}/DocumentReference`
-                    $http.post(url,dr).then(
+                    let vo = {}
+                    vo.qry = `${$scope.server}/DocumentReference`
+                    vo.content = dr
+
+                    $http.post('/validator/proxy',vo).then(
+
                         function (data) {
-console.log(data)
-                            let location = data.headers('Content-Location')
+                            //returns the updated resource
+                            let savedDR = data.data
+                            let location =`${savedDR.resourceType}.${savedDR.id}`
+                            console.log(data)
+
+                            //let location = data.headers('Content-Location')
                             alert(`Bundle saved as ${location}`)
 
                             $scope.loadLibrary()
@@ -301,7 +318,10 @@ console.log(data)
             //exceute a fhirPath against the bundle and return the result
             $scope.executeFhirPathForTemplate = function (fhirPath) {
                 try {
-                    return fhirpath.evaluate($scope.inputtedBundle, fhirPath)
+                    let result = fhirpath.evaluate($scope.inputtedBundle, fhirPath)
+                    console.log(fhirPath,result)
+                    return result
+
                 } catch (ex) {
                     return ex
                 }
