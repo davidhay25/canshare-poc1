@@ -22,6 +22,10 @@
             $locationProvider.hashPrefix('!');
         });
 
+        angular.module("pocApp").config(['$compileProvider', function ($compileProvider) {
+            $compileProvider.aHrefSanitizationWhitelist(/^\s*(http|https?|ftp|mailto|blob):/);
+        }]);
+
         angular.module("formsApp",[])
         angular.module('topApp', ['pocApp', 'formsApp'])
 
@@ -112,7 +116,15 @@
                     <!--
                     <button ng-hide="input.bundle" class="btn btn-link pull-right" ng-click="loadSample()">Load sample</button>
                     -->
-                    <button ng-show="input.bundle" class="btn btn-link pull-right" ng-click="validate('an')">Validate</button>
+                    <button ng-show="input.bundle" class="btn btn-link pull-right" ng-click="validate()">Validate</button>
+
+
+                    <a class="btn btn-link pull-right"  download="{{downloadLinkCsvName}}"
+                       href="{{downloadLinkCsv}}" title="{{downloadLinkCsvName}}" >
+                        Download all FHIRPath
+                    </a>
+
+
 
 
                     <div class="row">
@@ -148,7 +160,7 @@
                                                 <div class="clickable" ng-click="loadFromLibrary(entry)">{{entry.resource.id}}</div>
                                             </td>
                                             <td>{{entry.resource.description}}</td>
-
+                                            <td>{{entry.resource.meta.versionId}}</td>
 
                                         </tr>
                                     </table>
@@ -187,10 +199,6 @@
                         </div>
 
                     </div>
-
-
-
-
 
                 </uib-tab>
 
@@ -290,7 +298,9 @@
 -->
                 </uib-tab>
 
-                <uib-tab  ng-show="input.bundle" heading="Visualizations">
+                <uib-tab  ng-show="input.bundle">
+                    <uib-tab-heading>Visualizations <span class="badge">{{inputtedBundle.entry.length}}</span> </uib-tab-heading>
+
                     <viewbundle bundle="inputtedBundle" validationoo = "oo"></viewbundle>
                 </uib-tab>
 

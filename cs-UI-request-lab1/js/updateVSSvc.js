@@ -1,6 +1,6 @@
 angular.module("pocApp")
 
-    .service('updateVSSvc', function($q,$http) {
+    .service('updateVSSvc', function($q,$http,utilsSvc) {
 
         let extUrl = "http://canshare.co.nz/fhir/StructureDefinition/concept-type"
 
@@ -15,6 +15,51 @@ angular.module("pocApp")
         let snomed = "http://snomed.info/sct"
 
         return {
+            makeDownload : function (arItem) {
+                let that = this
+                let ar = []
+                ar.push(`Url\tId\tStatus\tTitle\tDescription\tLastUpdated\tECL\n`)
+                arItem.forEach(function (item) {
+                    let vs = item.vs
+                    let lne = vs.url
+                    lne += `\t${vs.id}`
+                    lne += `\t${vs.status}`
+                    lne += `\t${tidyText(vs.title)}`
+                    lne += `\t${tidyText(vs.description)}`
+                    lne += `\t${vs.meta.lastUpdated}`
+                    lne += `\t${that.getEcl(vs)}`
+                    ar.push(lne)
+                })
+                let downLoad = ar.join('\n')
+                return downLoad
+
+                function tidyText(s) {
+                    if (s) {
+                        s = s.replace(/\t/g, " ");
+                        s = s.replace(/\n/g, " ");
+                        s = s.replace(/\r/g, " ");
+                        return s
+                    } else {
+                        return ""
+                    }
+                }
+
+            },
+            getEcl : function (vs) {
+                let ecl = ""
+                if (vs.compose && vs.compose.include) {
+
+                    vs.compose.include.forEach(function (inc) {
+                        //if the include has a filter, then it's the ecl. Otherwise it's a diect concept
+                        if (inc.filter) {
+                            //this is the ecl
+                            ecl = inc.filter[0].value
+                        }
+
+                    })
+                }
+                return ecl
+            },
             addConceptToCodeSystem : function (cs,newConcept) {
                 //add a concept to the pre-pub codesystem if not already there
                 //returns true if the CS was updated
@@ -128,7 +173,7 @@ angular.module("pocApp")
 
             },
 
-            getConceptType : function(el)  {
+            getConceptTypeDEP : function(el)  {
                 //get the type of concept - display or prepub
                 let code
                 if (el.extension) {
@@ -143,7 +188,7 @@ angular.module("pocApp")
             },
 
 
-        setConceptType : function(el,type)  {
+        setConceptTypeDEP : function(el,type)  {
             //set the concept type = 'prepub' and 'display'
             //right now we can assume that this will be the only extension we use.
             //If there's already an extension on this element then just remve it

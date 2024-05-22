@@ -4,9 +4,36 @@ angular.module("pocApp")
 
         return {
             getVersion : function(){
-                return "0.8.13"
+                return "0.8.14"
             },
-            fhirDataTypes : function(){
+            makeSafeString : function(s) {
+            if (s) {
+                s = s.replace(/-/g, "");
+                s = s.replace(/\./g, "");
+                s = s.replace(/\,/g, "");
+                s = s.replace(/\(/g, "");
+                s = s.replace(/\)/g, "");
+                s = s.replace(/\'/g, "");
+                s = s.replace(/\’/g, "");
+                s = s.replace(/\?/g, "");
+
+                s = s.replace(/ /g, "");
+                s = s.replace(/\//g, "");
+                s = s.replace(/\:/g, "");
+                s = s.replace(/\%/g, "");
+                s = s.replace(/\_/g, "");
+                s = s.replace(/\#/g, "");
+                s = s.replace(/\–/g, "");
+                s = s.replace(/\;/g, "");
+
+                return s
+            } else {
+                return ""
+            }
+
+        },
+
+        fhirDataTypes : function(){
                 //theres also a list in snapShot Svc
                 return ['boolean','code','date','dateTime','decimal','integer','string','Address','Attachment','CodeableConcept','ContactPoint','Group','HumanName','Identifier','Period','Quantity','Ratio']
             },

@@ -27,6 +27,10 @@
         });
         angular.module("pocApp").constant("moment", moment);
 
+        angular.module("pocApp").config(['$compileProvider', function ($compileProvider) {
+            $compileProvider.aHrefSanitizationWhitelist(/^\s*(http|https?|ftp|mailto|blob):/);
+        }]);
+
         angular.module("formsApp",[])
         angular.module('topApp', ['pocApp', 'formsApp'])
 
@@ -134,12 +138,19 @@
         </div>
     </nav>
 
+
+    <a class="btn btn-link pull-right"  download="{{downloadLinkCsvName}}"
+       href="{{downloadLinkCsv}}" title="{{downloadLinkCsvName}}" >
+        Download VS list
+    </a>
+
+
     <uib-tabset>
         <uib-tab heading="Edit ValueSet">
             <br/>
 
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-4">
 
                     <uib-tabset>
                         <uib-tab heading="Alphabetical">
@@ -147,7 +158,7 @@
                             <div class="row">
 
                                 <div class="col-md-6">
-                                    <checkbox ng-model="input.onlyRetired"></checkbox> Only retired
+                                    <checkbox ng-model="input.includeRetired"></checkbox> Include retired
                                 </div>
 
                                 <div class="col-md-6">
@@ -187,6 +198,12 @@
                             </div>
 
                         </uib-tab>
+                        <uib-tab  heading="Bespoke query">
+                            <textarea class="form-control" ng-model="input.bespoke"
+                                      placeholder="Enter query - eg ValueSet?name=cs"></textarea>
+
+                            <button class="btn-link btn" ng-click="executeBespoke(input.bespoke)">Execute</button>
+                        </uib-tab>
                     </uib-tabset>
 
 
@@ -194,7 +211,7 @@
                 </div>
 
 
-                <div ng-show="selectedVS" class="col-md-9">
+                <div ng-show="selectedVS" class="col-md-8">
 
                     <div class="alert-info alert" ng-hide="user">
                         Update and Create operations on the publishing Server can only be done by
@@ -246,6 +263,13 @@
                                     <td>Syndication Status</td>
                                     <td>
                                         {{syndicationStatus}}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Last updated</td>
+                                    <td>
+                                        {{selectedVS.meta.lastUpdated | date}}
                                     </td>
                                 </tr>
 

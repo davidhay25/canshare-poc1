@@ -545,8 +545,6 @@ angular.module("pocApp")
                 }
 
             }
-
-
         }
 
 

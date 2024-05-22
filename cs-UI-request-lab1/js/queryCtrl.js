@@ -453,6 +453,14 @@ console.log($scope.allTargets)
 
             //whether to show a particular VS
             $scope.showVS = function (item) {
+
+                if (! $scope.input.includeRetired) {
+                    if (item.vs.status == 'retired') {
+                        return false
+                    }
+                }
+
+
                 let filter = $scope.input.filterlist
                 if (filter) {
                     let match = item.display.toLowerCase().indexOf(filter.toLowerCase()) > -1 || item.vs.url.toLowerCase().indexOf(filter.toLowerCase()) > -1

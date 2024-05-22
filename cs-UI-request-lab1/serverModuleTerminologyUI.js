@@ -238,7 +238,7 @@ function setup(app) {
     })
 
     //make an ECL query
-    app.post('/nzhts/eclNEW',async function(req,res){
+    app.post('/nzhts/ecl',async function(req,res){
 
         let ecl = req.body.ecl      //raw ecl
 
@@ -252,13 +252,14 @@ function setup(app) {
         let param = {resourceType:'Parameters',parameter:[]}
 
         let vo = {}// {url:"http://snomed.info/sct?fhir_vs=ecl"}
-        let p1 = {name:'url',valueUri:`http://snomed.info/sct/`}
-        let p = {name:'fhir_vs',valueString:`ecl/${encodedEcl}`}
+        //let p1 = {name:'url',valueUri:`http://snomed.info/sct`}
+        let p1 = {name:'url',valueUri:`http://snomed.info/sct/21000210109?fhir_vs=ecl/${encodedEcl}`}
+        //let p = {name:'fhir_vs',valueString:`ecl/${encodedEcl}`}
         let p3 = {name:'displayLanguage',valueString:`en-x-sctlang-23162100-0210105t`}
 
         //vo["fhir_vs"] = `ecl/${encodedEcl}`
         param.parameter.push(p1)
-        param.parameter.push(p)
+        //param.parameter.push(p)
         param.parameter.push(p3)
 
        // param.parameter.push({url:"http://snomed.info/sct?fhir_vs=ecl"})
@@ -296,7 +297,7 @@ function setup(app) {
     })
 
 
-    app.post('/nzhts/ecl',async function(req,res){
+    app.post('/nzhts/eclORIG',async function(req,res){
 
         let ecl = req.body.ecl      //raw ecl
 
@@ -563,6 +564,7 @@ function setup(app) {
 
         }
     })
+
 
 
 

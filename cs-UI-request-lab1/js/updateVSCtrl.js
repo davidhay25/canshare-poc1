@@ -4,8 +4,6 @@ angular.module("pocApp")
 
             $scope.version = utilsSvc.getVersion()
 
-
-
             $scope.input = {}
             $scope.isDirty = false;
             let nzDisplayLanguage = "en-x-sctlang-23162100-0210105"
@@ -15,8 +13,6 @@ angular.module("pocApp")
             // >>>>>>>> this approach won't work any more to discriminate between the
             //different include elements - but I'll keep them as separate versions in case we need them to be different
             let versionEcl = "http://snomed.info/sct/21000210109"      //the version that has the ECL statements
-            //let versionDirect = "http://snomed.info/sct/21000210109"             //concepts directly included in the VS. Often changing the display
-            //let versionPrePub = "http://snomed.info/sct/21000210109"  //the version that has concepts not yet published
 
             //the url for the unpublished concepts. this will be the system value in the valueset,
             //and the url for the CodeSystem
@@ -40,42 +36,21 @@ angular.module("pocApp")
             )
 
 
-            //an extension that describes the type of concept when directly included in the VS
-            //So I can split them up in the UI
-            //code - values: 'prepub' (pre published) 'display' (changing the display)
-         //   let extUrl = "http://canshare.co.nz/fhir/StructureDefinition/concept-type"
+            $scope.executeBespoke = function (qry) {
+                let encodedQry = encodeURIComponent(qry)
+                let fullQry = `/nzhts?qry=${encodedQry}`
+                $http.get(fullQry).then(
+                    function (data) {
+                        console.log(data)
+                    },function () {
 
-            /*
-            //get the type of the concept - from the extension. values 'prepub' and 'display'
-            function getConceptType(el) {
-                let code
-                if (el.extension) {
-                    el.extension.forEach(function (ext) {
-                        if (ext.url == extUrl) {
-                            code = ext.valueCode
-                        }
+                    }
+                )
 
-                    })
-                }
-                return code
-            }
-
-            //set the concept type = 'prepub' and 'display'
-            //right now we can assume that this will be the only extension we use.
-            function setConceptType(el,type) {
-                //If there's already an extension on this element then just remve it
-                if (el.extension) {
-                    el.extension.length = 0
-                } else {
-                    el.extension = []
-                }
-
-                let ext = {url:extUrl,valueCode:type}
-                el.extension.push(ext)
             }
 
 
-            */
+
 
             //retrieve ValueSets
             getValueSets = function () {
@@ -83,7 +58,7 @@ angular.module("pocApp")
 
                 let deferred = $q.defer()
 
-                let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&_sort=title&_count=5000`
+                let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&_sort=title&_count=5000&_summary=false`
 
                 let encodedQry = encodeURIComponent(qry)
 
@@ -113,6 +88,13 @@ angular.module("pocApp")
             getValueSets().then(
                 function (ar) {
                     $scope.allVSItem = ar
+
+                    //create download
+                    let download = updateVSSvc.makeDownload($scope.allVSItem)
+
+                    $scope.downloadLinkCsv = window.URL.createObjectURL(new Blob([download ],{type:"text/tsv"}))
+                    $scope.downloadLinkCsvName = `allValueSets.tsv`
+
                     //console.log(ar)
                     delete $scope.showLoadingMessage
 
@@ -127,29 +109,6 @@ angular.module("pocApp")
                         }
 
                     })
-
-                    /*
-
-                   for (const item of $scope.sortedVS) {
-                       let age =  moment().diff(moment(item.vs.meta.lastUpdated),'days');
-
-                       if (age < 7) {
-                           let qry = `/nzhts/syndStatus?resourceType=ValueSet&id=${item.vs.id}`
-                           $http.get(qry).then(
-                               function (data) {
-                                   console.log(data.data)
-
-
-
-                               }
-                           )
-
-                       }
-
-
-                   }
-
- */
 
 
                 }
@@ -340,7 +299,6 @@ angular.module("pocApp")
 
             $scope.testECL = function (ecl) {
 
-                //let encodedEcl = encodeURIComponent(ecl)
                 let vo = {ecl:ecl}
 
 
@@ -352,17 +310,8 @@ angular.module("pocApp")
                         alert(angular.toJson(err.data))
                     })
 
-                /*
-                $http.get(`nzhts/ecl?qry=${encodedEcl}`).then(
-                    function (data) {
-                        $scope.textEclVS = data.data
 
-                    }, function (err) {
-                        console.log(err)
-                    })
-*/
 
-                //fhir_vs=ecl/[ecl] - all concept ids that match the supplied (URI-encoded) expression constraint
             }
 
             $scope.canSave = function () {
@@ -373,6 +322,26 @@ angular.module("pocApp")
             //whether to show a particular VS
             $scope.showVS = function (item) {
 
+                if (! $scope.input.includeRetired) {
+                    if (item.vs.status == 'retired') {
+                        return false
+                    }
+                }
+
+                let filter = $scope.input.filterlist
+                if (! filter) {
+                    return true
+                }
+
+                if ((item.display.toLowerCase().indexOf(filter.toLowerCase()) > -1) ||
+                    (item.vs.id.toLowerCase().indexOf(filter.toLowerCase()) > -1)) {
+
+                    return true
+                } else {
+                    return false
+                }
+
+/*
                 if ($scope.input.onlyRetired) {
                     if (item.vs.status == 'retired') {
                         return true
@@ -389,6 +358,7 @@ angular.module("pocApp")
                         return true
                     }
                 }
+                */
 
             }
 

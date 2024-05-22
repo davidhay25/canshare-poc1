@@ -84,6 +84,7 @@ angular.module("pocApp")
                     let item = {fp:fhirPath}
                     item.title = vo.title
                     $scope.input.template.items.push(item)      //for the UI
+                    $scope.makeTemplateDownload($scope.input.template)
                     //todo update dr
 
                     //load the template then update it
@@ -139,6 +140,7 @@ angular.module("pocApp")
                         let template = angular.fromJson(json)
                         console.log(template)
                         $scope.input.template = template     //     {items:[{fp}]}
+                        $scope.makeTemplateDownload(template)
                         if (cb) {
                             cb(dr,template)
                         }
@@ -149,6 +151,7 @@ angular.module("pocApp")
                         if (err.status == 404 || err.status == 410) {
                             //the default template wasn't found - create it
                             $scope.input.template = {items:[]}
+                            $scope.makeTemplateDownload($scope.input.template)
                             if (cb) {
                                 let dr = {resourceType:"DocumentReference",status:"current"}
                                 dr.id = "fpTemplate"
@@ -259,7 +262,8 @@ angular.module("pocApp")
                         $scope.input.bundle = bundle
 
 
-                        $scope.validate()
+                        //validate, but don't save again!
+                        $scope.validate(true)
 
 
                         console.log(bundle)
@@ -272,7 +276,54 @@ angular.module("pocApp")
                 )
             }
 
+            //update a bundle based on the identifier in the bundle
+            //
+            $scope.updateBundle = function (bundle) {
+                if (! bundle.identifier) {
+                    console.log('no identifier')
+                    return
+                }
+
+                //the identifier.value will be the id of the DocumentReference containing the bundle
+                let bundleId = bundle.identifier.value
+
+                if (! bundleId) {
+                    console.log("no identifier value")
+                    return
+                }
+                bundleId = bundleId.replace(/ /g, "")   //remove any spaces
+                bundleId = bundleId.replace(/_/g, "-")   //underscore to minus
+                //now we can create the DR
+
+
+                let dr = {resourceType:"DocumentReference",status:"current"}
+                dr.id = bundleId
+                dr.description = `Transaction bundle: ${bundleId}`
+                dr.type = {coding:[{system:"http://canshare.co.nz/fhir/NamingSystem/bv",code:"bundle"}]}
+                dr.date = new Date().toISOString()
+
+                let att = {data:btoa($scope.input.bundle)}
+                dr.content=[{attachment:att}]
+
+                let vo = {}
+                vo.content = dr
+                vo.qry = $scope.server //only the server root is needed. The server will construct the PUT url from that
+
+                $http.put('/validator/proxy',vo).then(
+                    function (data) {
+                        alert(`bundle updated in library: DocumentReference/${bundleId}`)
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+
+            }
+
+            //add the bundle as a new entry in the library. May wind up replacing this
+            //with the update
             $scope.saveBundle = function () {
+
+
                 let description = window.prompt("Enter a description of this bundle")
                 if (description) {
                     let dr = {resourceType:"DocumentReference",status:"current"}
@@ -306,8 +357,6 @@ angular.module("pocApp")
                         }
                     )
 
-
-
                 } else {
                     alert("No message entered. Bundle not saved.")
                 }
@@ -317,15 +366,50 @@ angular.module("pocApp")
 
             //exceute a fhirPath against the bundle and return the result
             $scope.executeFhirPathForTemplate = function (fhirPath) {
-                try {
-                    let result = fhirpath.evaluate($scope.inputtedBundle, fhirPath)
-                    console.log(fhirPath,result)
-                    return result
+                if ($scope.inputtedBundle) {
+                    try {
+                        let result = fhirpath.evaluate($scope.inputtedBundle, fhirPath, null, fhirpath_r4_model)
+                        console.log(fhirPath,result)
+                        return result
 
-                } catch (ex) {
-                    return ex
+                    } catch (ex) {
+                        console.log(ex)
+                        return ex
+                    }
                 }
+
             }
+
+            $scope.makeTemplateDownload = function (template) {
+
+                let ar = []
+                ar.push(`Title\tFHIRPath\n`)
+
+                template.items.forEach(function (item) {
+                    let lne = tidyText(item.title)
+                    lne += `\t${item.fp}`
+                    ar.push(lne)
+                })
+
+                let download = ar.join('\n')
+                $scope.downloadLinkCsv = window.URL.createObjectURL(new Blob([download],{type:"text/tsv"}))
+                $scope.downloadLinkCsvName = `allFHIRPath.tsv`
+
+
+
+                function tidyText(s) {
+                    if (s) {
+                        s = s.replace(/\t/g, " ");
+                        s = s.replace(/\n/g, " ");
+                        s = s.replace(/\r/g, " ");
+                        return s
+                    } else {
+                        return ""
+                    }
+                }
+
+            }
+
 
 
             $scope.executeFhirPath = function (fhirPath) {
@@ -340,7 +424,7 @@ angular.module("pocApp")
             }
 
             //
-            $scope.validate = function() {
+            $scope.validate = function(nosave) {
                 //let url = `${$scope.server}/Bundle/$validate`
                 let url =  "validator/validateBundle"
 
@@ -355,6 +439,14 @@ angular.module("pocApp")
 
                 //the bundle parsed as an object
                 $scope.inputtedBundle = bundle
+
+
+                if (! nosave) {
+                    //if there's an identifier then the bundle will be saved using the identifier.value as the resource id
+                    $scope.updateBundle(bundle)
+                }
+
+
 
                 //validate that all entries have a conditional on identifier
                 validateConditional(bundle)
