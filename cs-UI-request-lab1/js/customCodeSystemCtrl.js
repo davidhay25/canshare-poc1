@@ -12,6 +12,8 @@ angular.module("pocApp")
                 $scope.generateResources()
             }
 
+
+
             $scope.saveCustomVS = function () {
                 let msg = "Are you sure you wish to update this valueSet and CodeSystem"
 
@@ -37,12 +39,67 @@ angular.module("pocApp")
                 }
             }
 
-            //load all codesystems
-            $scope.loadAllCS = function () {
+            $scope.selectCustomVSItem = function (item) {
+                console.log(item)
+                let vs = item.vs
+
+                //If we expand the ValueSet, then we can re-create the codesystem
+
+                let qry = `ValueSet/$expand?url=${vs.url}&_summary=false`
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        console.log(data.data)
+                        //now we can create the internal model from the expansion
+                        let expandedVs = data.data
+                        $scope.input.name = vs.name     //the expanded vs doesn't include the vs name etc.
+                        $scope.input.title = vs.title
+                        $scope.input.description = vs.description
+                        $scope.model = {concepts:[]}
+                        for (concept of expandedVs.expansion.contains) {
+                            delete concept.system       //not needed in the codesystem
+                            $scope.model.concepts.push(concept)
+                        }
+
+
+                        $scope.generateResources()
+
+
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                ).finally(
+                    function () {
+                        $scope.showWaiting = false
+                    }
+                )
 
             }
 
-            $scope.loadAllCS()
+            //load all codesystems
+            $scope.loadAllVS = function () {
+                getValueSets("http://canshare.co.nz/fhir/NamingSystem/nonsnomed-valuesets%7c").then(
+                    function (ar) {
+                        console.log(ar)
+                        $scope.customVS = angular.copy(ar)
+
+                        $scope.customVS.sort(function (a,b) {
+                            if (a.vs.meta.lastUpdated > b.vs.meta.lastUpdated) {
+                                return -1
+                            } else {
+                                return 1
+                            }
+
+                        })
+
+                    },function (err) {
+                        console.log(err)
+                    }
+                )
+            }
+
+            $scope.loadAllVS()
 
             $scope.newCS = function() {
                 $scope.model = {concepts:[],url:"",title:"",description:""}

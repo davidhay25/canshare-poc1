@@ -5,10 +5,21 @@
   <div class="row">
 
     <div class="col-md-3">
-      List of non-SNOMED codesystems
+      <div class="myScroll">
+        <div class="list-group">
+          <div ng-class="{'list-group-item':true,listItemSelected:selectedItem.vs.id==item.vs.id,retired:item.vs.status == 'retired'}"
+               style="cursor: pointer" ng-repeat="item in customVS" ng-click="selectCustomVSItem(item)">
+            <div>{{item.display}}</div>
+            <div class="pull-right"><em>{{item.vs.meta.lastUpdated | ageSeconds}}</em></div>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="col-md-9">
+
+      <button class="pull-right btn btn-link" ng-click="saveCustomVS()">Save non-SNOMED VS</button>
 
       <uib-tabset>
         <uib-tab heading="Edit ValueSet and CodeSystem">
@@ -50,6 +61,7 @@
           </table>
 
           <table class="table table-bordered">
+            <tr><th>Code</th><th>Display</th></tr>
             <tr ng-repeat="concept in model.concepts">
               <td>{{concept.code}}</td>
               <td>{{concept.display}}</td>

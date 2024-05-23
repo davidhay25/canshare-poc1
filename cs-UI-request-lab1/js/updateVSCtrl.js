@@ -53,13 +53,14 @@ angular.module("pocApp")
 
 
             //retrieve ValueSets
-            getValueSets = function () {
+            getValueSets = function (identifier) {
                 //return a list of subsetted canshare valuesets
+                identifier = identifier || "http://canshare.co.nz/fhir/NamingSystem/valuesets%7c"
 
                 let deferred = $q.defer()
 
-                let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&_sort=title&_count=5000&_summary=false`
-
+                let qry = `ValueSet?identifier=${identifier}&_sort=title&_count=5000&_summary=false`
+                console.log(qry)
                 let encodedQry = encodeURIComponent(qry)
 
                 $http.get(`nzhts?qry=${encodedQry}`).then(
@@ -75,6 +76,8 @@ angular.module("pocApp")
                             })
 
                             deferred.resolve(ar)
+                        } else {
+                            deferred.resolve([])
                         }
                     }, function (err) {
                         console.log(err)
