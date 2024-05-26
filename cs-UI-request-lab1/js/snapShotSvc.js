@@ -647,17 +647,19 @@ angular.module("pocApp")
                         let ed = hash[path]
                         if (ed) {
                             newSnapshot.push(ed)
+                            delete hash[path]
                         } else {
                             console.log(`path ${path} not found`)
                             logger(`path ${path} not found`,dg.name)
                         }
-
-
                     }
-
                 })
 
                 //append any left over
+                Object.keys(hash).forEach(function (key) {
+                    newSnapshot.push(hash[key])
+
+                })
 
                 dg.snapshot = newSnapshot
 

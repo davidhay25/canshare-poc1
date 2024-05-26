@@ -28,6 +28,10 @@ angular.module("pocApp")
 
                 })
                 delete $scope.selectedModel.changes //an artifact from earlier work
+
+                //if there's a fixed order, then remove the ordering instructions
+                delete $scope.selectedModel.ordering
+
                 $scope.selectedModel.ssOrder = ar
                 alert("Order has been set on DG")
             }
