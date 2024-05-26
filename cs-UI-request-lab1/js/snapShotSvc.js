@@ -527,6 +527,9 @@ angular.module("pocApp")
                             //ensure that the children of groups are contiguous
                             adjustGroupOrdering(dg)
 
+                            //where there is a fixed order set (dg.ssOrderP
+                            setFixedOrder(dg)
+
                             //look for business related issues - eg a ValueSet and options - in the dg. Doesn't alter the DG.
                             auditDG(dg)
 
@@ -625,6 +628,44 @@ angular.module("pocApp")
 
         }
 
+        function setFixedOrder(dg) {
+
+            if (dg.ssOrder) {
+                //make a hash by path of the current ss
+                console.log(`Setting fixed path for ${dg.name}`)
+                logger(`Setting fixed path`,dg.name)
+                let hash = {}
+                dg.snapshot.forEach(function (ed) {
+                    hash[ed.path] = ed
+                })
+
+                //iterate over the ssOrder element, deleting from the hash as they are added
+                let newSnapshot = []
+                //newSnapshot.push(dg.snapshot[0])    //the root
+                dg.ssOrder.forEach(function (path,inx) {
+                    if (inx > 0) {
+                        let ed = hash[path]
+                        if (ed) {
+                            newSnapshot.push(ed)
+                        } else {
+                            console.log(`path ${path} not found`)
+                            logger(`path ${path} not found`,dg.name)
+                        }
+
+
+                    }
+
+                })
+
+                //append any left over
+
+                dg.snapshot = newSnapshot
+
+
+            }
+
+        }
+
 
         return {
             makeSnapshots: function (hashAllDG,inLogToConsole) {
@@ -686,6 +727,20 @@ angular.module("pocApp")
                 return allDgSnapshot
             },
 
+            addOrderToAllDG : function () {
+                let testHash = {}
+                Object.keys(allDgSnapshot).forEach(function (key) {
+                    let dg = angular.copy(allDgSnapshot[key])
+                    dg.pinOrder = []
+                    dg.snapshot.forEach(function (ed) {
+                        dg.pinOrder.push(ed.path)
+
+                    })
+                    delete dg.snapshot
+                    testHash[key] = dg
+                })
+                return testHash
+            },
 
 
             getDGList : function () {

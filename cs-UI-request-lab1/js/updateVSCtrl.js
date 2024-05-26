@@ -69,10 +69,14 @@ angular.module("pocApp")
                         if (bundle && bundle.entry) {
                             let ar = []
                             bundle.entry.forEach(function (entry) {
+                                //let vs = entry.resp
+
                                 let item = {vs:entry.resource}
                                 item.display = entry.resource.title || entry.resource.name
                                 //item.lastUpdated = new Date(entry.resource.meta.lastUpdated)
                                 ar.push(item)
+
+
                             })
 
                             deferred.resolve(ar)

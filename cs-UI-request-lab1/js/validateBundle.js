@@ -24,26 +24,63 @@ angular.module("pocApp")
                 alert("Under development")
             }
 
+            //retrieve all the patients for the selection table
+            $scope.getAllPatients = function() {
+                $scope.allPatients = []
+                let qry = `${$scope.server}/Patient`
+                let encodedQry = encodeURIComponent(qry)
+                $http.get(`/proxy?qry=${encodedQry}`).then(
+                    function (data) {
+                        for (entry of data.data.entry) {
+                            let resource = entry.resource
+                            $scope.allPatients.push(resource)
 
-            $scope.executeQuery = function (query) {
+                        }
+                        $scope.allPatients.sort(function (a,b) {
+                            try {
+                                if (a.identifier[0].value > b.identifier[0].value) {
+                                    return 1
+                                } else {
+                                    return -1
+                                }
+                            } catch (ex) {
+                                return 0
+                            }
+
+
+                        })
+
+
+                    },function (err) {
+
+                    })
+
+            }
+            $scope.getAllPatients()
+
+            //retrieve a single patients data and display
+            $scope.selectPatient = function (patient) {
+                let qry = `Patient/${patient.id}/$everything`
+                $scope.executeQuery(qry,function () {
+                    $scope.validate(true)
+                })
+
+            }
+
+            //execute a query that returns a bundle and set $scope.input.bundle
+            $scope.executeQuery = function (query,cb) {
+                delete $scope.input.bundle
                 let qry = `${$scope.server}/${query}`
                 let encodedQry = encodeURIComponent(qry)
                 $http.get(`/proxy?qry=${encodedQry}`).then(
 
-                //$http.get(qry).then(
                     function (data) {
                         let bundle = data.data
-
-
                         $scope.input.bundle = angular.toJson(bundle,true)
-
-
-                       // $scope.validate()
-
-
                         console.log(bundle)
-
-
+                        if (cb) {
+                            cb(bundle)
+                        }
 
                     }, function (err) {
                         alert(`Error: ${angular.toJson(err.data)}`)
@@ -369,7 +406,7 @@ angular.module("pocApp")
                 if ($scope.inputtedBundle) {
                     try {
                         let result = fhirpath.evaluate($scope.inputtedBundle, fhirPath, null, fhirpath_r4_model)
-                        console.log(fhirPath,result)
+                        //console.log(fhirPath,result)
                         return result
 
                     } catch (ex) {
@@ -433,6 +470,11 @@ angular.module("pocApp")
                     bundle= angular.fromJson($scope.input.bundle)
                 } catch (e) {
                     alert("Not valid Json. Try again.")
+                    return
+                }
+
+                if (bundle.resourceType !== 'Bundle') {
+                    alert("Validate is only for Bundles")
                     return
                 }
 
@@ -537,13 +579,33 @@ angular.module("pocApp")
             function validateConditional(bundle) {
                 $scope.conditionalValidation = []
 
+                $scope.countConditionalErrors = 0
+
                 bundle.entry.forEach(function (entry) {
                     let resource = entry.resource
                     let item = {entry:entry}
                     let request = entry.request
                     let isError = false
 
-                    //todo need to check resource has identifier
+
+
+                    let identifier = resource.identifier
+                    let identifierString = ""
+                    if (identifier && identifier.length > 0) {
+                        identifierString = `${resource.resourceType}?identifier=${identifier[0].system}|${identifier[0].value}`
+                       /*
+                        let ar = url.split('=')
+                        let identifierInUrl = ar[1]
+                        if (identifierString !== identifierInUrl) {
+                            isError = true
+                            msg += "The identifier in the conditional update does not match the identifier in the resource"
+                        }
+                        */
+                    } else {
+                        isError = true
+                        msg += "There is no identifier in the resource"
+                    }
+
 
                     if (request) {
                         let msg = ""
@@ -553,6 +615,13 @@ angular.module("pocApp")
                         }
                         let url = request.url
                         if (url) {
+
+                            if (url !== identifierString) {
+                                msg += `  conditional url should be ${identifierString}`
+                                isError = true
+                            }
+
+                            /*
                             let str = `${resource.resourceType}?identifier=`
                             if (! url.startsWith(str)) {
                                 isError = true
@@ -562,8 +631,18 @@ angular.module("pocApp")
                                 isError = true
                                 msg += "The identifier should also have the system"
                             }
+                            */
+
                             //item.msg = msg
                           //  $scope.conditionalValidation.push(item)
+
+
+
+                            if (isError) {
+                                item.msg = msg
+                                $scope.conditionalValidation.push(item)
+                            }
+
                         } else {
                             isError = true
                             msg += "Missing entry.request.url"
@@ -573,11 +652,15 @@ angular.module("pocApp")
 
                         if (! isError) {
                             item.msg = "No issues"
-                            $scope.conditionalValidation.push(item)
+                            //Not sure if there is value in 'no issue' messages
+                            //$scope.conditionalValidation.push(item)
+                        } else {
+                            $scope.countConditionalErrors ++
                         }
 
                     } else {
                         item.msg = "Missing request parameter in entry"
+                        $scope.countConditionalErrors ++
                         $scope.conditionalValidation.push(item)
                     }
 

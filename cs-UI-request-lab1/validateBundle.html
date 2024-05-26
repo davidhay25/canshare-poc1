@@ -69,7 +69,7 @@
                 <div class="col-md-4 col-sm-4">
                         <span>
                             <a class="navbar-brand" href="#">
-                                Bundle Visualizer (v2)
+                                CanShare Bundle Visualizer
                             </a>
                         </span>
 
@@ -109,7 +109,7 @@
 
             <uib-tabset active="input.mainTabActive">
 
-                <uib-tab heading = "Bundle">
+                <uib-tab heading = "Bundle / Select">
                     <a class="btn btn-link pull-right"
                        href="https://build.fhir.org/ig/davidhay25/actnow/branches/main/index.html" target="_blank">ACT-NOW Implementation Guide</a>
 
@@ -123,8 +123,6 @@
                        href="{{downloadLinkCsv}}" title="{{downloadLinkCsvName}}" >
                         Download all FHIRPath
                     </a>
-
-
 
 
                     <div class="row">
@@ -171,25 +169,46 @@
                                     <textarea class="form-control" ng-model="input.query" rows="3"
                                         placeholder = "Enter the REST query here, excluding the server. eg Patient?identifier=ZDY4805"
                                     ></textarea>
-
-                                    <button class="btn btn-link" ng-click="executeQuery(input.query)">Execute</button>
+<!--
+                                    <a class="btn btn-link " target="_blank"
+                                       href="http://clinfhir.com/query.html">clinFHIR server query</a>
+                                    -->
+                                    <button class="btn btn-link pull-right" ng-click="executeQuery(input.query)">Execute</button>
 
                                 </uib-tab>
-                                <uib-tab heading = "Local">
+                                <uib-tab heading = "Patients">
+                                    <div class="myScrollSmall">
+                                        <table class="table-bordered table">
+                                            <tr ng-repeat="patient in allPatients">
+                                                <td>
+                                                    <div class="clickable" ng-click="selectPatient(patient)">
+                                                        {{patient.identifier[0].value}}
+                                                    </div>
+                                                </td>
+
+                                                <td>{{patient.name[0].text}}</td>
+
+                                                <td>
+
+                                                        {{patient.id}}
+
+
+                                                </td>
+
+
+                                            </tr>
+                                        </table>
+                                    </div>
+
 
                                 </uib-tab>
+
+
                             </uib-tabset>
 
 
 
-<!--
-                            <div class="list-group">
-                                <div class="list-group-item" ng-repeat="entry in libraryResultBundle.entry">
-                                    {{entry.resource.id}} {{entry.resource.description}}
 
-                                </div>
-                            </div>
-                        -->
                         </div>
 
                         <div class="col-md-6">
@@ -262,22 +281,37 @@
                             </div>
                         </uib-tab>
                         <uib-tab heading="Conditional update">
-                            <h4>issues checking Conditional update</h4>
+                            <uib-tab-heading>Conditional update
+                                <span ng-show="countConditionalErrors > 0" class="badge">{{countConditionalErrors}}</span> </uib-tab-heading>
+
+
+
+
+                            <h4>Issues checking Conditional update</h4>
 
                             <div class="row">
                                 <div class="col-md-6">
-                                    <table class="table table-condensed table-bordered">
-                                        <tr ng-repeat="item in conditionalValidation track by $index">
-                                            <td>{{item.entry.resource.resourceType}}
-                                                <div><em>{{item.entry.resource.id}}</em></div>
-                                            </td>
+                                    <div class="myScroll">
+                                        <table class="table table-condensed table-bordered">
+                                            <tr ng-repeat="item in conditionalValidation track by $index"
+                                                style="cursor: pointer"
+                                                ng-class="{listItemSelected: input.selectedEntryFromConditional == item.entry}"
+                                                ng-click="input.selectedEntryFromConditional = item.entry">
+                                                <td>{{item.entry.resource.resourceType}}
+                                                    <div><em>{{item.entry.resource.id}}</em></div>
+                                                </td>
 
-                                            <td>{{item.msg}}</td>
-                                        </tr>
-                                    </table>
+                                                <td>{{item.msg}}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+
                                 </div>
                                 <div class="col-md-6">
+                                    <pre>{{input.selectedEntryFromConditional | json}}</pre>
                                 </div>
+
+                            <!--    <pre>{{conditionalValidation | json}}</pre> -->
                             </div>
 
 
@@ -301,7 +335,8 @@
                 <uib-tab  ng-show="input.bundle">
                     <uib-tab-heading>Visualizations <span class="badge">{{inputtedBundle.entry.length}}</span> </uib-tab-heading>
 
-                    <viewbundle bundle="inputtedBundle" validationoo = "oo"></viewbundle>
+                    <viewbundle bundle="inputtedBundle" validationoo = "oo" server = "server"></viewbundle>
+
                 </uib-tab>
 
                 <uib-tab heading="FHIRPath query" ng-show="inputtedBundle">

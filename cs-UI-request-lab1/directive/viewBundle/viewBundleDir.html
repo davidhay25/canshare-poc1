@@ -43,7 +43,8 @@
                     <li><a href="#"><strong>Versions:</strong></a></li>
 
                     <li ng-repeat="version in resourceVersions">
-                        <span style="cursor: pointer" ng-click="selectVersion(version)">{{version}}</span>
+                        <span style="cursor: pointer"
+                              ng-click="selectVersion(input.selectedBundleEntry.resource,version)">{{version}}</span>
                     </li>
 
                 </ul>
@@ -56,6 +57,49 @@
             </div>
         </div>
 
+    </uib-tab>
+
+    <uib-tab heading="Table">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="myScroll">
+                    <table class="table table-bordered table-condensed">
+                        <tr ng-repeat="entry in bundle.entry">
+                            <td ng-class="{activeFhirDisplay:entry == input.selectedBundleEntry}">
+                                <div ng-click="selectEntry(entry)">
+                                    <div class="clickable">{{entry.resource.resourceType}}</div>
+                                </div>
+                            </td>
+                            <td>
+                                {{resourceSummary(entry.resource)}}
+                            </td>
+
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                <div ng-show = "linkToSpec">
+                    <a class='pull-right' target="_blank" ng-href="{{linkToSpec}}">View resource type in spec</a>
+                </div>
+                <div class="clearfix"></div>
+
+                <ul class="pagination" style="margin-top:1px;margin-bottom:1px" ng-show="input.selectedBundleEntry.resource.meta.versionId > 1">
+                    <li><a href="#"><strong>Versions:</strong></a></li>
+
+                    <li ng-repeat="version in resourceVersions">
+                        <span style="cursor: pointer" ng-click="selectVersion(version)">{{version}}</span>
+                    </li>
+
+                </ul>
+
+
+
+
+                <pre>{{input.selectedBundleEntry | json}}</pre>
+            </div>
+        </div>
     </uib-tab>
 
     <uib-tab heading="Graph" select="fitChart()">

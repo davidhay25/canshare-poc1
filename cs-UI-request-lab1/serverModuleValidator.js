@@ -41,7 +41,15 @@ async function setup(app) {
                 res.json(result.data)
             } catch (ex) {
 
-                res.status(400).json(ex)
+
+                if (ex.response) {
+                    res.status(400).json(ex.response.data)
+
+                } else {
+                    res.status(400).json(ex)
+                }
+
+
             }
         }
     )

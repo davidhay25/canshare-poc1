@@ -59,7 +59,6 @@ angular.module("pocApp")
                             $scope.ssErrorTypes.push(log.isError)
                         }
                     }
-
                 }
 
 
@@ -68,6 +67,11 @@ angular.module("pocApp")
 
                 //assign the snapshot svc to the modelSvc so that it can read the snapshots of DGs
                 modelCompSvc.setSnapshotSvc(snapshotSvc)
+
+                let hash = snapshotSvc.addOrderToAllDG()
+                let size = modelsSvc.getSizeOfObject(hash)
+                console.log(`Size of world with oder set: ${size/1024} K`)
+
 
             }
 

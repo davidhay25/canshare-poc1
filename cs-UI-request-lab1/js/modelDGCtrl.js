@@ -20,10 +20,23 @@ angular.module("pocApp")
             $scope.setOrder = function () {
                 let ar = []
                 $scope.fullElementList.forEach(function (item) {
-                    ar.push(item.ed.path)
+                    let path = item.ed.path
+                    if (path) {
+                        let shortPath = $filter("dropFirstInPath")(path)
+                        ar.push(shortPath)
+                    }
+
                 })
+                delete $scope.selectedModel.changes //an artifact from earlier work
                 $scope.selectedModel.ssOrder = ar
+                alert("Order has been set on DG")
             }
+
+            $scope.removeOrder = function () {
+                delete $scope.selectedModel.ssOrder
+                alert("Order has been removed from DG")
+            }
+
 
             $scope.showDiff = function(filter,path) {
                 if (! filter || ! path) {return true}

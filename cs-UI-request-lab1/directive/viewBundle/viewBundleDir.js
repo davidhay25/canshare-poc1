@@ -6,7 +6,8 @@ angular.module('formsApp')
                 //@ reads the attribute value, = provides two-way binding, & works with functions
 
                 bundle: '=',
-                validationoo : '='
+                validationoo : '=',
+                server : '='
             },
             link: function(scope, element, attrs) {
             /*    console.log("vb link called")
@@ -32,6 +33,67 @@ angular.module('formsApp')
 
                 let baseFhirUrl = "http://hl7.org/fhir/R4B/"     //hard code to R4B. may need to become a parameter...
 
+                //return a text display of the resource for the table view
+                //specific types atm - really used in the Valentia act now stuff...
+                $scope.resourceSummary = function (resource) {
+                    let summary = resource.id
+                    switch (resource.resourceType) {
+                        case 'Patient' :
+                            if (resource.name) {
+                                summary = HumanName(resource.name[0])
+                            }
+                            break
+                        case 'MedicationRequest' :
+                            summary  = CodeableConcept(resource.medicationCodeableConcept)
+                            break
+                        case 'MedicationAdministration' :
+                            summary  = CodeableConcept(resource.medicationCodeableConcept)
+                            break
+                        case 'Observation' :
+                            summary = CodeableConcept(resource.code)
+                            break
+                        case 'CarePlan' :
+                            summary = resource.title
+                            break
+                        case 'Condition' :
+                            summary = resource.title
+                            break
+
+                        default :
+                            break
+
+                    }
+                    return summary
+
+                    function CodeableConcept(cc) {
+                        let summary = ""
+                        if (cc.text) {
+                            summary = cc.text
+                        } else {
+                            if (cc.coding) {
+                                if (cc.coding[0].display) {
+                                    summary = cc.coding[0].display
+                                } else {
+                                    summary =`${cc.coding[0].system}|${cc.coding[0].code}`
+                                }
+                            }
+                        }
+                        return summary
+                    }
+                    function HumanName(hn) {
+                        let summary = ""
+                        if (hn) {
+                            if (hn.text) {
+                                summary = hn.text
+                            }
+                        }
+
+                        return summary
+                    }
+
+
+                }
+
                 //select an entry from the bundle
                 $scope.selectEntry = function(entry){
                     delete $scope.resourceVersions
@@ -49,9 +111,11 @@ angular.module('formsApp')
                 }
 
                 //todo select a specific version of the current resource
-                $scope.selectVersion = function(version) {
-                    let url = ""
-                    alert("Version retrieval not yet enabled")
+                $scope.selectVersion = function(resource,version) {
+                    let url = `${$scope.server}${resource.resourceType}/_history/${version}`
+
+
+                    alert(url)
                 }
 
                 $scope.$watch(

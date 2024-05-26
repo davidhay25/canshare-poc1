@@ -40,7 +40,7 @@ angular.module("pocApp")
             }
 
             $scope.selectCustomVSItem = function (item) {
-                console.log(item)
+
                 let vs = item.vs
 
                 //If we expand the ValueSet, then we can re-create the codesystem
@@ -50,7 +50,7 @@ angular.module("pocApp")
                 $scope.showWaiting = true
                 $http.get(`nzhts?qry=${encodedQry}`).then(
                     function (data) {
-                        console.log(data.data)
+
                         //now we can create the internal model from the expansion
                         let expandedVs = data.data
                         $scope.input.name = vs.name     //the expanded vs doesn't include the vs name etc.
@@ -64,6 +64,8 @@ angular.module("pocApp")
 
 
                         $scope.generateResources()
+
+                        $scope.canSetId = false
 
 
                     }, function (err) {
@@ -102,6 +104,12 @@ angular.module("pocApp")
             $scope.loadAllVS()
 
             $scope.newCS = function() {
+
+                $scope.canSetId = true
+                delete $scope.input.name
+                delete $scope.input.title
+                delete $scope.input.description
+
                 $scope.model = {concepts:[],url:"",title:"",description:""}
             }
 

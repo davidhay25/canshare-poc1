@@ -24,26 +24,13 @@
       <uib-tabset>
         <uib-tab heading="Edit ValueSet and CodeSystem">
           <table class="table table-bordered">
-            <!--
-            <tr>
-              <td>ValueSet Url</td>
-              <td><input type="text"
-                         placeholder="The full url of the ValueSet url"
-                         ng-blur="$scope.generateResources()" class="form-control" ng-model="input.vsUrl"/> </td>
-            </tr>
 
             <tr>
-              <td>CodeSystem Url</td>
+              <td>Id</td>
               <td><input type="text"
-                         placeholder="The full url of the CodeSystem url"
-                         ng-blur="generateResources()" class="form-control" ng-model="input.csUrl"/> </td>
-            </tr>
-    -->
-            <tr>
-              <td>Name</td>
-              <td><input type="text"
-                         placeholder="Name of the CS & VS - no spaces. eg my-laterality"
-                         ng-blur="generateResources()" class="form-control" ng-model="input.name"/> </td>
+                 ng-disabled = "! canSetId"
+                 placeholder="Id (and name) of the CS & VS - no spaces. eg my-laterality"
+                 ng-blur="generateResources()" class="form-control" ng-model="input.name"/> </td>
             </tr>
 
             <tr>

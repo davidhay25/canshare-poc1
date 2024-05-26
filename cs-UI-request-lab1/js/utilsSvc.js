@@ -4,7 +4,7 @@ angular.module("pocApp")
 
         return {
             getVersion : function(){
-                return "0.8.14"
+                return "0.8.15"
             },
             makeSafeString : function(s) {
             if (s) {

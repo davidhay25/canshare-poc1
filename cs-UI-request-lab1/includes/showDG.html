@@ -198,9 +198,22 @@
             <div class="pull-right">
               <div class="clickable myIcon" ng-click="expandDTTree()">Expand all ({{fullElementList.length -1}})</div>
               <div class="clickable myIcon" ng-click="showSSLog(selectedModel.name)">Snapshot log</div>
-              <!--
-              <div class="clickable myIcon" ng-click="setOrder()">Set order</div>
-              -->
+
+              <div class="clickable myIcon"
+                   ng-hide="selectedModel.ssOrder"
+                   ng-click="setOrder()">Set order</div>
+
+              <div class="clickable myIcon"
+                   ng-show="selectedModel.ssOrder"
+                   ng-click="setOrder()">Update order</div>
+
+
+              <div class="clickable myIcon"
+                   ng-show="selectedModel.ssOrder"
+                   ng-click="removeOrder()">Remove order</div>
+
+
+
             </div>
 
 
