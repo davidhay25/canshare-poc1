@@ -648,11 +648,16 @@ angular.module("pocApp")
 
             //checks that ant current value for the property is in the options ($scope.cmProperties[propName].options)
             //if not, then set it to the first value
+            //$scope.local.cmOptions - current value
+            //$scope.cmProperties has possible values
             // $scope.cmProperties[propName].options must have been set first
             function checkCurrentValue(propName) {
                 if (! $scope.local.cmOptions[propName]) {
-                    $scope.log.push({msg:`No existing value, setting to first`,obj:$scope.cmProperties[propName],objTitle:"All options"})
-                    $scope.local.cmOptions[propName] = $scope.cmProperties[propName].options[0]
+                    //$scope.log.push({msg:`No existing value, setting to first`,obj:$scope.cmProperties[propName],objTitle:"All options"})
+                    $scope.log.push({msg:`No existing value, not setting anything`,obj:$scope.cmProperties[propName],objTitle:"All options"})
+                    //$scope.local.cmOptions[propName] = $scope.cmProperties[propName].options[0]
+
+
                 } else {
                     //see if the current value is in the set of concepts.
                     //If it is then all good - otherwise set it to the first
