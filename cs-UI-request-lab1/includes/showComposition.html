@@ -416,55 +416,6 @@
                 </div>
 
 
-                    <!--
-                 <div ng-show="selectedCompositionNode.data.ed.kind == 'section'">
-                   <br/><br/>
-                   <strong>Add new DG to section</strong>
-
-                 <div class="row">
-                   <div class="col-md-4">
-
-
-                     <div class="clickable" ng-click="selectDGForSection()">Select DG</div>
-                     <div>Type: {{input.newCompType.name}}</div>
-
-                     <br/>
-
-                     <div>
-                       <input placeholder ="path (no spaces)" type="text" class="form-control"
-                              ng-model="input.newCompName"/>
-                     </div>
-
-                     <div>
-                       <input placeholder ="Title (in tree)" type="text" class="form-control"
-                              ng-model="input.newCompTitle"/>
-                     </div>
-                     <button ng-show = "input.newCompType" class="btn btn-link"
-                             ng-click="addDGtoSection(
-                              selectedCompositionNode.data.ed,
-                               input.newCompType,
-                               input.newCompName,
-                               input.newCompTitle)">Add DG</button>
-
-
-                   </div>
-
-                   <div class="col-md-8">
-                     <table class="table-bordered table">
-                       <tr ng-repeat="ed in input.newCompType.diff">
-                         <td>{{ed.title}}</td>
-                         <td>{{ed.type[0]}}</td>
-                         <td>{{ed.mult}}</td>
-                         <td>{{ed.description}}</td>
-                       </tr>
-                     </table>
-
-                   </div>
-                 </div>
-              </div>
-
-                    -->
-
               </div>
 
                 </div>
@@ -660,7 +611,7 @@
           <tbody>
           <tr
                   ng-style="{ 'background-color': getRowColour(item.ed) }"
-                  ng-showXXX="item.ed.mult !== '0..0'"
+
                   ng-repeat="item in allCompElements track by $index">
             <td>
               <div ng-style="{ 'padding-left': (item.ed.path | pathindent) }">
@@ -760,6 +711,9 @@
 
       <button class="btn-link btn pull-right" ng-click="previewQ(fullQ)">Examine Q</button>
 
+
+      <renderform q="fullQ" qr="{}"></renderform>
+
       <!--
       <span style="padding-top: 8px" class="pull-right">
         <span class="clickable" ng-click="qGenerationOptions()">Q generation: </span>
@@ -768,6 +722,8 @@
 
       </span>
       -->
+
+      <!--
 
       <uib-tabset>
         <uib-tab heading="Form">
@@ -800,7 +756,7 @@
       </uib-tabset>
 
 
-
+-->
 
 
 
