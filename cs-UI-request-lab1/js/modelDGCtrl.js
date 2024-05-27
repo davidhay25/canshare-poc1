@@ -510,7 +510,8 @@ angular.module("pocApp")
                         return true
                     }
 
-                    if (type == 'Group') {
+                    //A group can be resliced
+                    if (type == 'Group'  &&  ed.originalType && ed.originalType.length > 0) {
                         return true
                     }
                 }
@@ -555,6 +556,7 @@ angular.module("pocApp")
                     console.log(clone)
 
                     $scope.selectedModel.diff.push(clone)
+
                     traceSvc.addAction({action:'add-slice',path:newPath,model:$scope.selectedModel})
 
                     //also need to change the type of the element that was sliced. hmmm.
@@ -567,14 +569,15 @@ angular.module("pocApp")
                     //set the type of the element being sliced to group
                     ed.type = ['Group']
 
-
                     //update the selectedModel
                     //if you're slicing an inherited path, will need to add an override element
                     let inx = -1
                     let found
+                    let shortPath = $filter('dropFirstInPath')(ed.path)
+
                     for (const ed1 of $scope.selectedModel.diff) {
                         inx++
-                        let shortPath = $filter('dropFirstInPath')(ed.path)
+                        //let shortPath = $filter('dropFirstInPath')(ed.path)
                         if (ed1.path == shortPath) {
                             ed.path = shortPath
                             $scope.selectedModel.diff.splice(inx,1,angular.copy(ed))
@@ -584,26 +587,12 @@ angular.module("pocApp")
                     }
 
                     if (! found) {
+
                         ed.path = $filter('dropFirstInPath')(ed.path)
-                        $scope.selectedModel.diff.push(ed)
+
+                        $scope.selectedModel.diff.push(angular.copy(ed))
+
                     }
-
-
-/*
-                    //update the global change log
-                    modelDGSvc.updateChanges($scope.selectedModel,
-                        {edPath:newPath,
-                            msg:`Sliced ${ed.path}`},
-                        $scope)
-
-                        $scope.makeSnapshots()
-
-                    //rebuild fullList and re-draw the tree
-                    $scope.refreshFullList($scope.selectedModel)
-
-                    $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:displayPath})
-
-*/
 
                     $scope.makeSnapshots()
 

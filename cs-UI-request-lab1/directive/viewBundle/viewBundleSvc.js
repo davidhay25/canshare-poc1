@@ -106,7 +106,7 @@ angular.module("formsApp")
 
                     focusResourceRef = `${options.focusResource.resourceType}/${options.focusResource.id}` //default to type/id
 
-                    /* 
+                    /*
                     if (options.focusResource.id.indexOf('-') > -1) {    //this is a UUID
                         focusResourceRef = `urn:uuid:${options.focusResource.id}`
                     }
