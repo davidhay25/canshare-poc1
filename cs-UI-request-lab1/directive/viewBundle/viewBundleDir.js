@@ -167,6 +167,22 @@ angular.module('formsApp')
                     function() {
                         delete $scope.input.selectedBundleEntry
                         if ($scope.bundle && $scope.bundle.entry) {
+                            let lst = $scope.bundle.entry
+
+                            lst.sort(function (a,b) {
+                                try {
+                                    if (a.resource.resourceType > b.resource.resourceType) {
+                                        return 1
+                                    } else {
+                                        return -1
+                                    }
+                                } catch (e) {
+                                    return 0
+                                }
+
+                            })
+
+
                             createGraph($scope.bundle)
                         }
 
@@ -183,12 +199,9 @@ angular.module('formsApp')
                     //return
 
                     let vo = viewBundleSvc.makeGraph({arResources: arResources,focusResource:focusResource})  //actually entries...
-
-                   // console.log($scope.graphId)
+                    $scope.missingReferences = vo.missingReferences
 
                     let container = document.getElementById('graph');
-                   // let container = document.getElementById($scope.graphId);
-                   // console.log(container)
                     if (container) {
 
 

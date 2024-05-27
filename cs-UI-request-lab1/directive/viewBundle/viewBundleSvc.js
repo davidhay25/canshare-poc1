@@ -97,6 +97,8 @@ angular.module("formsApp")
             //options {arResources:[]
             makeGraph: function (options) {
 
+
+                //let hashResources = {}      //resource by id
                 //let objColours = {}
                 let missingReferences = {}      //where a resource references a missing entry...
                 let focusResourceRef
@@ -104,9 +106,11 @@ angular.module("formsApp")
 
                     focusResourceRef = `${options.focusResource.resourceType}/${options.focusResource.id}` //default to type/id
 
+                    /* 
                     if (options.focusResource.id.indexOf('-') > -1) {    //this is a UUID
                         focusResourceRef = `urn:uuid:${options.focusResource.id}`
                     }
+                    */
 
 
                 }
@@ -124,18 +128,18 @@ angular.module("formsApp")
 
                 //create the nodes...
 
+
                 arResources.forEach(function(resource,inx) {
 
-                    //assume that thes are all uuids
-                    //todo change
 
 
-                    //todo - need a way to
+
                     let url = `${resource.resourceType}/${resource.id}`
+                    /* - um, no - this is not a good check for a uuid!
                     if (resource.id.indexOf('-') > -1) {    //this is a UUID
                         url = `urn:uuid:${resource.id}`
                     }
-
+*/
                     //check to see if this resource is already in the bundle...
                     if (!objNodes[url]) {
                         objNodes[url] = resource
@@ -153,7 +157,7 @@ angular.module("formsApp")
 
                         var refs = [];
                         findReferences(refs,resource,resource.resourceType);    //locate all the outbound references for this element
-                        let cRefs = []
+                        //let cRefs = []
 
                         refs.forEach(function(ref){
                             allReferences.push({src:node,path:ref.path,targ:ref.reference,index:ref.index})
@@ -181,11 +185,6 @@ angular.module("formsApp")
                             from: ref.src.id,
                             to: ref.targ, // targetNode.id,
                             label: label,arrows : {to:true}}
-                      //  arEdges.push(edge)
-                     //   arEdges.push({id: 'e' + arEdges.length +1,
-                      //      from: ref.src.id,
-                       //     to: ref.targ, // targetNode.id,
-                           // label: label,arrows : {to:true}})
 
 
                         //console.log(focusResourceRef, ref.src.id,ref.targ)
@@ -209,7 +208,10 @@ angular.module("formsApp")
                         }
 
                     } else {
-
+                        let resource = ref.src.data.resource
+                        missingReferences[resource.id] = missingReferences[resource.id] || {refs:[]}
+                        missingReferences[resource.id].resource = resource
+                        missingReferences[resource.id].refs.push({target:ref.targ,path:ref.path})
                         console.log('>>>>>>> error Node Id '+ref.targ + ' is not present. (From '+ ref.src.id)
                     }
                 });
@@ -226,8 +228,7 @@ angular.module("formsApp")
                         }
                     } else {
                         arNodes1.push(node)
-                     //   edge.id = 'e' + arEdges.length + 1
-                      //  arEdges.push(edge)
+
                     }
 
                 })
@@ -244,11 +245,12 @@ angular.module("formsApp")
                 var data = {
                     nodes: nodes,
                     edges: edges
+
                 };
 
                 console.log(missingReferences)
 
-                return {graphData : data};
+                return {graphData : data,missingReferences:missingReferences};
 
 
                 function findReferences(refs,node,nodePath,index) {

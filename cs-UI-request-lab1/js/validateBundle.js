@@ -27,7 +27,7 @@ angular.module("pocApp")
             //retrieve all the patients for the selection table
             $scope.getAllPatients = function() {
                 $scope.allPatients = []
-                let qry = `${$scope.server}/Patient`
+                let qry = `${$scope.server}/Patient?_count=200`
                 let encodedQry = encodeURIComponent(qry)
                 $http.get(`/proxy?qry=${encodedQry}`).then(
                     function (data) {
@@ -150,14 +150,6 @@ angular.module("pocApp")
 
                 })
 
-
-
-
-
-
-
-
-
             }
             $scope.loadTemplate = function (cb) {
                 //load a template from the Decref
@@ -253,7 +245,7 @@ angular.module("pocApp")
 
             $scope.loadLibrary = function () {
 
-                let url = `${$scope.server}/DocumentReference?type=bundle&_sort=-date&_summary=true&_count=20`
+                let url = `${$scope.server}/DocumentReference?type=bundle&_sort=-date&_summary=true&_count=200`
 
                 //let url = `Patient/${patient.id}/$everything`
                 let encodedQry = encodeURIComponent(url)
