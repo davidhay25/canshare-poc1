@@ -331,7 +331,7 @@ angular.module("pocApp")
                     //break when we reach the property being populated.
                     //does assume the object retains the order...
                     if (prop == propKey) {
-                        break
+                        // 27-may - use all values break
                     }
                     $scope.uiHashValues[prop] = $scope.local.cmOptions[prop] //$scope.local.cmOptions has the data entered thus far.
                 }
