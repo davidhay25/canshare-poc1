@@ -107,14 +107,11 @@ angular.module("formsApp")
                     focusResourceRef = `${options.focusResource.resourceType}/${options.focusResource.id}` //default to type/id
 
 
-                    if (options.focusResource.id.indexOf('-') > -1) {    //this is a UUID
-                        focusResourceRef = `urn:uuid:${options.focusResource.id}`
-                    }
-
-
-
-                }
-
+                    if (isUUID(options.focusResource.id)) {
+                        //if (options.focusResource.id.indexOf('-') > -1) {    //this is a UUID
+                            focusResourceRef = `urn:uuid:${options.focusResource.id}`
+                        }
+                   }
 
                 var arNodes = [], arEdges = [], edge;
                 var objNodes = {};
@@ -136,8 +133,9 @@ angular.module("formsApp")
 
                     let url = `${resource.resourceType}/${resource.id}`
 
-                  
-                    if (resource.id.indexOf('-') > -1) {    //this is a UUID
+
+                    if (isUUID(resource.id)) {
+                   // if (resource.id.indexOf('-') > -1) {    //this is a UUID
                         url = `urn:uuid:${resource.id}`
                     }
 
@@ -253,6 +251,16 @@ angular.module("formsApp")
 
                 return {graphData : data,missingReferences:missingReferences};
 
+                //https://stackoverflow.com/questions/7905929/how-to-test-valid-uuid-guid
+                function isUUID ( uuid ) {
+                    let s = "" + uuid;
+
+                    s = s.match('^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
+                    if (s === null) {
+                        return false;
+                    }
+                    return true;
+                }
 
                 function findReferences(refs,node,nodePath,index) {
                     angular.forEach(node,function(value,key){
