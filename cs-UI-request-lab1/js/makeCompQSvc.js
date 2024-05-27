@@ -80,9 +80,11 @@ angular.module("pocApp")
                         let allDgElements = snapshotSvc.getFullListOfElements(dgName)
                         let vo = makeQSvc.makeQFromDG(allDgElements,hashAllDG)
 
-                        sectionItem.item = vo.section.item[0].item
 
+                        //sectionItem.item = vo.section.item[0].item  //note they are both arrays
+                        sectionItem.item = vo.Q.item[0].item  //note they are both arrays
 
+                        //console.log(vo)
 
                         break
 
@@ -96,7 +98,7 @@ angular.module("pocApp")
                         break
                     default :
 
-                       // break       //for now ignore the rest of the processing
+                        break       //for now ignore the rest of the processing as we're getting the DG  in case 3 above
                         //contents of the section DG. Add to the current section
                         let type = ed.type[0]
                         let isDG = false

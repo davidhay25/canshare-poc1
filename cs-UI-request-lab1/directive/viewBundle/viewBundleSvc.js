@@ -106,11 +106,11 @@ angular.module("formsApp")
 
                     focusResourceRef = `${options.focusResource.resourceType}/${options.focusResource.id}` //default to type/id
 
-                    /*
+
                     if (options.focusResource.id.indexOf('-') > -1) {    //this is a UUID
                         focusResourceRef = `urn:uuid:${options.focusResource.id}`
                     }
-                    */
+
 
 
                 }
@@ -135,11 +135,12 @@ angular.module("formsApp")
 
 
                     let url = `${resource.resourceType}/${resource.id}`
-                    /* - um, no - this is not a good check for a uuid!
+
+                  
                     if (resource.id.indexOf('-') > -1) {    //this is a UUID
                         url = `urn:uuid:${resource.id}`
                     }
-*/
+
                     //check to see if this resource is already in the bundle...
                     if (!objNodes[url]) {
                         objNodes[url] = resource
