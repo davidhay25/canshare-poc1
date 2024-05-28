@@ -403,29 +403,78 @@ angular.module("pocApp")
                     } else {
                         //now examine the valueset expansions to get the actual concepts. There may be more than one...
 
+
+
+                        //The list of concepts to apply should be the intersection between what is already in
+                        //the property list ($scope.cmProperties[propKey].options) and the list of concepts returned
+                        //from the forwards engine (ie a concept that is in both)
+
+
                         //empty the current set of options
-                        $scope.cmProperties[propKey].options = []
+                        //$scope.cmProperties[propKey].options = []
 
                         //actually, we now have all the expanded VS in memory (after implementing the reverseengine
                         //and this routine does check all valuesets
+
+                        //first create the complete set of concepts from the forward engine
+                        let forwardList = []
                         for (const url of $scope.uiMatchingVS) {
                             let arConcepts = $scope.hashExpandedVs[url]
                             if (arConcepts) {
                                 for (const concept of arConcepts) {
 
+                                    let ar = forwardList.filter(concept1 => concept1.code == concept.code )
+                                    if (ar.length == 0) {
+                                        forwardList.push(concept)
+                                    }
+/*
                                     let ar = $scope.cmProperties[propKey].options.filter(concept1 => concept1.code == concept.code )
                                     if (ar.length == 0) {
                                         $scope.cmProperties[propKey].options.push(concept)
                                     }
+                                    */
+
                                 }
 
-                                $scope.lstMatchingConceptsForUI = $scope.cmProperties[propKey].options
+
+
+                                //$scope.lstMatchingConceptsForUI = $scope.cmProperties[propKey].options
+
+
+
+
+
                                 $scope.log.push({msg:`List of concepts `,obj:$scope.cmProperties[propKey].options,objTitle:"Possible concepts"})
 
                             } else {
                                 alert(`The VS with the url ${url} is not present`)
                             }
                         }
+
+                        //now that we have the forward list, we match it with the current list to get those in both
+                        let existingList = $scope.cmProperties[propKey].options || []
+
+                        //empty the properties list
+                        if ( $scope.cmProperties[propKey].options.length == 0) {
+                            //There's nothing yet so the full forward list can be used
+                            $scope.cmProperties[propKey].options = forwardList
+                        } else {//there's already a list - need to change it to the intersection...
+                            $scope.cmProperties[propKey].options = []
+
+                            //go through the forwardlist...
+                            for (let concept of forwardList)  {
+                                //is it in the existing list
+                                let ar = existingList.filter(concept1 => concept1.code == concept.code )
+
+                                if (ar.length > 0) {
+                                    //yes! we can add it...
+                                    $scope.cmProperties[propKey].options.push(concept)
+                                }
+                            }
+                        }
+
+
+
 
 
 
@@ -579,7 +628,7 @@ angular.module("pocApp")
                     if (cmProperty.concept.code == propertyCode) {
                         canApply = false        //turn off the application process. properties after this one will not have their options set
                     }
-                    //console.log(propName,canApply)
+
 
                     if (canApply) {
                         //set false when we're past the current property and stop setting the value

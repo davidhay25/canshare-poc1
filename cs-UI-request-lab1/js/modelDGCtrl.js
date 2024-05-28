@@ -590,7 +590,8 @@ angular.module("pocApp")
 
                         ed.path = $filter('dropFirstInPath')(ed.path)
 
-                        $scope.selectedModel.diff.push(angular.copy(ed))
+                        let length = $scope.selectedModel.diff.length
+                        $scope.selectedModel.diff.splice(length-1,0,angular.copy(ed))
 
                     }
 

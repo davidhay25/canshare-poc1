@@ -649,9 +649,9 @@ angular.module("pocApp")
                     if (data.node) {
                         $scope.selectedCompositionNode = data.node;
                         $scope.commentsThisPath = $scope.commentsThisComp[$scope.selectedCompositionNode.data.ed.path]
-
-
                         $scope.currentLinkId = $scope.selectedCompositionNode.data.ed.path
+
+                        console.log(data.node)
 
 
                     }
@@ -682,6 +682,9 @@ angular.module("pocApp")
 
                         $scope.selectedED = data.node.data.ed
                         $scope.currentLinkId = $scope.selectedCompositionNode.data.ed.path
+
+                        console.log(data.node)
+
 
 
                     }

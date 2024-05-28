@@ -170,9 +170,21 @@
 
                         <uib-tab heading="Tree"  select="tabSelect('tree')">
                             <div class="pull-right clickable" ng-click="expandCompTree()">Expand all ({{allCompElements.length}})</div>
-                            <div class="myScroll">
-                                <div id="compositionTree"></div>
+
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="myScroll">
+                                        <div id="compositionTree"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <pre>{{selectedED | json}}</pre>
+                                </div>
                             </div>
+
+
+
+
                         </uib-tab>
 
                         <uib-tab ng-show = 'false' heading = "comp list">
@@ -400,6 +412,12 @@
                                 <div class="banner">Details</div>
 
 
+                                <div ng-show="selectedCompositionNode.data.ed.kind == 'section'">
+                                    {{selectedCompositionNode.data.ed.title}}
+                                    todo test this...
+
+                                </div>
+
                                 <div ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
 
                                     <div class="row">
@@ -420,7 +438,7 @@
                                         </div>
                                     </div>
 
-                                    <div ng-show = "false" class="row">
+                                    <div class="row">
                                         <div class="col-md-3">
                                             Type
                                         </div>
@@ -431,6 +449,15 @@
                                                 </div>
                                                 {{type}}
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            Cardinality
+                                        </div>
+                                        <div class="col-md-9">
+                                            {{selectedCompositionNode.data.ed.min}}..{{selectedCompositionNode.data.ed.max}}
                                         </div>
                                     </div>
 
@@ -480,8 +507,6 @@
                                             <div ng-repeat="segment in getPathSegments(selectedCompositionNode.data.ed.path) track by $index">
                                                 <div ng-show="$index > 0"> {{segment}}</div>
                                             </div>
-
-
 
                                         </div>
                                     </div>
