@@ -34,11 +34,20 @@ angular.module("pocApp")
 
                 $scope.selectedModel.ssOrder = ar
                 alert("Order has been set on DG")
+                //rebuild fullList and re-draw the tree
+
+                $scope.makeSnapshots()
+                $scope.refreshFullList($scope.selectedModel)
+               // $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:displayPath})
+
             }
 
             $scope.removeOrder = function () {
                 delete $scope.selectedModel.ssOrder
                 alert("Order has been removed from DG")
+
+                $scope.makeSnapshots()
+                $scope.refreshFullList($scope.selectedModel)
             }
 
 

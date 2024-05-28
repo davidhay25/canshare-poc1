@@ -46,8 +46,7 @@ angular.module("pocApp")
 
             },
 
-
-
+            
             sortFullListByInsertAfter(lst,dg,hashAllDG) {
                 //perform the actual re-ordering. update lst
                 let lstOrdering = []
@@ -56,33 +55,37 @@ angular.module("pocApp")
                     //there is ordering defined on the DG
                     lstOrdering = dg.ordering
                 } else {
-                    //the DG has no ordering defined directly.
-                    //walk up the inheritance chain until we find a parent with ordering (if any)
-                    let tmpDG = dg
-                    let keepGoing = true
-                    let ctr = 0         // a counter to trap any infinate recursion error. probably unneeded
-                    while (tmpDG.parent && keepGoing) {
-                        let dgTitle = tmpDG.title
-                        let parent = tmpDG.parent
-                        tmpDG = hashAllDG[parent]
-                        if (! tmpDG) {
-                            alert(`DG ${parent} was not found. Referenced in ${dgTitle}`)
-                            return
-                        }
+                    if (! dg.ssOrder) {
+                        //the DG has no ordering defined directly.
+                        //walk up the inheritance chain until we find a parent with ordering (if any)
+                        //but only if there is no ssOrder defined
+                        let tmpDG = dg
+                        let keepGoing = true
+                        let ctr = 0         // a counter to trap any infinate recursion error. probably unneeded
+                        while (tmpDG.parent && keepGoing) {
+                            let dgTitle = tmpDG.title
+                            let parent = tmpDG.parent
+                            tmpDG = hashAllDG[parent]
+                            if (! tmpDG) {
+                                alert(`DG ${parent} was not found. Referenced in ${dgTitle}`)
+                                return
+                            }
 
-                        if (tmpDG.ordering && tmpDG.ordering.length > 0) {
-                            lstOrdering = tmpDG.ordering
-                            keepGoing = false       //to stop the recursion
-                        }
+                            if (tmpDG.ordering && tmpDG.ordering.length > 0) {
+                                lstOrdering = tmpDG.ordering
+                                keepGoing = false       //to stop the recursion
+                            }
 
-                        ctr++
-                        if (ctr > 100) {
-                            keepGoing = false
-                            alert(`Error finding ultimate parent of ${dg.name} - recursion issue most likely`)
-                            return
+                            ctr++
+                            if (ctr > 100) {
+                                keepGoing = false
+                                alert(`Error finding ultimate parent of ${dg.name} - recursion issue most likely`)
+                                return
+                            }
                         }
                     }
-                }
+                    }
+
 
                 if (lstOrdering.length == 0) {
                     //no ordering list was found in the DG or parental hierarchy
