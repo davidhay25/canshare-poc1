@@ -46,7 +46,7 @@ angular.module("pocApp")
 
             },
 
-            
+
             sortFullListByInsertAfter(lst,dg,hashAllDG) {
                 //perform the actual re-ordering. update lst
                 let lstOrdering = []

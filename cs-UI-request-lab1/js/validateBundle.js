@@ -513,6 +513,14 @@ angular.module("pocApp")
 
 
                 function parseOO(oo) {
+
+                    let hash = {}
+                    bundle.entry.forEach(function (entry) {
+                        let resource = entry.resource
+                        hash[`${resource.id}*`] = entry
+                    })
+
+
                     //parse the validation response into a lis
                     $scope.arIssues = []
 
@@ -522,7 +530,23 @@ angular.module("pocApp")
 
                         if (iss.location) {
                             let loc = iss.location[0]
+
+                            //for some reason the bundle entry number is not the
+                            //position of the resource in the bundle !!!
+                            //so getting from the resource id
+                            //does assume that the id is unique across all resources in the bundle
+
+
+                            //get the issue based on the id
+                            let ar1 = loc.split('/')
+                            let id = ar1[2]
+                            console.log(id,hash[id])
+                            item.entry = hash[id]
+
+                            /*
+                            //get the resource based on the number in the issue
                             let ar = loc.split('[')
+
                             if (ar.length > 1) {
                                 let l = ar[1]   // 2].resource
                                 let g = l.indexOf(']')
@@ -533,6 +557,8 @@ angular.module("pocApp")
                             } else {
                                 //unknownIssues.push(iss)
                             }
+
+*/
 
 
                         } else {
