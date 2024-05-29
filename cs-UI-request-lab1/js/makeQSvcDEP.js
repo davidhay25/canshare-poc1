@@ -1,8 +1,11 @@
 //This is the current service to make Q
 
+
+//A copy of the servric befoer I removed the deprecated items...
+//CAN BE DELETED AT SOME POINT - BELT & BRACES STUFF!!!
 angular.module("pocApp")
 
-    .service('makeQSvc', function($http,codedOptionsSvc,QutilitiesSvc,snapshotSvc,$filter) {
+    .service('makeQSvcDEPå', function($http,codedOptionsSvc,QutilitiesSvc,snapshotSvc) {
 
 
 
@@ -587,44 +590,6 @@ angular.module("pocApp")
 
             },
 
-
-            makeHierarchicalQFromDG : function (lstElements,hashAllDG) {
-                //just for testing to see if we really need to flatten the Q
-
-                let Q = {resourceType:'Questionnaire'}
-                let currentItem
-                let hashItems = {}      //items by linkId
-
-                for (const item of lstElements) {
-                    let ed = item.ed
-                    let path = ed.path
-                    let ar = path.split('.')
-                    let segmentCount = ar.length
-
-                    if (currentItem) {
-                        let parentItemPath = $filter('dropLastInPath')(path)
-                        currentItem = {linkId:path,type:'string',text:ed.title,item:[]}
-                        if (ed.mult.indexOf('..*')> -1) {
-                            currentItem.repeats = true
-                        }
-                        hashItems[parentItemPath].item.push(currentItem)
-                        hashItems[parentItemPath].type = "group"
-                        hashItems[path] = currentItem
-
-
-                    } else {
-                        currentItem = {linkId:path,type:'string',text:ed.title,item:[]}
-                        hashItems[path] = currentItem
-                        Q.item = [currentItem]
-
-                    }
-
-                }
-                return {Q:Q}
-
-
-            },
-
             makeTreeFromQ : function (Q) {
                 //pass in a Q and return a tree array representation
                 //used in previewQ
@@ -728,6 +693,607 @@ angular.module("pocApp")
 
 
 
+            //this is used by the composition to build the Q
+            //this has the structure needed for tabs
+            makeQFromTreeTabDEP :  async function (treeObject,comp,strategy) {
+                //this is a version I'm using during connectathon to implemnet the tabs extensions
+                //the Q that are created won't be able to be used in my renderer...
+
+                return new Promise(async (resolve) => {
+                    //Given a tree array representing a composition (from jstree), construct a Q resource
+
+                    let that = this
+
+                    //This generation is complex! Create a log to capture significant activity for debugging
+                    //It will also indicate the order in which operations occur
+                    let log = []
+
+                    let pathsToHide = []    //a list of paths that should not appear in the Q. It is assembled dynamically
+
+                    //get the EnableWhens defined on the Composition for the sections
+                    let hashSectionEW = {}      //any enableWhen for this section
+                    if (comp && comp.enableWhen) {
+                        comp.enableWhen.forEach(function (ew) {
+                            hashSectionEW[ew.targetSection] = hashSectionEW[ew.targetSection] || []
+                            hashSectionEW[ew.targetSection].push(ew)
+                        })
+                    }
+
+
+                    //console.log(treeObject)
+                    let qName = treeObject[0].id
+                    let id = "cs-" + qName
+                    Q = {resourceType: "Questionnaire", id: id, status: "draft", name: qName, item: []}
+                    Q.url = `http://canshare.co.nz/fhir/Questionnaire/${id}`
+                    let extTS = {url:"http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-preferredTerminologyServer"}
+                    extTS.valueUrl = "https://nzhts.digital.health.nz/fhir/"
+                    Q.extension = [extTS]
+
+
+                    //create a top level item to represent a tab container
+                    //all of the sections are added to that item
+                    let containerSection = {text: "tabContainer", linkId: qName, extension:[], type:'group', item: []}
+
+                    let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+                    ext.valueCodeableConcept = {coding:[{code:"tab-container",system:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}]}
+                    containerSection.extension.push(ext)
+
+
+                    log.push({msg:`Added container section`,item:angular.copy(containerSection)})
+
+                    Q.item.push(containerSection)
+
+
+
+                    // section is the current section. Used when adding a new group
+
+                    let section // = {text: "section", linkId: qName, item: []}
+
+                    let obj = {}
+
+                    //parent is what the item will be added to (a section of a group
+                    //node is the node from the tree - multi level
+                    // section is the current section. Used when adding a new group
+                    async function addChild(parent, node, section) {
+
+                        let canAdd = true
+
+                        let ar = node.id.split('.')
+                        if (ar.length == 2) {
+                            //this is a section definition. Create a new Q section and add to the Q root
+
+                            let sectionName = ar[1]     //the second segment
+                            section = {text: node.text, linkId: node.id, type: 'group', extension:[],item: []}
+
+                            //Add the tab container extension as well
+                            let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+                            ext.valueCodeableConcept = {coding:[{code:"page",system:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}]}
+                            section.extension.push(ext)
+
+                            //are there any conditionals (enableWhen) to add
+                            if (hashSectionEW[sectionName]) {
+                                section.enableWhen = section.enableWhen || []
+                                hashSectionEW[sectionName].forEach(function (vo) {
+                                    // let vo = hashSectionEW[sectionName]
+                                    let ew = {}
+                                    ew.question = `${ar[0]}.${vo.sourceSection}.${vo.ed}`
+                                    ew.operator = vo.operator || "="
+
+
+                                    if (typeof ew.value == 'boolean') {
+                                        //this is a boolean
+                                        ew.answerBoolean = vo.value
+                                    } else {
+                                        //must be a coding
+                                        ew.answerCoding = vo.value
+                                        delete ew.answerCoding.pt
+                                        ew.answerCoding.system = ew.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
+                                    }
+
+                                    section.enableWhen.push(ew)
+
+                                })
+
+                                //console.log(section.enableWhen)
+
+                            }
+
+                            //here is where the section is added to the Q. All other items are added to the section
+                            if (section) {
+                                log.push({msg:`Added section ${section.text}`,item:angular.copy(section)})
+                                containerSection.item.push(section)
+                            }
+
+
+                            //Q.item.push(section)
+
+                            canAdd = false          //because it's already been added
+                        } else if (ar.length == 3) {
+                            //this is the section DG name attached to the section item
+                            //we've got the children enumerated - we want to enumerate them but not add this one
+                            canAdd = false
+                        } else if (ar.length == 4) {
+                            //this is the DG name within the section
+                            canAdd = false
+                        }
+
+
+                        //so, we've determined that this element can be added and isn't a group or description child. is the 'hideInQ' set
+                        //for it (or for any of the ancestors.
+                        if (canAdd) {
+                            if (node.data.ed.hideInQ) {
+                                //if this is set to hide, then set canAdd false, and add the
+                                //path to the list of 'pathsToHide'
+                                pathsToHide.push(node.data.ed.path)
+                                canAdd = false
+                            } else {
+                                //check that the path of this element is not in the pathsToHide list
+                                for (const path of pathsToHide) {
+                                    //if (node.data.ed.path.startsWith(path)) {
+                                    if (node.data.ed.path.isChildPath(path)) {
+                                        canAdd = false
+                                        break
+                                    }
+                                }
+                            }
+
+                        }
+
+
+                        if (canAdd) {
+                            let item = {text: node.text, linkId: node.id, type: 'string'}
+
+                            if (node.data.ed.mult == '0..*' || node.data.ed.mult == '1..*') {
+                                item.repeats = true
+                            }
+
+                            //the definition is the link back to the model - the DG. We drop the first 2 segments
+                            //in the path as they are the composition & section name
+                            if (node.data.ed.path) {
+                                let ar = node.data.ed.path.split('.')
+                                ar.splice(0, 2)
+                                //todo  - will become a uri - when the DGs are published as models
+                                item.definition = ar.join('.')
+                            }
+
+                            //todo - get correct type. This is just a placeholder
+                            if (node.children && node.children.length > 0) {
+                                item.type = 'group'
+                            }
+
+
+                            //the path prefix is the path to the DG in the composition - {compname}.{section name}.
+                            //this is the first 2 segments in the node id (which is the full path)
+                            let ar = node.id.split('.')
+
+                            let pathPrefix = `${ar[0]}.${ar[1]}.${ar[2]}.`
+                            addEnableWhen(node.data.ed, item, pathPrefix)  //If there are any conditionals
+
+                            //set the control type to use. Will add the VS or answerOptions to the item
+                            //temp let response = await setControlType(node.data.ed, item, strategy)
+                            setControlType(node.data.ed, item, strategy)
+                            let response = item
+
+                            //applying formatting to a label
+                           // let ext1 = {url:"http://hl7.org/fhir/StructureDefinition/rendering-xhtml"}
+                           // ext1.valueString = `<div style="color: green">${response.text}</div>`
+                            //response['_text'] = {extension: [ext1]}
+
+                            if (false && node.data.ed.mult == '0..*' || node.data.ed.mult == '1..*') {
+                                let ext2 = {url:"http://hl7.org/fhir/StructureDefinition/rendering-xhtml"}
+                                ext2.valueString = `<div style="font-weight:bold">${response.text}</div>`
+                                response['_text'] = {extension: [ext2]}
+                            }
+
+
+                            //add a tooltip with the description
+                            //response.item = []
+                            if (false && node.data.ed.description) {
+                                let tt = {text: node.data.ed.description, linkId: `${node.data.ed.path}-tt`, type: 'display',extension:[]}
+                                let ext = {url: "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+                                //ext.valueCodeableConcept = {coding:[{system:"http://hl7.org/fhir/questionnaire-item-control",code:"flyover"}]}
+                                ext.valueCodeableConcept = {coding:[{system:"http://hl7.org/fhir/questionnaire-item-control",code:"help"}]}
+                                tt.extension.push(ext)
+
+                                response.item = response.item || []
+                                response.item.push(tt)
+                            }
+
+                            //add a placeholder
+                            if (node.data.ed.placeholder) {
+                                let extPlaceholder = {url:"http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-placeholder"}
+                                extPlaceholder.valueString = node.data.ed.placeholder
+                                response.extension = response.extension || []
+                                response.extension.push(extPlaceholder)
+                            }
+
+
+
+                            log.push({msg:`Adding item ${response.text} to ${parent.text}`,item:angular.copy(response)})
+                           // parent.item = parent.item || []
+                           // parent.item.push(response)
+
+                            //let root = parent
+                            let root = section
+
+                            if (node.children && node.children.length > 0) {
+                                response.text
+                                response.type = 'group'
+                                response.item = []
+
+
+                                let ext = {url: "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"}
+                                ext.valueInteger = 2
+                                response.extension = response.extension || []
+                                response.extension.push(ext)
+
+
+                                root.item.push(response)
+
+
+                                node.children.forEach(function (childNode) {
+                                    //addChild(item,childNode)
+                                    addChild(response, childNode, section)
+                                })
+                            } else {
+                                parent.item.push(response)
+                            }
+
+
+
+
+                        }
+
+
+
+                        if (!canAdd &&   node.children && node.children.length > 0) {
+
+                            //create a new group item and add to the current section
+                            let group = {
+                                text: `${node.text}`,
+                                type: 'group',
+                                linkId: `group-${node.id}`,
+                                item: []
+                            }
+
+
+                            let ext = {url: "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"}
+                            ext.valueInteger = 2
+                            group.extension = group.extension || []
+                            group.extension.push(ext)
+
+
+                            //console.log(section.linkId)
+                            //console.log(group.linkId)
+                            //console.log("")
+
+                            section.item = section.item || []
+                            //section.item.push(group)
+
+
+                            //For some reason the routine adds an additional element after adding the group.
+                            //This prevents that. Took ages to figure out! Change at your peril...
+                            if (group.linkId !== `group-${section.linkId}`) {
+                                log.push({msg:`Added group ${group.text}`,item:angular.copy(group)})
+                                section.item.push(group)
+                            } else {
+                                log.push({msg:`DID NOT add group ${group.text}`,item:angular.copy(group)})
+                                //console.log(`not adding ${group.linkId}`)
+                            }
+
+
+
+                            //pass the group in as the parent
+                            node.children.forEach(function (childNode) {
+                                //addChild(item,childNode)
+                                addChild(group, childNode, section)
+                            })
+
+
+
+                        }
+                    }
+
+                    //there's only a single child which returns the top level
+                    treeObject[0].children.forEach(function (node) {
+                        addChild(section, node, section)
+                    })
+
+
+                    //the DG name is added as a child to the section item. Not sure how to prevent that - for now, remove them
+                    Q.item.forEach(function (item) {
+
+                        console.log(item.item)
+                        if (item.item) {
+                            //just remove the first child - it will have the empty item
+                        //temp    item.item.splice(0, 1)
+                        }
+
+                    })
+
+
+
+                    resolve({Q:Q,log:log}) //that.makeQ(treeObject)
+
+                    function processChildren() {
+
+                    }
+
+
+
+                })
+
+
+            },
+
+            //this is used by the composition to build the Q
+            //this is the version that my renderer can support
+            //now using the tab version only...
+            makeQFromTreeDEP :  async function (treeObject,comp,strategy) {
+                //this is the original Q creator before I started hacking around with it
+                return new Promise(async (resolve) => {
+                    //Given a tree array representing a composition (from jstree), construct a Q resource
+                    let that = this
+
+                    let pathsToHide = []    //a list of paths that should not appear in the Q. It is assembled dynamically
+
+                    //get the EnableWhens defined on the Composition for the sections
+                    let hashSectionEW = {}      //any enableWhen for this section
+                    if (comp && comp.enableWhen) {
+                        comp.enableWhen.forEach(function (ew) {
+                            hashSectionEW[ew.targetSection] = hashSectionEW[ew.targetSection] || []
+                            hashSectionEW[ew.targetSection].push(ew)
+                        })
+                    }
+
+
+                    console.log(treeObject)
+                    let qName = treeObject[0].id
+                    let id = "cs-" + qName
+                    Q = {resourceType: "Questionnaire", id: id, status: "draft", name: qName, item: []}
+
+                    let section = {text: "section", linkId: qName, item: []}
+
+                    let obj = {}
+
+                    //parent is what the item will be added to (a section of a group
+                    //node is the node from the tree - multi level
+                    // section is the current section. Used when adding a new group
+                    async function addChild(parent, node, section) {
+
+                        let canAdd = true
+                        //if the id / path length is 2, then this is representing a section from the tree
+                        //the node id structure is {comp name}.{section name}.{dg name}...
+                        //todo - need to think about z elements
+
+
+                        let ar = node.id.split('.')
+                        if (ar.length == 2) {
+                            //this is a section definition. Create a new Q section and add to the Q root
+                            //Add the tab container extension as well
+                            let sectionName = ar[1]     //the second segment
+                            section = {text: node.text, linkId: node.id, type: 'group', item: []}
+
+
+
+                            //are there any conditionals (enableWhen) to add
+                            if (hashSectionEW[sectionName]) {
+                                section.enableWhen = section.enableWhen || []
+                                hashSectionEW[sectionName].forEach(function (vo) {
+                                    // let vo = hashSectionEW[sectionName]
+                                    let ew = {}
+                                    ew.question = `${ar[0]}.${vo.sourceSection}.${vo.ed}`
+                                    ew.operator = "="
+                                    ew.answerCoding = vo.value
+                                    section.enableWhen.push(ew)
+                                })
+
+                                console.log(section.enableWhen)
+
+                            }
+
+                            Q.item.push(section)
+                            canAdd = false          //because it's already been added
+                        } else if (ar.length == 3) {
+                            //this is the DG name attached to the section
+                            //we've got the children enumerated - we want to enumerate them but not add this one
+                            canAdd = false
+                        }
+
+                        //so, we've determined that this element can be added. is the 'hideInQ' set
+                        //for it (or for any of the ancestors.
+                        if (canAdd) {
+                            if (node.data.ed.hideInQ) {
+                                //if this is set to hide, then set canAdd false, and add the
+                                //path to the list of 'pathsToHide'
+                                pathsToHide.push(node.data.ed.path)
+                                canAdd = false
+                            } else {
+                                //check that the path of this element is not in the pathsToHide list
+                                for (const path of pathsToHide) {
+                                    //if (node.data.ed.path.startsWith(path)) {
+                                    if (node.data.ed.path.isChildPath(path)) {
+                                        canAdd = false
+                                        break
+                                    }
+                                }
+                            }
+
+                        }
+
+
+                        if (canAdd) {
+                            let item = {text: node.text, linkId: node.id, type: 'string'}
+
+                            //the definition is the link back to the model - the DG. We drop the first 2 segments
+                            //in the path as they are the composition & section name
+
+                            if (node.data.ed.path) {
+                                let ar = node.data.ed.path.split('.')
+                                ar.splice(0, 2)
+                                //todo  - will become a uri - when the DGs are published as models
+                                item.definition = ar.join('.')
+                            }
+
+                            //todo - get correct type. This is just a placeholder
+                            if (node.children && node.children.length > 0) {
+                                item.type = 'group'
+                            }
+
+
+                            //the path prefix is the path to the DG in the composition - {compname}.{section name}.
+                            //this is the first 2 segments in the node id (which is the full path)
+                            let ar = node.id.split('.')
+
+                            let pathPrefix = `${ar[0]}.${ar[1]}.${ar[2]}.`
+                            addEnableWhen(node.data.ed, item, pathPrefix)  //If there are any conditionals
+
+                            //set the control type to use. Will add the VS or answerOptions to the item
+                            let timerlabel = node.id
+                            console.time(timerlabel)
+                            let response = await setControlType(node.data.ed, item, strategy)
+
+                            console.log(response)
+                            console.timeEnd(timerlabel)
+                            parent.item = parent.item || []
+                            //parent.item.push(item)
+                            parent.item.push(response)
+                        }
+
+
+                        if (node.children && node.children.length > 0) {
+
+                            //create a new group item and add to the current section
+                            let group = {
+                                text: `${node.text}`,
+                                type: 'group',
+                                linkId: `group-${node.id}`,
+                                item: [],
+                                extension: []
+                            }
+                            //let group = {text:`group-${node.text}`,type:'group',linkId:`group-${node.id}` ,item:[],extension:[]}
+                            let ext = {url: "http://clinfhir.com/fhir/StructureDefinition/canshare-questionnaire-column-count"}
+                            ext.valueInteger = 2
+                            group.extension.push(ext)
+
+                            section.item = section.item || []
+
+
+                            //For some reason the routine adds an additional element after adding the group.
+                            //This prevents that. Took ages to figure out! Change at your peril...
+                            if (group.linkId !== `group-${section.linkId}`) {
+                                section.item.push(group)
+                            }
+
+
+                            //section.item.push(group)
+
+
+
+                            //pass the group in as the parent
+                            node.children.forEach(function (childNode) {
+                                //addChild(item,childNode)
+                                addChild(group, childNode, section)
+                            })
+
+                        }
+                    }
+
+                    //there's only a single child which returns the top level
+                    treeObject[0].children.forEach(function (node) {
+                        addChild(section, node, section)
+                    })
+
+
+                    //the DG name is added as a child to the section item. Not sure how to prevent that - for now, remove them
+                    Q.item.forEach(function (item) {
+
+                        console.log(item.item)
+                        if (item.item) {
+                            //just remove the first child - it will have the empty item
+                            item.item.splice(0, 1)
+                        }
+
+                    })
+
+
+                    resolve(Q) //that.makeQ(treeObject)
+                })
+
+
+            },
+
+            moveDownDEP : function (node,treeData) {
+                //move up within the parent
+                let parent = node.parent
+                let bottomThisParent = -1  //the topmost item that has this parent
+                let pos = -1 //position of this node
+                treeData.forEach(function (item,inx) {
+                    if (item.id == node.id) {
+                        pos = inx
+                    }
+                    if (item.parent == node.parent) {
+                        bottomThisParent = inx
+                    }
+
+                })
+
+                if (bottomThisParent > pos) {
+
+                    let nodeToMove = treeData.splice(pos,1)[0]
+                    let amountToMove = 1
+
+                    if (node.data.level == 'group') {
+                        amountToMove = bottomThisParent - pos+1
+                    }
+
+                    treeData.splice(pos+amountToMove,0,nodeToMove)
+                }
+
+            },
+            moveUpDEP : function (node,treeData) {
+                //move up within the parent
+                let parent = node.parent
+                let topThisParent = -1  //the topmost item that has this parent
+                let pos = -1 //position of this node
+                treeData.forEach(function (item,inx) {
+                    if (item.id == node.id) {
+                        pos = inx
+                    }
+                    if (item.parent == node.parent && topThisParent == -1) {
+                        topThisParent = inx
+                    }
+
+                })
+
+                if (topThisParent < pos) {
+
+                    let nodeToMove = treeData.splice(pos,1)[0]
+                    let amountToMove = 1
+                    //A group needs to be moved above any children of the group above
+                    if (node.data.level == 'group') {
+                        amountToMove = pos-topThisParent+1
+                    }
+
+                    treeData.splice(pos-amountToMove,0,nodeToMove)
+                }
+
+            },
+
+            isADGDEP : function (ed, hashAllDG) {
+                let isADG = false
+                if (ed.kind == 'dg') {
+                    isADG = true
+                } else {
+                    if (ed.type) {
+                        let model = hashAllDG[ed.type]
+                        if (model && model.diff && model.diff.length > 0) {
+                            isADG = true
+                        }
+                    }
+                }
+                return isADG
+            },
 
             getControlDetails : function(ed) {
                 //return the control type & hint based on the ed

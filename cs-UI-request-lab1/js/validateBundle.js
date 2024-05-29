@@ -454,6 +454,8 @@ angular.module("pocApp")
 
             //
             $scope.validate = function(nosave) {
+
+                delete $scope.input.selectedIssue
                 //let url = `${$scope.server}/Bundle/$validate`
                 let url =  "validator/validateBundle"
 
@@ -479,7 +481,6 @@ angular.module("pocApp")
                     //if there's an identifier then the bundle will be saved using the identifier.value as the resource id
                     $scope.updateBundle(bundle)
                 }
-
 
 
                 //validate that all entries have a conditional on identifier

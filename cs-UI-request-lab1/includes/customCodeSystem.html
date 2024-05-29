@@ -14,23 +14,30 @@
             <div class="clearfix"></div>
           </div>
         </div>
+
+        <button class="btn-link btn" ng-click="newCS()">New CodeSystem</button>
+
       </div>
     </div>
 
     <div class="col-md-9">
 
-      <button class="pull-right btn btn-link" ng-click="saveCustomVS()">Save non-SNOMED VS</button>
+      <button class="pull-right btn btn-link"
+              ng-show="ccDirty"
+              ng-click="saveCustomVS()">Save non-SNOMED VS</button>
 
-      <uib-tabset>
+      <uib-tabset ng-show="model">
         <uib-tab heading="Edit ValueSet and CodeSystem">
           <table class="table table-bordered">
 
             <tr>
               <td>Id</td>
               <td><input type="text"
-                 ng-disabled = "! canSetId"
-                 placeholder="Id (and name) of the CS & VS - no spaces. eg my-laterality"
-                 ng-blur="generateResources()" class="form-control" ng-model="input.name"/> </td>
+                 disabled = "disabled"
+                 placeholder="Id (and name) of the CS & VS - no spaces or _. eg canshare-ns-laterality"
+                 ng-blur="generateResources()" class="form-control" ng-model="input.name"/>
+
+              </td>
             </tr>
 
             <tr>

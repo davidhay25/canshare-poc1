@@ -21,17 +21,20 @@
     <uib-tab heading="List">
         <div class="row">
             <div class="col-md-3">
-                <div class="list-group">
-                    <div ng-class="{'list-group-item':true,activeFhirDisplay:entry == input.selectedBundleEntry}"
-                         ng-repeat="entry in bundle.entry"
-                         style="cursor:pointer;"
-                         ng-click="selectEntry(entry)">
-                        {{entry.resource.resourceType}}
 
-                        <div ng-show = "entry.resource.meta.versionId"
-                                class="pull-right">v{{entry.resource.meta.versionId}}</div>
+                <div class="myScroll">
+                    <div class="list-group">
+                        <div ng-class="{'list-group-item':true,activeFhirDisplay:entry == input.selectedBundleEntry}"
+                             ng-repeat="entry in bundle.entry"
+                             style="cursor:pointer;"
+                             ng-click="selectEntry(entry)">
+                            {{entry.resource.resourceType}}
 
-                        <div>Id: <em>{{entry.resource.id}}</em>  </div>
+                            <div ng-show = "entry.resource.meta.versionId"
+                                    class="pull-right">v{{entry.resource.meta.versionId}}</div>
+
+                            <div>Id: <em>{{entry.resource.id}}</em>  </div>
+                        </div>
                     </div>
                 </div>
             </div>

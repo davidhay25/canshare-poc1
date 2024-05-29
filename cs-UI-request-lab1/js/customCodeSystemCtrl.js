@@ -4,15 +4,21 @@ angular.module("pocApp")
 
             $scope.input = {}
 
+            $scope.ccDirty = false
+
             $scope.addCustomConcept = function () {
                 let concept = {code:$scope.input.newCode,display:$scope.input.newDisplay}
                 $scope.model.concepts.push(concept)
                 delete $scope.input.newCode
                 delete $scope.input.newDisplay
+
                 $scope.generateResources()
             }
 
-
+            $scope.removeCustomConcept = function (inx) {
+                $scope.model.concepts.splice(inx,1)
+                $scope.ccDirty = true
+            }
 
             $scope.saveCustomVS = function () {
                 let msg = "Are you sure you wish to update this valueSet and CodeSystem"
@@ -25,6 +31,7 @@ angular.module("pocApp")
                             $http.put(qry,$scope.vs).then(
                                 function (data) {
                                     alert('Both ValueSet and CodeSystem update complete')
+                                    $scope.ccDirty = false
                                 },function (err) {
                                     alert('The CodeSystem was updated, but not the ValueSet:' + angular.toJson(err.data))
                                 }
@@ -42,6 +49,7 @@ angular.module("pocApp")
             $scope.selectCustomVSItem = function (item) {
 
                 let vs = item.vs
+                $scope.ccDirty = false
 
                 //If we expand the ValueSet, then we can re-create the codesystem
 
@@ -53,7 +61,7 @@ angular.module("pocApp")
 
                         //now we can create the internal model from the expansion
                         let expandedVs = data.data
-                        $scope.input.name = vs.name     //the expanded vs doesn't include the vs name etc.
+                        $scope.input.name = vs.id || vs.name.replace(/_/g,'-')     //the expanded vs doesn't include the vs name etc.
                         $scope.input.title = vs.title
                         $scope.input.description = vs.description
                         $scope.model = {concepts:[]}
@@ -64,8 +72,9 @@ angular.module("pocApp")
 
 
                         $scope.generateResources()
+                        $scope.ccDirty = false      //is set by generate resources
 
-                        $scope.canSetId = false
+                       // $scope.canSetId = false
 
 
                     }, function (err) {
@@ -79,51 +88,95 @@ angular.module("pocApp")
 
             }
 
+
+
             //load all codesystems
             $scope.loadAllVS = function () {
-                getValueSets("http://canshare.co.nz/fhir/NamingSystem/nonsnomed-valuesets%7c").then(
-                    function (ar) {
-                        console.log(ar)
-                        $scope.customVS = angular.copy(ar)
 
-                        $scope.customVS.sort(function (a,b) {
-                            if (a.vs.meta.lastUpdated > b.vs.meta.lastUpdated) {
-                                return -1
-                            } else {
-                                return 1
-                            }
 
-                        })
+                let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/nonsnomed-valuesets%7c&_sort=title&_count=5000&_summary=false`
+                console.log(qry)
+                let encodedQry = encodeURIComponent(qry)
 
-                    },function (err) {
-                        console.log(err)
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        let bundle = data.data
+                        if (bundle && bundle.entry) {
+                            $scope.customVS = []
+                            bundle.entry.forEach(function (entry) {
+                                let item = {vs:entry.resource}
+                                item.display = entry.resource.title || entry.resource.name
+
+                                $scope.customVS.push(item)
+                            })
+                        }
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
                     }
-                )
+
+                    )
+
             }
 
             $scope.loadAllVS()
 
             $scope.newCS = function() {
 
-                $scope.canSetId = true
-                delete $scope.input.name
-                delete $scope.input.title
-                delete $scope.input.description
+                let msg = "Id of ValueSet (will become part of  url)"
+                let newName = prompt(msg)
+                if (newName) {
+                    //$scope.canSetId = true
+                    if (newName.indexOf(" ") > -1 || newName.indexOf('_') > -1) {
+                        alert("Spaces and underscore not allowed")
+                        return
+                    }
 
-                $scope.model = {concepts:[],url:"",title:"",description:""}
+                    let url = `https://nzhts.digital.health.nz/fhir/ValueSet/${newName}`
+                    let qry = `ValueSet?url=${url}`
+                    console.log(qry)
+                    let encodedQry = encodeURIComponent(qry)
+
+                    $http.get(`nzhts?qry=${encodedQry}`).then(
+                        function (data) {
+                            let bundle = data.data
+                            if (bundle.entry && bundle.entry.length > 0) {
+                                alert("This name has already been used")
+                                return
+                            }
+
+
+                            //This will be a new valueset & codesystem
+                            $scope.input.name = newName
+                            delete $scope.input.title
+                            delete $scope.input.description
+
+                            $scope.model = {concepts:[],url:"",title:"",description:""}
+
+
+                        }, function (err) {
+                            alert("Error: " + angular.toJson(err))
+                        }
+                    )
+
+                    //check the VS doesn't a;ready exist
+
+
+
+                }
+
+
             }
 
-            $scope.newCS()
+
             
-            $scope.removeCustomConcept = function (inx) {
-                $scope.model.concepts.splice(inx,1)
-            }
+
 
             //generate he CS & VS from the
             $scope.generateResources = function() {
-                let name = $scope.input.name
+                $scope.ccDirty = true
+                let name = $scope.input.name.replace(/_/g,'-')
                 $scope.cs = {resourceType:"CodeSystem",status:'active'}
-                $scope.cs.id = name
+                $scope.cs.id = name       //can't have underscore in an id
 
                 let vsUrl = `https://nzhts.digital.health.nz/fhir/ValueSet/${name}`
                 let csUrl = `http://canshare.co.nz/fhir/CodeSystem/${name}`
