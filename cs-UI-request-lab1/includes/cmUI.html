@@ -57,7 +57,7 @@
 
 
 
-                                      <!-- Allows us to explicitely decide when to show the message - not just
+                                      <!-- Allows us to explicitly decide when to show the message - not just
                                       when the set of values has not been determined
 
                                        probably not needed now - which means we can remove the 'noMatches' flag-->
@@ -180,6 +180,40 @@
 
                   <uib-tabset>
 
+
+                      <uib-tab heading="Defaults">
+                          <br/>
+                          <div class="row">
+                              <div class="col-md-4">
+                                  Cancer Service
+                              </div>
+                              <div class="col-md-4">
+                                 <select class="form-control" ng-model="default.service"
+                                         ng-change = "setDefaultService(default.service)"
+                                         ng-options="concept.display for concept in input.allService"/>
+                              </div>
+                          </div>
+
+                          <br/>
+
+                          <!--
+                          <div class="row" ng-show="default.service.code">
+                              <div class="col-md-4">
+                                  Cancer Stream
+                              </div>
+                              <div class="col-md-4">
+                                  <select class="form-control" ng-model="default.stream"
+                                          ng-change = "resetUI()"
+                                          ng-options="concept.display for concept in input.allStreams"/>
+                              </div>
+                          </div>
+
+                          -->
+
+
+
+                      </uib-tab>
+
                       <uib-tab heading="Log">
                           <div class="row">
                               <div class="col-md-6">
@@ -195,7 +229,7 @@
 
                               </div>
                               <div class="col-md-6">
-                                    <h4>{{local.logEntry.objTitle}}</h4>
+                                  <h4>{{local.logEntry.objTitle}}</h4>
                                   <div class="myScroll">
                                       <pre ng-show="local.logEntry.obj">{{local.logEntry.obj | json}}</pre>
                                   </div>
@@ -205,7 +239,7 @@
                           </div>
                       </uib-tab>
 
-                      <uib-tab heading="Reverse Lookup details">
+                      <uib-tab heading="Reverse engine">
                           <div class="banner">
                               <div>Property: {{reverseLookup.element.display}}
 
@@ -362,8 +396,7 @@
 
                       </uib-tab>
 
-
-                      <uib-tab heading="Forward engine details">
+                      <uib-tab heading="Forward engine">
                           <h4>Property values used by engine when locating matching targets</h4>
                           <table class="table table-condensed table-bordered">
                               <tr><th>Property</th><th>Display</th><th>Code</th><th>System</th></tr>

@@ -32,9 +32,6 @@ angular.module("pocApp")
                         $scope.input.types = modelsSvc.getAllTypes($scope.hashAllDG)
 
 
-
-
-
                     })
 
                     //need to generate the snapshot for all DG. This is needed for the Q generation

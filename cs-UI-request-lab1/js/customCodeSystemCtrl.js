@@ -50,6 +50,7 @@ angular.module("pocApp")
 
                 let vs = item.vs
                 $scope.ccDirty = false
+                $scope.selectedCsItem = item
 
                 //If we expand the ValueSet, then we can re-create the codesystem
 

@@ -7,7 +7,7 @@
     <div class="col-md-3">
       <div class="myScroll">
         <div class="list-group">
-          <div ng-class="{'list-group-item':true,listItemSelected:selectedItem.vs.id==item.vs.id,retired:item.vs.status == 'retired'}"
+          <div ng-class="{'list-group-item':true,listItemSelected:selectedCsItem.vs.id==item.vs.id,retired:item.vs.status == 'retired'}"
                style="cursor: pointer" ng-repeat="item in customVS" ng-click="selectCustomVSItem(item)">
             <div>{{item.display}}</div>
             <div class="pull-right"><em>{{item.vs.meta.lastUpdated | ageSeconds}}</em></div>

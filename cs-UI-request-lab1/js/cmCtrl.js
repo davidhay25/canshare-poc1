@@ -3,6 +3,7 @@ angular.module("pocApp")
         function ($scope,$http,$q,querySvc,cmSvc,$uibModal,utilsSvc) {
 
             $scope.local = {cmOptions : {},cm:{property:{}}}
+            $scope.default = {}
 
             $scope.cmProperties = {}
 
@@ -722,6 +723,31 @@ angular.module("pocApp")
 
 
 
+            $scope.setDefaultService = function (concept) {
+//alert('change')
+                let serviceCode = $scope.cmProperties['cancer-stream'].concept.code
+
+                for (const element of $scope.fullSelectedCM.group[0].element) {
+                    if (element.code == serviceCode) {     //this is the set of targets which could match this code
+
+                        let hash = {'cancer-service':concept}
+                        let vo = cmSvc.rulesEngine(hash,element,$scope.hashExpandedVs)
+                        console.log(vo)
+
+                        $scope.input.allStreams = $scope.hashExpandedVs[vo.lstVS[0]]
+
+                        $scope.resetUI()
+
+                        break
+                    }
+                }
+
+
+            }
+
+
+
+
             //reset all the inputs for the UI
             $scope.resetUI = function () {
                 delete $scope.lstMatchingConceptsForUI
@@ -733,8 +759,36 @@ angular.module("pocApp")
 
                 $scope.log = []
 
-
                 setup()         //sets the defaulvalues
+
+                let defaultServiceSelected = false
+                if ($scope.default.service && $scope.default.service.code) {
+                    //$scope.cmProperties['cancer-service'].options = $scope.input.allService
+                    $scope.local.cmOptions['cancer-service'] = $scope.default.service
+                    defaultServiceSelected = true
+                    $scope.uiValueSelected('cancer-service',$scope.local.cmOptions['cancer-service'])
+                }
+
+/*
+                //if there's a default stream, then there must be a default service
+                if ($scope.default.stream && $scope.default.stream.code) {
+                    $scope.local.cmOptions['cancer-stream'] = $scope.default.stream
+
+                    $scope.cmProperties['cancer-stream'].options = $scope.input.allStreams
+
+                    //if there's a default stream, then populate from the stream
+                    $scope.uiValueSelected('cancer-stream',$scope.local.cmOptions['cancer-stream'])
+                } else {
+                    //if there's no default stream, then populate from the service
+                    if (defaultServiceSelected) {
+                        $scope.uiValueSelected('cancer-service',$scope.local.cmOptions['cancer-service'])
+                    }
+
+                }
+
+                */
+
+
 
             }
 
@@ -1007,9 +1061,12 @@ angular.module("pocApp")
                 let serviceUrl = "https://nzhts.digital.health.nz/fhir/ValueSet/canshare-cancer-service"
                 let serviceConcepts = $scope.hashExpandedVs[serviceUrl]
 
+                $scope.input.allService = [{display:"No default"}]    //for default
+
                 if (serviceConcepts) {
-                    for (concept of serviceConcepts) {
+                    for (const concept of serviceConcepts) {
                         $scope.cmProperties['cancer-service'].options.push(concept)
+                        $scope.input.allService.push(concept)
                     }
                 } else {
                     alert(`The service ValueSet ${serviceUrl} was not found`)
@@ -1034,7 +1091,6 @@ angular.module("pocApp")
 
             //when a concept is selected from the histology typeahead in the histology UI
             $scope.histoSelected = function (concept) {
-
 
                 performReverseLookup('histologic-type-primary',concept)
                 console.log($scope.reverseLookup)
@@ -1122,7 +1178,7 @@ angular.module("pocApp")
                 delete $scope.local.cm.property[k]
             }
 
-            $scope.resetUIData = function () {
+            $scope.resetUIDataDEP = function () {
                 delete $scope.displayMatchNumber
                 delete $scope.input.cmProperty
                 delete $scope.cmExpandedVS
@@ -1131,6 +1187,8 @@ angular.module("pocApp")
                 delete $scope.selectedElement
                 $scope.local.cm.property = {}
                 delete $scope.reverseLookup
+
+
 
             }
 

@@ -1718,13 +1718,13 @@ angular.module("pocApp")
 
                         //this is just testing the hierarchical Q
 
-                        let voHQ = makeQSvc.makeHierarchicalQFromDG($scope.fullElementList,$scope.hashAllDG)
-                        console.log(voHQ)
+                       // let voHQ = makeQSvc.makeHierarchicalQFromDG($scope.fullElementList,$scope.hashAllDG)
+                     //   console.log(voHQ)
 
-                        console.log(angular.toJson(voHQ.Q))
+                     //   console.log(angular.toJson(voHQ.Q))
 
                         //>>>>>>>>>>. todo - just for testing
-                        console.log(voHQ.Q)
+                    //    console.log(voHQ.Q)
                         //$scope.localCopyToClipboard(angular.toJson(voHQ.Q))
 
 
