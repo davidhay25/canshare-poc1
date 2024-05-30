@@ -5,6 +5,10 @@ angular.module("pocApp")
             $scope.local = {cmOptions : {},cm:{property:{}}}
             $scope.default = {}
 
+            //the mode of operation of the UI - manual or directed
+
+            $scope.default.mode = 'directed'
+
             $scope.cmProperties = {}
 
             // $scope.local.conceptMapTab = 3      //select the UI tab while developing
@@ -14,6 +18,8 @@ angular.module("pocApp")
             $scope.log= []
 
             let snomed = "http://snomed.info/sct"
+
+
 
 
 
@@ -158,6 +164,13 @@ angular.module("pocApp")
                 //  Mostly the empty ones - but also check that existing values are correct (?when would they not be)
                 //  We then populate options for the next one...
                 //      actually keep on going if there are no options or only a single one
+
+                if ($scope.default.mode == 'manual') {
+                    //in manual mode no action is taken when the user selects a value
+                    return
+                }
+
+
                 $scope.log = []     //log actions.
                 delete $scope.local.logEntry
 
@@ -722,6 +735,46 @@ angular.module("pocApp")
             }
 
 
+            //mode can either be directed or manual.
+            //directed follows the ConceptMap
+            //manual just shows them all
+
+            $scope.changeMode = function (mode) {
+
+                if (mode == 'directed') {
+                    $scope.resetUI()
+                }
+
+                if (mode == 'manual') {
+                    //set all the options to the maximal set
+
+                    //set the list oo options for all properties
+                    for (const key of Object.keys($scope.cmProperties)) {
+
+                        //let fullVS = $scope.cmProperties[key].fullVS
+
+                        let cmProperty = $scope.cmProperties[key]
+                        if (cmProperty.fullVS) {
+
+                            let fullVSName = `https://nzhts.digital.health.nz/fhir/ValueSet/${cmProperty.fullVS}`
+
+                            cmProperty.options = $scope.hashExpandedVs[fullVSName]
+
+                            if (cmProperty.options && cmProperty.options.length > 0) {
+                                //set  the value to the first element in the VS
+                                $scope.local.cmOptions[key] = cmProperty.options[0]
+                            }
+
+                        }
+
+
+
+                    }
+
+
+
+                }
+            }
 
             $scope.setDefaultService = function (concept) {
 //alert('change')
@@ -756,6 +809,8 @@ angular.module("pocApp")
                 delete $scope.reverseLookup
                 //delete $scope.appliedFromReverse        //if true, then the reverse stuff was applied to previous properties
                 $scope.local.cmOptions = {}     //the data entered
+
+                $scope.default.mode = 'directed'    //uses the conceptmap
 
                 $scope.log = []
 
@@ -1036,18 +1091,18 @@ angular.module("pocApp")
                 $scope.cmProperties['patient-sex'] = {concept: {code:"184100006"},
                     next:'cancer-service',options:[]}
                 $scope.cmProperties['cancer-service'] = {concept: {code:"299801000210106"},
-                    next:'cancer-stream',options:[]}
+                    next:'cancer-stream',options:[],fullVS:'canshare-cancer-service'}
                 $scope.cmProperties['cancer-stream'] = {concept:{code:"299811000210108",display:"Cancer Stream",system:snomed},
-                    next:'cancer-substream',previous:'cancer-service', options : []}
+                    next:'cancer-substream',previous:'cancer-service', options : [],fullVS:'canshare-cancer-stream'}
                 $scope.cmProperties['cancer-substream'] = {concept: {code:"299821000210103"},
-                    next:'cancer-type',previous:'cancer-stream',options:[]}
+                    next:'cancer-type',previous:'cancer-stream',options:[],fullVS:'canshare-cancer-substream'}
                 $scope.cmProperties['cancer-type'] = {concept: {code:"299831000210101"},
-                    next:'primary-site',previous:'cancer-substream',options:[]}
+                    next:'primary-site',previous:'cancer-substream',options:[],fullVS:'canshare-cancer-type'}
                 $scope.cmProperties['primary-site'] = {concept: {code:"399687005"},
-                    next:'primary-site-laterality',previous:'cancer-type',options:[]}
+                    next:'primary-site-laterality',previous:'cancer-type',options:[],fullVS:'canshare-primary-topography'}
                 $scope.cmProperties['primary-site-laterality'] = {concept: {code:"297561000210100"},
-                    next:'histologic-type-primary',previous:'primary-site',options:[]}
-                $scope.cmProperties['histologic-type-primary'] = {concept: {code:"512001000004108"},options:[],
+                    next:'histologic-type-primary',previous:'primary-site',options:[],fullVS:'canshare-laterality'}
+                $scope.cmProperties['histologic-type-primary'] = {concept: {code:"512001000004108"},options:[],fullVS:'canshare-who-histology',
                     previous:'primary-site-laterality'}
 
                 $scope.cmProperties['patient-sex'].options.push({code:"U",display:"Unknown"})

@@ -183,6 +183,22 @@
 
                       <uib-tab heading="Defaults">
                           <br/>
+
+                          <div class="row">
+                              <div class="col-md-4">
+                                  Mode
+                              </div>
+                              <div class="col-md-4">
+                                  <select class="form-control" ng-model="default.mode"
+                                          ng-change = "changeMode(default.mode)">
+                                      <option value="directed">Directed</option>
+                                      <option value="manual">Manual</option>
+                                  </select>
+                              </div>
+                          </div>
+
+                          <br/><hr/>
+
                           <div class="row">
                               <div class="col-md-4">
                                   Cancer Service
@@ -195,6 +211,10 @@
                           </div>
 
                           <br/>
+
+
+
+
 
                           <!--
                           <div class="row" ng-show="default.service.code">
