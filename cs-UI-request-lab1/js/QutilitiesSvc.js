@@ -13,6 +13,8 @@ angular.module("pocApp")
 
         return {
 
+
+
             setFixedValue : function (ed,item) {
                 //if a fixed value, set the Q elements
                 if (ed.fixedCoding) {   //todo - need to look for other dts we can fix

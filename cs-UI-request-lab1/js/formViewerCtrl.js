@@ -1,18 +1,25 @@
 angular.module("pocApp")
     .controller('formViewerCtrl',
-        function ($scope,$http,$uibModal,$localStorage,$q) {
+        function ($scope,$http,$uibModal,$localStorage,$q,makeQuestionnaireSvc,snapshotSvc,modelCompSvc) {
 
-            let dgFilter
-            let emailFilter
+
             $scope.input = {}
 
-            $scope.restoreDG = function () {
-                alert("Not yet enabled")
-            }
+            $scope.input.autoClipboard = true
+
+            $scope.leftPanel = 'col-md-3'
+            $scope.rightPanel = 'col-md-9'
+
+            $scope.csiroUrl = "https://smartforms.csiro.au/playground"
 
             function loadWorld() {
                 //the localstorage objects
                 $scope.world = $localStorage.world
+                $scope.hashAllDG = $localStorage.world.dataGroups
+                $scope.hashAllComp = $localStorage.world.compositions
+
+                snapshotSvc.makeSnapshots($scope.hashAllDG,true)
+
                 $scope.arDG = []
                 Object.keys($scope.world.dataGroups).forEach(function (key) {
                     $scope.arDG.push($scope.world.dataGroups[key])
@@ -33,95 +40,84 @@ angular.module("pocApp")
             }
             loadWorld()
 
-
+/*
             let obj = {comp:$scope.world.compositions,dg:$scope.world.dataGroups}
+
             $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([angular.toJson(obj,true) ],{type:"application/json"}))
             $scope.downloadLinkJsonName = `world.json`
+*/
+
+            $scope.selectComp = function (comp) {
+                $scope.selectedModel = comp
+
+                //snapshotSvc holds the snapshots..
+                modelCompSvc.setSnapshotSvc(snapshotSvc)
+
+                let tmp = angular.copy($scope.hashAllDG)
+                let vo = modelCompSvc.makeFullList(comp,tmp,$scope.hashAllDG)
+                $scope.allCompElements = vo.allElements     //list of all elements. used by the Table and Q generation (at least)
+
+                $scope.Q =  makeQuestionnaireSvc.makeHierarchicalQFromComp($scope.allCompElements,$scope.hashAllDG)
+                if ($scope.input.autoClipboard) {
+                    localCopyToClipboard(angular.toJson($scope.Q.Q,2))
+                }
+
+            }
+
+
 
             $scope.selectDG = function (dg) {
-                $scope.selectedDG = dg
-            }
+                $scope.selectedModel = dg
+                $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name,dg)// vo.allElements
 
-            $scope.deleteDG = function () {
-                if (confirm("Are you sure you wish to remove this DG from local storage? (Any version on the Library is untouched")){
-                    delete $localStorage.world.dataGroups[$scope.selectedDG.name]
-                    delete $scope.selectedDG
-                    loadWorld()
-                }
-            }
-
-            function getTrace(count) {
-                count = count || 200
-                let qry = `/trace?count=${count}`
-                $http.get(qry).then(
-                    function (data) {
-                        $scope.traceHistory = data.data
-
-                        $scope.hashDG = {}
-                        $scope.hashUser = {}
-                        for (const item of $scope.traceHistory) {
-                            if (item.model && item.model.kind == 'dg') {
-                                $scope.hashDG[item.model.name] = item.model.name
-                            }
-                            if (item.userEmail) {
-                                $scope.hashUser[item.userEmail] = item.userEmail
-                            }
-
-                        }
-                        $scope.lstType = [""]
-                        for (const name of Object.keys($scope.hashDG)) {
-                            $scope.lstType.push(name)
-                        }
-
-                        $scope.lstType.sort(function(a,b){
-                            if (a.toLowerCase() > b.toLowerCase()) {
-                                return 1
-                            } else {
-                                return -1
-                            }
-                        })
-
-                    }, function (err) {
-                        console.log(err)
+                makeQuestionnaireSvc.makeHierarchicalQFromDG($scope.fullElementList,$scope.hashAllDG,function (Q) {
+                    $scope.Q = Q
+                    if ($scope.input.autoClipboard) {
+                        localCopyToClipboard(angular.toJson($scope.Q,true))
                     }
-                )
-            }
-            getTrace()
+                })
 
-            $scope.setFilter = function (dgName) {
-                dgFilter = dgName
-            }
-            $scope.setEmailFilter = function (email) {
-                emailFilter = email
+/*
+                $scope.Q = makeQuestionnaireSvc.makeHierarchicalQFromDG($scope.fullElementList,$scope.hashAllDG)
+                if ($scope.input.autoClipboard) {
+                    localCopyToClipboard(angular.toJson($scope.Q.Q,2))
+                }
+                */
             }
 
-            $scope.canShow = function (item) {
+            $scope.toggleLeftPanel = function(){
+                if ($scope.leftPanel == 'col-md-3') {
+                    $scope.leftPanel = 'hidden'
+                    $scope.rightPanel = 'col-md-12'
+                } else {
+                    $scope.leftPanel = 'col-md-3'
+                    $scope.rightPanel = 'col-md-9'
+                }
+            }
 
-                if ($scope.input.hideSelect && item.action == 'select') {
-                    return false
+            let localCopyToClipboard = function(text) {
+                let textArea = document.createElement("textarea");
+                textArea.value = text;
+
+                // Avoid scrolling to bottom
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.position = "fixed";
+
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    let successful = document.execCommand('copy');
+                    let msg = successful ? 'successful' : 'unsuccessful';
+                    console.log('Fallback: Copying text command was ' + msg);
+                } catch (err) {
+                    alert('Fallback: Oops, unable to copy', err);
                 }
 
-                //let canShow = true
-
-                if (dgFilter) {
-                    if (item.model && item.model.name !== dgFilter) {
-                        return false
-                    }
-                }
-
-                if (emailFilter) {
-                    if (item.userEmail && item.userEmail !== emailFilter) {
-                        return false
-                    }
-                }
-
-                return true
+                document.body.removeChild(textArea);
             }
-
-            $scope.selectTraceItem = function (item) {
-                $scope.selectedTraceItem = item
-            }
-
 
 
             //--------- login stuff
