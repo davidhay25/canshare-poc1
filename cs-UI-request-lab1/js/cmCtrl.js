@@ -738,7 +738,7 @@ angular.module("pocApp")
 
 
             $scope.selectManualOverride = function (m) {
-                console.log(m)
+                //console.log(m)
                 if (! m) {
                     $scope.default.mode = 'manual'
                     //about to be checked
@@ -749,7 +749,7 @@ angular.module("pocApp")
                     $scope.changeMode('directed')
                 }
 
-                console.log($scope.default.manual)
+                //console.log($scope.default.manual)
             }
 
             //mode can either be directed or manual.
@@ -780,7 +780,19 @@ angular.module("pocApp")
                             if (cmProperty.options && cmProperty.options.length > 0) {
                                 //set  the value to the first element in the VS
                                 //clear the value
-                                delete $scope.local.cmOptions[key]
+                                let currentConcept = $scope.local.cmOptions[key]
+                                if (currentConcept) {
+                                    for (const c of cmProperty.options) {
+                                        if (c.code == currentConcept.code){
+                                            $scope.local.cmOptions[key] = c
+                                            break
+                                        }
+                                    }
+
+                                }
+
+
+                                //delete $scope.local.cmOptions[key]
                                 //$scope.local.cmOptions[key] = cmProperty.options[0]
                             }
 
