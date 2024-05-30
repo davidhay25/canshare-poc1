@@ -735,6 +735,23 @@ angular.module("pocApp")
             }
 
 
+
+
+            $scope.selectManualOverride = function (m) {
+                console.log(m)
+                if (! m) {
+                    $scope.default.mode = 'manual'
+                    //about to be checked
+                    $scope.changeMode('manual')
+
+                } else {
+                    $scope.default.mode = 'directed'
+                    $scope.changeMode('directed')
+                }
+
+                console.log($scope.default.manual)
+            }
+
             //mode can either be directed or manual.
             //directed follows the ConceptMap
             //manual just shows them all
@@ -762,7 +779,9 @@ angular.module("pocApp")
 
                             if (cmProperty.options && cmProperty.options.length > 0) {
                                 //set  the value to the first element in the VS
-                                $scope.local.cmOptions[key] = cmProperty.options[0]
+                                //clear the value
+                                delete $scope.local.cmOptions[key]
+                                //$scope.local.cmOptions[key] = cmProperty.options[0]
                             }
 
                         }
