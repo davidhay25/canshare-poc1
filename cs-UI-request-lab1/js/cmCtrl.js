@@ -22,9 +22,6 @@ angular.module("pocApp")
 
 
 
-
-
-
             //functions to get ConceptMap & expanded ValueSet..
             //localforage is defined by the library script. uses indexedDb as the local storage...
             //https://localforage.github.io/localForage/#data-api-getitem
@@ -373,7 +370,7 @@ angular.module("pocApp")
 
                     $scope.log.push({msg:`${$scope.uiMatchingVS.length} valueset or concept returned`,obj:$scope.uiMatchingVS,objTitle:"ValueSet or concept"})
 
-                    //actually, all VS are aggregated. We look at the forst entrey only to see if it is a single concept
+                    //actually, all VS are aggregated. We look at the first entry only to see if it is a single concept
                     /* if ($scope.uiMatchingVS.length > 1) {
                         $scope.log.push({msg:`WARNING: Only the first one evaluated. `})
                     }
@@ -417,8 +414,6 @@ angular.module("pocApp")
                     } else {
                         //now examine the valueset expansions to get the actual concepts. There may be more than one...
 
-
-
                         //The list of concepts to apply should be the intersection between what is already in
                         //the property list ($scope.cmProperties[propKey].options) and the list of concepts returned
                         //from the forwards engine (ie a concept that is in both)
@@ -431,33 +426,19 @@ angular.module("pocApp")
                         //and this routine does check all valuesets
 
                         //first create the complete set of concepts from the forward engine
+                        //this is a de-duping exercise...
                         let forwardList = []
                         for (const url of $scope.uiMatchingVS) {
                             let arConcepts = $scope.hashExpandedVs[url]
                             if (arConcepts) {
                                 for (const concept of arConcepts) {
-
                                     let ar = forwardList.filter(concept1 => concept1.code == concept.code )
                                     if (ar.length == 0) {
                                         forwardList.push(concept)
                                     }
-/*
-                                    let ar = $scope.cmProperties[propKey].options.filter(concept1 => concept1.code == concept.code )
-                                    if (ar.length == 0) {
-                                        $scope.cmProperties[propKey].options.push(concept)
-                                    }
-                                    */
-
                                 }
 
-
-
                                 //$scope.lstMatchingConceptsForUI = $scope.cmProperties[propKey].options
-
-
-
-
-
                                 $scope.log.push({msg:`List of concepts `,obj:$scope.cmProperties[propKey].options,objTitle:"Possible concepts"})
 
                             } else {
@@ -472,7 +453,8 @@ angular.module("pocApp")
                         if ( $scope.cmProperties[propKey].options.length == 0) {
                             //There's nothing yet so the full forward list can be used
                             $scope.cmProperties[propKey].options = forwardList
-                        } else {//there's already a list - need to change it to the intersection...
+                        } else {
+                            //there's already a list - need to change it to the intersection...
                             $scope.cmProperties[propKey].options = []
 
                             //go through the forwardlist...
@@ -480,6 +462,7 @@ angular.module("pocApp")
                                 //is it in the existing list
                                 let ar = existingList.filter(concept1 => concept1.code == concept.code )
 
+                                //they are in both....
                                 if (ar.length > 0) {
                                     //yes! we can add it...
                                     $scope.cmProperties[propKey].options.push(concept)
@@ -546,7 +529,6 @@ angular.module("pocApp")
                 }
 
             }
-
 
 
 
@@ -847,18 +829,20 @@ angular.module("pocApp")
 
                 setup()         //sets the defaulvalues
 
-                /*
+
                 let defaultServiceSelected = false
                 if ($scope.default.service && $scope.default.service.code) {
                     //$scope.cmProperties['cancer-service'].options = $scope.input.allService
                     $scope.local.cmOptions['cancer-service'] = $scope.default.service
                     defaultServiceSelected = true
-                    $scope.uiValueSelected('cancer-service',$scope.local.cmOptions['cancer-service'])
+                   $scope.uiValueSelected('cancer-service',$scope.local.cmOptions['cancer-service'])
                 }
 
-                */
+
+
 
 /*
+
                 //if there's a default stream, then there must be a default service
                 if ($scope.default.stream && $scope.default.stream.code) {
                     $scope.local.cmOptions['cancer-stream'] = $scope.default.stream
@@ -875,8 +859,8 @@ angular.module("pocApp")
 
                 }
 
-                */
 
+*/
 
 
             }

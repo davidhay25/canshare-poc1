@@ -4,7 +4,7 @@ angular.module("pocApp")
 
 
             $scope.input = {}
-            //$scope.input.mainTabActive = 1      //just while developing - selects that conceptmap tab
+            $scope.input.mainTabActive = 1      //just while developing - selects that conceptmap tab
 
 
             $scope.localStorage = $localStorage
