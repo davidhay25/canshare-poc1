@@ -847,6 +847,7 @@ angular.module("pocApp")
 
                 setup()         //sets the defaulvalues
 
+                /*
                 let defaultServiceSelected = false
                 if ($scope.default.service && $scope.default.service.code) {
                     //$scope.cmProperties['cancer-service'].options = $scope.input.allService
@@ -854,6 +855,8 @@ angular.module("pocApp")
                     defaultServiceSelected = true
                     $scope.uiValueSelected('cancer-service',$scope.local.cmOptions['cancer-service'])
                 }
+
+                */
 
 /*
                 //if there's a default stream, then there must be a default service
