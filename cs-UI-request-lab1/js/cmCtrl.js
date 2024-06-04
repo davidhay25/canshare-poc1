@@ -19,6 +19,8 @@ angular.module("pocApp")
 
             let snomed = "http://snomed.info/sct"
 
+            let vsPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/"
+
 
 
 
@@ -153,6 +155,14 @@ angular.module("pocApp")
             }
 
 
+            $scope.setMaximalOptions = function (propName) {
+
+                let vsUrl = `${vsPrefix}${$scope.cmProperties[propName].fullVS}`
+                console.log(vsUrl,$scope.hashExpandedVs[vsUrl])
+                $scope.cmProperties[propName].options = angular.copy($scope.hashExpandedVs[vsUrl])
+
+
+            }
 
             //handler when a value is selected
             $scope.uiValueSelected = function (propKey,value) {
@@ -666,18 +676,15 @@ angular.module("pocApp")
                                 $scope.local.cmOptions[propName] = arNewOptions[0]      //set the value
                             } else {
 
-                                //todo #2 create a new list which is the intersection of the list from the reverse
+                                //create a new list which is the intersection of the list of the reverse
                                 //and the current options in the property (from forward)
                                 let newList = []
 
-
-                                //let currentList = cmProperty[propName].options   //current options - presumably from last forward
                                 let currentList = cmProperty.options   //current options - presumably from last forwar
 
                                 for (let concept of arNewOptions)  {
                                     //is it in the existing list
                                     let ar = currentList.filter(concept1 => concept1.code == concept.code )
-
                                     //they are in both....
                                     if (ar.length > 0) {
                                         //yes! we can add it...
@@ -698,9 +705,6 @@ angular.module("pocApp")
                                         delete $scope.local.cmOptions[propName]
                                     }
                                 }
-
-
-
 
                                 $scope.log.push({msg:`Setting options for ${propName}`,obj:arNewOptions,objTitle:"Options"})
                                 cmProperty.options = arNewOptions   //set the list of possible concepts to those from the reverse lokup
@@ -790,7 +794,6 @@ angular.module("pocApp")
                     $scope.changeMode('directed')
                 }
 
-                //console.log($scope.default.manual)
             }
 
             //mode can either be directed or manual.
@@ -814,7 +817,7 @@ angular.module("pocApp")
                         let cmProperty = $scope.cmProperties[key]
                         if (cmProperty.fullVS) {
 
-                            let fullVSName = `https://nzhts.digital.health.nz/fhir/ValueSet/${cmProperty.fullVS}`
+                            let fullVSName = `${vsPrefix}${cmProperty.fullVS}`
 
                             cmProperty.options = $scope.hashExpandedVs[fullVSName]
 
@@ -956,6 +959,7 @@ angular.module("pocApp")
                         //add the VS with all topography. used for the primary-site-laterality
                         lstVsUrl.push('https://nzhts.digital.health.nz/fhir/ValueSet/canshare-topography')
                         lstVsUrl.push('https://nzhts.digital.health.nz/fhir/ValueSet/canshare-cancer-service')
+
 
                         $scope.fullSelectedCM.group.forEach(function (group) {
                             group.element.forEach(function (element) {
@@ -1192,6 +1196,7 @@ angular.module("pocApp")
                 //get the list of services from the ConceptMap
                 let serviceUrl = "https://nzhts.digital.health.nz/fhir/ValueSet/canshare-cancer-service"
                 let serviceConcepts = $scope.hashExpandedVs[serviceUrl]
+
 
                 $scope.input.allService = [{display:"No default"}]    //for default
 

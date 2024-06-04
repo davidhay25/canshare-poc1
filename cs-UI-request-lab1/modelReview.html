@@ -178,7 +178,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <pre>{{selectedED | json}}</pre>
+
                                 </div>
                             </div>
 
@@ -421,7 +421,7 @@
                                 <div ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
 
                                     <div class="row">
-                                        <div class="col-md-3">
+                                        <div class="col-md-3 ">
                                             Title
                                         </div>
                                         <div class="col-md-9">
@@ -485,7 +485,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="row" ng-show="selectedCompositionNode.data.ed.options">
+                                    <div class="row" ng-show="selectedCompositionNode.data.ed.options.length > 0">
                                         <div class="col-md-3">
                                             Options
                                         </div>
@@ -511,22 +511,77 @@
                                         </div>
                                     </div>
 
-                                    <div ng-show = "false" class="row" >
+                                    <div ng-show="hasFixedValue(selectedCompositionNode.data.ed)" class="row" >
                                         <div class="col-md-3">
                                             Fixed value
                                         </div>
                                         <div class="col-md-9">
+                                            <div ng-show="selectedCompositionNode.data.ed.fixedCode">
+                                                {{selectedCompositionNode.data.ed.fixedCode}}
+                                            </div>
 
+                                            <div ng-show="selectedCompositionNode.data.ed.fixedRatio">
+                                                <div ng-show="selectedCompositionNode.data.ed.fixedRatio.numerator.unit">Numerator unit: {{selectedCompositionNode.data.ed.fixedRatio.numerator.unit}}</div>
+                                                <div ng-show="selectedCompositionNode.data.ed.fixedRatio.denominator.unit">Denominator unit: {{selectedCompositionNode.data.ed.fixedRatio.denominator.unit}}</div>
+                                                <div ng-show="selectedCompositionNode.data.ed.fixedRatio.denominator.value">Denominator value: {{selectedCompositionNode.data.ed.fixedRatio.denominator.value}}</div>
+                                            </div>
+
+                                            <div ng-show="selectedCompositionNode.data.ed.fixedQuantity">
+                                                <span ng-show = "selectedCompositionNode.data.ed.fixedQuantity.unit">
+                                                  Unit: {{selectedCompositionNode.data.ed.fixedQuantity.unit}}
+                                                </span>
+
+                                                <span ng-show = "selectedCompositionNode.data.ed.fixedQuantity.value">
+                                                  Value: {{selectedCompositionNode.data.ed.fixedQuantity.value}}
+                                                </span>
+                                            </div>
+
+                                            <div ng-show="selectedCompositionNode.data.ed.fixedCoding">
+                                                {{selectedCompositionNode.data.ed.fixedCoding.code}} | {{selectedCompositionNode.data.ed.fixedCoding.display}} | {{selectedCompositionNode.data.ed.fixedCoding.system}}
+                                            </div>
+
+                                            <span ng-show="selectedCompositionNode.data.ed.fixedCoding ||
+                                                selectedCompositionNode.data.ed.fixedQuantity || selectedCompositionNode.data.ed.fixedRatio"
+                                                class="pull-right"></span>
 
                                         </div>
                                     </div>
 
-                                    <div ng-show = "false" class="row" >
+                                    <div ng-show = "hasDefaultValue(selectedCompositionNode.data.ed)" class="row" >
                                         <div class="col-md-3">
                                             Default value
                                         </div>
                                         <div class="col-md-9">
+                                            <div class="col-md-9">
+                                                <div ng-show="selectedCompositionNode.data.ed.defaultCode">
+                                                    {{selectedCompositionNode.data.ed.defaultCode}}
+                                                </div>
 
+                                                <div ng-show="selectedCompositionNode.data.ed.defaultRatio">
+                                                    <div ng-show="selectedCompositionNode.data.ed.defaultRatio.numerator.unit">Numerator unit: {{selectedCompositionNode.data.ed.defaultRatio.numerator.unit}}</div>
+                                                    <div ng-show="selectedCompositionNode.data.ed.defaultRatio.denominator.unit">Denominator unit: {{selectedCompositionNode.data.ed.defaultRatio.denominator.unit}}</div>
+                                                    <div ng-show="selectedCompositionNode.data.ed.defaultRatio.denominator.value">Denominator value: {{selectedCompositionNode.data.ed.defaultRatio.denominator.value}}</div>
+                                                </div>
+
+                                                <div ng-show="selectedCompositionNode.data.ed.defaultQuantity">
+                                                <span ng-show = "selectedCompositionNode.data.ed.defaultQuantity.unit">
+                                                  Unit: {{selectedCompositionNode.data.ed.defaultQuantity.unit}}
+                                                </span>
+
+                                                    <span ng-show = "selectedCompositionNode.data.ed.defaultQuantity.value">
+                                                  Value: {{selectedCompositionNode.data.ed.defaultQuantity.value}}
+                                                </span>
+                                                </div>
+
+                                                <div ng-show="selectedCompositionNode.data.ed.defaultCoding">
+                                                    {{selectedCompositionNode.data.ed.defaultCoding.code}} | {{selectedCompositionNode.data.ed.defaultCoding.display}} | {{selectedCompositionNode.data.ed.defaultCoding.system}}
+                                                </div>
+
+                                                <span ng-show="selectedCompositionNode.data.ed.defaultCoding ||
+                                                selectedCompositionNode.data.ed.defaultQuantity || selectedCompositionNode.data.ed.defaultRatio"
+                                                      class="pull-right"></span>
+
+                                            </div>
 
                                         </div>
                                     </div>
@@ -628,6 +683,9 @@
                         </uib-tab>
                         <uib-tab heading="Form">
                             The rendered version of the form (from the POC)
+                        </uib-tab>
+                        <uib-tab heading="Json">
+                            <pre>{{selectedED | json}}</pre>
                         </uib-tab>
                     </uib-tabset>
 

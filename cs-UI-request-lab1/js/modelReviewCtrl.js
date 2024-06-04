@@ -92,6 +92,26 @@ angular.module("pocApp")
                 }
             )
 
+
+
+            $scope.hasFixedValue = function (ed) {
+                if (ed) {
+                     if (ed.fixedCode || ed.fixedRatio || ed.fixedQuantity || ed.fixedCoding) {
+                        return true
+                    }
+                }
+            }
+
+            $scope.hasDefaultValue = function (ed) {
+                if (ed) {
+                    if (ed.defaultCode || ed.defaultRatio || ed.defaultQuantity || ed.defaultCoding) {
+                        return true
+                    }
+                }
+            }
+
+
+
             //the equivalent of the cardinality
             $scope.getObligation = function (ed) {
                 if (ed) {
