@@ -457,7 +457,7 @@
                                             Cardinality
                                         </div>
                                         <div class="col-md-9">
-                                            {{selectedCompositionNode.data.ed.min}}..{{selectedCompositionNode.data.ed.max}}
+                                            {{selectedCompositionNode.data.ed.mult}}
                                         </div>
                                     </div>
 
@@ -510,6 +510,27 @@
 
                                         </div>
                                     </div>
+
+                                    <div ng-show = "false" class="row" >
+                                        <div class="col-md-3">
+                                            Fixed value
+                                        </div>
+                                        <div class="col-md-9">
+
+
+                                        </div>
+                                    </div>
+
+                                    <div ng-show = "false" class="row" >
+                                        <div class="col-md-3">
+                                            Default value
+                                        </div>
+                                        <div class="col-md-9">
+
+
+                                        </div>
+                                    </div>
+
 
                                     <div ng-show = "true" class="row" ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept' ">
                                         <div class="col-md-3">

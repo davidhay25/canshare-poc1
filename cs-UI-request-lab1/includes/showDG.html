@@ -550,11 +550,6 @@
                       <span ng-show="selectedNode.data.ed.fixedCoding ||
                         selectedNode.data.ed.fixedQuantity || selectedNode.data.ed.fixedRatio"
                             class="pull-right">
-<!--
-                        <span ng-show="getSourceModelName(selectedNode.data.ed) !== selectedModel.name">
-                          set on {{getSourceModelName(selectedNode.data.ed)}}
-                        </span>
-                        -->
 
                         <span ng-hide ="presentInDiff(selectedNode.data.ed.path)">
                           set on {{getSourceModelName(selectedNode.data.ed)}}

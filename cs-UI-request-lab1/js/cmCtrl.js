@@ -448,9 +448,28 @@ angular.module("pocApp")
                         }
 
                         //now that we have the forward list, we match it with the current list to get those in both
-                        let existingList = $scope.cmProperties[propKey].options || []
+                        //let existingList = $scope.cmProperties[propKey].options || []
 
-                        //empty the properties list
+
+                        //todo #1 replace the set of options with the set form the forwards ebgine.
+                        //If there is an existing values and it is in the set then leave it
+                        //otherwise remove it
+                        $scope.cmProperties[propKey].options = forwardList
+
+                        if ($scope.local.cmOptions[propKey]) {
+                            let concept = $scope.local.cmOptions[propKey]
+                            let ar = forwardList.filter(concept1 => concept1.code == concept.code )
+                            if (ar.length == 0) {
+                                //nope - the existing value is not in the new list
+                                delete $scope.local.cmOptions[propKey]
+                            }
+                        }
+
+
+
+                        /*
+
+                        //TOTO REPLACE empty the properties list
                         if ( $scope.cmProperties[propKey].options.length == 0) {
                             //There's nothing yet so the full forward list can be used
                             $scope.cmProperties[propKey].options = forwardList
@@ -469,7 +488,11 @@ angular.module("pocApp")
                                     $scope.cmProperties[propKey].options.push(concept)
                                 }
                             }
+
+
+
                         }
+                        */
 
 
 
@@ -629,6 +652,10 @@ angular.module("pocApp")
                         if (arNewOptions) {
                             //console.log(propName,arNewOptions.length)
                             //there are options for this element fromthe reverse lookup
+
+
+
+
                             if (arNewOptions.length == 1) {
                                 //if there's only 1 value, then set it
                                 $scope.log.push({msg:`Setting single value for ${propName}`,obj:arNewOptions[0],objTitle:"Value set"})
@@ -638,6 +665,43 @@ angular.module("pocApp")
 
                                 $scope.local.cmOptions[propName] = arNewOptions[0]      //set the value
                             } else {
+
+                                //todo #2 create a new list which is the intersection of the list from the reverse
+                                //and the current options in the property (from forward)
+                                let newList = []
+
+
+                                //let currentList = cmProperty[propName].options   //current options - presumably from last forward
+                                let currentList = cmProperty.options   //current options - presumably from last forwar
+
+                                for (let concept of arNewOptions)  {
+                                    //is it in the existing list
+                                    let ar = currentList.filter(concept1 => concept1.code == concept.code )
+
+                                    //they are in both....
+                                    if (ar.length > 0) {
+                                        //yes! we can add it...
+                                        newList.push(concept)
+                                    }
+                                }
+
+                                //assign the new list to the property options
+                                $scope.cmProperties[propName].options = newList
+
+                                //If there's a value, then make sure it is in the new list
+                                //otherwise remove it
+                                if ($scope.local.cmOptions[propName]) {
+                                    let concept = $scope.local.cmOptions[propName]
+                                    let ar = newList.filter(concept1 => concept1.code == concept.code )
+                                    if (ar.length == 0) {
+                                        //nope - the existing value is not in th enew list
+                                        delete $scope.local.cmOptions[propName]
+                                    }
+                                }
+
+
+
+
                                 $scope.log.push({msg:`Setting options for ${propName}`,obj:arNewOptions,objTitle:"Options"})
                                 cmProperty.options = arNewOptions   //set the list of possible concepts to those from the reverse lokup
                                 delete cmProperty.singleConcept
@@ -670,11 +734,14 @@ angular.module("pocApp")
                         } else {
                             //if there are no options from the reverse lookup to apply, then delete any existing value
                             //that might be there, and set the .noMatches flag on cmProperties (? todo couldn't we just look at the length of options)
-                            /*      cmProperty.options = []
-                                  cmProperty.noMatches = true
-                                  delete cmProperty.singleConcept
-                                  $scope.local.cmOptions[propName] = null
-                              */
+                            if ($scope.default.mode !== 'manual') {
+                                cmProperty.options = []
+                                cmProperty.noMatches = true
+                                delete cmProperty.singleConcept
+                                $scope.local.cmOptions[propName] = null
+                            }
+
+
 
                         }
                     }
