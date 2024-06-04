@@ -185,6 +185,7 @@ angular.module("pocApp")
                 //sets $scope.reverseLookup which {targets:[],element: {},hashProperty:{}}
 
                 performReverseLookup(propKey,value)
+
                 if ($scope.reverseLookup) {
                     //now apply the reverse lookup stuff. Sets empty properties & check already entered
                     $scope.applyReverse()
@@ -578,15 +579,6 @@ angular.module("pocApp")
 
 
 
-
-                    /*
-
-                    while (propKeyToExamine) {
-                        let result = cmSvc.reverseRulesEngine(cmElement,value, $scope.hashExpandedVs,$scope.local.cmOptions)
-                        //if there are no matches then remove the previous value and try again.
-
-                    }
-*/
 
 
 

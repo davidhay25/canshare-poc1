@@ -174,6 +174,12 @@ angular.module("pocApp")
 
             //generate he CS & VS from the
             $scope.generateResources = function() {
+
+                let da = new Date().toISOString()
+                let ar = da.split('T')
+                let dateString = ar[0]
+                let versionString = dateString.replace(/-/g, "");
+
                 $scope.ccDirty = true
                 let name = $scope.input.name.replace(/_/g,'-')
                 $scope.cs = {resourceType:"CodeSystem",status:'active'}
@@ -182,6 +188,7 @@ angular.module("pocApp")
                 let vsUrl = `https://nzhts.digital.health.nz/fhir/ValueSet/${name}`
                 let csUrl = `http://canshare.co.nz/fhir/CodeSystem/${name}`
                 $scope.cs.url = csUrl
+                $scope.cs.version = versionString
                 let csIdentifier = {system:"http://canshare.co.nz/fhir/NamingSystem/codesystems",value:name}
                 $scope.cs.identifier = [csIdentifier]
                 $scope.cs.name = name
@@ -198,6 +205,7 @@ angular.module("pocApp")
                 $scope.vs = {resourceType:"ValueSet",status:'active'}
                 $scope.vs.id = name
                 $scope.vs.url = vsUrl
+                $scope.vs.version = versionString
                 //$scope.vs.contained = [$scope.cs]
 
                 //this identifier will have the ValueSet appear in the main list
