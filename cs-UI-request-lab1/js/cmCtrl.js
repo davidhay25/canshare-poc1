@@ -157,9 +157,19 @@ angular.module("pocApp")
 
             $scope.setMaximalOptions = function (propName) {
 
+                let currentValue = $scope.local.cmOptions[propName]
+
                 let vsUrl = `${vsPrefix}${$scope.cmProperties[propName].fullVS}`
                 console.log(vsUrl,$scope.hashExpandedVs[vsUrl])
                 $scope.cmProperties[propName].options = angular.copy($scope.hashExpandedVs[vsUrl])
+
+                for (const concept of $scope.cmProperties[propName].options) {
+                    if (concept.code == currentValue.code) {
+                        $scope.local.cmOptions[propName] = concept
+                        break
+                    }
+                }
+
 
 
             }
