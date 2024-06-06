@@ -686,6 +686,10 @@ console.log($scope.allTargets)
                                 alert("There were ${} matching ValueSets. This is very likely an issue with duplicated resrces on the terminology server")
                             } else {
                                 $scope.selectedVS = data.data.entry[0].resource
+
+                                $scope.expandVSInTS($scope.selectedVS)
+
+
                             }
                         } else {
                             alert("The ValueSet was not found")

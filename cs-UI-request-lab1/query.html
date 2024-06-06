@@ -170,13 +170,7 @@
                     <div class="banner"> {{selectedVS.description}}</div>
                     <br/>
                     <uib-tabset>
-                        <uib-tab heading="Json">
-                            <br/>
-                            Query: {{termServerQuery}}
-                            <br/>  <br/>
 
-                            <pre>{{selectedVS | json}}</pre>
-                        </uib-tab>
 
                         <uib-tab heading="Expand">
                             <br/>
@@ -229,6 +223,15 @@
 
 
                         </uib-tab>
+
+                        <uib-tab heading="Json">
+                            <br/>
+                            Query: {{termServerQuery}}
+                            <br/>  <br/>
+
+                            <pre>{{selectedVS | json}}</pre>
+                        </uib-tab>
+
 
                         <uib-tab heading="Forms where used">
                             <br/>
