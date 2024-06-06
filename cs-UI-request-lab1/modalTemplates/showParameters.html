@@ -72,8 +72,23 @@
                     </tr>
                 </table>
             </uib-tab>
-            <uib-tab heading="Graph">
+            <uib-tab ng-show = "false" heading="Graph">
                 A graph of the parents of this concept - walk up the parental tree to ultimate parents...
+            </uib-tab>
+            <uib-tab ng-show = "codeSystem" heading="CodeSystem">
+
+                <em>{{system}}</em>
+
+                <table class="table-condensed table table-bordered">
+                    <tr><th>Code</th><th>Display</th></tr>
+                    <tr ng-repeat="concept in codeSystem.concept">
+                        <td>{{concept.code}}</td>
+                        <td>{{concept.display}}</td>
+                    </tr>
+                </table>
+
+
+
             </uib-tab>
             <uib-tab heading="Json">
                 <pre>{{parameters | json}}</pre>

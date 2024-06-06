@@ -28,6 +28,8 @@ angular.module("pocApp")
             $scope.languages = []       //languages that can be used for the expansion
             $scope.languages.push({display:"Default",code:""})
             $scope.languages.push({display:"CanShare",code:"en-x-sctlang-23162100-0210105"})
+            $scope.input.selectedLanguage = $scope.languages[1]     //default to canshare
+
 
 
             let nzDisplayLanguage = "en-x-sctlang-23162100-0210105"
@@ -626,7 +628,8 @@ console.log($scope.allTargets)
             $scope.expandVSInTS = function (vs) {
                 delete $scope.expandedVS
                 delete $scope.expansionError
-                let qry = `ValueSet/$expand?url=${vs.url}&_summary=false&displayLanguage=${nzDisplayLanguage}`
+                //let qry = `ValueSet/$expand?url=${vs.url}&_summary=false&displayLanguage=${nzDisplayLanguage}`
+                let qry = `ValueSet/$expand?url=${vs.url}&_summary=false`
 
                 if ($scope.input.selectedLanguage && $scope.input.selectedLanguage.code) {
                     qry += `&displayLanguage=${$scope.input.selectedLanguage.code} `
@@ -666,6 +669,7 @@ console.log($scope.allTargets)
                 delete $scope.qUsingVS
                 delete $scope.dummyQR
                 delete $scope.expansionError
+                delete $scope.input.filter
 
 
                 let qry = `ValueSet?url=${item.vs.url}&_summary=false`

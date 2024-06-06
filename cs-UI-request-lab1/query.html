@@ -142,7 +142,7 @@
         <uib-tab >
             <uib-tab-heading>CanShare ValueSets <span class="badge">{{allVSItem.length}}</span> </uib-tab-heading>
             <br/>
-            <em>This tab will make queries against the New Zealand National Terminology server</em>
+            <em class="pull-right">This tab will make queries against the New Zealand National Terminology server</em>
             <div ng-show="showLoadingMessage">Loading ValueSets, please wait...</div>
             <br/>
             <div class="row">
@@ -193,9 +193,9 @@
                                     <button class="btn btn-primary pull-right" ng-click="expandVSInTS(selectedVS)">Expand</button>
                                 </div>
                             </div>
+
                             <br/>
-                            <div ng-show="expandQry">Query: {{expandQry}}</div>
-                            <br/>
+
 
 
                             <pre ng-show="expansionError">{{expansionError.data | json}}</pre>
@@ -207,10 +207,17 @@
                                         <tr ng-repeat="concept in expandedVS.expansion.contains">
                                             <td>{{concept.display}}</td>
                                             <td>
-                                                <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
+                                                <div  class="clickable" ng-click="lookup(concept.code,concept.system)">
+                                                    {{concept.code}}</div>
+                                                </td>
                                             <td>{{concept.system}}</td>
                                         </tr>
                                     </table>
+                                </uib-tab>
+                                <uib-tab heading="Query">
+                                    <br/>
+                                    <p>The query that produced this ValueSet</p>
+                                    <div ng-show="expandQry">{{expandQry}}</div>
                                 </uib-tab>
                                 <uib-tab heading="Json">
                                     <pre>{{expandedVS | json}}</pre>
