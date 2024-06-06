@@ -1,11 +1,22 @@
 angular.module("pocApp")
     .controller('queryCtrl',
-        function ($scope,$http,$localStorage,$uibModal,$q,$timeout,querySvc,utilsSvc,cmSvc) {
+        function ($scope,$http,$localStorage,$uibModal,$q,$timeout,querySvc,utilsSvc,cmSvc,$window) {
 
 
             $scope.input = {}
             //$scope.input.mainTabActive = 1      //just while developing - selects that conceptmap tab
 
+
+            let vsPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/"
+
+
+            let srch = $window.location.search;
+            $scope.inputVs = null
+            if (srch) {
+
+                $scope.inputVs = `${vsPrefix}${srch.substr(1)}`
+                //alert(modelName)
+            }
 
             $scope.localStorage = $localStorage
 
@@ -184,16 +195,7 @@ console.log($scope.allTargets)
 
             }
 
-/* no longer used
-            querySvc.getConceptMaps().then(
-                function (data) {
-                    $scope.allConceptMaps = data
-                    //console.log(data)
-                },function (err) {
-                    console.log(err)
-                }
-            )
-*/
+
 
             //load a concept map then expand all the ValueSets used.
             $scope.selectCMItem = function (item,expand) {
@@ -590,21 +592,33 @@ console.log($scope.allTargets)
                         $scope.allVSItem = ar
                         //console.log(ar)
                         delete $scope.showLoadingMessage
+
+
+                        //If a vsUrl was passed in, see if it is in the list of items, and if so select it...
+
+
+                        if ($scope.inputVs) {
+
+                            let ar = $scope.allVSItem.filter(item => item.vs.url == $scope.inputVs)
+                            if (ar.length > 0) {
+                                $scope.input.filterlist = $scope.inputVs
+                                //$scope.showVS()
+                                $scope.selectVSItem(ar[0])
+                            }
+
+
+                        }
+
+
+
+
+
                     }
                 )
             }
 
             $scope.changeInstance($scope.input.tsInstance)
 
-            /*
-            querySvc.getValueSets($scope.input.tsInstance).then(
-                function (ar) {
-                    $scope.allVSItem = ar
-                    //console.log(ar)
-                    delete $scope.showLoadingMessage
-                }
-            )
-            */
 
 
 
