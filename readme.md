@@ -1,3 +1,22 @@
+
+# 
+
+## How to deploy an instance of the LIM
+
+setup server
+install node
+install pms
+clone from github
+setup pm2
+install data
+(todo create install from export script)
+
+
+
+
+
+# old stuff
+
 ## To start for development
 
 * cd cs-customOps & execute docker compose up in this folder. Will start mongo & hapi
