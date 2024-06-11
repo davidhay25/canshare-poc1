@@ -46,7 +46,7 @@
                       <uib-tab heading="Progressive">
                           <br/>
                           <table class="table table-bordered">
-                              <tr ng-repeat = "(k,v) in cmProperties">
+                              <tr ng-repeat = "(k,v) in cmProperties" ng-hide="k == 'patient-sex'">
                                   <td width = "30%">
                                       <div class = 'clickable' ng-click="setMaximalOptions(k)">{{k}}</div>
                                   </td>

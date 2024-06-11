@@ -163,12 +163,15 @@ angular.module("pocApp")
                 console.log(vsUrl,$scope.hashExpandedVs[vsUrl])
                 $scope.cmProperties[propName].options = angular.copy($scope.hashExpandedVs[vsUrl])
 
-                for (const concept of $scope.cmProperties[propName].options) {
-                    if (concept.code == currentValue.code) {
-                        $scope.local.cmOptions[propName] = concept
-                        break
+                if (currentValue) {
+                    for (const concept of $scope.cmProperties[propName].options) {
+                        if (concept.code == currentValue.code) {
+                            $scope.local.cmOptions[propName] = concept
+                            break
+                        }
                     }
                 }
+
 
 
 
@@ -188,10 +191,19 @@ angular.module("pocApp")
                 }
 
 
+
+
                 $scope.log = []     //log actions.
                 delete $scope.local.logEntry
 
                 $scope.local.uiTitle = `Property selected: ${propKey}`
+
+                /*
+                if (propKey == 'primary-site-laterality') {
+                    $scope.log.push({msg:'Ignoring laterality'})
+                    return
+                }
+                */
 
                 if (! value) {
                     //I think this is being triggered when a value is being updated after reverse lookup
@@ -605,7 +617,7 @@ angular.module("pocApp")
                     while (propKeyToExamine) {
                         let hashValues = getHashValues(propKeyToExamine)
 
-                        $scope.log.push({msg:`Performing reverse lookup from ${propKey} value ${value.code}`,
+                        $scope.log.push({msg:`Performing reverse lookup from ${propKeyToExamine} value ${value.code}`,
                             obj:hashValues,objTitle:"Values passed to reverse engine"})
 
                         let result = cmSvc.reverseRulesEngine(cmElement,value, $scope.hashExpandedVs,hashValues)
@@ -1179,20 +1191,28 @@ angular.module("pocApp")
                 $scope.local.cmOptions = {}
                 //these are the properties
                 $scope.cmProperties = {}
+
                 $scope.cmProperties['patient-sex'] = {concept: {code:"184100006"},
                     next:'cancer-service',options:[]}
+
                 $scope.cmProperties['cancer-service'] = {concept: {code:"299801000210106"},
                     next:'cancer-stream',options:[],fullVS:'canshare-cancer-service'}
+
                 $scope.cmProperties['cancer-stream'] = {concept:{code:"299811000210108",display:"Cancer Stream",system:snomed},
                     next:'cancer-substream',previous:'cancer-service', options : [],fullVS:'canshare-cancer-stream'}
+
                 $scope.cmProperties['cancer-substream'] = {concept: {code:"299821000210103"},
                     next:'cancer-type',previous:'cancer-stream',options:[],fullVS:'canshare-cancer-substream'}
+
                 $scope.cmProperties['cancer-type'] = {concept: {code:"299831000210101"},
                     next:'primary-site',previous:'cancer-substream',options:[],fullVS:'canshare-cancer-type'}
+
                 $scope.cmProperties['primary-site'] = {concept: {code:"399687005"},
                     next:'primary-site-laterality',previous:'cancer-type',options:[],fullVS:'canshare-primary-topography'}
+
                 $scope.cmProperties['primary-site-laterality'] = {concept: {code:"297561000210100"},
                     next:'histologic-type-primary',previous:'primary-site',options:[],fullVS:'canshare-laterality'}
+
                 $scope.cmProperties['histologic-type-primary'] = {concept: {code:"512001000004108"},options:[],fullVS:'canshare-who-histology',
                     previous:'primary-site-laterality'}
 
