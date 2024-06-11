@@ -190,20 +190,17 @@ angular.module("pocApp")
                     return
                 }
 
-
-
-
                 $scope.log = []     //log actions.
                 delete $scope.local.logEntry
 
                 $scope.local.uiTitle = `Property selected: ${propKey}`
 
-                /*
+
                 if (propKey == 'primary-site-laterality') {
                     $scope.log.push({msg:'Ignoring laterality'})
                     return
                 }
-                */
+
 
                 if (! value) {
                     //I think this is being triggered when a value is being updated after reverse lookup
@@ -624,6 +621,9 @@ angular.module("pocApp")
                         if (result.targets.length == 0) {
                             //look at the previous propkey
                             propKeyToExamine = $scope.cmProperties[propKeyToExamine].previous
+
+                            $scope.log.push({msg:`No targets found. Examining ${propKeyToExamine}`})
+
                         } else {
                             propKeyToExamine = null
                             $scope.reverseLookup = result
@@ -631,9 +631,6 @@ angular.module("pocApp")
                                 obj:$scope.reverseLookup,objTitle:"Reverse engine response"})
                         }
                     }
-
-
-
 
 
 
@@ -680,6 +677,8 @@ angular.module("pocApp")
                         $scope.log.push({msg:`Rev: check ${propName} `})
 
                         let arNewOptions = $scope.reverseLookup.hashProperty[propName]       //an array of possible concepts from the reverse engine
+
+
 
                         if (arNewOptions) {
                             //console.log(propName,arNewOptions.length)
@@ -761,6 +760,7 @@ angular.module("pocApp")
                             //if there are no options from the reverse lookup to apply, then delete any existing value
                             //that might be there, and set the .noMatches flag on cmProperties (? todo couldn't we just look at the length of options)
                             if ($scope.default.mode !== 'manual') {
+                                $scope.log.push({msg:`There were no options from the reverse lookup. Clearing value.`})
                                 cmProperty.options = []
                                 cmProperty.noMatches = true
                                 delete cmProperty.singleConcept
@@ -800,9 +800,6 @@ angular.module("pocApp")
                     }
                 }
             }
-
-
-
 
             $scope.selectManualOverride = function (m) {
                 //console.log(m)
