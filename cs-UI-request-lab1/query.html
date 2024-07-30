@@ -3,7 +3,7 @@
 <head>
     <base href="/">
     <meta charset="UTF-8">
-    <title>Query</title>
+    <title>Terminology</title>
 
     <script src="js/libs/jquery-1.9.0.min.js"></script>
     <script src="js/libs/angular.min1-5.js"></script>
@@ -12,11 +12,15 @@
 
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/common.css"/>
-    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
 
     <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
     <script src="js/libs/jstree.min.js"></script>
+
+    <!--
+    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+
+    -->
 
     <style>
         .inactive {
@@ -48,21 +52,15 @@
 
     <script src="js/queryCtrl.js"></script>
     <script src="js/querySvc.js"></script>
-    <script src="js/libs/vis.min.js"></script>
-    <script src="js/makeLibraryQuery.js"></script>
-    <script src="js/showParameters.js"></script>
+
     <script src="js/filters.js"></script>
-    <script src="js/makeCMCtrl.js"></script>
+
     <script src="js/cmCtrl.js"></script>
     <script src="js/cmSvc.js"></script>
     <script src="js/commonSvc.js"></script>
+
     <script src="js/selectConceptCtrl.js"></script>
 
-    <script src="directive/viewBundle/viewBundleDir.js"></script>
-    <script src="directive/viewBundle/viewBundleSvc.js"></script>
-
-    <script src="directive/renderForm/renderFormDir.js"></script>
-    <script src="directive/renderForm/renderFormSvc.js"></script>
     <script src="js/utilsSvc.js"></script>
 
     <!-- https://localforage.github.io/localForage/ -->
@@ -70,7 +68,20 @@
 
     <script src="js/vsSvc.js"></script>
     <script src="js/viewVSCtrl.js"></script>
+    <script src="js/showParameters.js"></script>
 
+    <!--
+        <script src="js/libs/vis.min.js"></script>
+
+    <script src="js/makeLibraryQuery.js"></script>
+
+        <script src="js/makeCMCtrl.js"></script>
+
+        <script src="directive/viewBundle/viewBundleDir.js"></script>
+    <script src="directive/viewBundle/viewBundleSvc.js"></script>
+    <script src="directive/renderForm/renderFormDir.js"></script>
+    <script src="directive/renderForm/renderFormSvc.js"></script>
+    -->
 
     <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
 
@@ -83,10 +94,10 @@
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
         <div class="container-fluid">
-            <div class="col-md-2 col-sm-2">
+            <div class="col-md-3">
                     <span>
                         <a class="navbar-brand" href="#">
-                            Query Terminology Server
+                            Terminology functions
                         </a>
                     </span>
 
@@ -95,7 +106,7 @@
 
 
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="navbar-text">
 
                    <select class="form-control pull-left"
@@ -240,41 +251,8 @@
                         </uib-tab>
 
 
-                        <uib-tab heading="Forms where used">
-                            <br/>
 
 
-                            <button class="btn btn-link pull-right"
-
-                                    ng-click="refreshVsQList(selectedVS.url)">Refresh</button>
-
-
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="list-group">
-                                        <div class="list-group-item"
-                                             ng-click="selectQfromVSList(v.Q)"
-                                             style="cursor: pointer"
-                                             ng-repeat="(k,v) in qUsingVS">
-                                            {{v.Q.title || v.Q.name}}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-9">
-                                    <uib-tabset ng-show="selectedQ">
-                                        <uib-tab heading="Form">
-                                            <renderform  q="selectedQ" qr="dummyQR" form="dummyFormData"></renderform>
-                                        </uib-tab>
-                                        <uib-tab heading="Json">
-                                            <pre>{{selectedQ | json}}</pre>
-                                        </uib-tab>
-                                    </uib-tabset>
-
-                                </div>
-                            </div>
-
-
-                        </uib-tab>
                     </uib-tabset>
 
                 </div>
@@ -307,545 +285,6 @@
                 <ng-include src = "'./includes/cmUI.html'"></ng-include>
 
             </div>
-        </uib-tab>
-
-<!--
-        <uib-tab ng-show="false" heading="ConceptMap">
-
-            <div class="row">
-                <div class="col-md-3">
-                    <br/>
-                    <checkbox ng-model = 'input.onlyCanShare'></checkbox> Only CanShare
-                    <br/>
-                    <checkbox ng-model = 'input.excludeHL7'></checkbox> Exclude HL7 maps
-                    <br/>
-
-                    <checkbox ng-model = 'input.loadComplete'></checkbox> Load full map (including groups)
-                    <br/><br/>
-
-                    <div class="myScroll">
-                        <div class="list-group">
-                            <div ng-class="{'list-group-item':true,listItemSelected:fullSelectedCM.id==item.cm.id}"
-                                 ng-show="showCM(item)"
-                                 style="cursor: pointer" ng-repeat="item in allConceptMaps" ng-click="selectCMItem(item)">
-                                {{item.display}}
-
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="col-md-9">
-
-                    <uib-tabset>
-
-                        <uib-tab heading="Translate operation" >
-
-                            <div ng-hide="fullSelectedCM.group">
-                                <br/>
-                                Click <span class="clickable" ng-click="selectCMItem({cm:fullSelectedCM},true)">here</span> to get the complete ConceptMap
-                                <br/>  <br/>
-                            </div>
-
-                            <uib-tabset ng-show = "fullSelectedCM.group">
-
-
-                                <uib-tab heading="Example UI">
-                                    <div ng-controller="cmCtrl">
-
-                                        <ng-include src = "'./includes/cmUI.html'"></ng-include>
-
-                                    </div>
-
-
-
-                                </uib-tab>
-
-
-
-                                <uib-tab heading="Single item lookup">
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-
-                                            <strong>What to look for</strong>
-                                            <select class="form-control" ng-model = "input.selectedCmSource"
-                                                    ng-change="setDependsOnProperties(input.selectedCmSource)"
-                                                    ng-options=   "v.display + '  (' + v.code + ')' for v in cmSources"></select>
-                                            <br/>
-
-                                            <table class="table table-bordered">
-                                                <tr ng-repeat = "(k,v) in doProperties">
-                                                    <td>{{k}}</td>
-                                                    <td>
-                                                        <select class="form-control" ng-model="input.cmOptions[k]"
-                                                                ng-change="generateTranslateQuery()"
-                                                                ng-options="v.display for (k,v) in v">
-
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                            </table>
-
-                                            <button class="btn btn-danger pull-right" ng-click="performTranslate()">Perform lookup</button>
-                                            <br/><br/>
-
-
-                                            <div >
-
-
-
-                                                <strong>Internal filter (not using terminology server) <span class="badge">{{myResult.length}}</span> </strong>
-
-                                                <uib-tabset ng-show="myResult">
-                                                    <uib-tab heading="List">
-                                                        <table class="table-bordered table">
-                                                            <tr ng-repeat = "target in myResult">
-                                                                <td>{{target.code}}</td>
-                                                                <td>{{target.display}}</td>
-                                                                <td>
-                                                                    <div ng-display="target.valueSet">
-                                                                        <div class="clickable" ng-click="expandVSFromCM(target.code)">Show VS</div>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        </table>
-                                                    </uib-tab>
-                                                    <uib-tab heading="Json">
-                                                        <pre>{{myResult | json}}</pre>
-                                                    </uib-tab>
-                                                </uib-tabset>
-
-
-
-                                                <div class="pull-right clickable" ng-click="input.showParams = ! input.showParams">Show Parameters query</div>
-                                                <strong>Result from Terminology server <span class="badge">{{resultParametersList.length}}</span> </strong>
-                                                <pre ng-show="translateError">{{translateError | json}}</pre>
-                                                <br/>
-
-                                                <uib-tabset ng-show="resultParameters">
-                                                    <uib-tab heading="List">
-                                                        <table class="table-bordered table">
-                                                            <tr ng-repeat = "concept in resultParametersList">
-                                                                <td>{{concept.code}}</td>
-                                                                <td>{{concept.display}}</td>
-                                                                <td>
-                                                                    <div ng-display="target.valueSet">
-                                                                        <div class="clickable" ng-click="expandVSFromCM(concept.code)">Show VS</div>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        </table>
-                                                    </uib-tab>
-                                                    <uib-tab heading="Json">
-                                                        <pre>{{resultParameters | json}}</pre>
-                                                    </uib-tab>
-                                                </uib-tabset>
-
-
-                                            </div>
-
-
-                                        </div>
-                                        <div class="col-md-6">
-
-                                            <div ng-show="input.showParams">
-                                                <strong>Request Parameters resource</strong>
-                                                <pre>{{translateParameters | json}}</pre>
-                                            </div>
-
-                                            <div ng-show = "expandedCMVS">
-                                                <strong>Expanded Value set.
-                                                    <span class="badge">{{expandedCMVS.expansion.contains.length}}</span>
-                                                </strong>
-                                                <div><em>{{expandVSFromCMQuery}}</em></div>
-                                                <table class="table table-bordered">
-                                                    <tr><th>Display</th><th>Code</th><th>System</th></tr>
-                                                    <tr ng-repeat="concept in expandedCMVS.expansion.contains">
-                                                        <td>{{concept.display}}</td>
-                                                        <td>
-                                                            <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
-                                                        <td>{{concept.system}}</td>
-                                                    </tr>
-                                                </table>
-                                            </div>
-
-
-
-
-                                        </div>
-                                    </div>
-
-
-
-
-
-
-
-
-
-                                </uib-tab>
-                                <uib-tab heading="All item lookup">
-                                    for multi source cm (multi element)
-                                    dropdowns for all properties
-                                    show options for all 'sources'
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <table class="table table-bordered">
-                                                <tr ng-repeat = "(k,v) in doProperties">
-                                                    <td>{{k}}</td>
-                                                    <td>
-                                                        <select class="form-control" ng-model="input.cmOptions[k]"
-                                                                ng-change="generateTranslateQuery()"
-                                                                ng-options="v.display for (k,v) in v">
-
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                            </table>
-
-                                            <button class="btn btn-danger pull-right" ng-click="performTranslateAllSources()">Perform lookup</button>
-                                            <br/><br/>
-                                        </div>
-                                        <div class="col-md-6">
-
-                                        </div>
-                                    </div>
-
-
-
-
-
-
-                                </uib-tab>
-                                <uib-tab heading="Criteria">
-                                    <div ng-repeat="group in fullSelectedCM.group">
-                                        <div ng-repeat="element in group.element">
-                                            <br/>
-                                            <div>Looking for: {{element.code}} ({{element.display}})</div>
-                                            <div>Potential results</div>
-                                            <br/>
-                                            <div class="rounded-box" ng-repeat="target in element.target">
-                                                <div class="row">
-
-                                                    <div class="col-md-4">
-                                                        <div class="banner">Match</div>
-                                                        <div>Code: {{target.code}}</div>
-                                                        <div>Display: {{target.display}}</div>
-                                                        <div>Equivalence: {{target.equivalence}}</div>
-                                                        <div>Comment: {{target.comment}}</div>
-                                                    </div>
-
-                                                    <div class="col-md-8">
-                                                        <div class="banner">Criteria</div>
-                                                        <table class="table table-bordered">
-                                                            <tr><th>Property</th><th>Code</th><th>System</th><th>Value</th></tr>
-                                                            <tr ng-repeat = "do in target.dependsOn">
-                                                                <td>{{do.property}}</td>
-                                                                <td>{{do.value}}</td>
-                                                                <td>{{do.system}}</td>
-
-                                                                <td>{{do.display}}</td>
-                                                            </tr>
-                                                        </table>
-
-                                                    </div>
-
-
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-
-                                    </div>
-                                </uib-tab>
-                            </uib-tabset>
-
-
-
-
-
-                        </uib-tab>
-
-
-                        <uib-tab heading="Maps">
-                            <div ng-hide="fullSelectedCM.group">
-                                <br/>
-                                Click <span class="clickable" ng-click="selectCMItem({cm:fullSelectedCM},true)">here</span> to get the complete ConceptMap
-                                <br/>  <br/>
-                            </div>
-
-                            <div ng-show="loadingCM">
-                                Loading the ConceptMap. This can take a few seconds if the mappings are large...
-                            </div>
-                            <div ng-show="fullSelectedCM">Source ValueSet: {{fullSelectedCM.sourceCanonical}} {{fullSelectedCM.sourceUri}}</div>
-                            <div ng-show="fullSelectedCM">Target ValueSet: {{fullSelectedCM.targetCanonical}} {{fullSelectedCM.targetUri}}</div>
-
-
-                            <br/>
-
-                            <div class="myScrollX">
-                                <div ng-repeat="group in fullSelectedCM.group">
-
-                                    <div class="tableFixHead">
-                                        <table class="table table-bordered table-condensed">
-                                            <thead>
-                                            <tr>
-                                                <th colspan="2">{{group.source}}</th>
-                                                <th>{{group.target}}</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr ng-repeat="element in group.element">
-                                                <td><div class="clickable" ng-click="lookup(element.code,group.source)">{{element.code}}</div></td>
-                                                <td>{{element.display}}</td>
-                                                <td>
-                                                    <div ng-repeat="target in element.target">
-                                                        <span class="clickable" ng-click="lookup(target.code,group.target)">{{target.code}} </span>
-
-                                                        {{target.display}} <span > ({{target.equivalence}})</span>
-                                                        <span class="pull-right" ng-show="target.dependsOn">
-                                                            X
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td>
-
-                                                </td>
-                                            </tr>
-                                            </tbody>
-
-                                        </table>
-                                    </div>
-
-                                </div>
-                            </div>
-
-
-                        </uib-tab>
-
-                        <uib-tab heading="Json">
-                            <a ng-show="downloadLinkMapName" class="btn btn-link pull-right" download="{{downloadLinkMapName}}"
-                               href="{{downloadLinkMap}}" title="{{downloadLinkMapName}}" >
-                                Download ConceptMap
-                            </a>
-
-                            <div class="clearfix"></div>
-                            <div ng-hide="fullSelectedCM.group">
-                                <br/>
-                                Click <span class="clickable" ng-click="selectCMItem({cm:fullSelectedCM},true)">here</span> to get the complete ConceptMap
-                                <br/>  <br/>
-                            </div>
-                            <pre>{{fullSelectedCM | json}}</pre>
-                        </uib-tab>
-
-                    </uib-tabset>
-
-
-                </div>
-            </div>
-
-        </uib-tab>
-
--->
-
-        <!--
-
-        <uib-tab ng-show="false" heading="NZHTS analysis">
-            <br/>
-
-            <button ng-hide="rawAnalysis" class="btn btn-primary pull-right" ng-click="vsAnalysis()">Perform analysis</button>
-
-            <div ng-hide="rawAnalysis">
-                <p>Performs basic analytics on the CanShare ValueSets on the NZHTS server. Click the link to the right to
-                perform the analysis. Note that this can sometimes take 5-10 seconds to perform</p>
-
-                <p>Reports available:</p>
-                <ul>
-                    <li>A list of ValueSets with a count of the number of concepts in each. The ValueSet contents can be displayed.</li>
-                    <li>A list of concept showing the ValueSet/s they appear in. The ValueSet contents can be displayed.</li>
-                </ul>
-                <p>The reports can be quite long, so to look for a specific code or ValueSet, use the browser search
-                function - Control S or Command S - when the report is displayed.</p>
-
-            </div>
-
-            <uib-tabset ng-show="rawAnalysis">
-                <uib-tab heading="Count of concepts in each ValueSet">
-
-                    <br/>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div ng-show="rawAnalysis.vsLength">{{rawAnalysis.vsLength.length}} ValueSets</div>
-                            <br/>
-                            <div class="myScroll">
-                                <table class="table table-bordered table-condensed">
-                                    <tr ng-repeat="item in rawAnalysis.vsLength">
-                                        <td>
-                                            <div class="clickable" ng-click="expandFromAnalysis(item.url)">
-                                                {{item.url | lastInUrl}}
-                                            </div>
-                                        </td>
-                                        <td>{{item.title}}</td>
-                                        <td>{{item.expandedCount}}</td>
-                                    </tr>
-                                </table>
-                            </div>
-
-
-                        </div>
-                        <div class="col-md-6" ng-show="expandedVSFromAnalysis">
-                            <div class="banner">{{expandedVSFromAnalysis.url}}</div>
-                            <uib-tabset>
-                                <uib-tab heading="Concepts">
-
-                                    <table class="table table-bordered table-condensed">
-                                        <tr><th>Display</th><th>Code</th><th>System</th></tr>
-                                        <tr ng-repeat="concept in expandedVSFromAnalysis.expansion.contains">
-                                            <td>{{concept.display}}</td>
-                                            <td>
-                                                <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
-                                            <td>{{concept.system}}</td>
-                                        </tr>
-                                    </table>
-                                </uib-tab>
-                                <uib-tab heading="Json">
-                                    <pre>{{expandedVSFromAnalysis | json}}</pre>
-                                </uib-tab>
-                            </uib-tabset>
-
-
-
-                        </div>
-                    </div>
-
-                </uib-tab>
-
-                <uib-tab heading="Concepts by ValueSet">
-                    <br/>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div ng-show="rawAnalysis.conceptVS">{{rawAnalysis.conceptCount}} Concepts</div>
-                            <br/>
-                            <div class="myScroll">
-                                <table class="table-condensed table table-bordered">
-                                    <tr><th>Code</th><th>Display</th><th>ValueSet</th></tr>
-                                    <tr ng-repeat="(k,v) in rawAnalysis.conceptVS">
-                                        <td>
-                                            <div  class="clickable" ng-click="lookup(v.concept.code)">{{v.concept.code}}</div></td>
-
-
-
-
-                                        </td>
-
-                                        <td>{{v.concept.display}}</td>
-                                        <td style="width: 50%">
-                                            <div ng-repeat = "vs in v.vs"  >
-                                                <div class="clickable" ng-click="expandFromAnalysisVS(vs)">{{vs | lastInUrl}}</div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-
-                        </div>
-                        <div class="col-md-6" ng-show="expandedVSFromAnalysisVS">
-                            <div class="banner">{{expandedVSFromAnalysisVS.url}}</div>
-                            <table class="table table-bordered table-condensed">
-                                <tr><th>Display</th><th>Code</th><th>System</th></tr>
-                                <tr ng-repeat="concept in expandedVSFromAnalysisVS.expansion.contains">
-                                    <td>{{concept.display}}</td>
-                                    <td>
-                                        <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
-                                    <td>{{concept.system}}</td>
-                                </tr>
-                            </table>
-
-                        </div>
-                    </div>
-
-                </uib-tab>
-
-                <uib-tab heading="Json">
-                    <pre>{{rawAnalysis | json}}</pre>
-                </uib-tab>
-            </uib-tabset>
-
-
-
-        </uib-tab>
-
--->
-
-
-        <!-- Hide for the moment. May move to a separate app -->
-        <uib-tab ng-show="false" heading="General queries">
-            <br/>
-            <em>These are queries against the CanShare FHIR server</em>
-            <div class="row">
-                <div class="col-md-1">
-                    Query
-                </div>
-                <div class="col-md-9">
-                    <input type="text" class="form-control" ng-model="generalQuery"/>
-                </div>
-
-                <div class="col-md-2">
-                    <button class="btn btn-primary" ng-click="executeGeneralQuery(generalQuery)">Execute</button>
-                </div>
-            </div>
-            <hr/>
-            <div class="row">
-                <div class="col-md-4">
-
-                    <uib-tabset>
-                        <uib-tab heading="Library">
-                            <br/>
-                            <ul class="list-unstyled">
-                                <li ng-click="executeFromLibrary(item)"
-                                    class="clickable"
-                                    ng-repeat="item in library.entry track by $index">
-                                    {{item.display}}
-                                </li>
-                            </ul>
-                        </uib-tab>
-
-                        <uib-tab heading="History (last 20)">
-                            <br/>
-                            <ul class="list-unstyled">
-                                <li
-                                    class="clickable"
-
-                                    ng-repeat="item in localStorage.genHistory track by $index">
-
-                                    <span  ng-click="executeFromHistory(item)">{{trimDisplay(item,65)}}</span>
-
-                                    <span ng-click="removeHistory($index)"> <i class="glyphicon glyphicon-remove-sign pull-right"></i></span>
-                                </li>
-                            </ul>
-                        </uib-tab>
-                    </uib-tabset>
-
-
-
-
-                    <br/>
-
-
-
-                </div>
-                <div class="col-md-8">
-                    <pre ng-show="ooGeneral">{{ooGeneral | json}}</pre>
-                    <viewbundle bundle="generalBundle"></viewbundle>
-                </div>
-            </div>
-
-
-
-
         </uib-tab>
 
 

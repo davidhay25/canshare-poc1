@@ -14,7 +14,7 @@ const commonModule = require("./serverModuleCommonUI.js")
 
 let jwt_decode = require( "jwt-decode")
 console.log(jwt_decode)
-let library = require("./library.json")
+//let library = require("./library.json")
 
 
 //load the config file for accessing NZHTS (the file is excluded from git)
@@ -604,7 +604,7 @@ function setup(app) {
         res.json(allConceptMaps)
     })
 
-    app.get('/termServers', function(req,res) {
+    app.get('/termServersDEP', function(req,res) {
         let ar = []
         //only return the display and url
         servers.forEach(function (svr) {
@@ -613,7 +613,7 @@ function setup(app) {
         res.json(ar)
     })
 
-    app.get('/searchLibrary', function(req,res) {
+    app.get('/searchLibraryDEP', function(req,res) {
 
         res.json(library)
     })

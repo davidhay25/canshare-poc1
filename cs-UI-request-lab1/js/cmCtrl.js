@@ -5,6 +5,8 @@ angular.module("pocApp")
             $scope.local = {cmOptions : {},cm:{property:{}}}
             $scope.default = {}
 
+            let nzDisplayLanguage = "en-x-sctlang-23162100-0210105"
+
             //the mode of operation of the UI - manual or directed
 
             $scope.default.mode = 'directed'
@@ -21,11 +23,8 @@ angular.module("pocApp")
 
             let vsPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/"
 
-
-
-
             //functions to get ConceptMap & expanded ValueSet..
-            //localforage is defined by the library script. uses indexedDb as the local storage...
+            //localforage is defined by the library script. uses indexedDb as the local storage in the browser...
             //https://localforage.github.io/localForage/#data-api-getitem
             $scope.fromCache = false
             localforage.getItem('cmData').then(function(value) {
@@ -43,7 +42,7 @@ angular.module("pocApp")
                     console.log(`Size of ValueSets : ${utilsSvc.getSizeOfObject($scope.hashExpandedVs)/1000} Kb`)
                     //can setup as the service vs will be present
 
-                    console.log($scope.hashExpandedVs)
+                   // console.log($scope.hashExpandedVs)
 
                     setup()
 
@@ -153,7 +152,6 @@ angular.module("pocApp")
 
 
             }
-
 
             $scope.setMaximalOptions = function (propName) {
 
@@ -302,7 +300,6 @@ angular.module("pocApp")
 
 
             }
-
 
             //sets the options for a specific property
             $scope.populateUIControl = function (propKey,noNext,calledFromUI) {
@@ -647,8 +644,6 @@ angular.module("pocApp")
 
             }
 
-
-
             $scope.applyReverse = function () {
                 //apply the information from the reverse lookup to all the properties prior to this one. Algorithm to apply from top down (excl. gender):
                 //if the result is empty, then apply the options from the reverse object {targets:,element:,hashProperty, sourceConcept:}
@@ -892,8 +887,6 @@ angular.module("pocApp")
             }
 
 
-
-
             //reset all the inputs for the UI
             $scope.resetUI = function () {
                 delete $scope.lstMatchingConceptsForUI
@@ -1068,20 +1061,6 @@ angular.module("pocApp")
             }
 
 
-            $scope.showTarget = function (target) {
-                if ($scope.selectedTarget && target.code == $scope.selectedTarget.code) {
-                    delete $scope.selectedTarget
-                } else {
-                    $scope.selectedTarget = target
-                }
-
-            }
-
-            $scope.selectTarget = function (target) {
-                $scope.selectedTarget = target
-            }
-
-
             $scope.viewVS = function (url) {
 
                 $uibModal.open({
@@ -1101,64 +1080,42 @@ angular.module("pocApp")
                 })
             }
 
-            //expand a ValueSet
-            $scope.cmExpandVS = function (url) {
-                delete $scope.cmExpandedVS
-                delete $scope.selectedTarget
-                delete $scope.lstMatchingConcepts
-                delete $scope.matchingVS
 
+            $scope.expandVSFromCM = function (code) {
+                //when a VS is selected in a CM expansion...
+                //This can either be a valueset url or a code
 
-                let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=en-x-sctlang-23162100-0210105`
-                console.log(qry)
-                let encodedQry = encodeURIComponent(qry)
-                $scope.showWaiting = true
-                $http.get(`nzhts?qry=${encodedQry}`).then(
-                    function (data) {
-                        $scope.cmExpandedVS = data.data
+                let url
+                if (code.indexOf('http') > -1) {
+                    //this is a valueset url
+                    url = code
+                } else {
+                    url = `http://snomed.info/sct?fhir_vs=refset/${code}`
+                }
 
-
-                        if ($scope.cmExpandedVS.expansion && $scope.cmExpandedVS.expansion.contains) {
-
-                            $scope.cmExpandedVS.expansion.contains.sort(function(a,b) {
-                                if (a.display > b.display) {
-                                    return 1
-                                } else {
-                                    return -1
-                                }
-                            })
-
-                        }
-
-
-
-
-                    }, function (err) {
-
-                    }
-                ).finally(
-                    function () {
-                        $scope.showWaiting = false
-                    }
-                )
-            }
-
-            function expandVDEP(url) {
+                $scope.input.showParams = false
+                delete $scope.expandedCMVS
+                //default to a canshare expansion
                 let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=${nzDisplayLanguage}`
+
+                $scope.expandVSFromCMQuery = qry
                 let encodedQry = encodeURIComponent(qry)
                 $scope.showWaiting = true
                 $http.get(`nzhts?qry=${encodedQry}`).then(
                     function (data) {
-                        $scope.expandedVS = data.data
+                        $scope.expandedCMVS = data.data
                     }, function (err) {
-
+                        alert(`ValueSet: ${url} not found`)
                     }
                 ).finally(
                     function () {
                         $scope.showWaiting = false
                     }
                 )
+
+
             }
+
 
             function showCmTree(treeData) {
                 $('#cmTree').jstree('destroy');
@@ -1171,6 +1128,8 @@ angular.module("pocApp")
                         $scope.selectedCmTreeTarget = data.node.data;
                         console.log(data.node)
                         delete $scope.expandedCMVS
+                        //$scope.$digest();
+                        //expandedCMVS
                     }
 
                     $scope.$digest();       //as the event occurred outside of angular...
@@ -1280,66 +1239,45 @@ angular.module("pocApp")
 
             }
 
-            $scope.getFirstValueDEP = function (lst) {
-                if (lst && lst.length > 0) {
-                    return lst[0].code
-                }
-
-            }
 
             $scope.showConcept = function(c) {
                 return `${c.display} (${c.code})`
             }
 
-            //get all the concepts for a single property - this is applying the rules engine...
-            //called from the Rules tab
-            $scope.getOptionsOnePropertyDEP = function() {
-                //console.log($scope.local.cm.property)
-                delete $scope.lstMatchingConcepts
-                delete $scope.cmExpandedVS      //so it's not in the display area
-                delete $scope.displayMatchNumber
-                //call the rules engine to determine the possible concepts. The engine needs:
-
-                //  the list of user selected values for all properties so far  - local.cm.property
-                //  the property that needs the list - input.cmProperty & $scope.selectedElement
-
-                //
-
-                //rules engine takes:
-                //
-                let vo = cmSvc.rulesEngine($scope.local.cm.property,
-                    $scope.selectedElement,$scope.hashExpandedVs)
-
-                $scope.matchingVS = vo.lstVS
-                $scope.matchedRules = vo.lstMatches
-
-                //look uo the matched elements (to display in the UI as well as the table)
-                $scope.displayMatchNumber = "Match: "
-                $scope.selectedElement.target.forEach(function (target) {
-                    if (target.matched) {
-                        $scope.displayMatchNumber += target.comment + " "
-                    }
-                })
-                if ( $scope.displayMatchNumber == "Match: ") {
-                    $scope.displayMatchNumber = 'No matching targets'
-                }
-
-                let qry = `/nzhts/expandMultipleVs`
-                $http.post(qry,vo.lstVS).then(
-                    function (data) {
-                        console.log(data)
-                        $scope.lstMatchingConcepts = data.data
-                    }, function (err) {
-                        console.log(err)
-                    }
-                )
-
-            }
 
             //clear the value for a specific property
             $scope.resetValue = function (k) {
                 delete $scope.local.cm.property[k]
             }
+
+
+            //locate all values for other properties which could result in this value
+            //value is a concept
+
+
+            function makeHashParams() {
+                let params = {}
+                for (const key of Object.keys($scope.cmProperties)) {
+
+                    let v = $scope.local.cmOptions[key]
+                    console.log(key,v)
+                    if (v) {
+                        params[key] = v
+
+                    }
+
+                }
+                return params
+
+            }
+
+
+            $scope.lookupByRowNumber = function (rowNumber) {
+                $scope.singleTargetByRow = $scope.targetByRow[rowNumber]
+            }
+
+            //====================  deprecated functions here....
+
 
             $scope.resetUIDataDEP = function () {
                 delete $scope.displayMatchNumber
@@ -1391,7 +1329,7 @@ angular.module("pocApp")
                                                     $scope.hashProperties[property].push(concept)
                                                 }
                                             })
-                                            
+
                                             canAdd = false  //just to stop the value being added .
                                         } else {
                                             let v = don.value //the value is actually a code
@@ -1446,11 +1384,141 @@ angular.module("pocApp")
             }
 
 
-            //locate all values for other properties which could result in this value
-            //value is a concept
+
+
+            //expand a ValueSet
+            $scope.cmExpandVSDEP = function (url) {
+                delete $scope.cmExpandedVS
+                delete $scope.selectedTarget
+                delete $scope.lstMatchingConcepts
+                delete $scope.matchingVS
+
+
+                let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=en-x-sctlang-23162100-0210105`
+                console.log(qry)
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        $scope.cmExpandedVS = data.data
+
+
+                        if ($scope.cmExpandedVS.expansion && $scope.cmExpandedVS.expansion.contains) {
+
+                            $scope.cmExpandedVS.expansion.contains.sort(function(a,b) {
+                                if (a.display > b.display) {
+                                    return 1
+                                } else {
+                                    return -1
+                                }
+                            })
+
+                        }
+
+
+
+
+                    }, function (err) {
+
+                    }
+                ).finally(
+                    function () {
+                        $scope.showWaiting = false
+                    }
+                )
+            }
+
+
+
+            $scope.showTargetDEP = function (target) {
+                if ($scope.selectedTarget && target.code == $scope.selectedTarget.code) {
+                    delete $scope.selectedTarget
+                } else {
+                    $scope.selectedTarget = target
+                }
+
+            }
+
+            $scope.selectTargetDEP = function (target) {
+                $scope.selectedTarget = target
+            }
+
+
+
+
+            function expandVDEP(url) {
+                let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=${nzDisplayLanguage}`
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        $scope.expandedVS = data.data
+                    }, function (err) {
+
+                    }
+                ).finally(
+                    function () {
+                        $scope.showWaiting = false
+                    }
+                )
+            }
+
+
+            $scope.getFirstValueDEP = function (lst) {
+                if (lst && lst.length > 0) {
+                    return lst[0].code
+                }
+
+            }
+            //get all the concepts for a single property - this is applying the rules engine...
+            //called from the Rules tab
+            $scope.getOptionsOnePropertyDEP = function() {
+                //console.log($scope.local.cm.property)
+                delete $scope.lstMatchingConcepts
+                delete $scope.cmExpandedVS      //so it's not in the display area
+                delete $scope.displayMatchNumber
+                //call the rules engine to determine the possible concepts. The engine needs:
+
+                //  the list of user selected values for all properties so far  - local.cm.property
+                //  the property that needs the list - input.cmProperty & $scope.selectedElement
+
+                //
+
+                //rules engine takes:
+                //
+                let vo = cmSvc.rulesEngine($scope.local.cm.property,
+                    $scope.selectedElement,$scope.hashExpandedVs)
+
+                $scope.matchingVS = vo.lstVS
+                $scope.matchedRules = vo.lstMatches
+
+                //look uo the matched elements (to display in the UI as well as the table)
+                $scope.displayMatchNumber = "Match: "
+                $scope.selectedElement.target.forEach(function (target) {
+                    if (target.matched) {
+                        $scope.displayMatchNumber += target.comment + " "
+                    }
+                })
+                if ( $scope.displayMatchNumber == "Match: ") {
+                    $scope.displayMatchNumber = 'No matching targets'
+                }
+
+                let qry = `/nzhts/expandMultipleVs`
+                $http.post(qry,vo.lstVS).then(
+                    function (data) {
+                        console.log(data)
+                        $scope.lstMatchingConcepts = data.data
+                    }, function (err) {
+                        console.log(err)
+                    }
+                )
+
+            }
+
+
 
             //create an array of params representing the selected value of all properties
-            function makeParams() {
+            function makeParamsDEP() {
                 let params = []
                 for (const key of Object.keys($scope.cmProperties)) {
 
@@ -1471,28 +1539,6 @@ angular.module("pocApp")
 
             }
 
-            function makeHashParams() {
-                let params = {}
-                for (const key of Object.keys($scope.cmProperties)) {
-
-                    let v = $scope.local.cmOptions[key]
-                    console.log(key,v)
-                    if (v) {
-                        params[key] = v
-
-                    }
-
-                }
-                return params
-
-            }
-
-
-            $scope.lookupByRowNumber = function (rowNumber) {
-                $scope.singleTargetByRow = $scope.targetByRow[rowNumber]
-            }
-
-            //---------  deprecated functions here....
 
             //generate the translate query from the canshare lookup tab
             function makeTranslateQueryDEP(conceptWeWant,cmUrl)  {

@@ -35,14 +35,80 @@
     <br/>
   <uib-tabset active="local.conceptMapTab">
 
-    <uib-tab heading="UI">
+      <uib-tab heading="UI">
         <br/>
 
 
           <div class="row">
               <div class="col-md-6">
 
-                  <uib-tabset>
+
+                  <table class="table table-bordered">
+                      <tr ng-repeat = "(k,v) in cmProperties" ng-hide="k == 'patient-sex'">
+                          <td width = "30%">
+                              <div class = 'clickable' ng-click="setMaximalOptions(k)">{{k}}</div>
+                          </td>
+                          <td>
+                              <div class="row">
+                                  <div class="col-md-10">
+
+
+
+
+                                      <!-- Allows us to explicitly decide when to show the message - not just
+                                      when the set of values has not been determined
+
+                                       probably not needed now - which means we can remove the 'noMatches' flag-->
+                                      <div ng-show="v.noMatches">
+                                          <!-- There were no matching ValueSets or Concepts -->
+
+                                      </div>
+
+
+
+                                      <div ng-show="v.singleConcept && v.options.length == 0">
+                                          <!--
+                                          <input type="text" class="form-control"  value="{{v.singleConcept.display}}"/>
+                                          -->
+                                          <select class="form-control">
+
+                                              <option>{{v.singleConcept.display}}</option>
+                                          </select>
+
+                                      </div>
+
+                                      <div ng-show="v.options.length > 0">
+                                          <select class="form-control" ng-model="local.cmOptions[k]"
+                                                  ng-change="uiValueSelected(k,local.cmOptions[k])"
+                                                  ng-options="v.display for (k,v) in v.options">
+
+                                          </select>
+                                          <!--
+                                                                                    <input type="text" ng-model="test"
+                                                                                           typeahead-editable = "false"
+                                                                                           typeahead-on-select="selectFromTA($item, k,k)"
+
+                                                                                           uib-typeahead="concept.display for concept in v.options | filter:$viewValue"
+                                                                                           class="form-control" />
+
+                                          -->
+                                      </div>
+                                  </div>
+                                  <div class="col-md-2">
+                                      <i class=" glyphicon glyphicon-search clickable"
+                                         ng-show="v.options.length > 10"
+                                         ng-click="selectConcept(k,v)"></i>
+                                      <!--
+                                                                                <i ng-show="local.cmOptions[k]" class=" glyphicon glyphicon-remove clickable"
+                                                                                   ng-click="clearProperty(k)"></i>
+                                      -->
+                                  </div>
+                              </div>
+                          </td>
+                      </tr>
+                  </table>
+
+                  <uib-tabset ng-show="false">
                       <uib-tab heading="Progressive">
                           <br/>
                           <table class="table table-bordered">
@@ -159,6 +225,9 @@
 
                       </uib-tab>
                   </uib-tabset>
+
+
+
                   <button class="btn-primary btn" ng-click="resetUI()">Reset</button>
 
 
@@ -469,257 +538,7 @@
 
       </uib-tab>
 
-    <uib-tab ng-show="false" heading="Rules">
-      <br/>
-
-        <div ng-show="input.showHelp" class="alert-info alert">
-            This tab indicates how the target matching works.
-            <br/><br/>
-            You first select a property. The app then displays a couple of things.
-            <br/><br/>
-            <ul>
-                <li>All the properties and values from all the <span class="elementName">target.dependsOn</span> parts
-                of all the targets. ie all the possible property values that can determine which target
-                    is selected. They are rendered in a drop-down which therefore contain all the possible
-                values.</li>
-                <li>A table containing all the targets. Each row in the table contains the criteria which cause that
-                target to be matched, and the corresponding ValueSet or Concept.</li>
-            </ul>
-
-            To see which target would be matched by a particular combination of property values,
-            make the appropriate selection in the dropdown and then click the 'Select target' button.
-            <br/><br/>
-            The target that matches the combination of property values is then outlined in green.
-            There should only be one match for any given combination. If there is more than one
-            then let the CanShare team know.
-
-
-
-        </div>
-      <div >
-        <div class="row">
-          <div class="col-md-2">
-            <strong>Select property</strong>
-          </div>
-          <div class="col-md-2">
-            <select ng-model = "input.cmProperty" class="form-control"
-
-                    ng-options="k as k for (k,v) in cmProperties" ng-change="makeListOfTargets(input.cmProperty)"></select>
-
-          </div>
-
-          <div class="col-md-1">
-            <button class="btn btn-link" ng-click="resetUIData()">Reset</button>
-          </div>
-            <div class="col-md-7">
-                <em>This is the property for which you are looking for potential values</em>
-            </div>
-        </div>
-      </div>
-      <br/>
-
-
-      <uib-tabset ng-show="selectedElement">
-        <uib-tab heading="List of targets for {{input.cmProperty}}">
-          <br/>
-
-          <div class="row">
-            <div class="col-md-7">
-              <div class="rounded-box">
-
-
-                  <div ng-repeat="(k,v) in cmProperties">
-                      <div class="row" ng-show="hashProperties[k]">
-                          <div class="col-md-3">
-                              {{k}}
-                          </div>
-                          <div class="col-md-7">
-                              <select class="form-control" ng-model="local.cm.property[k]"
-                                      ng-options="showConcept(c) for c in hashProperties[k]"></select>
-                          </div>
-
-
-                          <div class="col-md-2">
-                              <div class="clickable" ng-click="resetValue(k)">Reset</div>
-                          </div>
-
-                      </div>
-                  </div>
-
-
-<!--
-                  <hr/>
-              <div ng-repeat="(k,v) in hashProperties">
-
-
-                <div class="row">
-                  <div class="col-md-3">
-                    {{k}}
-                  </div>
-
-
-
-                  <div class="col-md-7">
-                    <select class="form-control" ng-model="local.cm.property[k]"
-                            ng-options="showConcept(c) for c in v"></select>
-                  </div>
-
-
-                    <div class="col-md-2">
-                        <div class="clickable" ng-click="resetValue(k)">Reset</div>
-                    </div>
-
-                </div>
-
-              </div>
--->
-                <br/>
-
-
-              <div class="row">
-                  <div class="col-md-8">
-                      <em>These lists are populated from all dependsOn values for all rules (target) in the property element. They are NOT
-                          progressively populated as selections are made (the UI tab will do that eventually). In other
-                          words the contents of each target property has all the possible values from all the
-                          dependsOn entries.</em>
-                  </div>
-                  <div class="col-md-4">
-                      <button class="btn-primary btn pull-right" ng-click="getOptionsOneProperty()">Select target</button>
-                      <div class="clearfix"/>
-                      <br/>
-                      <div class="pull-right">{{displayMatchNumber}}</div>
-                  </div>
-              </div>
-
-
-              </div>
-
-              <hr/>
-              <strong>Potential targets from ConceptMap</strong>
-              <div class="myScroll">
-                <table class="table table-bordered">
-                  <tr><th>Criteria</th><th>Matched ValueSet or Concept</th><th>Action</th></tr>
-                  <tr ng-repeat="target in selectedElement.target" ng-class ="{matched:target.matched}">
-                      <td>{{target.comment}}</td>
-                    <td>
-                      <table class="table table-bordered">
-
-                        <tr ng-repeat="dep in target.dependsOn">
-
-                          <td style="width: 40%;">{{dep.property}}</td>
-                            <td>{{dep['x-operator']}}</td>
-                          <td>
-                              <div ng-show="dep['x-operator'] == '='">
-                                  {{dep.display}} ({{dep.value}})
-                              </div>
-                              <div ng-show="dep['x-operator'] == 'in-vs'">
-                                  <div ng-click= "cmExpandVS(dep.value)" >
-                                      <em>Value in this VS</em>
-                                      <div class="clickable">{{dep.value}}</div>
-                                  </div>
-
-                              </div>
-
-
-
-                          </td>
-
-
-
-                        </tr>
-                      </table>
-                    </td>
-                    <td>
-                      <div ng-show="target.code.indexOf('http') == -1">{{target.display}} ({{target.code}})</div>
-                      <div ng-show="target.code.indexOf('http') !== -1" class="clickable" ng-click="cmExpandVS(target.code)">{{target.display}}</div>
-                    </td>
-
-                    <td>
-                        <div ng-show="false">
-                            <i class="glyphicon glyphicon-edit clickable" ng-click="editRule(target)"></i>
-                            <div><i class="glyphicon glyphicon-remove clickable"></i></div>
-                        </div>
-                        <div class="clickable" ng-click = "showTarget(target)">Show</div>
-
-
-
-                    </td>
-
-
-                  </tr>
-                </table>
-              </div>
-
-
-
-            </div>
-            <div class="col-md-5">
-
-
-                <div ng-show="matchingVS.length > 0" >
-                  <strong>Matching ValueSet or Concept</strong>
-                  <ul>
-                    <li ng-repeat="vs in matchingVS">{{vs}}</li>
-                  </ul>
-
-                </div>
-
-
-
-
-
-              <div ng-show = "lstMatchingConcepts">
-                <strong>Concepts from all matching ValueSets</strong>
-                <div class="myScroll">
-                  <ul>
-                    <li ng-repeat="concept in lstMatchingConcepts">
-                      {{concept.display}}
-                      (<span class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</span>)
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-
-                <div ng-show="selectedTarget">
-                    <pre>{{selectedTarget | json}}</pre>
-                </div>
-
-
-              <div ng-show="cmExpandedVS" class="banner">{{cmExpandedVS.url}}</div>
-              <div class="myScroll">
-                <ul>
-                  <li ng-repeat="concept in cmExpandedVS.expansion.contains">
-                    {{concept.display}}
-                    (<span class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</span>)
-                  </li>
-                </ul>
-              </div>
-
-
-
-
-            </div>
-          </div>
-
-
-
-
-        </uib-tab>
-        <uib-tab heading = "Json of element">
-            <div ng-show="input.showHelp" class="alert-info alert">
-                This is the json of the selected element section. Note that there is an additional
-                entry in the json called 'match'. This is used internally by the app to indicate
-                which of the targets match the input values and is not part of the ConceptMap json.
-            </div>
-
-          <pre>{{selectedElement | json}}</pre>
-        </uib-tab>
-      </uib-tabset>
-    </uib-tab>
-
-
-    <uib-tab heading="Tree">
+      <uib-tab heading="Tree">
         <div ng-show="input.showHelp" class="alert-info alert">
             This tab represents a tree view of the ConceptMap and allows the individual entries within
             the CM to be displayed in a number of formats including the raw Json.
@@ -859,12 +678,7 @@
           <pre>{{fullSelectedCM | json}}</pre>
       </uib-tab>
 
-
-
-
   </uib-tabset>
-
-
 
 
 </div>
