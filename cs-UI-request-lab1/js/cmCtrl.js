@@ -201,7 +201,6 @@ angular.module("pocApp")
                     return
                 }
 
-
                 if (! value) {
                     //I think this is being triggered when a value is being updated after reverse lookup
                     //but in any case, if there is no value then don't do anything
