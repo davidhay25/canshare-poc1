@@ -78,8 +78,8 @@
                                       </div>
 
                                       <div ng-show="v.options.length > 0">
-                                          <select class="form-control" ng-model="local.cmOptions[k]"
-                                                  ng-change="uiValueSelected(k,local.cmOptions[k])"
+                                          <select class="form-control" ng-model="local.cmPropertyValue[k]"
+                                                  ng-change="uiValueSelected(k,local.cmPropertyValue[k])"
                                                   ng-options="v.display for (k,v) in v.options">
 
                                           </select>
@@ -99,7 +99,7 @@
                                          ng-show="v.options.length > 10"
                                          ng-click="selectConcept(k,v)"></i>
                                       <!--
-                                                                                <i ng-show="local.cmOptions[k]" class=" glyphicon glyphicon-remove clickable"
+                                                                                <i ng-show="local.cmPropertyValue[k]" class=" glyphicon glyphicon-remove clickable"
                                                                                    ng-click="clearProperty(k)"></i>
                                       -->
                                   </div>
@@ -146,8 +146,8 @@
                                       </div>
 
                                       <div ng-show="v.options.length > 0">
-                                          <select class="form-control" ng-model="local.cmOptions[k]"
-                                                  ng-change="uiValueSelected(k,local.cmOptions[k])"
+                                          <select class="form-control" ng-model="local.cmPropertyValue[k]"
+                                                  ng-change="uiValueSelected(k,local.cmPropertyValue[k])"
                                                   ng-options="v.display for (k,v) in v.options">
 
                                           </select>
@@ -167,7 +167,7 @@
                                              ng-show="v.options.length > 10"
                                              ng-click="selectConcept(k,v)"></i>
 <!--
-                                          <i ng-show="local.cmOptions[k]" class=" glyphicon glyphicon-remove clickable"
+                                          <i ng-show="local.cmPropertyValue[k]" class=" glyphicon glyphicon-remove clickable"
                                              ng-click="clearProperty(k)"></i>
 -->
                                       </div>
@@ -186,7 +186,7 @@
                               <tr>
                                   <td>Histology</td>
                                   <td>
-                                      <input type="text" class="form-control" ng-model="local.cmOptions['histologic-type-primary']"
+                                      <input type="text" class="form-control" ng-model="local.cmPropertyValue['histologic-type-primary']"
 
                                              typeahead-editable = "false
 "                                            typeahead-on-select = "histoSelected($item)"
@@ -207,13 +207,13 @@
 
                                       <div ng-show="v.options.length >1 && v.options.length < 5">
                                           <div ng-repeat = "concept in v.options">
-                                              <input type="radio" ng-model="local.cmOptions[k]" value="{{concept.code}}" /> {{concept.display}}
+                                              <input type="radio" ng-model="local.cmPropertyValue[k]" value="{{concept.code}}" /> {{concept.display}}
                                           </div>
 
                                       </div>
 
                                       <div ng-show="v.options.length > 4">
-                                          <select class="form-control" ng-model="local.cmOptions[k]"
+                                          <select class="form-control" ng-model="local.cmPropertyValue[k]"
                                                   ng-options="v1.display for v1 in v.options">
                                           </select>
 
@@ -446,8 +446,8 @@
                                   <pre>{{cmProperties | json}}</pre>
                               </div>
                               <div class="col-md-6">
-                                  <strong>local.cmOptions (Property values)</strong>
-                                  <pre>{{local.cmOptions | json}}</pre>
+                                  <strong>local.cmPropertyValue (Property values)</strong>
+                                  <pre>{{local.cmPropertyValue | json}}</pre>
                               </div>
                           </div>
                       </uib-tab>

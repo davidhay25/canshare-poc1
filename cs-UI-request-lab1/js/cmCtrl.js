@@ -104,7 +104,7 @@ angular.module("pocApp")
             //  .concept is the snomed concept for the property
             //  .singleConcept is set when there is only a single possible value for the property
 
-            //$scope.local.cmOptions[key] - the actual value (a concept) for the property
+            //$scope.local.cmPropertyValue[key] - the actual value (a concept) for the property
             
             $scope.clearProperty = function (propKey) {
                 //todo should just be empty
@@ -115,7 +115,7 @@ angular.module("pocApp")
                 $scope.log = []
                 $scope.log.push({msg:`Clearing value of ${propKey}`})
 
-                delete $scope.local.cmOptions[propKey]
+                delete $scope.local.cmPropertyValue[propKey]
                 delete $scope.cmProperties[propKey].singleConcept
               //  $scope.log.push({msg:`Start populate from ${propKey}`})
                // $scope.populateUIControl(propKey)
@@ -145,7 +145,7 @@ angular.module("pocApp")
                     console.log(concept)
 
                     //need to set the value of the dropdown as well
-                    $scope.local.cmOptions[propKey] = concept
+                    $scope.local.cmPropertyValue[propKey] = concept
 
                     $scope.uiValueSelected(propKey,concept)
                 })
@@ -155,7 +155,7 @@ angular.module("pocApp")
 
             $scope.setMaximalOptions = function (propName) {
 
-                let currentValue = $scope.local.cmOptions[propName]
+                let currentValue = $scope.local.cmPropertyValue[propName]
 
                 let vsUrl = `${vsPrefix}${$scope.cmProperties[propName].fullVS}`
                 console.log(vsUrl,$scope.hashExpandedVs[vsUrl])
@@ -164,7 +164,7 @@ angular.module("pocApp")
                 if (currentValue) {
                     for (const concept of $scope.cmProperties[propName].options) {
                         if (concept.code == currentValue.code) {
-                            $scope.local.cmOptions[propName] = concept
+                            $scope.local.cmPropertyValue[propName] = concept
                             break
                         }
                     }
@@ -194,16 +194,19 @@ angular.module("pocApp")
                 $scope.local.uiTitle = `Property selected: ${propKey}`
 
 
+
+                //Changing laterality won't change any other values so don't bother with
                 if (propKey == 'primary-site-laterality') {
-                    $scope.log.push({msg:'Ignoring laterality'})
+                    $scope.log.push({msg:'Ignoring laterality forward and reverse checks'})
                     return
                 }
+
 
                 if (! value) {
                     //I think this is being triggered when a value is being updated after reverse lookup
                     //but in any case, if there is no value then don't do anything
                     $scope.log.push({msg:`uiValueSelected() called with no value. Property value ${propKey} deleted`})
-                    delete $scope.local.cmOptions[propKey]
+                    delete $scope.local.cmPropertyValue[propKey]
                     return
                 }
 
@@ -233,19 +236,19 @@ angular.module("pocApp")
                         if (checkValue) {
                             $scope.log.push({msg:`Fwd: checking existing value of ${key}`})
                             //checkValue is set when we're past the current property
-                            //if there is a value, then check to see if it is in local.cmOptions[propName].
+                            //if there is a value, then check to see if it is in local.cmPropertyValue[propName].
                             //if it is then leave it
                             //if not then clear the value (but not the options)
                             //(this supports the reverse lookup)
 
                             //cmProperties[key].options has the list of options
-                            //local.cmOptions[key] has the current value
+                            //local.cmPropertyValue[key] has the current value
                             //cmProperties[key].singleConcept has the value if there is only 1
 
-                            if ($scope.local.cmOptions[key]) {
-                                $scope.log.push({msg:`Value already selected`,obj:$scope.local.cmOptions[key],objTitle:"Current valie"})
+                            if ($scope.local.cmPropertyValue[key]) {
+                                $scope.log.push({msg:`Value already selected`,obj:$scope.local.cmPropertyValue[key],objTitle:"Current valie"})
                                 //there is a selected value here - is it in the list of options
-                                let currentValue = $scope.local.cmOptions[key]
+                                let currentValue = $scope.local.cmPropertyValue[key]
                                 let ar = $scope.cmProperties[key].options.filter(concept => concept.code == currentValue.code )
 
 
@@ -253,7 +256,7 @@ angular.module("pocApp")
                                     $scope.log.push({msg:`${key} value not in new list. Clearing.`,obj:$scope.cmProperties[key].options,objTitle:"Current options"})
                                     //the current value is not in the set of possible values. clear it
                                     //todo - this is different to the reverse lookup where we default the first one. ?which is correct
-                                    delete $scope.local.cmOptions[key]
+                                    delete $scope.local.cmPropertyValue[key]
                                     delete $scope.cmProperties[key].singleConcept
                                 }
                             }
@@ -263,7 +266,7 @@ angular.module("pocApp")
                             delete $scope.cmProperties[key].singleConcept //flag that the option is a single concept
                             delete $scope.cmProperties[key].noMatches  //flag that no options were found
                             delete $scope.local.uiValues[key]  //data entered for that property
-                            delete $scope.local.cmOptions[key]  //list of options for that property
+                            delete $scope.local.cmPropertyValue[key]  //list of options for that property
                             */
                         }
                         if (key == propKey) {
@@ -283,14 +286,14 @@ angular.module("pocApp")
                     $scope.populateUIControl(def.next)  //populate the UI with the set of possible values. Will check all following properties
                 }
 
-                //so that the dropdowns work, make sure the value (local.cmOptions) is from the list cmProperties[k].options
+                //so that the dropdowns work, make sure the value (local.cmPropertyValue) is from the list cmProperties[k].options
                 //Otherwise angular doesn't set the dropdown correctly
                 Object.keys($scope.cmProperties).forEach(function (propName) {
-                    if ($scope.local.cmOptions[propName] && $scope.cmProperties[propName].options) {
-                        let code = $scope.local.cmOptions[propName].code
+                    if ($scope.local.cmPropertyValue[propName] && $scope.cmProperties[propName].options) {
+                        let code = $scope.local.cmPropertyValue[propName].code
                         for (const c of $scope.cmProperties[propName].options) {
                             if (c.code == code) {
-                                $scope.local.cmOptions[propName] = c
+                                $scope.local.cmPropertyValue[propName] = c
                                 break
                             }
                         }
@@ -332,7 +335,7 @@ angular.module("pocApp")
                 //if there is already a value for this property then leave it alone and don't
                 //progress further. - no, we need to check that it is still relevant.
                 /*
-                if ($scope.local.cmOptions[propKey]) {
+                if ($scope.local.cmPropertyValue[propKey]) {
                     $scope.log.push({msg:`${propKey} already has a value - leave it`  })
                    return
                 }
@@ -370,7 +373,7 @@ angular.module("pocApp")
                     if (prop == propKey) {
                         // 27-may - use all values break
                     }
-                    $scope.uiHashValues[prop] = $scope.local.cmOptions[prop] //$scope.local.cmOptions has the data entered thus far.
+                    $scope.uiHashValues[prop] = $scope.local.cmPropertyValue[prop] //$scope.local.cmPropertyValue has the data entered thus far.
                 }
 
                 $scope.log.push({msg:`About to execute rules engine for ${propKey}`,obj:$scope.uiHashValues,objTitle:"Current property values"})
@@ -388,7 +391,7 @@ angular.module("pocApp")
                 //Apply the result from the forward rules engine.
                 //if it is a valueset then just set the possible values ($scope.cmProperties[propKey].options)
                 //If the result is a single concept (does not start with http) then
-                //  set the property value ($scope.local.cmOptions[propKey]) and process the next property
+                //  set the property value ($scope.local.cmPropertyValue[propKey]) and process the next property
                 //  also set ($scope.cmProperties[propKey].singleConcept) so it displays in the UI
                 //If the result returns no values then set $scope.cmProperties[propKey].noMatches and process the next property
 
@@ -416,7 +419,7 @@ angular.module("pocApp")
                         //todo - there are multiple objects storing this value - need to be refactored
 
                         $scope.uiHashValues[propKey] = $scope.singleConcept
-                        $scope.local.cmOptions[propKey] = $scope.singleConcept
+                        $scope.local.cmPropertyValue[propKey] = $scope.singleConcept
 
                         //if the singleConcept isn't in the list of options then it won't display
                         //??? why should this happen?
@@ -426,7 +429,7 @@ angular.module("pocApp")
 
 
 
-                        //$//scope.uiHashValues[prop] = $scope.local.cmOptions[prop] //$scope.local.cmOptions has the data entered thus far.
+                        //$//scope.uiHashValues[prop] = $scope.local.cmPropertyValue[prop] //$scope.local.cmPropertyValue has the data entered thus far.
 
 
                         //as there is only a single concept, which is not editable then move on to the next one
@@ -481,12 +484,12 @@ angular.module("pocApp")
                         //otherwise remove it
                         $scope.cmProperties[propKey].options = forwardList
 
-                        if ($scope.local.cmOptions[propKey]) {
-                            let concept = $scope.local.cmOptions[propKey]
+                        if ($scope.local.cmPropertyValue[propKey]) {
+                            let concept = $scope.local.cmPropertyValue[propKey]
                             let ar = forwardList.filter(concept1 => concept1.code == concept.code )
                             if (ar.length == 0) {
                                 //nope - the existing value is not in the new list
-                                delete $scope.local.cmOptions[propKey]
+                                delete $scope.local.cmPropertyValue[propKey]
                             }
                         }
 
@@ -526,11 +529,11 @@ angular.module("pocApp")
 
 /*
                         //now that we've updated the list of options, we have to update the value as well (for angular)
-                        if ($scope.local.cmOptions[propKey]) {
-                            let currentCode = $scope.local.cmOptions[propKey].code
+                        if ($scope.local.cmPropertyValue[propKey]) {
+                            let currentCode = $scope.local.cmPropertyValue[propKey].code
                             for (const v of $scope.cmProperties[propKey].options ) {
                                 if (v.code == currentCode) {
-                                    $scope.local.cmOptions[propKey] = v
+                                    $scope.local.cmPropertyValue[propKey] = v
                                     break
                                 }
                             }
@@ -567,11 +570,11 @@ angular.module("pocApp")
 
                 //now that we've updated the list of options, we have to update the value as well (for angular)
                 //otherwise the dropdowns won't be correctly displayed
-                if ($scope.local.cmOptions[propKey]) {
-                    let currentCode = $scope.local.cmOptions[propKey].code
+                if ($scope.local.cmPropertyValue[propKey]) {
+                    let currentCode = $scope.local.cmPropertyValue[propKey].code
                     for (const v of $scope.cmProperties[propKey].options ) {
                         if (v.code == currentCode) {
-                            $scope.local.cmOptions[propKey] = v
+                            $scope.local.cmPropertyValue[propKey] = v
                             break
                         }
                     }
@@ -634,7 +637,7 @@ angular.module("pocApp")
                         let hash = {}
                         let propKeyToGet = $scope.cmProperties[propKey].previous
                         while (propKeyToGet) {
-                            hash[propKeyToGet] = $scope.local.cmOptions[propKeyToGet]
+                            hash[propKeyToGet] = $scope.local.cmPropertyValue[propKeyToGet]
                             propKeyToGet = $scope.cmProperties[propKeyToGet].previous
                         }
                         return hash
@@ -688,7 +691,7 @@ angular.module("pocApp")
                                 cmProperty.options.length = 0
                                 delete cmProperty.noMatches
 
-                                $scope.local.cmOptions[propName] = arNewOptions[0]      //set the value
+                                $scope.local.cmPropertyValue[propName] = arNewOptions[0]      //set the value
                             } else {
 
                                 //create a new list which is the intersection of the list of the reverse
@@ -712,12 +715,12 @@ angular.module("pocApp")
 
                                 //If there's a value, then make sure it is in the new list
                                 //otherwise remove it
-                                if ($scope.local.cmOptions[propName]) {
-                                    let concept = $scope.local.cmOptions[propName]
+                                if ($scope.local.cmPropertyValue[propName]) {
+                                    let concept = $scope.local.cmPropertyValue[propName]
                                     let ar = newList.filter(concept1 => concept1.code == concept.code )
                                     if (ar.length == 0) {
                                         //nope - the existing value is not in th enew list
-                                        delete $scope.local.cmOptions[propName]
+                                        delete $scope.local.cmPropertyValue[propName]
                                     }
                                 }
 
@@ -731,18 +734,18 @@ angular.module("pocApp")
                                 checkCurrentValue(propName,arNewOptions)
 
                                 /*
-                                if (! $scope.local.cmOptions[propName]) {
+                                if (! $scope.local.cmPropertyValue[propName]) {
                                     $scope.log.push({msg:`No existing data, setting options`,obj:arNewOptions})
-                                    $scope.local.cmOptions[propName] = cmProperty.options[0]
+                                    $scope.local.cmPropertyValue[propName] = cmProperty.options[0]
                                 } else {
                                     //see if the current value is in the set of concepts.
                                     //If it is then all good - otherwise set it to the first
-                                    let currentValue = $scope.local.cmOptions[propName]
+                                    let currentValue = $scope.local.cmPropertyValue[propName]
                                     let ar = $scope.cmProperties[propName].options.filter(concept => concept.code == currentValue.code )
                                     if (ar.length == 0) {
                                         $scope.log.push({msg:`Existing value not in set. Removing.`,obj:currentValue})
                                         //there is a current value, and it's not in the set of options. clear it
-                                        delete $scope.local.cmOptions[propName]
+                                        delete $scope.local.cmPropertyValue[propName]
                                     }
                                 }
                                 */
@@ -754,15 +757,20 @@ angular.module("pocApp")
                             //if there are no options from the reverse lookup to apply, then delete any existing value
                             //that might be there, and set the .noMatches flag on cmProperties (? todo couldn't we just look at the length of options)
                             if ($scope.default.mode !== 'manual') {
-                                $scope.log.push({msg:`There were no options from the reverse lookup. Clearing value.`})
-                                cmProperty.options = []
-                                cmProperty.noMatches = true
-                                delete cmProperty.singleConcept
-                                $scope.local.cmOptions[propName] = null
+
+                                //laterality is a special case - don't update any value here.
+                                if (propName !== 'primary-site-laterality') {
+                                    $scope.log.push({msg:`There were no options from the reverse lookup. Clearing value.`})
+                                    cmProperty.options = []
+                                    cmProperty.noMatches = true
+                                    delete cmProperty.singleConcept
+                                    $scope.local.cmPropertyValue[propName] = null
+                                } else {
+                                    $scope.log.push({msg:`Not changing any value for laterality.`})
+                                }
+
                             }
-
-
-
+                            
                         }
                     }
                 })
@@ -772,25 +780,25 @@ angular.module("pocApp")
 
             //checks that ant current value for the property is in the options ($scope.cmProperties[propName].options)
             //if not, then set it to the first value
-            //$scope.local.cmOptions - current value
+            //$scope.local.cmPropertyValue - current value
             //$scope.cmProperties has possible values
             // $scope.cmProperties[propName].options must have been set first
             function checkCurrentValue(propName) {
-                if (! $scope.local.cmOptions[propName]) {
+                if (! $scope.local.cmPropertyValue[propName]) {
                     //$scope.log.push({msg:`No existing value, setting to first`,obj:$scope.cmProperties[propName],objTitle:"All options"})
                     $scope.log.push({msg:`No existing value, not setting anything`,obj:$scope.cmProperties[propName],objTitle:"All options"})
-                    //$scope.local.cmOptions[propName] = $scope.cmProperties[propName].options[0]
+                    //$scope.local.cmPropertyValue[propName] = $scope.cmProperties[propName].options[0]
 
 
                 } else {
                     //see if the current value is in the set of concepts.
                     //If it is then all good - otherwise set it to the first
-                    let currentValue = $scope.local.cmOptions[propName]
+                    let currentValue = $scope.local.cmPropertyValue[propName]
                     let ar = $scope.cmProperties[propName].options.filter(concept => concept.code == currentValue.code )
                     if (ar.length == 0) {
                         $scope.log.push({msg:`Existing value not in set. Removing.`,obj:currentValue,objTitle:"Value being removed"})
                         //there is a current value, and it's not in the set of options. clear it
-                        delete $scope.local.cmOptions[propName]
+                        delete $scope.local.cmPropertyValue[propName]
                     }
                 }
             }
@@ -837,11 +845,11 @@ angular.module("pocApp")
                             if (cmProperty.options && cmProperty.options.length > 0) {
                                 //set  the value to the first element in the VS
                                 //clear the value
-                                let currentConcept = $scope.local.cmOptions[key]
+                                let currentConcept = $scope.local.cmPropertyValue[key]
                                 if (currentConcept) {
                                     for (const c of cmProperty.options) {
                                         if (c.code == currentConcept.code){
-                                            $scope.local.cmOptions[key] = c
+                                            $scope.local.cmPropertyValue[key] = c
                                             break
                                         }
                                     }
@@ -849,8 +857,8 @@ angular.module("pocApp")
                                 }
 
 
-                                //delete $scope.local.cmOptions[key]
-                                //$scope.local.cmOptions[key] = cmProperty.options[0]
+                                //delete $scope.local.cmPropertyValue[key]
+                                //$scope.local.cmPropertyValue[key] = cmProperty.options[0]
                             }
 
                         }
@@ -894,7 +902,7 @@ angular.module("pocApp")
                 delete $scope.uiHashValues
                 delete $scope.reverseLookup
                 //delete $scope.appliedFromReverse        //if true, then the reverse stuff was applied to previous properties
-                $scope.local.cmOptions = {}     //the data entered
+                $scope.local.cmPropertyValue = {}     //the data entered
 
                 $scope.default.mode = 'directed'    //uses the conceptmap
 
@@ -906,9 +914,9 @@ angular.module("pocApp")
                 let defaultServiceSelected = false
                 if ($scope.default.service && $scope.default.service.code) {
                     //$scope.cmProperties['cancer-service'].options = $scope.input.allService
-                    $scope.local.cmOptions['cancer-service'] = $scope.default.service
+                    $scope.local.cmPropertyValue['cancer-service'] = $scope.default.service
                     defaultServiceSelected = true
-                   $scope.uiValueSelected('cancer-service',$scope.local.cmOptions['cancer-service'])
+                   $scope.uiValueSelected('cancer-service',$scope.local.cmPropertyValue['cancer-service'])
                 }
 
 
@@ -918,16 +926,16 @@ angular.module("pocApp")
 
                 //if there's a default stream, then there must be a default service
                 if ($scope.default.stream && $scope.default.stream.code) {
-                    $scope.local.cmOptions['cancer-stream'] = $scope.default.stream
+                    $scope.local.cmPropertyValue['cancer-stream'] = $scope.default.stream
 
                     $scope.cmProperties['cancer-stream'].options = $scope.input.allStreams
 
                     //if there's a default stream, then populate from the stream
-                    $scope.uiValueSelected('cancer-stream',$scope.local.cmOptions['cancer-stream'])
+                    $scope.uiValueSelected('cancer-stream',$scope.local.cmPropertyValue['cancer-stream'])
                 } else {
                     //if there's no default stream, then populate from the service
                     if (defaultServiceSelected) {
-                        $scope.uiValueSelected('cancer-service',$scope.local.cmOptions['cancer-service'])
+                        $scope.uiValueSelected('cancer-service',$scope.local.cmPropertyValue['cancer-service'])
                     }
 
                 }
@@ -1143,7 +1151,7 @@ angular.module("pocApp")
             }
 
             function setup() {
-                $scope.local.cmOptions = {}
+                $scope.local.cmPropertyValue = {}
                 //these are the properties
                 $scope.cmProperties = {}
 
@@ -1224,13 +1232,13 @@ angular.module("pocApp")
 
                     //set the default values is between 1 and 3 (will be rendered as radios in the UI
                     if ($scope.cmProperties[prop].options && $scope.cmProperties[prop].options.length < 4) {
-                        $scope.local.cmOptions[prop] = $scope.cmProperties[prop].options[0].code
+                        $scope.local.cmPropertyValue[prop] = $scope.cmProperties[prop].options[0].code
 
 
 
                     }
 
-                    //$scope.local.cmOptions[prop] = $scope.reverseLookup.hashProperty[prop]
+                    //$scope.local.cmPropertyValue[prop] = $scope.reverseLookup.hashProperty[prop]
                 }
 
                 console.log($scope.cmProperties)
@@ -1259,7 +1267,7 @@ angular.module("pocApp")
                 let params = {}
                 for (const key of Object.keys($scope.cmProperties)) {
 
-                    let v = $scope.local.cmOptions[key]
+                    let v = $scope.local.cmPropertyValue[key]
                     console.log(key,v)
                     if (v) {
                         params[key] = v
@@ -1522,7 +1530,7 @@ angular.module("pocApp")
                 let params = []
                 for (const key of Object.keys($scope.cmProperties)) {
 
-                    let v = $scope.local.cmOptions[key]
+                    let v = $scope.local.cmPropertyValue[key]
                     console.log(key,v)
                     if (v) {
 
@@ -1555,9 +1563,9 @@ angular.module("pocApp")
                 translateParameters.parameter.push({name:"coding",valueCoding:conceptWeWant})
 
                 //add the dependencies
-                if ($scope.local.cmOptions) {
-                    Object.keys($scope.local.cmOptions).forEach(function (key) {
-                        let p = $scope.local.cmOptions[key]
+                if ($scope.local.cmPropertyValue) {
+                    Object.keys($scope.local.cmPropertyValue).forEach(function (key) {
+                        let p = $scope.local.cmPropertyValue[key]
                         p.system = snomed
 //console.log(p)
                         let depParam1 = {name:"dependency",part :[]}
