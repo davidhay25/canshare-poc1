@@ -250,6 +250,33 @@
                   <uib-tabset>
 
 
+
+
+                      <uib-tab heading="Log">
+                          <div class="row">
+                              <div class="col-md-6">
+                                  <div class="myScrollSmall">
+                                      <table class="table table-bordered">
+                                          <tr ng-repeat="entry in log"
+                                              ng-class="{clickable:entry.obj}"
+                                              ng-click="local.logEntry = entry">
+                                              <td>{{entry.msg}}</td>
+                                          </tr>
+                                      </table>
+                                  </div>
+
+                              </div>
+                              <div class="col-md-6">
+                                  <h4>{{local.logEntry.objTitle}}</h4>
+                                  <div class="myScroll">
+                                      <pre ng-show="local.logEntry.obj">{{local.logEntry.obj | json}}</pre>
+                                  </div>
+
+
+                              </div>
+                          </div>
+                      </uib-tab>
+
                       <uib-tab heading="Defaults">
                           <br/>
 
@@ -278,9 +305,9 @@
                                   Cancer Service
                               </div>
                               <div class="col-md-4">
-                                 <select class="form-control" ng-model="default.service"
-                                         ng-change = "setDefaultService(default.service)"
-                                         ng-options="concept.display for concept in input.allService"/>
+                                  <select class="form-control" ng-model="default.service"
+                                          ng-change = "setDefaultService(default.service)"
+                                          ng-options="concept.display for concept in input.allService"/>
                               </div>
                           </div>
 
@@ -289,49 +316,24 @@
 
 
 
-<!--
+                          <!--
 
-                          <div class="row" ng-show="default.service.code">
-                              <div class="col-md-4">
-                                  Cancer Stream
-                              </div>
-                              <div class="col-md-4">
-                                  <select class="form-control" ng-model="default.stream"
-                                          ng-change = "resetUI()"
-                                          ng-options="concept.display for concept in input.allStreams"/>
-                              </div>
-                          </div>
+                                                    <div class="row" ng-show="default.service.code">
+                                                        <div class="col-md-4">
+                                                            Cancer Stream
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <select class="form-control" ng-model="default.stream"
+                                                                    ng-change = "resetUI()"
+                                                                    ng-options="concept.display for concept in input.allStreams"/>
+                                                        </div>
+                                                    </div>
 
-                         -->
-
-
+                                                   -->
 
 
-                      </uib-tab>
-
-                      <uib-tab heading="Log">
-                          <div class="row">
-                              <div class="col-md-6">
-                                  <div class="myScrollSmall">
-                                      <table class="table table-bordered">
-                                          <tr ng-repeat="entry in log"
-                                              ng-class="{clickable:entry.obj}"
-                                              ng-click="local.logEntry = entry">
-                                              <td>{{entry.msg}}</td>
-                                          </tr>
-                                      </table>
-                                  </div>
-
-                              </div>
-                              <div class="col-md-6">
-                                  <h4>{{local.logEntry.objTitle}}</h4>
-                                  <div class="myScroll">
-                                      <pre ng-show="local.logEntry.obj">{{local.logEntry.obj | json}}</pre>
-                                  </div>
 
 
-                              </div>
-                          </div>
                       </uib-tab>
 
                       <uib-tab heading="Reverse engine">

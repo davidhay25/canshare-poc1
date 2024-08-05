@@ -8,7 +8,7 @@ angular.module("pocApp")
 
 
             let autoQ = true   //whether to automatically generate a Q
-            let removeZeroedOut = false  //when creating the full element list, remove mult = 0..0
+            //let removeZeroedOut = false  //when creating the full element list, remove mult = 0..0
 
             $scope.newInflater = true  //running the new inflater
 
@@ -114,7 +114,6 @@ angular.module("pocApp")
                         $scope.input.ssFilter = dg
                     }
                 }
-
             }
 
             $scope.ssBack = function () {
@@ -1647,6 +1646,7 @@ angular.module("pocApp")
 
 
                 $scope.relationshipsSummary = snapshotSvc.getRelationshipsSummary(dg.name)
+
                 //by supplying the dg in the call, the eds will be annotatded with 'definedOnDG' for those in the diff
                 $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name,dg)// vo.allElements
 
@@ -1670,11 +1670,6 @@ angular.module("pocApp")
                 })
 
 
-                //$scope.hiddenSummary = `${cntVisible}/${cntHidden}`
-
-
-
-               // console.log(`Visible: ${cntVisible}  Hidden:${cntHidden}`)
 
                 //adjust according to 'insertAfter' values
                 orderingSvc.sortFullListByInsertAfter($scope.fullElementList,dg,$scope.hashAllDG)
@@ -1686,47 +1681,27 @@ angular.module("pocApp")
                 $scope.orderingByToMove = orderingSvc.getOrderingByToMove(dg)
                 $scope.referencedDGOrdering = orderingSvc.createMoveFromReferences($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
 
-                /* - enable when is now a separate dialog
-                //create the list of potential enableWhen sources
-                $scope.ewSources = []
-                $scope.fullElementList.forEach(function (item) {
-                    if (item.ed.type && item.ed.type[0] == 'CodeableConcept') {
-                        let t = {ed:item.ed,shortPath: $filter('dropFirstInPath')(item.ed.path)}
-                        $scope.ewSources.push(t)
-                    }
-                })
 
-                */
+
 
                 $scope.dgFshLM = igSvc.makeFshForDG(dg,$scope.fullElementList)
-                //$scope.dgFshLM = igSvc.makeFshForDG(dg,vo.allElements)
                 makeGraph()
 
                 //a Q representation of the DG
 
-                if (autoQ) {
+                if ( autoQ) {
 
                     //we first gather all the Valuesets from the Term sever then make the Q
                     //note that in the composition this is part of the makeQ function - so a different patters
 
 
                     vsSvc.getAllVS($scope.fullElementList, function () {
-                        let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
+                    let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
 
 
-                        $scope.dgQ = voQ.Q
+                     $scope.dgQ = voQ.Q
 
-                        //this is just testing the hierarchical Q
-
-                       // let voHQ = makeQSvc.makeHierarchicalQFromDG($scope.fullElementList,$scope.hashAllDG)
-                     //   console.log(voHQ)
-
-                     //   console.log(angular.toJson(voHQ.Q))
-
-                        //>>>>>>>>>>. todo - just for testing
-                    //    console.log(voHQ.Q)
-                        //$scope.localCopyToClipboard(angular.toJson(voHQ.Q))
-
+//console.log(angular.toJson($scope.dgQ ))
 
                     })
 
@@ -1764,6 +1739,7 @@ angular.module("pocApp")
                     $scope.selectedModel = dg
 
 
+                    /* - don;t do any fsh related stuff - will extract to separate page...
                     //get the profile FSH for this DG
                     delete $scope.input.dgFsh
                     let url1 = `/fsh/DG/${dg.name}`
@@ -1778,7 +1754,10 @@ angular.module("pocApp")
                         }
                     )
 
-                    $scope.fhirResourceType = igSvc.findResourceType(dg,$scope.hashAllDG)
+
+                    */
+
+                    $scope.fhirResourceType = igSvc.findResourceType(dg,$scope.hashAllDG)   //not sure if this is used wo fsh stuff
 
                     //check the current checkedout state on the library.
                     //Always update the local version checkedout (not data) with the one from the library
@@ -1798,9 +1777,6 @@ angular.module("pocApp")
 
 
                     $scope.refreshUpdates()     //update the xref
-
-
-
                     $scope.refreshFullList(dg)      //the complete list of elements for this DG + graph & Q
                 }
 

@@ -731,7 +731,7 @@ angular.module("pocApp")
 
             getControlDetails : function(ed) {
                 //return the control type & hint based on the ed
-
+                //used by modelsSvc
                 let controlHint = "string"            //this can be any value - it will be an extension in the Q - https://hl7.org/fhir/R4B/extension-questionnaire-itemcontrol.html
                 let controlType = "string"          //this has to be one of the defined type values
 

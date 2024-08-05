@@ -193,8 +193,6 @@ angular.module("pocApp")
 
                 $scope.local.uiTitle = `Property selected: ${propKey}`
 
-
-
                 //Changing laterality won't change any other values so don't bother with
                 if (propKey == 'primary-site-laterality') {
                     $scope.log.push({msg:'Ignoring laterality forward and reverse checks'})
@@ -212,14 +210,11 @@ angular.module("pocApp")
 
                 //this is the reverse lookup stuff.
                 //sets $scope.reverseLookup which {targets:[],element: {},hashProperty:{}}
-
                 performReverseLookup(propKey,value)
-
                 if ($scope.reverseLookup) {
                     //now apply the reverse lookup stuff. Sets empty properties & check already entered
                     $scope.applyReverse()
                 }
-
 
                 $scope.log.push({msg:`Starting forward checks`})
                 if (false) {
@@ -277,13 +272,20 @@ angular.module("pocApp")
 
                 }
 
-
                 //---------------- now can process the next property in the sequence
                 let def = $scope.cmProperties[propKey]
                 if (def && def.next) {  //next is the property after this one (defined in the initial setup)
                     //def.next is the next control in the order
                     $scope.log.push({msg:`Populate UI control for ${def.next}`})
                     $scope.populateUIControl(def.next)  //populate the UI with the set of possible values. Will check all following properties
+
+                    //if the property that was selected (propKey) is the cancer type, then it may be possible
+                    //to default the primary site.
+
+                    if (propKey == 'cancer-type') {
+                        getDefaultPrimarySite(value)
+                    }
+
                 }
 
                 //so that the dropdowns work, make sure the value (local.cmPropertyValue) is from the list cmProperties[k].options
@@ -300,8 +302,97 @@ angular.module("pocApp")
                     }
                 })
 
+            }
+
+            function getDefaultPrimarySite(concept) {
+                //alert(`check default primary site: ${concept.code}`)
+                $scope.log.push({msg:`check default primary site: ${concept.code}`})
+                let siteCodes = []      //there can be multiple site codes for a given diagnosis
+                let system = snomed // concept.system || snomed
+                //let code ='93849006'// '93689003' //concept.code
+                let code = concept.code //'93849006'// '93689003' //concept.code
+                let findingSiteCode = 363698007  //the code for the finding site attribute
+
+                ///CodeSystem/$lookup?system=http://snomed.info/sct&code=93689003&property=363698007
+                let qry = `CodeSystem/$lookup?system=${system}&code=${code}&property=${findingSiteCode}`
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        let parameters = data.data
+                        if (parameters.parameter) {
+                            for (const p of parameters.parameter) {
+                                console.log(p)
+                                if (p.name == 'property' && p.part) {
+                                    for (const part of p.part) {
+                                        if (part.name == 'subproperty' && part.part) {
+                                            for (const subpart of part.part) {
+                                                if (subpart.name == 'value') {
+                                                    //at last - a site code value!!
+                                                    siteCodes.push(subpart.valueCode)
+                                                }
+                                            }
+
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                        console.log(angular.toJson(data.data) )
+
+                        if (siteCodes.length == 0) {
+                            $scope.log.push({msg:`No site codes found for this concept`})
+                        } else {
+                            let sum = "Codes found: "
+                                siteCodes.forEach(function (code) {
+                                sum += code + " "
+                            })
+                            $scope.log.push({msg:sum})
+
+                            let defaultSiteConceptCode = siteCodes[0]
+
+                            let found
+                            for (const concept of $scope.cmProperties['primary-site'].options) {
+                                if (concept.code == defaultSiteConceptCode) {
+                                    $scope.local.cmPropertyValue['primary-site'] = concept
+                                    found = true
+                                    break
+                                }
+                            }
+                            if (found) {
+                                console.log('found')
+                                $scope.log.push({msg:`Code is in list, setting as default`})
+                            } else {
+                                $scope.log.push({msg:`Code not found in list, ignoring`})
+                                console.log('not found')
+                            }
 
 
+/*
+
+                            if ($scope.cmProperties['primary-site'].options.filter(c => c.code == defaultSiteConceptCode)) {
+                                console.log('found')
+                                $scope.log.push({msg:`Code is in list, setting as default`})
+
+
+
+                               // $scope.local.cmPropertyValue[key] has the current value
+
+                            } else {
+                                $scope.log.push({msg:`Code not found in list, ignoring`})
+                                console.log('not found')
+                            }
+
+                            $scope.cmProperties['primary-site'].options
+*/
+
+                        }
+
+
+
+                    }
+                )
             }
 
             //sets the options for a specific property
@@ -778,7 +869,7 @@ angular.module("pocApp")
             }
 
 
-            //checks that ant current value for the property is in the options ($scope.cmProperties[propName].options)
+            //checks that any current value for the property is in the options ($scope.cmProperties[propName].options)
             //if not, then set it to the first value
             //$scope.local.cmPropertyValue - current value
             //$scope.cmProperties has possible values
@@ -1214,13 +1305,48 @@ angular.module("pocApp")
                 let treeData = querySvc.makeTree($scope.fullSelectedCM,$scope.cmProperties)
                 showCmTree(treeData)
 
-                //stuff for the histology UI
-                $scope.histology = $scope.hashExpandedVs['https://nzhts.digital.health.nz/fhir/ValueSet/canshare-who-histology']
+                //stuff for the histology UI - no longer used
+                //$scope.histology = $scope.hashExpandedVs['https://nzhts.digital.health.nz/fhir/ValueSet/canshare-who-histology']
 
             }
 
+
+            $scope.showConcept = function(c) {
+                return `${c.display} (${c.code})`
+            }
+
+
+            //clear the value for a specific property
+            $scope.resetValue = function (k) {
+                delete $scope.local.cm.property[k]
+            }
+
+
+            function makeHashParams() {
+                let params = {}
+                for (const key of Object.keys($scope.cmProperties)) {
+
+                    let v = $scope.local.cmPropertyValue[key]
+                    console.log(key,v)
+                    if (v) {
+                        params[key] = v
+
+                    }
+
+                }
+                return params
+
+            }
+
+
+            $scope.lookupByRowNumber = function (rowNumber) {
+                $scope.singleTargetByRow = $scope.targetByRow[rowNumber]
+            }
+
+            //====================  deprecated functions here....
+
             //when a concept is selected from the histology typeahead in the histology UI
-            $scope.histoSelected = function (concept) {
+            $scope.histoSelectedDEP = function (concept) {
 
                 performReverseLookup('histologic-type-primary',concept)
                 console.log($scope.reverseLookup)
@@ -1247,44 +1373,6 @@ angular.module("pocApp")
 
             }
 
-
-            $scope.showConcept = function(c) {
-                return `${c.display} (${c.code})`
-            }
-
-
-            //clear the value for a specific property
-            $scope.resetValue = function (k) {
-                delete $scope.local.cm.property[k]
-            }
-
-
-            //locate all values for other properties which could result in this value
-            //value is a concept
-
-
-            function makeHashParams() {
-                let params = {}
-                for (const key of Object.keys($scope.cmProperties)) {
-
-                    let v = $scope.local.cmPropertyValue[key]
-                    console.log(key,v)
-                    if (v) {
-                        params[key] = v
-
-                    }
-
-                }
-                return params
-
-            }
-
-
-            $scope.lookupByRowNumber = function (rowNumber) {
-                $scope.singleTargetByRow = $scope.targetByRow[rowNumber]
-            }
-
-            //====================  deprecated functions here....
 
 
             $scope.resetUIDataDEP = function () {

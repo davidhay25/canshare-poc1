@@ -1257,10 +1257,15 @@
 
     <uib-tab heading="Form">
 
+      <pre>{{dgQ | json}}</pre>
+
       <button class="btn-link btn pull-right" ng-click="previewQ(dgQ)">Examine Q</button>
 
-      <renderform q="dgQ" qr="{}" form="{}"></renderform>
 
+<!-- - not working for some Q (procedure)
+
+      <renderform q="dgQ" qr="{}" form="{}"></renderform>
+-->
 
     </uib-tab>
 
