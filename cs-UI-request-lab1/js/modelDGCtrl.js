@@ -154,7 +154,7 @@ angular.module("pocApp")
             }
 
 
-            $scope.hideInQ = function (edIn) {
+            $scope.hideInQDEP = function (edIn) {
 
                 if (! $scope.user || $scope.selectedModel.checkedOut !== $scope.user.email) {
                     alert("You must check out the DG to make changes")

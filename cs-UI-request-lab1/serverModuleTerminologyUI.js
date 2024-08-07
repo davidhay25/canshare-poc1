@@ -386,35 +386,7 @@ function setup(app) {
     //queries against the Terminology Server
     app.get('/nzhts',async function(req,res){
         let query = req.query.qry
-      //  console.log(`nzhts query: ${req.query.qry}`)
 
-        //the cache is 'opt-in' to avoid tricky cache issues...  It's mostly needed for the LIM forms
-        //it will be necessary to manually empty the cache when we update the TS
-        //should really only do this when expanding a VS
-/*
-        let allowcache = req.headers['x-allowcache']
-
-        //if the cache is active then see if the VS is in there
-        if (vsCache !== undefined && allowcache == 'yes')  {
-            if (vsCache[query]) {
-                vsCacheStats.hit++
-                if (vsCache[query] == "404") {
-                    //the previous query was a 404
-                    res.status(404).json({})
-                    return
-                } else {
-                    res.json(vsCache[query])
-                    return
-                }
-
-            } else {
-                //the response is not (yet) in the cache
-                vsCacheStats.miss++
-            }
-
-        }
-
-*/
 
 
 
@@ -452,21 +424,10 @@ function setup(app) {
                 config['content-type'] = "application/fhir+json"
 
                 axios.get(qry,config).then(function(data) {
-                    //console.log(data.data)
-                    //note that the 'query' variable is the original query sans server
-                  /*  if (allowcache == 'yes') {
-                        vsCache[query] = data.data
-                    }
-                    */
 
                     res.json(data.data)
-                   // console.log("----- found -----")
+
                 }).catch(function(ex) {
-                    /*
-                    if (allowcache == 'yes') {
-                        vsCache[query] = 404        //we're assuming that all errors are 404
-                    }
-                    */
                     if (ex.response) {
                         //console.log("----- NOT found -----")
                         res.status(ex.response.status).json(ex.response.data)

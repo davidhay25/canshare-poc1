@@ -6,7 +6,54 @@ angular.module("pocApp")
         let cache = {}
 
 
+
+
         return {
+
+            updateVSFromUrlHash : function (hash,cb) {
+                let lst = []
+                let that = this
+                for (const url of Object.keys(hash)) {
+                    let vs = that.fixUrl(url)            //adds the NXHTS prefix if missing
+
+                    if (! cache[vs]) {    //only add once!
+                        lst.push(vs)
+                    }
+
+
+                }
+
+
+                that.updateCacheFromList(lst, cb)
+            },
+
+            updateCacheFromList : function(lst,cb) {
+                let that = this
+                cmSvc.getVSContentsHash(lst).then(
+                    function (hash) {
+                        //console.log(hash)
+                        that.setVSContents(hash)
+                        //hashVS = hash
+
+
+                        let size1 = utilsSvc.getSizeOfObject(hash)
+                        console.log(`Size of retrieved VS: ${size1/1024} K`)
+                        lst.forEach(function (vs) {
+                            // console.log(" " + vs)
+                        })
+
+                        let size2 = utilsSvc.getSizeOfObject(cache)
+                        console.log(`Size of full VS cache: ${size2/1024} K`)
+
+                        cb()
+                    }, function () {
+                        //If a VS is not
+                        cb()
+                    }
+                )
+            },
+
+
             getAllVS : function(allElements, cb) {
                 let that = this
             //return
@@ -30,7 +77,10 @@ angular.module("pocApp")
             })
 
 
-            cmSvc.getVSContentsHash(lst).then(
+                that.updateCacheFromList(lst, cb)
+
+/*
+                cmSvc.getVSContentsHash(lst).then(
                 function (hash) {
                     //console.log(hash)
                     that.setVSContents(hash)
@@ -47,18 +97,22 @@ angular.module("pocApp")
                     console.log(`Size of full VS cache: ${size2/1024} K`)
 
                     cb()
+                }, function () {
+                    //If a VS is not
+                    cb()
                 }
+
+
             )
 
-            //code from conceptmap stuff
-
+*/
 
 
             console.log('getting VS')
 
         },
 
-        fixUrl(url) {
+            fixUrl(url) {
                 if (url.indexOf('http') == -1) {
                     url = "https://nzhts.digital.health.nz/fhir/ValueSet/" + url
                 }

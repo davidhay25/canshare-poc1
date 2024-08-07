@@ -365,6 +365,21 @@ angular.module("pocApp")
                     promises.push(addToHash(url,hashExpanded))
                 })
 
+
+                $q.all(promises).then(
+                    function(results) {
+                    // All promises resolved successfully
+
+                    deferred.resolve(hashExpanded)
+
+                }, function () {
+                    console.log(hashExpanded)
+                    deferred.resolve(hashExpanded)
+                    }
+
+                )
+
+/*
                 $q.all(promises).then(function(results) {
                     // All promises resolved successfully
 
@@ -376,7 +391,7 @@ angular.module("pocApp")
                     console.log(hashExpanded)
                     deferred.resolve(hashExpanded)
                 })
-
+*/
                 return deferred.promise
 
 
@@ -409,11 +424,13 @@ angular.module("pocApp")
 
                                 hash[response.data.url] = ar
                                 defer.resolve()
+                            } else {
+                                defer.resolve()
                             }
                         },
                         function (err) {
                             //ignore any errors
-                            //console.log(`${url} fail`)
+                            console.log(`${url} fail`)
                             defer.resolve()
                         }
                     )

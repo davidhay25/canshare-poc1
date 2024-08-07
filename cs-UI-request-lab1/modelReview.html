@@ -83,14 +83,22 @@
     -->
     <script src="js/vsSvc.js"></script>
     <script src="js/orderingSvc.js"></script>
-    <script src="js/makeCompQSvc.js"></script>
+    <script src="js/makeCompQSvcDEP.js"></script>
     <script src="js/cmSvc.js"></script>
     <script src="js/snapShotSvc.js"></script>
     <script src="js/QutilitiesSvc.js"></script>
 
+
+
     <script src="directive/renderForm/renderFormSvc.js"></script>
     <script src="directive/renderForm/renderFormDir.js"></script>
     <script src="directive/renderSingleItem/renderSingleItemDir.js"></script>
+
+
+    <!-- While developing new directive -->
+    <script src="directive/renderForm2/renderFormSvc2.js"></script>
+    <script src="directive/renderForm2/renderFormDir2.js"></script>
+    <script src="js/questionnaireSvc.js"></script>
 
 <!--
     <script src="js/models/ObservationModels.js"></script>
@@ -153,7 +161,9 @@
     </nav>
 
 
-    <uib-tabset ng-show="selectedComp">
+        <renderform2 q="fullQ" hash-ed="hashEd" technicalview="input.technical"></renderform2>
+
+    <uib-tabset ng-show="false && selectedComp">
         <uib-tab>
             <uib-tab-heading>
                 <span ng-show="selectedComp.kind == 'dg'">Data Group</span>

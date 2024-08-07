@@ -1,0 +1,50 @@
+
+
+
+<div ng-show="entry.type == 'group'">
+  <div class="group">{{item.title }}</div>
+</div>
+
+<div ng-show="entry.type == 'leaf'">
+  <div class="leaf">
+    <div>{{entry.title }}</div>
+
+    <div style="padding-left: 15px; padding-right: 15px" ng-switch="entry.item.type">
+
+      <div ng-switch-when = "choice" >
+
+        <select class="form-control"  ng-model="dataEntered[entry.linkId]"
+                ng-options="concept.display for concept in getOptions(entry.ed)">
+        </select>
+
+      </div>
+
+      <div ng-switch-when = "quantity">
+
+
+        <input class="form-control"
+               ng-focus="onFocus(item)"
+               placeholder="{{cell.meta.placeholder}}"
+               ng-model="dataEntered[item.linkId]"/>
+      </div>
+
+      <div ng-switch-default>
+
+        <input class="form-control"
+
+               ng-focus="onFocus(entry)"
+               placeholder="{{cell.meta.placeholder}}"
+               ng-model="dataEntered[entry.linkId]"/>
+
+
+
+      </div>
+
+
+    </div>
+
+  </div>
+
+</div>
+
+<br/>

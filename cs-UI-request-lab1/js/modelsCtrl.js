@@ -2,12 +2,12 @@
 //https://www.joelonsoftware.com/2000/04/06/things-you-should-never-do-part-i/
 angular.module("pocApp")
     .controller('modelsCtrl',
-        function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,makeQSvc,orderingSvc,makeCompQSvc,
+        function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,makeQSvc,orderingSvc,
                   snapshotSvc,vsSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
 
-            let autoQ = true   //whether to automatically generate a Q
+            let autoQ = false   //whether to automatically generate a Q
             //let removeZeroedOut = false  //when creating the full element list, remove mult = 0..0
 
             $scope.newInflater = true  //running the new inflater
@@ -1603,7 +1603,7 @@ angular.module("pocApp")
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)      //overites the previou slist
 
                 $scope.allCompElements = vo.allElements     //list of all elements. used by the Table and Q generation (at least)
-
+/*
 
                 if (autoQ) {
                     //generate the Q and also retrieve all the ValueSets
@@ -1612,11 +1612,9 @@ angular.module("pocApp")
                         $scope.fullQ = Q
                     })
                 }
-
+*/
 
                 //$scope.hashCompElements = vo.hashAllElements
-
-
 
                 let download = modelCompSvc.makeTSVDownload(vo.allElements)
 

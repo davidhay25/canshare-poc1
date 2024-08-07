@@ -1,10 +1,18 @@
 angular.module("pocApp")
     .controller('modelReviewCtrl',
-        function ($scope,$http,modelsSvc,modelCompSvc,$timeout, $uibModal,makeQSvc,utilsSvc,$window,makeCompQSvc, snapshotSvc) {
+        function ($scope,$http,modelsSvc,modelCompSvc,$timeout, $uibModal,makeQSvc,utilsSvc,$window,makeCompQSvc, snapshotSvc,vsSvc) {
 
             $scope.input = {}
 
 
+            // ----------- consume events emitted by the v2 Q renderer ----
+            $scope.$on('viewVS',function (event,vs) {
+                $scope.viewVS(vs)
+
+            })
+
+            //display the technical items
+            $scope.input.technical = true
 
             //in the table view, hide common DG like HCP as the details are not relevant to reviewers
             $scope.input.hideSomeDG = true
@@ -16,8 +24,6 @@ angular.module("pocApp")
             let modelName = null
             if (search) {
                 modelName = search.substr(1)
-                //alert(modelName)
-
             }
 
 
@@ -142,7 +148,7 @@ angular.module("pocApp")
             //if showAllCommentSummary is true (ie the summary tab is being shown) display the full list of comments in the right pane
             $scope.showAllCommentSummary = true
             $scope.tabSelect = function (tabname) {
-                console.log(tabname)
+                //console.log(tabname)
                 if (tabname == 'summary') {
                     $scope.showAllCommentSummary = true
                 } else {
@@ -536,27 +542,32 @@ angular.module("pocApp")
                 //todo just for dev atm - not sure if
                 $scope.selectedComp = dg
                 $scope.setCommentsThisModel()   //retrieve comments for this model
-
-
-
                 $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)
+
+                //retrieve all the ValueSets in this DG. They are cached in the service
+                $scope.showWaiting = true
+                vsSvc.getAllVS($scope.fullElementList, function () {
+                    //alert("all VS available")
+                    $scope.showWaiting = false
+                })
 
                 //let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
                 //$scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
 
 
+               // let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
+               // $scope.fullQ = voQ.Q
 
-                let voQ = makeQSvc.makeQFromDG(vo.allElements,$scope.hashAllDG)
+                let voQ = makeQSvc.makeHierarchicalQFromDG($scope.fullElementList,$scope.hashAllDG)
                 $scope.fullQ = voQ.Q
-
-
+                $scope.hashEd = voQ.hashEd
 
                 //The DG element tree
                 let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
                 //makeDGTree(treeData)
 
 
-                let rootNodeId = vo.allElements[0].path
+                let rootNodeId = $scope.fullElementList[0].path
                 //let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
 
 
@@ -584,38 +595,79 @@ angular.module("pocApp")
             }
 
             $scope.selectComposition = function (comp) {
-                delete $scope.selectedComp
-                //delete
+
+                if (! comp) {
+                    return
+                }
+
+                //retrieve all the ValueSets in this DG. They are cached in the service
+                //$scope.showWaiting = true
+
+                /*
+                vsSvc.getAllVS($scope.fullElementList, function () {
+                    //alert("all VS available")
+                    $scope.showWaiting = false
+                })
+*/
+
+                $scope.selectedComp = comp
+                let vo = makeQSvc.makeHierarchicalQFromComp(comp,$scope.hashAllDG)
+
+                $scope.fullQ = vo.Q         //will invoke the Q renderer directive
+                $scope.hashEd = vo.hashEd
+
+                $scope.showWaiting = true
+                vsSvc.updateVSFromUrlHash(vo.hashVS,function(){
+                        $scope.showWaiting = false
+                })
+
+
+
+
+                return
+
+                //test stuff
+
+
+                console.log(comp)
+                $scope.setCommentsThisModel()   //todo - pass in model
+
+                let vo1 = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
+                $scope.allCompElements = vo1.allElements
+                $scope.hashCompElements = vo1.hashAllElements
+
+                delete  $scope.fullQ
+                delete  $scope.Qlog
+
+                let rootNodeId = $scope.allCompElements[0].path
+                let treeData = modelsSvc.makeCompTree($scope.allCompElements)
+
+                $scope.treeData = treeData      //used in the Q builder
+
+                //console.log(treeData)
+                makeCompTree(treeData,rootNodeId)
+
+                //test stuff
+                //let rootNodeId = $scope.allCompElements[0].path
+                //let treeData1 = modelsSvc.makeTreeFromElementList($scope.allCompElements)
+                //makeDGTree(treeData1,rootNodeId)
+
+                //generate the Q for the composition
+                makeCompQSvc.makeQ($scope.allCompElements,$scope.hashAllDG,function (Q) {
+                    $scope.fullQ = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
+                })
+
+
+                //stuff for the table...
 
                 //used to exclude paths like HCP from the table
                 $scope.pathsToIgnore = {}
-
-                $scope.selectedComp = comp
-                console.log(comp)
 
                 $scope.input.tableSections = [{name:'all',title:'All sections'}]
                 comp.sections.forEach(function (section) {
                     $scope.input.tableSections.push({name:section.name,title:section.title})
                 })
                 $scope.input.tableSection = $scope.input.tableSections[0]
-
-                delete  $scope.fullQ
-                delete  $scope.Qlog
-
-                if (! comp) {
-                    return
-                }
-
-
-
-
-                let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
-
-
-
-                $scope.allCompElements = vo.allElements
-                $scope.hashCompElements = vo.hashAllElements
-
 
                 //get the set of all paths to ignore. These are those where the DG type is in  DGsToHideInCompTable
                 //when rendering the table, any paths starting with any of this set will be ignored
@@ -627,30 +679,6 @@ angular.module("pocApp")
                     }
                 })
                 console.log($scope.pathsToIgnore)
-
-
-                //try a custom tree view for the reviewer
-
-
-
-
-                let rootNodeId = $scope.allCompElements[0].path
-                //let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
-
-
-                let treeData = modelsSvc.makeCompTree($scope.allCompElements)
-
-                $scope.treeData = treeData      //used in the Q builder
-
-                //console.log(treeData)
-                makeCompTree(treeData,rootNodeId)
-
-                $scope.setCommentsThisModel()
-
-                //generate the Q for the composition
-                makeCompQSvc.makeQ($scope.allCompElements,$scope.hashAllDG,function (Q) {
-                    $scope.fullQ = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
-                })
 
             }
 

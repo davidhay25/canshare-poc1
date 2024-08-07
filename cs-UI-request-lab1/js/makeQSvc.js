@@ -6,6 +6,8 @@ angular.module("pocApp")
 
 
 
+
+
         //given an ed, return the control type and hine
         function getControlDetails(ed) {
             //return the control type & hint based on the ed
@@ -31,6 +33,14 @@ angular.module("pocApp")
                         controlHint = "boolean"
                         controlType = "boolean"
                         break
+                    case 'Quantity' :
+                        controlHint = "quantity"
+                        controlType = "quantity"
+                        if (ed.units) {
+
+                            console.log(ed.units)
+                        }
+                        break
                     case 'dateTime' :
                         controlHint = "dateTime"
                         controlType = "dateTime"
@@ -53,7 +63,6 @@ angular.module("pocApp")
                         controlType = "display"
 
 
-
                 }
 
                 //determine if this is a referece to another DG
@@ -64,15 +73,8 @@ angular.module("pocApp")
                         controlType = "display"
                     }
 
-
             }
 
-
-            /*
-            if (ed.controlHint && ) {
-                controlHint = ed.controlHint
-            }
-*/
 
             return {controlType:controlType,controlHint:controlHint}
 
@@ -304,71 +306,99 @@ angular.module("pocApp")
                          //resolve(item)
                          break
                  }
-               //  resolve(item)
-           //  })
+
 
         }
 
 
         return {
 
-            makeQFromDGDEP : function (lstElements,hashAllDG) {
+
+            makeHierarchicalQFromComp : function (comp,hashAllDG) {
+                //construct a Q from the composition
+                //strategy is to gather the DG from the comp sections, create DG Qs then assemble them into the comp Q
+                //assumption is that the composition itself doesn't change the DG contents - it is just a selector of DGs
+                let that = this
+                let Q = {resourceType:'Questionnaire',item:[]}
+                Q.title = comp.title
+
+                let hashEd = {}         //has of ED by path (=linkId)
+                let hashVS = {}         //all valueSets
+
+//   $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)
+
+                for (const section of comp.sections) {
+                    let sectionItem = {linkId:section.name,text:section.title,type:'group',item:[]}
+                    Q.item.push(sectionItem)
+                    for (const contentDG of section.items) {     //a section can have multiple DGs within it.
+                        let dgType = contentDG.type[0]        //the dg type. Generally a 'section' dg
+                        let dgElementList = snapshotSvc.getFullListOfElements(dgType)
+                        let vo = that.makeHierarchicalQFromDG(dgElementList)
 
 
-                let dgName = lstElements[0].ed.path
+                        let dgQ = vo.Q
+                        let hashByPath = vo.hashEd          //EDs from the child
 
-                //get the full DG so we can get the ultimate parent
-                let fullDG = snapshotSvc.getDG(dgName)
-                console.log(fullDG)
+                        //the list of all EDs
+                        Object.keys(vo.hashEd).forEach(function (linkId) {
+                            hashEd[linkId] = vo.hashEd[linkId]
+                        })
 
-                let qUrl = `http://canshare.co.nz/fhir/questionnaire-name/${dgName}`
-                let Q = {resourceType:"Questionnaire",status:'draft',url:qUrl,item:[]}
-                let section = []
+                        //all ValueSets
+                        Object.keys(vo.hashVS).forEach(function (url) {
+                            hashVS[url] =  hashVS[url] || []
+                            hashVS[url].concat(vo.hashVS[url])
 
-                if (fullDG.ultimateParent == 'Section') {
-                    //if it's a section, then each ed within the section is a full DG, so process each
-                    //one individually and aggregate all of them is a list. This means the 'boxing' around
-                    //the DGs is preserved
+                        })
+
+                        //the section is populated by DGs - but there area a couple of ways that has been done.
+                        //sectionPatientDetails is a DG thhat has the Patient DG as a child
+                        //bresteReporthistolymphnodes has the elements directly
+                        //to be discussed next week
 
 
-                    let hash = {}
-                    lstElements.forEach(function (item) {
-                        if (item.ed.path) {
-                            let ar = item.ed.path.split('.')
-                            let name = ar[0]
-                            hash[name] = true
+
+                        //add the child elements to the Q
+                        for (const child of dgQ.item[0].item){
+                            sectionItem.item.push(child)
                         }
 
-                    })
 
-                    console.log(hash)
+/*
 
-                    let vo = this.internalMakeQFromDG(lstElements,hashAllDG) //{Q:Q,section:section}
-                    Q.item.push(vo.section)
-                    section.push(vo.section)
+                        console.log(dgQ.item[0] )
+                        let firstItem = dgQ.item[0]
+
+                        if (firstItem.definition) {
+                            for (const child of dgQ.item[0].item){
+                                sectionItem.item.push(child)
+                            }
+                        } else {
+                            //this is a DG added to a section DG. Just add the contents - not the section root
+                            for (const child of dgQ.item[0].item[0].item){
+                                sectionItem.item.push(child)
+                            }
+                        }
+
+
+*/
 
 
 
-                } else {
-                    let vo = this.internalMakeQFromDG(lstElements,hashAllDG) //{Q:Q,section:section}
-                    Q.item.push(vo.section)
-                    section.push(vo.section)
+
+                    }
                 }
 
+                return {Q:Q,hashEd:hashEd,hashVS:hashVS}
 
-                return {Q:Q,section:section}
+
             },
 
-            //this is used by the DG form creation
-            makeQFromDG : function (lstElements,hashAllDG) {
-                //generate a Q based on the list of elements that represents a DG
 
-                if (! lstElements || lstElements.length == 0) {
-                    return {}
-                }
+            makeHierarchicalQFromDG : function (lstElements,hashAllDG) {
+                //Used in the new Q renderer
 
-                let dgName = lstElements[0].ed.path
-
+                //create list of paths to hide
                 //construct a list of paths to hide
                 let basePathsToHide = []    //a list of all paths where hideInQ is set. Any elements starting with this path are also set
                 lstElements.forEach(function (thing) {
@@ -377,12 +407,13 @@ angular.module("pocApp")
                         basePathsToHide.push(thing.ed.path)  //the full path
                     }
                 })
+                console.log(basePathsToHide)
 
                 //now create the list of ED to include in the Q
                 //we do this first so that we can exclude all child elements of hidden elements as well
                 let lstQElements = []
                 lstElements.forEach(function (thing,ctr) {
-                    if (ctr > 0) {
+
                         let ed = thing.ed
                         let okToAdd = true
                         if (ed.mult == '0..0') {okToAdd = false}
@@ -395,215 +426,39 @@ angular.module("pocApp")
                             }
                         }
                         if (okToAdd) {
-                            lstQElements.push(ed)
+                            lstQElements.push(thing)
                         }
-                    }
-                })
-
-                //now can build the Q
-                let qUrl = `http://canshare.co.nz/fhir/questionnaire-name/${dgName}`
-                let Q = {resourceType:"Questionnaire",status:'draft',url:qUrl,item:[]}
-
-                //there's a single section (item) for the DG (This is a Q section - not the same as the composition section)
-                let section = {text:lstElements[0].ed.title,linkId:`${dgName}-section`,item:[]}
-                section.definition = lstElements[0].ed.path
-                section.type = "group"
-
-                Q.item.push(section)
-
-
-                let group //= topGroup
-
-                //strategy is to represent the DG as a flattened structure off the section item with up to 2 levels
-                //if an element (ed) is a FHIR DT (excl group) then it is appended to the section item
-                //if the element is a group or DT then a Q group item is created and added to the section.
-                //  components of the group / DT are then added to that group item
-
-
-                let processingDGPath = null     //When processing a DT / group, what the path of that group is
-
-                lstQElements.forEach(function (ed) {
-
-                    let path = ed.path
-                    let type = ed.type[0]
-
-                    //if the ed is a DT or a Group then create a Q group item to hold the contents.
-                    //set the processingDGPath to the path of the ED so we know when we get past it
-
-                    //console.log(processingDGPath,path,path.isChildPath(processingDGPath))
-
-                    if (processingDGPath) {
-                        //if we're already processing a group / DG , is the path of this ed the same? (ie are we still processing a member of that DT / group
-                        if (stillOnProcessingPath(ed,path,processingDGPath)) {
-                        //if ( path.isChildPath(processingDGPath)) {
-                            //yes, we're still on the same path, so just create and add an item to the group
-                            let item = {text:ed.title,linkId:ed.path,type:'string'}
-                            decorateItem(ed,item)
-                            group.item.push(item)
-                        } else {
-                            //no, we've move on to something different. What sort is it
-                            checkEd(ed)    //will set processingDGPath if a group / DG. clear otherwise
-                        }
-
-                    } else {
-                        //we're not currently processing a group / ED
-                        checkEd(ed)
-                    }
-
-                    if (false) {
-
-
-                    if (hashAllDG[type]) {
-                        //console.log('new group',ed)
-                        //this is not a group datatype - slightly confusing...
-                        group = makeGroup(ed)
-                        addEnableWhen(ed,group)  //If there are any conditionals
-
-                        processingDGPath = path
-                    } else {
-                        //need to see if we've finished procesing a path
-                        if (processingDGPath) {
-                            //yes, we have started processing a DG group. Are we still on that path?
-
-                            if ( !path.isChildPath(processingDGPath)) {
-                                //group = topGroup  - this puts everyting at the top
-                                //We've moved on past the DG.
-
-                                //may13
-
-
-                                //todo - may not want to use the DG being processed for the group ?What should the text be
-                                //let groupEd = {title:"Group",path:`${ed.title}-group`}
-                                let groupEd = {title:ed.title,path:`${ed.title}-group`}
-                                group = makeGroup(groupEd)       //create a new group for the elements following the referenced DG
-
-                                //todo - this doesn't appear to do anything...
-
-                                processingDGPath = null
-                            }
-
-                        }
-
-                        let item = {text:ed.title,linkId:ed.path,type:'string'}
-
-                        decorateItem(ed,item)
-
-                        if (type == 'Group') {
-                            item.type = "display"
-                        }
-
-
-                        group.item.push(item)
-
-
-
-
-
-                        /* - don't think we're supporting that now...
-                        //have to check here to ensure 'other' item is after main one
-                        if (ed.otherType) {
-                            //if there's an 'otherType set then the function will return the items to insert (as conditionals need to be set)
-                            let lstItem = addOtherItem(ed,item)    //if the element has the 'otherType' set then add the extra item + ew
-                            //the function returns the items to add, in order
-                            lstItem.forEach(function (newItem) {
-                                group.item.push(newItem)
-                            })
-                        } else {
-                            //if there's no otherType then just add the new item
-
-                        }
-                        */
-                    }
-                    }
 
                 })
 
-                //the section is just the first item in the Q - maybe remove
-                return {Q:Q,section:section}
-
-                //Is the path still part of the processing path?
-                function stillOnProcessingPath(ed,path,processingDGPath) {
-                    //first use the 'isChildPath' function.
-                    if (! path.isChildPath(processingDGPath)) {
-                        //not on the path, return false
-                        return false
-                    }
-                    //the path is still on the path - is it a DG??
-                    let type = ed.type[0]
-                    if (hashAllDG[type]) {
-                        return false
-                    } else {
-                        return true
-                    }
-
-
-
-                }
-
-                function checkEd(ed) {
-                    let path = ed.path
-                    let type = ed.type[0]
-
-                    if (hashAllDG[type] || type=="Group") {
-                        //it's a DG or group.
-                        processingDGPath = path
-                        group = makeGroup(ed) //will add to section
-                        addEnableWhen(ed,group)  //If there are any conditionals
-                        //section.item.push(group)
-                    } else {
-                        //just a FHIR DT - add to the section
-                        delete processingDGPath
-                        let item = {text:ed.title,linkId:ed.path,type:'string'}
-                        decorateItem(ed,item)
-                        section.item.push(item)
-                    }
-                }
-
-
-
-                //set the other attributes of the item from the ed
-                function decorateItem(ed,item) {
-                    if (ed.autoPop) {item.text += ' (Auto populated)'}
-                    item.definition = ed.path
-                    addEnableWhen(ed,item)  //If there are any contitionals
-                    setControlType(ed,item)  //set the control type to use - also expands any ValueSet
-                    QutilitiesSvc.setFixedValue(ed,item)
-                }
-
-                function makeGroup(ed) {
-                    let text = ed.title || ed.path
-                    let group = {text:text,linkId: ed.path,type:'group',item:[]}
-                    group.definition = ed.path
-
-                    //group.linkId = ed.path
-                    section.item.push(group)
-
-                    //add a display element may2024
-                    //let display = {text:text,linkId: `${ed.path}-display`,type:'display'}
-                    //group.item.push(display)
-
-                    return group
-                }
-
-            },
-
-
-            makeHierarchicalQFromDG : function (lstElements,hashAllDG) {
-                //just for testing to see if we really need to flatten the Q
 
                 let Q = {resourceType:'Questionnaire'}
+                Q.title = lstElements[0].display
                 let currentItem
                 let hashItems = {}      //items by linkId
+                let hashEd = {}         //has of ED by path (=linkId)
+                let hashVS = {}         //hash of all ValueSets defined
 
-                for (const item of lstElements) {
+                for (const item of lstQElements) {
                     let ed = item.ed
                     let path = ed.path
-                    let ar = path.split('.')
-                    let segmentCount = ar.length
+                    hashEd[path] = ed
+                    //let ar = path.split('.')
+                    //let segmentCount = ar.length
+
+                    if (ed.valueSet) {
+                        hashVS[ed.valueSet] = hashVS[ed.valueSet] ||  []
+                        hashVS[ed.valueSet].push(ed.path)
+                    }
 
                     if (currentItem) {
                         let parentItemPath = $filter('dropLastInPath')(path)
+                        //console.log(parentItemPath)
                         currentItem = {linkId:path,type:'string',text:ed.title,item:[]}
+                        decorateItem(currentItem,ed)
+
+
+
                         if (ed.mult.indexOf('..*')> -1) {
                             currentItem.repeats = true
                         }
@@ -614,13 +469,28 @@ angular.module("pocApp")
 
                     } else {
                         currentItem = {linkId:path,type:'string',text:ed.title,item:[]}
+                        decorateItem(currentItem,ed)
+
                         hashItems[path] = currentItem
                         Q.item = [currentItem]
 
                     }
 
                 }
-                return {Q:Q}
+                return {Q:Q,hashEd:hashEd,hashVS:hashVS}
+
+                function decorateItem(item,ed) {
+                    let vo = getControlDetails(ed)
+                    item.type = vo.controlType
+
+
+                    if (ed.type) {      //if the ed is the root of a dg then it won't have a type
+                        item.definition = ed.type[0]
+                    }
+
+
+                   // {controlType:controlType,controlHint:controlHint}
+                }
 
 
             },
@@ -726,9 +596,6 @@ angular.module("pocApp")
 
             },
 
-
-
-
             getControlDetails : function(ed) {
                 //return the control type & hint based on the ed
                 //used by modelsSvc
@@ -768,6 +635,282 @@ angular.module("pocApp")
 
                 return {controlType:controlType,controlHint:controlHint}
 
+            },
+
+            makeQFromDGDEP : function (lstElements,hashAllDG) {
+
+
+                let dgName = lstElements[0].ed.path
+
+                //get the full DG so we can get the ultimate parent
+                let fullDG = snapshotSvc.getDG(dgName)
+                console.log(fullDG)
+
+                let qUrl = `http://canshare.co.nz/fhir/questionnaire-name/${dgName}`
+                let Q = {resourceType:"Questionnaire",status:'draft',url:qUrl,item:[]}
+                let section = []
+
+                if (fullDG.ultimateParent == 'Section') {
+                    //if it's a section, then each ed within the section is a full DG, so process each
+                    //one individually and aggregate all of them is a list. This means the 'boxing' around
+                    //the DGs is preserved
+
+
+                    let hash = {}
+                    lstElements.forEach(function (item) {
+                        if (item.ed.path) {
+                            let ar = item.ed.path.split('.')
+                            let name = ar[0]
+                            hash[name] = true
+                        }
+
+                    })
+
+                    console.log(hash)
+
+                    let vo = this.internalMakeQFromDG(lstElements,hashAllDG) //{Q:Q,section:section}
+                    Q.item.push(vo.section)
+                    section.push(vo.section)
+
+
+
+                } else {
+                    let vo = this.internalMakeQFromDG(lstElements,hashAllDG) //{Q:Q,section:section}
+                    Q.item.push(vo.section)
+                    section.push(vo.section)
+                }
+
+
+                return {Q:Q,section:section}
+            },
+
+            //this is used by the DG form creation
+            makeQFromDGDEP : function (lstElements,hashAllDG) {
+                //generate a Q based on the list of elements that represents a DG
+
+                if (! lstElements || lstElements.length == 0) {
+                    return {}
+                }
+
+                let dgName = lstElements[0].ed.path
+
+                //construct a list of paths to hide
+                let basePathsToHide = []    //a list of all paths where hideInQ is set. Any elements starting with this path are also set
+                lstElements.forEach(function (thing) {
+                    //Actually, there shouldn't be anything with the mult 0..0 any more - but hideInQ is certainly there
+                    if (thing.ed.hideInQ || (thing.ed.mult == '0..0')) {
+                        basePathsToHide.push(thing.ed.path)  //the full path
+                    }
+                })
+
+                //now create the list of ED to include in the Q
+                //we do this first so that we can exclude all child elements of hidden elements as well
+                let lstQElements = []
+                lstElements.forEach(function (thing,ctr) {
+                    if (ctr > 0) {
+                        let ed = thing.ed
+                        let okToAdd = true
+                        if (ed.mult == '0..0') {okToAdd = false}
+                        if (okToAdd) {
+                            for (const pth of basePathsToHide) {
+                                if (ed.path == pth || ed.path.isChildPath(pth)) {
+                                    okToAdd = false
+                                    break
+                                }
+                            }
+                        }
+                        if (okToAdd) {
+                            lstQElements.push(ed)
+                        }
+                    }
+                })
+
+                //now can build the Q
+                let qUrl = `http://canshare.co.nz/fhir/questionnaire-name/${dgName}`
+                let Q = {resourceType:"Questionnaire",status:'draft',url:qUrl,item:[]}
+
+                //there's a single section (item) for the DG (This is a Q section - not the same as the composition section)
+                let section = {text:lstElements[0].ed.title,linkId:`${dgName}-section`,item:[]}
+                section.definition = lstElements[0].ed.path
+                section.type = "group"
+
+                Q.item.push(section)
+
+
+                let group //= topGroup
+
+                //strategy is to represent the DG as a flattened structure off the section item with up to 2 levels
+                //if an element (ed) is a FHIR DT (excl group) then it is appended to the section item
+                //if the element is a group or DT then a Q group item is created and added to the section.
+                //  components of the group / DT are then added to that group item
+
+
+                let processingDGPath = null     //When processing a DT / group, what the path of that group is
+
+                lstQElements.forEach(function (ed) {
+
+                    let path = ed.path
+                    let type = ed.type[0]
+
+                    //if the ed is a DT or a Group then create a Q group item to hold the contents.
+                    //set the processingDGPath to the path of the ED so we know when we get past it
+
+                    //console.log(processingDGPath,path,path.isChildPath(processingDGPath))
+
+                    if (processingDGPath) {
+                        //if we're already processing a group / DG , is the path of this ed the same? (ie are we still processing a member of that DT / group
+                        if (stillOnProcessingPath(ed,path,processingDGPath)) {
+                            //if ( path.isChildPath(processingDGPath)) {
+                            //yes, we're still on the same path, so just create and add an item to the group
+                            let item = {text:ed.title,linkId:ed.path,type:'string'}
+                            decorateItem(ed,item)
+                            group.item.push(item)
+                        } else {
+                            //no, we've move on to something different. What sort is it
+                            checkEd(ed)    //will set processingDGPath if a group / DG. clear otherwise
+                        }
+
+                    } else {
+                        //we're not currently processing a group / ED
+                        checkEd(ed)
+                    }
+
+                    if (false) {
+
+
+                        if (hashAllDG[type]) {
+                            //console.log('new group',ed)
+                            //this is not a group datatype - slightly confusing...
+                            group = makeGroup(ed)
+                            addEnableWhen(ed,group)  //If there are any conditionals
+
+                            processingDGPath = path
+                        } else {
+                            //need to see if we've finished procesing a path
+                            if (processingDGPath) {
+                                //yes, we have started processing a DG group. Are we still on that path?
+
+                                if ( !path.isChildPath(processingDGPath)) {
+                                    //group = topGroup  - this puts everyting at the top
+                                    //We've moved on past the DG.
+
+                                    //may13
+
+
+                                    //todo - may not want to use the DG being processed for the group ?What should the text be
+                                    //let groupEd = {title:"Group",path:`${ed.title}-group`}
+                                    let groupEd = {title:ed.title,path:`${ed.title}-group`}
+                                    group = makeGroup(groupEd)       //create a new group for the elements following the referenced DG
+
+                                    //todo - this doesn't appear to do anything...
+
+                                    processingDGPath = null
+                                }
+
+                            }
+
+                            let item = {text:ed.title,linkId:ed.path,type:'string'}
+
+                            decorateItem(ed,item)
+
+                            if (type == 'Group') {
+                                item.type = "display"
+                            }
+
+
+                            group.item.push(item)
+
+
+
+
+
+                            /* - don't think we're supporting that now...
+                            //have to check here to ensure 'other' item is after main one
+                            if (ed.otherType) {
+                                //if there's an 'otherType set then the function will return the items to insert (as conditionals need to be set)
+                                let lstItem = addOtherItem(ed,item)    //if the element has the 'otherType' set then add the extra item + ew
+                                //the function returns the items to add, in order
+                                lstItem.forEach(function (newItem) {
+                                    group.item.push(newItem)
+                                })
+                            } else {
+                                //if there's no otherType then just add the new item
+
+                            }
+                            */
+                        }
+                    }
+
+                })
+
+                //the section is just the first item in the Q - maybe remove
+                return {Q:Q,section:section}
+
+                //Is the path still part of the processing path?
+                function stillOnProcessingPath(ed,path,processingDGPath) {
+                    //first use the 'isChildPath' function.
+                    if (! path.isChildPath(processingDGPath)) {
+                        //not on the path, return false
+                        return false
+                    }
+                    //the path is still on the path - is it a DG??
+                    let type = ed.type[0]
+                    if (hashAllDG[type]) {
+                        return false
+                    } else {
+                        return true
+                    }
+
+
+
+                }
+
+                function checkEd(ed) {
+                    let path = ed.path
+                    let type = ed.type[0]
+
+                    if (hashAllDG[type] || type=="Group") {
+                        //it's a DG or group.
+                        processingDGPath = path
+                        group = makeGroup(ed) //will add to section
+                        addEnableWhen(ed,group)  //If there are any conditionals
+                        //section.item.push(group)
+                    } else {
+                        //just a FHIR DT - add to the section
+                        delete processingDGPath
+                        let item = {text:ed.title,linkId:ed.path,type:'string'}
+                        decorateItem(ed,item)
+                        section.item.push(item)
+                    }
+                }
+
+
+
+                //set the other attributes of the item from the ed
+                function decorateItem(ed,item) {
+                    if (ed.autoPop) {item.text += ' (Auto populated)'}
+                    item.definition = ed.path
+                    addEnableWhen(ed,item)  //If there are any contitionals
+                    setControlType(ed,item)  //set the control type to use - also expands any ValueSet
+                    QutilitiesSvc.setFixedValue(ed,item)
+                }
+
+                function makeGroup(ed) {
+                    let text = ed.title || ed.path
+                    let group = {text:text,linkId: ed.path,type:'group',item:[]}
+                    group.definition = ed.path
+
+                    //group.linkId = ed.path
+                    section.item.push(group)
+
+                    //add a display element may2024
+                    //let display = {text:text,linkId: `${ed.path}-display`,type:'display'}
+                    //group.item.push(display)
+
+                    return group
+                }
+
             }
+
         }
     })
