@@ -549,30 +549,28 @@ angular.module("pocApp")
                 vsSvc.getAllVS($scope.fullElementList, function () {
                     //alert("all VS available")
                     $scope.showWaiting = false
+
+                    //the second option expands the valuesets as options into the Q - todo make this an option
+                    let voQ = makeQSvc.makeHierarchicalQFromDG($scope.fullElementList,true) //,$scope.hashAllDG)
+                    $scope.fullQ = voQ.Q
+                    $scope.hashEd = voQ.hashEd
+                    console.log(voQ.errorLog)
+
+                    //The DG element tree
+                    let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
+                    //makeDGTree(treeData)
+
+
+                    let rootNodeId = $scope.fullElementList[0].path
+                    //let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
+
+
+                    console.log(treeData)
+                    makeDGTree(treeData,rootNodeId)
+
                 })
 
-                //let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
-                //$scope.fullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
 
-
-               // let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
-               // $scope.fullQ = voQ.Q
-
-                let voQ = makeQSvc.makeHierarchicalQFromDG($scope.fullElementList,$scope.hashAllDG)
-                $scope.fullQ = voQ.Q
-                $scope.hashEd = voQ.hashEd
-
-                //The DG element tree
-                let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
-                //makeDGTree(treeData)
-
-
-                let rootNodeId = $scope.fullElementList[0].path
-                //let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
-
-
-                console.log(treeData)
-                makeDGTree(treeData,rootNodeId)
 
 
 
@@ -611,10 +609,11 @@ angular.module("pocApp")
 */
 
                 $scope.selectedComp = comp
-                let vo = makeQSvc.makeHierarchicalQFromComp(comp,$scope.hashAllDG)
+                let vo = makeQSvc.makeHierarchicalQFromComp(comp)//,$scope.hashAllDG)
 
                 $scope.fullQ = vo.Q         //will invoke the Q renderer directive
                 $scope.hashEd = vo.hashEd
+                console.log(vo.errorLog)
 
                 $scope.showWaiting = true
                 vsSvc.updateVSFromUrlHash(vo.hashVS,function(){

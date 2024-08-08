@@ -14,7 +14,7 @@
       <div ng-switch-when = "choice" >
 
         <select class="form-control"  ng-model="dataEntered[entry.linkId]"
-                ng-options="concept.display for concept in getOptions(entry.ed)">
+                ng-options="concept.display for concept in getOptions(entry.item)">
         </select>
 
       </div>

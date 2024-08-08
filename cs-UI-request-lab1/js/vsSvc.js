@@ -131,10 +131,14 @@ angular.module("pocApp")
 
             },
             getOneVS : function (url) {
-                //get the contents for a single vs
-                let url1 = this.fixUrl(url)
+                if (url) {
+                    //get the contents for a single vs
+                    let url1 = this.fixUrl(url)
+                    return cache[url1]
+                } else {
+                    throw new Error("Calling getOneVS with an empty url")
+                }
 
-                return cache[url1]
             }
         }
 

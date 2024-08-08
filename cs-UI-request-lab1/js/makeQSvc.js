@@ -2,7 +2,7 @@
 
 angular.module("pocApp")
 
-    .service('makeQSvc', function($http,codedOptionsSvc,QutilitiesSvc,snapshotSvc,$filter) {
+    .service('makeQSvc', function($http,codedOptionsSvc,QutilitiesSvc,snapshotSvc,$filter,vsSvc) {
 
 
 
@@ -37,7 +37,7 @@ angular.module("pocApp")
                         controlHint = "quantity"
                         controlType = "quantity"
                         if (ed.units) {
-
+                            //p
                             console.log(ed.units)
                         }
                         break
@@ -314,13 +314,20 @@ angular.module("pocApp")
         return {
 
 
-            makeHierarchicalQFromComp : function (comp,hashAllDG) {
+            makeHierarchicalQFromComp : function (comp,expandVS) {
                 //construct a Q from the composition
                 //strategy is to gather the DG from the comp sections, create DG Qs then assemble them into the comp Q
                 //assumption is that the composition itself doesn't change the DG contents - it is just a selector of DGs
+                //if expandVS is true, then the contents of the VS will be expanded as options into the item. May need to limit the length...
+
                 let that = this
+                let errorLog = []
+
                 let Q = {resourceType:'Questionnaire',item:[]}
                 Q.title = comp.title
+                Q.status = 'active'
+                Q.url = `http://canshare.co.nz/questionnaire/${comp.name}`
+
 
                 let hashEd = {}         //has of ED by path (=linkId)
                 let hashVS = {}         //all valueSets
@@ -328,75 +335,87 @@ angular.module("pocApp")
 //   $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)
 
                 for (const section of comp.sections) {
-                    let sectionItem = {linkId:section.name,text:section.title,type:'group',item:[]}
-                    Q.item.push(sectionItem)
-                    for (const contentDG of section.items) {     //a section can have multiple DGs within it.
-                        let dgType = contentDG.type[0]        //the dg type. Generally a 'section' dg
-                        let dgElementList = snapshotSvc.getFullListOfElements(dgType)
-                        let vo = that.makeHierarchicalQFromDG(dgElementList)
+                    if (section.items && section.items.length > 0) {
+                        let sectionItem = {linkId:section.name,text:section.title,type:'group',item:[]}
+                        Q.item.push(sectionItem)
+                        for (const contentDG of section.items) {     //a section can have multiple DGs within it.
+                            let dgType = contentDG.type[0]        //the dg type. Generally a 'section' dg
+                            let dgElementList = snapshotSvc.getFullListOfElements(dgType)
+                            let vo = that.makeHierarchicalQFromDG(dgElementList)
 
 
-                        let dgQ = vo.Q
-                        let hashByPath = vo.hashEd          //EDs from the child
+                            let dgQ = vo.Q
+                            let hashByPath = vo.hashEd          //EDs from the child
 
-                        //the list of all EDs
-                        Object.keys(vo.hashEd).forEach(function (linkId) {
-                            hashEd[linkId] = vo.hashEd[linkId]
-                        })
-
-                        //all ValueSets
-                        Object.keys(vo.hashVS).forEach(function (url) {
-                            hashVS[url] =  hashVS[url] || []
-                            hashVS[url].concat(vo.hashVS[url])
-
-                        })
-
-                        //the section is populated by DGs - but there area a couple of ways that has been done.
-                        //sectionPatientDetails is a DG thhat has the Patient DG as a child
-                        //bresteReporthistolymphnodes has the elements directly
-                        //to be discussed next week
+                            //the list of all EDs
+                            Object.keys(vo.hashEd).forEach(function (linkId) {
+                                hashEd[linkId] = vo.hashEd[linkId]
+                            })
 
 
+                            //all ValueSets
+                            Object.keys(vo.hashVS).forEach(function (url) {
+                                hashVS[url] =  hashVS[url] || []
+                                hashVS[url].concat(vo.hashVS[url])
 
-                        //add the child elements to the Q
-                        for (const child of dgQ.item[0].item){
-                            sectionItem.item.push(child)
-                        }
+                            })
+
+                            //any errors
+                            if (vo.errorLog.length > 0) {
+                                errorLog = errorLog.concat(vo.errorLog)
+                            }
+
+                            //the section is populated by DGs - but there area a couple of ways that has been done.
+                            //sectionPatientDetails is a DG thhat has the Patient DG as a child
+                            //bresteReporthistolymphnodes has the elements directly
+                            //to be discussed next week
 
 
-/*
 
-                        console.log(dgQ.item[0] )
-                        let firstItem = dgQ.item[0]
-
-                        if (firstItem.definition) {
+                            //add the child elements to the Q
                             for (const child of dgQ.item[0].item){
                                 sectionItem.item.push(child)
                             }
-                        } else {
-                            //this is a DG added to a section DG. Just add the contents - not the section root
-                            for (const child of dgQ.item[0].item[0].item){
-                                sectionItem.item.push(child)
-                            }
+
+
+                            /*
+
+                                                    console.log(dgQ.item[0] )
+                                                    let firstItem = dgQ.item[0]
+
+                                                    if (firstItem.definition) {
+                                                        for (const child of dgQ.item[0].item){
+                                                            sectionItem.item.push(child)
+                                                        }
+                                                    } else {
+                                                        //this is a DG added to a section DG. Just add the contents - not the section root
+                                                        for (const child of dgQ.item[0].item[0].item){
+                                                            sectionItem.item.push(child)
+                                                        }
+                                                    }
+
+
+                            */
+
+
+
+
                         }
-
-
-*/
-
-
-
-
                     }
+
                 }
 
-                return {Q:Q,hashEd:hashEd,hashVS:hashVS}
+                return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog}
 
 
             },
 
 
-            makeHierarchicalQFromDG : function (lstElements,hashAllDG) {
+            makeHierarchicalQFromDG : function (lstElements,expandVS) {
                 //Used in the new Q renderer
+                //if expandVS is true, then the contents of the VS will be expanded as options into the item. May need to limit the length...
+                let errorLog = []
+                let firstElement = lstElements[0]
 
                 //create list of paths to hide
                 //construct a list of paths to hide
@@ -433,7 +452,10 @@ angular.module("pocApp")
 
 
                 let Q = {resourceType:'Questionnaire'}
-                Q.title = lstElements[0].display
+                Q.title = firstElement.display
+                Q.status = 'active'
+                Q.url = `http://canshare.co.nz/questionnaire/${firstElement.ed.path}`
+                Q.id = `canshare-${firstElement.ed.path}`
                 let currentItem
                 let hashItems = {}      //items by linkId
                 let hashEd = {}         //has of ED by path (=linkId)
@@ -445,30 +467,31 @@ angular.module("pocApp")
                     hashEd[path] = ed
                     //let ar = path.split('.')
                     //let segmentCount = ar.length
-
+/*
                     if (ed.valueSet) {
                         hashVS[ed.valueSet] = hashVS[ed.valueSet] ||  []
                         hashVS[ed.valueSet].push(ed.path)
                     }
+                    */
 
                     if (currentItem) {
                         let parentItemPath = $filter('dropLastInPath')(path)
                         //console.log(parentItemPath)
-                        currentItem = {linkId:path,type:'string',text:ed.title,item:[]}
+                        currentItem = {linkId:path,type:'string',text:ed.title}
+
                         decorateItem(currentItem,ed)
-
-
 
                         if (ed.mult.indexOf('..*')> -1) {
                             currentItem.repeats = true
                         }
+                        hashItems[parentItemPath].item = hashItems[parentItemPath].item || []
                         hashItems[parentItemPath].item.push(currentItem)
                         hashItems[parentItemPath].type = "group"
                         hashItems[path] = currentItem
 
 
                     } else {
-                        currentItem = {linkId:path,type:'string',text:ed.title,item:[]}
+                        currentItem = {linkId:path,type:'string',text:ed.title}
                         decorateItem(currentItem,ed)
 
                         hashItems[path] = currentItem
@@ -477,12 +500,58 @@ angular.module("pocApp")
                     }
 
                 }
-                return {Q:Q,hashEd:hashEd,hashVS:hashVS}
+                return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog}
 
                 function decorateItem(item,ed) {
+
+                    if (! ed.type) {
+                        return
+                    }
+
                     let vo = getControlDetails(ed)
                     item.type = vo.controlType
 
+                    //set the ValueSet or options from the ed to the item
+                    //the valueset takes precedence
+                    let edType = ed.type[0]
+
+                    if (edType == 'CodeableConcept') {
+                        if (ed.valueSet) {
+                            //check for any spaces in the valueSet url
+                            if (ed.valueSet.indexOf(' ') > -1 ) {
+                                //this is an illegal vs name
+                                errorLog.push({msg:`${ed.path} has an invalid valueSet: ${ed.valueSet}. The valueSet was not included`})
+                            } else {
+                                //hash of valueset by path
+                                hashVS[ed.valueSet] = hashVS[ed.valueSet] ||  []
+                                hashVS[ed.valueSet].push(ed.path)
+
+                                if (expandVS) {
+                                    //if we're expanding the VS, then add all the contents as optoins...
+                                    item.answerOption = []
+                                    let options = vsSvc.getOneVS(ed.valueSet)
+                                    if (options) {
+                                        for (const concept of options) {
+                                            item.answerOption.push({valueCoding : concept})
+                                        }
+                                    } else {
+                                        item.answerOption.push({valueCoding : {display:"The ValueSet is missing"}})
+                                    }
+
+                                } else {
+                                    //otherwise, add the answervalueSet property and let the renderer retrieve the contents
+                                    item.answerValueSet = ed.valueSet
+                                }
+                            }
+                        } else if (ed.options && ed.options.length > 0) {
+                            item.answerOption = []
+                            for (const concept of ed.options) {
+                                item.answerOption.push({valueCoding : concept})
+                            }
+                        } else {
+                            item.answerOption = [{valueCoding : {display:"There is neither a ValueSet nor options"}}]
+                        }
+                    }
 
                     if (ed.type) {      //if the ed is the root of a dg then it won't have a type
                         item.definition = ed.type[0]

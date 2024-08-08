@@ -297,7 +297,34 @@
           <pre>{{selectedItem | json}}</pre>
         </uib-tab>
 
+        <uib-tab heading="Validate">
+          <div class="btn btn-link pull-right" ng-click="validate(q)">Perform validation</div>
+          <div class="clearfix"></div>
 
+          <div class="btn btn-link" ng-click="saveToServer(true)">Open in fhirpathlab</div>
+
+
+          <div class="myScroll">
+            <table class="table table-bordered">
+              <tr ng-repeat="iss in oo.issue track by $index" ng-show="showIssue(iss)">
+                <td>{{iss.severity}}</td>
+                <td>{{iss.diagnostics}}
+                  <div><em>{{iss.location[0]}}</em></div>
+                  <div>{{iss.details.text}}</div>
+                  <div ng-repeat = "exp in iss.expression">
+                    <em>{{exp}}</em>
+                  </div>
+                </td>
+
+              </tr>
+            </table>
+          </div>
+
+
+
+
+
+        </uib-tab>
 
 
         <uib-tab heading="Q">

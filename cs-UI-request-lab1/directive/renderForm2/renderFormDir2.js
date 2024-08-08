@@ -10,14 +10,35 @@ angular.module('formsApp')
                 technicalview : '=' //show technical items
             },
 
+            //https://fhirpath-lab.com/Questionnaire/tester
+
+
             templateUrl: 'directive/renderForm2/renderFormDir2.html',
-            controller: function($scope,renderFormsSvc2,questionnaireSvc,vsSvc){
+            controller: function($scope,renderFormsSvc2,questionnaireSvc,vsSvc,$http){
 
                 //$scope.vsSvc = vsSvc
                 $scope.datePopup = {}
                 $scope.dataEntered = {}
 
-                $scope.getOptions = function (ed) {
+                $scope.serverbase = "https://fhir.forms-lab.com/"
+
+                //get the options for a choice element. Prefer the ValueSet, then options
+                $scope.getOptions = function (item) {
+
+                    let concepts = []
+                    if (item.answerValueSet) {
+                        let options = vsSvc.getOneVS(item.answerValueSet)
+                        console.log(options)
+                        return options
+                    } else {
+                        if (item.answerOption) {
+                            for (opt of item.answerOption) {
+                                concepts.push(opt.valueCoding)
+                            }
+                            return concepts
+                        }
+                    }
+/*
                     let concepts = []
                     if (ed.valueSet) {
                         let options = vsSvc.getOneVS(ed.valueSet)
@@ -28,9 +49,16 @@ angular.module('formsApp')
                             return ed.options
                         }
                     }
-                    return concepts
-                }
 
+                    */
+
+                   // return concepts
+                }
+/*
+                $scope.redirect = function () {
+                    window.open("http://cnn.com")
+                }
+*/
                 $scope.openDate = function(linkId) {
                     $scope.datePopup[linkId] = {opened:true}
                     // $scope.datePopup.opened = true
@@ -117,6 +145,77 @@ console.log($scope.listItems)
                     $scope.selectedItem = item
                     $scope.selectedEd = $scope.hashEd[$scope.selectedItem.linkId]
                     console.log(item)
+                }
+
+                //validate the Q
+                $scope.validate = function (Q) {
+                    delete $scope.oo
+                    $scope.errorCount = 0
+                    $scope.warningCount = 0
+                    $scope.validating = true
+                    let url = `${$scope.serverbase}Questionnaire/$validate`
+                    $http.post(url,Q).then(
+                        function (data) {
+                            $scope.validating = false
+                            $scope.oo = data.data
+                            //console.log(data.data)
+                            $scope.oo.issue.forEach(function (iss) {
+                                if (iss.severity == 'error') {
+                                    $scope.errorCount ++
+                                } else {
+                                    $scope.warningCount ++
+                                }
+                            })
+
+                        },function (err) {
+                            $scope.validating = false
+                            $scope.oo = err.data
+                            //console.log(err.data)
+                        }
+                    )
+                }
+
+
+                $scope.saveToServer = function (openLab) {
+                    //saves the Q to the hapi server so that we can invoke the fhirpath lab
+                    //Once the POC is ssl then we can save there instead
+                    if (confirm("This will save the Q to a FHIR server, then display it using the CSIRO renderer. This can take a few seconds, so please be patient.")) {
+
+
+
+
+                        let qry = `https://fhir.forms-lab.com/Questionnaire/${$scope.q.id}`
+
+                        //let qry = `https://hapi.fhir.org/baseR4/Questionnaire/${$scope.Q.id}`
+//https://dev.fhirpath-lab.com/Questionnaire/tester?id={{pathToQ}}
+                        let config = {headers:{'content-type':'application/fhir+json'}}
+
+                        $http.put(qry,$scope.q,config).then(
+                            function (data) {
+                                //alert("Resource saved.")
+                                if (openLab) {
+
+                                    //https://fhirpath-lab.com/Questionnaire/tester?tab=csiro+renderer&id=....
+                                    //let redirectUrl = `${$scope.serverbase}Questionnaire/tester?id=${encodeURI(qry)}`
+                                    let redirectUrl = `https://fhirpath-lab.com/Questionnaire/tester?tab=csiro+renderer&id=${qry}`
+
+                                    //console.log(redirectUrl)
+
+                                    window.open(redirectUrl)
+                                }
+                                $scope.pathToQ = qry
+                            },
+                            function (err) {
+                                alert(angular.toJson(err))
+                            }
+                        )
+                    }
+
+
+                }
+
+                $scope.showIssue = function (iss) {
+                    return true
                 }
 
                 //assume that the hosting app will consume this event & display the VS
