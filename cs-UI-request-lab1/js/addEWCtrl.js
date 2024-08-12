@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('addEWCtrl',
-        function ($scope,modelsSvc, targetED,DG,fullElementList,$timeout,$filter,codedOptionsSvc,$timeout) {
+        function ($scope,modelsSvc, targetED,DG,fullElementList,$timeout,$filter,codedOptionsSvc,vsSvc) {
             //ED is element definition that is the target
             //DG is the full data group
             $scope.targetED = targetED
@@ -27,11 +27,27 @@ angular.module("pocApp")
                 return display
             }
 
-            //retrieve all the possible options for the selected CC element. Have as separate
-            //function to support future VS lookup
+            //retrieve all the possible options for the selected CC element.
+            //valueset has priority
             function getOptionsForCC(ed){
 
 
+                delete $scope.options
+                delete $scope.valueSet
+
+                if (ed.valueSet) {
+                    $scope.valueSet = ed.valueSet
+                    $scope.options = vsSvc.getOneVS(ed.valueSet)
+
+                } else {
+                    if (ed.options) {
+                        $scope.options = ed.options
+                    }
+                }
+
+
+
+/*
 
                 codedOptionsSvc.getOptionsForEd(ed).then(
                     function(vo) {
@@ -60,7 +76,7 @@ angular.module("pocApp")
 
                     }
                 )
-
+*/
 
                // return ed.options       //ie an array of conepts
             }

@@ -5,6 +5,36 @@ angular.module("formsApp")
 
         return {
 
+            isEnabled : function (item,hashData) {
+                //is this item enabled according to the enableWhen properties
+                if (! item.enableWhen) {return}
+
+
+
+                //default to 'or' comparison  - todo
+                let isEnabled = false
+                item.enableWhen.forEach(function (ew) {
+
+                    let value = hashData[ew.question]
+                    if (value) {
+                        if (ew.answerCoding) {
+                            if (value.system == ew.answerCoding.system && value.code == ew.answerCoding.code) {
+                                isEnabled = true
+                            }
+                        }
+
+                    }
+
+
+
+
+                })
+
+                return isEnabled
+
+
+            },
+
             createControlList : function (item,hashEd) {
                 //create a list of items
                 let lst = []
@@ -63,6 +93,32 @@ angular.module("formsApp")
                     let iconFile = "icons/icon-q-" + item.type + ".png"
                     node.icon = iconFile
 
+                    //---- set style of node
+                    let arStyle = []         //the style element to add to the node['a_attr']
+                    if (item.enableWhen && item.enableWhen.length > 0) {
+                        arStyle.push("text-decoration-line: underline")
+                        arStyle.push("text-decoration-style: dotted")
+                    }
+
+                    if (item.required) {
+                        arStyle.push("font-weight:bold")
+                    }
+
+
+
+
+                    //create tree attribute node
+                    if (arStyle.length > 0) {
+                        let style = ""
+                        arStyle.forEach(function (s) {
+                            style += s + ";"
+
+                        })
+                        node['a_attr'] = { "style": style}
+                        // console.log(ed.path,style)
+                    }
+
+
                     treeData.push(node)
 
                     //now look at any sub children
@@ -93,7 +149,7 @@ angular.module("formsApp")
 
 
                 addQToTree(Q)
-
+/*
                 //now that we have completed the tree array (and populated hashItem)
                 //we can make the conditional display a bit nicer by adding the text for the question
 
@@ -107,6 +163,8 @@ angular.module("formsApp")
                         })
                     }
                 })
+
+                */
 
                 return {treeData: treeData,hashItem:hashItem}
 

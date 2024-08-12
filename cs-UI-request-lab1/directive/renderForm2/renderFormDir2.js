@@ -7,7 +7,8 @@ angular.module('formsApp')
                 //@ reads the attribute value, = provides two-way binding, & works with functions
                 q: '=',
                 hashEd : '=',        //hash of all elementDefinitions by path (=ed)
-                technicalview : '=' //show technical items
+                technicalview : '=', //show technical items
+                treenode : '@'       //where to mount the tree
             },
 
             //https://fhirpath-lab.com/Questionnaire/tester
@@ -15,6 +16,9 @@ angular.module('formsApp')
 
             templateUrl: 'directive/renderForm2/renderFormDir2.html',
             controller: function($scope,renderFormsSvc2,questionnaireSvc,vsSvc,$http){
+
+
+                console.log($scope)
 
                 //$scope.vsSvc = vsSvc
                 $scope.datePopup = {}
@@ -75,14 +79,35 @@ angular.module('formsApp')
                 $scope.$watch(
                     function() {return $scope.q},
                     function() {
-                        setupQ()
+                        if ($scope.q) {
+                            setupQ()
+                        }
+
                     }
                 );
 
 
                 function setupQ () {
+
                     console.log($scope.q)
                     console.log($scope.hashEd)
+
+                    //create the redirect url to fhorPathLab.
+
+                    let qry = `https://fhir.forms-lab.com/Questionnaire/${$scope.q.id}`
+
+                    $scope.redirectUrl = `https://fhirpath-lab.com/Questionnaire/tester?tab=csiro+renderer&id=${qry}` //redirectUrl
+
+
+                    $scope.treenode = $scope.treenode || "designTreeX"
+                    //add the node
+                    let html = `<div id="${$scope.treenode}"></div>`
+                    $( "#designTree" ).after( ( html ) );
+
+
+
+
+
                     if ($scope.q) {
 
                         let vo = renderFormsSvc2.makeTreeFromQ($scope.q)
@@ -104,6 +129,30 @@ angular.module('formsApp')
 
                 }
 
+                //called when the form is updated
+                $scope.dataUpdated = function (item) {
+                    //check all items to see if the enabled state has changed for any of them
+                    markDisabled($scope.listItems)
+                }
+
+                function markDisabled(entries) {
+                    entries.forEach(function (entry) {
+                       entry.isDisabled = false
+                       let linkId = entry.linkId
+                        let item = entry.item
+
+                        if (item.enableWhen && item.enableWhen.length > 0) {
+
+                            entry.isDisabled = ! (renderFormsSvc2.isEnabled(item,$scope.dataEntered))
+                            console.log(item.linkId,entry.isDisabled)
+                        }
+
+//console.log(entries)
+
+                       //dataEntered[item.id]
+                   })
+
+                }
 
 
                 let drawTree = function(treeData){
@@ -115,9 +164,12 @@ angular.module('formsApp')
                         }
                     })
 
-                    $('#designTree').jstree('destroy');
 
-                    let x = $('#designTree').jstree(
+                    console.log(`#${$scope.treenode}`)
+
+                    $(`#${$scope.treenode}`).jstree('destroy');
+
+                    let x = $(`#${$scope.treenode}`).jstree(
                         {'core': {'multiple': false, 'data': treeData, 'themes': {name: 'proton', responsive: true}}}
                     ).on('changed.jstree', function (e, data) {
                         //seems to be the node selection event...
@@ -128,9 +180,10 @@ angular.module('formsApp')
                             $scope.selectedEd = $scope.hashEd[$scope.selectedItem.linkId]
 
                             $scope.listItems = renderFormsSvc2.createControlList($scope.selectedItem,$scope.hashEd)
-console.log($scope.listItems)
+                            markDisabled($scope.listItems)
+                            //console.log($scope.listItems)
 
-                            console.log(data.node)
+                            //console.log(data.node)
                         }
 
                         $scope.$digest();       //as the event occurred outside of angular...
@@ -176,13 +229,12 @@ console.log($scope.listItems)
                 }
 
 
+
+
                 $scope.saveToServer = function (openLab) {
                     //saves the Q to the hapi server so that we can invoke the fhirpath lab
                     //Once the POC is ssl then we can save there instead
                     if (confirm("This will save the Q to a FHIR server, then display it using the CSIRO renderer. This can take a few seconds, so please be patient.")) {
-
-
-
 
                         let qry = `https://fhir.forms-lab.com/Questionnaire/${$scope.q.id}`
 
@@ -190,22 +242,32 @@ console.log($scope.listItems)
 //https://dev.fhirpath-lab.com/Questionnaire/tester?id={{pathToQ}}
                         let config = {headers:{'content-type':'application/fhir+json'}}
 
+                        $scope.savingQ = true
                         $http.put(qry,$scope.q,config).then(
                             function (data) {
-                                //alert("Resource saved.")
+                                $scope.savingQ = false
+                               // $scope.$digest()
+                                //let redirectUrl = `https://fhirpath-lab.com/Questionnaire/tester?tab=csiro+renderer&id=${qry}`
+                                //console.log(redirectUrl)
+                                //$scope.redirectUrl = redirectUrl
+
+                                let msg = `Q has been saved on the server. I'll try to load the renderer with the url ${$scope.redirectUrl}`
+                                msg += " If that fails, then try the direct link that has appeared."
+                                alert(msg)
                                 if (openLab) {
 
                                     //https://fhirpath-lab.com/Questionnaire/tester?tab=csiro+renderer&id=....
                                     //let redirectUrl = `${$scope.serverbase}Questionnaire/tester?id=${encodeURI(qry)}`
-                                    let redirectUrl = `https://fhirpath-lab.com/Questionnaire/tester?tab=csiro+renderer&id=${qry}`
 
-                                    //console.log(redirectUrl)
 
-                                    window.open(redirectUrl)
+                                    copyToClipboard($scope.redirectUrl)
+
+                                    window.open($scope.redirectUrl)
                                 }
                                 $scope.pathToQ = qry
                             },
                             function (err) {
+                                $scope.savingQ = false
                                 alert(angular.toJson(err))
                             }
                         )
@@ -227,8 +289,9 @@ console.log($scope.listItems)
 
 
                 //called by a cell to indicate if it should be shown
-                $scope.showConditional = function (cell,form) {
+                $scope.showConditional = function (entry) {
 
+console.log(entry)
                     return true
 
                     if (! cell.meta) {
@@ -282,6 +345,29 @@ console.log($scope.listItems)
                 }
 
 
+                let copyToClipboard = function(text) {
+                    let textArea = document.createElement("textarea");
+                    textArea.value = text;
+
+                    // Avoid scrolling to bottom
+                    textArea.style.top = "0";
+                    textArea.style.left = "0";
+                    textArea.style.position = "fixed";
+
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+
+                    try {
+                        let successful = document.execCommand('copy');
+                        let msg = successful ? 'successful' : 'unsuccessful';
+                        console.log('Fallback: Copying text command was ' + msg);
+                    } catch (err) {
+                        alert('Fallback: Oops, unable to copy', err);
+                    }
+
+                    document.body.removeChild(textArea);
+                }
 
             }
         }

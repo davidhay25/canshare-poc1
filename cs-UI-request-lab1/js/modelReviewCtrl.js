@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('modelReviewCtrl',
-        function ($scope,$http,modelsSvc,modelCompSvc,$timeout, $uibModal,makeQSvc,utilsSvc,$window,makeCompQSvc, snapshotSvc,vsSvc) {
+        function ($scope,$http,modelsSvc,modelCompSvc,$timeout, $uibModal,makeQSvc,utilsSvc,$window, snapshotSvc,vsSvc) {
 
             $scope.input = {}
 
@@ -8,7 +8,6 @@ angular.module("pocApp")
             // ----------- consume events emitted by the v2 Q renderer ----
             $scope.$on('viewVS',function (event,vs) {
                 $scope.viewVS(vs)
-
             })
 
             //display the technical items
@@ -57,7 +56,6 @@ angular.module("pocApp")
                             $scope.hashAllCompositions = {}
                             data.data.forEach(function (comp) {
                                 $scope.hashAllCompositions[comp.name] = comp
-
                             })
 
 
@@ -72,7 +70,6 @@ angular.module("pocApp")
                             //now that we have all the DG & Compositions, was a modelName passed in?
 
                             if (modelName) {
-
                                 if ($scope.hashAllCompositions[modelName]) {
                                     $scope.selectComposition($scope.hashAllCompositions[modelName])
                                     $scope.selectedFromUrl = true      //to indicate that the modelname was passed in on the url
@@ -609,22 +606,38 @@ angular.module("pocApp")
 */
 
                 $scope.selectedComp = comp
-                let vo = makeQSvc.makeHierarchicalQFromComp(comp)//,$scope.hashAllDG)
 
-                $scope.fullQ = vo.Q         //will invoke the Q renderer directive
-                $scope.hashEd = vo.hashEd
-                console.log(vo.errorLog)
-
+                //we need to get all the valueses in the composition - which meand we need
+                //all the elements...
                 $scope.showWaiting = true
-                vsSvc.updateVSFromUrlHash(vo.hashVS,function(){
-                        $scope.showWaiting = false
+                let voComp = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
+
+
+                vsSvc.getAllVS(voComp.allElements, function () {
+                    //alert("all VS available")
+                    $scope.showWaiting = false
+                    let vo = makeQSvc.makeHierarchicalQFromComp(comp,true)//,$scope.hashAllDG)
+
+                    $scope.fullQ = vo.Q         //will invoke the Q renderer directive
+                    $scope.hashEd = vo.hashEd
+                    console.log(vo.errorLog)
                 })
+
+
+
+
+
+/*
 
 
 
 
                 return
 
+                $scope.showWaiting = true
+                vsSvc.updateVSFromUrlHash(vo.hashVS,function(){
+                    $scope.showWaiting = false
+                })
                 //test stuff
 
 
@@ -678,7 +691,7 @@ angular.module("pocApp")
                     }
                 })
                 console.log($scope.pathsToIgnore)
-
+*/
             }
 
 

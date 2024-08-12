@@ -10,7 +10,7 @@ angular.module("pocApp")
 
         return {
 
-            updateVSFromUrlHash : function (hash,cb) {
+            updateVSFromUrlHashDEP : function (hash,cb) {
                 let lst = []
                 let that = this
                 for (const url of Object.keys(hash)) {

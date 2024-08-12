@@ -5,6 +5,7 @@ angular.module("pocApp")
     .service('makeQSvc', function($http,codedOptionsSvc,QutilitiesSvc,snapshotSvc,$filter,vsSvc) {
 
 
+        let unknownCodeSystem = "http://example.com/fhir/CodeSystem/example"
 
 
 
@@ -146,7 +147,10 @@ angular.module("pocApp")
                             qEW.answerCoding = ew.value
                             delete qEW.answerCoding.pt  //the preferred term...
                             delete qEW.answerCoding.fsn  //the preferred term...
-                            qEW.answerCoding.system = qEW.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
+
+
+                            qEW.answerCoding.system = qEW.answerCoding.system || unknownCodeSystem
+                            //qEW.answerCoding.system = qEW.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
                             canAdd = true
                         }
                     }
@@ -323,10 +327,27 @@ angular.module("pocApp")
                 let that = this
                 let errorLog = []
 
-                let Q = {resourceType:'Questionnaire',item:[]}
+                let Q = {resourceType:'Questionnaire'}
                 Q.title = comp.title
                 Q.status = 'active'
-                Q.url = `http://canshare.co.nz/questionnaire/${comp.name}`
+                Q.id = `canshare-${comp.name}`
+                Q.url = `http://canshare.co.nz/questionnaireUrl/${comp.name}`
+                Q.item = []
+
+                let containerSection = {text: "tabContainer", linkId: comp.name, extension: [], type: 'group', item: []}
+                let ext = {url: "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+                ext.valueCodeableConcept = {
+                    coding: [{
+                        code: "tab-container",
+                        system: "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
+                    }]
+                }
+                containerSection.extension.push(ext)
+
+                Q.item.push(containerSection)
+
+
+
 
 
                 let hashEd = {}         //has of ED by path (=linkId)
@@ -337,12 +358,12 @@ angular.module("pocApp")
                 for (const section of comp.sections) {
                     if (section.items && section.items.length > 0) {
                         let sectionItem = {linkId:section.name,text:section.title,type:'group',item:[]}
-                        Q.item.push(sectionItem)
+                        //Q.item.push(sectionItem)
+                        containerSection.item.push(sectionItem)
                         for (const contentDG of section.items) {     //a section can have multiple DGs within it.
                             let dgType = contentDG.type[0]        //the dg type. Generally a 'section' dg
                             let dgElementList = snapshotSvc.getFullListOfElements(dgType)
-                            let vo = that.makeHierarchicalQFromDG(dgElementList)
-
+                            let vo = that.makeHierarchicalQFromDG(dgElementList,expandVS)
 
                             let dgQ = vo.Q
                             let hashByPath = vo.hashEd          //EDs from the child
@@ -352,12 +373,10 @@ angular.module("pocApp")
                                 hashEd[linkId] = vo.hashEd[linkId]
                             })
 
-
                             //all ValueSets
                             Object.keys(vo.hashVS).forEach(function (url) {
                                 hashVS[url] =  hashVS[url] || []
                                 hashVS[url].concat(vo.hashVS[url])
-
                             })
 
                             //any errors
@@ -369,8 +388,6 @@ angular.module("pocApp")
                             //sectionPatientDetails is a DG thhat has the Patient DG as a child
                             //bresteReporthistolymphnodes has the elements directly
                             //to be discussed next week
-
-
 
                             //add the child elements to the Q
                             for (const child of dgQ.item[0].item){
@@ -480,10 +497,13 @@ angular.module("pocApp")
                         currentItem = {linkId:path,type:'string',text:ed.title}
 
                         decorateItem(currentItem,ed)
+                        addEnableWhen(ed,currentItem)
 
                         if (ed.mult.indexOf('..*')> -1) {
                             currentItem.repeats = true
                         }
+
+
                         hashItems[parentItemPath].item = hashItems[parentItemPath].item || []
                         hashItems[parentItemPath].item.push(currentItem)
                         hashItems[parentItemPath].type = "group"
@@ -493,6 +513,7 @@ angular.module("pocApp")
                     } else {
                         currentItem = {linkId:path,type:'string',text:ed.title}
                         decorateItem(currentItem,ed)
+                        addEnableWhen(ed,currentItem)
 
                         hashItems[path] = currentItem
                         Q.item = [currentItem]
@@ -506,6 +527,31 @@ angular.module("pocApp")
 
                     if (! ed.type) {
                         return
+                    }
+
+
+                    if (ed.mult) {
+                        //required bolding
+                        if (ed.mult.indexOf('1..') > -1) {
+                            //need to add to any existing stype
+                            item.required = true
+
+                          //  arStyle.push("font-weight:bold")
+                            // node['a_attr'] = { "style": "font-weight:bold" }
+                        }
+                        //multiple
+                        if (ed.mult.indexOf('..*') > -1) {
+                            item.text += " *"
+                        }
+                    }
+
+                  //  if (ed.mult.startsWith('1')){
+                     //   item.required = true
+                   // }
+
+                    if (ed.fixedCoding || ed.fixedString) {
+                        arStyle.push("color : blue")
+                        // node['a_attr'] = { "style": "color : blue" }
                     }
 
                     let vo = getControlDetails(ed)
@@ -532,10 +578,11 @@ angular.module("pocApp")
                                     let options = vsSvc.getOneVS(ed.valueSet)
                                     if (options) {
                                         for (const concept of options) {
+                                            concept.system = concept.system || unknownCodeSystem
                                             item.answerOption.push({valueCoding : concept})
                                         }
                                     } else {
-                                        item.answerOption.push({valueCoding : {display:"The ValueSet is missing"}})
+                                        item.answerOption.push({valueCoding : {display:"The ValueSet is missing or empty"}})
                                     }
 
                                 } else {
@@ -546,6 +593,9 @@ angular.module("pocApp")
                         } else if (ed.options && ed.options.length > 0) {
                             item.answerOption = []
                             for (const concept of ed.options) {
+                                delete concept.fsn
+                                delete concept.pt
+                                concept.system = concept.system || unknownCodeSystem
                                 item.answerOption.push({valueCoding : concept})
                             }
                         } else {

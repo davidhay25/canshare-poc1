@@ -169,7 +169,7 @@ angular.module("pocApp")
 
             }
 
-            //------------
+            //--------------------------
 
 
 
@@ -1466,13 +1466,10 @@ angular.module("pocApp")
 
                         },
                         function () {
-                            alert("Sorry, that name has already been used on the Library.")
+                            alert("Sorry, that name has already been used in the Library.")
                             //name is not unique
                         }
                     )
-
-
-
 
                 }
 
@@ -1577,7 +1574,7 @@ angular.module("pocApp")
 
 
 
-                $scope.$broadcast("compSelected")   //for the profiling
+                $scope.$broadcast("compSelected")   //for the profiling - todo - cancel
 
                 //check the current checkedout state on the library.
                 //Always update the local version checkedout (not data) with the one from the library
@@ -1603,7 +1600,20 @@ angular.module("pocApp")
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)      //overites the previou slist
 
                 $scope.allCompElements = vo.allElements     //list of all elements. used by the Table and Q generation (at least)
-/*
+
+
+                /*
+                vsSvc.getAllVS($scope.allCompElements, function () {
+                    //$scope.showWaiting = false
+                    let vo = makeQSvc.makeHierarchicalQFromComp(comp,true)//,$scope.hashAllDG)
+
+                    $scope.fullQ = vo.Q         //will invoke the Q renderer directive
+                   // $scope.hashEd = vo.hashEd
+                    console.log(vo.errorLog)
+                })
+                */
+
+                /*
 
                 if (autoQ) {
                     //generate the Q and also retrieve all the ValueSets
@@ -1679,13 +1689,13 @@ angular.module("pocApp")
                 $scope.orderingByToMove = orderingSvc.getOrderingByToMove(dg)
                 $scope.referencedDGOrdering = orderingSvc.createMoveFromReferences($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
 
-
-
-
                 $scope.dgFshLM = igSvc.makeFshForDG(dg,$scope.fullElementList)
                 makeGraph()
 
-                //a Q representation of the DG
+                //always get all the valueset contents
+                vsSvc.getAllVS($scope.fullElementList, function () {
+
+                })
 
                 if ( autoQ) {
 
@@ -1694,7 +1704,15 @@ angular.module("pocApp")
 
 
                     vsSvc.getAllVS($scope.fullElementList, function () {
-                    let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
+
+
+                        let voQ = makeQSvc.makeHierarchicalQFromDG($scope.fullElementList,true) //,$scope.hashAllDG)
+                        //$scope.fullQ = voQ.Q
+                        //$scope.hashEd = voQ.hashEd
+                        console.log(voQ.errorLog)
+
+
+                    //let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
 
 
                      $scope.dgQ = voQ.Q
@@ -1720,7 +1738,7 @@ angular.module("pocApp")
             //only used for DG now
             $scope.selectModel = function (dg) {
                 if (dg) {
-                    traceSvc.addAction({action:'select',model:dg})
+                    //traceSvc.addAction({action:'select',model:dg})
 
                     //note to self - there is a lot of audit stuff that is likely
                     //not needed now 'cause we trap recursive references. If there appears to be a need, perhaps a separate invokable command...
@@ -1783,6 +1801,8 @@ angular.module("pocApp")
 
             //this is the DG graph
             function makeGraph() {
+
+                return      //not currently used
 
                 let container = document.getElementById('graph');
                 if (container) {
@@ -1911,12 +1931,16 @@ angular.module("pocApp")
 
                         let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
                         drawDGTree(treeData)
+
+                        /* todo - recator to use new service
+
                         //re-create the Questionnaire
                         vsSvc.getAllVS($scope.fullElementList, function () {
                             let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
                             $scope.dgQ = voQ.Q
 
                         })
+                        */
 
                         $scope.$digest()
 
