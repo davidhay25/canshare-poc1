@@ -363,6 +363,7 @@ angular.module("pocApp")
                         for (const contentDG of section.items) {     //a section can have multiple DGs within it.
                             let dgType = contentDG.type[0]        //the dg type. Generally a 'section' dg
                             let dgElementList = snapshotSvc.getFullListOfElements(dgType)
+                            console.log(`About to process ${dgType}`)
                             let vo = that.makeHierarchicalQFromDG(dgElementList,expandVS)
 
                             let dgQ = vo.Q
@@ -528,7 +529,8 @@ angular.module("pocApp")
                     if (! ed.type) {
                         return
                     }
-
+                    item.definition = ed.type[0]
+console.log(ed.type,ed)
 
                     if (ed.mult) {
                         //required bolding
@@ -549,10 +551,8 @@ angular.module("pocApp")
                      //   item.required = true
                    // }
 
-                    if (ed.fixedCoding || ed.fixedString) {
-                        arStyle.push("color : blue")
-                        // node['a_attr'] = { "style": "color : blue" }
-                    }
+                    //if (ed.fixedCoding || ed.fixedString) {
+
 
                     let vo = getControlDetails(ed)
                     item.type = vo.controlType
@@ -603,9 +603,16 @@ angular.module("pocApp")
                         }
                     }
 
-                    if (ed.type) {      //if the ed is the root of a dg then it won't have a type
-                        item.definition = ed.type[0]
+                    //This check must be after the options as any answerOption needs to be removed...
+                    if (ed.fixedCoding) {
+                        let coding = ed.fixedCoding
+                        delete coding.fsn
+                        item.initial = [{valueCoding : coding}]
+                        delete item.answerOption        //if there's an initial, then can't have options as well
+                        item.readOnly = true
                     }
+
+
 
 
                    // {controlType:controlType,controlHint:controlHint}

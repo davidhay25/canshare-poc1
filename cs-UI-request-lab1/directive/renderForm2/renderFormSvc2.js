@@ -105,6 +105,18 @@ angular.module("formsApp")
                     }
 
 
+                    //used for fixed values - readOnly also set true
+                    if (item.initial) {
+                        arStyle.push("color : blue")
+                    }
+
+
+                    /*
+                    if (ed.fixedCoding || ed.fixedString) {
+                        arStyle.push("color : blue")
+                        // node['a_attr'] = { "style": "color : blue" }
+                    }
+*/
 
 
                     //create tree attribute node

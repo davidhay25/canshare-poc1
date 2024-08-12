@@ -326,7 +326,11 @@
         </uib-tab>
 
         <uib-tab heading="Validate">
-          <div class="btn btn-link pull-right" ng-click="validate(q)">Perform validation</div>
+
+          <div class="btn btn-link" ng-click="validate(q)">Perform validation</div>
+
+          <img class="pull-right" ng-show="validating" src="css/ajax_loader_blue_32.gif"/>
+
           <div class="clearfix"></div>
 
 
