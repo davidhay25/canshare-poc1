@@ -530,7 +530,7 @@ angular.module("pocApp")
                         return
                     }
                     item.definition = ed.type[0]
-console.log(ed.type,ed)
+
 
                     if (ed.mult) {
                         //required bolding
@@ -547,15 +547,13 @@ console.log(ed.type,ed)
                         }
                     }
 
-                  //  if (ed.mult.startsWith('1')){
-                     //   item.required = true
-                   // }
-
-                    //if (ed.fixedCoding || ed.fixedString) {
 
 
                     let vo = getControlDetails(ed)
+
                     item.type = vo.controlType
+
+
 
                     //set the ValueSet or options from the ed to the item
                     //the valueset takes precedence
@@ -600,6 +598,17 @@ console.log(ed.type,ed)
                             }
                         } else {
                             item.answerOption = [{valueCoding : {display:"There is neither a ValueSet nor options"}}]
+                        }
+                    }
+
+                    if (edType == 'Quantity') {
+                        //https://smartforms.csiro.au/docs/components/quantity
+                        if (ed.units && ed.units.length > 0) {
+                            let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-unit"}
+                            ext.valueCoding = {code:ed.units[0],system:"http://unitsofmeasure.org",display:ed.units[0]}
+                            item.extension = ed.extension || []
+                            item.extension.push(ext)
+
                         }
                     }
 

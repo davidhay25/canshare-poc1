@@ -401,21 +401,14 @@ angular.module("pocApp")
 
                     node.data.ed.controlType = voControl.controlType
                     node.data.ed.controlHint = voControl.controlHint
-
                     node.icon = `icons/icon_primitive.png`  //the default icon
 
                     let arStyle = []         //the style element to add to the node['a_attr']
 
-
                     if (ed.kind) {
-
-                        //let iconFile = `icons/${treeIcons[ed.kind]}`
                         if (treeIcons[ed.kind]) {
                             node.icon = `icons/${treeIcons[ed.kind]}`
                         }
-
-
-
                     }
 
                     //todo ??? does a DG have z elements ???

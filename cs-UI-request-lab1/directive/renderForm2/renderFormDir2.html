@@ -20,8 +20,17 @@
       <div class="myScroll">
         <div id="designTree"></div>
 
-
+        <div><em>Legend:</em></div>
+        <div><strong style="margin-left: 8px">Bold</strong> elements are required</div>
+        <div><span style="color: blue; margin-left: 8px">Blue</span>  elements have a fixed value</div>
+        <div style=" margin-left: 8px">A trailing <strong>*</strong> indicates element can repeat.</div>
+        <div style=" margin-left: 8px">
+            <span style="text-decoration-line: underline;text-decoration-style: dotted">
+              Dotted underline</span> is conditional</div>
       </div>
+
+
+
 
 
     </div>
@@ -36,13 +45,14 @@
         </div>
       </div>
 
-
+"
     </div>
     <div class="col-md-4  col-sm-4">
 
       <div class="rounded-box">
         <div class="pull-right"><img ng-show="savingQ" src="css/ajax_loader_blue_32.gif"/></div>
-        <div class="btn btn-link pull-right" ng-hide="savingQ" ng-click="saveToServer(true)">Save and open in renderer</div>
+        <div class="btn btn-link pull-right"
+             ng-hide="savingQ || ! technicalview" ng-click="saveToServer(true)">Save and open in renderer</div>
         <div style="padding: 8px" ng-show="savingQ">Saving...</div>
         <div ng-show="redirectUrl">
           <a class = "btn" ng-href="{{redirectUrl}}" target="_blank">Load Renderer</a>
@@ -57,13 +67,140 @@
 
 
 
-        <uib-tab heading="Details">
 
 
 
 
 
+          <uib-tab heading="Details">
 
+            <br/>
+            <table class="table table-bordered table-condensed">
+
+              <tr>
+                <td class="detailName" style="width : 15%">Title</td>
+                <td>
+                  {{selectedEd.title}}
+                </td>
+              </tr>
+
+              <tr>
+                <td class="detailName" >Description</td>
+                <td>
+                  {{selectedEd.description}}
+                </td>
+              </tr>
+
+              <tr>
+                <td class="detailName" >Type</td>
+                <td>
+                  <div ng-repeat="type in selectedEd.type">
+                    <div ng-show="fhirDataTypes.indexOf(type) > -1" class="pull-right">
+                      <a target = "_blank" ng-href="{{fhirRoot}}datatypes.html#{{type}}">Details in spec</a>
+                    </div>
+                    {{type}}
+                  </div>
+                </td>
+              </tr>
+
+
+              <tr>
+                <td ng-show="technicalview" class="detailName">  Q type</td>
+                <td>
+                  {{selectedItem.type}}
+                </td>
+              </tr>
+
+              <tr>
+                <td class="detailName">Cardinality</td>
+                <td>
+                  {{selectedEd.mult}}
+                </td>
+              </tr>
+              <tr>
+                <td class="detailName">Obligation</td>
+                <td>
+                  <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
+
+
+
+                  <div ng-show = "selectedCompositionNode.data.host">
+                    <!-- for now, just hide it if a section is selected todo - check this logic
+                    Host:{{selectedCompositionNode.data.host.mult}}
+                    -->
+                  </div>
+                  <div ng-hide = "selectedCompositionNode.data.host">
+                    {{getObligation(selectedCompositionNode.data.ed)}}
+
+                    <!--{{selectedCompositionNode.data.ed.mult}}-->
+
+                  </div>
+                </td>
+              </tr>
+
+              <tr  ng-show="selectedEd.options.length > 0">
+                <td class="detailName">Options</td>
+                <td>
+                  <ul>
+                    <li ng-repeat="option in selectedEd.options">
+                      {{option.display}}
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+
+              <tr  ng-show="selectedEd.type[0] == 'CodeableConcept' ">
+                <td class="detailName">ValueSet</td>
+                <td>
+                  <div><em>{{selectedEd.valueSet}}</em>
+
+                    <div ng-hide="selectedEd.valueSet">
+                      No ValueSet specified
+                    </div>
+
+
+                  </div>
+                  <div>
+                    <button ng-show="selectedEd.valueSet"
+                            ng-click="viewVS(selectedEd.valueSet)"
+                            class="btn-link btn">View VS</button>
+
+                  </div>
+
+                </td>
+              </tr>
+
+
+              <tr ng-show="selectedEd.enableWhen" >
+
+                <td class="detailName">Conditional</td>
+                <td>
+
+                  
+                  <table class="table">
+                    <tr><th>Source</th><th>Op.</th><th>Value</th></tr>
+                    <tr ng-repeat="ew in selectedEd.enableWhen">
+                      <td>{{ew.source}}</td>
+                      <td>{{ew.operator}}</td>
+                      <td>{{ew.value.code}} | {{ew.value.display}}</td>
+                    </tr>
+                  </table>
+
+
+                </td>
+              </tr>
+
+              <tr>
+                <td class="detailName"> Source Ref</td>
+                <td>
+                  {{selectedEd.sourceReference}}
+                </td>
+              </tr>
+
+
+            </table>
+
+<!--
             <div class="row">
               <div class="col-md-3 ">
                 Title
@@ -96,7 +233,7 @@
               </div>
             </div>
 
-          <div class="row" ng-show="technicalview">
+            <div class="row" ng-show="technicalview">
             <div class="col-md-3">
               Q type
             </div>
@@ -104,8 +241,6 @@
               {{selectedItem.type}}
             </div>
           </div>
-
-
 
             <div class="row">
               <div class="col-md-3">
@@ -121,19 +256,18 @@
                 Obligation
               </div>
               <div class="col-md-9">
-                <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
+
 
 
 
                 <div ng-show = "selectedCompositionNode.data.host">
-                  <!-- for now, just hide it if a section is selected todo - check this logic
-                  Host:{{selectedCompositionNode.data.host.mult}}
-                  -->
+
+
                 </div>
                 <div ng-hide = "selectedCompositionNode.data.host">
                   {{getObligation(selectedCompositionNode.data.ed)}}
 
-                  <!--{{selectedCompositionNode.data.ed.mult}}-->
+
 
                 </div>
 
@@ -242,7 +376,7 @@
             </div>
 
 
-            <div ng-show = "true" class="row" ng-show="selectedEd.type[0] == 'CodeableConcept' ">
+            <div class="row" ng-show="selectedEd.type[0] == 'CodeableConcept' ">
               <div class="col-md-3">
                 ValueSet
               </div>
@@ -291,6 +425,8 @@
               </div>
             </div>
 
+            -->
+
         </uib-tab>
 
         <uib-tab heading="Data">
@@ -317,15 +453,15 @@
         </uib-tab>
 
 
-        <uib-tab heading="ED">
+        <uib-tab  ng-show="technicalview" heading="ED">
           <pre>{{selectedEd | json}}</pre>
         </uib-tab>
 
-        <uib-tab heading="Item">
+        <uib-tab  ng-show="technicalview" heading="Item">
           <pre>{{selectedItem | json}}</pre>
         </uib-tab>
 
-        <uib-tab heading="Validate">
+        <uib-tab ng-show="technicalview" heading="Validate">
 
           <div class="btn btn-link" ng-click="validate(q)">Perform validation</div>
 
@@ -359,9 +495,10 @@
         </uib-tab>
 
 
-        <uib-tab heading="Q">
+        <uib-tab ng-show="technicalview" heading="Q">
           <pre>{{q | json}}</pre>
         </uib-tab>
+
       </uib-tabset>
 
     </div>
