@@ -31,10 +31,10 @@ async function setup(app) {
     })
 
     //get all the comments for a composition
-    app.get('/review/:compName',async function(req,res){
+    app.get('/review/:modelName',async function(req,res){
 
-        let compName = req.params.compName
-        const query = {compName : compName}
+        let modelName = req.params.modelName
+        const query = {modelName : modelName}
         try {
             const cursor = await database.collection("review").find(query).toArray()
             res.json(cursor)
@@ -46,7 +46,7 @@ async function setup(app) {
     })
 
     //update a comment
-    app.put('/review/:compName',async function(req,res){
+    app.put('/review/:modelName',async function(req,res){
 
         let comment = req.body
         comment.lastUpdated = new Date()

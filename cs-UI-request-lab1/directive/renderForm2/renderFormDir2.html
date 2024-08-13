@@ -64,15 +64,7 @@
       <uib-tabset>
 
 
-
-
-
-
-
-
-
-
-          <uib-tab heading="Details">
+        <uib-tab heading="Details">
 
             <br/>
             <table class="table table-bordered table-condensed">
@@ -176,7 +168,7 @@
                 <td class="detailName">Conditional</td>
                 <td>
 
-                  
+
                   <table class="table">
                     <tr><th>Source</th><th>Op.</th><th>Value</th></tr>
                     <tr ng-repeat="ew in selectedEd.enableWhen">
@@ -429,6 +421,38 @@
 
         </uib-tab>
 
+        <uib-tab >
+          <uib-tab-heading>
+            Notes <span ng-show="hashNotes[selectedEd.path].length > 0" class="badge">{{hashNotes[selectedEd.path].length}}</span>
+          </uib-tab-heading>
+          <table class="table table-condensed" ng-show="hashNotes[selectedEd.path].length > 0">
+            <tr><th>Comment</th><th>Disposition</th></tr>
+            <tr ng-repeat = "note in hashNotes[selectedEd.path]">
+              <td>{{note.note}}</td>
+              <td>{{note.disposition.display}}
+                <div><em>{{note.dispositionNote}}</em></div>
+
+              </td>
+            </tr>
+
+          </table>
+
+          <strong>New note</strong>
+
+          <textarea class="form-control" ng-model="input.note"></textarea>
+          <br/>
+          <div class="row">
+            <div class="col-md-6">
+              <input type="text" class="form-control" ng-model="input.author" placeholder="Your name"/>
+            </div>
+            <div class="col-md-6">
+              <button ng-show="input.note"
+                      class="btn btn-link pull-right" ng-click="addNote(input.note,input.author,selectedEd)">Add note</button>
+            </div>
+
+          </div>
+        </uib-tab>
+
         <uib-tab heading="Data">
 
 
@@ -452,14 +476,24 @@
 
         </uib-tab>
 
+        <uib-tab  ng-show="technicalview" heading="Model">
+          <uib-tabset>
+            <uib-tab  ng-show="technicalview" heading="ED">
+              <pre>{{selectedEd | json}}</pre>
+            </uib-tab>
 
-        <uib-tab  ng-show="technicalview" heading="ED">
-          <pre>{{selectedEd | json}}</pre>
+            <uib-tab  ng-show="technicalview" heading="Item">
+              <pre>{{selectedItem | json}}</pre>
+            </uib-tab>
+          </uib-tabset>
+
         </uib-tab>
 
-        <uib-tab  ng-show="technicalview" heading="Item">
-          <pre>{{selectedItem | json}}</pre>
-        </uib-tab>
+
+
+
+
+
 
         <uib-tab ng-show="technicalview" heading="Validate">
 
@@ -489,13 +523,14 @@
           </div>
 
 
+          <pre>{{q | json}}</pre>
 
 
 
         </uib-tab>
 
 
-        <uib-tab ng-show="technicalview" heading="Q">
+        <uib-tab ng-show="false && technicalview" heading="Q">
           <pre>{{q | json}}</pre>
         </uib-tab>
 

@@ -470,7 +470,8 @@ angular.module("pocApp")
 
 
                 let Q = {resourceType:'Questionnaire'}
-                Q.title = firstElement.display
+                Q.name = firstElement.ed.path
+                Q.title = firstElement.title
                 Q.status = 'active'
                 Q.url = `http://canshare.co.nz/questionnaire/${firstElement.ed.path}`
                 Q.id = `canshare-${firstElement.ed.path}`
@@ -552,6 +553,17 @@ angular.module("pocApp")
                     let vo = getControlDetails(ed)
 
                     item.type = vo.controlType
+
+                    if (vo.controlHint == 'radio') {
+                        let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+
+                        let cc = {coding:[{code: 'radio-button',system:'http://hl7.org/fhir/questionnaire-item-control'}]}
+                        ext.valueCodeableConcept = cc
+                        item.extension = ed.extension || []
+                        item.extension.push(ext)
+                    }
+
+
 
 
 

@@ -87,45 +87,69 @@ angular.module('formsApp')
                 );
 
 
+
                 function setupQ () {
 
                     console.log($scope.q)
                     console.log($scope.hashEd)
 
-                    //create the redirect url to fhorPathLab.
-
+                    //create the redirect url to fhirPathLab.
                     let qry = `https://fhir.forms-lab.com/Questionnaire/${$scope.q.id}`
 
                     $scope.redirectUrl = `https://fhirpath-lab.com/Questionnaire/tester?tab=csiro+renderer&id=${qry}` //redirectUrl
 
-
+                    //This was code to allow multiple of this directive in a single page. Didn't work. May no longer be needed.
                     $scope.treenode = $scope.treenode || "designTreeX"
                     //add the node
                     let html = `<div id="${$scope.treenode}"></div>`
                     $( "#designTree" ).after( ( html ) );
 
+                    //$scope.q is set from the directive attributes. setupQ() is only called when it is not null
+                    let vo = renderFormsSvc2.makeTreeFromQ($scope.q)
+                    $scope.treeData = vo.treeData
+
+                    drawTree(vo.treeData)       //for drawing the tree
+
+                    getNotes($scope.q.name)
 
 
+                }
 
+                function getNotes(name) {
+                    //get any existing notes for this model
 
-                    if ($scope.q) {
-
-                        let vo = renderFormsSvc2.makeTreeFromQ($scope.q)
-                        $scope.treeData = vo.treeData
-
-
-/*
-                        //show sections
-                        vo.treeData.forEach(function (item) {
-                            item.state.opened = true
-                            if (item.parent == 'root') {
-                                item.state.opened = false;
+                    let url = `review/${name}`
+                    $http.get(url).then(
+                        function (data) {
+                            // [{name: id: note: user:}]
+                            console.log(data)
+                            //create a hash by path
+                            $scope.hashNotes = {}
+                            for (const note of data.data) {
+                                $scope.hashNotes[note.path] = $scope.hashNotes[note.path] || []
+                                $scope.hashNotes[note.path].push(note)
                             }
+                            console.log($scope.hashNotes)
+                        },
+                        function (err) {
+                            console.log(err)
                         })
-*/
-                        drawTree(vo.treeData)       //for drawing the tree
 
-                    }
+                }
+
+                //add a new  for an element
+                $scope.addNote = function (note,user,ed) {
+                    let newNote = {note:note, userName : user, path: ed.path,modelName:$scope.q.name}
+                    $http.post('/review',newNote).then(
+                        function () {
+                            $scope.hashNotes = $scope.hashNotes || []
+                            $scope.hashNotes[newNote.path].push(newNote)
+                        },function (err) {
+                            alert(angular.toJson(err))
+                        }
+                    )
+
+                    console.log(newNote,ed)
 
                 }
 
@@ -144,7 +168,7 @@ angular.module('formsApp')
                         if (item.enableWhen && item.enableWhen.length > 0) {
 
                             entry.isDisabled = ! (renderFormsSvc2.isEnabled(item,$scope.dataEntered))
-                            console.log(item.linkId,entry.isDisabled)
+                            //console.log(item.linkId,entry.isDisabled)
                         }
 
 //console.log(entries)
