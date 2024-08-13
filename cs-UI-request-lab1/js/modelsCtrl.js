@@ -1658,7 +1658,12 @@ angular.module("pocApp")
                 //by supplying the dg in the call, the eds will be annotatded with 'definedOnDG' for those in the diff
                 $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name,dg)// vo.allElements
 
-//console.log($scope.fullElementList)
+                $scope.fullElementList.forEach(function (item) {
+                    console.log(item.ed.path)
+                })
+                
+
+console.log($scope.fullElementList)
 
                 $scope.fullElementHash = {}         //I seem to need this quite a lot. Though memory usage is getting high...
                 //create the list of all paths in the DG. Used by the 'ordering'

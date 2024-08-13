@@ -134,7 +134,9 @@ angular.module("pocApp")
 
                 let cDg = allDg[dgName]  //cDg = component Dg.
                 //let cDg = angular.copy(allDg[dgName])  //cDg = component Dg.
-                for (const ed of cDg.diff) {
+                for (const ed1 of cDg.diff) {
+
+                    let ed = angular.copy(ed1)
 
                     //temp delete ed.sourceModelName   //the previous version saved this in the DG. I prefer to add it here.
 
@@ -194,8 +196,10 @@ angular.module("pocApp")
 
 
             //create the override hash on the DG and remove override elements on referenced elements from the full diff
-            //into the overrides note that this does not includes Groups - they remain in the fullDifs and are processed
-            createDgOverride(dg)
+            //into the overrides note that this does not include Groups - they remain in the fullDifs and are processed
+            //Changed on Aug 14 2024 as it didn't seem to work in complex cases. Rather we wait until
+            //the referenced DG is being inserted and don't insert elements from the referenced DG that already exist.
+            //temp aug14createDgOverride(dg)
 
             //now we can create the initial snapshot (override DG's will have been removed from the fullDiff)
             let arElements = []     //for the log
@@ -444,7 +448,28 @@ angular.module("pocApp")
                                             let ed1 = angular.copy(edToInsert)  //as we're updating the path...
                                             let path = `${insertPath}.${edToInsert.path}`
                                             ed1.path = path
-                                            arElements.push(ed1)
+
+                                            //aug14 - if there's already an element at the path then don't insert
+                                            //this is a change to the strategy of overriding the contents of referenced DG's
+                                            //where we were removing the overrides, inserting from the referenced DG and then
+                                            //replacing the elements that were overriden.
+                                            let canInsert = true
+                                            for (ed2 of dg.fullDiff) {
+                                                if (ed2.path == path) {
+                                                    canInsert = false
+                                                    break
+                                                }
+                                            }
+
+                                            if (canInsert) {
+                                                arElements.push(ed1)
+                                            }
+
+
+                                            //aug 14arElements.push(ed1)
+
+
+
                                         })
 
                                         //the log entry. Include the elements that are being inserted
