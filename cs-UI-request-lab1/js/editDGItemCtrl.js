@@ -317,7 +317,7 @@ angular.module("pocApp")
                         $scope.qControlOptions =  ["string","text"]
                         break
                     case "CodeableConcept" :
-                        $scope.qControlOptions =  ["drop-down","autocomplete","lookup","radio"]
+                        $scope.qControlOptions =  ["drop-down","autocomplete","lookup","radio","check-box"]
                         break
                 }
 

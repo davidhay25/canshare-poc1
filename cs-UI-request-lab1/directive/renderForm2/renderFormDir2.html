@@ -45,7 +45,7 @@
         </div>
       </div>
 
-"
+
     </div>
     <div class="col-md-4  col-sm-4">
 
@@ -161,6 +161,49 @@
 
                 </td>
               </tr>
+
+
+
+
+              <tr ng-show="hasFixedValue(selectedEd)">
+                <td  class="detailName" >
+                  Fixed value
+                </td>
+                <td class="col-md-9">
+
+                  <div ng-show="selectedEd.fixedCode">
+                    {{selectedEd.fixedCode}}
+                  </div>
+                  
+
+                  <div ng-show="selectedEd.fixedRatio">
+                    <div ng-show="selectedEd.fixedRatio.numerator.unit">Numerator unit: {{selectedEd.fixedRatio.numerator.unit}}</div>
+                    <div ng-show="selectedEd.fixedRatio.denominator.unit">Denominator unit: {{selectedEd.fixedRatio.denominator.unit}}</div>
+                    <div ng-show="selectedEd.fixedRatio.denominator.value">Denominator value: {{selectedEd.fixedRatio.denominator.value}}</div>
+                  </div>
+
+                  <div ng-show="selectedEd.fixedQuantity">
+                                                <span ng-show = "selectedEd.fixedQuantity.unit">
+                                                  Unit: {{selectedEd.fixedQuantity.unit}}
+                                                </span>
+
+                    <span ng-show = "selectedEd.fixedQuantity.value">
+                                                  Value: {{selectedEd.fixedQuantity.value}}
+                                                </span>
+                  </div>
+
+                  <div ng-show="selectedEd.fixedCoding">
+                    {{selectedEd.fixedCoding.code}} | {{selectedEd.fixedCoding.display}} | {{selectedEd.fixedCoding.system}}
+                  </div>
+
+                  <span ng-show="selectedEd.fixedCoding ||
+                                                selectedEd.fixedQuantity || selectedEd.fixedRatio"
+                        class="pull-right"></span>
+
+                </td>
+              </tr>
+
+
 
 
               <tr ng-show="selectedEd.enableWhen" >
@@ -506,7 +549,7 @@
 
 
 
-          <div class="myScroll">
+          <div ng-show="oo" class="myScroll">
             <table class="table table-bordered">
               <tr ng-repeat="iss in oo.issue track by $index" ng-show="showIssue(iss)">
                 <td>{{iss.severity}}</td>

@@ -42,30 +42,11 @@ angular.module('formsApp')
                             return concepts
                         }
                     }
-/*
-                    let concepts = []
-                    if (ed.valueSet) {
-                        let options = vsSvc.getOneVS(ed.valueSet)
-                        console.log(options)
-                        return options
-                    } else {
-                        if (ed.options) {
-                            return ed.options
-                        }
-                    }
 
-                    */
+                }
 
-                   // return concepts
-                }
-/*
-                $scope.redirect = function () {
-                    window.open("http://cnn.com")
-                }
-*/
                 $scope.openDate = function(linkId) {
                     $scope.datePopup[linkId] = {opened:true}
-                    // $scope.datePopup.opened = true
                 }
 
                 $scope.input = {};
@@ -153,6 +134,14 @@ angular.module('formsApp')
 
                     console.log(newNote,ed)
 
+                }
+
+                $scope.hasFixedValue = function (ed) {
+                    if (ed) {
+                        if (ed.fixedCode || ed.fixedRatio || ed.fixedQuantity || ed.fixedCoding) {
+                            return true
+                        }
+                    }
                 }
 
                 //called when the form is updated

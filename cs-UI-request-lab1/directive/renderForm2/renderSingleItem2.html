@@ -7,7 +7,7 @@
 
 <div ng-show="entry.type == 'leaf'">
   <div ng-class="{leaf:true, disabled:entry.isDisabled}">
-    <div>
+    <div style="cursor: pointer" ng-click="onFocus(entry)">
       {{entry.title }}
 
     </div>
@@ -17,20 +17,42 @@
       <div ng-switch-when = "choice" >
 
 
+        <div ng-show="entry.ed.fixedCoding">
+          <div ng-click="onFocus(entry)">
+            Fixed value: {{entry.ed.fixedCoding.code}} | {{entry.ed.fixedCoding.display}} | {{entry.ed.fixedCoding.system}}
+          </div>
+
+
+
+        </div>
+
+
+        <div ng-hide="entry.ed.fixedCoding">
 
         <!-- Just have radio & dropdown for now...-->
         <div ng-show="entry.ed.controlHint == 'radio'">
           <div ng-repeat="concept in getOptions(entry.item)">
             <input type="radio" ng-model="dataEntered[entry.linkId]"
+                   ng-focus="onFocus(entry)"
                    ng-change = "dataUpdated(entry.item)"
                     ng-value="{{concept}}"/> {{concept.display}}
           </div>
         </div>
 
+          <div ng-show="entry.ed.controlHint == 'check-box'">
+            <div ng-repeat="concept in getOptions(entry.item)">
+              <input type="checkbox" ng-model="dataEntered[entry.linkId+$index]"
+                     ng-focus="onFocus(entry)"
+                     ng-change = "dataUpdated(entry.item)"
+                     ng-value="{{concept}}"/> {{concept.display}}
+            </div>
+            <em>This is not working in the same way as the CSIRO renderer</em>
+          </div>
+
 
 
         <!-- Default is the drop down-->
-        <div ng-show="!entry.ed.controlHint || entry.ed.controlHint == 'drop-down'">
+        <div ng-hide=" entry.ed.controlHint == 'radio' || entry.ed.controlHint == 'check-box'">
           <select class="form-control"  ng-model="dataEntered[entry.linkId]"
                   ng-focus="onFocus(entry.item)"
                   ng-change = "dataUpdated(entry.item)"
@@ -40,7 +62,7 @@
         </div>
 
 
-
+      </div>
 
 
 
@@ -62,6 +84,50 @@
 
 
 
+
+
+      </div>
+
+      <div ng-switch-when = "boolean" >
+
+        <input type="radio" ng-model="dataEntered[entry.linkId]"
+               ng-focus="onFocus(entry)"
+               name = "{{entry.linkId}}"
+               ng-change = "dataUpdated(entry.item)"
+               ng-value="yes"/> Yes
+
+        <input type="radio" ng-model="dataEntered[entry.linkId]"
+               ng-focus="onFocus(entry)"
+               name = "{{entry.linkId}}"
+               ng-change = "dataUpdated(entry.item)"
+               ng-value="no"/> No
+
+      </div>
+
+      <div ng-switch-when="date">
+        <input ng-change = "dataUpdated(entry.item)" class="form-control" type="date" ng-model="dataEntered[entry.linkId]">
+      </div>
+
+      <div ng-switch-when="dateTime">
+        <input ng-change = "dataUpdated(entry.item)" class="form-control" type="datetime-local" ng-model="dataEntered[entry.linkId]">
+
+<!--
+        <p class="input-group">
+
+          <input type="text" class="form-control" uib-datepicker-popup="dd-MMMM-yyyy"
+                 ng-model="dataEntered[entry.linkId]" is-open="datePopup[entry.linkId].opened"
+                 ng-focus="onFocus(cell)"
+                 ng-change = "dataUpdated(entry.item)"/>
+
+          <span class="input-group-btn">
+                  <button type="button" class="btn btn-default" ng-click="openDate(entry.linkId)">
+                      <i class="glyphicon glyphicon-calendar"></i>
+                  </button>
+                </span>
+
+        </p>
+
+        -->
 
 
       </div>

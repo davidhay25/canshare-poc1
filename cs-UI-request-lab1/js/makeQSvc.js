@@ -46,6 +46,10 @@ angular.module("pocApp")
                         controlHint = "dateTime"
                         controlType = "dateTime"
                         break
+                    case 'date' :
+                        controlHint = "date"
+                        controlType = "date"
+                        break
                     case 'CodeableConcept' :
                         //  controltype is always choice. May want typeahead later
 
@@ -84,7 +88,7 @@ angular.module("pocApp")
 
         //If the ed has the 'otherType set, then an additional item mutst be created - possibl with an enableWhen
         //The function returns the items to insert (including the source) - possibly not needed, but I'll leave it like this for now
-        function addOtherItem(ed,sourceItem) {
+        function addOtherItemDEP(ed,sourceItem) {
             let arItems = []        //the function returns the list of items
             switch (ed.otherType) {
                 case "always" :
@@ -484,14 +488,7 @@ angular.module("pocApp")
                     let ed = item.ed
                     let path = ed.path
                     hashEd[path] = ed
-                    //let ar = path.split('.')
-                    //let segmentCount = ar.length
-/*
-                    if (ed.valueSet) {
-                        hashVS[ed.valueSet] = hashVS[ed.valueSet] ||  []
-                        hashVS[ed.valueSet].push(ed.path)
-                    }
-                    */
+
 
                     if (currentItem) {
                         let parentItemPath = $filter('dropLastInPath')(path)
@@ -530,17 +527,14 @@ angular.module("pocApp")
                     if (! ed.type) {
                         return
                     }
-                    item.definition = ed.type[0]
 
+                    item.definition = ed.type[0]    //todo should be a reference to the ED
 
                     if (ed.mult) {
                         //required bolding
                         if (ed.mult.indexOf('1..') > -1) {
                             //need to add to any existing stype
                             item.required = true
-
-                          //  arStyle.push("font-weight:bold")
-                            // node['a_attr'] = { "style": "font-weight:bold" }
                         }
                         //multiple
                         if (ed.mult.indexOf('..*') > -1) {
@@ -563,7 +557,14 @@ angular.module("pocApp")
                         item.extension.push(ext)
                     }
 
+                    if (vo.controlHint == 'check-box') {
+                        let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
 
+                        let cc = {coding:[{code: 'check-box',system:'http://hl7.org/fhir/questionnaire-item-control'}]}
+                        ext.valueCodeableConcept = cc
+                        item.extension = ed.extension || []
+                        item.extension.push(ext)
+                    }
 
 
 
@@ -572,45 +573,61 @@ angular.module("pocApp")
                     let edType = ed.type[0]
 
                     if (edType == 'CodeableConcept') {
-                        if (ed.valueSet) {
-                            //check for any spaces in the valueSet url
-                            if (ed.valueSet.indexOf(' ') > -1 ) {
-                                //this is an illegal vs name
-                                errorLog.push({msg:`${ed.path} has an invalid valueSet: ${ed.valueSet}. The valueSet was not included`})
-                            } else {
-                                //hash of valueset by path
-                                hashVS[ed.valueSet] = hashVS[ed.valueSet] ||  []
-                                hashVS[ed.valueSet].push(ed.path)
 
-                                if (expandVS) {
-                                    //if we're expanding the VS, then add all the contents as optoins...
-                                    item.answerOption = []
-                                    let options = vsSvc.getOneVS(ed.valueSet)
-                                    if (options) {
-                                        for (const concept of options) {
-                                            concept.system = concept.system || unknownCodeSystem
-                                            item.answerOption.push({valueCoding : concept})
-                                        }
-                                    } else {
-                                        item.answerOption.push({valueCoding : {display:"The ValueSet is missing or empty"}})
-                                    }
+                        //check for fixedCoding. If there is, then set an answeroption with initialSelected
 
-                                } else {
-                                    //otherwise, add the answervalueSet property and let the renderer retrieve the contents
-                                    item.answerValueSet = ed.valueSet
-                                }
-                            }
-                        } else if (ed.options && ed.options.length > 0) {
-                            item.answerOption = []
-                            for (const concept of ed.options) {
-                                delete concept.fsn
-                                delete concept.pt
-                                concept.system = concept.system || unknownCodeSystem
-                                item.answerOption.push({valueCoding : concept})
-                            }
+                        if (ed.fixedCoding) {
+                            let concept = ed.fixedCoding
+                            item.answerOption = [{valueCoding:concept,initialSelected:true}]
+
                         } else {
-                            item.answerOption = [{valueCoding : {display:"There is neither a ValueSet nor options"}}]
+                            //no fixed value - check for valuesets & options
+                            if (ed.valueSet) {
+                                //check for any spaces in the valueSet url
+                                if (ed.valueSet.indexOf(' ') > -1 ) {
+                                    //this is an illegal vs name
+                                    errorLog.push({msg:`${ed.path} has an invalid valueSet: ${ed.valueSet}. The valueSet was not included`})
+                                } else {
+                                    //hash of valueset by path
+                                    hashVS[ed.valueSet] = hashVS[ed.valueSet] ||  []
+                                    hashVS[ed.valueSet].push(ed.path)
+
+                                    if (expandVS) {
+                                        //if we're expanding the VS, then add all the contents as optoins...
+                                        item.answerOption = []
+                                        let options = vsSvc.getOneVS(ed.valueSet)
+                                        if (options) {
+                                            for (const concept of options) {
+                                                concept.system = concept.system || unknownCodeSystem
+                                                item.answerOption.push({valueCoding : concept})
+                                            }
+                                        } else {
+                                            item.answerOption.push({valueCoding : {display:"The ValueSet is missing or empty"}})
+                                        }
+
+                                    } else {
+                                        //otherwise, add the answervalueSet property and let the renderer retrieve the contents
+                                        item.answerValueSet = ed.valueSet
+                                    }
+                                }
+                            } else if (ed.options && ed.options.length > 0) {
+                                item.answerOption = []
+                                for (const concept of ed.options) {
+                                    delete concept.fsn
+                                    delete concept.pt
+                                    concept.system = concept.system || unknownCodeSystem
+                                    item.answerOption.push({valueCoding : concept})
+                                }
+                            } else {
+                                item.answerOption = [{valueCoding : {display:"There is neither a ValueSet nor options"}}]
+                            }
+
                         }
+
+
+
+
+
                     }
 
                     if (edType == 'Quantity') {
@@ -623,7 +640,7 @@ angular.module("pocApp")
 
                         }
                     }
-
+/*
                     //This check must be after the options as any answerOption needs to be removed...
                     if (ed.fixedCoding) {
                         let coding = ed.fixedCoding
@@ -632,7 +649,7 @@ angular.module("pocApp")
                         delete item.answerOption        //if there's an initial, then can't have options as well
                         item.readOnly = true
                     }
-
+*/
 
 
 
