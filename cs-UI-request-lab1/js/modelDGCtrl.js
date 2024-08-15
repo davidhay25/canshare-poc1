@@ -63,22 +63,6 @@ angular.module("pocApp")
             }
 
 
-            //whether to show an element in the full element list.
-            $scope.canShowDGElementDEP = function(element,inx) {
-                if (inx ==0) {
-                    return false
-                }
-
-                if ($scope.input.showHiddenDGElement) {
-                    return true
-                } else {
-                    if (element.ed.mult == '0..0') {
-                        return false
-                    } else {return true}
-                }
-
-
-            }
 
             $scope.cloneDG = function (dg) {
                 $uibModal.open({
@@ -195,17 +179,20 @@ angular.module("pocApp")
             //check out the current DG
             $scope.checkOut = function () {
 
-
                 librarySvc.checkOut($scope.selectedModel,$scope.user,function (dg) {
                     //returns the DG downloaded from the library
                     if (dg) {
                         $scope.hashAllDG[dg.name] = dg
-                        $scope.selectModel(dg)      //in modelsCtrl
-                        traceSvc.addAction({action:'checkout',model:dg,description:"after"})
+
+                        $scope.makeSnapshots()
+
+                       // $timeout(function () {
+                            $scope.selectModel(dg)      //in modelsCtrl
+                       // },500)
+
                     }
-
-
                 })
+
             }
 
             $scope.checkIn = function () {
@@ -222,6 +209,8 @@ angular.module("pocApp")
                         function (data) {
                             //returns the model from the library
                             $scope.hashAllDG[$scope.selectedModel.name] = data
+                            $scope.makeSnapshots()
+
                             traceSvc.addAction({action:'revert-after',model:data})
                             $scope.$emit('updateDGList',{name:$scope.selectedModel.name})
 
@@ -695,7 +684,7 @@ angular.module("pocApp")
                     return
                 }
 
-                if (! confirm("Are you sure you wish to delete this element")) {
+                if (! confirm(`Are you sure you wish to delete this element: ${pathToDelete}`)) {
                     return
                 }
 

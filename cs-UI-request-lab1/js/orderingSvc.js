@@ -211,10 +211,6 @@ angular.module("pocApp")
 
                             //console.log(ed.path,type, hashAllDG[type].ordering)
 
-
-
-
-
                         }
                     }
 

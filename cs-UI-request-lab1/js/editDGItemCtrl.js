@@ -16,16 +16,7 @@ angular.module("pocApp")
             }
             $scope.fullElementList = fullElementList
             let dgName = fullElementList[0].ed.path     //it's aways the first element in the list...
-/*
-            //create the list of all paths in the DG. Used by the 'insertAfter'
-            $scope.allPaths = []
-            $scope.fullElementList.forEach(function (item) {
-                if (item.ed.mult !== '0..0') {
-                    $scope.allPaths.push(item.ed.path)
-                }
 
-            })
-*/
             $scope.options = []     //a list of options. Will be saved as ed.options
             $scope.units = [] //a list of units. Will be saved as ed.units
 
@@ -41,6 +32,7 @@ angular.module("pocApp")
             }
 
             //used to detect duplicate path names
+            //Issue is that it won't include deleted items (mult = 0..0) as they are no linger in the list...
             fullElementList.forEach(function (item) {
                 let ed = item.ed
                 if (ed && ed.path) {
@@ -107,6 +99,7 @@ angular.module("pocApp")
 
                 $scope.input.hideInQ =  item.ed.hideInQ
                 $scope.input.autoPop =  item.ed.autoPop
+                $scope.input.prepop =  item.ed.prepop
 
                 $scope.input.selectedType = item.ed.type[0]
                 setControlOptions($scope.input.selectedType)
@@ -351,6 +344,7 @@ angular.module("pocApp")
                 ed.valueSet = $scope.input.valueSet
                 ed.hideInQ = $scope.input.hideInQ
                 ed.autoPop = $scope.input.autoPop
+                ed.prePop = $scope.input.prePop
                 ed.placeholder = $scope.input.placeholder
                 if ($scope.input.controlHint) {
                     ed.controlHint = $scope.input.controlHint

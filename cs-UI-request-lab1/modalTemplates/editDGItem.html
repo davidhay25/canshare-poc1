@@ -201,6 +201,13 @@
           </tr>
 
           <tr>
+            <td>PrePop expression</td>
+            <td><input type="text"
+                       placeholder="FHIRPath pre-pop expression - eg Patient.name.first().family"
+                       class="form-control" ng-model="input.prePop"/> </td>
+          </tr>
+
+          <tr>
             <td>Hide label text</td>
             <td><checkbox ng-model="input.hideLabel"/>
               <div><em>If checked, there will be no label displayed for this item</em></div>
@@ -215,6 +222,7 @@
                      placeholder="Element label if not the text. XHTML supported."
                      class="form-control" ng-model="input.labelText"/> </td>
           </tr>
+
 
 
 

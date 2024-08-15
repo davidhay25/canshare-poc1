@@ -2,7 +2,7 @@
 
 angular.module("pocApp")
 
-    .service('makeQSvc', function($http,codedOptionsSvc,QutilitiesSvc,snapshotSvc,$filter,vsSvc) {
+    .service('makeQSvc', function($http,codedOptionsSvc,QutilitiesSvc,snapshotSvc,$filter,vsSvc,orderingSvc) {
 
 
         let unknownCodeSystem = "http://example.com/fhir/CodeSystem/example"
@@ -322,7 +322,7 @@ angular.module("pocApp")
         return {
 
 
-            makeHierarchicalQFromComp : function (comp,expandVS) {
+            makeHierarchicalQFromComp : function (comp,expandVS,hashAllDG) {
                 //construct a Q from the composition
                 //strategy is to gather the DG from the comp sections, create DG Qs then assemble them into the comp Q
                 //assumption is that the composition itself doesn't change the DG contents - it is just a selector of DGs
@@ -338,7 +338,7 @@ angular.module("pocApp")
                 Q.url = `http://canshare.co.nz/questionnaireUrl/${comp.name}`
                 Q.item = []
 
-                let containerSection = {text: "tabContainer", linkId: comp.name, extension: [], type: 'group', item: []}
+                let containerSection = {text: "Sections", linkId: comp.name, extension: [], type: 'group', item: []}
                 let ext = {url: "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
                 ext.valueCodeableConcept = {
                     coding: [{
@@ -351,22 +351,21 @@ angular.module("pocApp")
                 Q.item.push(containerSection)
 
 
-
-
-
                 let hashEd = {}         //has of ED by path (=linkId)
                 let hashVS = {}         //all valueSets
-
-//   $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)
 
                 for (const section of comp.sections) {
                     if (section.items && section.items.length > 0) {
                         let sectionItem = {linkId:section.name,text:section.title,type:'group',item:[]}
-                        //Q.item.push(sectionItem)
                         containerSection.item.push(sectionItem)
                         for (const contentDG of section.items) {     //a section can have multiple DGs within it.
                             let dgType = contentDG.type[0]        //the dg type. Generally a 'section' dg
                             let dgElementList = snapshotSvc.getFullListOfElements(dgType)
+
+                            //adjust according to 'insertAfter' values
+                            let dg = hashAllDG[dgType]
+                            orderingSvc.sortFullListByInsertAfter(dgElementList,dg,hashAllDG)
+
                             console.log(`About to process ${dgType}`)
                             let vo = that.makeHierarchicalQFromDG(dgElementList,expandVS)
 

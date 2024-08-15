@@ -49,7 +49,7 @@ angular.module("pocApp")
             $scope.ssHx = []
 
             $scope.makeSnapshots = function() {
-               // console.log('-------->   building snapshots...')
+                console.log('-------->   building snapshots...')
                 let voSs = snapshotSvc.makeSnapshots($scope.hashAllDG,true)
                 $scope.snapshotLog = voSs.log
                 $scope.ssErrorTypes = ['All']
@@ -1008,6 +1008,7 @@ angular.module("pocApp")
                         traceSvc.addAction({action:'delete-local',model:$scope.hashAllDG[dgName]})
                         delete $scope.hashAllDG[dgName]
                         delete $scope.selectedModel
+                        delete $scope.selectedNode
 
                         $scope.makeAllDTList()
                         $scope.refreshUpdates()
@@ -1102,9 +1103,18 @@ angular.module("pocApp")
                         ar.splice(0,1)
 
                         ed.path = `${pathOfCurrentElement}${ar.join('.')}`
-                        $scope.selectedModel.diff.push(ed)
-                        displayPath = ed.path
-                        traceSvc.addAction({action:'new-element',model:$scope.selectedModel,path:displayPath})
+
+                        //The path check in the dialog doesn't look for deleted elements, so we need to check here
+                        let ar1 = $scope.selectedModel.diff.filter(localEd => localEd.path == ed.path)
+                        if (ar1.length == 0) {
+                            $scope.selectedModel.diff.push(ed)
+                            displayPath = ed.path
+                            traceSvc.addAction({action:'new-element',model:$scope.selectedModel,path:displayPath})
+
+                        } else {
+                            alert("There's a deleted element with this path. It cannot be added.")
+                        }
+
 
                     } else {
                         //If an edit, then need to see if the item is directly defined on the DG (which will be updated),
@@ -1134,6 +1144,7 @@ angular.module("pocApp")
                                 ed1.otherType = ed.otherType
                                 ed1.hideInQ = ed.hideInQ
                                 ed1.autoPop = ed.autoPop
+                                ed1.prePop = ed.prePop
 
                                 ed1.hideLabel = ed.hideLabel
                                 ed1.labelText = ed.labelText
@@ -1452,12 +1463,9 @@ angular.module("pocApp")
 
                                 //save a copy to the Library (a we do with DGs)
                                 librarySvc.checkOut(newComp,$scope.user)
-                                //let qry = `/model/comp/${newComp.name}`
 
 
                                 $scope.hashAllCompositions[newComp.name] = newComp
-
-                                //$localStorage.world.compositions[newComp.name] = newComp
 
                                 $scope.selectComposition(newComp)
                             } else {
@@ -1649,36 +1657,27 @@ angular.module("pocApp")
             //also draw the graph & tree
             $scope.refreshFullList = function (dg) {
 
-
                 delete $scope.errorLog
-
-
                 $scope.relationshipsSummary = snapshotSvc.getRelationshipsSummary(dg.name)
 
                 //by supplying the dg in the call, the eds will be annotatded with 'definedOnDG' for those in the diff
                 $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name,dg)// vo.allElements
-
+/*
                 $scope.fullElementList.forEach(function (item) {
                     console.log(item.ed.path)
                 })
                 
 
 console.log($scope.fullElementList)
-
+*/
                 $scope.fullElementHash = {}         //I seem to need this quite a lot. Though memory usage is getting high...
                 //create the list of all paths in the DG. Used by the 'ordering'
                 $scope.allPaths = []  //used for the manual re-ordering
 
-                // hidden elements no longed in fullelement list
-               // let cntHidden = 0, cntVisible=0
-
                 $scope.fullElementList.forEach(function (item) {
                     $scope.fullElementHash[item.ed.path] = item.ed
                     if (item.ed.mult !== '0..0') {
-                       // cntVisible ++
                         $scope.allPaths.push(item.ed.path)
-                    } else {
-                       // cntHidden++
                     }
                 })
 
@@ -1695,13 +1694,13 @@ console.log($scope.fullElementList)
                 $scope.referencedDGOrdering = orderingSvc.createMoveFromReferences($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
 
                 $scope.dgFshLM = igSvc.makeFshForDG(dg,$scope.fullElementList)
-                makeGraph()
+                makeGraph()     //todo - do we want the graph back?
 
                 //always get all the valueset contents
                 vsSvc.getAllVS($scope.fullElementList, function () {
 
                 })
-
+/*
                 if ( autoQ) {
 
                     //we first gather all the Valuesets from the Term sever then make the Q
@@ -1728,7 +1727,7 @@ console.log($scope.fullElementList)
 
                 }
 
-
+*/
 
                 //The DG element tree
                 let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
@@ -1743,19 +1742,7 @@ console.log($scope.fullElementList)
             //only used for DG now
             $scope.selectModel = function (dg) {
                 if (dg) {
-                    //traceSvc.addAction({action:'select',model:dg})
 
-                    //note to self - there is a lot of audit stuff that is likely
-                    //not needed now 'cause we trap recursive references. If there appears to be a need, perhaps a separate invokable command...
-                    // temp - not using the audit now I think$scope.dgAudit = modelDGSvc.auditDGDiff(dg,$scope.hashAllDG)
-
-
-                    /* not sure about these 'errors' - seem to be many false positives.
-                    //make sure that $localStorage has been updated
-                    if (angular.toJson(dg) !== angular.toJson($localStorage.world.dataGroups[dg.name])) {
-                        alert(`Warning! the Browser copy of the DG ${dg.name} doesn't match the copy in memory! You should re-load the page and check it. From modelsCtrl:select`)
-                    }
-*/
                     clearB4Select()
                     $scope.selectedModel = dg
 
@@ -1874,7 +1861,6 @@ console.log($scope.fullElementList)
                         plugins:['dnd'],
                         dnd: {
                             'is_draggable' : function(nodes,e) {
-
                                 return $scope.canEdit($scope.selectedModel)
 
                             }
@@ -1969,40 +1955,6 @@ console.log($scope.fullElementList)
                 }
 
             })
-
-            function makeDGTreeSAVE(treeData) {
-                $('#dgTree').jstree('destroy');
-
-                let x = $('#dgTree').jstree(
-                    {'core': {'multiple': false, 'data': treeData,
-
-                            'themes': {name: 'proton', responsive: true}}}
-                ).on('changed.jstree', function (e, data) {
-                    // the node selection event...
-
-
-                    if (data.node) {
-                        $scope.selectedNode = data.node;
-                    }
-
-                    //set up the EnableWhen (conditional show)
-                    delete $scope.ewSourceValues
-                    delete $scope.input.ewSource
-                    delete $scope.input.ewSourceValue
-
-
-
-                    $scope.$digest();       //as the event occurred outside of angular...
-                }).bind("loaded.jstree", function (event, data) {
-                    let id = treeData[0].id
-                    $(this).jstree("open_node",id);
-                    //$(this).jstree("open_all");  //open all nodes
-
-
-                    $scope.$digest();
-                });
-
-            }
 
 
             $scope.expandCompTree = function () {

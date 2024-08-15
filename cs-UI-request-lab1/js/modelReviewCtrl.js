@@ -1,6 +1,7 @@
 angular.module("pocApp")
     .controller('modelReviewCtrl',
-        function ($scope,$http,modelsSvc,modelCompSvc,$timeout, $uibModal,makeQSvc,utilsSvc,$window, snapshotSvc,vsSvc) {
+        function ($scope,$http,modelsSvc,modelCompSvc,$timeout, $uibModal,makeQSvc,utilsSvc,$window,
+                  orderingSvc,snapshotSvc,vsSvc) {
 
             $scope.input = {}
 
@@ -94,8 +95,6 @@ angular.module("pocApp")
 
                 }
             )
-
-
 
             $scope.hasFixedValue = function (ed) {
                 if (ed) {
@@ -541,6 +540,10 @@ angular.module("pocApp")
                 $scope.setCommentsThisModel()   //retrieve comments for this model
                 $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)
 
+                //adjust according to 'insertAfter' values
+                orderingSvc.sortFullListByInsertAfter($scope.fullElementList,dg,$scope.hashAllDG)
+
+
                 //retrieve all the ValueSets in this DG. They are cached in the service
                 $scope.showWaiting = true
                 vsSvc.getAllVS($scope.fullElementList, function () {
@@ -616,7 +619,7 @@ angular.module("pocApp")
                 vsSvc.getAllVS(voComp.allElements, function () {
                     //alert("all VS available")
                     $scope.showWaiting = false
-                    let vo = makeQSvc.makeHierarchicalQFromComp(comp,true)//,$scope.hashAllDG)
+                    let vo = makeQSvc.makeHierarchicalQFromComp(comp,true,$scope.hashAllDG)
 
                     $scope.fullQ = vo.Q         //will invoke the Q renderer directive
                     $scope.hashEd = vo.hashEd

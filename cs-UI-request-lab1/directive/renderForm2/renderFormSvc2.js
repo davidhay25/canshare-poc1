@@ -22,16 +22,10 @@ angular.module("formsApp")
                                 isEnabled = true
                             }
                         }
-
                     }
-
-
-
-
                 })
 
                 return isEnabled
-
 
             },
 
@@ -72,6 +66,7 @@ angular.module("formsApp")
 
                 let hashItem = {}
                 let treeData = []
+
                 let root = {id:'root',text:Q.title || 'Root',parent:'#',state:{}}
                 treeData.push(root)
 
@@ -104,20 +99,10 @@ angular.module("formsApp")
                         arStyle.push("font-weight:bold")
                     }
 
-
                     //used for fixed values - readOnly also set true
                     if (item.initial) {
                         arStyle.push("color : blue")
                     }
-
-
-                    /*
-                    if (ed.fixedCoding || ed.fixedString) {
-                        arStyle.push("color : blue")
-                        // node['a_attr'] = { "style": "color : blue" }
-                    }
-*/
-
 
                     //create tree attribute node
                     if (arStyle.length > 0) {

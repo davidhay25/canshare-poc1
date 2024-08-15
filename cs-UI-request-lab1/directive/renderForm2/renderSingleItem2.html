@@ -1,8 +1,9 @@
 
 
 
-<div ng-show="entry.type == 'group'">
-  <div class="group">{{item.title }}</div>
+<div ng-show="entry.type == 'group' || entry.item.type == 'group'">
+  <div class="group">{{entry.item.text }}</div>
+
 </div>
 
 <div ng-show="entry.type == 'leaf'">
@@ -17,11 +18,15 @@
       <div ng-switch-when = "choice" >
 
 
-        <div ng-show="entry.ed.fixedCoding">
-          <div ng-click="onFocus(entry)">
-            Fixed value: {{entry.ed.fixedCoding.code}} | {{entry.ed.fixedCoding.display}} | {{entry.ed.fixedCoding.system}}
-          </div>
 
+        <div ng-show="entry.ed.fixedCoding">
+          <div class="row">
+            <div class="col-md-10">
+              <div ng-click="onFocus(entry)">
+                Fixed value: {{entry.ed.fixedCoding.code}} | {{entry.ed.fixedCoding.display}} | {{entry.ed.fixedCoding.system}}
+              </div>
+            </div>
+          </div>
 
 
         </div>
@@ -53,11 +58,19 @@
 
         <!-- Default is the drop down-->
         <div ng-hide=" entry.ed.controlHint == 'radio' || entry.ed.controlHint == 'check-box'">
-          <select class="form-control"  ng-model="dataEntered[entry.linkId]"
-                  ng-focus="onFocus(entry.item)"
-                  ng-change = "dataUpdated(entry.item)"
-                  ng-options="concept.display for concept in getOptions(entry.item)">
-          </select>
+          <div class="row">
+            <div class="col-md-10">
+              <select class="form-control"  ng-model="dataEntered[entry.linkId]"
+                      ng-focus="onFocus(entry.item)"
+                      ng-change = "dataUpdated(entry.item)"
+                      ng-options="concept.display for concept in getOptions(entry.item)">
+              </select>
+            </div>
+            <div class="col-md-2">
+              {{getOptions(entry.item).length}}
+            </div>
+          </div>
+
 
         </div>
 
@@ -104,12 +117,26 @@
 
       </div>
 
-      <div ng-switch-when="date">
-        <input ng-change = "dataUpdated(entry.item)" class="form-control" type="date" ng-model="dataEntered[entry.linkId]">
-      </div>
+      <div ng-switch-when = "date">
+        <div class="row">
+          <div class="col-md-10">
+            <input ng-change = "dataUpdated(entry.item)" class="form-control" type="date" ng-model="dataEntered[entry.linkId]">
 
-      <div ng-switch-when="dateTime">
-        <input ng-change = "dataUpdated(entry.item)" class="form-control" type="datetime-local" ng-model="dataEntered[entry.linkId]">
+          </div>
+          <div class="col-md-2">
+          </div>
+        </div>
+         </div>
+
+      <div ng-switch-when = "dateTime">
+        <div class="row">
+          <div class="col-md-10">
+            <input ng-change = "dataUpdated(entry.item)" class="form-control" type="datetime-local" ng-model="dataEntered[entry.linkId]">
+
+          </div>
+          <div class="col-md-2">
+          </div>
+        </div>
 
 <!--
         <p class="input-group">
@@ -133,13 +160,20 @@
       </div>
 
       <div ng-switch-default>
+        <div class="row">
+          <div class="col-md-10">
+            <input class="form-control"
 
-        <input class="form-control"
+                   ng-focus="onFocus(entry)"
+                   ng-change = "dataUpdated(entry.item)"
+                   placeholder="{{cell.meta.placeholder}}"
+                   ng-model="dataEntered[entry.linkId]"/>
+          </div>
+          <div class="col-md-2">
+          </div>
+        </div>
 
-               ng-focus="onFocus(entry)"
-               ng-change = "dataUpdated(entry.item)"
-               placeholder="{{cell.meta.placeholder}}"
-               ng-model="dataEntered[entry.linkId]"/>
+
 
 
 
@@ -149,7 +183,7 @@
     </div>
 
     <div ng-repeat="ew in entry.ed.enableWhen" ng-show="entry.isDisabled">
-      <em>{{ew.source}}{{ew.operator}}{{ew.value.display}}</em>
+      <em>{{ew.source | dropFirstInPath}}{{ew.operator}}{{ew.value.display}}</em>
 
     </div>
 

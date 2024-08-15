@@ -215,7 +215,7 @@
                   <table class="table">
                     <tr><th>Source</th><th>Op.</th><th>Value</th></tr>
                     <tr ng-repeat="ew in selectedEd.enableWhen">
-                      <td>{{ew.source}}</td>
+                      <td>{{ew.source | dropFirstInPath}}</td>
                       <td>{{ew.operator}}</td>
                       <td>{{ew.value.code}} | {{ew.value.display}}</td>
                     </tr>
@@ -226,9 +226,16 @@
               </tr>
 
               <tr>
-                <td class="detailName"> Source Ref</td>
+                <td class="detailName">Source Ref</td>
                 <td>
                   {{selectedEd.sourceReference}}
+                </td>
+              </tr>
+
+              <tr ng-show="selectedEd.prePop && technicalview">
+                <td class="detailName">PrePop</td>
+                <td>
+                  {{selectedEd.prePop}}
                 </td>
               </tr>
 
