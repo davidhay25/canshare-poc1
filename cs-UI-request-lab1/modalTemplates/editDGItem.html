@@ -186,10 +186,32 @@
             <td><checkbox ng-model="input.hideInQ"> </td>
           </tr>
 
-          <tr>
+          <tr ng-show="false">
             <td>Set auto populate flag</td>
             <td><checkbox ng-model="input.autoPop"/>
               <div><em>If checked, an '(Auto populated) will appear in the Questionnaire</em></div>
+            </td>
+          </tr>
+
+          <tr ng-show="false">
+            <td>Set auto gTable flag</td>
+            <td><checkbox ng-model="input.gtable"/>
+              <div><em>If checked, the contents will be displayed in a table row</em></div>
+            </td>
+          </tr>
+
+          <tr>
+            <td>Set collapsible option</td>
+            <td>
+              <div class="row">
+                <div class="col-md-6">
+                  <select class="form-control" ng-model="input.collapsible"
+                          ng-options = "opt for opt in input.collapsibleOptions"></select>
+                </div>
+              </div>
+
+
+              <div><em>Allows a group to be expanded / collapsed</em></div>
             </td>
           </tr>
 
@@ -202,12 +224,28 @@
 
           <tr>
             <td>PrePop expression</td>
-            <td><input type="text"
-                       placeholder="FHIRPath pre-pop expression - eg Patient.name.first().family"
-                       class="form-control" ng-model="input.prePop"/> </td>
+            <td>
+              <div class="row">
+                <div class="col-md-10">
+                  <input type="text"
+                         placeholder="FHIRPath pre-pop expression - eg Patient.name.first().family"
+                         class="form-control" ng-model="input.prePop"/>
+
+                </div>
+                <div class="col-md-1">
+                  <span class="btn btn-link" ng-click="testPrePop(input.prePop)">Test</span>
+
+                </div>
+                <div class="col-md-1">
+
+                  <span>Spec</span>
+                </div>
+              </div>
+            <div><pre ng-show="testPPResult">{{testPPResult | json}}</pre></div>
+            </td>
           </tr>
 
-          <tr>
+          <tr ng-show="false">
             <td>Hide label text</td>
             <td><checkbox ng-model="input.hideLabel"/>
               <div><em>If checked, there will be no label displayed for this item</em></div>

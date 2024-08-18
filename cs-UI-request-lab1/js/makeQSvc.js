@@ -6,7 +6,32 @@ angular.module("pocApp")
 
 
         let unknownCodeSystem = "http://example.com/fhir/CodeSystem/example"
+        let extLaunchContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+        extPrePopUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+        extItemControlUrl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
+        extCollapsibleUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-collapsible"
+        //let extGtableUrl = ""
+       // let extSourceQuery = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-sourceQueries"
+        systemItemControl = "http://hl7.org/fhir/questionnaire-item-control"
 
+        function addPrePopExtensions(Q) {
+            //add the SDC extensions required for pre-pop
+            Q.extension = Q.extension || []
+            addExtension("LaunchPatient","Patient","The patient that is to be used to pre-populate the form")
+            addExtension("LaunchPractitioner","Practitioner","The practitioner that is to be used to pre-populate the form")
+
+            //let ext = {url:extSourceQuery,valueReference:{reference:"#PrePopQuery"}}
+
+            function addExtension(name,type,description) {
+                let ext = {url:extLaunchContextUrl,extension:[]}
+
+                ext.extension.push({url:'name',valueId:name})
+                ext.extension.push({url:'type',valueCode:type})
+                ext.extension.push({url:'description',valueString:description})
+                Q.extension.push(ext)
+            }
+
+        }
 
 
         //given an ed, return the control type and hine
@@ -197,7 +222,7 @@ angular.module("pocApp")
                      //console.log(item.text,data.controlType,data.controlHint)
                      //the hint is the extension that gives more options to the renderer
                      item.extension = item.extension || []
-                     let ext = {url: "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+                     let ext = {url: extItemControlUrl}
                      ext.valueCodeableConcept = {
                          coding: [{
                              code: vo.controlHint,
@@ -336,16 +361,20 @@ angular.module("pocApp")
                 Q.status = 'active'
                 Q.id = `canshare-${comp.name}`
                 Q.url = `http://canshare.co.nz/questionnaireUrl/${comp.name}`
+                addPrePopExtensions(Q)
                 Q.item = []
 
                 let containerSection = {text: "Sections", linkId: comp.name, extension: [], type: 'group', item: []}
-                let ext = {url: "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+                let ext = {url: extItemControlUrl}
                 ext.valueCodeableConcept = {
                     coding: [{
                         code: "tab-container",
-                        system: "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
+                        system: "http://hl7.org/fhir/questionnaire-item-control"
                     }]
                 }
+
+                //http://hl7.org/fhir/ValueSet/questionnaire-item-control
+                //
                 containerSection.extension.push(ext)
 
                 Q.item.push(containerSection)
@@ -473,11 +502,13 @@ angular.module("pocApp")
 
 
                 let Q = {resourceType:'Questionnaire'}
+                Q.id = `canshare-${firstElement.ed.path}`
                 Q.name = firstElement.ed.path
                 Q.title = firstElement.title
                 Q.status = 'active'
                 Q.url = `http://canshare.co.nz/questionnaire/${firstElement.ed.path}`
-                Q.id = `canshare-${firstElement.ed.path}`
+
+                addPrePopExtensions(Q)
                 let currentItem
                 let hashItems = {}      //items by linkId
                 let hashEd = {}         //has of ED by path (=linkId)
@@ -541,14 +572,12 @@ angular.module("pocApp")
                         }
                     }
 
-
-
                     let vo = getControlDetails(ed)
 
                     item.type = vo.controlType
 
                     if (vo.controlHint == 'radio') {
-                        let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+                        let ext = {url:extItemControlUrl}
 
                         let cc = {coding:[{code: 'radio-button',system:'http://hl7.org/fhir/questionnaire-item-control'}]}
                         ext.valueCodeableConcept = cc
@@ -557,7 +586,7 @@ angular.module("pocApp")
                     }
 
                     if (vo.controlHint == 'check-box') {
-                        let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"}
+                        let ext = {url:extItemControlUrl}
 
                         let cc = {coding:[{code: 'check-box',system:'http://hl7.org/fhir/questionnaire-item-control'}]}
                         ext.valueCodeableConcept = cc
@@ -624,9 +653,6 @@ angular.module("pocApp")
                         }
 
 
-
-
-
                     }
 
                     if (edType == 'Quantity') {
@@ -639,20 +665,43 @@ angular.module("pocApp")
 
                         }
                     }
-/*
-                    //This check must be after the options as any answerOption needs to be removed...
-                    if (ed.fixedCoding) {
-                        let coding = ed.fixedCoding
-                        delete coding.fsn
-                        item.initial = [{valueCoding : coding}]
-                        delete item.answerOption        //if there's an initial, then can't have options as well
-                        item.readOnly = true
+
+                    if (ed.prePop) {
+                        //let ext = {url:extPrePopUrl}
+                        let ext = {url:"http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"}
+
+                        //Assume a naming convention for context names - '%Launch{resourcetype}
+                        let expression = `%Launch${ed.prePop}`
+                        ext.valueExpression = {language:"text/fhirpath",expression:expression}
+                        item.extension = item.extension || []
+                        item.extension.push(ext)
+
                     }
-*/
 
 
 
-                   // {controlType:controlType,controlHint:controlHint}
+                    if (ed.collapsible) {
+                        let ext = {url:extCollapsibleUrl}
+                        ext.valueCode = ed.collapsible
+                        item.extension = item.extension || []
+                        item.extension.push(ext)
+                    }
+
+                    if (ed.gtable) {
+                        let ext = {url:extItemControlUrl}
+                        ext.valueCodeableConcept = {
+                            coding: [{
+                                code: "gtable",
+                                system: systemItemControl
+                            }]
+                        }
+
+                        item.extension = item.extension || []
+                        item.extension.push(ext)
+
+                    }
+
+
                 }
 
 

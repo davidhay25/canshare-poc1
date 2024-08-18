@@ -3,6 +3,12 @@
 angular.module("formsApp")
     .service('renderFormsSvc2', function() {
 
+        //copied from makeQ.svc
+        let unknownCodeSystem = "http://example.com/fhir/CodeSystem/example"
+        let extLaunchContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+        let extPrePopUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+
+
         return {
 
             isEnabled : function (item,hashData) {
@@ -61,11 +67,13 @@ angular.module("formsApp")
 
             makeTreeFromQ : function(Q) {
                 // a recursive form of the tree generation
+                //todo - create list of pre-pop expressions
 
                 let that = this
 
                 let hashItem = {}
                 let treeData = []
+                let prepopExpression = []
 
                 let root = {id:'root',text:Q.title || 'Root',parent:'#',state:{}}
                 treeData.push(root)
@@ -115,6 +123,15 @@ angular.module("formsApp")
                         // console.log(ed.path,style)
                     }
 
+                    //check for prepop expression
+                    if (item.extension) {
+                        for (const ext of item.extension) {
+                            if (ext.url == extPrePopUrl && ext.valueExpression) {
+                                prepopExpression.push({linkId:item.linkId,expression:ext.valueExpression.expression})
+
+                            }
+                        }
+                    }
 
                     treeData.push(node)
 
@@ -163,7 +180,7 @@ angular.module("formsApp")
 
                 */
 
-                return {treeData: treeData,hashItem:hashItem}
+                return {treeData: treeData,hashItem:hashItem,prepopExpression:prepopExpression}
 
 
 

@@ -1,0 +1,4164 @@
+
+{
+  "resourceType": "Bundle",
+  "type": "bundle",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "8479",
+        "meta": {
+          "versionId": "6",
+          "lastUpdated": "2022-04-27T05:28:19.308+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Levi hay</div>"
+        },
+        "identifier": [
+          {
+            "value": "COF-1"
+          }
+        ],
+        "name": [
+          {
+            "use": "official",
+            "text": "Levi hay",
+            "family": "hay",
+            "given": [
+              "Levi",
+              "Updated"
+            ]
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2019-10-10"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "8490",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.413+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Onychomycosis</div>"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "14657009",
+                "display": "Diagnosis",
+                "path": "category"
+              }
+            ],
+            "text": "Diagnosis"
+          }
+        ],
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "24484000",
+              "display": "severe",
+              "path": "severity"
+            }
+          ],
+          "text": "severe"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "414941998",
+              "display": "onychomycosis",
+              "path": "code"
+            }
+          ],
+          "text": "onychomycosis"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "onsetAge": {
+          "value": 77,
+          "system": "http://unitsofmeasure.org",
+          "code": "a"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "8491",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.413+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Angina</div>"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "14657009",
+                "display": "Diagnosis",
+                "path": "category"
+              }
+            ],
+            "text": "Diagnosis"
+          }
+        ],
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "6736007",
+              "display": "moderate",
+              "path": "severity"
+            }
+          ],
+          "text": "Moderate"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "194818000",
+              "display": "angina",
+              "path": "code"
+            }
+          ],
+          "text": "angina"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "onsetAge": {
+          "value": 76,
+          "system": "http://unitsofmeasure.org",
+          "code": "a"
+        },
+        "evidence": [
+          {
+            "code": [
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/ct",
+                    "code": "29857009",
+                    "display": "Chest Pain"
+                  }
+                ],
+                "text": "Chest Pain"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "8481",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.413+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Asthma</div>"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "14657009",
+                "display": "Diagnosis",
+                "path": "category"
+              }
+            ],
+            "text": "Diagnosis"
+          }
+        ],
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "6736007",
+              "display": "mild to moderate",
+              "path": "severity"
+            }
+          ],
+          "text": "mild to moderate"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "195917001",
+              "display": "asthma",
+              "path": "code"
+            }
+          ],
+          "text": "asthma"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "onsetAge": {
+          "value": 14,
+          "system": "http://unitsofmeasure.org",
+          "code": "a"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "8482",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.413+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Diabetes</div>"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "14657009",
+                "display": "Diagnosis",
+                "path": "category"
+              }
+            ],
+            "text": "Diagnosis"
+          }
+        ],
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "6736007",
+              "display": "moderate",
+              "path": "severity"
+            }
+          ],
+          "text": "moderate"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "73211009",
+              "display": "diabetes",
+              "path": "code"
+            }
+          ],
+          "text": "diabetes"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "onsetAge": {
+          "value": 60,
+          "system": "http://unitsofmeasure.org",
+          "code": "a"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "8487",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.413+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Rheumatoid arthritis - left elbow</div>"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "14657009",
+                "display": "Diagnosis",
+                "path": "category"
+              }
+            ],
+            "text": "Diagnosis"
+          }
+        ],
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "6736007",
+              "display": "mild to moderate",
+              "path": "severity"
+            }
+          ],
+          "text": "Diagnosis"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "69896004",
+              "display": "rheumatoid arthritis",
+              "path": "code"
+            }
+          ],
+          "text": "rheumatoid arthritis - left elbow"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "onsetAge": {
+          "value": 74,
+          "system": "http://unitsofmeasure.org",
+          "code": "a"
+        },
+        "evidence": [
+          {
+            "code": [
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/ct",
+                    "code": "57676002",
+                    "display": "Painful Joint"
+                  }
+                ],
+                "text": "Painful joint"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "8488",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.413+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">GERD</div>"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "14657009",
+                "display": "Diagnosis",
+                "path": "category"
+              }
+            ],
+            "text": "Diagnosis"
+          }
+        ],
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "6736007",
+              "display": "moderate",
+              "path": "severity"
+            }
+          ],
+          "text": "Moderate"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "235595009",
+              "display": "GERD",
+              "path": "code"
+            }
+          ],
+          "text": "GERD"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "onsetAge": {
+          "value": 66,
+          "system": "http://unitsofmeasure.org",
+          "code": "a"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "8489",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.413+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Hypercholesterolaemia</div>"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "14657009",
+                "display": "Diagnosis",
+                "path": "category"
+              }
+            ],
+            "text": "Diagnosis"
+          }
+        ],
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "6736007",
+              "display": "moderate",
+              "path": "severity"
+            }
+          ],
+          "text": "Moderate"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "13644009",
+              "display": "high cholesterol",
+              "path": "code"
+            }
+          ],
+          "text": "high cholesterol"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "onsetAge": {
+          "value": 68,
+          "system": "http://unitsofmeasure.org",
+          "code": "a"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "8483",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.413+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Hypertension</div>"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "14657009",
+                "display": "Diagnosis",
+                "path": "category"
+              }
+            ],
+            "text": "Diagnosis"
+          }
+        ],
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "255604002",
+              "display": "mild",
+              "path": "severity"
+            }
+          ],
+          "text": "Mild"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "38341003",
+              "display": "hypertension",
+              "path": "code"
+            }
+          ],
+          "text": "hypertension"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "onsetAge": {
+          "value": 68,
+          "system": "http://unitsofmeasure.org",
+          "code": "a"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "8484",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.413+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Depression</div>"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "14657009",
+                "display": "Diagnosis",
+                "path": "category"
+              }
+            ],
+            "text": "Diagnosis"
+          }
+        ],
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "6736007",
+              "display": "moderate",
+              "path": "severity"
+            }
+          ],
+          "text": "Moderate"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "35489007",
+              "display": "depression",
+              "path": "code"
+            }
+          ],
+          "text": "depression"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "onsetAge": {
+          "value": 74,
+          "system": "http://unitsofmeasure.org",
+          "code": "a"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "8485",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.413+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Neuropathic pain</div>"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "14657009",
+                "display": "Diagnosis",
+                "path": "category"
+              }
+            ],
+            "text": "Diagnosis"
+          }
+        ],
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "6736007",
+              "display": "moderate",
+              "path": "severity"
+            }
+          ],
+          "text": "moderate"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "247389009",
+              "display": "neuropathic pain",
+              "path": "code"
+            }
+          ],
+          "text": "neuropathic pain"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "onsetAge": {
+          "value": 75,
+          "system": "http://unitsofmeasure.org",
+          "code": "a"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "8486",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.413+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Rheumatoid Arthritis</div>"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "14657009",
+                "display": "Diagnosis",
+                "path": "category"
+              }
+            ],
+            "text": "Diagnosis"
+          }
+        ],
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "6736007",
+              "display": "moderate",
+              "path": "severity"
+            }
+          ],
+          "text": "Moderate"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "69896004",
+              "display": "rheumatoid arthritis",
+              "path": "code"
+            }
+          ],
+          "text": "rheumatoid arthritis - both hands"
+        },
+        "bodySite": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/ct",
+                "code": "12861001",
+                "display": "both hands",
+                "path": "bodySite"
+              }
+            ],
+            "text": "both hands"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "onsetAge": {
+          "value": 72,
+          "system": "http://unitsofmeasure.org",
+          "code": "a"
+        },
+        "evidence": [
+          {
+            "code": [
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/ct",
+                    "code": "57676002",
+                    "display": "Painful Joint"
+                  }
+                ],
+                "text": "Painful joint"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "List",
+        "id": "8480",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.413+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Problem list</div>"
+        },
+        "status": "current",
+        "mode": "snapshot",
+        "title": "Problems List",
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/list-example-use-codes",
+              "code": "problems",
+              "path": "code"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "date": "2019-10-23T06:42:45-03:00",
+        "entry": [
+          {
+            "date": "2019-10-23T06:42:45-03:00",
+            "item": {
+              "reference": "Condition/8481"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:45-03:00",
+            "item": {
+              "reference": "Condition/8482"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:45-03:00",
+            "item": {
+              "reference": "Condition/8483"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:45-03:00",
+            "item": {
+              "reference": "Condition/8484"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:45-03:00",
+            "item": {
+              "reference": "Condition/8485"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:45-03:00",
+            "item": {
+              "reference": "Condition/8486"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:45-03:00",
+            "item": {
+              "reference": "Condition/8487"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:45-03:00",
+            "item": {
+              "reference": "Condition/8488"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:45-03:00",
+            "item": {
+              "reference": "Condition/8489"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:45-03:00",
+            "item": {
+              "reference": "Condition/8490"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:45-03:00",
+            "item": {
+              "reference": "Condition/8491"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "List",
+        "id": "8532",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Medication list</div>"
+        },
+        "status": "current",
+        "mode": "snapshot",
+        "title": "Medication List",
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/list-example-use-codes",
+              "code": "medications",
+              "path": "code"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "date": "2019-10-23T06:42:47-03:00",
+        "entry": [
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8533"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8534"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8535"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8536"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8537"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8538"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8539"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8540"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8541"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8542"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8543"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8544"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8545"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8546"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8547"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8548"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8549"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8550"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:47-03:00",
+            "item": {
+              "reference": "MedicationStatement/8551"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "List",
+        "id": "8554",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:49.534+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Allergies list</div>"
+        },
+        "status": "current",
+        "mode": "snapshot",
+        "title": "Allergies List",
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/list-example-use-codes",
+              "code": "allergies",
+              "path": "code"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "date": "2019-10-23T06:42:49-03:00",
+        "entry": [
+          {
+            "date": "2019-10-23T06:42:49-03:00",
+            "item": {
+              "reference": "AllergyIntolerance/8555"
+            }
+          },
+          {
+            "date": "2019-10-23T06:42:49-03:00",
+            "item": {
+              "reference": "AllergyIntolerance/8556"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "8501",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.812+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Sep 9th 2019 for headache</div>"
+        },
+        "status": "finished",
+        "type": [
+          {
+            "text": "OutPatient"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/8179",
+              "display": "Dr John Doe"
+            }
+          }
+        ],
+        "period": {
+          "start": "2019-09-09T09:42:46.667Z"
+        },
+        "diagnosis": [
+          {
+            "condition": {
+              "reference": "Condition/8487"
+            }
+          },
+          {
+            "condition": {
+              "reference": "Condition/8484"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "8500",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.812+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Oct 6th 2019 for sore throat</div>"
+        },
+        "status": "finished",
+        "type": [
+          {
+            "text": "OutPatient"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/8181",
+              "display": "Dr Annette Jones"
+            }
+          }
+        ],
+        "period": {
+          "start": "2019-10-06T09:42:46.667Z"
+        },
+        "diagnosis": [
+          {
+            "condition": {
+              "reference": "Condition/8488"
+            }
+          },
+          {
+            "condition": {
+              "reference": "Condition/8485"
+            }
+          },
+          {
+            "condition": {
+              "reference": "Condition/8483"
+            }
+          },
+          {
+            "condition": {
+              "reference": "Condition/8489"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "8499",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.812+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Oct 13th 2019 for sore throat</div>"
+        },
+        "status": "finished",
+        "type": [
+          {
+            "text": "GP"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/8179",
+              "display": "Dr John Doe"
+            }
+          }
+        ],
+        "period": {
+          "start": "2019-10-13T09:42:46.667Z"
+        },
+        "diagnosis": [
+          {
+            "condition": {
+              "reference": "Condition/8486"
+            }
+          },
+          {
+            "condition": {
+              "reference": "Condition/8483"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "8498",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.812+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Sep 10th 2019 for sore throat</div>"
+        },
+        "status": "finished",
+        "type": [
+          {
+            "text": "GP"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/8179",
+              "display": "Dr John Doe"
+            }
+          }
+        ],
+        "period": {
+          "start": "2019-09-10T09:42:46.667Z"
+        },
+        "diagnosis": [
+          {
+            "condition": {
+              "reference": "Condition/8482"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "8497",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.812+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Oct 11th 2019 for sore throat</div>"
+        },
+        "status": "finished",
+        "type": [
+          {
+            "text": "GP"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/8181",
+              "display": "Dr Annette Jones"
+            }
+          }
+        ],
+        "period": {
+          "start": "2019-10-11T09:42:46.666Z"
+        },
+        "diagnosis": [
+          {
+            "condition": {
+              "reference": "Condition/8484"
+            }
+          },
+          {
+            "condition": {
+              "reference": "Condition/8483"
+            }
+          },
+          {
+            "condition": {
+              "reference": "Condition/8491"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "8496",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.812+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Sep 18th 2019 for headache</div>"
+        },
+        "status": "finished",
+        "type": [
+          {
+            "text": "GP"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/8181",
+              "display": "Dr Annette Jones"
+            }
+          }
+        ],
+        "period": {
+          "start": "2019-09-18T09:42:46.666Z"
+        },
+        "diagnosis": [
+          {
+            "condition": {
+              "reference": "Condition/8491"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "8495",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.812+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Sep 30th 2019 for headache</div>"
+        },
+        "status": "finished",
+        "type": [
+          {
+            "text": "OutPatient"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/8181",
+              "display": "Dr Annette Jones"
+            }
+          }
+        ],
+        "period": {
+          "start": "2019-09-30T09:42:46.666Z"
+        },
+        "diagnosis": [
+          {
+            "condition": {
+              "reference": "Condition/8490"
+            }
+          },
+          {
+            "condition": {
+              "reference": "Condition/8489"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "8494",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.812+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Sep 18th 2019 for headache</div>"
+        },
+        "status": "finished",
+        "type": [
+          {
+            "text": "OutPatient"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/8181",
+              "display": "Dr Annette Jones"
+            }
+          }
+        ],
+        "period": {
+          "start": "2019-09-18T09:42:46.666Z"
+        },
+        "diagnosis": [
+          {
+            "condition": {
+              "reference": "Condition/8486"
+            }
+          },
+          {
+            "condition": {
+              "reference": "Condition/8481"
+            }
+          },
+          {
+            "condition": {
+              "reference": "Condition/8488"
+            }
+          },
+          {
+            "condition": {
+              "reference": "Condition/8486"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "8493",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.812+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Oct 6th 2019 for headache</div>"
+        },
+        "status": "finished",
+        "type": [
+          {
+            "text": "GP"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/8181",
+              "display": "Dr Annette Jones"
+            }
+          }
+        ],
+        "period": {
+          "start": "2019-10-06T09:42:46.666Z"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "8492",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:46.812+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Sep 30th 2019 for sore throat</div>"
+        },
+        "status": "finished",
+        "type": [
+          {
+            "text": "GP"
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/8179",
+              "display": "Dr John Doe"
+            }
+          }
+        ],
+        "period": {
+          "start": "2019-09-30T09:42:46.665Z"
+        },
+        "diagnosis": [
+          {
+            "condition": {
+              "reference": "Condition/8488"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8523",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Heart Rate, 78 bpm</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8867-4",
+              "path": "code"
+            }
+          ],
+          "text": "Heart Rate"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-09-25T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 78,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8502",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Body Temperature, 36 C</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8310-5",
+              "path": "code"
+            }
+          ],
+          "text": "Body Temperature"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-23T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 36,
+          "unit": "C"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8524",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Respiratory Rate, 28 resp/min</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "9279-1",
+              "path": "code"
+            }
+          ],
+          "text": "Respiratory Rate"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-09-25T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 28,
+          "unit": "resp/min"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8521",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Weight, 76.6 Kg</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "3141-9",
+              "path": "code"
+            }
+          ],
+          "text": "Weight"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-02T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 76.6,
+          "unit": "Kg"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8522",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Body Temperature, 36.7 C</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8310-5",
+              "path": "code"
+            }
+          ],
+          "text": "Body Temperature"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-09-25T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 36.7,
+          "unit": "C"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8520",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Height, 90 cm</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8302-2",
+              "path": "code"
+            }
+          ],
+          "text": "Height"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-02T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 90,
+          "unit": "cm"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8509",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Respiratory Rate, 31 resp/min</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "9279-1",
+              "path": "code"
+            }
+          ],
+          "text": "Respiratory Rate"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-16T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 31,
+          "unit": "resp/min"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8507",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Body Temperature, 36.8 C</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8310-5",
+              "path": "code"
+            }
+          ],
+          "text": "Body Temperature"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-16T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 36.8,
+          "unit": "C"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8529",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Respiratory Rate, 31 resp/min</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "9279-1",
+              "path": "code"
+            }
+          ],
+          "text": "Respiratory Rate"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-09-18T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 31,
+          "unit": "resp/min"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8508",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Heart Rate, 81 bpm</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8867-4",
+              "path": "code"
+            }
+          ],
+          "text": "Heart Rate"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-16T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 81,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8505",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Height, 90 cm</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8302-2",
+              "path": "code"
+            }
+          ],
+          "text": "Height"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-23T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 90,
+          "unit": "cm"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8527",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Body Temperature, 36.4 C</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8310-5",
+              "path": "code"
+            }
+          ],
+          "text": "Body Temperature"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-09-18T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 36.4,
+          "unit": "C"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8506",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Weight, 71.8 Kg</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "3141-9",
+              "path": "code"
+            }
+          ],
+          "text": "Weight"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-23T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 71.8,
+          "unit": "Kg"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8528",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Heart Rate, 73 bpm</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8867-4",
+              "path": "code"
+            }
+          ],
+          "text": "Heart Rate"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-09-18T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 73,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8503",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Heart Rate, 78 bpm</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8867-4",
+              "path": "code"
+            }
+          ],
+          "text": "Heart Rate"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-23T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 78,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8525",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Height, 90 cm</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8302-2",
+              "path": "code"
+            }
+          ],
+          "text": "Height"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-09-25T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 90,
+          "unit": "cm"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8504",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Respiratory Rate, 26 resp/min</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "9279-1",
+              "path": "code"
+            }
+          ],
+          "text": "Respiratory Rate"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-23T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 26,
+          "unit": "resp/min"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8526",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Weight, 73.1 Kg</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "3141-9",
+              "path": "code"
+            }
+          ],
+          "text": "Weight"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-09-25T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 73.1,
+          "unit": "Kg"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8512",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Body Temperature, 36.8 C</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8310-5",
+              "path": "code"
+            }
+          ],
+          "text": "Body Temperature"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-09T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 36.8,
+          "unit": "C"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8513",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Heart Rate, 81 bpm</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8867-4",
+              "path": "code"
+            }
+          ],
+          "text": "Heart Rate"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-09T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 81,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8510",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Height, 90 cm</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8302-2",
+              "path": "code"
+            }
+          ],
+          "text": "Height"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-16T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 90,
+          "unit": "cm"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8511",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Weight, 71.9 Kg</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "3141-9",
+              "path": "code"
+            }
+          ],
+          "text": "Weight"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-16T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 71.9,
+          "unit": "Kg"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8530",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Height, 90 cm</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8302-2",
+              "path": "code"
+            }
+          ],
+          "text": "Height"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-09-18T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 90,
+          "unit": "cm"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8531",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Weight, 72.4 Kg</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "3141-9",
+              "path": "code"
+            }
+          ],
+          "text": "Weight"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-09-18T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 72.4,
+          "unit": "Kg"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8518",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Heart Rate, 83 bpm</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8867-4",
+              "path": "code"
+            }
+          ],
+          "text": "Heart Rate"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-02T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 83,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8519",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Respiratory Rate, 33 resp/min</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "9279-1",
+              "path": "code"
+            }
+          ],
+          "text": "Respiratory Rate"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-02T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 33,
+          "unit": "resp/min"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8516",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Weight, 74.2 Kg</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "3141-9",
+              "path": "code"
+            }
+          ],
+          "text": "Weight"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-09T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 74.2,
+          "unit": "Kg"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8517",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Body Temperature, 36 C</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8310-5",
+              "path": "code"
+            }
+          ],
+          "text": "Body Temperature"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-02T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 36,
+          "unit": "C"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8514",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Respiratory Rate, 29 resp/min</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "9279-1",
+              "path": "code"
+            }
+          ],
+          "text": "Respiratory Rate"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-09T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 29,
+          "unit": "resp/min"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8515",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:47.465+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Height, 90 cm</div>"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8302-2",
+              "path": "code"
+            }
+          ],
+          "text": "Height"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "effectiveDateTime": "2019-10-09T06:42:47-03:00",
+        "valueQuantity": {
+          "value": 90,
+          "unit": "cm"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8534",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">aspirin 81mg once daily</div>"
+        },
+        "contained": [
+          {
+            "resourceType": "Medication",
+            "id": "med1",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/ct",
+                  "code": "370167008 ",
+                  "display": "aspirin 81mg e/c tablet "
+                }
+              ],
+              "text": "aspirin 81mg e/c tablet"
+            }
+          }
+        ],
+        "status": "active",
+        "medicationReference": {
+          "reference": "#med1",
+          "display": "aspirin 81mg e/c tablet"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "once daily",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8535",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">beclomethasone 2 puffs twice daily</div>"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "376733004",
+              "display": "beclomethasone dipropionate 40mcg aerosol",
+              "path": "medicationCodeableConcept"
+            }
+          ],
+          "text": "beclomethasone dipropionate 40mcg aerosol"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "2 puffs twice daily",
+            "timing": {
+              "repeat": {
+                "frequency": 2,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "asNeededBoolean": false
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8551",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "321323009",
+              "display": "buspirone 5mg",
+              "path": "medicationCodeableConcept"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "3 times daily",
+            "timing": {
+              "repeat": {
+                "frequency": 3,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8536",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">carvedilol 25 mg twice daily</div>"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "318632005",
+              "display": "carvedilol 25 mg",
+              "path": "medicationCodeableConcept"
+            }
+          ],
+          "text": "carvedilol 25 mg"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "twice daily",
+            "timing": {
+              "repeat": {
+                "frequency": 2,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8537",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">chlortalidone 15 mg once daily</div>"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "376321007",
+              "display": "chlortalidone 15 mg",
+              "path": "medicationCodeableConcept"
+            }
+          ],
+          "text": "chlortalidone 15 mg"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "once daily",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8538",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">citalopram 20 mg once daily</div>"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "321987003",
+              "display": "citalopram 20 mg",
+              "path": "medicationCodeableConcept"
+            }
+          ],
+          "text": "citalopram 20 mg"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "once daily",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8539",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">gabapentin 600mg twice daily</div>"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "323021008",
+              "display": "gabapentin 600mg",
+              "path": "medicationCodeableConcept"
+            }
+          ],
+          "text": "gabapentin 600mg"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "twice daily",
+            "timing": {
+              "repeat": {
+                "frequency": 2,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8540",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">insulin glargine 100units/mL 28 units nocte</div>"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "400847007",
+              "display": "insulin glargine 100units/mL injection",
+              "path": "medicationCodeableConcept"
+            }
+          ],
+          "text": "insulin glargine 100units/mL injection"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "28 units before bed",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8550",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">isosorbide mononitrate 20mg once daily</div>"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "319134001",
+              "display": "isosorbide mononitrate 20mg",
+              "path": "medicationCodeableConcept"
+            }
+          ],
+          "text": "isosorbide mononitrate 20mg"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "once daily at bedtime",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8549",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">lisinopril 20mg mane</div>"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "318860005",
+              "display": "lisinopril 20mg",
+              "path": "medicationCodeableConcept"
+            }
+          ],
+          "text": "lisinopril 20mg"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "once daily",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8541",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">losartan 100mg + hydrochlorothiazide 12.5mg once daily</div>"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "444639002",
+              "display": "losartan 100mg + hydrochlorothiazide 12.5mg",
+              "path": "medicationCodeableConcept"
+            }
+          ],
+          "text": "losartan 100mg + hydrochlorothiazide 12.5mg"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "once daily",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8542",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">metformin 1000mg twice daily</div>"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "411533003",
+              "display": "metformin 1000mg",
+              "path": "medicationCodeableConcept"
+            }
+          ],
+          "text": "metformin 1000mg"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "1 tab twice daily",
+            "timing": {
+              "repeat": {
+                "frequency": 2,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8543",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">naproxen 500mg twice daily</div>"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "329839005",
+              "display": "naproxen 500mg e/c tablet",
+              "path": "medicationCodeableConcept"
+            }
+          ],
+          "text": "naproxen 500mg e/c tablet"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "1 tab twice daily",
+            "timing": {
+              "repeat": {
+                "frequency": 2,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8544",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">omeprazole 40mg daily</div>"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "407848004",
+              "display": "omeprazole 40mg e/c tablet",
+              "path": "medicationCodeableConcept"
+            }
+          ],
+          "text": "omeprazole 40mg e/c tablet "
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "1 tab once daily",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8545",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">prednisone 20mg 2 tabs/day</div>"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "325456002",
+              "display": "prednisone 20mg",
+              "path": "medicationCodeableConcept"
+            }
+          ],
+          "text": "prednisone 20mg"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "2 tabs once daily",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "asNeededBoolean": true
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8533",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">salbutamol inhaler 2 puffs every 4 hours as required</div>"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": " 320176004",
+              "display": " salbutamol 100micrograms/inhaler ",
+              "path": "medicationCodeableConcept"
+            }
+          ],
+          "text": "salbutamol 100micrograms/inhaler"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "2 puffs every 4 hours as needed",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 4,
+                "periodUnit": "h"
+              }
+            },
+            "asNeededBoolean": true
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8546",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">simvastatin 40mg once daily</div>"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "429374003",
+              "display": "simvastatin 40mg",
+              "path": "medicationCodeableConcept"
+            }
+          ],
+          "text": "simvastatin 40mg"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "1 tab once daily",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "asNeededBoolean": true
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8547",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">terbinafine 250mg once daily</div>"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "324718007",
+              "display": "terbinafine 250mg",
+              "path": "medicationCodeableConcept"
+            }
+          ],
+          "text": "terbinafine 250mg"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "1 tab once daily",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "asNeededBoolean": true
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "8548",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:48.666+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">zolpidem 5mg sublingual tablet, 1 nocte</div>"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/ct",
+              "code": "442160008",
+              "display": "zolpidem 5mg sublingual tablet",
+              "path": "medicationCodeableConcept"
+            }
+          ],
+          "text": "zolpidem 5mg sublingual tablet"
+        },
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "dosage": [
+          {
+            "text": "1 tab before bed",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Appointment",
+        "id": "8553",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:49.047+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><div>Routine checkup</div><div>Dr Dave</div></div>"
+        },
+        "status": "pending",
+        "description": "Routine checkup",
+        "start": "2019-10-30T06:42:48-03:00",
+        "end": "2019-10-30T06:57:48-03:00",
+        "minutesDuration": 15,
+        "participant": [
+          {
+            "actor": {
+              "display": "Dr Dave"
+            },
+            "status": "accepted"
+          },
+          {
+            "actor": {
+              "reference": "Patient/8479"
+            },
+            "status": "accepted"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Appointment",
+        "id": "8552",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:49.047+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><div>Investigate Angina</div><div>Clarence cardiology clinic</div></div>"
+        },
+        "status": "pending",
+        "description": "Investigate Angina",
+        "start": "2019-10-27T06:42:48-03:00",
+        "end": "2019-10-27T06:57:48-03:00",
+        "minutesDuration": 15,
+        "participant": [
+          {
+            "actor": {
+              "display": "Clarence cardiology clinic"
+            },
+            "status": "accepted"
+          },
+          {
+            "actor": {
+              "reference": "Patient/8479"
+            },
+            "status": "accepted"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "AllergyIntolerance",
+        "id": "8555",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2021-04-28T00:31:39.445+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Ibuprofen causes urticaria</div>"
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical",
+              "code": "active",
+              "display": "Active",
+              "path": "clinicalStatus"
+            }
+          ]
+        },
+        "type": "allergy",
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "387207008",
+              "display": "Ibuprofen",
+              "path": "code"
+            }
+          ]
+        },
+        "patient": {
+          "reference": "Patient/8479"
+        },
+        "recorder": {
+          "reference": "Practitioner/8179"
+        },
+        "reaction": [
+          {
+            "manifestation": [
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "126485001",
+                    "display": "Urticaria"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "AllergyIntolerance",
+        "id": "8556",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-10-23T09:42:49.534+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">eggs causes hives</div>"
+        },
+        "type": "allergy",
+        "category": [
+          "food"
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "91930004",
+              "display": "Allergy to eggs",
+              "path": "code"
+            }
+          ]
+        },
+        "patient": {
+          "reference": "Patient/8479"
+        },
+        "onsetAge": {
+          "value": 4,
+          "unit": "year",
+          "system": "http://unitsofmeasure.org",
+          "code": "a"
+        },
+        "recorder": {
+          "reference": "Practitioner/8181"
+        },
+        "reaction": [
+          {
+            "manifestation": [
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "247472004",
+                    "display": "Hives"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "422587007",
+                    "display": "Nausea"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "422400008",
+                    "display": "Vomiting"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Task",
+        "id": "cf-1631484675000t",
+        "meta": {
+          "versionId": "12",
+          "lastUpdated": "2021-09-13T01:05:59.646+00:00"
+        },
+        "status": "completed",
+        "businessStatus": {
+          "coding": [
+            {
+              "system": "http://clinfhir.com/cs/corrections",
+              "code": "reply-received",
+              "path": "businessStatus"
+            }
+          ]
+        },
+        "intent": "order",
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+              "code": "medRecCxReq",
+              "path": "code"
+            }
+          ]
+        },
+        "description": "Not a smoker",
+        "focus": {
+          "reference": "Communication/cf-1631495156251c"
+        },
+        "for": {
+          "reference": "Patient/8479"
+        },
+        "input": [
+          {
+            "type": {
+              "text": "Original communication"
+            },
+            "valueReference": {
+              "reference": "Communication/cf-1631484675000c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Communication",
+        "id": "cf-1631484675000c",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2021-09-12T22:11:16.100+00:00"
+        },
+        "status": "completed",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "category"
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "about": [
+          {
+            "reference": "Task/cf-1631484675000t"
+          }
+        ],
+        "sent": "2021-09-12T22:11:14.999Z",
+        "recipient": [
+          {
+            "reference": "Organization/cmdhb"
+          }
+        ],
+        "sender": {
+          "reference": "Patient/8479"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "reasonCode"
+              }
+            ]
+          }
+        ],
+        "payload": [
+          {
+            "contentString": "Not a smoker"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Communication",
+        "id": "cf-1631486644669c",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2021-09-12T22:44:05.356+00:00"
+        },
+        "status": "completed",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "category"
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "about": [
+          {
+            "reference": "Communication/cf-1631484675000c"
+          }
+        ],
+        "sent": "2021-09-12T22:44:04.668Z",
+        "recipient": [
+          {
+            "reference": "Patient/8479"
+          }
+        ],
+        "sender": {
+          "reference": "Organization/cmdhb"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "reasonCode"
+              }
+            ]
+          }
+        ],
+        "payload": [
+          {
+            "contentString": "you sure"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Communication",
+        "id": "cf-1631490434788c",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2021-09-12T23:47:16.715+00:00"
+        },
+        "status": "completed",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "category"
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "about": [
+          {
+            "reference": "Communication/cf-1631484675000c"
+          }
+        ],
+        "sent": "2021-09-12T23:47:14.788Z",
+        "recipient": [
+          {
+            "reference": "Patient/8479"
+          }
+        ],
+        "sender": {
+          "reference": "Organization/cmdhb"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "reasonCode"
+              }
+            ]
+          }
+        ],
+        "payload": [
+          {
+            "contentString": "ss"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Communication",
+        "id": "cf-1631490533417c",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2021-09-12T23:48:55.873+00:00"
+        },
+        "status": "completed",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "category"
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "about": [
+          {
+            "reference": "Communication/cf-1631484675000c"
+          }
+        ],
+        "sent": "2021-09-12T23:48:53.417Z",
+        "recipient": [
+          {
+            "reference": "Patient/8479"
+          }
+        ],
+        "sender": {
+          "reference": "Organization/cmdhb"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "reasonCode"
+              }
+            ]
+          }
+        ],
+        "payload": [
+          {
+            "contentString": "aa"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Communication",
+        "id": "cf-1631490633726c",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2021-09-12T23:50:36.118+00:00"
+        },
+        "status": "completed",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "category"
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "about": [
+          {
+            "reference": "Communication/cf-1631484675000c"
+          }
+        ],
+        "sent": "2021-09-12T23:50:33.726Z",
+        "recipient": [
+          {
+            "reference": "Patient/8479"
+          }
+        ],
+        "sender": {
+          "reference": "Organization/cmdhb"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "reasonCode"
+              }
+            ]
+          }
+        ],
+        "payload": [
+          {
+            "contentString": "bbb"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Communication",
+        "id": "cf-1631490699881c",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2021-09-12T23:51:42.070+00:00"
+        },
+        "status": "completed",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "category"
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "about": [
+          {
+            "reference": "Communication/cf-1631484675000c"
+          }
+        ],
+        "sent": "2021-09-12T23:51:39.881Z",
+        "recipient": [
+          {
+            "reference": "Patient/8479"
+          }
+        ],
+        "sender": {
+          "reference": "Organization/cmdhb"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "reasonCode"
+              }
+            ]
+          }
+        ],
+        "payload": [
+          {
+            "contentString": "ccc"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Communication",
+        "id": "cf-1631490830472c",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2021-09-12T23:53:52.425+00:00"
+        },
+        "status": "completed",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "category"
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "about": [
+          {
+            "reference": "Communication/cf-1631484675000c"
+          }
+        ],
+        "sent": "2021-09-12T23:53:50.472Z",
+        "recipient": [
+          {
+            "reference": "Patient/8479"
+          }
+        ],
+        "sender": {
+          "reference": "Organization/cmdhb"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "reasonCode"
+              }
+            ]
+          }
+        ],
+        "payload": [
+          {
+            "contentString": "ddd"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Communication",
+        "id": "cf-1631490910077c",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2021-09-12T23:55:12.007+00:00"
+        },
+        "status": "completed",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "category"
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "about": [
+          {
+            "reference": "Communication/cf-1631484675000c"
+          }
+        ],
+        "sent": "2021-09-12T23:55:10.077Z",
+        "recipient": [
+          {
+            "reference": "Patient/8479"
+          }
+        ],
+        "sender": {
+          "reference": "Organization/cmdhb"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "reasonCode"
+              }
+            ]
+          }
+        ],
+        "payload": [
+          {
+            "contentString": "eee"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Communication",
+        "id": "cf-1631490948608c",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2021-09-12T23:55:50.993+00:00"
+        },
+        "status": "completed",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "category"
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "about": [
+          {
+            "reference": "Communication/cf-1631484675000c"
+          }
+        ],
+        "sent": "2021-09-12T23:55:48.608Z",
+        "recipient": [
+          {
+            "reference": "Patient/8479"
+          }
+        ],
+        "sender": {
+          "reference": "Organization/cmdhb"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "reasonCode"
+              }
+            ]
+          }
+        ],
+        "payload": [
+          {
+            "contentString": "fff"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Communication",
+        "id": "cf-1631491235484c",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2021-09-13T00:00:37.412+00:00"
+        },
+        "inResponseTo": [
+          {
+            "reference": "Communication/cf-1631490948608c"
+          }
+        ],
+        "status": "completed",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "category"
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "about": [
+          {
+            "reference": "Communication/cf-1631484675000c"
+          }
+        ],
+        "sent": "2021-09-13T00:00:35.484Z",
+        "recipient": [
+          {
+            "reference": "Organization/cmdhb"
+          }
+        ],
+        "sender": {
+          "reference": "Patient/8479"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "reasonCode"
+              }
+            ]
+          }
+        ],
+        "payload": [
+          {
+            "contentString": "respond to fff"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Communication",
+        "id": "cf-1631495156251c",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2021-09-13T01:05:58.879+00:00"
+        },
+        "status": "completed",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "category"
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "Patient/8479"
+        },
+        "about": [
+          {
+            "reference": "Communication/cf-1631484675000c"
+          }
+        ],
+        "sent": "2021-09-13T01:05:56.251Z",
+        "recipient": [
+          {
+            "reference": "Patient/8479"
+          }
+        ],
+        "sender": {
+          "reference": "Organization/cmdhb"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/uv/patient-corrections/CodeSystem/PatientCorrectionTaskTypes",
+                "code": "medRecCxReq",
+                "path": "reasonCode"
+              }
+            ]
+          }
+        ],
+        "payload": [
+          {
+            "contentString": "all done."
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "8179",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-09-23T01:55:12.413+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Dr John Doe</div>"
+        },
+        "identifier": [
+          {
+            "system": "http://fhir.hl7.org.nz/identifier",
+            "value": "jd"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr John Doe"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "8181",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2019-09-23T01:55:12.827+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Dr Annette Jones</div>"
+        },
+        "identifier": [
+          {
+            "system": "http://fhir.hl7.org.nz/identifier",
+            "value": "aj"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr Annette Jones"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Organization",
+        "id": "cmdhb",
+        "meta": {
+          "versionId": "3",
+          "lastUpdated": "2022-05-15T22:40:20.314+00:00"
+        },
+        "name": "Counties Manukau DHB"
+      }
+    }
+  ]
+}

@@ -6,6 +6,8 @@ angular.module("pocApp")
             $scope.input = {}
 
 
+            $scope.input.collapsibleOptions = ['default-open','default-closed']
+
             //need a default base for editing
             $scope.fixed = {}
             $scope.default = {}
@@ -92,13 +94,12 @@ angular.module("pocApp")
                 $scope.input.hideLabel =  item.ed.hideLabel
                 $scope.input.labelText =  item.ed.labelText
 
-
-
-
-
-
                 $scope.input.hideInQ =  item.ed.hideInQ
                 $scope.input.autoPop =  item.ed.autoPop
+
+                $scope.input.collapsible =  item.ed.collapsible
+
+                $scope.input.gtable =  item.ed.gtable
                 $scope.input.prepop =  item.ed.prepop
 
                 $scope.input.selectedType = item.ed.type[0]
@@ -344,6 +345,8 @@ angular.module("pocApp")
                 ed.valueSet = $scope.input.valueSet
                 ed.hideInQ = $scope.input.hideInQ
                 ed.autoPop = $scope.input.autoPop
+                ed.collapsible = $scope.input.collapsible
+                ed.gtable = $scope.input.gtable
                 ed.prePop = $scope.input.prePop
                 ed.placeholder = $scope.input.placeholder
                 if ($scope.input.controlHint) {
@@ -419,6 +422,22 @@ angular.module("pocApp")
                     delete $scope.fixedDisplay
                 }
 
+            }
+            
+            $scope.testPrePop = function (prePop) {
+                delete $scope.testPPResult
+                let expression = `%Launch${prePop}`
+                let qry = `/Q/prepop?fp=${expression}&ts=${new Date().toISOString()}`
+                $http.get(qry).then(
+                    function (data) {
+                        $scope.testPPResult = data.data.result
+                      //  alert(angular.toJson(data.data.result,null,2))
+
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                        console.log(err)
+                    }
+                )
             }
 
             $scope.save = function() {

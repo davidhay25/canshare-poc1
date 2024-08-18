@@ -1,0 +1,47 @@
+{
+  "resourceType": "Bundle",
+
+  "type": "collection",
+
+  "entry": [
+    {
+      "fullUrl": "http://test.canshare.co.nz:8080/fhir/Patient/136",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "136",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-19T03:27:53.739+00:00",
+          "source": "#wvAH8Oumk55pBR6m",
+          "profile": [
+            "http://canshare.co.nz/fhir/StructureDefinition/an-patient"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Rida</div>"
+        },
+        "identifier": [
+          {
+            "system": "https://standards.digital.health.nz/ns/nhi-id",
+            "value": "ZTA2211"
+          }
+        ],
+        "name": [
+          {
+            "text": "Rida",
+            "family": "Jones",
+            "given": [
+              "Rida"
+            ]
+          }
+        ],
+        "gender": "female",
+        "birthDate": "1992-10-09"
+      },
+      "search": {
+        "mode": "match"
+      }
+    }
+  ]
+}

@@ -30,17 +30,14 @@
       </div>
 
 
-
-
-
     </div>
     <div class="col-md-4  col-sm-4">
+      <div class="pull-right btn btn-link" ng-click="prePop()">Pre-pop</div>
 
       <div class="myScroll">
         <div ng-repeat="entry in listItems">
           <div>
-            <ng-include
-                    src = "'directive/renderForm2/renderSingleItem2.html'"></ng-include>
+            <ng-include src = "'directive/renderForm2/renderSingleItem2.html'"></ng-include>
           </div>
         </div>
       </div>
@@ -57,6 +54,7 @@
         <div ng-show="redirectUrl">
           <a class = "btn" ng-href="{{redirectUrl}}" target="_blank">Load Renderer</a>
         </div>
+
         <div class="clearfix"/>
       </div>
 
@@ -548,6 +546,11 @@
         <uib-tab ng-show="technicalview" heading="Validate">
 
           <div class="btn btn-link" ng-click="validate(q)">Perform validation</div>
+
+
+          <div class="clickable pull-right" style="padding: 8px" ng-click = "downloadQ()">
+            Download Q
+          </div>
 
           <img class="pull-right" ng-show="validating" src="css/ajax_loader_blue_32.gif"/>
 

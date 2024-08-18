@@ -26,6 +26,7 @@ const terminologyModule = require("./serverModuleTerminologyUI")
 const modelModule = require("./serverModuleModel")
 const reviewModule = require("./serverModuleReview")
 const validatorModule = require("./serverModuleValidator")
+const QModule = require("./serverModuleQ")
 
 //let config = require("./config.json")
 
@@ -52,8 +53,10 @@ terminologyModule.setup(app)
 modelModule.setup(app)
 reviewModule.setup(app)
 validatorModule.setup(app)
+QModule.setup(app)
 
 //common calls (not specifically related to requester or lab. ?move to separate module
+
 
 app.get('/sampleAN',function (req,res) {
     let fle = require("./samples/valenciaMay11.json")

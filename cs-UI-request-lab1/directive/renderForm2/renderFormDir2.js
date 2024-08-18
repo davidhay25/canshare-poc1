@@ -89,10 +89,33 @@ angular.module('formsApp')
                     let vo = renderFormsSvc2.makeTreeFromQ($scope.q)
                     $scope.treeData = vo.treeData
 
+                    $scope.prepopExpression = vo.prepopExpression
+                    console.log($scope.prepopExpression)
+
+
                     drawTree(vo.treeData)       //for drawing the tree
 
                     getNotes($scope.q.name)
 
+                }
+
+
+                $scope.prePop = function (Q) {
+                    //using the pre-pop expressions in the Q call the server and initialize dataEntered
+                    for (const exp of $scope.prepopExpression) {
+                        let qry = `/Q/prepop?fp=${exp.expression}`
+                        $http.get(qry).then(
+                            function (data) {
+                                if (data.data && data.data.result && data.data.result.length > 0) {
+                                    $scope.dataEntered[exp.linkId] = data.data.result[0]
+                                }
+
+                            }, function (err) {
+                                console.log(err)
+                            }
+                        )
+
+                    }
 
                 }
 
@@ -162,9 +185,7 @@ angular.module('formsApp')
                             //console.log(item.linkId,entry.isDisabled)
                         }
 
-//console.log(entries)
 
-                       //dataEntered[item.id]
                    })
 
                 }
@@ -247,14 +268,13 @@ angular.module('formsApp')
 
 
                 $scope.saveToServer = function (openLab) {
-                    //saves the Q to the hapi server so that we can invoke the fhirpath lab
+                    //saves the Q to the fhirpath lab server so that we can invoke the fhirpath lab
                     //Once the POC is ssl then we can save there instead
                     if (confirm("This will save the Q to a FHIR server, then display it using the CSIRO renderer. This can take a few seconds, so please be patient.")) {
 
                         let qry = `https://fhir.forms-lab.com/Questionnaire/${$scope.q.id}`
 
-                        //let qry = `https://hapi.fhir.org/baseR4/Questionnaire/${$scope.Q.id}`
-//https://dev.fhirpath-lab.com/Questionnaire/tester?id={{pathToQ}}
+
                         let config = {headers:{'content-type':'application/fhir+json'}}
 
                         $scope.savingQ = true

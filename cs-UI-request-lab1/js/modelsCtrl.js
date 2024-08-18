@@ -1144,6 +1144,8 @@ angular.module("pocApp")
                                 ed1.otherType = ed.otherType
                                 ed1.hideInQ = ed.hideInQ
                                 ed1.autoPop = ed.autoPop
+                                ed1.collapsible = ed.collapsible
+                                ed1.gtable = ed.gtable
                                 ed1.prePop = ed.prePop
 
                                 ed1.hideLabel = ed.hideLabel
