@@ -4,7 +4,6 @@ angular.module("pocApp")
 
     .service('makeQSvc', function($http,codedOptionsSvc,QutilitiesSvc,snapshotSvc,$filter,vsSvc,orderingSvc) {
 
-
         let unknownCodeSystem = "http://example.com/fhir/CodeSystem/example"
         let extLaunchContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
         extPrePopUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
@@ -154,6 +153,9 @@ angular.module("pocApp")
         //updates the item object directly
         //When used by the Composition, we add a prefix which is {compname}.{section name}. (note the trailing dot)
         function addEnableWhen(ed,item,pathPrefix) {
+
+            //return
+
             pathPrefix = pathPrefix || ""
             if (ed && ed.enableWhen && ed.enableWhen.length > 0) {
                 //console.log(ed,'has ew')
@@ -347,11 +349,10 @@ angular.module("pocApp")
         return {
 
 
-            makeHierarchicalQFromComp : function (comp,expandVS,hashAllDG) {
+            makeHierarchicalQFromComp : function (comp,hashAllDG) {
                 //construct a Q from the composition
                 //strategy is to gather the DG from the comp sections, create DG Qs then assemble them into the comp Q
                 //assumption is that the composition itself doesn't change the DG contents - it is just a selector of DGs
-                //if expandVS is true, then the contents of the VS will be expanded as options into the item. May need to limit the length...
 
                 let that = this
                 let errorLog = []
@@ -364,7 +365,7 @@ angular.module("pocApp")
                 addPrePopExtensions(Q)
                 Q.item = []
 
-                let containerSection = {text: "Sections", linkId: comp.name, extension: [], type: 'group', item: []}
+                let containerSection = {text: comp.title, linkId: comp.name, extension: [], type: 'group', item: []}
                 let ext = {url: extItemControlUrl}
                 ext.valueCodeableConcept = {
                     coding: [{
@@ -396,7 +397,14 @@ angular.module("pocApp")
                             orderingSvc.sortFullListByInsertAfter(dgElementList,dg,hashAllDG)
 
                             console.log(`About to process ${dgType}`)
-                            let vo = that.makeHierarchicalQFromDG(dgElementList,expandVS)
+                            //path prefix is used to adjust enablewhen targets
+                            let pathPrefix = sectionItem.linkId
+
+
+                            let config = {expandVS:true,enableWhen:false,pathPrefix : pathPrefix}
+                            //todo - enablewhen not working for composition yet
+                            let vo = that.makeHierarchicalQFromDG(dgElementList,config)
+                            //let vo = that.makeHierarchicalQFromDG(dgElementList,expandVS,pathPrefix)
 
                             let dgQ = vo.Q
                             let hashByPath = vo.hashEd          //EDs from the child
@@ -428,28 +436,6 @@ angular.module("pocApp")
                             }
 
 
-                            /*
-
-                                                    console.log(dgQ.item[0] )
-                                                    let firstItem = dgQ.item[0]
-
-                                                    if (firstItem.definition) {
-                                                        for (const child of dgQ.item[0].item){
-                                                            sectionItem.item.push(child)
-                                                        }
-                                                    } else {
-                                                        //this is a DG added to a section DG. Just add the contents - not the section root
-                                                        for (const child of dgQ.item[0].item[0].item){
-                                                            sectionItem.item.push(child)
-                                                        }
-                                                    }
-
-
-                            */
-
-
-
-
                         }
                     }
 
@@ -461,11 +447,15 @@ angular.module("pocApp")
             },
 
 
-            makeHierarchicalQFromDG : function (lstElements,expandVS) {
+            makeHierarchicalQFromDG : function  (lstElements,config) {
                 //Used in the new Q renderer
-                //if expandVS is true, then the contents of the VS will be expanded as options into the item. May need to limit the length...
+                //config.enableWhen will cause the enableWhens to be set
+                //config.pathPrefix is used for enable when targets. Only used from composition. It may be null
+                //if config.expandVS is true, then the contents of the VS will be expanded as options into the item. May need to limit the length...
                 let errorLog = []
                 let firstElement = lstElements[0]
+
+
 
                 //create list of paths to hide
                 //construct a list of paths to hide
@@ -476,7 +466,7 @@ angular.module("pocApp")
                         basePathsToHide.push(thing.ed.path)  //the full path
                     }
                 })
-                console.log(basePathsToHide)
+                //console.log(basePathsToHide)
 
                 //now create the list of ED to include in the Q
                 //we do this first so that we can exclude all child elements of hidden elements as well
@@ -497,7 +487,6 @@ angular.module("pocApp")
                         if (okToAdd) {
                             lstQElements.push(thing)
                         }
-
                 })
 
 
@@ -526,12 +515,17 @@ angular.module("pocApp")
                         currentItem = {linkId:path,type:'string',text:ed.title}
 
                         decorateItem(currentItem,ed)
-                        addEnableWhen(ed,currentItem)
+                        if (config.enableWhen) {
+                            addEnableWhen(ed,currentItem,config.pathPrefix)
+                        }
+
 
                         if (ed.mult.indexOf('..*')> -1) {
                             currentItem.repeats = true
                         }
 
+
+                        hashItems[parentItemPath] = hashItems[parentItemPath] || {}
 
                         hashItems[parentItemPath].item = hashItems[parentItemPath].item || []
                         hashItems[parentItemPath].item.push(currentItem)
@@ -542,7 +536,9 @@ angular.module("pocApp")
                     } else {
                         currentItem = {linkId:path,type:'string',text:ed.title}
                         decorateItem(currentItem,ed)
-                        addEnableWhen(ed,currentItem)
+                        if (config.enableWhen) {
+                            addEnableWhen(ed,currentItem,config.pathPrefix)
+                        }
 
                         hashItems[path] = currentItem
                         Q.item = [currentItem]
@@ -558,7 +554,7 @@ angular.module("pocApp")
                         return
                     }
 
-                    item.definition = ed.type[0]    //todo should be a reference to the ED
+                    item.definition = `${ed.path}` //`${firstElement.ed.path}.${ed.path}`
 
                     if (ed.mult) {
                         //required bolding
@@ -614,17 +610,19 @@ angular.module("pocApp")
                                 //check for any spaces in the valueSet url
                                 if (ed.valueSet.indexOf(' ') > -1 ) {
                                     //this is an illegal vs name
+                                    item.answerOption = [{valueCoding : {display:"The ValueSet name is illegal (has a space)"}}]
                                     errorLog.push({msg:`${ed.path} has an invalid valueSet: ${ed.valueSet}. The valueSet was not included`})
+
                                 } else {
                                     //hash of valueset by path
                                     hashVS[ed.valueSet] = hashVS[ed.valueSet] ||  []
                                     hashVS[ed.valueSet].push(ed.path)
 
-                                    if (expandVS) {
+                                    if (config.expandVS) {
                                         //if we're expanding the VS, then add all the contents as optoins...
                                         item.answerOption = []
                                         let options = vsSvc.getOneVS(ed.valueSet)
-                                        if (options) {
+                                        if (options && options.length > 0) {
                                             for (const concept of options) {
                                                 concept.system = concept.system || unknownCodeSystem
                                                 item.answerOption.push({valueCoding : concept})

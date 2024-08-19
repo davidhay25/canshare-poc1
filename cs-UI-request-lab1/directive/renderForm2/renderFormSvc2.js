@@ -11,6 +11,22 @@ angular.module("formsApp")
 
         return {
 
+            getExtension : function (element,url,type) {
+                //return the value of an extensiop
+                let valueType = `value${type}`
+                let result = []
+                if (element.extension) {
+                    for (const ext of element.extension) {
+                        if (ext.url == url) {
+                            result.push(ext[valueType])
+                        }
+                    }
+                }
+
+                return result
+
+            },
+
             isEnabled : function (item,hashData) {
                 //is this item enabled according to the enableWhen properties
                 if (! item.enableWhen) {return}
@@ -34,6 +50,8 @@ angular.module("formsApp")
                 return isEnabled
 
             },
+
+
 
             createControlList : function (item,hashEd) {
                 //create a list of items
@@ -75,8 +93,8 @@ angular.module("formsApp")
                 let treeData = []
                 let prepopExpression = []
 
-                let root = {id:'root',text:Q.title || 'Root',parent:'#',state:{}}
-                treeData.push(root)
+               // let root = {id:'root',text:Q.title || 'Root',parent:'#',state:{}}
+                //treeData.push(root)
 
 
                 function addItemToTree(parent,item,level,sectionItem) {
@@ -149,7 +167,8 @@ angular.module("formsApp")
 
                 function addQToTree(Q) {
                     //create a parent for this Q
-                    let qParentId = `root`
+                    //let qParentId = `root`
+                    let qParentId = `#`
                     //let node = {id:qParentId,text:Q.title || `q${ctr}`,parent:"root",data:{level:'chapter'}}
 
                     // treeData.push(node)

@@ -20,11 +20,14 @@ angular.module('formsApp')
 
                 console.log($scope)
 
-                //$scope.vsSvc = vsSvc
+
                 $scope.datePopup = {}
                 $scope.dataEntered = {}
 
                 $scope.serverbase = "https://fhir.forms-lab.com/"
+                $scope.labUI = "https://dev.fhirpath-lab.com/"
+
+                //https://dev.fhirpath-lab.com/Questionnaire/tester?id=https%3A%2F%2Ffhir.forms-lab.com%2FQuestionnaire%2Fpre-pop-test-lforms
 
                 //get the options for a choice element. Prefer the ValueSet, then options
                 $scope.getOptions = function (item) {
@@ -74,10 +77,16 @@ angular.module('formsApp')
                     console.log($scope.q)
                     console.log($scope.hashEd)
 
-                    //create the redirect url to fhirPathLab.
-                    let qry = `https://fhir.forms-lab.com/Questionnaire/${$scope.q.id}`
+                    let obj = $scope.q
+                    $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([angular.toJson(obj,true) ],{type:"application/json"}))
+                    $scope.downloadLinkJsonName = `${$scope.q.name}.json`
 
-                    $scope.redirectUrl = `https://fhirpath-lab.com/Questionnaire/tester?tab=csiro+renderer&id=${qry}` //redirectUrl
+
+
+                    //create the redirect url to fhirPathLab.
+                    let qry = `${$scope.serverbase}Questionnaire/${$scope.q.id}`
+
+                    $scope.redirectUrl = `${$scope.labUI}Questionnaire/tester?tab=csiro+renderer&id=${qry}` //redirectUrl
 
                     //This was code to allow multiple of this directive in a single page. Didn't work. May no longer be needed.
                     $scope.treenode = $scope.treenode || "designTreeX"
@@ -87,10 +96,13 @@ angular.module('formsApp')
 
                     //$scope.q is set from the directive attributes. setupQ() is only called when it is not null
                     let vo = renderFormsSvc2.makeTreeFromQ($scope.q)
+
                     $scope.treeData = vo.treeData
 
-                    $scope.prepopExpression = vo.prepopExpression
-                    console.log($scope.prepopExpression)
+                    $scope.prepopExpression = vo.prepopExpression   //for evaluating pre-pop
+                    $scope.hashItem = vo.hashItem   //also for pre-pop - eg date
+
+                    //console.log($scope.prepopExpression)
 
 
                     drawTree(vo.treeData)       //for drawing the tree
@@ -100,14 +112,24 @@ angular.module('formsApp')
                 }
 
 
-                $scope.prePop = function (Q) {
+                $scope.prePop = function () {
                     //using the pre-pop expressions in the Q call the server and initialize dataEntered
                     for (const exp of $scope.prepopExpression) {
                         let qry = `/Q/prepop?fp=${exp.expression}`
                         $http.get(qry).then(
                             function (data) {
+
                                 if (data.data && data.data.result && data.data.result.length > 0) {
                                     $scope.dataEntered[exp.linkId] = data.data.result[0]
+
+                                    console.log(data.data.result[0])
+                                }
+
+                                let item = $scope.hashItem[exp.linkId]
+                                if (item) {
+                                    if (item.type == 'date' || item.type == 'dateTime') {
+                                        $scope.dataEntered[exp.linkId] = new Date(data.data.result[0])
+                                    }
                                 }
 
                             }, function (err) {
@@ -117,7 +139,13 @@ angular.module('formsApp')
 
                     }
 
+
+
+                    console.log($scope.dataEntered)
+
                 }
+
+
 
                 function getNotes(name) {
                     //get any existing notes for this model
@@ -265,6 +293,17 @@ angular.module('formsApp')
                 }
 
 
+                $scope.copyToClipboard = function () {
+
+                    copyToClipboard(angular.toJson($scope.q,2),function (successful) {
+                        if (successful) {
+                            alert("Questionnaire placed on clipboard")
+                        } else {
+                            alert("There are an error and the Questionnaire was not placed on the clipboard")
+                        }
+                    })
+
+                }
 
 
                 $scope.saveToServer = function (openLab) {
@@ -272,7 +311,7 @@ angular.module('formsApp')
                     //Once the POC is ssl then we can save there instead
                     if (confirm("This will save the Q to a FHIR server, then display it using the CSIRO renderer. This can take a few seconds, so please be patient.")) {
 
-                        let qry = `https://fhir.forms-lab.com/Questionnaire/${$scope.q.id}`
+                        let qry = `${$scope.serverbase}Questionnaire/${$scope.q.id}`
 
 
                         let config = {headers:{'content-type':'application/fhir+json'}}
@@ -380,7 +419,7 @@ console.log(entry)
                 }
 
 
-                let copyToClipboard = function(text) {
+                let copyToClipboard = function(text,cb) {
                     let textArea = document.createElement("textarea");
                     textArea.value = text;
 
@@ -395,10 +434,15 @@ console.log(entry)
 
                     try {
                         let successful = document.execCommand('copy');
-                        let msg = successful ? 'successful' : 'unsuccessful';
-                        console.log('Fallback: Copying text command was ' + msg);
+                        if (cb) {
+                            cb(successful)
+                        }
+
                     } catch (err) {
-                        alert('Fallback: Oops, unable to copy', err);
+                        if (cb) {
+                            cb(false)
+                        }
+
                     }
 
                     document.body.removeChild(textArea);

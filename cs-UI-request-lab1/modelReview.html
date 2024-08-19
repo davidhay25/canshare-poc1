@@ -40,6 +40,10 @@
         });
         angular.module("pocApp").constant("moment", moment);
 
+        angular.module("pocApp").config(['$compileProvider', function ($compileProvider) {
+            $compileProvider.aHrefSanitizationWhitelist(/^\s*(http|https?|ftp|mailto|blob):/);
+        }]);
+
         //this allows the directives (which are in the formsApp) to be used. see https://stackoverflow.com/questions/15641730/angular-js-directives-in-different-modules
         angular.module("formsApp",[])
         angular.module('topApp', ['pocApp', 'formsApp'])

@@ -211,7 +211,7 @@
               </div>
 
 
-              <div><em>Allows a group to be expanded / collapsed</em></div>
+              <div><em>Allows a group to be expanded / collapsed. Only makes sense for Groups or DataGroups.</em></div>
             </td>
           </tr>
 
@@ -219,7 +219,7 @@
 
           <tr>
             <td>Placeholder text</td>
-            <td><input type="text" class="form-control" ng-model="input.placeholder"/> </td>
+            <td><input type="text" class="form-control" placeholder="Not currently suppported in renderer" ng-model="input.placeholder"/> </td>
           </tr>
 
           <tr>
@@ -238,17 +238,18 @@
                 </div>
                 <div class="col-md-1">
 
-                  <span>Spec</span>
+                  <a style="display:block ; margin-top: 8px" href="https://hl7.org/fhir/fhirpath.html" target="_blank">Spec</a>
                 </div>
+
               </div>
             <div><pre ng-show="testPPResult">{{testPPResult | json}}</pre></div>
             </td>
           </tr>
 
-          <tr ng-show="false">
+          <tr >
             <td>Hide label text</td>
             <td><checkbox ng-model="input.hideLabel"/>
-              <div><em>If checked, there will be no label displayed for this item</em></div>
+              <div><em>If checked, there will be no label displayed for this item. NOT CURRENTLY SUPPORTED</em></div>
             </td>
           </tr>
 

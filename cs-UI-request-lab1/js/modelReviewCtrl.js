@@ -551,7 +551,9 @@ angular.module("pocApp")
                     $scope.showWaiting = false
 
                     //the second option expands the valuesets as options into the Q - todo make this an option
-                    let voQ = makeQSvc.makeHierarchicalQFromDG($scope.fullElementList,true) //,$scope.hashAllDG)
+                    let config = {expandVS:true,enableWhen:true}
+                    //let voQ = makeQSvc.makeHierarchicalQFromDG($scope.fullElementList,true) //,$scope.hashAllDG)
+                    let voQ = makeQSvc.makeHierarchicalQFromDG($scope.fullElementList,config) //,$scope.hashAllDG)
                     $scope.fullQ = voQ.Q
                     $scope.hashEd = voQ.hashEd
                     console.log(voQ.errorLog)
@@ -619,7 +621,9 @@ angular.module("pocApp")
                 vsSvc.getAllVS(voComp.allElements, function () {
                     //alert("all VS available")
                     $scope.showWaiting = false
-                    let vo = makeQSvc.makeHierarchicalQFromComp(comp,true,$scope.hashAllDG)
+
+
+                    let vo = makeQSvc.makeHierarchicalQFromComp(comp,$scope.hashAllDG)
 
                     $scope.fullQ = vo.Q         //will invoke the Q renderer directive
                     $scope.hashEd = vo.hashEd

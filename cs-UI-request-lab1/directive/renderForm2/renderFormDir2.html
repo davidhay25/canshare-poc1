@@ -237,6 +237,14 @@
                 </td>
               </tr>
 
+              <tr ng-show="selectedEd.collapsible && technicalview">
+                <td class="detailName">Collapsible</td>
+                <td>
+                  {{selectedEd.collapsible}}
+                </td>
+              </tr>
+
+
 
             </table>
 
@@ -543,14 +551,21 @@
 
 
 
-        <uib-tab ng-show="technicalview" heading="Validate">
+        <uib-tab ng-show="technicalview" heading="Q">
 
-          <div class="btn btn-link" ng-click="validate(q)">Perform validation</div>
+          <span class="btn btn-link" ng-click="validate(q)">Perform validation</span>
 
 
-          <div class="clickable pull-right" style="padding: 8px" ng-click = "downloadQ()">
-            Download Q
-          </div>
+          <span class="clickable pull-right" style="padding: 8px" ng-click = "copyToClipboard()">
+            Copy to clipboard
+          </span>
+
+          <a class="btn btn-link" download="{{downloadLinkJsonName}}"
+             href="{{downloadLinkJson}}" title="{{downloadLinkJsonName}}" >
+            Download Json
+          </a>
+
+
 
           <img class="pull-right" ng-show="validating" src="css/ajax_loader_blue_32.gif"/>
 
@@ -559,7 +574,7 @@
 
 
 
-          <div ng-show="oo" class="myScroll">
+          <div ng-show="oo" >
             <table class="table table-bordered">
               <tr ng-repeat="iss in oo.issue track by $index" ng-show="showIssue(iss)">
                 <td>{{iss.severity}}</td>
