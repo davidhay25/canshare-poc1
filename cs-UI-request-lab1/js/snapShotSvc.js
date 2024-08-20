@@ -118,7 +118,6 @@ angular.module("pocApp")
             dg.snapshot = []        //the definitive snapshot of all elements in order
 
 
-
             //now, create a diff array that has all elements
             let arFullDiffPath = []     //will contain paths of all elements in the expanded DG
             let hashEdPath = {}         //a hash, keyed by path than has the DG at that path. This may be replaced by subsequent DG's in the hierarchy
@@ -282,7 +281,7 @@ angular.module("pocApp")
 
 
 
-        function applyOverrides(dg) {
+        function applyOverridesDEP(dg) {
 
             if (dg.overrides) {
 
@@ -454,7 +453,8 @@ angular.module("pocApp")
                                             //where we were removing the overrides, inserting from the referenced DG and then
                                             //replacing the elements that were overriden.
                                             let canInsert = true
-                                            for (ed2 of dg.fullDiff) {
+                                            //for (const ed2 of dg.fullDiff) {
+                                            for (const ed2 of dg.snapshot) {  //20 aug 2020
                                                 if (ed2.path == path) {
                                                     canInsert = false
                                                     break
@@ -475,6 +475,11 @@ angular.module("pocApp")
                                         //the log entry. Include the elements that are being inserted
                                         let msg = `Inserting ${arElements.length} elements into ${dg.name}.${ed.path} from ${dgToInsert.name} (${dgToInsert.title})`
                                         logger(msg,dg.name,false,arElements)
+
+                                        if (dg.name == "ColorectalHistoTumour") {
+                                            console.log(ed.path,dgToInsert.name,arElements)
+                                        }
+
 
                                         //now insert the list of ed's from referenced DG into the snapshot
                                         insertIntoSnapshot(dg,insertPath,arElements)
@@ -498,12 +503,17 @@ angular.module("pocApp")
                             logger(`DG: ${dg.name} has a completed snapshot !`,dg.name)
                             //todo - remove any specific elements from the diff
 
+                            if (dg.name == "ColorectalHistoTumour") {
+                                console.log(">>>>>>>> insert complete")
+                                let v = angular.copy(dg)
+                                console.log(dg.snapshot)
+                            }
 
                             //now that the DG is complete, remove those where references have been 'zeroed out' in the diff and
                             //replace those changed in the diff
                             //we can't do that before as the full snapshot needs to be created first
                             //note that after this function has executed, overrides is cleared...
-                             applyOverrides(dg)
+                           //overrides are not used any more - aug 20 2024  applyOverrides(dg)
 
 
                             //but there are also hierarchical Groups which may have hidden elements or overrides.
