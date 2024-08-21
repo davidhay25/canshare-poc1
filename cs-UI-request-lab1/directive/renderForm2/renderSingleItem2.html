@@ -49,7 +49,7 @@
                      ng-change = "dataUpdated(entry.item)"
                      ng-value="{{concept}}"/> {{concept.display}}
             </div>
-            <em>This is not working in the same way as the CSIRO renderer</em>
+
           </div>
 
 
@@ -118,7 +118,9 @@
       <div ng-switch-when = "date">
         <div class="row">
           <div class="col-md-10">
-            <input ng-change = "dataUpdated(entry.item)" class="form-control" type="date" ng-model="dataEntered[entry.linkId]">
+            <input ng-change = "dataUpdated(entry.item)"
+                   ng-focus="onFocus(entry)"
+                   class="form-control" type="date" ng-model="dataEntered[entry.linkId]">
 
           </div>
           <div class="col-md-2">
@@ -129,7 +131,9 @@
       <div ng-switch-when = "dateTime">
         <div class="row">
           <div class="col-md-10">
-            <input ng-change = "dataUpdated(entry.item)" class="form-control" type="datetime-local" ng-model="dataEntered[entry.linkId]">
+            <input ng-change = "dataUpdated(entry.item)"
+                   ng-focus="onFocus(entry)"
+                   class="form-control" type="datetime-local" ng-model="dataEntered[entry.linkId]">
 
           </div>
           <div class="col-md-2">
@@ -184,7 +188,11 @@
       <em>{{ew.source | dropFirstInPath}}{{ew.operator}}{{ew.value.display}}</em>
     </div>
 
-    <div ng-show="entry.ed.prePop"><em style="padding-left: 12px; color: grey">Pre-populated from PMS</em></div>
+
+    <div ng-show="entry.ed.prePop && ! entry.ed.autoPop"><em style="padding-left: 12px; color: grey">Pre-populated</em></div>
+
+    <div ng-show="entry.ed.autoPop"><em style="padding-left: 12px; color: grey">{{entry.ed.autoPop}}</em></div>
+
 
   </div>
 

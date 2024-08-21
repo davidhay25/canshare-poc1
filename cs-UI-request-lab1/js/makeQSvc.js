@@ -152,18 +152,60 @@ angular.module("pocApp")
         //Add the 'enable when' to the Q
         //updates the item object directly
         //When used by the Composition, we add a prefix which is {compname}.{section name}. (note the trailing dot)
-        function addEnableWhen(ed,item,pathPrefix) {
+        function addEnableWhen(ed,item,inPathPrefix) {
 
             //return
 
-            pathPrefix = pathPrefix || ""
+            let allEW = []  //track all EW created as the Q is created. Used to check the links once the Q is cinisher
+            let pathPrefix = ""
+            if (inPathPrefix) {
+                pathPrefix = inPathPrefix + "."
+            }
+
+            //need to adjust for embedded DGs
+            //let sourcePath =
+
+
+
             if (ed && ed.enableWhen && ed.enableWhen.length > 0) {
                 //console.log(ed,'has ew')
                  //item.enableWhen = []
 
                 ed.enableWhen.forEach(function (ew) {
                     let qEW = {}
-                    qEW.question = `${pathPrefix}${ew.source}` //linkId of source is relative to the parent (DG)
+
+                    let source = QutilitiesSvc.updateEWSourcePath(ed.path,ew.source)
+
+                    //let source = ew.source
+/*
+                    //adjustment for embedded DG path
+                    let arControllerPath = ew.source.split('.')  //the control element - question / source
+                    let arThisPath = ed.path.split('.')      // this ed - the one that is dependant
+
+                    //console.log(arThisPath[0],arControllerPath[0])
+                    if (arThisPath[0] !== arControllerPath[0]) {
+                        //This is an ew in a 'contained' DG
+                        let diff = Math.abs(arThisPath.length - arControllerPath.length)
+                        if (arThisPath.length > arControllerPath.length) {
+
+                            let ar = arThisPath.slice(0,diff)
+                            arControllerPath = ar.concat(arControllerPath)
+                            source = arControllerPath.join('.')
+                        } else {
+                            console.log("EnableWhen paths don't seem right...")
+                            //not sure if this is ever true - or what to do if it is!
+                            //probably remove the extra elements from source???
+                            //let ar = arControllerPath.slice(diff)
+                           // arThisPath = ar.concat(arThisPath)
+                            //source = arThisPath.join('.')
+                        }
+
+                    }
+*/
+
+                    qEW.question = `${pathPrefix}${source}` //linkId of source is relative to the parent (DG)
+
+                    //qEW.question = `${pathPrefix}${ew.source}` //linkId of source is relative to the parent (DG)
                     qEW.operator = ew.operator
                     //if the ew.value is an object then assume a Coding. Otherwise a boolean (we only support these 2)
 
@@ -193,6 +235,13 @@ angular.module("pocApp")
                         item.enableWhen = item.enableWhen || []
                         item.enableWhen.push(qEW)
 
+                        //for the validation we need the target link as well... So this would be an invalid EW on the Q - don't add it!
+                        let copyEW = angular.copy(qEW)
+                        copyEW.target = item.linkId
+
+                        allEW.push(copyEW)
+
+
                         if (item.enableWhen.length == 2) {
                             //if there are 2 EW then set the EW behaviour. More than 2 and it will already be set...
                             item.enableBehavior = 'any'    //todo - may need to specify this
@@ -201,7 +250,7 @@ angular.module("pocApp")
 
                 })
             }
-           // return item
+            return allEW
         }
 
         //set the control type (and hint extension) for the item
@@ -346,6 +395,11 @@ angular.module("pocApp")
         }
 
 
+
+
+
+
+
         return {
 
 
@@ -356,6 +410,7 @@ angular.module("pocApp")
 
                 let that = this
                 let errorLog = []
+                let allEW = []      //all EnableWhens - for validation
 
                 let Q = {resourceType:'Questionnaire'}
                 Q.title = comp.title
@@ -365,7 +420,7 @@ angular.module("pocApp")
                 addPrePopExtensions(Q)
                 Q.item = []
 
-                let containerSection = {text: comp.title, linkId: comp.name, extension: [], type: 'group', item: []}
+                let containerSection = {text: comp.title, linkId: `tab-${comp.name}`, extension: [], type: 'group', item: []}
                 let ext = {url: extItemControlUrl}
                 ext.valueCodeableConcept = {
                     coding: [{
@@ -386,8 +441,13 @@ angular.module("pocApp")
 
                 for (const section of comp.sections) {
                     if (section.items && section.items.length > 0) {
-                        let sectionItem = {linkId:section.name,text:section.title,type:'group',item:[]}
+                        let sectionItem = {linkId:`sect-${section.name}`,text:section.title,type:'group',item:[]}
                         containerSection.item.push(sectionItem)
+
+                        //make up an ed for the section for the display in the UI. It's not a real ed...
+                        let sectionEd = {linkId:sectionItem.linkId,path:sectionItem.linkId}
+                        hashEd[sectionItem.linkId] = sectionEd
+
                         for (const contentDG of section.items) {     //a section can have multiple DGs within it.
                             let dgType = contentDG.type[0]        //the dg type. Generally a 'section' dg
                             let dgElementList = snapshotSvc.getFullListOfElements(dgType)
@@ -396,15 +456,16 @@ angular.module("pocApp")
                             let dg = hashAllDG[dgType]
                             orderingSvc.sortFullListByInsertAfter(dgElementList,dg,hashAllDG)
 
-                            console.log(`About to process ${dgType}`)
                             //path prefix is used to adjust enablewhen targets
                             let pathPrefix = sectionItem.linkId
 
 
-                            let config = {expandVS:true,enableWhen:false,pathPrefix : pathPrefix}
+                            let config = {expandVS:true,enableWhen:true,pathPrefix : pathPrefix,calledFromComp:true}
                             //todo - enablewhen not working for composition yet
                             let vo = that.makeHierarchicalQFromDG(dgElementList,config)
-                            //let vo = that.makeHierarchicalQFromDG(dgElementList,expandVS,pathPrefix)
+
+
+                            allEW.push(...vo.allEW)
 
                             let dgQ = vo.Q
                             let hashByPath = vo.hashEd          //EDs from the child
@@ -417,12 +478,12 @@ angular.module("pocApp")
                             //all ValueSets
                             Object.keys(vo.hashVS).forEach(function (url) {
                                 hashVS[url] =  hashVS[url] || []
-                                hashVS[url].concat(vo.hashVS[url])
+                                hashVS[url].push(...vo.hashVS[url])
                             })
 
                             //any errors
                             if (vo.errorLog.length > 0) {
-                                errorLog = errorLog.concat(vo.errorLog)
+                                errorLog.push(...vo.errorLog)
                             }
 
                             //the section is populated by DGs - but there area a couple of ways that has been done.
@@ -441,7 +502,17 @@ angular.module("pocApp")
 
                 }
 
-                return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog}
+                console.log(allEW)
+
+                //validate the enablewhens
+                for (const ew of allEW) {
+                    if (! hashEd[ew.question]) {
+
+                        errorLog.push({msg:`EnableWhen on ${ew.target} refers to a missing element: ${ew.question}`})
+                    }
+                }
+
+                return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog,allEW:allEW}
 
 
             },
@@ -451,9 +522,15 @@ angular.module("pocApp")
                 //Used in the new Q renderer
                 //config.enableWhen will cause the enableWhens to be set
                 //config.pathPrefix is used for enable when targets. Only used from composition. It may be null
+                let pathPrefix = ""
+                if (config.pathPrefix) {
+                    pathPrefix = config.pathPrefix + "."
+                }
+
                 //if config.expandVS is true, then the contents of the VS will be expanded as options into the item. May need to limit the length...
                 let errorLog = []
                 let firstElement = lstElements[0]
+                let allEW = []      //all EnableWhen. Used for validation
 
 
 
@@ -466,7 +543,7 @@ angular.module("pocApp")
                         basePathsToHide.push(thing.ed.path)  //the full path
                     }
                 })
-                //console.log(basePathsToHide)
+
 
                 //now create the list of ED to include in the Q
                 //we do this first so that we can exclude all child elements of hidden elements as well
@@ -489,7 +566,6 @@ angular.module("pocApp")
                         }
                 })
 
-
                 let Q = {resourceType:'Questionnaire'}
                 Q.id = `canshare-${firstElement.ed.path}`
                 Q.name = firstElement.ed.path
@@ -506,24 +582,29 @@ angular.module("pocApp")
                 for (const item of lstQElements) {
                     let ed = item.ed
                     let path = ed.path
-                    hashEd[path] = ed
 
+
+                    //If this is being called from the composition then add the pathprefix to the path (linkId)
+                    let newLink = path
+                    if (pathPrefix) {
+                        newLink = `${pathPrefix}${path}`
+                    }
+                    hashEd[newLink] = ed
 
                     if (currentItem) {
                         let parentItemPath = $filter('dropLastInPath')(path)
                         //console.log(parentItemPath)
-                        currentItem = {linkId:path,type:'string',text:ed.title}
+                        currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
 
                         decorateItem(currentItem,ed)
                         if (config.enableWhen) {
-                            addEnableWhen(ed,currentItem,config.pathPrefix)
+                            let ar =  addEnableWhen(ed,currentItem,config.pathPrefix)
+                            allEW.push(...ar)
                         }
-
 
                         if (ed.mult.indexOf('..*')> -1) {
                             currentItem.repeats = true
                         }
-
 
                         hashItems[parentItemPath] = hashItems[parentItemPath] || {}
 
@@ -534,10 +615,11 @@ angular.module("pocApp")
 
 
                     } else {
-                        currentItem = {linkId:path,type:'string',text:ed.title}
+                        currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
                         decorateItem(currentItem,ed)
                         if (config.enableWhen) {
-                            addEnableWhen(ed,currentItem,config.pathPrefix)
+                            let ar = addEnableWhen(ed,currentItem,config.pathPrefix)
+                            allEW.push(...ar)
                         }
 
                         hashItems[path] = currentItem
@@ -546,7 +628,23 @@ angular.module("pocApp")
                     }
 
                 }
-                return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog}
+
+
+                //validate the enablewhens - but not if the generation is called from the composition
+                if (! config.calledFromComp) {
+                    for (const ew of allEW) {
+                        if (! hashEd[ew.question]) {
+                            errorLog.push({msg:`EnableWhen on ${ew.target} refers to a missing element: ${ew.question}`})
+                        }
+                    }
+                }
+
+
+                return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog, allEW : allEW}
+
+                function adjustEWPath() {
+                    //when a DG is child of another (
+                }
 
                 function decorateItem(item,ed) {
 

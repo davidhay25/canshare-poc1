@@ -8,7 +8,8 @@ angular.module('formsApp')
                 q: '=',
                 hashEd : '=',        //hash of all elementDefinitions by path (=ed)
                 technicalview : '=', //show technical items
-                treenode : '@'       //where to mount the tree
+                treenode : '@',       //where to mount the tree
+                errors: '='             //errors to display in the UI
             },
 
             //https://fhirpath-lab.com/Questionnaire/tester
@@ -76,6 +77,7 @@ angular.module('formsApp')
 
                     console.log($scope.q)
                     console.log($scope.hashEd)
+                    console.log($scope.errors)
 
                     let obj = $scope.q
                     $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([angular.toJson(obj,true) ],{type:"application/json"}))

@@ -149,8 +149,6 @@
               <div class="clickable pull-right" ng-click="setFixedValue('fixed')">Edit</div>
               <div style="margin-right: 8px" class="clickable pull-right" ng-click="clearFixedValue('fixed')">Clear</div>
 
-
-
               {{fixedDisplay}}
 
             </td>
@@ -161,8 +159,6 @@
 
               <div class="clickable pull-right" ng-click="setFixedValue('default')">Edit</div>
               <div style="margin-right: 8px" class="clickable pull-right" ng-click="clearFixedValue('default')">Clear</div>
-
-
 
               {{defaultDisplay}}
 
@@ -187,9 +183,9 @@
           </tr>
 
           <tr >
-            <td>Set auto populate flag</td>
-            <td><checkbox ng-model="input.autoPop"/>
-              <div><em>If checked, an '(Auto populated) will appear in the Questionnaire</em></div>
+            <td>Auto populate note</td>
+            <td><input type="text" class="form-control" ng-model="input.autoPop"/>
+              <div><em>A note about any prepop. Will appear in the form.</em></div>
             </td>
           </tr>
 

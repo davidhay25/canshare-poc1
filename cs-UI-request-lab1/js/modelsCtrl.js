@@ -2,7 +2,7 @@
 //https://www.joelonsoftware.com/2000/04/06/things-you-should-never-do-part-i/
 angular.module("pocApp")
     .controller('modelsCtrl',
-        function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,makeQSvc,orderingSvc,
+        function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,orderingSvc,
                   snapshotSvc,vsSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
@@ -1664,14 +1664,7 @@ angular.module("pocApp")
 
                 //by supplying the dg in the call, the eds will be annotatded with 'definedOnDG' for those in the diff
                 $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name,dg)// vo.allElements
-/*
-                $scope.fullElementList.forEach(function (item) {
-                    console.log(item.ed.path)
-                })
-                
 
-console.log($scope.fullElementList)
-*/
                 $scope.fullElementHash = {}         //I seem to need this quite a lot. Though memory usage is getting high...
                 //create the list of all paths in the DG. Used by the 'ordering'
                 $scope.allPaths = []  //used for the manual re-ordering
@@ -1702,34 +1695,7 @@ console.log($scope.fullElementList)
                 vsSvc.getAllVS($scope.fullElementList, function () {
 
                 })
-/*
-                if ( autoQ) {
 
-                    //we first gather all the Valuesets from the Term sever then make the Q
-                    //note that in the composition this is part of the makeQ function - so a different patters
-
-
-                    vsSvc.getAllVS($scope.fullElementList, function () {
-
-
-                        let voQ = makeQSvc.makeHierarchicalQFromDG($scope.fullElementList,true) //,$scope.hashAllDG)
-                        //$scope.fullQ = voQ.Q
-                        //$scope.hashEd = voQ.hashEd
-                        console.log(voQ.errorLog)
-
-
-                    //let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
-
-
-                     $scope.dgQ = voQ.Q
-
-//console.log(angular.toJson($scope.dgQ ))
-
-                    })
-
-                }
-
-*/
 
                 //The DG element tree
                 let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)

@@ -245,6 +245,13 @@
               </tr>
 
 
+              <tr>
+                <td ng-show="technicalview" class="detailName">LinkId</td>
+                <td>
+                  {{selectedItem.linkId}}
+                </td>
+              </tr>
+
 
             </table>
 
@@ -596,6 +603,19 @@
 
 
         </uib-tab>
+
+        <uib-tab ng-show="technicalview && errors.length > 0" >
+          <uib-tab-heading>
+            Errors <span class="badge">{{errors.length}}</span>
+          </uib-tab-heading>
+
+          <table class="table-bordered table-bordered table-condensed">
+            <tr ng-repeat="el in errors">
+              <td>{{el.msg}}</td>
+            </tr>
+          </table>
+        </uib-tab>
+
 
 
         <uib-tab ng-show="false && technicalview" heading="Q">

@@ -1,6 +1,6 @@
 angular.module("pocApp")
 
-    .service('modelDGSvc', function($http,$q,$localStorage) {
+    .service('modelDGSvc', function($http,$q,$localStorage,QutilitiesSvc) {
 
         let config = {}
         let vsUrlPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/" //the url prefix
@@ -99,15 +99,23 @@ angular.module("pocApp")
                     if (item.ed && item.ed.enableWhen && item.ed.mult !== '0..0') {
                         //note that the ew here is not the same as in the Q - for example it has 'source' rather than 'question'
                         item.ed.enableWhen.forEach(function (ew) {
-                            let sourceEd = hashElements[ew.source]
 
 
+                            //adjusts the source (controller) path for contained DG's with conditionals
+                            let source = QutilitiesSvc.updateEWSourcePath(item.ed.path,ew.source)
+
+                            //let sourceEd = hashElements[ew.source]
+                            let sourceEd = hashElements[source]
+
+
+                            /* - aug2024 - now sure that this is right
                             //for inherited elements the first segment is always the current dg name
                             let ar = item.ed.path.split('.')
                             ar[0] = dgName
                             let newPath = ar.join('.')
-
-                            let entry = {path:newPath,ew:ew,ed:sourceEd}
+*/
+                            let entry = {path:item.ed.path,ew:ew,ed:sourceEd}
+                            //let entry = {path:newPath,ew:ew,ed:sourceEd}
                             if (! sourceEd) {
                                 entry.error = `Warning! source ed not found at path ${ew.source}`
                             }

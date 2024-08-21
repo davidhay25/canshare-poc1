@@ -454,6 +454,7 @@ angular.module("pocApp")
                                             //replacing the elements that were overriden.
                                             let canInsert = true
                                             //for (const ed2 of dg.fullDiff) {
+                                            //this could be made more efficient with a hash - but this is simpler
                                             for (const ed2 of dg.snapshot) {  //20 aug 2020
                                                 if (ed2.path == path) {
                                                     canInsert = false

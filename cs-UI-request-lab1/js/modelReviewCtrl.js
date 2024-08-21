@@ -556,6 +556,7 @@ angular.module("pocApp")
                     let voQ = makeQSvc.makeHierarchicalQFromDG($scope.fullElementList,config) //,$scope.hashAllDG)
                     $scope.fullQ = voQ.Q
                     $scope.hashEd = voQ.hashEd
+                    $scope.errorLog = voQ.errorLog
                     console.log(voQ.errorLog)
 
                     //The DG element tree
@@ -627,6 +628,8 @@ angular.module("pocApp")
 
                     $scope.fullQ = vo.Q         //will invoke the Q renderer directive
                     $scope.hashEd = vo.hashEd
+                    $scope.errorLog = vo.errorLog
+
                     console.log(vo.errorLog)
                 })
 
