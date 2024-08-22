@@ -643,10 +643,14 @@
 
               <uib-tab>
 
-                <uib-tab-heading>Conditional show <span class="badge">
-                  {{selectedNode.data.ed.enableWhen.length || 0}}</span>
+                <uib-tab-heading>Conditional <span class="badge">
+                  {{selectedNode.data.ed.enableWhen.length || 0}} | {{selectedNode.data.ed.conditionalVS.length || 0}}</span>
                 </uib-tab-heading>
                 <br/>
+
+
+                <div ng-show = "selectedNode.data.ed.enableWhen">
+                <strong>Element Show</strong>
 
                 <table class="table table-bordered">
                   <tr><th>Source</th><th>Operator</th><th>Value</th></tr>
@@ -667,6 +671,27 @@
                 <!-- TODO - come back to this after bug fixes -->
                 <div ng-show="canEdit(selectedModel)" class="btn-link btn pull-right"
                      ng-click="addEWNew()">Add new control element</div>
+
+
+                </div>
+
+                <div ng-show = "selectedNode.data.ed.conditionalVS">
+                  <hr/>
+                  <strong>Conditional ValueSet</strong>
+
+                  <table class="table table-bordered">
+                    <tr><th>Path</th><th>Value</th><th>ValueSet</th></tr>
+                    <tr ng-repeat="row in selectedNode.data.ed.conditionalVS">
+                      <td>{{row.path}}</td>
+                      <td>{{row.value.display}}</td>
+                      <td>{{row.valueSet}}</td>
+
+                    </tr>
+                  </table>
+
+                </div>
+
+
 
 
 
@@ -1224,6 +1249,7 @@
       <table class="table-bordered table">
         <tr><th>Target (what to hide)</th><th>Controlling element</th><th>Controller description</th><th>Op</th>
           <th>Value (that will show target)</th>
+          <th>Where defined</th>
           <th ng-show="canEdit(selectedModel)">Delete</th>
 
         </tr>
@@ -1241,10 +1267,12 @@
             <div ng-show="dep.ew.value.code">{{dep.ew.value.code}} | {{dep.ew.value.display}}</div>
             <div ng-hide="dep.ew.value.code">{{dep.ew.value}}</div>
           </td>
+          <td>{{dep.source}}</td>
           <td ng-show="canEdit(selectedModel)">
             <i style="color: red" class="glyphicon glyphicon-remove clickable"
                ng-click="removeEnableWhen($index,dep.path)"></i>
           </td>
+
         </tr>
       </table>
 

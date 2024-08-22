@@ -323,6 +323,9 @@ angular.module("pocApp")
             }
 
             $scope.removeEnableWhen = function (inx,path) {
+                alert('remove disabled for now')
+                return
+
                 if (! confirm("Are you sure you wish to remove this Conditional show")) {
                     return
                 }

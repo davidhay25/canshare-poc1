@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('editDGItemCtrl',
-        function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal,$http,parentEd,igSvc,initialTab) {
+        function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal,$http,parentEd,igSvc,initialTab,vsSvc) {
             $scope.item = item      //will be {ed:} if editing an existing item
             $scope.allTypes = allTypes
             $scope.input = {}
@@ -11,6 +11,8 @@ angular.module("pocApp")
             //need a default base for editing
             $scope.fixed = {}
             $scope.default = {}
+
+            let snomed = "http://snomed.info/sct"
 
             //set the initial tab displayed
             if (initialTab == 'profile') {
@@ -47,23 +49,23 @@ angular.module("pocApp")
                 }
             })
 
-            //console.log(hashChildNames)
 
-
-
-            let snomed = "http://snomed.info/sct"
-
-            function makeQuantityDisplay(quantity) {
-                let display = ""
-                if (quantity.unit) {
-                    display += `Unit: ${quantity.unit}  `
+            //update the coded list for the optional valueSet feature. A separate routine to make the logic clearer
+            $scope.codedElements = []
+            fullElementList.forEach(function (item) {
+                let ed = item.ed
+                if (ed.type) {
+                    if (ed.type[0] == 'CodeableConcept') {
+                        $scope.codedElements.push(ed)
+                    }
                 }
-                if (quantity.value) {
-                    display += `Value: ${quantity.value}`
-                }
-                return display
+            })
 
-            }
+
+
+            //conditional ValueSet options that apply to this item
+            $scope.conditionalVS = []
+
 
 
             //when an item is passed in for editing
@@ -137,9 +139,6 @@ angular.module("pocApp")
                 if (item.ed.fixedQuantity) {
                     $scope.fixed = {elName:'fixedQuantity',value:item.ed.fixedQuantity}
                     $scope.fixedDisplay = makeQuantityDisplay(item.ed.fixedQuantity)
-
-
-
                 }
 
                 //displays for default
@@ -161,10 +160,11 @@ angular.module("pocApp")
                 if (item.ed.defaultQuantity) {
                     $scope.default = {elName:'defaultQuantity',value:item.ed.defaultQuantity}
                     $scope.defaultDisplay = makeQuantityDisplay(item.ed.defaultQuantity)
-
-
                 }
-                
+
+                if (item.ed.conditionalVS) {
+                    $scope.conditionalVS = item.ed.conditionalVS
+                }
 
                 //todo why this? (and there's another when creating new
                 for (const typ of allTypes) {
@@ -188,6 +188,53 @@ angular.module("pocApp")
             }
 
 
+
+            //======== functions for conditionalVS
+
+            $scope.setConditionalVSValues = function (path) {
+                //called when setting the option path for conditional VS to create the list of possible values (concepts)
+
+                $scope.conditionalVSOptions = []
+                for (const item of fullElementList) {
+                    if (item.ed.path == path) {
+                        let ed = item.ed
+                        if (ed.valueSet) {
+                            $scope.conditionalVSOptions = vsSvc.getOneVS(ed.valueSet)
+                        } else if (ed.options) {
+                            $scope.conditionalVSOptions = ed.options
+                        } else {
+
+                        }
+                        break
+                    }
+                }
+            }
+
+            $scope.addConditionalVS = function (path,value,valueSet) {
+                $scope.conditionalVS.push({path:path,value:value,valueSet:valueSet})
+
+                delete $scope.input.conditionalVSPath
+                delete $scope.input.conditionalVSValue
+                delete $scope.input.conditionalVSValueSet
+
+            }
+
+            //---------
+
+
+            function makeQuantityDisplay(quantity) {
+                let display = ""
+                if (quantity.unit) {
+                    display += `Unit: ${quantity.unit}  `
+                }
+                if (quantity.value) {
+                    display += `Value: ${quantity.value}`
+                }
+                return display
+
+            }
+
+
             $scope.viewVS = function (vsName) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/viewVS.html',
@@ -208,13 +255,15 @@ angular.module("pocApp")
 
             //return true if the datatype can have a fixed value
             $scope.isFixedType = function (type) {
-
                 if (type == 'CodeableConcept' || type == 'Quantity' || type == 'Ratio' || type == 'code') {
                     //if (type == 'CodeableConcept' || type == 'decimal' || type == 'string') {
                     return true
                 }
-
             }
+
+
+
+
 
             $scope.selectElementPath = function () {
                 //select an element path from the fhirPath profiling dialog
@@ -358,6 +407,7 @@ angular.module("pocApp")
 
 
 
+                ed.conditionalVS = $scope.conditionalVS
 
 
                 if ($scope.input.otherType) {

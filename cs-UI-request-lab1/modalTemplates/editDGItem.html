@@ -269,6 +269,52 @@
 
 
       <uib-tab ng-show="input.selectedType == 'CodeableConcept'">
+        <uib-tab-heading>Conditional valueSets <span class="badge">{{conditionalVS.length}}</span> </uib-tab-heading>
+
+        <table class="table table-bordered">
+          <tr><th>Path</th><th>Value</th><th>ValueSet</th><th></th></tr>
+          <tr ng-repeat="row in conditionalVS">
+            <td>{{row.path}}</td>
+            <td>{{row.value.display}}</td>
+            <td>{{row.valueSet}}</td>
+            <td><i class="glyphicon glyphicon-remove pull-right clickable"
+                   ng-click="conditionalVS.splice($index,1)"></i></td>
+          </tr>
+
+          <tr>
+            <td>
+
+                  <select class="form-control" ng-model="input.conditionalVSPath"
+                          ng-change="setConditionalVSValues(input.conditionalVSPath.path)"
+                          ng-options = "item.title for item in codedElements"></select>
+
+
+
+            </td>
+            <td>
+
+              <select class="form-control" ng-model="input.conditionalVSValue"
+
+                      ng-options = "concept.display for concept in conditionalVSOptions"></select>
+
+
+
+
+
+
+            </td>
+            <td style="width: 45%"><input type="text" class="form-control" ng-model="input.conditionalVSValueSet"/> </td>
+
+            <td><i class="glyphicon glyphicon-plus-sign pull-right clickable"
+                   ng-click="addConditionalVS(input.conditionalVSPath.path,input.conditionalVSValue,input.conditionalVSValueSet)"></i></td>
+
+          </tr>
+        </table>
+
+
+      </uib-tab>
+
+      <uib-tab ng-show="input.selectedType == 'CodeableConcept'">
         <uib-tab-heading>Options <span class="badge">{{options.length}}</span> </uib-tab-heading>
 
         <uib-tabset>

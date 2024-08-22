@@ -1148,6 +1148,8 @@ angular.module("pocApp")
                                 ed1.gtable = ed.gtable
                                 ed1.prePop = ed.prePop
 
+                                ed1.conditionalVS = ed.conditionalVS
+
                                 ed1.hideLabel = ed.hideLabel
                                 ed1.labelText = ed.labelText
 

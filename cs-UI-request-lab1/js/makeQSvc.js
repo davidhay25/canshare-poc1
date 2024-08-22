@@ -221,7 +221,6 @@ angular.module("pocApp")
                             delete qEW.answerCoding.pt  //the preferred term...
                             delete qEW.answerCoding.fsn  //the preferred term...
 
-
                             qEW.answerCoding.system = qEW.answerCoding.system || unknownCodeSystem
                             //qEW.answerCoding.system = qEW.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
                             canAdd = true
@@ -561,10 +560,35 @@ angular.module("pocApp")
                                 }
                             }
                         }
+
+                        //now we need to look at the conditional ValueSets. If an item has condtional ValueSets defined
+                        //then an ed is constructed for each VS with an enableWhen defined.
+                        //todo - should the original be defined - what about the linkId
+
+                        if (thing.ed.conditionalVS) {
+                            ctr = 1
+                            thing.ed.conditionalVS.forEach(function (cvs) {
+                                let newThing = angular.copy(thing)
+                                //delete newThing.enableWhen
+
+                                let ew = {source:cvs.path,operator:'=',value:cvs.value}
+                                newThing.ed.enableWhen = [ew]
+                                newThing.ed.valueSet = cvs.valueSet
+                                newThing.ed.path =`${thing.ed.path}-${ctr++}`
+                                lstQElements.push(newThing)
+                            })
+
+                           //temp okToAdd = false     //don't show the original
+                        }
+
                         if (okToAdd) {
                             lstQElements.push(thing)
                         }
                 })
+
+
+
+
 
                 let Q = {resourceType:'Questionnaire'}
                 Q.id = `canshare-${firstElement.ed.path}`
@@ -606,8 +630,8 @@ angular.module("pocApp")
                             currentItem.repeats = true
                         }
 
+                        //here is where the new item is added to it's parent...
                         hashItems[parentItemPath] = hashItems[parentItemPath] || {}
-
                         hashItems[parentItemPath].item = hashItems[parentItemPath].item || []
                         hashItems[parentItemPath].item.push(currentItem)
                         hashItems[parentItemPath].type = "group"

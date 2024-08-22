@@ -102,6 +102,7 @@ angular.module("pocApp")
 
 
                             //adjusts the source (controller) path for contained DG's with conditionals
+                            //also called when rendering a Q...
                             let source = QutilitiesSvc.updateEWSourcePath(item.ed.path,ew.source)
 
                             //let sourceEd = hashElements[ew.source]
@@ -115,6 +116,8 @@ angular.module("pocApp")
                             let newPath = ar.join('.')
 */
                             let entry = {path:item.ed.path,ew:ew,ed:sourceEd}
+                            entry.source = source
+
                             //let entry = {path:newPath,ew:ew,ed:sourceEd}
                             if (! sourceEd) {
                                 entry.error = `Warning! source ed not found at path ${ew.source}`
