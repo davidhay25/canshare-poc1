@@ -668,12 +668,14 @@
                 </table>
                 <em ng-show="selectedNode.data.ed.enableWhen.length > 0">This element will be hidden in a form unless one of the above conditions is true</em>
 
+
+
+                </div>
+
                 <!-- TODO - come back to this after bug fixes -->
                 <div ng-show="canEdit(selectedModel)" class="btn-link btn pull-right"
                      ng-click="addEWNew()">Add new control element</div>
 
-
-                </div>
 
                 <div ng-show = "selectedNode.data.ed.conditionalVS">
                   <hr/>
@@ -752,6 +754,7 @@
             </uib-tabset>
 
 
+            <br/><br/>
             <div ng-hide="selectedNode.data.ed.kind == 'root' || ! canEdit(selectedModel)">
               {{selectedNode.data.ed.title}}
               <!--
