@@ -1694,8 +1694,10 @@ angular.module("pocApp")
                 makeGraph()     //todo - do we want the graph back?
 
                 //always get all the valueset contents
+                var startTime = performance.now()
                 vsSvc.getAllVS($scope.fullElementList, function () {
-
+                    var endTime = performance.now()
+                    console.log(`Call to getAllVS took ${endTime - startTime} milliseconds`)
                 })
 
 

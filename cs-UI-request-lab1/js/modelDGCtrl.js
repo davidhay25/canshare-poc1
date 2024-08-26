@@ -196,7 +196,6 @@ angular.module("pocApp")
             }
 
             $scope.checkIn = function () {
-                //if (confirm("Are you sure you wish to check th"))
                 traceSvc.addAction({action:'checkin',model:$scope.selectedModel})
                 librarySvc.checkIn($scope.selectedModel,$scope.user)
 
@@ -280,6 +279,7 @@ angular.module("pocApp")
 
             //add an enableWhen within the scope of the current DG. Assume (for now) that the trigger is a coded value
             //value is assumed to be a Coding todo - we now support boolean
+            //Still used - called from $scope.addEWNew() above
             $scope.addEnableWhen = function(item,value,op) {
                 //item is the controlling ed - the one whose value will hide/show the currently selected element
 
@@ -323,29 +323,32 @@ angular.module("pocApp")
             }
 
             $scope.removeEnableWhen = function (inx,path) {
-                alert('remove disabled for now')
-                return
+              //  alert('remove disabled for now')
+            //    return
 
                 if (! confirm("Are you sure you wish to remove this Conditional show")) {
                     return
                 }
                 //the path is the full path (incl. DGName) of the element where the EW is to be removed from.
                 //inx is the position within the array of EW
-                //let path = $filter('dropFirstInPath')($scope.selectedNode.data.ed.path)
+                //First, see if this path is present in the diff...
                 let updated = false
                 let pathInDG = $filter('dropFirstInPath')(path) //the path in the DG doesn't have the DF type name in front
                 for (const ed of $scope.selectedModel.diff) {
                     if (ed.path == pathInDG) {
+                        //yes, it is in the diff
+                        updated = true      //we definately don't want to add another
                         if (ed.enableWhen && ed.enableWhen.length > inx) {
                             let ew = ed.enableWhen.splice(inx,1)
-                            //selectedNode.data.ed.enableWhen
 
                             traceSvc.addAction({action:'remove-enablewhen',model:$scope.selectedModel,
                                 path:path,description:angular.toJson(ew[0])})
                             //in modelsCtrl
-                            $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:pathInDG})
-                            updated = true
+                           // $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:pathInDG})
+                           // updated = true
                             break
+                        } else {
+                            alert(`The remove index was ${inx} but the enableWhen length is only ${ed.enableWhen.length}. Not removed`)
                         }
 
                     }
@@ -366,6 +369,7 @@ angular.module("pocApp")
                 //need to re-build the key elements
                 $scope.makeSnapshots()
                 $scope.refreshFullList($scope.selectedModel)
+                //in modelsCtrl
                 $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:path})
 
 
