@@ -174,34 +174,8 @@ angular.module("pocApp")
                 ed.enableWhen.forEach(function (ew) {
                     let qEW = {}
 
+                    //When an EW is in a contained DG, then the paths of the source (in the EW) need to be updated
                     let source = QutilitiesSvc.updateEWSourcePath(ed.path,ew.source)
-
-                    //let source = ew.source
-/*
-                    //adjustment for embedded DG path
-                    let arControllerPath = ew.source.split('.')  //the control element - question / source
-                    let arThisPath = ed.path.split('.')      // this ed - the one that is dependant
-
-                    //console.log(arThisPath[0],arControllerPath[0])
-                    if (arThisPath[0] !== arControllerPath[0]) {
-                        //This is an ew in a 'contained' DG
-                        let diff = Math.abs(arThisPath.length - arControllerPath.length)
-                        if (arThisPath.length > arControllerPath.length) {
-
-                            let ar = arThisPath.slice(0,diff)
-                            arControllerPath = ar.concat(arControllerPath)
-                            source = arControllerPath.join('.')
-                        } else {
-                            console.log("EnableWhen paths don't seem right...")
-                            //not sure if this is ever true - or what to do if it is!
-                            //probably remove the extra elements from source???
-                            //let ar = arControllerPath.slice(diff)
-                           // arThisPath = ar.concat(arThisPath)
-                            //source = arThisPath.join('.')
-                        }
-
-                    }
-*/
 
                     qEW.question = `${pathPrefix}${source}` //linkId of source is relative to the parent (DG)
 
@@ -516,6 +490,17 @@ angular.module("pocApp")
 
             },
 
+            makeHierarchicalQFromDGDEP : function  (lstElements,config) {
+                let that = this
+
+                vsSvc.getAllVS(lstElements, function () {
+                    let vo = that.executeMakeHierarchicalQFromDG(lstElements,config)
+                    return vo
+                })
+
+
+
+            },
 
             makeHierarchicalQFromDG : function  (lstElements,config) {
                 //Used in the new Q renderer
@@ -532,6 +517,11 @@ angular.module("pocApp")
                 let allEW = []      //all EnableWhen. Used for validation
 
 
+                //all EDs where the valueSet is conditional. Anything that has a dependency of one of these
+                //ED's will need to have their dependency adjusted as the ED will not be added to the Q - rather
+                //an ED created for each VS will have been added with a linkId of  {linkId}-{inx}
+                //This will need to be an OR set of EW
+                let conditionalED = {}
 
                 //create list of paths to hide
                 //construct a list of paths to hide
@@ -567,6 +557,7 @@ angular.module("pocApp")
 
                         if (thing.ed.conditionalVS) {
                             ctr = 1
+                            conditionalED[thing.ed.path] = []
                             thing.ed.conditionalVS.forEach(function (cvs) {
                                 let newThing = angular.copy(thing)
                                 //delete newThing.enableWhen
@@ -576,9 +567,13 @@ angular.module("pocApp")
                                 newThing.ed.valueSet = cvs.valueSet
                                 newThing.ed.path =`${thing.ed.path}-${ctr++}`
                                 lstQElements.push(newThing)
+
+                                //the hash has a list of all the new eds that were created to replace the one with the conditional ValueSet
+                                conditionalED[thing.ed.path].push(newThing.ed.path)
+
                             })
 
-                           //temp okToAdd = false     //don't show the original
+                           okToAdd = false     //don't show the original
                         }
 
                         if (okToAdd) {
@@ -663,6 +658,15 @@ angular.module("pocApp")
                     }
                 }
 
+                //at this point the Q has been built, but if there were any elements with conditionalVS
+                //then that element will not have been added to the Q (conditional items for each possible VS will have been)
+                //and any other items that have a dependency on that one will need to be corrected...
+
+
+
+                console.log(conditionalED)
+
+                correctEW(Q,conditionalED)
 
                 return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog, allEW : allEW}
 
@@ -743,6 +747,27 @@ angular.module("pocApp")
                                     if (config.expandVS) {
                                         //if we're expanding the VS, then add all the contents as optoins...
                                         item.answerOption = []
+
+                                        /*
+                                        vsSvc.getOneVSAsync(ed.valueSet).then(
+                                            function (options) {
+                                                if (options && options.length > 0) {
+                                                    for (const concept of options) {
+                                                        concept.system = concept.system || unknownCodeSystem
+                                                        item.answerOption.push({valueCoding : concept})
+                                                    }
+                                                } else {
+                                                    item.answerOption.push({valueCoding : {display:"The ValueSet is missing or empty"}})
+                                                }
+                                            }, function (err) {
+                                                alert(err)
+                                            }
+                                        )
+*/
+
+
+
+
                                         let options = vsSvc.getOneVS(ed.valueSet)
                                         if (options && options.length > 0) {
                                             for (const concept of options) {
@@ -752,6 +777,9 @@ angular.module("pocApp")
                                         } else {
                                             item.answerOption.push({valueCoding : {display:"The ValueSet is missing or empty"}})
                                         }
+
+
+
 
                                     } else {
                                         //otherwise, add the answervalueSet property and let the renderer retrieve the contents
@@ -820,6 +848,65 @@ angular.module("pocApp")
                         item.extension.push(ext)
 
                     }
+
+
+                }
+
+                function correctEW(Q,conditionalED) {
+
+                    function checkItem(item) {
+
+                        if (item.enableWhen) {
+                            console.log(item.enableWhen)
+
+                            let newEWList = []
+
+                            item.enableWhen.forEach(function (ew) {
+                                if (conditionalED[ew.question]) {
+                                    console.log(`${item.linkId} needs adjusting`)
+
+                                  //  let lst = []
+                                    //we'll create new EW's for each of the conditional ED's that were created
+                                    conditionalED[ew.question].forEach(function (path) {
+                                        let newEw = angular.copy(ew)
+                                        newEw.question = path
+                                     //   lst.push(newEw)
+                                        newEWList.push(newEw)
+                                    })
+
+                                  //  item.enableWhen.push(...lst)
+
+                                  //  item.text += "ggg"
+                                    
+                                } else {
+                                    newEWList.push(ew)
+                                }
+
+                            })
+
+                            item.enableWhen = newEWList
+                            item.enableBehavior = 'any'
+
+
+
+
+                        }
+                        if (item.item) {
+                            item.item.forEach(function (child) {
+                                checkItem(child)
+                            })
+                        }
+
+                    }
+
+                    Q.item.forEach(function (item) {
+                        checkItem(item)
+                    })
+
+
+
+                    return Q
+
 
 
                 }

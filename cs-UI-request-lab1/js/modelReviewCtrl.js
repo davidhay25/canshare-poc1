@@ -552,7 +552,6 @@ angular.module("pocApp")
 
                     //the second option expands the valuesets as options into the Q - todo make this an option
                     let config = {expandVS:true,enableWhen:true}
-                    //let voQ = makeQSvc.makeHierarchicalQFromDG($scope.fullElementList,true) //,$scope.hashAllDG)
                     let voQ = makeQSvc.makeHierarchicalQFromDG($scope.fullElementList,config) //,$scope.hashAllDG)
                     $scope.fullQ = voQ.Q
                     $scope.hashEd = voQ.hashEd
@@ -568,7 +567,7 @@ angular.module("pocApp")
                     //let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
 
 
-                    console.log(treeData)
+                    //console.log(treeData)
                     makeDGTree(treeData,rootNodeId)
 
                 })
