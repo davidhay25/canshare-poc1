@@ -1246,28 +1246,28 @@ angular.module("pocApp")
                 //these are the properties
                 $scope.cmProperties = {}
 
-                $scope.cmProperties['patient-sex'] = {concept: {code:"184100006"},
+                $scope.cmProperties['patient-sex'] = {concept: {code:"184100006"},UI:'Patient sex',
                     next:'cancer-service',options:[]}
 
-                $scope.cmProperties['cancer-service'] = {concept: {code:"299801000210106"},
+                $scope.cmProperties['cancer-service'] = {concept: {code:"299801000210106"},UI:"Cancer Service",
                     next:'cancer-stream',options:[],fullVS:'canshare-cancer-service'}
 
-                $scope.cmProperties['cancer-stream'] = {concept:{code:"299811000210108",display:"Cancer Stream",system:snomed},
+                $scope.cmProperties['cancer-stream'] = {concept:{code:"299811000210108",display:"Cancer Stream",system:snomed}, UI:"Cancer Stream",
                     next:'cancer-substream',previous:'cancer-service', options : [],fullVS:'canshare-cancer-stream'}
 
-                $scope.cmProperties['cancer-substream'] = {concept: {code:"299821000210103"},
+                $scope.cmProperties['cancer-substream'] = {concept: {code:"299821000210103"}, UI:"Cancer Substream",
                     next:'cancer-type',previous:'cancer-stream',options:[],fullVS:'canshare-cancer-substream'}
 
-                $scope.cmProperties['cancer-type'] = {concept: {code:"299831000210101"},
+                $scope.cmProperties['cancer-type'] = {concept: {code:"299831000210101"}, UI:"Cancer Type",
                     next:'primary-site',previous:'cancer-substream',options:[],fullVS:'canshare-cancer-type'}
 
-                $scope.cmProperties['primary-site'] = {concept: {code:"399687005"},
+                $scope.cmProperties['primary-site'] = {concept: {code:"399687005"}, UI:"Primary Site",
                     next:'primary-site-laterality',previous:'cancer-type',options:[],fullVS:'canshare-primary-topography'}
 
-                $scope.cmProperties['primary-site-laterality'] = {concept: {code:"297561000210100"},
+                $scope.cmProperties['primary-site-laterality'] = {concept: {code:"297561000210100"},UI:"Laterality or Side",
                     next:'histologic-type-primary',previous:'primary-site',options:[],fullVS:'canshare-laterality'}
 
-                $scope.cmProperties['histologic-type-primary'] = {concept: {code:"512001000004108"},options:[],fullVS:'canshare-who-histology',
+                $scope.cmProperties['histologic-type-primary'] = {concept: {code:"512001000004108"},options:[],fullVS:'canshare-who-histology',UI:"Primary Histology",
                     previous:'primary-site-laterality'}
 
                 $scope.cmProperties['patient-sex'].options.push({code:"U",display:"Unknown"})
