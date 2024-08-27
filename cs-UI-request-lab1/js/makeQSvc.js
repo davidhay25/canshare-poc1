@@ -490,17 +490,7 @@ angular.module("pocApp")
 
             },
 
-            makeHierarchicalQFromDGDEP : function  (lstElements,config) {
-                let that = this
 
-                vsSvc.getAllVS(lstElements, function () {
-                    let vo = that.executeMakeHierarchicalQFromDG(lstElements,config)
-                    return vo
-                })
-
-
-
-            },
 
             makeHierarchicalQFromDG : function  (lstElements,config) {
                 //Used in the new Q renderer
@@ -557,7 +547,11 @@ angular.module("pocApp")
 
                         if (thing.ed.conditionalVS) {
                             ctr = 1
-                            conditionalED[thing.ed.path] = []
+
+                            let adjustedPath = `${pathPrefix}${thing.ed.path}`
+
+                            //conditionalED[thing.ed.path] = []
+                            conditionalED[adjustedPath] = []
                             thing.ed.conditionalVS.forEach(function (cvs) {
                                 let newThing = angular.copy(thing)
                                 //delete newThing.enableWhen
@@ -569,8 +563,9 @@ angular.module("pocApp")
                                 lstQElements.push(newThing)
 
                                 //the hash has a list of all the new eds that were created to replace the one with the conditional ValueSet
-                                conditionalED[thing.ed.path].push(newThing.ed.path)
+                                //conditionalED[thing.ed.path].push(newThing.ed.path)
 
+                                conditionalED[adjustedPath].push(`${pathPrefix}${newThing.ed.path}`)
                             })
 
                            okToAdd = false     //don't show the original
@@ -865,19 +860,15 @@ angular.module("pocApp")
                                 if (conditionalED[ew.question]) {
                                     console.log(`${item.linkId} needs adjusting`)
 
-                                  //  let lst = []
+
                                     //we'll create new EW's for each of the conditional ED's that were created
                                     conditionalED[ew.question].forEach(function (path) {
                                         let newEw = angular.copy(ew)
                                         newEw.question = path
-                                     //   lst.push(newEw)
                                         newEWList.push(newEw)
                                     })
 
-                                  //  item.enableWhen.push(...lst)
 
-                                  //  item.text += "ggg"
-                                    
                                 } else {
                                     newEWList.push(ew)
                                 }
