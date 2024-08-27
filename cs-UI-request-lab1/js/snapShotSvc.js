@@ -478,7 +478,7 @@ angular.module("pocApp")
                                         logger(msg,dg.name,false,arElements)
 
                                         if (dg.name == "ColorectalHistoTumour") {
-                                            console.log(ed.path,dgToInsert.name,arElements)
+                                           // console.log(ed.path,dgToInsert.name,arElements)
                                         }
 
 
@@ -504,7 +504,7 @@ angular.module("pocApp")
                             logger(`DG: ${dg.name} has a completed snapshot !`,dg.name)
                             //todo - remove any specific elements from the diff
 
-                            if (dg.name == "ColorectalHistoTumour") {
+                            if (false && dg.name == "ColorectalHistoTumour") {
                                 console.log(">>>>>>>> insert complete")
                                 let v = angular.copy(dg)
                                 console.log(dg.snapshot)

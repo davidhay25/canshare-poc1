@@ -1679,7 +1679,6 @@ angular.module("pocApp")
                 })
 
 
-
                 //adjust according to 'insertAfter' values
                 orderingSvc.sortFullListByInsertAfter($scope.fullElementList,dg,$scope.hashAllDG)
 

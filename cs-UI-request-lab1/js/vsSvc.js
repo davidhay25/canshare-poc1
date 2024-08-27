@@ -1,6 +1,6 @@
 angular.module("pocApp")
 
-    .service('vsSvc', function(cmSvc,utilsSvc) {
+    .service('vsSvc', function(cmSvc,utilsSvc,$q) {
 
         //cache of all vs. rebuilt each time the app runs. todo: could load into persistent browser cache like conceptmap stuff
         let cache = {}
@@ -31,7 +31,7 @@ angular.module("pocApp")
                 let that = this
                 cmSvc.getVSContentsHash(lst).then(
                     function (hash) {
-                        //console.log(hash)
+                        console.log(hash)
                         that.setVSContents(hash)
                         //hashVS = hash
 
@@ -44,6 +44,8 @@ angular.module("pocApp")
 
                         let size2 = utilsSvc.getSizeOfObject(cache)
                         console.log(`Size of full VS cache: ${size2/1024} K`)
+
+
 
                         cb()
                     }, function () {
@@ -65,15 +67,32 @@ angular.module("pocApp")
 
             allElements.forEach(function (item) {
                 if (item.ed && item.ed.valueSet) {
-
                     let vs = item.ed.valueSet
                     vs = that.fixUrl(vs)            //adds the NXHTS prefix if missing
 
                     if (lst.indexOf(vs) == -1 && ! cache[vs]) {    //only add once!
+                        console.log(`cache miss: ${vs}`)
                         lst.push(vs)
                     }
-
                 }
+
+                if (item.ed && item.ed.conditionalVS) {
+                    item.ed.conditionalVS.forEach(function (cvs) {
+                        let vs = cvs.valueSet
+                        if (vs) {
+                            vs = that.fixUrl(vs)            //adds the NXHTS prefix if missing
+
+                            if (lst.indexOf(vs) == -1 && ! cache[vs]) {    //only add once!
+                                console.log(`cache miss: ${vs}`)
+                                lst.push(vs)
+                            }
+                        }
+                    })
+                }
+
+
+
+
             })
 
 
@@ -138,6 +157,29 @@ angular.module("pocApp")
                 } else {
                     throw new Error("Calling getOneVS with an empty url")
                 }
+
+            },
+            getOneVSAsyncDEP : function (url) {
+                let deferred = $q.defer()
+                let that = this
+                if (url) {
+                    //get the contents for a single vs
+                    let url1 = this.fixUrl(url)
+                    if (cache[url1]) {
+                        deferred.resolve(cache[url1])
+                    } else {
+                        that.updateCacheFromList([url1],function () {
+                            deferred.resolve(cache[url1])
+                        })
+                    }
+
+
+
+                } else {
+                    deferred.reject("Calling getOneVS with an empty url")
+                }
+
+                return deferred.promise
 
             }
         }
