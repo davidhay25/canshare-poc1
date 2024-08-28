@@ -242,58 +242,42 @@ function setup(app) {
 
         let ecl = req.body.ecl      //raw ecl
 
-        console.log(ecl,ecl.length)
+        if (ecl) {
+            let encodedEcl =encodeURIComponent(ecl)
+            let qry = `${nzhtsconfig.serverBase}ValueSet/$expand`// ?url=http://snomed.info/sct?fhir_vs=ecl/${encodedEcl}`
+            let param = {resourceType:'Parameters',parameter:[]}
 
-        let encodedEcl =encodeURIComponent(ecl)
+            let vo = {}// {url:"http://snomed.info/sct?fhir_vs=ecl"}
+            let p1 = {name:'url',valueUri:`http://snomed.info/sct/21000210109?fhir_vs=ecl/${encodedEcl}`}
+            let p3 = {name:'displayLanguage',valueString:`en-x-sctlang-23162100-0210105t`}
 
-        let qry = `${nzhtsconfig.serverBase}ValueSet/$expand`// ?url=http://snomed.info/sct?fhir_vs=ecl/${encodedEcl}`
-        //qry += "&displayLanguage=en-x-sctlang-23162100-0210105"
+            param.parameter.push(p1)
+            param.parameter.push(p3)
 
-        let param = {resourceType:'Parameters',parameter:[]}
+            let token = await getNZHTSAccessToken()
+            if (token) {
+                let config = {headers:{authorization:'Bearer ' + token}}
+                config['content-type'] = "application/fhir+json"
 
-        let vo = {}// {url:"http://snomed.info/sct?fhir_vs=ecl"}
-        //let p1 = {name:'url',valueUri:`http://snomed.info/sct`}
-        let p1 = {name:'url',valueUri:`http://snomed.info/sct/21000210109?fhir_vs=ecl/${encodedEcl}`}
-        //let p = {name:'fhir_vs',valueString:`ecl/${encodedEcl}`}
-        let p3 = {name:'displayLanguage',valueString:`en-x-sctlang-23162100-0210105t`}
+                axios.post(qry,param,config).then(function(data) {
+                    res.json(data.data)
+                }).catch(function(ex) {
+                    if (ex.response) {
+                        console.log(ex.response.data)
+                        res.status(ex.response.status).json(ex.response.data)
+                    } else {
+                        res.status(500).json(ex)
+                    }
 
-        //vo["fhir_vs"] = `ecl/${encodedEcl}`
-        param.parameter.push(p1)
-        //param.parameter.push(p)
-        param.parameter.push(p3)
-
-       // param.parameter.push({url:"http://snomed.info/sct?fhir_vs=ecl"})
-        //param.parameter.push({"fhir_vs":`ecl/${ecl}`})
-
-
-        console.log(param)
-
-        let token = await getNZHTSAccessToken()
-        if (token) {
-
-            //var decoded = jwt_decode(token);
-            // let timeToExpire = decoded.exp * 1000 - Date.now()       //exp is in seconds
-            // console.log(timeToExpire / (1000 * 60 *60 ));
-
-            let config = {headers:{authorization:'Bearer ' + token}}
-            config['content-type'] = "application/fhir+json"
-
-            //let temp = JSON.stringify(param)
-
-            axios.post(qry,param,config).then(function(data) {
-                res.json(data.data)
-            }).catch(function(ex) {
-                if (ex.response) {
-                    console.log(ex.response.data)
-                    res.status(ex.response.status).json(ex.response.data)
-                } else {
-                    res.status(500).json(ex)
-                }
-
-            })
+                })
+            } else {
+                res.status(500).json({msg:"Unable to get Access Token."})
+            }
         } else {
-            res.status(500).json({msg:"Unable to get Access Token."})
+            res.status(400).json({msg:"Empty ECL"})
         }
+
+
     })
 
 
@@ -447,6 +431,47 @@ function setup(app) {
 
 
     })
+
+
+    app.get('/generateQA',async function(req,res){
+
+        let token = await getNZHTSAccessToken()
+
+        if (token) {
+            let config = {headers:{authorization:'Bearer ' + token}}
+            config['content-type'] = "application/fhir+json"
+            let report = []
+            let inx=0
+            let qry = `${nzhtsconfig.serverBase}ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&_count=5000`
+            console.log(qry)
+            let response = await axios.get(qry, config)
+            let bundle = response.data
+            for (const entry of bundle.entry) {
+                let vs = entry.resource
+                let ar = [vs.url]
+
+                let qryExpand = `${nzhtsconfig.serverBase}ValueSet/${vs.id}/$expand`
+                let resp = await axios.get(qryExpand, config)
+                let url = resp.data.url
+
+                ar.push(url)
+               // ar.push(
+                console.log(inx++)
+                let lne = ar.join(',')
+                report.push(lne)
+
+
+            }
+            res.json(report)
+
+        } else {
+            res.json({})
+        }
+
+
+    })
+
+
 
 
     //used for $translate

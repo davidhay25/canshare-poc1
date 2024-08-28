@@ -9,6 +9,8 @@ angular.module("pocApp")
             let nzDisplayLanguage = "en-x-sctlang-23162100-0210105"
             let snomed = "http://snomed.info/sct"
 
+            //let extMemberCount = "http://canshare.co.nz/fhir/StructureDefinition/vs-expanded-count"
+
             //the version is used to identify which include section is used for which purpose
             // >>>>>>>> this approach won't work any more to discriminate between the
             //different include elements - but I'll keep them as separate versions in case we need them to be different
@@ -52,7 +54,7 @@ angular.module("pocApp")
 
 
 
-            //retrieve ValueSets
+            //retrieve all ValueSets
             getValueSets = function (identifier) {
                 //return a list of subsetted canshare valuesets
                 identifier = identifier || "http://canshare.co.nz/fhir/NamingSystem/valuesets%7c"
@@ -130,7 +132,6 @@ angular.module("pocApp")
 
                     })
 
-
                 }
             )
 
@@ -197,13 +198,19 @@ angular.module("pocApp")
 
                 //Update the CodeSystem then the ValueSet...
 
-                updateVSSvc.updateCodeSystem($scope.prePubCS).then(
+                updateVSSvc.updateCodeSystem($scope.prePubCS,$scope.csDirty).then(
                     function () {
                         $scope.csDirty = false
                         let qry = '/nzhts/ValueSet'
                         $http.put(qry,vs).then(
                             function (data) {
-                                alert('Both ValueSet and CodeSystem update complete')
+                                if (! $scope.csDirty) {
+                                    alert('ValueSet update complete')
+                                } else {
+                                    alert('Both ValueSet and CodeSystem update complete')
+                                }
+
+
                             },function (err) {
                                 alert('The CodeSystem was updated, but not the ValueSet:' + angular.toJson(err.data))
                             }
@@ -213,54 +220,9 @@ angular.module("pocApp")
 
                     }, function (err) {
                         console.log(err)
-                        alert(`Neither CodeSystem nor ValueSet was updated: ${angular.toJson(err)}`)
+                        alert(`Neither CodeSystem nor ValueSet were updated: ${angular.toJson(err)}`)
                     }
                 )
-
-
-                /*
-
-                let qry = '/nzhts/ValueSet'
-                $http.put(qry,vs).then(
-                    function (data) {
-
-                        if ($scope.csDirty) {
-                            updateVSSvc.updateCodeSystem($scope.prePubCS).then(
-                                function () {
-                                    $scope.csDirty = false
-                                    alert('Both ValueSet and CodeSystem update complete')
-
-                                }, function (err) {
-                                    console.log(err)
-                                    alert(`The ValueSet was updated, but not the CodeSystem: ${angular.toJson(err)}`)
-                                }
-                            )
-
-                        } else {
-                            alert('ValueSet update complete')
-                        }
-
-
-                        $scope.isDirty = false
-                    }, function (err) {
-                        alert(angular.toJson(err))
-                    }
-                )
-
-                */
-
-/*
-                //a separate update function as sometimes the unpublished CodeSystem resource needs to be
-                function updateVsResource(vs,cb) {
-                    let qry = '/nzhts/ValueSet'
-                    $http.put(qry,vs).then(
-                        function (data) {
-
-                        }
-                }
-
-*/
-
 
 
             }
@@ -314,6 +276,8 @@ angular.module("pocApp")
                 $scope.input.status = 'active'
 
                 $scope.makeVS()
+
+                $scope.input.mainTabActive = 0      //select the detail tab
 
             }
 
@@ -391,6 +355,11 @@ angular.module("pocApp")
                 $scope.input.title = vs.title
                 $scope.input.description = vs.description
 
+                delete $scope.input.displayConcepts
+                delete $scope.input.prePubConcepts
+                delete $scope.input.ecl
+
+
                 //there are now potentially 3 include statements
                 //ecl: system = http://snomed.info/sct, version = https://snomed.info/sct/21000210109 and a filter element
                 //direct:
@@ -443,13 +412,15 @@ angular.module("pocApp")
                 delete $scope.selectedVS
                 delete $scope.expandQry
                 delete $scope.qUsingVS
+                delete $scope.bundleVersions
+                delete $scope.selectedVersion
                 //delete $scope.dummyQR
                 delete $scope.input.prePubConcepts
                 delete $scope.input.displayConcepts
 
-
-
                 let qry = `ValueSet?url=${item.vs.url}&_summary=false`
+
+                $scope.input.mainTabActive = 0      //select the detail tab
 
                 console.log(qry)
                 $scope.termServerQuery = qry
@@ -461,17 +432,25 @@ angular.module("pocApp")
                         //it's a query so a bundle is expected
                         if (data.data && data.data.entry) {
                             if (data.data.entry.length !== 1) {
-                                alert("There were ${data.data.entry.length} matching ValueSets. This is very likely an issue with duplicated resources on the terminology server")
+                                alert(`There were ${data.data.entry.length} matching ValueSets with the url ${item.vs.url}. This is very likely an issue with duplicated resources on the terminology server`)
                             } else {
                                 $scope.selectedVS = data.data.entry[0].resource
                                 parseVS($scope.selectedVS)
+
+                                //if there's no member count, then get it
+                                if (! updateVSSvc.getMemberCount($scope.selectedVS)) {
+                                    $scope.updateMemberCount($scope.selectedVS) //will expand the VS, update the member count & set dirty
+
+                                }
+
+
+
                                 console.log($scope.selectedVS)
                                 console.log($scope.input.prePubConcepts)
                             }
                         } else {
                             alert("The ValueSet was not found")
                         }
-
 
                     }, function (err) {
                         console.log(err)
@@ -494,14 +473,113 @@ angular.module("pocApp")
                         })
                         console.log(data.data)
 
-
-
                     }
                 )
 
 
+            }
+
+            //update the member count for the selected VS. Adds the membercount extension
+            $scope.updateMemberCount = function (vs) {
+
+                let qry = `ValueSet/$expand?url=${vs.url}&_summary=false&displayLanguage=${nzDisplayLanguage}`
+                let currentMemberCount = updateVSSvc.getMemberCount(vs)
+
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        if (data.data.expansion && data.data.expansion.contains) {
+                            let memberCount = data.data.expansion.contains.length
+                            //alert(memberCount)
+
+                            if (memberCount !== currentMemberCount) {
+                                updateVSSvc.setMemberCount(vs,memberCount)
+                                $scope.isDirty = true
+                            }
+
+                        }
 
 
+                        //extMemberCount
+
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                ).finally(
+                    function () {
+                        $scope.showWaiting = false
+                    }
+                )
+            }
+            setMemberCountDEP = function (vs,count) {
+                vs.extension = vs.extension  || []
+                let found = false
+                for (ext of vs.extension) {
+                    if (ext.url == extMemberCount) {
+                        ext.valueInteger = count
+                        found = true
+                        break
+                    }
+                }
+                if (! found) {
+                    vs.extension.push({url:extMemberCount,valueInteger : count})
+                }
+
+            }
+
+
+            $scope.getMemberCount = function (vs) {
+                return updateVSSvc.getMemberCount(vs)
+              /*  if (vs && vs.extension) {
+                    for (ext of vs.extension) {
+                        if (ext.url == extMemberCount) {
+                            return ext.valueInteger
+                            break
+                        }
+                    }
+                }
+                */
+            }
+
+            $scope.getVersions = function (vs) {
+
+                let qry = `ValueSet/${vs.id}/_history?_summary=false`
+
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        //it's a query so a bundle is expected
+                        if (data.data && data.data.entry) {
+                            console.log(data)
+                            $scope.bundleVersions = data.data
+                        } else {
+                            alert("The ValueSet was not found")
+                        }
+
+
+                    }, function (err) {
+                        console.log(err)
+                    }
+                ).finally(
+                    function () {
+                        $scope.showWaiting = false
+                    }
+                )
+            }
+
+            $scope.selectVersion = function (vs) {
+                $scope.selectedVersion = vs
+            }
+
+            //when a history item is selected
+            $scope.revert = function (vs) {
+                $scope.selectedVS = vs
+                parseVS($scope.selectedVS)
+                $scope.isDirty = true
+                $scope.input.mainTabActive = 0      //select the detail tab
 
             }
 

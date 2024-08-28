@@ -229,13 +229,12 @@
                             <span ng-hide="isNew" ng-click="updateVS(selectedVS)">Update VS</span>
                         </button>
 
-                        <div style = "padding: 8px " class="pull-right" ng-show="csDirty"><em>Pre-publication CodeSystem will be NOT updated</em></div>
 
                     </div>
 
 
 
-                    <uib-tabset>
+                    <uib-tabset active="input.mainTabActive">
 
                         <uib-tab heading="Edit ValueSet">
                             <table class="table">
@@ -273,6 +272,17 @@
                                     </td>
                                 </tr>
 
+                                <tr>
+                                    <td>Member count</td>
+                                    <td>
+                                        <span class="badge">{{getMemberCount(selectedVS)}}</span>
+
+                                        <div ng-show="false" class="btn-link btn pull-right" ng-click="updateMemberCount(selectedVS)">Refresh member count</div>
+
+                                    </td>
+                                </tr>
+
+
 
 
 
@@ -300,7 +310,9 @@
 
                                             </div>
                                             <div class="col-md-2">
-                                                <button class="btn btn-link" ng-click="testECL(input.ecl)">Test ECL</button>
+                                                <button
+                                                        ng-show="input.ecl"
+                                                        class="btn btn-link" ng-click="testECL(input.ecl)">Test ECL</button>
                                             </div>
                                         </div>
 
@@ -481,7 +493,9 @@
                             <pre>{{selectedVS | json}}</pre>
                         </uib-tab>
 
-                        <uib-tab heading="Unpublished concepts">
+                        <uib-tab>
+                            <uib-tab-heading>Unpublished concepts <span class="badge">{{prePubCS.concept.length}}</span>
+                            </uib-tab-heading>
                             <br/>
                             <em>This is the custom ValueSet for unpublished concepts. These are concepts that have been defined
                                 in SNOMED but not yet published. They have a different system url (as they don't yet exist in the
@@ -506,6 +520,46 @@
                                 </uib-tab>
                             </uib-tabset>
 
+
+
+
+                        </uib-tab>
+
+
+                        <uib-tab heading="History">
+                            <button class="btn btn-link pull-right" ng-click="getVersions(selectedVS)">Load versions</button>
+
+                            <div class="clearfix"></div>
+                            <br/>
+
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="myScroll">
+                                        <div class="list-group">
+                                            <div class="list-group-item"
+                                                 style="cursor: pointer"
+                                                 ng-click = "selectVersion(entry.resource)"
+                                                 ng-repeat = "entry in bundleVersions.entry">
+                                                {{entry.resource.meta.lastUpdated | date : "d MMM HH:mm"}}
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-10">
+                                    <div ng-show="selectedVersion">
+
+                                        <div>Title: {{selectedVersion.title}}</div>
+                                        <div>Description: {{selectedVersion.description}}</div>
+                                        <div>Updated: {{selectedVersion.meta.lastUpdated | date : "d MMM HH:mm"}}</div>
+                                        <pre>{{selectedVersion.compose | json}}</pre>
+                                        <br/>
+                                        <button class="btn-link btn pull-right"
+                                                ng-click="revert(selectedVersion)">Select for reversion</button>
+                                    </div>
+
+                                </div>
+                            </div>
 
 
 

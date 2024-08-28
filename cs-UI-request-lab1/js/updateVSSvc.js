@@ -13,14 +13,42 @@ angular.module("pocApp")
         let csVersion = "http://snomed.info/sct/version/21000210109"
 
         let snomed = "http://snomed.info/sct"
+        let extMemberCount = "http://canshare.co.nz/fhir/StructureDefinition/vs-expanded-count"
 
         return {
+            getMemberCount : function (vs) {
+                if (vs && vs.extension) {
+                    for (ext of vs.extension) {
+                        if (ext.url == extMemberCount) {
+                            return ext.valueInteger
+                            break
+                        }
+                    }
+                }
+                return ""
+            },
+            setMemberCount : function (vs,count) {
+                vs.extension = vs.extension  || []
+                let found = false
+                for (ext of vs.extension) {
+                    if (ext.url == extMemberCount) {
+                        ext.valueInteger = count
+                        found = true
+                        break
+                    }
+                }
+                if (! found) {
+                    vs.extension.push({url:extMemberCount,valueInteger : count})
+                }
+
+            },
             makeDownload : function (arItem) {
                 let that = this
                 let ar = []
-                ar.push(`Url\tId\tStatus\tTitle\tDescription\tLastUpdated\tECL\n`)
+                ar.push(`Url\tId\tStatus\tTitle\tDescription\tLastUpdated\tECL\tMember count\tUpdated display\tUnpublished codes\n`)
                 arItem.forEach(function (item) {
                     let vs = item.vs
+
                     let lne = vs.url
                     lne += `\t${vs.id}`
                     lne += `\t${vs.status}`
@@ -28,10 +56,69 @@ angular.module("pocApp")
                     lne += `\t${tidyText(vs.description)}`
                     lne += `\t${vs.meta.lastUpdated}`
                     lne += `\t${that.getEcl(vs)}`
+                    lne += `\t${that.getMemberCount(vs)}`
+                    //lne += `\t"line1\nline2\nline3"`
+
+                    let arUpd = getUpdatedDisplay(vs)
+                    if (arUpd.length > 0) {
+                        let cell = ""
+                        arUpd.forEach(function (s) {
+                            cell += `${s}\n`
+                        })
+                        lne += `\t"${cell}"`
+                    } else {
+                        lne += `\t`
+                    }
+
+                    let arUnp = getUnpublishedCodes(vs)
+                    if (arUnp.length > 0) {
+                        let cell = ""
+                        arUnp.forEach(function (s) {
+                            cell += `${s}\n`
+                        })
+                        lne += `\t"${cell}"`
+                    } else {
+                        lne += `\t`
+                    }
+
+
                     ar.push(lne)
                 })
                 let downLoad = ar.join('\n')
                 return downLoad
+
+
+                function getUnpublishedCodes(vs) {
+                    let ar = []
+                    if (vs.compose && vs.compose.include) {
+                        for (const inc of vs.compose.include) {
+                            if (inc.system == "http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished" && inc.concept) {
+                                inc.concept.forEach(function (concept) {
+                                    let lne = concept.code + " " + concept.display
+                                    ar.push(lne)
+                                })
+                            }
+                        }
+
+                    }
+                    return ar
+                }
+
+                function getUpdatedDisplay(vs) {
+                    let ar = []
+                    if (vs.compose && vs.compose.include) {
+                        for (const inc of vs.compose.include) {
+                            if (inc.system == "http://snomed.info/sct" && ! inc.filter && inc.concept) {
+                                inc.concept.forEach(function (concept) {
+                                    let lne = concept.code + " " + concept.display
+                                    ar.push(tidyText(lne))
+                                })
+                            }
+                        }
+
+                    }
+                    return ar
+                }
 
                 function tidyText(s) {
                     if (s) {
@@ -77,23 +164,29 @@ angular.module("pocApp")
 
             },
 
-            updateCodeSystem : function (cs) {
+            updateCodeSystem : function (cs,isDirty) {
                 //save the CS to the terminology server
                 let deferred = $q.defer()
 
                 //deferred.reject({msg:"CodeSystem update disabled"})
                 //return
 
-                cs.version = "1"
+                if (isDirty){
+                    cs.version = "1"
+console.log('uodating cs')
+                    let qry = '/nzhts/CodeSystem'
+                    $http.put(qry,cs).then(
+                        function (data) {
+                            deferred.resolve(data)
+                        }, function (err) {
+                            deferred.reject(angular.toJson(err))
+                        }
+                    )
+                } else {
+                    deferred.resolve(cs)
+                }
 
-                let qry = '/nzhts/CodeSystem'
-                $http.put(qry,cs).then(
-                    function (data) {
-                        deferred.resolve(data)
-                    }, function (err) {
-                        deferred.reject(angular.toJson(err))
-                    }
-                )
+
 
                 return deferred.promise
 
