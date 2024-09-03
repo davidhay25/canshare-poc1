@@ -107,12 +107,11 @@ angular.module("pocApp")
                         //is item1 a child of the element to move
                         let pth = $filter('dropFirstInPath')(item1.ed.path)
                         if (pth.isChildPath(toMove)) {
-
-                        //if ($filter('dropFirstInPath')(item1.ed.path).startsWith(toMove)) {
                             cnt++
                         }
                     })
 
+                    console.log(`${toMove} has ${cnt} elements to move`)
 
                     let currentPos = findCurrentPositionInList(toMove)
 
@@ -122,14 +121,49 @@ angular.module("pocApp")
                         let itemsToMove = lst.splice(currentPos,cnt)
 
                         //now find the insertion point
+                        let foundIt = false
                         for (let i=0; i< lst.length; i++) {
                             let tItem = lst[i]
                             if ($filter('dropFirstInPath')(tItem.ed.path) == insertAfter) {
+
+                                //sep 3 - need to move past any child elements of this path
+                                foundIt = true
+                                console.log(`found at ${i}`)
+
+                            } else if (foundIt) {
+                                let pth = $filter('dropFirstInPath')(tItem.ed.path)
+
+                                if (! pth.isChildPath(insertAfter)) {
+                                    console.log(`Inserting at ${i}`)
+                                    Array.prototype.splice.apply(lst, [i, 0].concat(itemsToMove));
+                                    //Array.prototype.splice.apply(lst, [i+1, 0].concat(itemsToMove));
+                                    insertPointFound = true
+                                    break
+                                }
+
+
+                            }
+
+
+
+
+                        }
+
+                        /*
+                        * for (let i=0; i< lst.length; i++) {
+                            let tItem = lst[i]
+                            if ($filter('dropFirstInPath')(tItem.ed.path) == insertAfter) {
+
+
+
                                 Array.prototype.splice.apply(lst, [i+1, 0].concat(itemsToMove));
                                 insertPointFound = true
                                 break
                             }
                         }
+                        * */
+
+
                         if (! insertPointFound) {
                             console.log(`Insert point ${item.insertAfter} not found, no re-ordering occurred`)
                             //we need to put them back
@@ -146,6 +180,10 @@ angular.module("pocApp")
                     //find where an item is in the tree based on the path
                     //have to do this each time as it may change with other moves
                     //ignores the first segment
+
+
+
+
                     let pos = -1
                     for (const item of lst) {
                         pos ++

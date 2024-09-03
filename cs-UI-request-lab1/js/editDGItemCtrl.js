@@ -102,7 +102,8 @@ angular.module("pocApp")
                 $scope.input.collapsible =  item.ed.collapsible
 
                 $scope.input.gtable =  item.ed.gtable
-                $scope.input.prepop =  item.ed.prepop
+                $scope.input.prePop =  item.ed.prePop
+                $scope.input.definition =  item.ed.definition
 
                 $scope.input.selectedType = item.ed.type[0]
                 setControlOptions($scope.input.selectedType)
@@ -397,6 +398,7 @@ angular.module("pocApp")
                 ed.collapsible = $scope.input.collapsible
                 ed.gtable = $scope.input.gtable
                 ed.prePop = $scope.input.prePop
+                ed.definition = $scope.input.definition
                 ed.placeholder = $scope.input.placeholder
                 if ($scope.input.controlHint) {
                     ed.controlHint = $scope.input.controlHint
@@ -474,13 +476,13 @@ angular.module("pocApp")
 
             }
             
-            $scope.testPrePop = function (prePop) {
+            $scope.testPrePop = function (prePop,displayElement) {
                 delete $scope.testPPResult
                 let expression = `%Launch${prePop}`
-                let qry = `/Q/prepop?fp=${expression}&ts=${new Date().toISOString()}`
+                let qry = `/Q/prePop?fp=${expression}&ts=${new Date().toISOString()}`
                 $http.get(qry).then(
                     function (data) {
-                        $scope.testPPResult = data.data.result
+                        $scope[displayElement] = data.data.result
                       //  alert(angular.toJson(data.data.result,null,2))
 
                     }, function (err) {

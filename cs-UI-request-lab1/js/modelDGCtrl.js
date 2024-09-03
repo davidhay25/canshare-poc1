@@ -5,6 +5,12 @@ angular.module("pocApp")
 
 
 
+            //from the conditional tab, select the element
+            $scope.selectCondElement = function (displayPath) {
+
+                $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:displayPath})
+            }
+
 
             $scope.fixGroupsDEP = function () {
                 //run the fixit routine to make sure group children immediately follow the group
@@ -25,8 +31,8 @@ angular.module("pocApp")
                         let shortPath = $filter("dropFirstInPath")(path)
                         ar.push(shortPath)
                     }
-
                 })
+
                 delete $scope.selectedModel.changes //an artifact from earlier work
 
                 //if there's a fixed order, then remove the ordering instructions
@@ -92,7 +98,32 @@ angular.module("pocApp")
                                 action:"checkout",
                                 model:newDG})
 
+
+                            //Any elements that have 'enableWhen' elements need to have  the source element
+                            //updated as the first segment may refer to the old DG name
+                            let oldName = dg.name
+                            let newName = vo.name
+
+                            if (newDG.diff) {
+                                newDG.diff.forEach(function (ed) {
+                                    if (ed.enableWhen) {
+                                        ed.enableWhen.forEach(function (ew) {
+                                            let ar = ew.source.split('.')
+                                            if (ar[0] == oldName) {
+                                                ar[0] = newName
+                                                ew.source = ar.join('.')
+                                            }
+                                        })
+                                    }
+                                })
+                            }
+
+
+
                             $scope.hashAllDG[newDG.name] = newDG
+
+                            $scope.makeSnapshots()
+
                             traceSvc.addAction({action:'clone-model',model:newDG})
 
                             $scope.makeAllDTList()  //create the various lists (and trees) for the dt list
@@ -299,7 +330,7 @@ angular.module("pocApp")
                         let ew = {source:sourcePath,operator:op,value:value}
                         ed.enableWhen.push(ew)
 
-                        traceSvc.addAction({action:'add-enablewhen',model:$scope.selectedModel,path:targetPath,description:'edit diff'})
+                        //traceSvc.addAction({action:'add-enablewhen',model:$scope.selectedModel,path:targetPath,description:'edit diff'})
                         break
                     }
                 }
@@ -318,7 +349,8 @@ angular.module("pocApp")
                 //delete $scope.input.ewSource
                 //in modelsCtrl
 
-                //$scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:targetPath})
+                //needed to re-draw the UI
+                $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:targetPath})
 
             }
 
@@ -558,7 +590,7 @@ angular.module("pocApp")
                         clone.type = ed.originalType
                     }
                     clone.slicedFrom = ed.path      //link back to edlement that was sliced . So we know it's a slice, and what of
-                    console.log(clone)
+                    //console.log(clone)
 
                     $scope.selectedModel.diff.push(clone)
 
@@ -578,11 +610,13 @@ angular.module("pocApp")
                     //if you're slicing an inherited path, will need to add an override element
                     let inx = -1
                     let found
+
+                    //see if there is an entry in the diff for this element. If there is,
+                    //then remove it and replace it with the new one
                     let shortPath = $filter('dropFirstInPath')(ed.path)
 
                     for (const ed1 of $scope.selectedModel.diff) {
                         inx++
-                        //let shortPath = $filter('dropFirstInPath')(ed.path)
                         if (ed1.path == shortPath) {
                             ed.path = shortPath
                             $scope.selectedModel.diff.splice(inx,1,angular.copy(ed))
@@ -591,12 +625,42 @@ angular.module("pocApp")
                         }
                     }
 
+                    //it wasn't there, so add it to the diff
                     if (! found) {
-
                         ed.path = $filter('dropFirstInPath')(ed.path)
+                        $scope.selectedModel.diff.push(ed)
 
-                        let length = $scope.selectedModel.diff.length
-                        $scope.selectedModel.diff.splice(length-1,0,angular.copy(ed))
+                      //  let length = $scope.selectedModel.diff.length
+                      //  $scope.selectedModel.diff.splice(length-1,0,angular.copy(ed))
+                    }
+
+                    //as we've changed the type of the sliced element from (whatever it was) to Group
+                    //we need to make sure that any child elements from the parent have a 0..0 override
+                    //otherwise they 'bleed' through... They will be in the full element list
+                    let hash = {}   //create a hash of existing diff elements by path so we don't duplicate
+                    $scope.selectedModel.diff.forEach(function (ed) {
+                        hash[ed.path] = ed
+                    })
+
+                    for (const thing of $scope.fullElementList) {
+                        let ed = thing.ed
+                        //if the path is alreadt a slice then leave it alone!
+                        if (ed.path && ed.path.indexOf('slice:') == -1) {
+                            let shortPath = $filter('dropFirstInPath')(ed.path)
+                            if (shortPath.isChildPath(basePath)) {
+                                if (hash[ed.path]) {
+                                    //There's already a diff entry - set the mult -> 0..0
+                                    hash[ed.path].mult = '0..0'
+                                } else {
+                                    //need to add an override diff
+                                    let clone = angular.copy(ed)
+                                    clone.path = shortPath
+                                    clone.mult = '0..0'
+                                    $scope.selectedModel.diff.push(clone)
+                                }
+                            }
+                        }
+
 
                     }
 

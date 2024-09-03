@@ -359,9 +359,17 @@ angular.module("pocApp")
                 //the VS is not available
 
                 let hashExpanded = {}
+
+
+
+
                 let promises = []
 
                 lst.forEach(function (url) {
+
+                    //this placeholder will be replaced with the expanded contents - unless the VS is not found
+                    //this avoids calling the expand multiple times... as the calling routine will cache this concept...
+                    hashExpanded[url] = [{system:"http://example.com",code:"notfound",display:"ValueSet not found"}]
                     promises.push(addToHash(url,hashExpanded))
                 })
 
@@ -373,7 +381,7 @@ angular.module("pocApp")
                     deferred.resolve(hashExpanded)
 
                 }, function () {
-                    console.log(hashExpanded)
+                    //console.log(hashExpanded)
                     deferred.resolve(hashExpanded)
                     }
 
@@ -431,6 +439,9 @@ angular.module("pocApp")
                         function (err) {
                             //ignore any errors
                             console.log(`${url} fail`)
+
+                          //  hash[response.data.url] = ar
+
                             defer.resolve()
                         }
                     )

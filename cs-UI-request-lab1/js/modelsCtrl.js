@@ -68,9 +68,10 @@ angular.module("pocApp")
                 //assign the snapshot svc to the modelSvc so that it can read the snapshots of DGs
                 modelCompSvc.setSnapshotSvc(snapshotSvc)
 
-                let hash = snapshotSvc.addOrderToAllDG()
-                let size = modelsSvc.getSizeOfObject(hash)
-                console.log(`Size of world with oder set: ${size/1024} K`)
+            //    let hash = snapshotSvc.addOrderToAllDG()
+
+              //  let size = modelsSvc.getSizeOfObject(hash)
+              //  console.log(`Size of world with oder set: ${size/1024} K`)
 
 
             }
@@ -1147,6 +1148,7 @@ angular.module("pocApp")
                                 ed1.collapsible = ed.collapsible
                                 ed1.gtable = ed.gtable
                                 ed1.prePop = ed.prePop
+                                ed1.definition = ed.definition
 
                                 ed1.conditionalVS = ed.conditionalVS
 
@@ -1207,7 +1209,7 @@ angular.module("pocApp")
                     //rebuild fullList and re-draw the tree
                     $scope.refreshFullList($scope.selectedModel)
 
-                    $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:displayPath})
+                //    $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:displayPath})
 
                 })
             }
@@ -1234,16 +1236,11 @@ angular.module("pocApp")
                 $('#sectionDGTree').jstree('select_node', item.DGName);
 
 
-
-
-
-
                 //$scope.selectModel
 
                 if (previous) {
                     $scope.hxDGLoad.push(previous)  //for the 'back' function
                 }
-
 
             }
 
@@ -1251,7 +1248,6 @@ angular.module("pocApp")
             $scope.back = function () {
                 if ($scope.hxDGLoad.length > 0) {
                     let DGName = $scope.hxDGLoad.pop()
-
                     $scope.termSelectDG({DGName:DGName})
                 }
 
@@ -1266,16 +1262,34 @@ angular.module("pocApp")
                 //set the tab to the DG tab
                 $scope.input.mainTabActive = $scope.ui.tabDG;
 
-                //locate the DG with this name and set it active. This will select it in the DG tab
+                //if item.hiddenDGName is not the same as the current model then select it.
                 //Note that elements use a 'hidden' property to set the DG name
-                $scope.selectedModel = $scope.hashAllDG[item.hiddenDGName]
-                $scope.selectModel($scope.selectedModel)
+
+                if ($scope.selectedModel.name !== item.hiddenDGName) {
+                    $scope.selectedModel = $scope.hashAllDG[item.hiddenDGName]
+                    $scope.selectModel($scope.selectedModel)
+                }
+
+
+                //the path may or may not have the DG name as the first segment - todo - clean this up
+                let path = item.path
+                let ar = path.split('.')
+                if (ar[0] !== item.hiddenDGName) {
+                    path = `${item.hiddenDGName}.${item.path}`
+                }
+
+                $scope.input.dgTabActive = 0        //ensure the tree tab is displayed
 
                 //selct the element in the DG tree. Need to wait for the tree to be built...
                 $timeout(function () {
-                    let fullPath = `${item.hiddenDGName}.${item.path}`
-                    $("#dgTree").jstree("select_node",  fullPath);
-                },1000)
+                    console.log(path)
+
+
+                    $("#dgTree").jstree("select_node",  path)
+
+                    //NO - don't do this here!! The select event won't fire...
+                   // $scope.input.dgTabActive = 0        //ensure the tree tab is displayed
+                },1500)
             }
 
 
@@ -1527,8 +1541,60 @@ angular.module("pocApp")
                             newModel.author = $scope.user.email
                             librarySvc.checkOut(newModel,$scope.user)
                         }
+
+
+                        //----
+                        //if it's a new child and the parent has any enableWhens that they will
+                        // have the root segment in the source as the parent dh name so a diff is needed that replaces
+                        // it with the new name. The same thing happens with clone...
+                        if (newModel.parent) {
+                            let parentDG = $scope.hashAllDG[newModel.parent]
+                            if (parentDG && parentDG.diff) {
+                                newModel.diff = newModel.diff || []
+
+                                parentDG.diff.forEach(function (ed) {
+
+
+                                    if (ed.enableWhen || ed.conditionalVS) {
+                                        let newEd = angular.copy(ed)
+
+                                        if (newEd.enableWhen) {
+                                            newEd.enableWhen.forEach(function (ew) {
+                                                let ar = ew.source.split('.')
+                                                if (ar[0] == parentDG.name) {
+                                                    ar[0] = newModel.name
+                                                    ew.source = ar.join('.')
+                                                }
+                                            })
+                                        }
+
+                                        if (newEd.conditionalVS) {
+                                            newEd.conditionalVS.forEach(function (cvs) {
+                                                let ar = cvs.path.split('.')
+                                                if (ar[0] == parentDG.name) {
+                                                    ar[0] = newModel.name
+                                                    cvs.path = ar.join('.')
+                                                }
+                                            })
+                                        }
+
+
+                                        newModel.diff.push(newEd)
+                                    }
+
+
+
+                                })
+                            }
+                        }
+
+
+
+                        //----
+
+
                         $scope.hashAllDG[newModel.name] = newModel
-                        sortDG()
+                        sortDG()    //make a sorted list for the UI
                         $scope.input.types[newModel.name] = newModel    //todo - this is a duplicate of hashAllDG
 
                         //a hash by type of all elements that reference it
@@ -1659,7 +1725,7 @@ angular.module("pocApp")
 
             //refresh the complete list of elements for this DG
             //also draw the graph & tree
-            $scope.refreshFullList = function (dg) {
+            $scope.refreshFullList = function (dg,noLoadVS) {
 
                 delete $scope.errorLog
                 $scope.relationshipsSummary = snapshotSvc.getRelationshipsSummary(dg.name)
@@ -1692,12 +1758,16 @@ angular.module("pocApp")
                 $scope.dgFshLM = igSvc.makeFshForDG(dg,$scope.fullElementList)
                 makeGraph()     //todo - do we want the graph back?
 
-                //always get all the valueset contents
-                var startTime = performance.now()
-                vsSvc.getAllVS($scope.fullElementList, function () {
-                    var endTime = performance.now()
-                    console.log(`Call to getAllVS took ${endTime - startTime} milliseconds`)
-                })
+                //we don't always need to get all the VS - just when the model is
+              //  if (loadVS) {
+                    //always get all the valueset contents
+                    var startTime = performance.now()
+                    vsSvc.getAllVS($scope.fullElementList, function () {
+                        var endTime = performance.now()
+                        console.log(`Call to getAllVS took ${endTime - startTime} milliseconds`)
+                    })
+             //   }
+
 
 
                 //The DG element tree
@@ -1843,6 +1913,7 @@ angular.module("pocApp")
                 ).on('changed.jstree', function (e, data) {
                     // the node selection event...
 
+                    console.log('select')
 
                     if (data.node) {
                         $scope.selectedNode = data.node;
@@ -1879,16 +1950,16 @@ angular.module("pocApp")
                     let sourceTitle = getElement(sourceId).title || sourceId
                     let targetTitle = getElement(targetId).title || targetId
                     if (confirm(`Are you sure you wish to move ${sourceTitle} after ${targetTitle}`)) {
+
+
                         $scope.selectedModel.ordering = $scope.selectedModel.ordering || []
                         $scope.selectedModel.ordering.push({toMove:sourceId,insertAfter:targetId})
-
 
                         //re-order the full list & re-draw the tree
                         orderingSvc.sortFullListByInsertAfter($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
 
                         //$scope.dgReferencesOrdering = orderingSvc.getOrderingForReferences($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
                         $scope.orderingByToMove = orderingSvc.getOrderingByToMove($scope.selectedModel) // elements with multiple move instructions {dupsExist:dupsExist,hash:hash}
-
 
 
                         let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)

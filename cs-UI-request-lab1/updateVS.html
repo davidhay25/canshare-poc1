@@ -272,7 +272,7 @@
                                     </td>
                                 </tr>
 
-                                <tr>
+                                <tr ng-show="false">
                                     <td>Member count</td>
                                     <td>
                                         <span class="badge">{{getMemberCount(selectedVS)}}</span>
@@ -302,7 +302,14 @@
                                 </tr>
 
                                 <tr>
-                                    <td>ECL</td>
+                                    <td>ECL
+
+                                        <div ng-show = "testEclVS.expansion.contains.length > 0">
+                                            <br/>
+                                            <em>{{testEclVS.expansion.contains.length}} concepts </em>
+                                        </div>
+
+                                    </td>
                                     <td>
                                         <div class="row">
                                             <div class="col-md-10">
@@ -373,6 +380,12 @@
                                 <tr>
                                     <td>Unpublished concepts
                                         <div><em><br/>Concepts created but not yet published. They are in a separate CodeSystem</em></div>
+
+                                        <div ng-show = "input.prePubConcepts.length > 0">
+                                            <br/>
+                                            <em>{{input.prePubConcepts.length}} concepts</em>
+                                        </div>
+
                                     </td>
                                     <td>
 
@@ -423,11 +436,11 @@
 
                             </table>
 
-                            <div ng-show="textEclVS">
-                                <strong>ECL result</strong>
+                            <div ng-show="testEclVS">
+                                <strong>ECL result</strong> {{testEclVS.expansion.contains.length}} concepts
                                 <table class="table table-bordered table-condensed">
                                     <tr><th>Display</th><th>Code</th><th>System</th></tr>
-                                    <tr ng-repeat="concept in textEclVS.expansion.contains">
+                                    <tr ng-repeat="concept in testEclVS.expansion.contains">
                                         <td>{{concept.display}}</td>
                                         <td>
                                             <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>

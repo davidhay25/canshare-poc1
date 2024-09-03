@@ -186,7 +186,7 @@
 
 
 
-  <uib-tabset>
+  <uib-tabset  active="input.dgTabActive">
 
 
 
@@ -652,7 +652,21 @@
                 <table class="table table-bordered">
                   <tr><th>Source</th><th>Operator</th><th>Value</th></tr>
                   <tr ng-repeat="dep in selectedNode.data.ed.enableWhen">
-                    <td>{{dep.source | dropFirstInPath}}</td>
+                    <td>
+                      {{dep.source | dropFirstInPath}}
+
+                      <span ng-show="dep.source.split('.')[0] !== selectedModel.name">
+                        <i style="color: red"
+                           uib-popover="This source does not match an element in the DG: {{dep.source}}"
+                           popover-placement="right"
+                           popover-trigger="'mouseenter'"
+                           class="pull-right glyphicon glyphicon-warning-sign"></i>
+
+
+                      </span>
+
+                    </td>
+
                     <td>{{dep.operator}}</td>
                     <td>
                       <div ng-show="dep.value.code">{{dep.value.code}} | {{dep.value.display}}</div>
@@ -695,7 +709,7 @@
 
 
               </uib-tab>
-
+<!--
               <uib-tab heading="Profiling">
                 <table class="table table-bordered table-condensed">
 
@@ -744,7 +758,7 @@
 
               </uib-tab>
 
-
+-->
               <uib-tab heading="Json">
                 <pre ng-show="selectedNode">{{selectedNode.data.ed | json}}</pre>
               </uib-tab>
@@ -765,19 +779,6 @@
 
             </div>
 
-            <!--
-
-            <button class="btn-link btn"
-                    ng-hide="selectedNode.data.ed.kind == 'root' || ! canEdit(selectedModel)"
-                    ng-click="hideinQ(selectedNode.data.ed)">Hide in Q ({{selectedNode.data.ed.title}})</button>
-
-
-            <button class="btn-link btn  pull-right"
-                    ng-hide="selectedNode.data.ed.kind == 'root' || ! canEdit(selectedModel)"
-                    ng-click="deleteDGItem(selectedNode.data.ed)">Delete this item ({{selectedNode.data.ed.title}})</button>
-
--->
-
           </div>
 
           <br/>
@@ -786,12 +787,10 @@
         </div>
       </div>
 
-
-
     </uib-tab>
 
 
-    <uib-tab heading="View">
+    <uib-tab heading="Views">
       <br/>
       <uib-tabset>
         <uib-tab heading="Logical Model">
@@ -979,9 +978,13 @@
 
         </uib-tab>
 
+        <uib-tab heading="Order element">
+          <pre>{{selectedModel.ssOrder | json}}</pre>
+
+        </uib-tab>
 
       </uib-tabset>
-      <em class="pull-right">Expanded. Excludes items with a Cardinality of 0..0</em>
+
 
 
 
@@ -1208,7 +1211,7 @@
 -->
     </uib-tab>
 
-    <uib-tab ng-show="false">
+    <uib-tab ng-if="false">
       <uib-tab-heading>Referenced by</uib-tab-heading>
 
 
@@ -1249,12 +1252,16 @@
       <table class="table-bordered table">
         <tr><th>Target (what to hide)</th><th>Controlling element</th><th>Controller description</th><th>Op</th>
           <th>Value (that will show target)</th>
-          <th>Where defined</th>
-          <th ng-show="canEdit(selectedModel)">Delete</th>
+
 
         </tr>
         <tr ng-repeat="dep in allDependencies">
-          <td>{{dep.path | dropFirstInPath}}</td>
+          <td>
+            <div class="clickable" ng-click="selectCondElement(dep.path)">
+              {{dep.path | dropFirstInPath}}
+            </div>
+
+          </td>
           <td>{{dep.ew.source | dropFirstInPath}}</td>
           <td>{{dep.ed.description}}
             <div ng-show="dep.error">
@@ -1266,11 +1273,6 @@
           <td>
             <div ng-show="dep.ew.value.code">{{dep.ew.value.code}} | {{dep.ew.value.display}}</div>
             <div ng-hide="dep.ew.value.code">{{dep.ew.value}}</div>
-          </td>
-          <td>{{dep.source}}</td>
-          <td ng-show="canEdit(selectedModel)">
-            <i style="color: red" class="glyphicon glyphicon-remove clickable"
-               ng-click="removeEnableWhen($index,dep.path)"></i>
           </td>
 
         </tr>

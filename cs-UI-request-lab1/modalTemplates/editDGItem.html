@@ -229,7 +229,7 @@
 
                 </div>
                 <div class="col-md-1">
-                  <span class="btn btn-link" ng-click="testPrePop(input.prePop)">Test</span>
+                  <span class="btn btn-link" ng-click="testPrePop(input.prePop,'testPPResult')">Test</span>
 
                 </div>
                 <div class="col-md-1">
@@ -239,6 +239,31 @@
 
               </div>
             <div><pre ng-show="testPPResult">{{testPPResult | json}}</pre></div>
+            </td>
+          </tr>
+
+          <tr>
+            <td>Extract expression</td>
+            <td>
+              <div class="row">
+                <div class="col-md-10">
+                  <input type="text"
+                         placeholder="FHIRPath extraction expression - eg Specimen.bodySite"
+                         class="form-control" ng-model="input.definition"/>
+                  <div><em>Note that you need a Resource context on the DG</em></div>
+
+                </div>
+                <div class="col-md-1">
+                  <span class="btn btn-link" ng-click="testPrePop(input.definition,'testExtract')">Test</span>
+
+                </div>
+                <div class="col-md-1">
+
+                  <a style="display:block ; margin-top: 8px" href="https://hl7.org/fhir/fhirpath.html" target="_blank">Spec</a>
+                </div>
+
+              </div>
+              <div><pre ng-show="testExtract">{{testExtract | json}}</pre></div>
             </td>
           </tr>
 

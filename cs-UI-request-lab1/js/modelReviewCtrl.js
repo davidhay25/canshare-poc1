@@ -552,12 +552,21 @@ angular.module("pocApp")
 
                     //the second option expands the valuesets as options into the Q - todo make this an option
                     let config = {expandVS:true,enableWhen:true}
+                    if (dg.type) {
+                        config.fhirType = dg.type // Used for definition based extraction
+                    }
                     let voQ = makeQSvc.makeHierarchicalQFromDG($scope.fullElementList,config) //,$scope.hashAllDG)
                     $scope.fullQ = voQ.Q
                     $scope.hashEd = voQ.hashEd
                     $scope.errorLog = voQ.errorLog
                     console.log(voQ.errorLog)
 
+                    //A report focussed on pre-popupation & extraction
+                    let voReport =  makeQSvc.makeReport($scope.fullQ)
+                    $scope.qReport =voReport.report
+
+
+                    return //   I don't think the tree is needed here
                     //The DG element tree
                     let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
                     //makeDGTree(treeData)

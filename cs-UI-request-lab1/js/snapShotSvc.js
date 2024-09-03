@@ -685,7 +685,7 @@ angular.module("pocApp")
                             newSnapshot.push(ed)
                             delete hash[path]
                         } else {
-                            console.log(`path ${path} not found`)
+                            console.log(`${dg.name}: path ${path} not found`)
                             logger(`path ${path} not found`,dg.name)
                         }
                     }
@@ -765,7 +765,7 @@ angular.module("pocApp")
                 return allDgSnapshot
             },
 
-            addOrderToAllDG : function () {
+            addOrderToAllDGDEP : function () {
                 let testHash = {}
                 Object.keys(allDgSnapshot).forEach(function (key) {
                     let dg = angular.copy(allDgSnapshot[key])

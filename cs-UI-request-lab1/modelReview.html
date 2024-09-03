@@ -165,8 +165,41 @@
     </nav>
 
 
-        <renderform2 q="fullQ" hash-ed="hashEd" technicalview="input.technical" errors="errorLog"></renderform2>
+        <uib-tabset>
+            <uib-tab heading="Form">
+                <renderform2 q="fullQ" hash-ed="hashEd" technicalview="input.technical" errors="errorLog"></renderform2>
+            </uib-tab>
+            <uib-tab heading="Q report">
 
+                <table class="table table-condensed table-bordered">
+                    <tr ng-repeat="entry in qReport.entries">
+                        <td>
+                            <div ng-style="{ 'padding-left': (entry.linkId | pathindent) }">
+                                {{entry.text}}
+                            </div>
+                        </td>
+                        <td>{{entry.type}}</td>
+                        <td>{{entry.mult}}</td>
+                        <td>
+                            <div ng-show="entry.definition">Definition: {{entry.definition}}</div>
+                            <div ng-show="entry.initialExpression">Initial: {{entry.initialExpression}}</div>
+
+
+
+                        </td>
+
+                    </tr>
+                </table>
+
+                https://build.fhir.org/ig/HL7/sdc/Questionnaire-demographics.html
+            </uib-tab>
+
+
+        </uib-tabset>
+
+<!--
+        <renderform2 q="fullQ" hash-ed="hashEd" technicalview="input.technical" errors="errorLog"></renderform2>
+-->
 
 
 

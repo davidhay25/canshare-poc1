@@ -67,7 +67,6 @@ angular.module('formsApp')
                         if ($scope.q) {
                             setupQ()
                         }
-
                     }
                 );
 

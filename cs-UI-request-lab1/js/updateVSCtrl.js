@@ -288,7 +288,7 @@ angular.module("pocApp")
 
                 $http.post(`nzhts/ecl`,vo).then(
                     function (data) {
-                        $scope.textEclVS = data.data
+                        $scope.testEclVS = data.data
 
                     }, function (err) {
                         alert(angular.toJson(err.data))
@@ -436,13 +436,13 @@ angular.module("pocApp")
                             } else {
                                 $scope.selectedVS = data.data.entry[0].resource
                                 parseVS($scope.selectedVS)
-
+/* not doing this now - but leave the code in for th emoment
                                 //if there's no member count, then get it
                                 if (! updateVSSvc.getMemberCount($scope.selectedVS)) {
                                     $scope.updateMemberCount($scope.selectedVS) //will expand the VS, update the member count & set dirty
 
                                 }
-
+*/
 
 
                                 console.log($scope.selectedVS)
@@ -480,6 +480,7 @@ angular.module("pocApp")
             }
 
             //update the member count for the selected VS. Adds the membercount extension
+            //not currently used...
             $scope.updateMemberCount = function (vs) {
 
                 let qry = `ValueSet/$expand?url=${vs.url}&_summary=false&displayLanguage=${nzDisplayLanguage}`

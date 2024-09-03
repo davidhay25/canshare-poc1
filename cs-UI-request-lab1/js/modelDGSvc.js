@@ -86,7 +86,7 @@ angular.module("pocApp")
                 //given the expanded element list - construct a list of all dependencies (enableWhen)
                 let allDependencies = []
 
-                //construct a hash of all elments in this DG
+                //construct a hash of all elements in this DG
                 let hashElements = {}
                 lstElements.forEach(function (item) {
                     if (item.ed.mult !== '0..0') {
@@ -109,14 +109,14 @@ angular.module("pocApp")
                             let sourceEd = hashElements[source]
 
 
-                            /* - aug2024 - now sure that this is right
+                            /* - aug2024 - not sure that this is right
                             //for inherited elements the first segment is always the current dg name
                             let ar = item.ed.path.split('.')
                             ar[0] = dgName
                             let newPath = ar.join('.')
 */
                             let entry = {path:item.ed.path,ew:ew,ed:sourceEd}
-                            entry.source = source
+                          //  entry.source = source
 
                             //let entry = {path:newPath,ew:ew,ed:sourceEd}
                             if (! sourceEd) {

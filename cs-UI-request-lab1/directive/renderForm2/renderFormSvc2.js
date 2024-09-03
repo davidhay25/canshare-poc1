@@ -8,6 +8,7 @@ angular.module("formsApp")
         let extLaunchContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
         let extPrePopUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
 
+        extHidden = "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
 
         return {
 
@@ -130,6 +131,23 @@ angular.module("formsApp")
                         arStyle.push("color : blue")
                     }
 
+
+
+                    //process extensions
+                    if (item.extension) {
+                        for (const ext of item.extension) {
+                            if (ext.url == extPrePopUrl && ext.valueExpression) {
+                                //this is a prepop expresstion
+                                prepopExpression.push({linkId:item.linkId,expression:ext.valueExpression.expression})
+                            }
+
+                            if (ext.url == extHidden && ext.valueBoolean) {
+                                //this is a hidden element - often with a fixed value...
+                                arStyle.push("text-decoration-line: line-through")
+                            }
+                        }
+                    }
+
                     //create tree attribute node
                     if (arStyle.length > 0) {
                         let style = ""
@@ -141,15 +159,6 @@ angular.module("formsApp")
                         // console.log(ed.path,style)
                     }
 
-                    //check for prepop expression
-                    if (item.extension) {
-                        for (const ext of item.extension) {
-                            if (ext.url == extPrePopUrl && ext.valueExpression) {
-                                prepopExpression.push({linkId:item.linkId,expression:ext.valueExpression.expression})
-
-                            }
-                        }
-                    }
 
                     treeData.push(node)
 

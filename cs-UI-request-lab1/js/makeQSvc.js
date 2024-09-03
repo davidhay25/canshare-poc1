@@ -6,9 +6,15 @@ angular.module("pocApp")
 
         let unknownCodeSystem = "http://example.com/fhir/CodeSystem/example"
         let extLaunchContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
-        extPrePopUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+
+        extInitialExpressionUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
         extItemControlUrl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
         extCollapsibleUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-collapsible"
+
+
+        extDefinitionExtraction = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
+        extHidden = "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
+
         //let extGtableUrl = ""
        // let extSourceQuery = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-sourceQueries"
         systemItemControl = "http://hl7.org/fhir/questionnaire-item-control"
@@ -29,6 +35,10 @@ angular.module("pocApp")
                 ext.extension.push({url:'description',valueString:description})
                 Q.extension.push(ext)
             }
+        }
+
+        function addExtractExtensions(DG,Q) {
+
 
         }
 
@@ -367,14 +377,73 @@ angular.module("pocApp")
 
         }
 
+        //find a specific extension
+        function getExtension(item,url,type) {
+            let result = []
+            if (item.extension) {
+                for (const ext of item.extension) {
+                    if (ext.url == url) {
+                        let vName = `value${type}`
+                        result.push(ext[vName])
+                    }
+                }
+            }
+            return result
 
+        }
 
-
-
-
+        //return true if has a fixed value
+        function isFixed(ed) {
+            if (ed.fixedCoding || ed.fixedBoolean || ed.fixedQuantity || ed.fixedRatio || ed.fixedCode) {
+                return true
+            }
+        }
 
         return {
 
+            makeReport : function (Q) {
+                //generate a report object for the table view (that displays key extraction / population details)
+
+                let report = {entries:[]}
+
+                function processItem(report,item) {
+                    let thing = {linkId:item.linkId,text:item.text,type:item.type,definition:item.definition}
+
+                    let mult = "0.."
+                    if (item.required) {
+                        mult = "1.."
+                    }
+                    if (item.repeats) {
+                        mult += "*"
+                    } else {
+                        mult += "1"
+                    }
+
+                    thing.mult = mult
+
+                    //check for initial expression
+                    let ar = getExtension(item,extInitialExpressionUrl,'Expression')
+                    if (ar.length > 0) {
+                        thing.initialExpression = ar[0].expression
+                    }
+
+
+                    report.entries.push(thing)
+                    if (item.item) {
+                        item.item.forEach(function (child) {
+                            processItem(report,child)
+                        })
+                    }
+                }
+
+
+                Q.item.forEach(function (item) {
+                    processItem(report,item)
+                })
+
+                return {report:report}
+
+            },
 
             makeHierarchicalQFromComp : function (comp,hashAllDG) {
                 //construct a Q from the composition
@@ -490,8 +559,6 @@ angular.module("pocApp")
 
             },
 
-
-
             makeHierarchicalQFromDG : function  (lstElements,config) {
                 //Used in the new Q renderer
                 //config.enableWhen will cause the enableWhens to be set
@@ -513,22 +580,37 @@ angular.module("pocApp")
                 //This will need to be an OR set of EW
                 let conditionalED = {}
 
-                //create list of paths to hide
-                //construct a list of paths to hide
+
+                //construct a list of paths to hide (not include in the Q)
                 let basePathsToHide = []    //a list of all paths where hideInQ is set. Any elements starting with this path are also set
                 lstElements.forEach(function (thing) {
                     //Actually, there shouldn't be anything with the mult 0..0 any more - but hideInQ is certainly there
+
+                    if (thing.ed.mult == '0..0') {
+                        basePathsToHide.push(thing.ed.path)  //the full path
+                    } else if (thing.ed.hideInQ) {
+                        //if it's a fixed value, then it will still be added to the Q, but it will be hidden -
+                        if (! isFixed(thing.ed) ) {
+                            basePathsToHide.push(thing.ed.path)  //the full path
+                        }
+                    }
+
+/*
+                    isFixed
+
+
                     if (thing.ed.hideInQ || (thing.ed.mult == '0..0')) {
+
                         basePathsToHide.push(thing.ed.path)  //the full path
                     }
+                    */
                 })
 
 
                 //now create the list of ED to include in the Q
                 //we do this first so that we can exclude all child elements of hidden elements as well
                 let lstQElements = []
-                lstElements.forEach(function (thing,ctr) {
-
+                lstElements.forEach(function (thing) {
                         let ed = thing.ed
                         let okToAdd = true
                         if (ed.mult == '0..0') {okToAdd = false}
@@ -545,8 +627,8 @@ angular.module("pocApp")
                         //then an ed is constructed for each VS with an enableWhen defined.
                         //todo - should the original be defined - what about the linkId
 
-                        if (thing.ed.conditionalVS) {
-                            ctr = 1
+                        if (thing.ed.conditionalVS && thing.ed.conditionalVS.length > 0) {
+                            let ctr = 1
 
                             let adjustedPath = `${pathPrefix}${thing.ed.path}`
 
@@ -577,9 +659,6 @@ angular.module("pocApp")
                 })
 
 
-
-
-
                 let Q = {resourceType:'Questionnaire'}
                 Q.id = `canshare-${firstElement.ed.path}`
                 Q.name = firstElement.ed.path
@@ -588,6 +667,14 @@ angular.module("pocApp")
                 Q.url = `http://canshare.co.nz/questionnaire/${firstElement.ed.path}`
 
                 addPrePopExtensions(Q)
+
+                //add definition based data extraction
+                if (config.fhirType) {
+                    Q.extension = Q.extension || []
+                    Q.extension.push({url:extDefinitionExtraction,valueCode:config.fhirType})
+                    //extDefinitionExtraction
+                }
+
                 let currentItem
                 let hashItems = {}      //items by linkId
                 let hashEd = {}         //has of ED by path (=linkId)
@@ -611,6 +698,8 @@ angular.module("pocApp")
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
 
                         decorateItem(currentItem,ed)
+
+
                         if (config.enableWhen) {
                             let ar =  addEnableWhen(ed,currentItem,config.pathPrefix)
                             allEW.push(...ar)
@@ -669,13 +758,23 @@ angular.module("pocApp")
                     //when a DG is child of another (
                 }
 
+
+                //add details to item
                 function decorateItem(item,ed) {
 
                     if (! ed.type) {
                         return
                     }
 
-                    item.definition = `${ed.path}` //`${firstElement.ed.path}.${ed.path}`
+                    item.definition = ed.definition // definition is used for definition based resource extraction
+
+                    //The only way an element will have hideInQ set but still be included is for fixed values.
+                    //they get added to the Q - but with the hidden extension
+
+                    if (ed.hideInQ) {
+                        item.extension = item.extension || []
+                        item.extension.push({url:extHidden,valueBoolean:true})
+                    }
 
                     if (ed.mult) {
                         //required bolding
@@ -714,15 +813,16 @@ angular.module("pocApp")
 
 
                     //set the ValueSet or options from the ed to the item
-                    //the valueset takes precedence
+                    //the fixed takes precedence, then ValueSet then options
+                    //todo - need to look for other datatypes than can be fixed
                     let edType = ed.type[0]
 
                     if (edType == 'CodeableConcept') {
 
                         //check for fixedCoding. If there is, then set an answeroption with initialSelected
-
                         if (ed.fixedCoding) {
                             let concept = ed.fixedCoding
+                            delete concept.fsn
                             item.answerOption = [{valueCoding:concept,initialSelected:true}]
 
                         } else {
@@ -809,9 +909,10 @@ angular.module("pocApp")
                         }
                     }
 
+                    //This is a pre-pop extression
                     if (ed.prePop) {
                         //let ext = {url:extPrePopUrl}
-                        let ext = {url:"http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"}
+                        let ext = {url:extInitialExpressionUrl}
 
                         //Assume a naming convention for context names - '%Launch{resourcetype}
                         let expression = `%Launch${ed.prePop}`
@@ -822,7 +923,7 @@ angular.module("pocApp")
                     }
 
 
-
+                    //collapsibe sections
                     if (ed.collapsible) {
                         let ext = {url:extCollapsibleUrl}
                         ext.valueCode = ed.collapsible
@@ -1095,7 +1196,7 @@ angular.module("pocApp")
             },
 
             //this is used by the DG form creation
-            makeQFromDGDEP : function (lstElements,hashAllDG) {
+            makeQFromDGDEPX : function (lstElements,hashAllDG) {
                 //generate a Q based on the list of elements that represents a DG
 
                 if (! lstElements || lstElements.length == 0) {

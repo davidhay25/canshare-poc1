@@ -38,9 +38,6 @@ angular.module("pocApp")
 
                         let size1 = utilsSvc.getSizeOfObject(hash)
                         console.log(`Size of retrieved VS: ${size1/1024} K`)
-                        lst.forEach(function (vs) {
-                            // console.log(" " + vs)
-                        })
 
                         let size2 = utilsSvc.getSizeOfObject(cache)
                         console.log(`Size of full VS cache: ${size2/1024} K`)
