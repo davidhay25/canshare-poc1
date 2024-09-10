@@ -548,6 +548,12 @@ angular.module("pocApp")
 
                 //validate the enablewhens
                 for (const ew of allEW) {
+
+
+
+
+
+
                     if (! hashEd[ew.question]) {
 
                         errorLog.push({msg:`EnableWhen on ${ew.target} refers to a missing element: ${ew.question}`})
@@ -610,6 +616,7 @@ angular.module("pocApp")
                 //now create the list of ED to include in the Q
                 //we do this first so that we can exclude all child elements of hidden elements as well
                 let lstQElements = []
+               // let hashEdsWithConditional = {}     //eds that have a conditional and won't be added to the Q.
                 lstElements.forEach(function (thing) {
                         let ed = thing.ed
                         let okToAdd = true
@@ -629,6 +636,7 @@ angular.module("pocApp")
 
                         if (thing.ed.conditionalVS && thing.ed.conditionalVS.length > 0) {
                             let ctr = 1
+                          // hashEdsWithConditional[thing.ed.path] = [] //this will have a list of all the ed's created
 
                             let adjustedPath = `${pathPrefix}${thing.ed.path}`
 
@@ -645,8 +653,6 @@ angular.module("pocApp")
                                 lstQElements.push(newThing)
 
                                 //the hash has a list of all the new eds that were created to replace the one with the conditional ValueSet
-                                //conditionalED[thing.ed.path].push(newThing.ed.path)
-
                                 conditionalED[adjustedPath].push(`${pathPrefix}${newThing.ed.path}`)
                             })
 
@@ -736,10 +742,12 @@ angular.module("pocApp")
                 //validate the enablewhens - but not if the generation is called from the composition
                 if (! config.calledFromComp) {
                     for (const ew of allEW) {
-                        if (! hashEd[ew.question]) {
+                        if (! hashEd[ew.question] && !  conditionalED[ew.question]) {
                             errorLog.push({msg:`EnableWhen on ${ew.target} refers to a missing element: ${ew.question}`})
                         }
                     }
+                } else {
+                    //Hiwever, if it was called by the composition then
                 }
 
                 //at this point the Q has been built, but if there were any elements with conditionalVS

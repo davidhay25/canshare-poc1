@@ -283,13 +283,24 @@ angular.module("pocApp")
                     //to default the primary site.
 
                     if (propKey == 'cancer-type') {
-                        getDefaultPrimarySite(value)
+                        getDefaultPrimarySite(value,function (value) {
+                            if (value) {
+                                //there was a single primary site which was set.
+                                //we need to invoke the forward engine to set the laterality...
+                                $scope.uiValueSelected  ('primary-site',value)
+                            }
+
+                        })
+
                     }
 
                 }
 
+
                 //so that the dropdowns work, make sure the value (local.cmPropertyValue) is from the list cmProperties[k].options
                 //Otherwise angular doesn't set the dropdown correctly
+                setDropDowns()
+                /*
                 Object.keys($scope.cmProperties).forEach(function (propName) {
                     if ($scope.local.cmPropertyValue[propName] && $scope.cmProperties[propName].options) {
                         let code = $scope.local.cmPropertyValue[propName].code
@@ -301,10 +312,25 @@ angular.module("pocApp")
                         }
                     }
                 })
+                */
+
+                function setDropDowns() {
+                    Object.keys($scope.cmProperties).forEach(function (propName) {
+                        if ($scope.local.cmPropertyValue[propName] && $scope.cmProperties[propName].options) {
+                            let code = $scope.local.cmPropertyValue[propName].code
+                            for (const c of $scope.cmProperties[propName].options) {
+                                if (c.code == code) {
+                                    $scope.local.cmPropertyValue[propName] = c
+                                    break
+                                }
+                            }
+                        }
+                    })
+                }
 
             }
 
-            function getDefaultPrimarySite(concept) {
+            function getDefaultPrimarySite(concept,cb) {
                 //alert(`check default primary site: ${concept.code}`)
                 $scope.log.push({msg:`check default primary site: ${concept.code}`})
                 let siteCodes = []      //there can be multiple site codes for a given diagnosis
@@ -352,40 +378,35 @@ angular.module("pocApp")
 
                             let defaultSiteConceptCode = siteCodes[0]
 
-                            let found
+                            let foundConcept = null
+                            /*
+                            if ($scope.cmProperties['primary-site'].options.length == 1) {
+                                $scope.local.cmPropertyValue['primary-site'] = concept
+                                foundConcept = concept
+                            }
+                            */
+
+
                             for (const concept of $scope.cmProperties['primary-site'].options) {
                                 if (concept.code == defaultSiteConceptCode) {
                                     $scope.local.cmPropertyValue['primary-site'] = concept
-                                    found = true
+                                    foundConcept = concept
                                     break
                                 }
                             }
-                            if (found) {
+
+
+                            if (foundConcept) {
                                 console.log('found')
                                 $scope.log.push({msg:`Code is in list, setting as default`})
+                                cb(foundConcept)
                             } else {
                                 $scope.log.push({msg:`Code not found in list, ignoring`})
                                 console.log('not found')
+                                cb()
                             }
 
 
-/*
-
-                            if ($scope.cmProperties['primary-site'].options.filter(c => c.code == defaultSiteConceptCode)) {
-                                console.log('found')
-                                $scope.log.push({msg:`Code is in list, setting as default`})
-
-
-
-                               // $scope.local.cmPropertyValue[key] has the current value
-
-                            } else {
-                                $scope.log.push({msg:`Code not found in list, ignoring`})
-                                console.log('not found')
-                            }
-
-                            $scope.cmProperties['primary-site'].options
-*/
 
                         }
 

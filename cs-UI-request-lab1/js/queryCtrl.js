@@ -16,6 +16,7 @@ angular.module("pocApp")
 
             $scope.localStorage = $localStorage
 
+            $scope.loadingCM = false
 
             $scope.version = utilsSvc.getVersion()
 

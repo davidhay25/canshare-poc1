@@ -120,7 +120,7 @@
 
             <div class="col-md-1 col-sm-1">
                 <form class="navbar-form navbar-left">
-                    <img ng-show="showWaiting || refreshingCache" src="css/ajax_loader_blue_32.gif"/>
+                    <img ng-show="showWaiting || refreshingCache || loadingCM" src="css/ajax_loader_blue_32.gif"/>
 
                 </form>
             </div>
@@ -269,6 +269,8 @@
                             uib-popover="Last updated: {{cacheDate | date : 'MMM dd  HH:mm:ss'}}"
                             popover-placement="left"
                             popover-trigger="'mouseenter'">Refresh cache</button>
+
+                    <img ng-show="showWaiting || refreshingCache || loadingCM" src="css/ajax_loader_blue_32.gif"/>
                 </div>
 
 
