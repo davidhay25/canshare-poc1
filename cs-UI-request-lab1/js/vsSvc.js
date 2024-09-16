@@ -68,7 +68,7 @@ angular.module("pocApp")
                     vs = that.fixUrl(vs)            //adds the NXHTS prefix if missing
 
                     if (lst.indexOf(vs) == -1 && ! cache[vs]) {    //only add once!
-                        console.log(`cache miss: ${vs}`)
+                       // console.log(`cache miss: ${vs}`)
                         lst.push(vs)
                     }
                 }

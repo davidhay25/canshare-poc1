@@ -11,22 +11,26 @@
 
   <uib-tabset>
 
-    <uib-tab heading="ValueSets & Options">
+    <uib-tab heading="ValueSets">
       <div class="pull-right"> All ValueSets and where they are used. Also lists Options.
       </div>
 
 
 
       <div class="clearfix"></div>
+
+      <h4>Elements with ValueSets</h4>
       <div class="tableFixHead">
         <table class="table table-bordered">
           <thead>
-          <tr><th>ValueSet Url</th><th>Where used</th></tr>
+          <tr><th>ValueSet Name</th><th>Where used</th></tr>
           </thead>
           <tbody>
-          <tr ng-repeat="v in arVsSummary" ng-class="{issue:v.issue}">
+          <tr ng-repeat="v in arVsSummary" ng-class="{issue:v.issue}" ng-if="v[0].isValueSet">
             <td>
-              <span class = 'clickable' ng-click="viewVS(v.url)">{{v.url}}</span></td>
+              <span class = 'clickable' ng-click="viewVS(v.url)">{{v.url}}</span>
+            </td>
+
             <td>
               <div ng-repeat = "item in v">
                 <div ng-show="item.DGName">
@@ -55,6 +59,58 @@
 
 
     </uib-tab>
+
+
+    <uib-tab heading="Options only">
+      <div class="pull-right"> All ValueSets and where they are used. Also lists Options.
+      </div>
+
+
+
+      <div class="clearfix"></div>
+
+      <h4>Elements with Options but no ValueSets</h4>
+      <div class="tableFixHead">
+        <table class="table table-bordered">
+          <thead>
+          <tr><th>DG Name-Path</th><th>Where used</th></tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="v in arVsSummary" ng-class="{issue:v.issue}" ng-if="! v[0].isValueSet">
+            <td>
+              {{v.url}}
+            </td>
+
+            <td>
+              <div ng-repeat = "item in v">
+                <div ng-show="item.DGName">
+                  DG: <span class="clickable" ng-click="termSelectDG(item)" >{{item.DGName}}</span>.
+                  Path: <span class="clickable" ng-click="termSelectDGItem(item)">{{item.path}}</span>
+                  <span ng-show = item.options>
+                  There are <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}} options</span> defined.
+                </span>
+                </div>
+
+                <div ng-show="item.compName">
+                  Comp: <span class="clickable" ng-click="termSelectComp(item)" >{{item.compName}}</span>.
+                  Path: <span class="clickable" ng-click="termSelectCompItem(item)">{{item.path}}</span>
+                  <span ng-show = item.options>
+                  There are <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}} options</span> defined.
+                </span>
+                </div>
+
+              </div>
+            </td>
+          </tr>
+          </tbody>
+
+        </table>
+      </div>
+
+
+    </uib-tab>
+
+
     <uib-tab heading = "DataGroups">
 
 

@@ -32,26 +32,30 @@
 
     </div>
     <div class="col-md-4  col-sm-4">
-      <div class="pull-right btn btn-link" ng-click="prePop()">Pre-pop</div>
 
-      <div class="myScroll">
-        <div ng-repeat="entry in listItems">
-          <div>
-            <ng-include src = "'directive/renderForm2/renderSingleItem2.html'"></ng-include>
+      <div class="rounded-box">
+        <div class="pull-right btn btn-link" ng-click="prePop()">Pre-pop</div>
+
+        <div class="myScroll">
+          <div ng-repeat="entry in listItems">
+            <div>
+              <ng-include src = "'directive/renderForm2/renderSingleItem2.html'"></ng-include>
+            </div>
           </div>
         </div>
       </div>
+
 
 
     </div>
     <div class="col-md-4  col-sm-4">
 
       <div class="rounded-box">
-        <div class="pull-right"><img ng-show="savingQ" src="css/ajax_loader_blue_32.gif"/></div>
+        <div class="pull-right"><img ng-if="savingQ" src="css/ajax_loader_blue_32.gif"/></div>
         <div class="btn btn-link pull-right"
              ng-hide="savingQ || ! technicalview" ng-click="saveToServer(true)">Save and open in renderer</div>
-        <div style="padding: 8px" ng-show="savingQ">Saving...</div>
-        <div ng-show="redirectUrl">
+        <div style="padding: 8px" ng-if="savingQ">Saving...</div>
+        <div ng-if="redirectUrl">
           <a class = "btn" ng-href="{{redirectUrl}}" target="_blank">Load Renderer</a>
         </div>
 
@@ -67,7 +71,7 @@
             <br/>
             <table class="table table-bordered table-condensed">
 
-              <tr ng-show="selectedEd.hideInQ">
+              <tr ng-if="selectedEd.hideInQ">
 
                 <td colspan="2">
                   <div style="text-align:center" ><em>This element is not actually displayed in the Questionnaire</em></div>
@@ -92,7 +96,7 @@
                 <td class="detailName" >Type</td>
                 <td>
                   <div ng-repeat="type in selectedEd.type">
-                    <div ng-show="fhirDataTypes.indexOf(type) > -1" class="pull-right">
+                    <div ng-if="fhirDataTypes.indexOf(type) > -1" class="pull-right">
                       <a target = "_blank" ng-href="{{fhirRoot}}datatypes.html#{{type}}">Details in spec</a>
                     </div>
                     {{type}}
@@ -102,7 +106,7 @@
 
 
               <tr>
-                <td ng-show="technicalview" class="detailName">  Q type</td>
+                <td ng-if="technicalview" class="detailName">  Q type</td>
                 <td>
                   {{selectedItem.type}}
                 </td>
@@ -121,7 +125,7 @@
 
 
 
-                  <div ng-show = "selectedCompositionNode.data.host">
+                  <div ng-if = "selectedCompositionNode.data.host">
                     <!-- for now, just hide it if a section is selected todo - check this logic
                     Host:{{selectedCompositionNode.data.host.mult}}
                     -->
@@ -135,7 +139,7 @@
                 </td>
               </tr>
 
-              <tr  ng-show="selectedEd.options.length > 0">
+              <tr  ng-if="selectedEd.options.length > 0">
                 <td class="detailName">Options</td>
                 <td>
                   <ul>
@@ -146,7 +150,7 @@
                 </td>
               </tr>
 
-              <tr  ng-show="selectedEd.type[0] == 'CodeableConcept' ">
+              <tr  ng-if="selectedEd.type[0] == 'CodeableConcept' ">
                 <td class="detailName">ValueSet</td>
                 <td>
                   <div><em>{{selectedEd.valueSet}}</em>
@@ -158,7 +162,7 @@
 
                   </div>
                   <div>
-                    <button ng-show="selectedEd.valueSet"
+                    <button ng-if="selectedEd.valueSet"
                             ng-click="viewVS(selectedEd.valueSet)"
                             class="btn-link btn">View VS</button>
 
@@ -170,38 +174,38 @@
 
 
 
-              <tr ng-show="hasFixedValue(selectedEd)">
+              <tr ng-if="hasFixedValue(selectedEd)">
                 <td  class="detailName" >
                   Fixed value
                 </td>
                 <td class="col-md-9">
 
-                  <div ng-show="selectedEd.fixedCode">
+                  <div ng-if="selectedEd.fixedCode">
                     {{selectedEd.fixedCode}}
                   </div>
                   
 
-                  <div ng-show="selectedEd.fixedRatio">
-                    <div ng-show="selectedEd.fixedRatio.numerator.unit">Numerator unit: {{selectedEd.fixedRatio.numerator.unit}}</div>
-                    <div ng-show="selectedEd.fixedRatio.denominator.unit">Denominator unit: {{selectedEd.fixedRatio.denominator.unit}}</div>
-                    <div ng-show="selectedEd.fixedRatio.denominator.value">Denominator value: {{selectedEd.fixedRatio.denominator.value}}</div>
+                  <div ng-if="selectedEd.fixedRatio">
+                    <div ng-if="selectedEd.fixedRatio.numerator.unit">Numerator unit: {{selectedEd.fixedRatio.numerator.unit}}</div>
+                    <div ng-if="selectedEd.fixedRatio.denominator.unit">Denominator unit: {{selectedEd.fixedRatio.denominator.unit}}</div>
+                    <div ng-if="selectedEd.fixedRatio.denominator.value">Denominator value: {{selectedEd.fixedRatio.denominator.value}}</div>
                   </div>
 
-                  <div ng-show="selectedEd.fixedQuantity">
-                                                <span ng-show = "selectedEd.fixedQuantity.unit">
+                  <div ng-if="selectedEd.fixedQuantity">
+                                                <span ng-if = "selectedEd.fixedQuantity.unit">
                                                   Unit: {{selectedEd.fixedQuantity.unit}}
                                                 </span>
 
-                    <span ng-show = "selectedEd.fixedQuantity.value">
+                    <span ng-if = "selectedEd.fixedQuantity.value">
                                                   Value: {{selectedEd.fixedQuantity.value}}
                                                 </span>
                   </div>
 
-                  <div ng-show="selectedEd.fixedCoding">
+                  <div ng-if="selectedEd.fixedCoding">
                     {{selectedEd.fixedCoding.code}} | {{selectedEd.fixedCoding.display}} | {{selectedEd.fixedCoding.system}}
                   </div>
 
-                  <span ng-show="selectedEd.fixedCoding ||
+                  <span ng-if="selectedEd.fixedCoding ||
                                                 selectedEd.fixedQuantity || selectedEd.fixedRatio"
                         class="pull-right"></span>
 
@@ -211,7 +215,7 @@
 
 
 
-              <tr ng-show="selectedEd.enableWhen" >
+              <tr ng-if="selectedEd.enableWhen" >
 
                 <td class="detailName">Conditional</td>
                 <td>
@@ -237,14 +241,14 @@
                 </td>
               </tr>
 
-              <tr ng-show="selectedEd.prePop && technicalview">
+              <tr ng-if="selectedEd.prePop && technicalview">
                 <td class="detailName">PrePop</td>
                 <td>
                   {{selectedEd.prePop}}
                 </td>
               </tr>
 
-              <tr ng-show="selectedEd.collapsible && technicalview">
+              <tr ng-if="selectedEd.collapsible && technicalview">
                 <td class="detailName">Collapsible</td>
                 <td>
                   {{selectedEd.collapsible}}
@@ -253,7 +257,7 @@
 
 
               <tr>
-                <td ng-show="technicalview" class="detailName">LinkId</td>
+                <td ng-if="technicalview" class="detailName">LinkId</td>
                 <td>
                   {{selectedItem.linkId}}
                 </td>
@@ -287,7 +291,7 @@
               </div>
               <div class="col-md-9">
                 <div ng-repeat="type in selectedEd.type">
-                  <div ng-show="fhirDataTypes.indexOf(type) > -1" class="pull-right">
+                  <div ng-if="fhirDataTypes.indexOf(type) > -1" class="pull-right">
                     <a target = "_blank" ng-href="{{fhirRoot}}datatypes.html#{{type}}">Details in spec</a>
                   </div>
                   {{type}}
@@ -295,7 +299,7 @@
               </div>
             </div>
 
-            <div class="row" ng-show="technicalview">
+            <div class="row" ng-if="technicalview">
             <div class="col-md-3">
               Q type
             </div>
@@ -322,7 +326,7 @@
 
 
 
-                <div ng-show = "selectedCompositionNode.data.host">
+                <div ng-if = "selectedCompositionNode.data.host">
 
 
                 </div>
@@ -336,7 +340,7 @@
               </div>
             </div>
 
-            <div class="row" ng-show="selectedEd.options.length > 0">
+            <div class="row" ng-if="selectedEd.options.length > 0">
               <div class="col-md-3">
                 Options
               </div>
@@ -349,86 +353,86 @@
               </div>
             </div>
 
-            <div ng-show = "false" class="row" >
+            <div ng-if = "false" class="row" >
               <div class="col-md-3">
                 Full Path
               </div>
               <div class="col-md-9">
 
                 <div ng-repeat="segment in getPathSegments(selectedCompositionNode.data.ed.path) track by $index">
-                  <div ng-show="$index > 0"> {{segment}}</div>
+                  <div ng-if="$index > 0"> {{segment}}</div>
                 </div>
 
               </div>
             </div>
 
-            <div ng-show="hasFixedValue(selectedEd)" class="row" >
+            <div ng-if="hasFixedValue(selectedEd)" class="row" >
               <div class="col-md-3">
                 Fixed value
               </div>
               <div class="col-md-9">
-                <div ng-show="selectedCompositionNode.data.ed.fixedCode">
+                <div ng-if="selectedCompositionNode.data.ed.fixedCode">
                   {{selectedCompositionNode.data.ed.fixedCode}}
                 </div>
 
-                <div ng-show="selectedCompositionNode.data.ed.fixedRatio">
-                  <div ng-show="selectedCompositionNode.data.ed.fixedRatio.numerator.unit">Numerator unit: {{selectedCompositionNode.data.ed.fixedRatio.numerator.unit}}</div>
-                  <div ng-show="selectedCompositionNode.data.ed.fixedRatio.denominator.unit">Denominator unit: {{selectedCompositionNode.data.ed.fixedRatio.denominator.unit}}</div>
-                  <div ng-show="selectedCompositionNode.data.ed.fixedRatio.denominator.value">Denominator value: {{selectedCompositionNode.data.ed.fixedRatio.denominator.value}}</div>
+                <div ng-if="selectedCompositionNode.data.ed.fixedRatio">
+                  <div ng-if="selectedCompositionNode.data.ed.fixedRatio.numerator.unit">Numerator unit: {{selectedCompositionNode.data.ed.fixedRatio.numerator.unit}}</div>
+                  <div ng-if="selectedCompositionNode.data.ed.fixedRatio.denominator.unit">Denominator unit: {{selectedCompositionNode.data.ed.fixedRatio.denominator.unit}}</div>
+                  <div ng-if="selectedCompositionNode.data.ed.fixedRatio.denominator.value">Denominator value: {{selectedCompositionNode.data.ed.fixedRatio.denominator.value}}</div>
                 </div>
 
-                <div ng-show="selectedCompositionNode.data.ed.fixedQuantity">
-                                                <span ng-show = "selectedCompositionNode.data.ed.fixedQuantity.unit">
+                <div ng-if="selectedCompositionNode.data.ed.fixedQuantity">
+                                                <span ng-if = "selectedCompositionNode.data.ed.fixedQuantity.unit">
                                                   Unit: {{selectedCompositionNode.data.ed.fixedQuantity.unit}}
                                                 </span>
 
-                  <span ng-show = "selectedCompositionNode.data.ed.fixedQuantity.value">
+                  <span ng-if = "selectedCompositionNode.data.ed.fixedQuantity.value">
                                                   Value: {{selectedCompositionNode.data.ed.fixedQuantity.value}}
                                                 </span>
                 </div>
 
-                <div ng-show="selectedCompositionNode.data.ed.fixedCoding">
+                <div ng-if="selectedCompositionNode.data.ed.fixedCoding">
                   {{selectedCompositionNode.data.ed.fixedCoding.code}} | {{selectedCompositionNode.data.ed.fixedCoding.display}} | {{selectedCompositionNode.data.ed.fixedCoding.system}}
                 </div>
 
-                <span ng-show="selectedCompositionNode.data.ed.fixedCoding ||
+                <span ng-if="selectedCompositionNode.data.ed.fixedCoding ||
                                                 selectedCompositionNode.data.ed.fixedQuantity || selectedCompositionNode.data.ed.fixedRatio"
                       class="pull-right"></span>
 
               </div>
             </div>
 
-            <div ng-show = "hasDefaultValue(selectedEd)" class="row" >
+            <div ng-if = "hasDefaultValue(selectedEd)" class="row" >
               <div class="col-md-3">
                 Default value
               </div>
               <div class="col-md-9">
                 <div class="col-md-9">
-                  <div ng-show="selectedCompositionNode.data.ed.defaultCode">
+                  <div ng-if="selectedCompositionNode.data.ed.defaultCode">
                     {{selectedCompositionNode.data.ed.defaultCode}}
                   </div>
 
-                  <div ng-show="selectedCompositionNode.data.ed.defaultRatio">
-                    <div ng-show="selectedCompositionNode.data.ed.defaultRatio.numerator.unit">Numerator unit: {{selectedCompositionNode.data.ed.defaultRatio.numerator.unit}}</div>
-                    <div ng-show="selectedCompositionNode.data.ed.defaultRatio.denominator.unit">Denominator unit: {{selectedCompositionNode.data.ed.defaultRatio.denominator.unit}}</div>
-                    <div ng-show="selectedCompositionNode.data.ed.defaultRatio.denominator.value">Denominator value: {{selectedCompositionNode.data.ed.defaultRatio.denominator.value}}</div>
+                  <div ng-if="selectedCompositionNode.data.ed.defaultRatio">
+                    <div ng-if="selectedCompositionNode.data.ed.defaultRatio.numerator.unit">Numerator unit: {{selectedCompositionNode.data.ed.defaultRatio.numerator.unit}}</div>
+                    <div ng-if="selectedCompositionNode.data.ed.defaultRatio.denominator.unit">Denominator unit: {{selectedCompositionNode.data.ed.defaultRatio.denominator.unit}}</div>
+                    <div ng-if="selectedCompositionNode.data.ed.defaultRatio.denominator.value">Denominator value: {{selectedCompositionNode.data.ed.defaultRatio.denominator.value}}</div>
                   </div>
 
-                  <div ng-show="selectedCompositionNode.data.ed.defaultQuantity">
-                                                <span ng-show = "selectedCompositionNode.data.ed.defaultQuantity.unit">
+                  <div ng-if="selectedCompositionNode.data.ed.defaultQuantity">
+                                                <span ng-if = "selectedCompositionNode.data.ed.defaultQuantity.unit">
                                                   Unit: {{selectedCompositionNode.data.ed.defaultQuantity.unit}}
                                                 </span>
 
-                    <span ng-show = "selectedCompositionNode.data.ed.defaultQuantity.value">
+                    <span ng-if = "selectedCompositionNode.data.ed.defaultQuantity.value">
                                                   Value: {{selectedCompositionNode.data.ed.defaultQuantity.value}}
                                                 </span>
                   </div>
 
-                  <div ng-show="selectedCompositionNode.data.ed.defaultCoding">
+                  <div ng-if="selectedCompositionNode.data.ed.defaultCoding">
                     {{selectedCompositionNode.data.ed.defaultCoding.code}} | {{selectedCompositionNode.data.ed.defaultCoding.display}} | {{selectedCompositionNode.data.ed.defaultCoding.system}}
                   </div>
 
-                  <span ng-show="selectedCompositionNode.data.ed.defaultCoding ||
+                  <span ng-if="selectedCompositionNode.data.ed.defaultCoding ||
                                                 selectedCompositionNode.data.ed.defaultQuantity || selectedCompositionNode.data.ed.defaultRatio"
                         class="pull-right"></span>
 
@@ -438,7 +442,7 @@
             </div>
 
 
-            <div class="row" ng-show="selectedEd.type[0] == 'CodeableConcept' ">
+            <div class="row" ng-if="selectedEd.type[0] == 'CodeableConcept' ">
               <div class="col-md-3">
                 ValueSet
               </div>
@@ -452,7 +456,7 @@
 
                 </div>
                 <div>
-                  <button ng-show="selectedEd.valueSet"
+                  <button ng-if="selectedEd.valueSet"
                           ng-click="viewVS(selectedEd.valueSet)"
                           class="btn-link btn">View VS</button>
 
@@ -460,7 +464,7 @@
               </div>
             </div>
 
-            <div class="row" ng-show="selectedEd.enableWhen">
+            <div class="row" ng-if="selectedEd.enableWhen">
               <div class="col-md-3">
                 Conditional
               </div>
@@ -477,7 +481,7 @@
               </div>
             </div>
 
-            <div class="row" ng-show="selectedEd.sourceReference">
+            <div class="row" ng-if="selectedEd.sourceReference">
               <div class="col-md-3">
                 Source Ref
               </div>
@@ -493,9 +497,9 @@
 
         <uib-tab >
           <uib-tab-heading>
-            Notes <span ng-show="hashNotes[selectedEd.path].length > 0" class="badge">{{hashNotes[selectedEd.path].length}}</span>
+            Notes <span ng-if="hashNotes[selectedEd.path].length > 0" class="badge">{{hashNotes[selectedEd.path].length}}</span>
           </uib-tab-heading>
-          <table class="table table-condensed" ng-show="hashNotes[selectedEd.path].length > 0">
+          <table class="table table-condensed" ng-if="hashNotes[selectedEd.path].length > 0">
             <tr><th>Comment</th><th>Disposition</th></tr>
             <tr ng-repeat = "note in hashNotes[selectedEd.path]">
               <td>{{note.note}}</td>
@@ -516,7 +520,7 @@
               <input type="text" class="form-control" ng-model="input.author" placeholder="Your name"/>
             </div>
             <div class="col-md-6">
-              <button ng-show="input.note"
+              <button ng-if="input.note"
                       class="btn btn-link pull-right" ng-click="addNote(input.note,input.author,selectedEd)">Add note</button>
             </div>
 
@@ -527,7 +531,7 @@
 
 
           <div ng-repeat="item in treeData">
-            <div ng-show="dataEntered[item.id]">
+            <div ng-if="dataEntered[item.id]">
               <div class="row">
                 <div class="col-md-6">
                   {{item.text}}
@@ -541,18 +545,18 @@
             </div>
           </div>
 
-          <pre>{{dataEntered | json}}</pre>
+          <pre ng-if="technicalview">{{dataEntered | json}}</pre>
 
 
         </uib-tab>
 
-        <uib-tab  ng-show="technicalview" heading="Model">
+        <uib-tab  ng-if="technicalview" heading="Model">
           <uib-tabset>
-            <uib-tab  ng-show="technicalview" heading="ED">
+            <uib-tab  ng-if="technicalview" heading="ED">
               <pre>{{selectedEd | json}}</pre>
             </uib-tab>
 
-            <uib-tab  ng-show="technicalview" heading="Item">
+            <uib-tab  ng-if="technicalview" heading="Item">
               <pre>{{selectedItem | json}}</pre>
             </uib-tab>
           </uib-tabset>
@@ -565,7 +569,7 @@
 
 
 
-        <uib-tab ng-show="technicalview" heading="Q">
+        <uib-tab ng-if="technicalview" heading="Q">
 
           <span class="btn btn-link" ng-click="validate(q)">Perform validation</span>
 
@@ -581,16 +585,16 @@
 
 
 
-          <img class="pull-right" ng-show="validating" src="css/ajax_loader_blue_32.gif"/>
+          <img class="pull-right" ng-if="validating" src="css/ajax_loader_blue_32.gif"/>
 
           <div class="clearfix"></div>
 
 
 
 
-          <div ng-show="oo" >
+          <div ng-if="oo" >
             <table class="table table-bordered">
-              <tr ng-repeat="iss in oo.issue track by $index" ng-show="showIssue(iss)">
+              <tr ng-repeat="iss in oo.issue track by $index" ng-if="showIssue(iss)">
                 <td>{{iss.severity}}</td>
                 <td>{{iss.diagnostics}}
                   <div><em>{{iss.location[0]}}</em></div>
@@ -611,7 +615,7 @@
 
         </uib-tab>
 
-        <uib-tab ng-show="technicalview && errors.length > 0" >
+        <uib-tab ng-if="technicalview && errors.length > 0" >
           <uib-tab-heading>
             Errors <span class="badge">{{errors.length}}</span>
           </uib-tab-heading>
@@ -625,7 +629,7 @@
 
 
 
-        <uib-tab ng-show="false && technicalview" heading="Q">
+        <uib-tab ng-if="false && technicalview" heading="Q">
           <pre>{{q | json}}</pre>
         </uib-tab>
 

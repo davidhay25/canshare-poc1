@@ -487,7 +487,14 @@ async function setup(app) {
     //get all active compositions - used by the library
     app.get('/model/allCompositions', async function(req,res) {
         //using deleted rather than active as there were a number of compositions already before I implemented the delete :(
-        const query = {deleted:{$ne : true}}  // bring them all back ATM{active:true} // active: { $lt: 15 } };
+
+        let query = {deleted:{$ne : true}}  // bring them all back ATM{active:true} // active: { $lt: 15 } };
+        if (req.query.includeDeleted) {
+            query = {}
+        }
+
+
+
         try {
             const cursor = await database.collection("comp").find(query).toArray()
             let arComp = []

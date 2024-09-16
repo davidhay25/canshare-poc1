@@ -3,14 +3,14 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,orderingSvc,
-                  snapshotSvc,vsSvc,
+                  snapshotSvc,vsSvc,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
 
-            let autoQ = false   //whether to automatically generate a Q
+            //let autoQ = false   //whether to automatically generate a Q
             //let removeZeroedOut = false  //when creating the full element list, remove mult = 0..0
 
-            $scope.newInflater = true  //running the new inflater
+            //$scope.newInflater = true  //running the new inflater
 
             //change the background colour of the DG summary according to the environment
             $scope.modelInfoClass = 'modelInfo'
@@ -67,11 +67,6 @@ angular.module("pocApp")
 
                 //assign the snapshot svc to the modelSvc so that it can read the snapshots of DGs
                 modelCompSvc.setSnapshotSvc(snapshotSvc)
-
-            //    let hash = snapshotSvc.addOrderToAllDG()
-
-              //  let size = modelsSvc.getSizeOfObject(hash)
-              //  console.log(`Size of world with oder set: ${size/1024} K`)
 
 
             }
@@ -226,8 +221,9 @@ angular.module("pocApp")
             }
 
             //look for DG errors like repeating parents in the hierarchy tree
-            if (Object.keys($scope.hashAllDG).length > 0) {         //There are DG's stored locally
-                modelDGSvc.checkAllDG($scope.hashAllDG)
+            if (Object.keys($scope.hashAllDG).length > 0) {         //There are DG's stored locally]
+                //this was introduced when there were lots of issues - I don't *think* it's needed any more
+                //keep for now modelDGSvc.checkAllDG($scope.hashAllDG)
 
                 //If there's a DG with no diff, all sorts of bad stuff happens. Shouldn't occur, but if it does it's a pain
                 //this at least prevents the app from crashing, so remedial action can be taken
@@ -262,7 +258,8 @@ angular.module("pocApp")
 
 
 
-            //a handler that will re-draw the list and tree views of the DGs.
+            //a handler that will re-draw the list and tree views of the DGs. nCalled when the set of DG's
+            //has been updated
 
             $scope.$on('updateDGList',function(ev,vo) {
 
@@ -271,6 +268,7 @@ angular.module("pocApp")
                 let vo1 = modelDGSvc.makeTreeViewOfDG($scope.hashAllDG)
                 showAllDGTree(vo1.treeData)
 
+                //if a model name has been passed in, then re-select that model
                 if (vo && vo.name) {
                     $scope.selectModel($scope.hashAllDG[vo.name] )
                 }
@@ -282,7 +280,7 @@ angular.module("pocApp")
             //record access
             //$http.post("model/access",{})
 
-            $scope.igBase = "https://build.fhir.org/ig/davidhay25/canshare-LIM/branches/main/"
+            //$scope.igBase = "https://build.fhir.org/ig/davidhay25/canshare-LIM/branches/main/"
 
             $localStorage.selectedTag = $localStorage.selectedTag || 'main'
             $scope.input.selectedTag = $localStorage.selectedTag       //default tag for tag filtered list
@@ -1025,10 +1023,6 @@ angular.module("pocApp")
                 $scope.input.mainTabActive = $scope.ui.tabDG;
             }
 
-
-
-
-
             //edits some of the attributes of a single ED.
             $scope.editDGItem = function (item,initialTab) {
                 let originalED = {}
@@ -1265,27 +1259,31 @@ angular.module("pocApp")
                 //if item.hiddenDGName is not the same as the current model then select it.
                 //Note that elements use a 'hidden' property to set the DG name
 
-                if ($scope.selectedModel.name !== item.hiddenDGName) {
+                if (! $scope.selectedModel || $scope.selectedModel.name !== item.hiddenDGName) {
                     $scope.selectedModel = $scope.hashAllDG[item.hiddenDGName]
                     $scope.selectModel($scope.selectedModel)
                 }
 
 
                 //the path may or may not have the DG name as the first segment - todo - clean this up
-                let path = item.path
+                let path = item.path || ""
                 let ar = path.split('.')
                 if (ar[0] !== item.hiddenDGName) {
                     path = `${item.hiddenDGName}.${item.path}`
                 }
 
-                $scope.input.dgTabActive = 0        //ensure the tree tab is displayed
+               $scope.input.dgTabActive = 0        //ensure the tree tab is displayed
+
+
 
                 //selct the element in the DG tree. Need to wait for the tree to be built...
                 $timeout(function () {
                     console.log(path)
 
-
-                    $("#dgTree").jstree("select_node",  path)
+                    //from chatgpt
+                    var tree = $('#dgTree').jstree(true);
+                    tree.select_node(path);
+                    $('#dgTree').trigger('select_node.jstree', {node: tree.get_node(path)});
 
                     //NO - don't do this here!! The select event won't fire...
                    // $scope.input.dgTabActive = 0        //ensure the tree tab is displayed
@@ -1582,15 +1580,9 @@ angular.module("pocApp")
                                         newModel.diff.push(newEd)
                                     }
 
-
-
                                 })
                             }
                         }
-
-
-
-                        //----
 
 
                         $scope.hashAllDG[newModel.name] = newModel
@@ -1602,6 +1594,7 @@ angular.module("pocApp")
 
                         $scope.makeAllDTList()      //updated
                         $scope.makeSnapshots()
+
                         $scope.selectModel(newModel)
 
                     } else {
@@ -1652,7 +1645,7 @@ angular.module("pocApp")
 
 
 
-                $scope.$broadcast("compSelected")   //for the profiling - todo - cancel
+                // $scope.$broadcast("compSelected")   //for the profiling - todo - cancel
 
                 //check the current checkedout state on the library.
                 //Always update the local version checkedout (not data) with the one from the library
@@ -1680,6 +1673,13 @@ angular.module("pocApp")
                 $scope.allCompElements = vo.allElements     //list of all elements. used by the Table and Q generation (at least)
 
 
+                //build the Q. This is to find any errors - we don't otherwise use the Q in this app anymore
+                //actually - it is used when saving a version -
+                let vo1 = makeQSvc.makeHierarchicalQFromComp(comp,$scope.hashAllDG)
+               // $scope.currentQ = vo1.Q
+                $scope.compQErrors = vo1.errorLog
+                console.log(vo1)
+
                 /*
                 vsSvc.getAllVS($scope.allCompElements, function () {
                     //$scope.showWaiting = false
@@ -1694,7 +1694,7 @@ angular.module("pocApp")
                 /*
 
                 if (autoQ) {
-                    //generate the Q and also retrieve all the ValueSets
+                    //generate the Q and also retrieve all the ValueSetsvo1.
 
                     makeCompQSvc.makeQ($scope.allCompElements, $scope.hashAllDG, function (Q) {
                         $scope.fullQ = Q
@@ -1723,15 +1723,21 @@ angular.module("pocApp")
             }
 
 
-            //refresh the complete list of elements for this DG
+            //refresh the complete list of elements for the currently selected DG
+            //used when the DG contents may have changed, but the same model has remained selected ($scope.selectModel selects a new model)
             //also draw the graph & tree
-            $scope.refreshFullList = function (dg,noLoadVS) {
+            $scope.refreshFullList = function (dg) {
 
                 delete $scope.errorLog
                 $scope.relationshipsSummary = snapshotSvc.getRelationshipsSummary(dg.name)
 
+                $scope.refreshUpdates()     //update the xref
+
+
                 //by supplying the dg in the call, the eds will be annotatded with 'definedOnDG' for those in the diff
-                $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name,dg)// vo.allElements
+
+                //temp $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name,dg)// vo.allElements
+                $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)// vo.allElements
 
                 $scope.fullElementHash = {}         //I seem to need this quite a lot. Though memory usage is getting high...
                 //create the list of all paths in the DG. Used by the 'ordering'
@@ -1780,31 +1786,14 @@ angular.module("pocApp")
 
             }
 
-            //only used for DG now
+
+            //Select a new DG  (originally called a model)
+            //when called, it always updates the checked out status from the library
             $scope.selectModel = function (dg) {
                 if (dg) {
 
                     clearB4Select()
                     $scope.selectedModel = dg
-
-
-                    /* - don;t do any fsh related stuff - will extract to separate page...
-                    //get the profile FSH for this DG
-                    delete $scope.input.dgFsh
-                    let url1 = `/fsh/DG/${dg.name}`
-                    $http.get(url1).then(
-                        function (data) {
-                            $scope.input.dgFsh = data.data
-                            $scope.$broadcast('dgSelected')     //so the FSH can be re-drawn
-
-                        }, function (err) {
-                            //why do this on error??? $scope.$broadcast('dgSelected')
-                            console.log(err.data)
-                        }
-                    )
-
-
-                    */
 
                     $scope.fhirResourceType = igSvc.findResourceType(dg,$scope.hashAllDG)   //not sure if this is used wo fsh stuff
 
@@ -1824,8 +1813,7 @@ angular.module("pocApp")
                         }
                     )
 
-
-                    $scope.refreshUpdates()     //update the xref
+                 //   $scope.refreshUpdates()     //update the xref
                     $scope.refreshFullList(dg)      //the complete list of elements for this DG + graph & Q
                 }
 
@@ -1909,8 +1897,8 @@ angular.module("pocApp")
                     }
 
 
-
-                ).on('changed.jstree', function (e, data) {
+                ).on('select_node.jstree', function (e, data) {
+                //).on('changed.jstree', function (e, data) {
                     // the node selection event...
 
                     console.log('select')
@@ -2028,10 +2016,6 @@ angular.module("pocApp")
                 });
 
             }
-
-
-
-
 
             $scope.fitAllDGGraph = function () {
                 if ($scope.graphAllDG) {

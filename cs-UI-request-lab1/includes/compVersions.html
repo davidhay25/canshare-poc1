@@ -1,0 +1,36 @@
+<div>
+
+
+  <button class="btn btn-link pull-right" ng-click="loadVersions()">Load</button>
+
+
+
+
+  <div class="row">
+    <div class="col-md-9">
+      <br/>
+      <table class="table table-condensed table-bordered">
+        <tr><th>Version</th><th>Comment</th><th>Date created</th><th>Items</th><th></th></tr>
+        <tr ng-repeat="row in compVersions">
+          <td>{{row.version}}</td>
+          <td>{{row.versionComment}}</td>
+          <td>{{row.createdDate | date : "MMM d yy hh:mm"}}</td>
+
+          <td>{{row.snapshotLength}}</td>
+          <td>
+            <a class="btn" ng-href="modelReview.html?{{row.name}}#{{row.version}}" target="_blank">Review</a>
+          </td>
+        </tr>
+      </table>
+
+    </div>
+    <div class="col-md-9">
+
+    </div>
+  </div>
+
+
+
+
+  <button class="btn btn-danger" ng-click="createVersion()"  ng-show = "canEditComp(selectedComposition)">New Version</button>
+</div>

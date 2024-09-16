@@ -43,7 +43,7 @@ angular.module("pocApp")
         }
 
 
-        //given an ed, return the control type and hine
+        //given an ed, return the control type and hint
         function getControlDetails(ed) {
             //return the control type & hint based on the ed
 
@@ -73,7 +73,7 @@ angular.module("pocApp")
                         controlType = "quantity"
                         if (ed.units) {
                             //p
-                            console.log(ed.units)
+                            //console.log(ed.units)
                         }
                         break
                     case 'dateTime' :
@@ -409,6 +409,7 @@ angular.module("pocApp")
                 function processItem(report,item) {
                     let thing = {linkId:item.linkId,text:item.text,type:item.type,definition:item.definition}
 
+
                     let mult = "0.."
                     if (item.required) {
                         mult = "1.."
@@ -457,12 +458,16 @@ angular.module("pocApp")
                 let Q = {resourceType:'Questionnaire'}
                 Q.title = comp.title
                 Q.status = 'active'
+                Q.name = comp.name
+                //make the version of the Q the same as the composition version
+                Q.version = comp.version
+
                 Q.id = `canshare-${comp.name}`
                 Q.url = `http://canshare.co.nz/questionnaireUrl/${comp.name}`
                 addPrePopExtensions(Q)
                 Q.item = []
 
-                let containerSection = {text: comp.title, linkId: `tab-${comp.name}`, extension: [], type: 'group', item: []}
+                let containerSection = {text: comp.title, linkId: `${comp.name}`, extension: [], type: 'group', item: []}
                 let ext = {url: extItemControlUrl}
                 ext.valueCodeableConcept = {
                     coding: [{
@@ -483,7 +488,9 @@ angular.module("pocApp")
 
                 for (const section of comp.sections) {
                     if (section.items && section.items.length > 0) {
-                        let sectionItem = {linkId:`sect-${section.name}`,text:section.title,type:'group',item:[]}
+                        //let sectionItem = {linkId:`sect-${section.name}`,text:section.title,type:'group',item:[]}
+                        //let sectionItem = {linkId:`${section.name}`,text:section.title,type:'group',item:[]}
+                        let sectionItem = {linkId:`${comp.name}.${section.name}`,text:section.title,type:'group',item:[]}
                         containerSection.item.push(sectionItem)
 
                         //make up an ed for the section for the display in the UI. It's not a real ed...
@@ -492,20 +499,20 @@ angular.module("pocApp")
 
                         for (const contentDG of section.items) {     //a section can have multiple DGs within it.
                             let dgType = contentDG.type[0]        //the dg type. Generally a 'section' dg
+
                             let dgElementList = snapshotSvc.getFullListOfElements(dgType)
 
                             //adjust according to 'insertAfter' values
                             let dg = hashAllDG[dgType]
                             orderingSvc.sortFullListByInsertAfter(dgElementList,dg,hashAllDG)
 
-                            //path prefix is used to adjust enablewhen targets
+                            //path prefix is prepended to the linkid (=path) from the DG. used to adjust enablewhen targets
                             let pathPrefix = sectionItem.linkId
 
-
                             let config = {expandVS:true,enableWhen:true,pathPrefix : pathPrefix,calledFromComp:true}
-                            //todo - enablewhen not working for composition yet
-                            let vo = that.makeHierarchicalQFromDG(dgElementList,config)
 
+                            console.log(`${dgType} ${dgElementList.length}`)
+                            let vo = that.makeHierarchicalQFromDG(dgElementList,config)
 
                             allEW.push(...vo.allEW)
 
@@ -524,11 +531,13 @@ angular.module("pocApp")
                             })
 
                             //any errors
+                            //console.log(`${dgType} ${vo.errorLog.length}`)
                             if (vo.errorLog.length > 0) {
+
                                 errorLog.push(...vo.errorLog)
                             }
 
-                            //the section is populated by DGs - but there area a couple of ways that has been done.
+                            //the section is populated by DGs - but there are a couple of ways that has been done.
                             //sectionPatientDetails is a DG thhat has the Patient DG as a child
                             //bresteReporthistolymphnodes has the elements directly
                             //to be discussed next week
@@ -544,19 +553,12 @@ angular.module("pocApp")
 
                 }
 
-                console.log(allEW)
+                //console.log(allEW)
 
                 //validate the enablewhens
                 for (const ew of allEW) {
-
-
-
-
-
-
                     if (! hashEd[ew.question]) {
-
-                        errorLog.push({msg:`EnableWhen on ${ew.target} refers to a missing element: ${ew.question}`})
+                        errorLog.push({msg:`EnableWhen on ${ew.target} refers to a missing element: ${ew.question}`,dgName:ew.dgName})
                     }
                 }
 
@@ -601,15 +603,6 @@ angular.module("pocApp")
                         }
                     }
 
-/*
-                    isFixed
-
-
-                    if (thing.ed.hideInQ || (thing.ed.mult == '0..0')) {
-
-                        basePathsToHide.push(thing.ed.path)  //the full path
-                    }
-                    */
                 })
 
 
@@ -678,7 +671,6 @@ angular.module("pocApp")
                 if (config.fhirType) {
                     Q.extension = Q.extension || []
                     Q.extension.push({url:extDefinitionExtraction,valueCode:config.fhirType})
-                    //extDefinitionExtraction
                 }
 
                 let currentItem
@@ -704,7 +696,6 @@ angular.module("pocApp")
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
 
                         decorateItem(currentItem,ed)
-
 
                         if (config.enableWhen) {
                             let ar =  addEnableWhen(ed,currentItem,config.pathPrefix)
@@ -740,7 +731,42 @@ angular.module("pocApp")
 
 
                 //validate the enablewhens - but not if the generation is called from the composition
+                //if the error is to an element that has conditional ValueSets, then it isn't really an error
+                //as the EW was updated to refer to all the conditional copies made (and a copy made in the  conditionalED[] array
+                let newAllEW = []   //the set of all enableWhens - excluding the conditional ValueSet ones...
+
+
+                for (const ew of allEW) {
+                    ew.dgName = firstElement.ed.path        //so that the DGName can be reported back to the composiiton
+                    //ew.dgPath = ew.question
+                    if (! hashEd[ew.question] ) {
+                        //the question (controller element) was not found
+                        //is this an element that had conditional valueSets?
+                        if (! conditionalED[ew.question]) {
+                            //no it isn't - it is an error
+                            newAllEW.push(ew)       //we still add it to the list - it needs to be fixed
+
+                            if (! config.calledFromComp) {
+
+                                errorLog.push({msg:`EnableWhen on ${ew.target} refers to a missing element: ${ew.question}`})
+                            }
+
+
+                        } else {
+                            //this is an element that had a conditional VS - and the element was not included in the Q so it doesn't go in thelist
+                        }
+
+
+
+                    } else {
+                        //the question / control element was found so add to the updated 'allEW' list
+                        newAllEW.push(ew)
+                    }
+                }
+
+                /*
                 if (! config.calledFromComp) {
+
                     for (const ew of allEW) {
                         if (! hashEd[ew.question] && !  conditionalED[ew.question]) {
                             errorLog.push({msg:`EnableWhen on ${ew.target} refers to a missing element: ${ew.question}`})
@@ -749,18 +775,18 @@ angular.module("pocApp")
                 } else {
                     //Hiwever, if it was called by the composition then
                 }
-
+*/
                 //at this point the Q has been built, but if there were any elements with conditionalVS
                 //then that element will not have been added to the Q (conditional items for each possible VS will have been)
                 //and any other items that have a dependency on that one will need to be corrected...
 
 
 
-                console.log(conditionalED)
+                //console.log(conditionalED)
 
                 correctEW(Q,conditionalED)
 
-                return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog, allEW : allEW}
+                return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog, allEW : newAllEW}
 
                 function adjustEWPath() {
                     //when a DG is child of another (
@@ -961,7 +987,7 @@ angular.module("pocApp")
                     function checkItem(item) {
 
                         if (item.enableWhen) {
-                            console.log(item.enableWhen)
+                            //console.log(item.enableWhen)
 
                             let newEWList = []
 

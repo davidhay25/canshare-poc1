@@ -83,31 +83,39 @@ angular.module("pocApp")
                         let dg = hashDG[key]
                             dg.diff.forEach(function (ed) {
                                 //let item = {}
-                                if (ed.valueSet && ed.mult !== '0..0') {
-                                    //hiddenDGName is used when linking to the DG item
-                                    let entry = {DGName : dg.name,hiddenDGName : dg.name, path: ed.path}
-                                    hashVS[ed.valueSet] = hashVS[ed.valueSet] || []
-                                    //are there options defined as well?
-                                    if (ed.options) {
-                                        //yes, add them to the summary
-                                        entry.options = ed.options
-                                    }
-                                    hashVS[ed.valueSet].push(entry)
+                                if (ed.mult !== '0..0') {
+                                    if (ed.valueSet) {
+                                        //hiddenDGName is used when linking to the DG item
+                                        let entry = {DGName : dg.name,hiddenDGName : dg.name, path: ed.path}
+                                        entry.isValueSet = true
+                                        hashVS[ed.valueSet] = hashVS[ed.valueSet] || []
 
-                                } else {
-                                    if (ed.options && ed.options.length > 0) {
-                                        //This is where there are options but no VS
-                                        let vsUrlTmp = `${dg.name}-${ed.path}`
-                                        let entry = {DGName : dg.name, path: ed.path}
-                                        entry.options = ed.options
-                                        hashVS[vsUrlTmp] = hashVS[vsUrlTmp] || []
-                                        hashVS[vsUrlTmp].push(entry)
+                                        //are there options defined as well?
+                                        if (ed.options) {
+                                            //yes, add them to the summary
+                                            entry.options = ed.options
+                                        }
+                                        hashVS[ed.valueSet].push(entry)
+
+                                    } else {
+                                        if (ed.options && ed.options.length > 0) {
+                                            //This is where there are options but no VS
+
+                                            let vsUrlTmp = `${dg.name}-${ed.path}`
+
+                                            let entry = {hiddenDGName : dg.name,DGName : dg.name, path: ed.path}
+                                            entry.options = ed.options
+                                            hashVS[vsUrlTmp] = hashVS[vsUrlTmp] || []
+                                            hashVS[vsUrlTmp].push(entry)
+                                        }
                                     }
                                 }
+
                             })
                     })
-
+/*
                     //now check the composition overrides
+                    //todo - We aren't using this any more
                     Object.keys(hashComp).forEach(function (key) {
                         let comp = hashComp[key]
                         //let item = {compName: comp.name}
@@ -144,6 +152,7 @@ angular.module("pocApp")
                         }
 
                     })
+                    */
 
                     //convert to an array and sort
                     let arVS = []

@@ -403,7 +403,12 @@ angular.module("pocApp")
                 $scope.refreshFullList($scope.selectedModel)
                 //in modelsCtrl
                 $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:path})
+/*
+                $timeout(function () {
+                    $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:path})
+                },1000)
 
+*/
 
             }
 

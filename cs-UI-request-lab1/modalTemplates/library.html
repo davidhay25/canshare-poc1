@@ -283,6 +283,9 @@
             <select class="form-control" ng-model="input.filter[k]"
                     ng-options="v for v in hashMetaProperties[k]"></select>
           </div>
+        </div>
+
+        <div class="row">
           <div class = "col-md-6">
             <div style="padding-top: 16px">
 
@@ -296,7 +299,18 @@
 
             </div>
            </div>
+          <div class = "col-md-6">
+            <div class="pull-right" style="padding-top: 16px">
+              <checkbox  ng-change="refreshCompSummary(input.includeDeletedComp)"
+
+                         ng-model="input.includeDeletedComp"></checkbox> Include deleted Compositions in list
+            </div>
+          </div>
+
         </div>
+
+
+
 
 
 

@@ -23,7 +23,7 @@
         </strong>
         -->
 
-      ({{selectedComposition.name}})
+      {{selectedComposition.name}}  <span class="pull-right" ng-show="selectedComposition.version">Version: {{selectedComposition.version}}</span>
         <div><em>{{selectedComposition.description}}</em></div>
         <div>
           <div ng-show="selectedComposition.sourceReference">
@@ -669,112 +669,16 @@
 
       <br/>
       <p>Section level Conditionals are set in the 'Sections' tab</p>
-      <!--
-      <strong>DataGroup Conditionals present in the Composition</strong>
-      <br/>
-      <em>todo: enableWhen from all DG's in the comp</em>
-
-
-
-      <table class="table table-bordered">
-        <tr ng-repeat = "vo in allCompElements" ng-show="vo.ed.enableWhen">
-          <td>{{vo.ed.path}}</td>
-          <td>
-            <div ng-repeat="ew in vo.ed.enableWhen">
-              <div class="row">
-                <div class="col-md-4">
-                  <div>Source section: {{ew.sourceSection}}</div>
-                  <div>Target section: {{ew.targetSection}}</div>
-                </div>
-                <div class="col-md-8">
-                  <div>Path: {{ew.ed}}</div>
-                  <div>Value: {{ew.value}}</div>
-                </div>
-              </div>
-
-
-
-            </div>
-          </td>
-        </tr>
-      </table>
-       <pre>{{allCompElements | json}}</pre>
-
--->
-
-
 
 
     </uib-tab>
 
-    <uib-tab ng-show="false" heading="Form">
-
-     <!-- <div id="compformlocation"></div> -->
-
-
-
-<!--
-
-  <renderform2 q="fullQ" hash-ed="hashAllDG" technicalview="true" treenode="compformlocation"></renderform2>
-
-      <button class="btn-link btn pull-right" ng-click="previewQ(fullQ)">Examine Q</button>
-
-
-      <renderform q="fullQ" qr="{}"></renderform>
-      -->
-
-      <!--
-      <span style="padding-top: 8px" class="pull-right">
-        <span class="clickable" ng-click="qGenerationOptions()">Q generation: </span>
-        <span ng-show="qStrategy.expandVS">expand VS</span>
-        <span ng-hide="qStrategy.expandVS">separate VS</span>
-
-      </span>
-      -->
-
-      <!--
-
-      <uib-tabset>
-        <uib-tab heading="Form">
-          <renderform q="fullQ" qr="{}"></renderform>
-        </uib-tab>
-        <uib-tab heading="Log">
-          <div class="row">
-            <div class="col-md-7">
-              <div class="myScroll">
-                <table class="table">
-                  <tr  ng-class="{listItemSelected:row==logEntry}" ng-repeat="row in Qlog">
-                    <td>{{$index}}</td>
-                    <td ng-click="showLogEntry(row)">{{row.msg}}
-                      <div><em>{{row.item.linkId}}</em></div>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-
-
-            </div>
-            <div class="col-md-5">
-              <div class="myScroll">
-              <pre>{{logEntry | json}}</pre>
-              </div>
-            </div>
-          </div>
-
-        </uib-tab>
-      </uib-tabset>
-
-
--->
-
-
-
-    </uib-tab>
 
     <uib-tab ng-show="false" heading="Graph">
       Graph of all DG linked back to Composition
     </uib-tab>
 
+    <!--
     <uib-tab ng-show="false">
       <uib-tab-heading>
         Overrides <span class="badge">{{getOverridesCount()}}</span>
@@ -796,6 +700,8 @@
       </table>
     </uib-tab>
 
+
+    -->
     <uib-tab>
       <uib-tab-heading>
         Notes <span class="badge">{{getNotesCount()}}</span>
@@ -834,7 +740,7 @@
       </table>
     </uib-tab>
 
-
+<!--
     <uib-tab ng-show = 'false' heading="All DG">
       <br/>
 
@@ -854,27 +760,40 @@
 
 
 
-      <!--
-
-      <table class="table table-bordered">
-        <tr ng-repeat="(k,v) in allDGInComp">
-          <td>{{k}}</td>
-          <td>
-            <div ng-repeat="item in v">
-              {{item.title}}: {{item.path}}
-            </div>
-
-          </td>
-        </tr>
-      </table>
-      -->
     </uib-tab>
+
 
 
     <uib-tab ng-show="false" heading="allCompElements">
       <pre>{{hashCompElements | json}}</pre>
     </uib-tab>
+    -->
 
+    <uib-tab>
+      <uib-tab-heading>Q errors <span class="badge">{{compQErrors.length}}</span> </uib-tab-heading>
+      <table class="table-bordered table table-condensed">
+        <tr ng-repeat="row in compQErrors">
+          <td>{{row.msg}}
+          <div>
+            <em>
+
+              <div class="clickable" ng-click="termSelectDGItem({hiddenDGName:row.dgName, path:row.dgPath})">{{row.dgName}}</div>
+
+
+            </em>
+          </div></td>
+        </tr>
+      </table>
+    </uib-tab>
+
+    <uib-tab heading="Versions">
+      <div ng-controller="compVersionsCtrl">
+        <ng-include src="'/includes/compVersions.html'"></ng-include>
+      </div>
+
+    </uib-tab>
+
+    <!-- profiling no longer done in this app
     <uib-tab heading="Profiling">
       <br/>
       <div ng-controller="profilingCompCtrl">
@@ -882,6 +801,8 @@
       </div>
 
     </uib-tab>
+
+    -->
 
     <uib-tab heading = "Json">
       <pre>{{selectedComposition | json}}</pre>

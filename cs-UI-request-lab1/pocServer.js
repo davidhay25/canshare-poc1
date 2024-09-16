@@ -28,6 +28,9 @@ const reviewModule = require("./serverModuleReview")
 const validatorModule = require("./serverModuleValidator")
 const QModule = require("./serverModuleQ")
 
+const compVersionsModule = require("./serverModuleCompVersions")
+
+
 //let config = require("./config.json")
 
 let express = require('express');
@@ -54,6 +57,7 @@ modelModule.setup(app)
 reviewModule.setup(app)
 validatorModule.setup(app)
 QModule.setup(app)
+compVersionsModule.setup(app)
 
 //common calls (not specifically related to requester or lab. ?move to separate module
 

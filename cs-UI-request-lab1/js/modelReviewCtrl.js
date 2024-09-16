@@ -22,8 +22,15 @@ angular.module("pocApp")
 
             let search = $window.location.search;
             let modelName = null
+            $scope.compVersion = null
+
             if (search) {
+
                 modelName = search.substr(1)
+                if ($window.location.hash) {
+                    $scope.compVersion = $window.location.hash.substr(1)
+                }
+
             }
 
 
@@ -35,10 +42,14 @@ angular.module("pocApp")
                         $scope.hashAllDG[dg.name] = dg
 
                         //has both dgs & fhir dta
-                        $scope.input.types = modelsSvc.getAllTypes($scope.hashAllDG)
+                       // $scope.input.types = modelsSvc.getAllTypes($scope.hashAllDG)
 
 
                     })
+
+                    //has both dgs & fhir dta
+                    $scope.input.types = modelsSvc.getAllTypes($scope.hashAllDG)
+
 
                     //need to generate the snapshot for all DG. This is needed for the Q generation
                     //the snapshots are all held within the service...
@@ -51,6 +62,7 @@ angular.module("pocApp")
 
                     //todo - if we decide that this app won't have the ability to select dg/comp
                     //then we don't need to get all the composiitons (will always need all the DGs)
+                    //but keep it for now (though there is a performance hit...
                     $http.get('/model/allCompositions').then(
                         function (data) {
                             //console.log(data.data)
@@ -60,22 +72,17 @@ angular.module("pocApp")
                             })
 
 
-                            /*
-                            //now we have both DG's and compositions we can build the hash of all types
-                            let world = {dataGroups:$scope.hashAllDG,compositions:$scope.hashAllCompositions}
-                            let vo1 = modelsSvc.validateModel(world)
-                            $scope.input.types = vo1.types      //a hash keyed by name
-
-                            console.log(vo1.errors)
-*/
                             //now that we have all the DG & Compositions, was a modelName passed in?
 
                             if (modelName) {
                                 if ($scope.hashAllCompositions[modelName]) {
-                                    $scope.selectComposition($scope.hashAllCompositions[modelName])
-                                    $scope.selectedFromUrl = true      //to indicate that the modelname was passed in on the url
-                                } else if ($scope.hashAllDG[modelName]) {
 
+
+                                    $scope.selectComposition($scope.hashAllCompositions[modelName],$scope.compVersion)
+                                    $scope.selectedFromUrl = true      //to indicate that the modelname was passed in on the url
+
+
+                                } else if ($scope.hashAllDG[modelName]) {
                                     $scope.selectDG($scope.hashAllDG[modelName])
                                     $scope.selectedFromUrl = true      //to indicate that the modelname was passed in on the url
                                 } else {
@@ -162,7 +169,7 @@ angular.module("pocApp")
             }
 
             //When an ed is selected in a table
-            $scope.selectED = function (ed) {
+            $scope.selectEDDEP = function (ed) {
                 $scope.selectedED = ed
                 $scope.currentLinkId = ed.path
 
@@ -208,7 +215,7 @@ angular.module("pocApp")
 
 
             //called by the table view to determine if a row is displayed
-            $scope.showTableRow = function (ed) {
+            $scope.showTableRowDEP = function (ed) {
                 if (ed.mult == '0..0') {
                     return false
                 }
@@ -307,7 +314,7 @@ angular.module("pocApp")
 
                 let compName = $scope.selectedComp.name
 
-                let comment = {path:path,compName:compName, comment:note}   //will need to add path when saving to db
+                let comment = {path:path,compName:compName, compVersion: $scope.compVersion,comment:note}   //will need to add path when saving to db
                 comment.id = 'id-'+ new Date().getTime()
                 comment.author = $scope.input.author
                 comment.ed = $scope.selectedED
@@ -467,7 +474,7 @@ angular.module("pocApp")
 
             //get all the comments for the given model (comp or dg)
             $scope.setCommentsThisModel = function(vo) {
-                let compName = $scope.selectedComp.name
+                let compName = $scope.selectedComp.name     //todo - modelName / selectedModel would be better names
                 delete $scope.allComments
                 $scope.commentsThisComp = {}
 
@@ -491,7 +498,8 @@ angular.module("pocApp")
 
                         //console.log($scope.commentsThisComp)
 
-                        //now construct a summary of comments by section
+                        //now construct a summary of comments by section. Really only makes sense for compositions
+                        //todo  - this needs work as there is an incorect assumption - see note re ar.slice(3) below
                         $scope.commentsBySection = {}
                         $scope.allComments.forEach(function (comment) {
                             if (comment.path) {
@@ -502,7 +510,7 @@ angular.module("pocApp")
                                 $scope.commentsBySection[section] = $scope.commentsBySection[section] || []
                                 let item = {control:control,comment:comment}
                                 item.path = comment.path
-                                item.shortPath = ar.slice(3).join('.')
+                                item.shortPath = ar.slice(3).join('.')      //todo - this isn't always true -
                                 $scope.commentsBySection[section].push(item)
                             }
 
@@ -603,30 +611,63 @@ angular.module("pocApp")
                 return colour
             }
 
-            $scope.selectComposition = function (comp) {
+            $scope.selectComposition = function (comp,version) {
 
                 if (! comp) {
                     return
                 }
 
-                //retrieve all the ValueSets in this DG. They are cached in the service
-                //$scope.showWaiting = true
-
-                /*
-                vsSvc.getAllVS($scope.fullElementList, function () {
-                    //alert("all VS available")
-                    $scope.showWaiting = false
-                })
-*/
-
                 $scope.selectedComp = comp
+
+
+                if (version) {
+                    //if a version is specified then retrieve that version
+
+                    let qry = `/comp/version/${comp.name}/${version}`
+                    $http.get(qry).then(
+                        function (data) {
+                            let compVersion = data.data     //a compositon that has a snapshot
+
+                            if (compVersion.Q && compVersion.snapshot) {
+
+
+                                vsSvc.getAllVS(compVersion.snapshot, function () {
+                                    $scope.fullQ = compVersion.Q         //will invoke the Q renderer directive
+                                    $scope.hashEd = {} //EDs are needed for notes
+                                    compVersion.snapshot.forEach(function (ed) {
+                                        $scope.hashEd[ed.path] = ed
+                                    })
+                                    $scope.errorLog = compVersion.errorLog || [] //vo.errorLog
+
+                                    //A report focussed on pre-popupation & extraction
+                                    let voReport =  makeQSvc.makeReport(compVersion.Q)
+                                    $scope.qReport =voReport.report
+
+
+
+                                })
+
+                            } else {
+                                alert("The composition was retrieved, but it has no snapshot so cannot be viewed.")
+                            }
+
+                        },function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+
+                } else {
+                    let voComp = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
+                    makeQ(voComp,comp)
+                }
+
 
                 //we need to get all the valueses in the composition - which meand we need
                 //all the elements...
-                $scope.showWaiting = true
-                let voComp = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
+                //$scope.showWaiting = true
 
 
+                /*
                 vsSvc.getAllVS(voComp.allElements, function () {
                     //alert("all VS available")
                     $scope.showWaiting = false
@@ -639,81 +680,40 @@ angular.module("pocApp")
                     $scope.errorLog = vo.errorLog
 
                     console.log(vo.errorLog)
+
                 })
+ */
+                function makeQ(voComp,comp) {
+                    vsSvc.getAllVS(voComp.allElements, function () {
+                        //alert("all VS available")
+                        $scope.showWaiting = false
 
 
+                        let vo = makeQSvc.makeHierarchicalQFromComp(comp,$scope.hashAllDG)
+
+                        $scope.fullQ = vo.Q         //will invoke the Q renderer directive
+                        $scope.hashEd = vo.hashEd
+                        $scope.errorLog = vo.errorLog
+
+                        //A report focussed on pre-popupation & extraction
+                        let voReport =  makeQSvc.makeReport($scope.fullQ)
+                        $scope.qReport =voReport.report
 
 
-
-/*
-
-
-
-
-                return
-
-                $scope.showWaiting = true
-                vsSvc.updateVSFromUrlHash(vo.hashVS,function(){
-                    $scope.showWaiting = false
-                })
-                //test stuff
-
-
-                console.log(comp)
-                $scope.setCommentsThisModel()   //todo - pass in model
-
-                let vo1 = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
-                $scope.allCompElements = vo1.allElements
-                $scope.hashCompElements = vo1.hashAllElements
-
-                delete  $scope.fullQ
-                delete  $scope.Qlog
-
-                let rootNodeId = $scope.allCompElements[0].path
-                let treeData = modelsSvc.makeCompTree($scope.allCompElements)
-
-                $scope.treeData = treeData      //used in the Q builder
-
-                //console.log(treeData)
-                makeCompTree(treeData,rootNodeId)
-
-                //test stuff
-                //let rootNodeId = $scope.allCompElements[0].path
-                //let treeData1 = modelsSvc.makeTreeFromElementList($scope.allCompElements)
-                //makeDGTree(treeData1,rootNodeId)
-
-                //generate the Q for the composition
-                makeCompQSvc.makeQ($scope.allCompElements,$scope.hashAllDG,function (Q) {
-                    $scope.fullQ = Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
-                })
-
-
-                //stuff for the table...
-
-                //used to exclude paths like HCP from the table
-                $scope.pathsToIgnore = {}
-
-                $scope.input.tableSections = [{name:'all',title:'All sections'}]
-                comp.sections.forEach(function (section) {
-                    $scope.input.tableSections.push({name:section.name,title:section.title})
-                })
-                $scope.input.tableSection = $scope.input.tableSections[0]
-
-                //get the set of all paths to ignore. These are those where the DG type is in  DGsToHideInCompTable
-                //when rendering the table, any paths starting with any of this set will be ignored
-                //this is to avoid cluttering the table view
-                $scope.allCompElements.forEach(function (item) {
-                    if (item.ed.type && DGsToHideInCompTable.indexOf(item.ed.type[0]) > -1) {
-                        $scope.pathsToIgnore[item.ed.path] = true
-
-                    }
-                })
-                console.log($scope.pathsToIgnore)
-*/
+                        console.log(vo.errorLog)
+                    })
+                }
             }
 
+            $scope.showReportLine = function (SDCOnly,entry) {
+                if (! SDCOnly) {return true}
 
-            function makeDGTree(treeData,rootNodeId) {
+                if (entry.definition || entry.initialExpression) {return true}
+
+                return false
+            }
+
+            function makeDGTreeDEP(treeData,rootNodeId) {
                 $('#compositionTree').jstree('destroy');
 
                 $scope.compTree = $('#compositionTree').jstree(
@@ -742,7 +742,7 @@ angular.module("pocApp")
             }
 
 
-            function makeCompTree(treeData,rootNodeId) {
+            function makeCompTreeDEP(treeData,rootNodeId) {
                 $('#compositionTree').jstree('destroy');
 
                 $scope.compTree = $('#compositionTree').jstree(

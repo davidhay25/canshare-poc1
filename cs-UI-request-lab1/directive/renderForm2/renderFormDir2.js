@@ -172,7 +172,13 @@ angular.module('formsApp')
 
                 //add a new  for an element
                 $scope.addNote = function (note,user,ed) {
-                    let newNote = {note:note, userName : user, path: ed.path,modelName:$scope.q.name}
+                    if (! ed) {
+                        alert("The element definition was not found. Notes cannot be added. Sorry about that.")
+                        return
+                    }
+                    let newNote = {note:note, userName : user, path: ed.path,modelName:$scope.q.name,version:$scope.q.version}
+
+
                     $http.post('/review',newNote).then(
                         function () {
                             $scope.hashNotes[newNote.path] = $scope.hashNotes[newNote.path] || []
@@ -244,11 +250,13 @@ angular.module('formsApp')
                             $scope.selectedItem = data.node.data.item
                             $scope.selectedEd = $scope.hashEd[$scope.selectedItem.linkId]
 
-                            $scope.listItems = renderFormsSvc2.createControlList($scope.selectedItem,$scope.hashEd)
-                            markDisabled($scope.listItems)
-                            //console.log($scope.listItems)
+                            console.log($scope.selectedItem,$scope.selectedEd)
 
-                            //console.log(data.node)
+                            //create the list of controls that represent the children of the selected ed
+                            $scope.listItems = renderFormsSvc2.createControlList($scope.selectedItem,$scope.hashEd)
+                            //mark the elements that are currently disabled (due to enableWhen) so the css class can be applied
+                            markDisabled($scope.listItems)
+
                         }
 
                         $scope.$digest();       //as the event occurred outside of angular...

@@ -479,12 +479,14 @@
             <ng-include src="'/includes/terminology.html'"></ng-include>
         </uib-tab>
 
+        <!--
         <uib-tab heading="Profiling"  select="setInitialTab(4)">
             <div ng-controller="profilingSummaryCtrl">
                 <ng-include src="'/includes/profilingSummary.html'"></ng-include>
             </div>
 
         </uib-tab>
+        -->
 
 
 
@@ -711,26 +713,36 @@
 <script src="js/publishCompCtrl.js"></script>
 <script src="js/addEWCtrl.js"></script>
 
-<script src="js/profilingDG.js"></script>
-<script src="js/profilingComp.js"></script>
-<script src="js/profilingSummaryCtrl.js"></script>
+
 
 <script src="js/orderingSvc.js"></script>
 
-<script src="js/makeCompQSvcDEP.js"></script>
+
 
 <script src="js/orderingCtrl.js"></script>
 
 <script src="js/libs/firebase.js"></script>
 <script src="js/libs/angularfire.min.js"></script>
 
-<script src="js/dgInflater.js"></script>
+
 <script src="js/snapShotSvc.js"></script>
+
+
+<script src="js/questionnaireSvc.js"></script>
+<script src="js/compVersionsCtrl.js"></script>
+
+<!--
+
+<script src="js/profilingDG.js"></script>
+<script src="js/profilingComp.js"></script>
+<script src="js/profilingSummaryCtrl.js"></script>
+
 
 <script src="directive/renderForm2/renderFormSvc2.js"></script>
 <script src="directive/renderForm2/renderFormDir2.js"></script>
-<script src="js/questionnaireSvc.js"></script>
-
+<script src="js/dgInflaterDEP.js"></script>
+<script src="js/makeCompQSvcDEP.js"></script>
+-->
 
 <script>
     const firebaseConfig = {

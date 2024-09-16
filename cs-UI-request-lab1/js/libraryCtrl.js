@@ -95,34 +95,32 @@ angular.module("pocApp")
             }
             $scope.refreshDGSummary()
 
-            //get all the compositions
-            let qryComp = `/model/allCompositions`
-            $http.get(qryComp).then(
-                function (data) {
-                    $scope.libraryComp = data.data
-                    $scope.libraryCompCount = $scope.libraryComp.length
-                    //console.log($scope.libraryComp)
-                    makeCompSummary(allComp,$scope.libraryComp)
-                }, function (err) {
-                    alert(angular.toJson(err.data))
-                })
+
+            $scope.refreshCompSummary = function (includeDeleted) {
+                //get all the compositions
+                let qryComp = `/model/allCompositions`
+                if (includeDeleted){
+                    qryComp += "?includeDeleted=true"
+                }
+
+                $http.get(qryComp).then(
+                    function (data) {
+                        $scope.libraryComp = data.data
+                        $scope.libraryCompCount = $scope.libraryComp.length
+                        //console.log($scope.libraryComp)
+                        //allComp are the compositions in the currents users browser cache
+                        makeCompSummary(allComp,$scope.libraryComp)
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    })
+            }
+            $scope.refreshCompSummary()
 
 
 
-/*
 
-            //get all the QO
-            let qryQO = `/model/allQObject`
-            $http.get(qryQO).then(
-                function (data) {
-                    $scope.libraryQO = data.data
-                    $scope.libraryQOCount = $scope.libraryQO.length
-                    //console.log($scope.libraryComp)
-                   // makeCompSummary(allComp,$scope.libraryComp)
-                }, function (err) {
-                    alert(angular.toJson(err.data))
-                })
-*/
+
+
 
             $scope.updateRepo = function () {
                 if (confirm("This will update all DGs in the Library with the loacal ones. Are you sure you wish to do this?")) {
