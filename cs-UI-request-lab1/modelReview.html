@@ -169,9 +169,9 @@
 
 
     <uib-tabset>
-            <uib-tab heading="Form">
-                <renderform2 q="fullQ" hash-ed="hashEd" technicalview="input.technical" errors="errorLog"></renderform2>
-            </uib-tab>
+        <uib-tab heading="Form">
+            <renderform2 q="fullQ" hash-ed="hashEd" technicalview="input.technical" errors="errorLog"></renderform2>
+        </uib-tab>
 
         <uib-tab heading="All comments">
             <table class="table-condensed table-bordered table">
@@ -200,7 +200,7 @@
 
         </uib-tab>
 
-        <uib-tab heading="Q report">
+        <uib-tab heading="SDC extraction elements">
             <div class="pull-right">
                 <checkbox ng-model="input.SDCOnly"></checkbox> Show only with SDC instructions
             </div>
@@ -219,16 +219,29 @@
                     <td>
                         <div ng-if="entry.definition">Definition: {{entry.definition}}</div>
                         <div ng-if="entry.initialExpression">Initial: {{entry.initialExpression}}</div>
+                        <div ng-if="entry.extractionContext">Extraction context: {{entry.extractionContext}}</div>
+
+
+
+
                     </td>
 
                 </tr>
             </table>
-<!--
-            <pre>{{qReport}}</pre>
+
+            <!--
+
+            <pre>{{qReport | json}}</pre>
 
                 https://build.fhir.org/ig/HL7/sdc/Questionnaire-demographics.html
             -->
+
             </uib-tab>
+
+        <uib-tab heading="Q">
+            <pre>{{fullQ | json}}</pre>
+        </uib-tab>
+
 
 
         </uib-tabset>

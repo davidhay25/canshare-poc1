@@ -4,14 +4,14 @@
     <div class="row">
       <div class="col-md-8 col-sm-8">
         <h3 class="modal-title">
-          Edit DG Item <span ng-show="item.ed">: {{item.ed.title}}</span>
+          Edit DG Item <span ng-if="item.ed">: {{item.ed.title}}</span>
         </h3>
       </div>
 
 
       <div class="col-md-4 col-sm-4">
 
-        <button ng-show="input.path"
+        <button ng-if="input.path"
                 class="btn btn-primary pull-right" ng-click="save()">Close</button>
 
         <button  class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
@@ -81,7 +81,7 @@
             </td>
           </tr>
 
-          <tr ng-show="input.selectedType == 'CodeableConcept'">
+          <tr ng-if="input.selectedType == 'CodeableConcept'">
             <td>ValueSet</td>
 
             <td>
@@ -91,7 +91,7 @@
                          class="form-control" ng-model="input.valueSet"/>
                 </div>
                 <div class="col-sm-2">
-                  <button ng-show="input.valueSet" class="btn-link btn" ng-click="viewVS(input.valueSet)">View VS</button>
+                  <button ng-if="input.valueSet" class="btn-link btn" ng-click="viewVS(input.valueSet)">View VS</button>
 
                 </div>
               </div>
@@ -129,7 +129,7 @@
             </td>
           </tr>
 
-          <tr  ng-show="input.selectedType == 'CodeableConcept'">
+          <tr  ng-if="input.selectedType == 'CodeableConcept'">
             <td>'Other' type</td>
             <td>
               <span ng-repeat = "opt in ['sometimes','textonly']">
@@ -142,7 +142,7 @@
           </tr>
 
 
-          <tr ng-show="isFixedType(input.selectedType)">
+          <tr ng-if="isFixedType(input.selectedType)">
             <td>Fixed value</td>
             <td>
 
@@ -153,7 +153,7 @@
 
             </td>
           </tr>
-          <tr ng-show="isFixedType(input.selectedType)">
+          <tr ng-if="isFixedType(input.selectedType)">
             <td>Default value</td>
             <td>
 
@@ -189,7 +189,7 @@
             </td>
           </tr>
 
-          <tr ng-show="false">
+          <tr ng-if="false">
             <td>Set auto gTable flag</td>
             <td><checkbox ng-model="input.gtable"/>
               <div><em>If checked, the contents will be displayed in a table row</em></div>
@@ -238,7 +238,7 @@
                 </div>
 
               </div>
-            <div><pre ng-show="testPPResult">{{testPPResult | json}}</pre></div>
+            <div><pre ng-if="testPPResult">{{testPPResult | json}}</pre></div>
             </td>
           </tr>
 
@@ -263,7 +263,7 @@
                 </div>
 
               </div>
-              <div><pre ng-show="testExtract">{{testExtract | json}}</pre></div>
+              <div><pre ng-if="testExtract">{{testExtract | json}}</pre></div>
             </td>
           </tr>
 
@@ -293,7 +293,7 @@
       </uib-tab>
 
 
-      <uib-tab ng-show="input.selectedType == 'CodeableConcept'">
+      <uib-tab ng-if="input.selectedType == 'CodeableConcept'">
         <uib-tab-heading>Conditional valueSets <span class="badge">{{conditionalVS.length}}</span> </uib-tab-heading>
 
         <table class="table table-bordered">
@@ -338,7 +338,7 @@
 
       </uib-tab>
 
-      <uib-tab ng-show="input.selectedType == 'CodeableConcept'">
+      <uib-tab ng-if="input.selectedType == 'CodeableConcept'">
         <uib-tab-heading>Options <span class="badge">{{options.length}}</span> </uib-tab-heading>
 
         <uib-tabset>
@@ -370,7 +370,7 @@
                       <input type="text" class="form-control" ng-model="input.newOptionCode"/>
                     </div>
                     <div class="col-md-4">
-                      <button ng-show="input.newOptionCode" class="btn btn-info" ng-click="lookupFSN(input.newOptionCode)">Lookup</button>
+                      <button ng-if="input.newOptionCode" class="btn btn-info" ng-click="lookupFSN(input.newOptionCode)">Lookup</button>
 
                     </div>
                   </div>
@@ -421,7 +421,7 @@
 
       </uib-tab>
 
-      <uib-tab ng-show="input.selectedType == 'Quantity'">
+      <uib-tab ng-if="input.selectedType == 'Quantity'">
         <uib-tab-heading>Units <span class="badge">{{units.length}}</span> </uib-tab-heading>
         <br/>
 
@@ -444,7 +444,7 @@
         <div class="alert alert-warning" ng-hide="fhirResourceType">
           There is no base FHIR resource type defined.
         </div>
-        <div ng-show="fhirResourceType">
+        <div ng-if="fhirResourceType">
           <strong>Base FHIR Resource type: {{fhirResourceType}}</strong>
         </div>
 
@@ -511,7 +511,7 @@
 
       </uib-tab>
 
-      <uib-tab ng-show="false" heading="Layout">
+      <uib-tab ng-if="false" heading="Layout">
         <br/>
         <table class="table-bordered table table-condensed">
           <tr>

@@ -5,6 +5,9 @@ angular.module("pocApp")
 
 
 
+            $timeout(function () {
+                console.log('watchers:' + $scope.$$watchers.length);
+            },5000)
             //from the conditional tab, select the element
             $scope.selectCondElement = function (displayPath) {
 

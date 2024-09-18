@@ -19,26 +19,22 @@
 
   </style>
 
-  <!--
-  <div class="banner" style="background-color: #ef8fbe" ng-show="newInflater">
-    Using new snapshot generator
-  </div>
-  -->
+
 
   <div ng-class="modelInfoClass">
     <div class="row">
       <div class="col-md-6">
         <strong>{{selectedModel.title}} </strong> ({{selectedModel.name}}) <em>{{selectedModel.description}}</em>
         <div>
-          <div ng-show="selectedModel.sourceReference">
+          <div ng-if="selectedModel.sourceReference">
             <strong>Source reference</strong>: {{selectedModel.sourceReference}}
           </div>
         </div>
 
-        <div ng-show="user.email">
+        <div ng-if="user.email">
           <span class="clickable" ng-click="cloneDG(selectedModel)">Make a copy</span>
 
-            <span class=" clickable spacer" ng-show = "canEdit(selectedModel)"
+            <span class=" clickable spacer" ng-if = "canEdit(selectedModel)"
                  ng-click="editModel(selectedModel)">Edit</span>
 
             <span class=" clickable spacer"
@@ -50,7 +46,7 @@
 
           <div class="row">
             <div class="col-md-6">
-              <div ng-show="selectedModel.parent">
+              <div ng-if="selectedModel.parent">
                 <strong>Parents</strong>
 
                 <div ng-repeat = "parent in relationshipsSummary.parents">
@@ -67,12 +63,12 @@
 
             <div class="col-md-6">
               <strong>Direct children</strong> ({{relationshipsSummary.children.length}})
-              <span ng-show="relationshipsSummary.children.length > 0"
+              <span ng-if="relationshipsSummary.children.length > 0"
                       class="clickable" ng-click="input.showDGChildren = ! input.showDGChildren">
-                <span ng-show="input.showDGChildren">Hide</span>
+                <span ng-if="input.showDGChildren">Hide</span>
                  <span ng-hide="input.showDGChildren">Show</span>
               </span>
-              <div ng-show="input.showDGChildren"
+              <div ng-if="input.showDGChildren"
                       ng-repeat = "child in relationshipsSummary.children">
                   <span class="clickable" style="margin-left: 8px"
                         ng-click="termSelectDG({DGName:child},selectedModel.name)">
@@ -99,18 +95,18 @@
       <button class="btn btn-link" ng-click="showLink('dg')">Link</button>
 
       <div class="pull-right">
-        <div ng-show="user.email">
+        <div ng-if="user.email">
 
           <button class="btn btn-success"
                   ng-hide="selectedModel.checkedOut" class="clickable" ng-click="checkOut()">Check out</button>
 
           <button class="btn btn-danger"
-                  ng-show="selectedModel.checkedOut && selectedModel.checkedOut == user.email"  ng-click="revert()">Revert</button>
+                  ng-if="selectedModel.checkedOut && selectedModel.checkedOut == user.email"  ng-click="revert()">Revert</button>
 
           <button class="btn btn-warning"
-                  ng-show="selectedModel.checkedOut && selectedModel.checkedOut == user.email"  ng-click="checkIn()">Check in</button>
+                  ng-if="selectedModel.checkedOut && selectedModel.checkedOut == user.email"  ng-click="checkIn()">Check in</button>
 
-          <div ng-show = "selectedModel.checkedOut && selectedModel.checkedOut !== user.email">
+          <div ng-if = "selectedModel.checkedOut && selectedModel.checkedOut !== user.email">
             <strong>Checked out to {{selectedModel.checkedOut}}</strong>
           </div>
         </div>
@@ -136,9 +132,6 @@
                          ng-click="removeTagFromDT(tag,selectedModel)"></i>
 
 
-
-
-
                   </div>
                 </div>
 
@@ -148,7 +141,7 @@
                   </div>
                   <div class="col-md-4">
                     <i class="glyphicon glyphicon-plus-sign pull-right"
-                       ng-show="input.newBespokeTag"
+                       ng-if="input.newBespokeTag"
                       style="padding-top: 8px;color: green"
                        ng-click="addTagToDT(input.newBespokeTag)"></i>
                   </div>
@@ -159,7 +152,7 @@
               <div class="col-md-6">
                 <select class="form-control" ng-model="input.newTag"
                         ng-options="tag for tag in tagNames"></select>
-                <div ng-show="input.newTag">
+                <div ng-if="input.newTag">
                   <button class="btn btn-link pull-right" ng-click="addTagToDT(input.newTag)">Add this tag</button>
                 </div>
 
@@ -173,7 +166,7 @@
 
       </table>
 
-      <div ng-show = "hxDGLoad.length > 0">
+      <div ng-if = "hxDGLoad.length > 0">
         <div ng-click="back()" class="clickable pull-right">
           Reload {{ hashAllDG[hxDGLoad[hxDGLoad.length-1]].title }}
         </div>
@@ -204,15 +197,13 @@
                    ng-click="setOrder()">Set order</div>
 
               <div class="clickable myIcon"
-                   ng-show="selectedModel.ssOrder"
+                   ng-if="selectedModel.ssOrder"
                    ng-click="setOrder()">Update order</div>
 
 
               <div class="clickable myIcon"
-                   ng-show="selectedModel.ssOrder"
+                   ng-if="selectedModel.ssOrder"
                    ng-click="removeOrder()">Remove order</div>
-
-
 
             </div>
 
@@ -222,8 +213,8 @@
             <div id="dgTree"></div>
 
           <div>
-          <button class="btn btn-link pull-right" ng-show="canEdit(selectedModel)"
-                  ng-click="editDGItem()">Add new element <span ng-show="selectedNode">to {{selectedNode.data.ed.path}}</span></button>
+          <button class="btn btn-link pull-right" ng-if="canEdit(selectedModel)"
+                  ng-click="editDGItem()">Add new element <span ng-if="selectedNode">to {{selectedNode.data.ed.path}}</span></button>
           </div>
           <br/><br/>
         <div><em>Legend:</em></div>
@@ -238,8 +229,8 @@
         </div>
         <div class="col-md-6 ">
 
-          <div class="background" ng-show="selectedNode.data.ed">
-          <div ng-show="selectedNode.data.ed">
+          <div class="background" ng-if="selectedNode.data.ed">
+          <div ng-if="selectedNode.data.ed">
 
 
           <div class="row">
@@ -251,20 +242,20 @@
 
               <button class="btn btn-link pull-right"
 
-                      ng-show="canSlice(selectedNode.data.ed) && canEdit(selectedModel)"
+                      ng-if="canSlice(selectedNode.data.ed) && canEdit(selectedModel)"
 
                       ng-click="slice(selectedNode.data.ed)">Slice</button>
             </div>
           </div>
 
 
-            <div ng-show = "selectedNode.data.ed.kind == 'root'">
+            <div ng-if = "selectedNode.data.ed.kind == 'root'">
               <table class="table table-bordered table-condensed">
                 <tr><td>Name</td><td>{{selectedModel.name}}</td></tr>
                 <tr><td>Description</td><td>{{selectedModel.description}}</td></tr>
-                <tr ng-show="selectedModel.type"><td>Resource type</td><td>{{selectedModel.type}}</td></tr>
-                <tr ng-show="selectedModel.sourceReference"><td>Source reference</td><td>{{selectedModel.sourceReference}}</td></tr>
-                <tr ng-show="selectedModel.checkedOut"><td>Checked out</td>
+                <tr ng-if="selectedModel.type"><td>Resource type</td><td>{{selectedModel.type}}</td></tr>
+                <tr ng-if="selectedModel.sourceReference"><td>Source reference</td><td>{{selectedModel.sourceReference}}</td></tr>
+                <tr ng-if="selectedModel.checkedOut"><td>Checked out</td>
                   <td>{{selectedModel.checkedOut}}</td></tr>
 
               </table>
@@ -273,7 +264,7 @@
 
 
             <button class="btn-link btn pull-right"
-                    ng-show="canEdit(selectedModel)"
+                    ng-if="canEdit(selectedModel)"
                     ng-click="editDGItem(selectedNode.data)">Edit </button>
 
 
@@ -282,7 +273,7 @@
               <uib-tab heading="Details">
                 <table class="table table-bordered table-condensed">
 
-                  <tr ng-show = "selectedNode.data.ed.path !== selectedModel.name">
+                  <tr ng-if = "selectedNode.data.ed.path !== selectedModel.name">
                     <td class="detailName" style="width : 20%">Path</td>
                     <td>
                       {{selectedNode.data.ed.path | dropFirstInPath}}
@@ -290,7 +281,7 @@
 
                       <!--  <span class="pull-right clickable" ng-click="hideInQ(selectedNode.data.ed)"> -->
                       <span class="pull-right" >
-                        <span ng-show="selectedNode.data.ed.hideInQ">Not shown in Q</span>
+                        <span ng-if="selectedNode.data.ed.hideInQ">Not shown in Q</span>
                         <span ng-hide="selectedNode.data.ed.hideInQ">Appears in Q</span>
                       </span>
 
@@ -323,7 +314,7 @@
                     <td class="detailName" style="width : 20%">Present in diff</td>
                     <td>
 
-                      <div ng-show="presentInDiff(selectedNode.data.ed.path)">
+                      <div ng-if="presentInDiff(selectedNode.data.ed.path)">
                         There is an entry in the diff for this path
                       </div>
 
@@ -340,7 +331,7 @@
                     <td>
                       <!--
                     <i class="glyphicon glyphicon-edit pull-right clickable"
-                       ng-show="canEdit(selectedModel)"
+                       ng-if="canEdit(selectedModel)"
                        ng-click="editDGItem(selectedNode.data)"></i>
                       -->
                    {{selectedNode.data.ed.title}}</td>
@@ -349,7 +340,7 @@
                   <tr><td class="detailName">Description</td><td>
                     <!--
                     <i class="glyphicon glyphicon-edit pull-right clickable"
-                       ng-show="canEdit(selectedModel)"
+                       ng-if="canEdit(selectedModel)"
                        ng-click="editDGItem(selectedNode.data)"></i>
                     -->
                     {{selectedNode.data.ed.description}}
@@ -359,7 +350,7 @@
                     <td><div ng-repeat="type in selectedNode.data.ed.type">
 
 
-                      <div ng-show="fhirDataTypes.indexOf(type) > -1" class="pull-right">
+                      <div ng-if="fhirDataTypes.indexOf(type) > -1" class="pull-right">
                         <a style="padding-right: 12px" target = "_blank" ng-href="{{fhirRoot}}datatypes.html#{{type}}">Details in spec </a>
                       </div>
 
@@ -373,10 +364,10 @@
 
                       {{type}}&nbsp;
 
-                      <div ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept' && canEdit(selectedModel)">
+                      <div ng-if="selectedNode.data.ed.type[0] == 'CodeableConcept' && canEdit(selectedModel)">
 
 
-                        <div ng-show="selectedNode.data.ed.otherType">
+                        <div ng-if="selectedNode.data.ed.otherType">
                           'Other' type: {{selectedNode.data.ed.otherType}}
                         </div>
 
@@ -387,14 +378,14 @@
                     </div>
                     </td></tr>
 
-                  <tr ng-show = "selectedNode.data.ed.path !== selectedModel.name && selectedNode.data.ed.type[0] !== 'Group'" && qControlOptions>
+                  <tr ng-if = "selectedNode.data.ed.path !== selectedModel.name && selectedNode.data.ed.type[0] !== 'Group'" && qControlOptions>
                     <td class="detailName">Input control</td>
                     <td>
                       <div class="row">
                         <div class="col-md-12">
 <!--
                           <i class="glyphicon glyphicon-edit pull-right clickable"
-                             ng-show="canEdit(selectedModel)"
+                             ng-if="canEdit(selectedModel)"
                              ng-click="editDGItem(selectedNode.data)"></i>
                           -->
 
@@ -422,23 +413,23 @@
                   <tr><td class="detailName">Cardinality</td><td>
                     <!--
                     <i class="glyphicon glyphicon-edit pull-right clickable"
-                       ng-show="canEdit(selectedModel)"
+                       ng-if="canEdit(selectedModel)"
                        ng-click="editDGItem(selectedNode.data)"></i>
                     -->
                     {{selectedNode.data.ed.mult}}
                   </td></tr>
 
-                  <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
+                  <tr ng-if="selectedNode.data.ed.type[0] == 'CodeableConcept'">
                     <td class="detailName">ValueSet</td>
                     <td>
 <!--
                       <i class="glyphicon glyphicon-edit pull-right clickable"
-                         ng-show="canEdit(selectedModel)"
+                         ng-if="canEdit(selectedModel)"
                          ng-click="editDGItem(selectedNode.data)"></i>
                       -->
 
                       <div>
-                        <span ng-show="selectedNode.data.ed.valueSet"
+                        <span ng-if="selectedNode.data.ed.valueSet"
                               ng-click="viewVS(selectedNode.data.ed.valueSet)"
                               class="clickable pull-right">View VS</span>
 
@@ -470,17 +461,17 @@
                     </td>
                   </tr>
 
-                  <tr ng-show="selectedNode.data.ed.autoPop">
+                  <tr ng-if="selectedNode.data.ed.autoPop">
                     <td class="detailName">Auto populated</td>
                     <td>
                       Yes
                     </td>
                   </tr>
 
-                  <tr ng-show="selectedNode.data.ed.type[0] == 'CodeableConcept'">
+                  <tr ng-if="selectedNode.data.ed.type[0] == 'CodeableConcept'">
                     <td class="detailName">Options</td>
                     <td>
-                      <div ng-show="selectedNode.data.ed.options">
+                      <div ng-if="selectedNode.data.ed.options">
                         <span
                                 ng-click = "editDGOptionsList(selectedNode.data.ed,true)"
                                 class="clickable pull-right">View list</span>
@@ -498,7 +489,7 @@
                     </td>
                   </tr>
 
-                  <tr ng-show="selectedNode.data.ed.type[0] == 'Quantity'">
+                  <tr ng-if="selectedNode.data.ed.type[0] == 'Quantity'">
                     <td class="detailName">Units</td>
                     <td>
 
@@ -511,37 +502,37 @@
                     </td>
                   </tr>
 
-                  <tr ng-show="isFixedType(selectedNode.data.ed)">
+                  <tr ng-if="isFixedType(selectedNode.data.ed)">
                     <td class="detailName">Fixed value</td>
 
                     <td>
-                      <div ng-show="selectedNode.data.ed.fixedCode">
+                      <div ng-if="selectedNode.data.ed.fixedCode">
                         {{selectedNode.data.ed.fixedCode}}
                       </div>
 
-                      <div ng-show="selectedNode.data.ed.fixedRatio">
-                        <div ng-show="selectedNode.data.ed.fixedRatio.numerator.unit">Numerator unit: {{selectedNode.data.ed.fixedRatio.numerator.unit}}</div>
-                        <div ng-show="selectedNode.data.ed.fixedRatio.denominator.unit">Denominator unit: {{selectedNode.data.ed.fixedRatio.denominator.unit}}</div>
-                        <div ng-show="selectedNode.data.ed.fixedRatio.denominator.value">Denominator value: {{selectedNode.data.ed.fixedRatio.denominator.value}}</div>
+                      <div ng-if="selectedNode.data.ed.fixedRatio">
+                        <div ng-if="selectedNode.data.ed.fixedRatio.numerator.unit">Numerator unit: {{selectedNode.data.ed.fixedRatio.numerator.unit}}</div>
+                        <div ng-if="selectedNode.data.ed.fixedRatio.denominator.unit">Denominator unit: {{selectedNode.data.ed.fixedRatio.denominator.unit}}</div>
+                        <div ng-if="selectedNode.data.ed.fixedRatio.denominator.value">Denominator value: {{selectedNode.data.ed.fixedRatio.denominator.value}}</div>
                       </div>
 
-                      <div ng-show="selectedNode.data.ed.fixedQuantity">
-                        <span ng-show = "selectedNode.data.ed.fixedQuantity.unit">
+                      <div ng-if="selectedNode.data.ed.fixedQuantity">
+                        <span ng-if = "selectedNode.data.ed.fixedQuantity.unit">
                           Unit: {{selectedNode.data.ed.fixedQuantity.unit}}
                         </span>
 
-                        <span ng-show = "selectedNode.data.ed.fixedQuantity.value">
+                        <span ng-if = "selectedNode.data.ed.fixedQuantity.value">
                           Value: {{selectedNode.data.ed.fixedQuantity.value}}
                         </span>
 
                       </div>
 
 
-                      <div ng-show="selectedNode.data.ed.fixedCoding">
+                      <div ng-if="selectedNode.data.ed.fixedCoding">
                         {{selectedNode.data.ed.fixedCoding.code}} | {{selectedNode.data.ed.fixedCoding.display}} | {{selectedNode.data.ed.fixedCoding.system}}
                       </div>
 
-                      <span ng-show="selectedNode.data.ed.fixedCoding ||
+                      <span ng-if="selectedNode.data.ed.fixedCoding ||
                         selectedNode.data.ed.fixedQuantity || selectedNode.data.ed.fixedRatio"
                             class="pull-right">
 
@@ -555,38 +546,38 @@
                     </td>
                   </tr>
 
-                  <tr ng-show="isFixedType(selectedNode.data.ed)">
+                  <tr ng-if="isFixedType(selectedNode.data.ed)">
                     <td class="detailName">Default value</td>
 
                     <td>
-                      <div ng-show="selectedNode.data.ed.defaultCode">
+                      <div ng-if="selectedNode.data.ed.defaultCode">
                         {{selectedNode.data.ed.defaultCode}}
                       </div>
 
 
-                      <div ng-show="selectedNode.data.ed.defaultRatio">
-                        <div ng-show="selectedNode.data.ed.defaultRatio.numerator.unit">Numerator unit: {{selectedNode.data.ed.defaultRatio.numerator.unit}}</div>
-                        <div ng-show="selectedNode.data.ed.defaultRatio.denominator.unit">Denominator unit: {{selectedNode.data.ed.defaultRatio.denominator.unit}}</div>
-                        <div ng-show="selectedNode.data.ed.defaultRatio.denominator.value">Denominator value: {{selectedNode.data.ed.defaultRatio.denominator.value}}</div>
+                      <div ng-if="selectedNode.data.ed.defaultRatio">
+                        <div ng-if="selectedNode.data.ed.defaultRatio.numerator.unit">Numerator unit: {{selectedNode.data.ed.defaultRatio.numerator.unit}}</div>
+                        <div ng-if="selectedNode.data.ed.defaultRatio.denominator.unit">Denominator unit: {{selectedNode.data.ed.defaultRatio.denominator.unit}}</div>
+                        <div ng-if="selectedNode.data.ed.defaultRatio.denominator.value">Denominator value: {{selectedNode.data.ed.defaultRatio.denominator.value}}</div>
                       </div>
 
-                      <div ng-show="selectedNode.data.ed.defaultQuantity">
-                        <span ng-show="selectedNode.data.ed.defaultQuantity.unit">
+                      <div ng-if="selectedNode.data.ed.defaultQuantity">
+                        <span ng-if="selectedNode.data.ed.defaultQuantity.unit">
                           Unit: {{selectedNode.data.ed.defaultQuantity.unit}}
                         </span>
-                        <span ng-show="selectedNode.data.ed.defaultQuantity.value">
+                        <span ng-if="selectedNode.data.ed.defaultQuantity.value">
                           Value: {{selectedNode.data.ed.defaultQuantity.value}}
                         </span>
                       </div>
 
-                      <div ng-show="selectedNode.data.ed.defaultCoding">
+                      <div ng-if="selectedNode.data.ed.defaultCoding">
                         {{selectedNode.data.ed.defaultCoding.code}} | {{selectedNode.data.ed.defaultCoding.display}} | {{selectedNode.data.ed.defaultCoding.system}}
                       </div>
 
-                      <span ng-show="selectedNode.data.ed.defaultCoding  || selectedNode.data.ed.defaultQuantity"
+                      <span ng-if="selectedNode.data.ed.defaultCoding  || selectedNode.data.ed.defaultQuantity"
                             class=" pull-right">
 
-                        <span ng-show="getSourceModelName(selectedNode.data.ed) !== selectedModel.name">
+                        <span ng-if="getSourceModelName(selectedNode.data.ed) !== selectedModel.name">
                           set on {{getSourceModelName(selectedNode.data.ed)}}
                         </span>
 
@@ -594,6 +585,15 @@
 
                       </span>
 
+                    </td>
+                  </tr>
+
+
+                  <tr ng-if="selectedNode.data.ed.definition">
+                    <td class="detailName">Definition</td>
+                    <td>
+
+                      {{selectedNode.data.ed.definition}}
                     </td>
                   </tr>
 
@@ -606,7 +606,7 @@
                     </td>
                   </tr>
 
-                  <tr ng-show="selectedNode.data.ed.prePop">
+                  <tr ng-if="selectedNode.data.ed.prePop">
                     <td class="detailName">Prepop</td>
                     <td>
 
@@ -614,7 +614,7 @@
                     </td>
                   </tr>
 
-                  <tr ng-show="selectedNode.data.ed.collapsible">
+                  <tr ng-if="selectedNode.data.ed.collapsible">
                     <td class="detailName">Collapsible</td>
                     <td>
 
@@ -623,7 +623,7 @@
                   </tr>
 
 
-                  <tr ng-show = "selectedNode.data.ed.insertAfter">
+                  <tr ng-if = "selectedNode.data.ed.insertAfter">
                     <td  class="detailName">Insert after</td>
                     <td>
 
@@ -646,7 +646,7 @@
                 <br/>
 
 
-                <div ng-show = "selectedNode.data.ed.enableWhen">
+                <div ng-if = "selectedNode.data.ed.enableWhen">
                 <strong>Element Show</strong>
 
                 <table class="table table-bordered">
@@ -655,7 +655,7 @@
                     <td>
                       {{dep.source | dropFirstInPath}}
 
-                      <span ng-show="dep.source.split('.')[0] !== selectedModel.name">
+                      <span ng-if="dep.source.split('.')[0] !== selectedModel.name">
                         <i style="color: red"
                            uib-popover="This source does not match an element in the DG: {{dep.source}}"
                            popover-placement="right"
@@ -669,26 +669,26 @@
 
                     <td>{{dep.operator}}</td>
                     <td>
-                      <div ng-show="dep.value.code">{{dep.value.code}} | {{dep.value.display}}</div>
+                      <div ng-if="dep.value.code">{{dep.value.code}} | {{dep.value.display}}</div>
                       <div ng-hide="dep.value.code">{{dep.value}}</div>
                     </td>
                     <td> <i style="color: red" class="glyphicon glyphicon-remove clickable"
-                            ng-show = "canEdit(selectedModel)"
+                            ng-if = "canEdit(selectedModel)"
                             ng-click="removeEnableWhen($index,selectedNode.data.ed.path)"></i></td>
                   </tr>
                 </table>
-                <em ng-show="selectedNode.data.ed.enableWhen.length > 0">This element will be hidden in a form unless one of the above conditions is true</em>
+                <em ng-if="selectedNode.data.ed.enableWhen.length > 0">This element will be hidden in a form unless one of the above conditions is true</em>
 
 
 
                 </div>
 
                 <!-- TODO - come back to this after bug fixes -->
-                <div ng-show="canEdit(selectedModel)" class="btn-link btn pull-right"
+                <div ng-if="canEdit(selectedModel)" class="btn-link btn pull-right"
                      ng-click="addEWNew()">Add new control element</div>
 
 
-                <div ng-show = "selectedNode.data.ed.conditionalVS">
+                <div ng-if = "selectedNode.data.ed.conditionalVS">
                   <hr/>
                   <strong>Conditional ValueSet</strong>
 
@@ -760,7 +760,7 @@
 
 -->
               <uib-tab heading="Json">
-                <pre ng-show="selectedNode">{{selectedNode.data.ed | json}}</pre>
+                <pre ng-if="selectedNode">{{selectedNode.data.ed | json}}</pre>
               </uib-tab>
             </uib-tabset>
 
@@ -819,7 +819,7 @@
                     <div ng-hide="input.showFullModel">
                       {{element.ed.path | dropFirstInPath}}
                     </div>
-                    <div ng-show="input.showFullModel">
+                    <div ng-if="input.showFullModel">
                       {{element.ed.path | lastInPath}}
                     </div>
                   </div>
@@ -837,21 +837,14 @@
                   </div>
                   <div><em class="clickable" ng-click="viewVS(element.ed.valueSet)">{{element.ed.valueSet}}</em></div>
 
-                  <div ng-show="element.ed.options.length > 0" >
+                  <div ng-if="element.ed.options.length > 0" >
                     <em class="clickable"
                         ng-click = "editDGOptionsList(element.ed)">View {{element.ed.options.length}} options
                     </em> </div>
 
                 </td>
                 <td>{{element.ed.mult}}</td>
-                <!--
-                    <td>
-                      <div ng-repeat="code in element.ed.code">
-                        {{code.code}}
-                      </div>
 
-                    </td>
-                -->
                 <td>
                   {{element.ed.fixedCode}}{{element.ed.fixedCoding}}{{element.ed.fixedDecimal}}{{element.ed.fixedString}}
                 </td>
@@ -877,7 +870,7 @@
             <div class="col-md-6">
 
 
-              <uib-tabset ng-show="selectedModelFromGraph">
+              <uib-tabset ng-if="selectedModelFromGraph">
 
                 <uib-tab heading="Table">
 
@@ -887,7 +880,7 @@
                       {{selectedModelFromGraph.name}}
 
                       <div class="clickable pull-right"
-                           ng-show="selectedModelFromGraph.name !== selectedModel.name"
+                           ng-if="selectedModelFromGraph.name !== selectedModel.name"
                            ng-click="termSelectDG({DGName:selectedModelFromGraph.name},selectedModel.name)">Load
                       </div>
 
@@ -992,7 +985,7 @@
     </uib-tab>
 
 <!--
-    <uib-tab ng-show="false" heading="Graph" select="fitGraph()">
+    <uib-tab ng-if="false" heading="Graph" select="fitGraph()">
 
       <em class="pull-right">DT inheritance hierarchy and referenced DTs</em>
       <br/>
@@ -1003,7 +996,7 @@
         <div class="col-md-6">
 
 
-          <uib-tabset ng-show="selectedModelFromGraph">
+          <uib-tabset ng-if="selectedModelFromGraph">
 
             <uib-tab heading="Table">
 
@@ -1013,7 +1006,7 @@
                   {{selectedModelFromGraph.name}}
 
                   <div class="clickable pull-right"
-                       ng-show="selectedModelFromGraph.name !== selectedModel.name"
+                       ng-if="selectedModelFromGraph.name !== selectedModel.name"
                        ng-click="termSelectDG({DGName:selectedModelFromGraph.name},selectedModel.name)">Load
                   </div>
 
@@ -1092,7 +1085,7 @@
 
 
    <!--
-<uib-tab ng-show="false" heading="Fixed values">
+<uib-tab ng-if="false" heading="Fixed values">
       todo: add other fixed types
 
       <br/>
@@ -1102,7 +1095,7 @@
           <tr><th>Path</th><th><th>Fixed value</th></tr>
           </thead>
           <tbody>
-          <tr ng-repeat="ed in selectedModel.diff" ng-show="ed.fixedCoding">
+          <tr ng-repeat="ed in selectedModel.diff" ng-if="ed.fixedCoding">
 
             <td>{{ed.path}}</td>
             <td>{{ed.fixedCoding}}</td>
@@ -1132,11 +1125,11 @@
               </div>
             </div>
 
-            <div ng-show="relationshipsSummary.parents.length > 0">
+            <div ng-if="relationshipsSummary.parents.length > 0">
               <div  class="rounded-box">{{selectedModel.title}}</div>
             </div>
 
-            <div  ng-show="relationshipsSummary.parents.length == 0">
+            <div  ng-if="relationshipsSummary.parents.length == 0">
               <em>There is no parent</em>
             </div>
 
@@ -1264,14 +1257,14 @@
           </td>
           <td>{{dep.ew.source | dropFirstInPath}}</td>
           <td>{{dep.ed.description}}
-            <div ng-show="dep.error">
+            <div ng-if="dep.error">
               <div class="alert alert-danger">{{dep.error}}</div>
             </div>
 
           </td>
           <td>{{dep.ew.operator}}</td>
           <td>
-            <div ng-show="dep.ew.value.code">{{dep.ew.value.code}} | {{dep.ew.value.display}}</div>
+            <div ng-if="dep.ew.value.code">{{dep.ew.value.code}} | {{dep.ew.value.display}}</div>
             <div ng-hide="dep.ew.value.code">{{dep.ew.value}}</div>
           </td>
 
@@ -1299,7 +1292,7 @@
     </uib-tab>
 
 
-    <uib-tab ng-show = "false" heading="Form">
+    <uib-tab ng-if = "false" heading="Form">
 
 
      <!-- <div id="dgformlocation"></div> -->
@@ -1362,7 +1355,7 @@
               <td>{{ed.mult}}</td>
               <td>{{ed.type[0]}}</td>
               <td>
-                <i ng-show="canEdit(selectedModel)" class="btn btn-link glyphicon glyphicon-remove clickable"
+                <i ng-if="canEdit(selectedModel)" class="btn btn-link glyphicon glyphicon-remove clickable"
                    ng-click="deleteDGDiff($index)"></i>
               </td>
             </tr>
@@ -1379,7 +1372,7 @@
               <div class="list-group myScroll">
                 <div ng-class="{'list-group-item':true,listItemSelected:input.selectedDiff.path == ed.path}"
                      ng-click="input.selectedDiff = ed"
-                     ng-show="showDiff(input.diffFilter,ed.path)"
+                     ng-if="showDiff(input.diffFilter,ed.path)"
                      ng-repeat="ed in selectedModel.diff">
                   {{ed.path}}
                 </div>
@@ -1428,7 +1421,7 @@
           <div class="tableFixHead">
             <table class="table-bordered table">
               <thead>
-              <tr><th ng-show="canEdit(selectedModel)"><span >Edit</span></th><th>Path</th><th>Title</th>
+              <tr><th ng-if="canEdit(selectedModel)"><span >Edit</span></th><th>Path</th><th>Title</th>
                 <th>Description</th><th>Type</th><th>Mult.</th><th>Source</th>
               </tr>
               </thead>
@@ -1438,10 +1431,10 @@
               <tr ng-repeat="element in fullElementList"
                   ng-class="{edIssue: element.ed.issue.length > 0}"
                   ng-classX="{hideElement: element.ed.mult == '0..0'}"
-                  ng-showX="canShowDGElement(element,$index)"
+                  ng-ifX="canShowDGElement(element,$index)"
                   ng-hideX="$index==0">
 
-                <td ng-show="canEdit(selectedModel)">
+                <td ng-if="canEdit(selectedModel)">
                   <i   class="glyphicon glyphicon-edit pull-right clickable"
                        ng-click="editDGItem(element)"></i>
                 </td>
@@ -1463,7 +1456,7 @@
                                       <div ng-hide="input.showFullModel">
                                         {{element.ed.path | dropFirstInPath}}
                                       </div>
-                                      <div ng-show="input.showFullModel">
+                                      <div ng-if="input.showFullModel">
                                         {{element.ed.path | lastInPath}}
 
                                       </div>
@@ -1516,15 +1509,15 @@
     </uib-tab>
 
 
-    <uib-tab ng-show="false" heading="Audit">
+    <uib-tab ng-if="false" heading="Audit">
       <!-- Audit only looks at hierarchy - not referenced DG-->
-      <uib-tab-heading>Audit <span ng-show="dgAudit.lstRedundantEd.length > 0" class="badge">{{dgAudit.lstRedundantEd.length}}</span> </uib-tab-heading>
+      <uib-tab-heading>Audit <span ng-if="dgAudit.lstRedundantEd.length > 0" class="badge">{{dgAudit.lstRedundantEd.length}}</span> </uib-tab-heading>
         <br/>
         <uib-tabset>
 
           <uib-tab heading="Diff Analysis">
 
-            <div ng-show="dgAudit.lstRedundantEd.length > 0">
+            <div ng-if="dgAudit.lstRedundantEd.length > 0">
               <h4>Redundant diff entries - no matching parent element</h4>
               <table class="table-bordered table">
                 <tr><th>Path</th><th>Title</th><th>Type</th><th>Card.</th></tr>
@@ -1548,7 +1541,7 @@
             <h4>Diff entries that match a parent element</h4>
             <table class="table-bordered table">
               <tr><th>Path</th><th>Where defined</th><th>Type</th><th>Card.</th></tr>
-              <tr ng-repeat="row in dgAudit.allElements" ng-show="row.mult == '0..0'">
+              <tr ng-repeat="row in dgAudit.allElements" ng-if="row.mult == '0..0'">
                 <td>{{row.path}}</td>
                 <td>{{row.definedTitle}}</td>
                 <td>{{row.type[0]}}</td>
@@ -1568,7 +1561,7 @@
                 <h4>All elements</h4>
                 <table class="table-bordered table">
                   <tr><th>Path</th><th>Where defined</th><th>Type</th><th>Card.</th></tr>
-                  <tr ng-repeat="row in dgAudit.allElements" ng-show="row.mult !== '0..0'">
+                  <tr ng-repeat="row in dgAudit.allElements" ng-if="row.mult !== '0..0'">
                     <td>{{row.path}}</td>
                     <td>{{row.definedTitle}}</td>
                     <td>{{row.type[0]}}</td>

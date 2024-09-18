@@ -88,7 +88,7 @@
 
             <div class="col-md-1 col-sm-1">
                 <form class="navbar-form navbar-left">
-                    <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+                    <img ng-if="showWaiting" src="css/ajax_loader_blue_32.gif"/>
 
                 </form>
             </div>
@@ -119,7 +119,7 @@
             <div class="col-md-1">
                 <div class="navbar-text" >
                     <div class="btn" ng-click = "toggleTrace()" class="clickable">
-                        <span ng-show="localStorage.trace.on"><span style="color: red">
+                        <span ng-if="localStorage.trace.on"><span style="color: red">
                             <strong>Trace on</strong></span> </span>
                         <span ng-hide="localStorage.trace.on">Trace off</span>
                         <span class="badge">{{localStorage.trace.contents.length}}</span>
@@ -147,7 +147,7 @@
                     </span>
                 </div>
 
-                <div class="navbar-text"  ng-show="user">
+                <div class="navbar-text"  ng-if="user">
                     <span class="btn" style="font-size:1.2em;  cursor: pointer" uib-popover="{{user.email}}"
                           popover-placement="left"
                           popover-trigger="'mouseenter'">
@@ -181,7 +181,7 @@
         <a style="padding-top: 8px; padding-right: 20px" class = 'pull-right' href="modelReview.html" target="_blank">Reviewer</a>
 -->
 
-        <button ng-show = "selectedModel" class="pull-right btn-link btn" ng-click="showDGSummary()">Show DG image</button>
+        <button ng-if = "selectedModel" class="pull-right btn-link btn" ng-click="showDGSummary()">Show DG image</button>
     </div>
 
 
@@ -220,7 +220,7 @@
                         <div class="list-group">
                             <div ng-class="{'list-group-item':true,listItemSelected:selectedComposition == v}" style="cursor: pointer"
                                  ng-click="selectComposition(v)"
-                                 ng-show="showComposition(v)"
+                                 ng-if="showComposition(v)"
                                  ng-repeat="(k,v) in world.compositions">
 
                                 <div>{{v.title}}</div>
@@ -230,7 +230,7 @@
                         </div>
 
                         <div>
-                            <button class="btn btn-link" ng-show = "user.email"
+                            <button class="btn btn-link" ng-if = "user.email"
                                     ng-click="newComposition()">New Composition</button>
                         </div>
                     </div>
@@ -260,17 +260,17 @@
                             <div>
                                 <!--
                                 <div class="pull-right clickable spacer"
-                                     ng-show = "canEdit(selectedModel)"  ng-click="editModel(selectedModel)">Edit</div>
+                                     ng-if = "canEdit(selectedModel)"  ng-click="editModel(selectedModel)">Edit</div>
                                 -->
-                                <div class="pull-right clickable spacer" ng-show = "user.email"
+                                <div class="pull-right clickable spacer" ng-if = "user.email"
                                      ng-click="newModel('dg')">New DG</div>
 
                                 <div class="pull-right clickable spacer"
-                                     ng-show = "user.email && selectedModel"
+                                     ng-if = "user.email && selectedModel"
                                      ng-click="newModel('dg',selectedModel)">New child</div>
 
 <!--
-                                <div class="pull-right clickable spacer" ng-show = "user.email && selectedModel"
+                                <div class="pull-right clickable spacer" ng-if = "user.email && selectedModel"
                                      ng-click="newModel('dg',selectedModel)">New child</div>
                                 -->
 
@@ -294,7 +294,7 @@
                                                ng-model="input.dgFilter"/>
                                     </div>
                                     <div class="col-md-6">
-                                        <button ng-show = "user.email" class="btn btn-link  pull-right" ng-click="newModel('dg')">New</button>
+                                        <button ng-if = "user.email" class="btn btn-link  pull-right" ng-click="newModel('dg')">New</button>
                                         <button class="btn btn-link pull-right" ng-click="listAllDG()">List all</button>
                                     </div>
                                 </div>
@@ -308,10 +308,10 @@
                                 <div class="list-group">
                                     <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
                                          ng-click="selectModel(v)"
-                                         ng-show="showDG(v,input.dgFilter)"
+                                         ng-if="showDG(v,input.dgFilter)"
                                          ng-repeat="v in sortedDGList">
 
-                                        <i ng-show="canEdit(v)"
+                                        <i ng-if="canEdit(v)"
                                                 class="glyphicon glyphicon-edit pull-right clickable"
                                            ng-click="editModel(v)"></i>
 
@@ -342,7 +342,7 @@
                             <div class="list-group background">
                                 <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
                                      ng-click="selectModel(v)"
-                                        ng-show="true || showDG(v,input.dgFilter)"
+                                        ng-if="true || showDG(v,input.dgFilter)"
                                      ng-repeat="v in tags[input.selectedTag] track by $index">
 
                                     <i class="glyphicon glyphicon-edit pull-right clickable"
@@ -360,11 +360,11 @@
                         <uib-tab heading = "Sections">
                             <div>
                                 <div class="pull-right clickable spacer"
-                                     ng-show = "canEdit(selectedModel)"  ng-click="editModel(selectedModel)">Edit</div>
-                                <div class="pull-right clickable spacer" ng-show = "user.email"  ng-click="newModel('dg')">New dg</div>
+                                     ng-if = "canEdit(selectedModel)"  ng-click="editModel(selectedModel)">Edit</div>
+                                <div class="pull-right clickable spacer" ng-if = "user.email"  ng-click="newModel('dg')">New dg</div>
 
                                 <div class="pull-right clickable spacer"
-                                     ng-show = "user.email && selectedModel"
+                                     ng-if = "user.email && selectedModel"
                                      ng-click="newModel('dg',selectedModel)">New child</div>
 
                             </div>
@@ -375,7 +375,7 @@
                             </div>
                         </uib-tab>
 
-                        <uib-tab ng-show="false" heading = "Category">
+                        <uib-tab ng-if="false" heading = "Category">
                             <em>Matching what's in the image</em>
                             <div class="myScroll">
                                 <div id="categoryDGTree"></div>
@@ -391,7 +391,7 @@
                 </div>
                 <div ng-class="rightPanel">
 
-                    <div  ng-show="input.showDGList">
+                    <div  ng-if="input.showDGList">
                         <div class="row">
                             <div class="col-md-12">
                                 <div style="margin-top: 7px" class="banner"> List of all DataGroups</div>
@@ -492,7 +492,7 @@
 
 
 
-        <uib-tab ng-show="errors.length > 0">
+        <uib-tab ng-if="errors.length > 0">
             <uib-tab-heading>
                 Errors <span class="badge">{{errors.length}}</span>
             </uib-tab-heading>
@@ -530,7 +530,7 @@
                       </span>
                     <br/>
                     <div class="myScroll">
-                        <pre ng-show="allFsh">{{allFsh}}</pre>
+                        <pre ng-if="allFsh">{{allFsh}}</pre>
                     </div>
                 </uib-tab>
 

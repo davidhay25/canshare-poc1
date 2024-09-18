@@ -16,7 +16,7 @@ const database = client.db("logger")    //all logs are in the same database
 
 
 function setup(app) {
-    console.log('setup')
+
 
     //copy the Q to the POC forms server
     app.put("/dashboard/Questionnaire",async function(req,res){

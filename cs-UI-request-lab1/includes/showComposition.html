@@ -23,10 +23,10 @@
         </strong>
         -->
 
-      {{selectedComposition.name}}  <span class="pull-right" ng-show="selectedComposition.version">Version: {{selectedComposition.version}}</span>
+      {{selectedComposition.name}}  <span class="pull-right" ng-if="selectedComposition.version">Version: {{selectedComposition.version}}</span>
         <div><em>{{selectedComposition.description}}</em></div>
         <div>
-          <div ng-show="selectedComposition.sourceReference">
+          <div ng-if="selectedComposition.sourceReference">
             <strong>Source reference</strong>: {{selectedComposition.sourceReference}}
           </div>
         </div>
@@ -43,7 +43,7 @@
 
       <div>
         <button class="btn btn-link"
-                ng-show = "user.email"
+                ng-if = "user.email"
                 ng-click="cloneComp(selectedComposition)">Make a copy of this Composition</button>
       </div>
 
@@ -59,25 +59,25 @@
       <a class="btn" ng-href="modelReview.html?{{selectedComposition.name}}" target="_blank">Review</a>
 
       <span style="margin-left: 16px" class="clickable"
-            ng-show="selectedComposition.checkedOut && selectedComposition.checkedOut == user.email"
+            ng-if="selectedComposition.checkedOut && selectedComposition.checkedOut == user.email"
             ng-click="publish(selectedComposition)">Publish</span>
 
       <div class="pull-right">
 
-        <div ng-show="user.email">
+        <div ng-if="user.email">
 
           <button class="btn btn-success"
                   ng-hide="selectedComposition.checkedOut" class="clickable" ng-click="checkOut()">Check out</button>
 
           <button class="btn btn-danger"
-                  ng-show="selectedComposition.checkedOut && selectedComposition.checkedOut == user.email"
+                  ng-if="selectedComposition.checkedOut && selectedComposition.checkedOut == user.email"
                   ng-click="revert()">Revert</button>
 
           <button class="btn btn-warning"
-                  ng-show="selectedComposition.checkedOut && selectedComposition.checkedOut == user.email"
+                  ng-if="selectedComposition.checkedOut && selectedComposition.checkedOut == user.email"
                   ng-click="checkIn()">Check in</button>
 
-          <div ng-show = "selectedComposition.checkedOut && selectedComposition.checkedOut !== user.email">
+          <div ng-if = "selectedComposition.checkedOut && selectedComposition.checkedOut !== user.email">
             <strong>Checked out to {{selectedComposition.checkedOut}}</strong>
           </div>
         </div>
@@ -97,10 +97,7 @@
 
   </div>
 
-  <div ng-show="false" class = "clickable pull-right">
 
-    <button class="btn-link btn pull-right" ng-click="libraryInteraction(selectedComposition)">Compare to library</button>
-  </div>
 
   <uib-tabset active="input.compTabActive" >
 
@@ -140,14 +137,14 @@
 
 
           <button class="btn-link btn pull-right"
-                  ng-show = "canEditComp(selectedComposition) && selectedCompositionNode.data.ed.kind == 'element'"
+                  ng-if = "canEditComp(selectedComposition) && selectedCompositionNode.data.ed.kind == 'element'"
                   ng-click="editOverride(selectedCompositionNode.data.ed)">Edit </button>
 
           <div class="background">
             <uib-tabset>
 
               <uib-tab heading = "Details">
-                <div ng-show="selectedCompositionNode">
+                <div ng-if="selectedCompositionNode">
 
                   <table class="table table-bordered">
 
@@ -172,16 +169,16 @@
                         Appears in Q
                       </td>
                       <td>
-                        <div ng-show = "selectedCompositionNode.data.ed.hideInQ">
+                        <div ng-if = "selectedCompositionNode.data.ed.hideInQ">
                           No
                         </div>
-                        <div ng-hide = "selectedCompositionNode.data.ed.hideInQ">
+                        <div ng-if  = "! selectedCompositionNode.data.ed.hideInQ">
                           Yes
                         </div>
                       </td>
                     </tr>
 
-                    <tr ng-show="false && selectedCompositionNode.data.ed.parent">
+                    <tr ng-if="false && selectedCompositionNode.data.ed.parent">
                       <td class="detailName">
                         Parent
                       </td>
@@ -210,7 +207,7 @@
                         <div>
 
                           <!-- This is a section DG-->
-                          <span ng-show = "selectedCompositionNode.data.ed.name"
+                          <span ng-if = "selectedCompositionNode.data.ed.name"
                                 class="clickable" ng-click="termSelectDG({DGName:selectedCompositionNode.data.ed.name})">
                              {{selectedCompositionNode.data.ed.name}}
                           </span>
@@ -229,11 +226,12 @@
                     </tr>
 
 
-                    <tr ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
+                    <tr ng-if = "selectedCompositionNode.data.ed.kind == 'element'">
                       <td class="detailName">Control type</td>
                       <td>{{selectedCompositionNode.data.ed.controlType}}</td>
                     </tr>
-                    <tr ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
+
+                    <tr ng-if = "selectedCompositionNode.data.ed.kind == 'element'">
                       <td class="detailName">Control hint</td>
                       <td> {{selectedCompositionNode.data.ed.controlHint}}</td>
                     </tr>
@@ -244,19 +242,19 @@
                       <td>
                         <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
 
-                        <div ng-show = "selectedCompositionNode.data.host">{{selectedCompositionNode.data.host.mult}}</div>
+                        <div ng-if = "selectedCompositionNode.data.host">{{selectedCompositionNode.data.host.mult}}</div>
                         <div ng-hide = "selectedCompositionNode.data.host">{{selectedCompositionNode.data.ed.mult}}</div>
                       </td>
                     </tr>
 
 
 
-                    <tr ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
+                    <tr ng-if="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
                       <td class="detailName">ValueSet</td>
                       <td>
                         <span><em>{{selectedCompositionNode.data.ed.valueSet}}</em></span>
                         <span class="pull-right">
-                          <button ng-show="selectedCompositionNode.data.ed.valueSet"
+                          <button ng-if="selectedCompositionNode.data.ed.valueSet"
                                   ng-click="viewVS(selectedCompositionNode.data.ed.valueSet)"
                                   class="btn-link btn">View VS</button>
 
@@ -275,10 +273,10 @@
                     </tr>
 
 
-                    <tr ng-show="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
+                    <tr ng-if="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept'">
                       <td class="detailName">Options list</td>
                       <td>
-                        <div ng-show="selectedCompositionNode.data.ed.options">
+                        <div ng-if="selectedCompositionNode.data.ed.options">
                           <span class="clickable pull-right"
                                 ng-click = "editOptionsList(selectedCompositionNode.data.ed,true)">
                             View list
@@ -296,7 +294,7 @@
 
 
 
-                    <tr  ng-show = "selectedCompositionNode.data.ed.type[0] =='Quantity'">
+                    <tr  ng-if = "selectedCompositionNode.data.ed.type[0] =='Quantity'">
                       <td class="detailName">Units</td>
                       <td>
                          <span ng-repeat="unit in selectedCompositionNode.data.ed.units">
@@ -306,38 +304,38 @@
                     </tr>
 
 
-                    <tr  ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
+                    <tr  ng-if = "selectedCompositionNode.data.ed.kind == 'element'">
                       <td class="detailName">Fixed value</td>
                       <td>
-                        <div ng-show="selectedCompositionNode.data.ed.fixedRatio">
-                          <div ng-show="selectedCompositionNode.data.ed.fixedRatio.numerator.unit">Numerator unit: {{selectedCompositionNode.data.ed.fixedRatio.numerator.unit}}</div>
-                          <div ng-show="selectedCompositionNode.data.ed.fixedRatio.denominator.unit">Denominator unit: {{selectedCompositionNode.data.ed.fixedRatio.denominator.unit}}</div>
-                          <div ng-show="selectedCompositionNode.data.ed.fixedRatio.denominator.value">Denominator value: {{selectedCompositionNode.data.ed.fixedRatio.denominator.value}}</div>
+                        <div ng-if="selectedCompositionNode.data.ed.fixedRatio">
+                          <div ng-if="selectedCompositionNode.data.ed.fixedRatio.numerator.unit">Numerator unit: {{selectedCompositionNode.data.ed.fixedRatio.numerator.unit}}</div>
+                          <div ng-if="selectedCompositionNode.data.ed.fixedRatio.denominator.unit">Denominator unit: {{selectedCompositionNode.data.ed.fixedRatio.denominator.unit}}</div>
+                          <div ng-if="selectedCompositionNode.data.ed.fixedRatio.denominator.value">Denominator value: {{selectedCompositionNode.data.ed.fixedRatio.denominator.value}}</div>
                         </div>
 
-                        <div ng-show="selectedCompositionNode.data.ed.fixedQuantity">
+                        <div ng-if="selectedCompositionNode.data.ed.fixedQuantity">
                           Unit: {{selectedCompositionNode.data.ed.fixedQuantity.unit}}
                         </div>
 
-                        <div ng-show="selectedCompositionNode.data.ed.fixedCoding">
+                        <div ng-if="selectedCompositionNode.data.ed.fixedCoding">
                           {{selectedCompositionNode.data.ed.fixedCoding.code}} | {{selectedCompositionNode.data.ed.fixedCoding.display}} | {{selectedCompositionNode.data.ed.fixedCoding.system}}
                         </div>
                       </td>
                     </tr>
-                    <tr ng-show = "selectedCompositionNode.data.ed.kind == 'element'">
+                    <tr ng-if = "selectedCompositionNode.data.ed.kind == 'element'">
                       <td class="detailName">Default value</td>
                       <td>
-                        <div ng-show="selectedCompositionNode.data.ed.defaultRatio">
-                          <div ng-show="selectedCompositionNode.data.ed.defaultRatio.numerator.unit">Numerator unit: {{selectedCompositionNode.data.ed.defaultRatio.numerator.unit}}</div>
-                          <div ng-show="selectedCompositionNode.data.ed.defaultRatio.denominator.unit">Denominator unit: {{selectedCompositionNode.data.ed.defaultRatio.denominator.unit}}</div>
-                          <div ng-show="selectedCompositionNode.data.ed.defaultRatio.denominator.value">Denominator value: {{selectedCompositionNode.data.ed.defaultRatio.denominator.value}}</div>
+                        <div ng-if="selectedCompositionNode.data.ed.defaultRatio">
+                          <div ng-if="selectedCompositionNode.data.ed.defaultRatio.numerator.unit">Numerator unit: {{selectedCompositionNode.data.ed.defaultRatio.numerator.unit}}</div>
+                          <div ng-if="selectedCompositionNode.data.ed.defaultRatio.denominator.unit">Denominator unit: {{selectedCompositionNode.data.ed.defaultRatio.denominator.unit}}</div>
+                          <div ng-if="selectedCompositionNode.data.ed.defaultRatio.denominator.value">Denominator value: {{selectedCompositionNode.data.ed.defaultRatio.denominator.value}}</div>
                         </div>
 
-                        <div ng-show="selectedCompositionNode.data.ed.defaultQuantity">
+                        <div ng-if="selectedCompositionNode.data.ed.defaultQuantity">
                           Unit: {{selectedCompositionNode.data.ed.defaultQuantity.unit}}
                         </div>
 
-                        <div ng-show="selectedCompositionNode.data.ed.defaultCoding">
+                        <div ng-if="selectedCompositionNode.data.ed.defaultCoding">
                           {{selectedCompositionNode.data.ed.defaultCoding.code}} | {{selectedCompositionNode.data.ed.defaultCoding.display}} | {{selectedCompositionNode.data.ed.defaultCoding.system}}
                         </div>
                       </td>
@@ -360,7 +358,7 @@
 
 
 
-                    <tr ng-show = "selectedCompositionNode.data.ed.zElement">
+                    <tr ng-if = "selectedCompositionNode.data.ed.zElement">
                       <td></td>
                       <td><em>This element has been added directly (a 'Z' element)</em></td>
                     </tr>
@@ -368,11 +366,11 @@
                   </table>
 
 
-                  <div ng-show = "canEditComp(selectedComposition)">
+                  <div ng-if = "canEditComp(selectedComposition)">
 
               <!-- If the root is selected, we can add a new section-->
                     <!--
-              <div ng-show="selectedCompositionNode.id.indexOf('.') == -1">
+              <div ng-if="selectedCompositionNode.id.indexOf('.') == -1">
                 <br/>
                 <strong>Add section</strong>
                 <div class="row">
@@ -384,7 +382,7 @@
                   </div>
                   <div class="col-md-4">
                     <button class="btn-link btn"
-                            ng-show="input.newSectionTitle"
+                            ng-if="input.newSectionTitle"
                             ng-click="addSection(selectedComposition,input.newSectionTitle)">Add new section</button>
                   </div>
                 </div>
@@ -401,16 +399,16 @@
                         ng-click="removeElement(selectedCompositionNode.data.ed)">Hide this element</button>
 
                 <button class="btn-link btn pull-right"
-                        ng-show = "selectedCompositionNode.data.ed.kind == 'element'"
+                        ng-if = "selectedCompositionNode.data.ed.kind == 'element'"
                         ng-click="editOverride(selectedCompositionNode.data.ed)">Edit </button>
 
               </div>
 
-              <div ng-show="selectedCompositionNode.data.ed.zElement">
+              <div ng-if="selectedCompositionNode.data.ed.zElement">
                 <button ng-click="removeZElement(selectedCompositionNode.data.ed)" class="btn btn-link pull-right">Remove this element</button>
               </div>
 
-                <div ng-show ="selectedCompositionNode.data.ed.kind == 'dg' || selectedCompositionNode.data.ed.kind == 'section'">
+                <div ng-if ="selectedCompositionNode.data.ed.kind == 'dg' || selectedCompositionNode.data.ed.kind == 'section'">
                   <button class="btn-link btn pull-right"
                           ng-click="addZElement(selectedCompositionNode.data.ed)">Add Z element</button>
                 </div>
@@ -427,7 +425,7 @@
                 <pre>{{selectedCompositionNode.data | json}}</pre>
               </uib-tab>
 
-              <uib-tab ng-show="false" heading="Full form processing Log">
+              <uib-tab ng-if="false" heading="Full form processing Log">
                 <div class="row">
                   <div class="col-md-8">
                     <div class="myScroll">
@@ -580,7 +578,7 @@
     </uib-tab>
 
 
-    <uib-tab ng-show="canEditComp(selectedComposition)" heading = "Headings">
+    <uib-tab ng-if="canEditComp(selectedComposition)" heading = "Headings">
       <br/>
       <div ng-controller="compSectionsCtrl">
         <ng-include src ="'includes/compSections.html'"></ng-include>
@@ -629,7 +627,7 @@
 
               <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->
 
-              <div ng-show = "item.host">{{item.host.mult}}</div>
+              <div ng-if = "item.host">{{item.host.mult}}</div>
               <div ng-hide = "item.host">{{item.ed.mult}}</div>
 
             </td>
@@ -647,7 +645,7 @@
     <uib-tab>
       <uib-tab-heading>Section conditionals <span class="badge">{{selectedComposition.enableWhen.length}}</span> </uib-tab-heading>
       <br/>
-      <div ng-show="selectedComposition.enableWhen.length > 0">
+      <div ng-if="selectedComposition.enableWhen.length > 0">
         <strong>Section level Conditionals present in the Composition</strong>
         <br/> <br/>
         <table class="table-bordered table">
@@ -674,12 +672,12 @@
     </uib-tab>
 
 
-    <uib-tab ng-show="false" heading="Graph">
+    <uib-tab ng-if="false" heading="Graph">
       Graph of all DG linked back to Composition
     </uib-tab>
 
     <!--
-    <uib-tab ng-show="false">
+    <uib-tab ng-if="false">
       <uib-tab-heading>
         Overrides <span class="badge">{{getOverridesCount()}}</span>
       </uib-tab-heading>
@@ -710,7 +708,7 @@
       <table class="table table-bordered">
         <tr><th>Path</th><th>Note</th></tr>
         <tr ng-repeat="item in allCompElements"
-          ng-show="item.ed.notes">
+          ng-if="item.ed.notes">
           <td>
             <div class="clickable" ng-click="selectCompTreePath(item.ed.path)">
               <!-- {{item.ed.path}} -->
@@ -731,7 +729,7 @@
       <table class="table table-bordered">
         <tr><th>Rules</th><th>Note</th></tr>
         <tr ng-repeat="item in allCompElements"
-            ng-show="item.ed.rules">
+            ng-if="item.ed.rules">
           <td style="width: 40%">
             <div class="clickable" ng-click="selectRuleTreePath(item.ed.path)">{{item.ed.path}}</div>
           </td>
@@ -741,7 +739,7 @@
     </uib-tab>
 
 <!--
-    <uib-tab ng-show = 'false' heading="All DG">
+    <uib-tab ng-if = 'false' heading="All DG">
       <br/>
 
       <table class="table table-bordered">
@@ -764,7 +762,7 @@
 
 
 
-    <uib-tab ng-show="false" heading="allCompElements">
+    <uib-tab ng-if="false" heading="allCompElements">
       <pre>{{hashCompElements | json}}</pre>
     </uib-tab>
     -->

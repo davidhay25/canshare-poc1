@@ -28,7 +28,7 @@
           <div class="btn btn-link pull-right" ng-click="toggleLog()">Toggle Log display</div>
         </div>
         <div class="col-md-4">
-          <button class="btn btn-link pull-right" ng-show="input.ssFilter"
+          <button class="btn btn-link pull-right" ng-if="input.ssFilter"
                   ng-click="termSelectDG({DGName:input.ssFilter.name})">Show DG</button>
         </div>
       </div>
@@ -47,8 +47,8 @@
           <div class="myScroll">
 
             <table class="table-bordered table table-condensed">
-              <tr ng-repeat = "row in snapshotLog"
-                  ng-show="showSSLogRow(row)">
+              <tr ng-repeat = "row in snapshotLog track by $index"
+                  ng-if="showSSLogRow(row)">
                 <td>{{row.index}}</td>
                 <td>
                   <div ng-class="{listItemSelected:selectedLogRow.index == row.index}"
@@ -61,7 +61,7 @@
 
 
         </div>
-        <div ng-show="selectedLogDg" ng-class="ssDisplayPanel">
+        <div ng-if="selectedLogDg" ng-class="ssDisplayPanel">
           <div class="banner">
             {{selectedLogDg.title}}
             <div><em>{{selectedLogDg.name}}</em></div>
@@ -87,7 +87,7 @@
                 <div class="col-md-6">
 
 
-              <span class="pull-right" ng-show="ssHx.length > 1">
+              <span class="pull-right" ng-if="ssHx.length > 1">
                 <i class="glyphicon glyphicon-backward clickable"
                    ng-click="ssBack()"></i>
                 </span>
@@ -301,7 +301,7 @@
 
               </div>
             </uib-tab>
-            <uib-tab ng-show = "selectedLogRow.details" heading="Details (1 step)">
+            <uib-tab ng-if = "selectedLogRow.details" heading="Details (1 step)">
               <em>Generally the elements that are inserted into the snapshot during this step.</em>
               <br/><br/>
 
@@ -352,7 +352,7 @@
 
       <table class="table table-bordered">
         <tr><th>Error type</th><th>DG</th><th>Description</th></tr>
-        <tr ng-show="showSsErrorItem(log,input.ssErrorType)" ng-repeat="log in snapshotLog">
+        <tr ng-if="showSsErrorItem(log,input.ssErrorType)" ng-repeat="log in snapshotLog">
           <td>{{log.isError}}</td>
           <td>
             <div class="btn btn-link"

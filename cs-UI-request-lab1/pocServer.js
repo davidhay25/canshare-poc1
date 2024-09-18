@@ -7,13 +7,20 @@ const axios = require("axios");
 
 console.log('port',process.env.POCSERVERBASE)
 
+//the port that the POC server listens on for HTML & API calls
 let port = process.env.POCSERVERBASE || 9500
+
+//the Mongo database used by the models (and associated) apps
+const mongoDbName = process.env.MONGODB || "canShare"
 
 const bodyParser = require('body-parser')
 
-console.log(`FHIR server root from env is ${process.env.SERVERBASE}`)
-console.log(`Log database from env is ${process.env.LOGDB}`)
-console.log(`Custom ops from env is ${process.env.CUSTOMOPS}`)
+console.log(`Server: Localserver root from env is ${process.env.POCSERVERBASE}`)
+console.log(`Server: FHIR server root from env is ${process.env.SERVERBASE}`)
+console.log(`Server: Log database from env is ${process.env.LOGDB}`)
+console.log(`Server: Custom ops from env is ${process.env.CUSTOMOPS}`)
+console.log(`Server: Mongo database name is ${mongoDbName}`)
+console.log("")
 
 let serverBase = process.env.SERVERBASE
 
@@ -53,8 +60,8 @@ labModule.setup(app)
 dashBoardModule.setup(app)
 clinicalViewerModule.setup(app)
 terminologyModule.setup(app)
-modelModule.setup(app)
-reviewModule.setup(app)
+modelModule.setup(app,mongoDbName)      //pass in the mongo database name to use
+reviewModule.setup(app,mongoDbName)
 validatorModule.setup(app)
 QModule.setup(app)
 compVersionsModule.setup(app)

@@ -12,6 +12,10 @@ angular.module("pocApp")
 
             //$scope.newInflater = true  //running the new inflater
 
+            $timeout(function () {
+                console.log('watchers:' + $scope.$$watchers.length);
+            },5000)
+
             //change the background colour of the DG summary according to the environment
             $scope.modelInfoClass = 'modelInfo'
             let host = $location.absUrl()
@@ -465,7 +469,7 @@ angular.module("pocApp")
 
 
             //show the Q preview. Lots of diagnostic stuff.
-            $scope.previewQ = function (Q) {
+            $scope.previewQDEP = function (Q) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/previewQ.html',
                     //backdrop: 'static',
@@ -1879,6 +1883,8 @@ angular.module("pocApp")
 
             function drawDGTree(treeData) {
                 //enable drag / drop for re-ordering
+
+                console.log("about to draw DG tree")
                 $('#dgTree').jstree('destroy');
 
                 let x = $('#dgTree').jstree(
@@ -1994,6 +2000,7 @@ angular.module("pocApp")
 
             //make the tree of the composition
             function makeCompTree(treeData,rootNodeId) {
+
                 $('#compositionTree').jstree('destroy');
 
                 $scope.compTree = $('#compositionTree').jstree(
@@ -2009,7 +2016,7 @@ angular.module("pocApp")
                 }).bind("loaded.jstree", function (event, data) {
                     let id = treeData[0].id
                     $(this).jstree("open_node",id);
-                    let treeObject = $(this).jstree(true).get_json('#', { 'flat': false })
+                    //let treeObject = $(this).jstree(true).get_json('#', { 'flat': false })
 
 
                     $scope.$digest();

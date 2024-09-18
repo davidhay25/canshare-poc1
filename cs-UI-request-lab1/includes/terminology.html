@@ -33,18 +33,18 @@
 
             <td>
               <div ng-repeat = "item in v">
-                <div ng-show="item.DGName">
+                <div ng-if="item.DGName">
                   DG: <span class="clickable" ng-click="termSelectDG(item)" >{{item.DGName}}</span>.
                   Path: <span class="clickable" ng-click="termSelectDGItem(item)">{{item.path}}</span>
-                  <span ng-show = item.options>
+                  <span ng-if = item.options>
                   There are <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}} options</span> defined.
                 </span>
                 </div>
 
-                <div ng-show="item.compName">
+                <div ng-if="item.compName">
                   Comp: <span class="clickable" ng-click="termSelectComp(item)" >{{item.compName}}</span>.
                   Path: <span class="clickable" ng-click="termSelectCompItem(item)">{{item.path}}</span>
-                  <span ng-show = item.options>
+                  <span ng-if = item.options>
                   There are <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}} options</span> defined.
                 </span>
                 </div>
@@ -83,18 +83,18 @@
 
             <td>
               <div ng-repeat = "item in v">
-                <div ng-show="item.DGName">
+                <div ng-if="item.DGName">
                   DG: <span class="clickable" ng-click="termSelectDG(item)" >{{item.DGName}}</span>.
                   Path: <span class="clickable" ng-click="termSelectDGItem(item)">{{item.path}}</span>
-                  <span ng-show = item.options>
+                  <span ng-if = item.options>
                   There are <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}} options</span> defined.
                 </span>
                 </div>
 
-                <div ng-show="item.compName">
+                <div ng-if="item.compName">
                   Comp: <span class="clickable" ng-click="termSelectComp(item)" >{{item.compName}}</span>.
                   Path: <span class="clickable" ng-click="termSelectCompItem(item)">{{item.path}}</span>
-                  <span ng-show = item.options>
+                  <span ng-if = item.options>
                   There are <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}} options</span> defined.
                 </span>
                 </div>
@@ -170,7 +170,7 @@
             <tr><th>Code|System</th><th>Display</th><th>Where used</th></tr>
           </thead>
           <tbody>
-          <tr ng-repeat="(k,v) in codeSummary" ng-show="canShowCodeReportLine(k)">
+          <tr ng-repeat="(k,v) in codeSummary" ng-if="canShowCodeReportLine(k)">
             <td>{{k}}</td>
             <td>{{v.display}}</td>
             <td>

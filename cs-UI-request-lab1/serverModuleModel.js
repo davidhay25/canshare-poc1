@@ -56,14 +56,19 @@ function isDifferent(model1,model2) {
 
 }
 
-async function setup(app) {
+async function setup(app,mongoDbName) {
     console.log("Setting up connection to mongodb in serverModuleModel")
 
     //const uri = "mongodb+srv://canshare:meUQP7RjdaVVTMuS@cluster0.okom61e.mongodb.net/?retryWrites=true&w=majority"
 
     const uri = "mongodb://127.0.0.1:27017"  //local machine
     const client = new MongoClient(uri);
-    database = client.db("canShare")
+    //database = client.db("canShare")
+    database = client.db(mongoDbName)
+
+
+
+
     await client.connect()
     //await listDatabases(client)
     console.log("model connected")

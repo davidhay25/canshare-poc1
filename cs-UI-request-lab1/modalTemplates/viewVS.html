@@ -36,7 +36,7 @@
                 <input type="text" class="form-control" ng-model="input.filter" placeholder="Filter text"/>
             </div>
             <div class="col-md-3">
-                <div ng-show="expandedVS.expansion.contains">{{expandedVS.expansion.contains.length}} concepts</div>
+                <div ng-if="expandedVS.expansion.contains">{{expandedVS.expansion.contains.length}} concepts</div>
             </div>
 
             <div class="col-md-2">

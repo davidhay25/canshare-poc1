@@ -11,8 +11,10 @@ angular.module("pocApp")
         extItemControlUrl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
         extCollapsibleUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-collapsible"
 
+        extQuantityUnit = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
 
-        extDefinitionExtraction = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
+
+        extExtractionContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
         extHidden = "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
 
         //let extGtableUrl = ""
@@ -42,6 +44,23 @@ angular.module("pocApp")
 
         }
 
+        function getExtractionContext(dgName,hashAllDG) {
+            let dg = hashAllDG[dgName]
+            let extractionContext
+            while (dg) {
+                if (dg.type) {
+                    extractionContext = dg.type
+                    break
+                } else {
+                    if (dg.parent) {
+                        dg = hashAllDG[dg.parent]
+                    } else {
+                        break
+                    }
+                }
+            }
+            return extractionContext
+        }
 
         //given an ed, return the control type and hint
         function getControlDetails(ed) {
@@ -67,6 +86,10 @@ angular.module("pocApp")
                     case 'boolean' :
                         controlHint = "boolean"
                         controlType = "boolean"
+                        break
+                    case 'decimal' :
+                        controlHint = "decimal"
+                        controlType = "decimal"
                         break
                     case 'Quantity' :
                         controlHint = "quantity"
@@ -405,6 +428,17 @@ angular.module("pocApp")
                 //generate a report object for the table view (that displays key extraction / population details)
 
                 let report = {entries:[]}
+                let thing = {text:Q.name}
+
+
+
+                //see if there is an extraction context on the Q
+                let ar1 = getExtension(Q,extExtractionContextUrl,'Code')
+                if (ar1.length > 0) {
+                    thing.extractionContext = ar1[0]
+                }
+
+                report.entries.push(thing)
 
                 function processItem(report,item) {
                     let thing = {linkId:item.linkId,text:item.text,type:item.type,definition:item.definition}
@@ -428,6 +462,14 @@ angular.module("pocApp")
                         thing.initialExpression = ar[0].expression
                     }
 
+                    //check for extraction context
+                    let ar1 = getExtension(item,extExtractionContextUrl,'Code')
+                    if (ar1.length > 0) {
+                        thing.extractionContext = ar1[0]
+                    }
+
+
+                    //console.log(item,thing)
 
                     report.entries.push(thing)
                     if (item.item) {
@@ -491,6 +533,8 @@ angular.module("pocApp")
                         //let sectionItem = {linkId:`sect-${section.name}`,text:section.title,type:'group',item:[]}
                         //let sectionItem = {linkId:`${section.name}`,text:section.title,type:'group',item:[]}
                         let sectionItem = {linkId:`${comp.name}.${section.name}`,text:section.title,type:'group',item:[]}
+
+                        //sectionItem.repeats = true
                         containerSection.item.push(sectionItem)
 
                         //make up an ed for the section for the display in the UI. It's not a real ed...
@@ -500,6 +544,8 @@ angular.module("pocApp")
                         for (const contentDG of section.items) {     //a section can have multiple DGs within it.
                             let dgType = contentDG.type[0]        //the dg type. Generally a 'section' dg
 
+
+                            //todo - should this ordering be done in the snapshot service???
                             let dgElementList = snapshotSvc.getFullListOfElements(dgType)
 
                             //adjust according to 'insertAfter' values
@@ -510,7 +556,13 @@ angular.module("pocApp")
                             let pathPrefix = sectionItem.linkId
 
                             let config = {expandVS:true,enableWhen:true,pathPrefix : pathPrefix,calledFromComp:true}
-
+                            config.hashAllDG = hashAllDG
+                            //If there's a type value on the DG, this is the FHIR resource type that can be extracted from it
+                       /*     if (dg.type) {
+                                config.fhirType = dg.type
+                            }
+*/
+                            //-------- make the Q for the DG....
                             console.log(`${dgType} ${dgElementList.length}`)
                             let vo = that.makeHierarchicalQFromDG(dgElementList,config)
 
@@ -542,7 +594,21 @@ angular.module("pocApp")
                             //bresteReporthistolymphnodes has the elements directly
                             //to be discussed next week
 
-                            //add the child elements to the Q
+                            //now we can actually add add the child elements from the DG to the Composition Q
+                            //First we need to see if there was an extract context defined on the DG Q. If so
+                            //it needs to be added to the section. It will be an extension with the url of extExtractionContextUrl
+                            //Note that there will only be a single extension of this type on the Q. If a DG has
+                            //multiple resources extracted from it, they will be in the items...
+
+                            let arExt = getExtension(vo.Q,extExtractionContextUrl,'Code')
+                            if (arExt.length) {
+                                sectionItem.extension = sectionItem.extension || []
+                                let ext = {url:extExtractionContextUrl,valueCode:arExt[0]}
+                                sectionItem.extension.push(ext)
+                            }
+
+
+
                             for (const child of dgQ.item[0].item){
                                 sectionItem.item.push(child)
                             }
@@ -575,6 +641,12 @@ angular.module("pocApp")
                 if (config.pathPrefix) {
                     pathPrefix = config.pathPrefix + "."
                 }
+
+                let dgName = lstElements[0].ed.path     //first line is the DG name
+
+
+
+                //console.log(dgType)
 
                 //if config.expandVS is true, then the contents of the VS will be expanded as options into the item. May need to limit the length...
                 let errorLog = []
@@ -633,7 +705,6 @@ angular.module("pocApp")
 
                             let adjustedPath = `${pathPrefix}${thing.ed.path}`
 
-                            //conditionalED[thing.ed.path] = []
                             conditionalED[adjustedPath] = []
                             thing.ed.conditionalVS.forEach(function (cvs) {
                                 let newThing = angular.copy(thing)
@@ -665,13 +736,37 @@ angular.module("pocApp")
                 Q.status = 'active'
                 Q.url = `http://canshare.co.nz/questionnaire/${firstElement.ed.path}`
 
-                addPrePopExtensions(Q)
 
-                //add definition based data extraction
-                if (config.fhirType) {
-                    Q.extension = Q.extension || []
-                    Q.extension.push({url:extDefinitionExtraction,valueCode:config.fhirType})
+                addPrePopExtensions(Q)      //launchPatient & LaunchPractitioner
+
+
+                //add definition based data extraction. This is where the DG can be extracted to a FHIR
+                //resource using the SDC defintion extratcion
+                //examine the DG hierarchy to see if there is a 'type' in any of the DG parents which is the SDC extraction context
+
+                let extractionContext = getExtractionContext(dgName,config.hashAllDG)
+                /*
+                let dg = config.hashAllDG[dgType]
+                let extractionContext
+                while (dg) {
+                    if (dg.type) {
+                        extractionContext = dg.type
+                        break
+                    } else {
+                        if (dg.parent) {
+                            dg = config.hashAllDG[dg.parent]
+                        } else {
+                            break
+                        }
+                    }
                 }
+*/
+                if (extractionContext) {
+                    Q.extension = Q.extension || []
+                    Q.extension.push({url:extExtractionContextUrl,valueCode:extractionContext})
+                }
+
+
 
                 let currentItem
                 let hashItems = {}      //items by linkId
@@ -695,7 +790,7 @@ angular.module("pocApp")
                         //console.log(parentItemPath)
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
 
-                        decorateItem(currentItem,ed)
+                        decorateItem(currentItem,ed,extractionContext)
 
                         if (config.enableWhen) {
                             let ar =  addEnableWhen(ed,currentItem,config.pathPrefix)
@@ -711,12 +806,13 @@ angular.module("pocApp")
                         hashItems[parentItemPath].item = hashItems[parentItemPath].item || []
                         hashItems[parentItemPath].item.push(currentItem)
                         hashItems[parentItemPath].type = "group"
+
                         hashItems[path] = currentItem
 
 
                     } else {
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
-                        decorateItem(currentItem,ed)
+                        decorateItem(currentItem,ed,extractionContext)
                         if (config.enableWhen) {
                             let ar = addEnableWhen(ed,currentItem,config.pathPrefix)
                             allEW.push(...ar)
@@ -794,15 +890,56 @@ angular.module("pocApp")
 
 
                 //add details to item
-                function decorateItem(item,ed) {
+                function decorateItem(item,ed,extractionContext) {
 
                     if (! ed.type) {
                         return
                     }
+                    let edType = ed.type[0]
 
-                    item.definition = ed.definition // definition is used for definition based resource extraction
 
-                    //The only way an element will have hideInQ set but still be included is for fixed values.
+                    console.log(edType)
+
+                    if (ed.definition) {
+                        //this will be the extract path for this element into the target resource
+                        //right now assumes extracting to a FHIR resource - will need further thought if profiled...
+
+                        let resourceType = extractionContext //config.fhirType //the extraction type passed in if the whole DG is extracted to a single resource
+
+                        if (! resourceType) {
+                            //this is a child element that is extracted into a separate resource
+                            let ar = ed.definition.split('.')
+                            resourceType = ar[0]
+                        }
+
+                        item.definition = `http://hl7.org/fhir/StructureDefinition/${resourceType}#${ed.definition}`
+                    }
+
+
+                    if (config.hashAllDG[edType]) {
+
+                        console.log("is DG", config.hashAllDG[edType])
+                        //this ed is a child ED. Des this DG have an extraction context? Curentlly a FHIR resource, but could be a profile
+
+                        //is there an extraction context (dg.type) on this DG or any of its parents
+                        let extractionContext = getExtractionContext(edType,config.hashAllDG)
+
+                        //let extractionContext = config.hashAllDG[edType].type
+                        if (extractionContext) {
+                            //extension type can be code or expression
+                            item.extension = item.extension || []
+                            item.extension.push({url:extExtractionContextUrl,valueCode:extractionContext})
+
+                           // item.extension.push({url:extExtractionContextUrl,valueExpression:{language:"text/fhirpath",expression:extractionContext}})
+                        }
+                    }
+/*
+                    if (ed.x) {
+                        item.extension = Q.extension || []
+                        item.extension.push({url:extExtractionContextUrl,valueCode:config.fhirType})
+                    }
+*/
+                    //The only way an element here will have hideInQ set but still be included is for fixed values.
                     //they get added to the Q - but with the hidden extension
 
                     if (ed.hideInQ) {
@@ -849,7 +986,7 @@ angular.module("pocApp")
                     //set the ValueSet or options from the ed to the item
                     //the fixed takes precedence, then ValueSet then options
                     //todo - need to look for other datatypes than can be fixed
-                    let edType = ed.type[0]
+
 
                     if (edType == 'CodeableConcept') {
 
@@ -934,13 +1071,28 @@ angular.module("pocApp")
 
                     if (edType == 'Quantity') {
                         //https://smartforms.csiro.au/docs/components/quantity
+
+                        if (ed.fixedQuantity) {
+                            if (ed.fixedQuantity.unit) {
+                                let ext = {url:extQuantityUnit}
+                                ext.valueCoding = {code:ed.fixedQuantity.unit,system:"http://unitsofmeasure.org",display:ed.fixedQuantity.unit}
+                                item.extension = ed.extension || []
+                                item.extension.push(ext)
+                            }
+
+
+                        }
+
+                        //if there are units
+                        /* - not sure what to do about this.
                         if (ed.units && ed.units.length > 0) {
-                            let ext = {url:"http://hl7.org/fhir/StructureDefinition/questionnaire-unit"}
+                            let ext = {url:extQuantityUnit}
                             ext.valueCoding = {code:ed.units[0],system:"http://unitsofmeasure.org",display:ed.units[0]}
                             item.extension = ed.extension || []
                             item.extension.push(ext)
 
                         }
+                        */
                     }
 
                     //This is a pre-pop extression

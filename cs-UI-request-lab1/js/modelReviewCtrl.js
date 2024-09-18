@@ -560,9 +560,14 @@ angular.module("pocApp")
 
                     //the second option expands the valuesets as options into the Q - todo make this an option
                     let config = {expandVS:true,enableWhen:true}
+                    config.hashAllDG = $scope.hashAllDG
+
+
+
                     if (dg.type) {
                         config.fhirType = dg.type // Used for definition based extraction
                     }
+
                     let voQ = makeQSvc.makeHierarchicalQFromDG($scope.fullElementList,config) //,$scope.hashAllDG)
                     $scope.fullQ = voQ.Q
                     $scope.hashEd = voQ.hashEd

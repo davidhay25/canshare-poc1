@@ -39,7 +39,7 @@
             <div>Local DG count: {{localDGCount}}</div>
           </div>
           <div class="col-md-3">
-            <div ng-show="user.email" class="pull-right clickable" ng-click="checkAllDGIn()">Check all DGs in</div>
+            <div ng-if="user.email" class="pull-right clickable" ng-click="checkAllDGIn()">Check all DGs in</div>
           </div>
           <div class="col-md-5">
             <div class="pull-right">
@@ -82,14 +82,14 @@
 
              </div>
           <div class="col-md-5">
-            <div ng-show="input.selectedItem">
+            <div ng-if="input.selectedItem">
 
               <div class="clickable pull-right"
-                   ng-show = "input.selectedItem.library"
+                   ng-if = "input.selectedItem.library"
                    ng-click="downloadDG(input.selectedItem.library )">Download</div>
 
               <div class="clickable pull-right"
-                   ng-show = "input.selectedItem.library"
+                   ng-if = "input.selectedItem.library"
                    style="margin-right: 8px"
                    ng-click="showHistory(input.selectedItem.library )">History</div>
 
@@ -105,7 +105,7 @@
                 <uib-tab heading="Library">
 
                   <button class="btn btn-link pull-right"
-                          ng-show="user && input.selectedItem.library"
+                          ng-if="user && input.selectedItem.library"
                           ng-click="deleteDG(input.selectedItem.library)">Delete in library</button>
                   <div class="clearfix"/>
 
@@ -193,7 +193,7 @@
 
       <uib-tab heading="DataGroups sync" >
 
-        <div ng-show="syncOutcomeDownloadSummary">
+        <div ng-if="syncOutcomeDownloadSummary">
           <br/>
           <em>Resources have been downloaded. Please refresh the browser.</em>
           <strong>Summary of download from Library</strong>
@@ -206,15 +206,15 @@
 
         </div>
 
-        <div ng-show="syncOutcomeUpload">
+        <div ng-if="syncOutcomeUpload">
           <br/>
           <strong>Summary of upload to Library</strong>
 
-          <div ng-show = "syncOutcomeUploadSummary.changed == 0">
+          <div ng-if = "syncOutcomeUploadSummary.changed == 0">
             Nothing was uploaded. The DGs in your local store exactly matches the Library copies. (There may be library DG's not in your local store though).
           </div>
 
-          <div ng-show = "syncOutcomeUploadSummary.changed > 0">
+          <div ng-if = "syncOutcomeUploadSummary.changed > 0">
             {{syncOutcomeUploadSummary.total}} resources were uploaded, {{syncOutcomeUploadSummary.changed}} were different to the Library version and were updated.
             <br/>
 
@@ -235,7 +235,7 @@
 
         <div ng-hide="syncOutcomeUpload || syncOutcomeDownloadSummary">
           <br/>
-          <div class="row" ng-show="user">
+          <div class="row" ng-if="user">
             <div class="col-md-4">
               <button class="btn btn-danger" ng-click="refreshFromRepo()">Refresh local store
                 <i class="glyphicon glyphicon-arrow-down"></i>
@@ -251,7 +251,7 @@
           </div>
           <br/>
 
-          <div class="row" ng-show="canBulkUpdateDGLibrary()">
+          <div class="row" ng-if="canBulkUpdateDGLibrary()">
             <div class="col-md-4">
               <button class="btn btn-danger" ng-click="updateRepo()">Update Library  <i class="glyphicon glyphicon-arrow-up"></i></button>
             </div>
@@ -292,10 +292,10 @@
                 <button
                       class="btn btn-link" ng-click="clearFilter()">Show all</button>
 
-              <button ng-show="user.email"
+              <button ng-if="user.email"
                       class="btn btn-link" ng-click="downloadDisplayedComp()">Download all shown</button>
 
-              <button class="btn btn-link pull-right" ng-show="user.email" class="pull-right clickable" ng-click="checkAllCompIn()">Check all Compositions in</button>
+              <button class="btn btn-link pull-right" ng-if="user.email" class="pull-right clickable" ng-click="checkAllCompIn()">Check all Compositions in</button>
 
             </div>
            </div>
@@ -316,21 +316,21 @@
 
         <table class="table table-bordered table-condensed">
           <tr><th>Title</th><th>Local sections</th><th>Local Meta</th><th>Library sections</th><th>Library Meta</th><th>Note</th></tr>
-          <tr ng-repeat="item in summaryComp" ng-show="showComp(item)">
+          <tr ng-repeat="item in summaryComp" ng-if="showComp(item)">
             <td>
               <strong>{{item.title}}</strong>
               <div class="clickable"
-                   ng-show="item.library && ! item.local"
+                   ng-if="item.library && ! item.local"
                    ng-click="downloadComp(item.library)">Download</div>
 
 
 
-              <div ng-show="item.library.checkedOut">
+              <div ng-if="item.library.checkedOut">
                 <br/>
                 CheckedOut: {{item.library.checkedOut}}
               </div>
 
-              <div ng-show="item.local && (item.local.checkedOut !== item.library.checkedOut)">
+              <div ng-if="item.local && (item.local.checkedOut !== item.library.checkedOut)">
                 Error! Local checkout is {{item.local.checkedOut}}, but library checkout is {{item.library.checkedOut}}
 
               </div>
@@ -371,7 +371,7 @@
             </td>
             <td>
               {{item.note}}
-              <div class="clickable" ng-show="item.library && user.email"
+              <div class="clickable" ng-if="item.library && user.email"
                    ng-click="deleteComposition(item.library)">Delete in library</div>
 
             </td>
