@@ -11,7 +11,8 @@ angular.module("pocApp")
         extItemControlUrl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
         extCollapsibleUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-collapsible"
 
-        extQuantityUnit = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
+        //extQuantityUnit = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
+        extQuantityUnit = "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption"
 
 
         extExtractionContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
@@ -39,11 +40,19 @@ angular.module("pocApp")
             }
         }
 
-        function addExtractExtensions(DG,Q) {
-
-
+        function addUseContext(Q) {
+            //adds the use context for the FHIRPath Lab. Need to configure this in some way
+            Q.useContext = Q.useContext || []
+            let uc = {code:{system:"http://terminology.hl7.org/CodeSystem/usage-context-type",code:"user",display:"User Type"}}
+            uc.valueCodeableConcept = {coding:[{code:'extract',display:'Demo Extract'}]}
+            Q.useContext.push(uc)
         }
 
+        function addPublisher(Q) {
+            Q.publisher = "DEMO: David Hay"
+        }
+
+        //get the extraction context from the DG
         function getExtractionContext(dgName,hashAllDG) {
             let dg = hashAllDG[dgName]
             let extractionContext
@@ -59,6 +68,13 @@ angular.module("pocApp")
                     }
                 }
             }
+
+            //is this a profile or a core resource type
+            if (extractionContext.indexOf('http') == -1) {
+                //this is a core FHIR patient resource. Add the rest of the url
+                extractionContext = `http://hl7.org/fhir/StructureDefinition/${extractionContext}`
+            }
+
             return extractionContext
         }
 
@@ -424,8 +440,13 @@ angular.module("pocApp")
 
         return {
 
+            getSDCEdSummary : function (ed) {
+                //return the key SDC elements for this ED. Used when generating the
+
+            },
+
             makeReport : function (Q) {
-                //generate a report object for the table view (that displays key extraction / population details)
+                //generate a report object for the SDC table view (that displays key extraction / population details)
 
                 let report = {entries:[]}
                 let thing = {text:Q.name}
@@ -433,10 +454,22 @@ angular.module("pocApp")
 
 
                 //see if there is an extraction context on the Q
-                let ar1 = getExtension(Q,extExtractionContextUrl,'Code')
+
+
+                //let ar1 = getExtension(Q,extExtractionContextUrl,'Code')
+                let ar1 = getExtension(Q,extExtractionContextUrl,'String')
                 if (ar1.length > 0) {
                     thing.extractionContext = ar1[0]
                 }
+
+                /*
+                let extractionContext = getExtractionContext(Q)
+
+                if (extractionContext) {
+                    thing.extractionContext = extractionContext
+                }
+
+                */
 
                 report.entries.push(thing)
 
@@ -456,14 +489,51 @@ angular.module("pocApp")
 
                     thing.mult = mult
 
-                    //check for initial expression
+                    //look for fixed values. These are values with answerOption, and initialSelected set
+                    if (item.answerOption) {
+                        //currently only using code & CodeableConcept
+                        Object.keys(item.answerOption).forEach(function (key) {
+                            console.log(key)
+                            if (item.answerOption[key].initialSelected) {
+                                console.log(item.answerOption[key])
+                                let opt = item.answerOption[key]
+                                console.log(opt)
+                                if (opt.valueCoding) {
+                                    thing.fixedValue = `${opt.valueCoding.code} | ${opt.valueCoding.display} | ${opt.valueCoding.system}`
+                                } else if (opt.valueCode) {
+                                    thing.fixedValue = opt.valueCode
+                                } else if (opt.valueString) {
+                                    thing.fixedValue = opt.valueString
+                                }
+
+
+                            }
+                        })
+                    }
+
+                    //look for extQuantityUnit extension. This is used in quantity to set the unit
+                    //In the model, for a Quantity set the 'fixedValue' property - setting the units
+                    let ar2 = getExtension(item,extQuantityUnit,'Coding')
+                    if (ar2.length > 0) {
+                        thing.fixedValue = `Units: ${ar2[0].code}`
+                    }
+
+
+                    //check for hidden values
+                    let ar0 = getExtension(item,extHidden,'Boolean')
+                    if (ar0.length > 0) {
+                        thing.isHidden = ar0[0]
+                    }
+
+                    //check for initial expression - used in CodeableConcept pre-pop
                     let ar = getExtension(item,extInitialExpressionUrl,'Expression')
                     if (ar.length > 0) {
                         thing.initialExpression = ar[0].expression
                     }
 
                     //check for extraction context
-                    let ar1 = getExtension(item,extExtractionContextUrl,'Code')
+                    //let ar1 = getExtension(item,extExtractionContextUrl,'Code')
+                    let ar1 = getExtension(item,extExtractionContextUrl,'String')
                     if (ar1.length > 0) {
                         thing.extractionContext = ar1[0]
                     }
@@ -507,6 +577,8 @@ angular.module("pocApp")
                 Q.id = `canshare-${comp.name}`
                 Q.url = `http://canshare.co.nz/questionnaireUrl/${comp.name}`
                 addPrePopExtensions(Q)
+                addUseContext(Q)
+                addPublisher(Q)
                 Q.item = []
 
                 let containerSection = {text: comp.title, linkId: `${comp.name}`, extension: [], type: 'group', item: []}
@@ -600,7 +672,8 @@ angular.module("pocApp")
                             //Note that there will only be a single extension of this type on the Q. If a DG has
                             //multiple resources extracted from it, they will be in the items...
 
-                            let arExt = getExtension(vo.Q,extExtractionContextUrl,'Code')
+                            //let arExt = getExtension(vo.Q,extExtractionContextUrl,'Code')
+                            let arExt = getExtension(vo.Q,extExtractionContextUrl,'String')
                             if (arExt.length) {
                                 sectionItem.extension = sectionItem.extension || []
                                 let ext = {url:extExtractionContextUrl,valueCode:arExt[0]}
@@ -738,32 +811,19 @@ angular.module("pocApp")
 
 
                 addPrePopExtensions(Q)      //launchPatient & LaunchPractitioner
-
+                addUseContext(Q)
+                addPublisher(Q)
 
                 //add definition based data extraction. This is where the DG can be extracted to a FHIR
                 //resource using the SDC defintion extratcion
                 //examine the DG hierarchy to see if there is a 'type' in any of the DG parents which is the SDC extraction context
-
+                //note that the extraction context is a complete url (not just a type name)
                 let extractionContext = getExtractionContext(dgName,config.hashAllDG)
-                /*
-                let dg = config.hashAllDG[dgType]
-                let extractionContext
-                while (dg) {
-                    if (dg.type) {
-                        extractionContext = dg.type
-                        break
-                    } else {
-                        if (dg.parent) {
-                            dg = config.hashAllDG[dg.parent]
-                        } else {
-                            break
-                        }
-                    }
-                }
-*/
+
                 if (extractionContext) {
                     Q.extension = Q.extension || []
-                    Q.extension.push({url:extExtractionContextUrl,valueCode:extractionContext})
+                    //Q.extension.push({url:extExtractionContextUrl,valueCode:extractionContext})
+                    Q.extension.push({url:extExtractionContextUrl,valueString:extractionContext})
                 }
 
 
@@ -890,6 +950,7 @@ angular.module("pocApp")
 
 
                 //add details to item
+                //extraction context is the url of the profile (could be a core type)
                 function decorateItem(item,ed,extractionContext) {
 
                     if (! ed.type) {
@@ -904,7 +965,11 @@ angular.module("pocApp")
                         //this will be the extract path for this element into the target resource
                         //right now assumes extracting to a FHIR resource - will need further thought if profiled...
 
-                        let resourceType = extractionContext //config.fhirType //the extraction type passed in if the whole DG is extracted to a single resource
+                        item.definition = `${extractionContext}#${ed.definition}`
+/*
+                        let resourceType = extractionContext //the extraction type passed in if the whole DG is extracted to a single resource
+
+
 
                         if (! resourceType) {
                             //this is a child element that is extracted into a separate resource
@@ -912,10 +977,22 @@ angular.module("pocApp")
                             resourceType = ar[0]
                         }
 
-                        item.definition = `http://hl7.org/fhir/StructureDefinition/${resourceType}#${ed.definition}`
+
+                        //
+
+
+                        //If it doesn't start with 'http' we assume it's a core resource profile
+                        if (ed.definition.indexOf('http') == -1) {
+                            item.definition = `http://hl7.org/fhir/StructureDefinition/${resourceType}#${ed.definition}`
+                        } else {
+                            item.definition = ed.definition
+                        }
+*/
+
                     }
 
 
+                    //If this ed is a reference to another, it can have a different exraction context...
                     if (config.hashAllDG[edType]) {
 
                         console.log("is DG", config.hashAllDG[edType])
@@ -933,12 +1010,7 @@ angular.module("pocApp")
                            // item.extension.push({url:extExtractionContextUrl,valueExpression:{language:"text/fhirpath",expression:extractionContext}})
                         }
                     }
-/*
-                    if (ed.x) {
-                        item.extension = Q.extension || []
-                        item.extension.push({url:extExtractionContextUrl,valueCode:config.fhirType})
-                    }
-*/
+
                     //The only way an element here will have hideInQ set but still be included is for fixed values.
                     //they get added to the Q - but with the hidden extension
 
@@ -963,6 +1035,16 @@ angular.module("pocApp")
 
                     item.type = vo.controlType
 
+                    //todo - refactor these
+                    if (vo.controlHint == 'autocomplete') {
+                        let ext = {url:extItemControlUrl}
+
+                        let cc = {coding:[{code: 'autocomplete',system:'http://hl7.org/fhir/questionnaire-item-control'}]}
+                        ext.valueCodeableConcept = cc
+                        item.extension = ed.extension || []
+                        item.extension.push(ext)
+                    }
+
                     if (vo.controlHint == 'radio') {
                         let ext = {url:extItemControlUrl}
 
@@ -986,6 +1068,12 @@ angular.module("pocApp")
                     //set the ValueSet or options from the ed to the item
                     //the fixed takes precedence, then ValueSet then options
                     //todo - need to look for other datatypes than can be fixed
+
+                    if (edType == 'code') {
+                        if (ed.fixedCode) {
+                            item.answerOption = [{valueString:ed.fixedCode,initialSelected:true}]
+                        }
+                    }
 
 
                     if (edType == 'CodeableConcept') {
@@ -1014,26 +1102,6 @@ angular.module("pocApp")
                                         //if we're expanding the VS, then add all the contents as optoins...
                                         item.answerOption = []
 
-                                        /*
-                                        vsSvc.getOneVSAsync(ed.valueSet).then(
-                                            function (options) {
-                                                if (options && options.length > 0) {
-                                                    for (const concept of options) {
-                                                        concept.system = concept.system || unknownCodeSystem
-                                                        item.answerOption.push({valueCoding : concept})
-                                                    }
-                                                } else {
-                                                    item.answerOption.push({valueCoding : {display:"The ValueSet is missing or empty"}})
-                                                }
-                                            }, function (err) {
-                                                alert(err)
-                                            }
-                                        )
-*/
-
-
-
-
                                         let options = vsSvc.getOneVS(ed.valueSet)
                                         if (options && options.length > 0) {
                                             for (const concept of options) {
@@ -1043,9 +1111,6 @@ angular.module("pocApp")
                                         } else {
                                             item.answerOption.push({valueCoding : {display:"The ValueSet is missing or empty"}})
                                         }
-
-
-
 
                                     } else {
                                         //otherwise, add the answervalueSet property and let the renderer retrieve the contents

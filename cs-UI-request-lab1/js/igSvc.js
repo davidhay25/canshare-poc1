@@ -113,7 +113,242 @@ angular.module("pocApp")
                 return {fsh:fsh}
             },
 
-            makeProfileFshDg : function (dg,type,fullElementList) {
+
+            makeProfileFshDg : function (dg,fullElementList) {
+                //updated profile creater.
+                //todo - better support for extensions (ie define them in the model)
+                let extensionUrlRoot = "http://canshare.co.nz/StructureDefinition"
+                let valueSetUrlRoot = "https://nzhts.digital.health.nz/fhir/ValueSet"
+                let arFsh = []
+                let logEd = []    //log of Eds that had fsh related content. Not all entries will...
+                let errors = []     //errors encountered during generation
+                let manifest = {extensions:{}}   //contains the structures created - currently only extensions
+                let hashExtensions = {} //hash of extensions by path
+                arFsh.push(`Profile:\t${dg.name}_profile`)
+                arFsh.push(`Parent:\t\t${dg.name}`)
+                arFsh.push(`Id:\t\t${dg.name}-id`)
+                arFsh.push(`Title:\t\t"${makeSafeString(dg.title)}"`)
+                if (dg.description) {
+                    arFsh.push(`Description:\t"${makeSafeString(dg.description)}"`)
+                }
+                arFsh.push(`\n`)
+
+                //iterate over all the elements in the DG looking for profiling instructions
+
+                fullElementList.forEach(function (item) {
+                    let ed = item.ed
+
+                    //extraction context
+
+
+                    //extraction expression
+
+
+                    //fixed value
+
+                    //valueSet (on any element)
+                    if (ed.valueSet) {
+
+                    }
+
+
+
+
+
+
+                })
+
+
+                arFsh.push(`\n`)
+
+                return arFsh.join('\n')
+
+/*
+                //now define all the extensions and add them to the fsh array
+                let arExtensions = []       //have extensions in a separate array so they can go at the bottom of the list
+                let hashExtensionUrl = {}       //don't re-define extensions (todo what to do if the same ext url is used in different profiles)
+                //todo - should extensions be in a separate, shared storage
+                Object.keys(hashExtensions).forEach(function (key) {
+                    //key is the root where it is applied in this profile
+                    let items = hashExtensions[key]
+
+                    //item is [{url: type:}]
+                    for (const item of items) {
+                        let url = item.url
+                        let type = item.type
+                        let ed = item.ed
+                        let internalName = $filter('lastInPath')(ed.path)
+                        if (! hashExtensionUrl[url]) {      //so each url has only a single definition
+                            //place the definition of extension in the hash. We're also putting it in the
+                            //profile 'file' - this is  redundant and we can likely remove later...
+                            hashExtensionUrl[url] = []
+
+                            hashExtensionUrl[url].push(`Extension:\t\t${internalName}_ext`)
+                            hashExtensionUrl[url].push(`Id:\t\t\t\t${internalName}-id`)
+                            hashExtensionUrl[url].push(`Title:\t\t\t"${internalName}"`)
+                            if (ed.description) {
+                                hashExtensionUrl[url].push(`Description:\t"${makeSafeString(ed.description)}"`)
+                            }
+                            hashExtensionUrl[url].push(`* ^url = "${url}"`)
+                            hashExtensionUrl[url].push(`* value[x] only ${type}`)
+
+                            if (item.valueSet) {
+                                let vsUrl = item.valueSet
+
+                                if (vsUrl.indexOf('http') == -1) {
+                                    vsUrl = `${valueSetUrlRoot}/${vsUrl}`
+                                }
+
+                                hashExtensionUrl[url].push(`* value[x] from ${vsUrl} (preferred)`)
+                            }
+
+                            //add the extension definition to the arExtensions array.
+
+                            arExtensions = arExtensions.concat(hashExtensionUrl[url])
+                            arExtensions.push('\n')
+                        }
+                    }
+                })
+
+                //add all the extension references to the elements in the profile
+                Object.keys(hashExtensions).forEach(function (key) {
+                    //key is the root where it is applied in this profile
+                    let items = hashExtensions[key]     //represents
+
+                    let prefix = ""
+                    if (key !== 'root') {
+                        prefix = `${key}.`
+                    }
+
+                    //item is [{url: type: valueSet: name:}]
+                    let arLne = [`* ${prefix}extension contains `]
+                    for (const item of items) {
+                        //arFsh.push(`extension contain`)
+                        arLne.push(`\t${item.url} named ${item.name} ${item.ed.mult} and`)
+                    }
+
+                    arLne[arLne.length-1] = arLne[arLne.length-1].slice(0,-3)
+
+                    arFsh = arFsh.concat(arLne)
+                    arFsh.push('\n')
+                })
+
+
+                //now concatenate the extension definitions to the fsh array
+
+                arExtensions.splice(0,0,"\n//---extensions---- Any updates to extensions will not be saved---------\n")
+                arFsh = arFsh.concat(arExtensions)
+
+*/
+
+
+                function addSingleElement(ed) {
+                    //add a single element. todo: add support for bindings, fixed values etc.
+                    //called when there is a FHIRPath entry, but no extension, fsh or 'is reference' set
+
+                    let path = $filter('dropFirstInPath')(ed.profile.fhirPath)
+
+                    //the default line
+                    let lne = `* ${path} ${ed.mult}`
+
+                    if (ed.valueSet) {
+                        lne = `* ${path} from ${ed.valueSet} (preferred)`
+                    }
+
+                    //shouldn't have both a default and a fixed value
+                    if (ed.defaultCoding) {
+                        lne = `* ${path} ^defaultValueCodeableConcept = ${ed.defaultCoding.system}#${ed.defaultCoding.code}  //default value`
+                    }
+
+                    if (ed.fixedCoding) {
+                        lne = `* ${path} = ${ed.fixedCoding.system}#${ed.fixedCoding.code}  //fixed value`
+                    }
+
+                    if (ed.fixedCode) {
+                        lne = `* ${path} = #${ed.fixedCode} //fixed value`
+                    }
+
+                    arFsh.push(lne)
+
+                    // code ^defaultValueCodeableConcept = http://mysystem#cd
+
+                    logEd.push({ed:ed,reason:'Single element',content:[lne]})
+
+                }
+
+                function addReference(ed) {
+                    //add a reference to the arFsh
+                    let type = ed.type[0]   //todo the naming needs further thought
+                    //let path = ed.path
+                    if (ed.profile.fhirPath) {
+                        let path = $filter('dropFirstInPath')(ed.profile.fhirPath)
+                        arFsh.push(`* ${path} = Reference(${type}-id)`)
+                    } else {
+                        errors.push({ed:ed,issue:'fhirPath is missing',content:[]})
+                    }
+
+                    logEd.push({ed:ed,reason:'Reference to other resource',content:[type]})
+
+                }
+
+                function addExtension(ed) {
+                    //add an extension to the hashExtensions
+                    //this routine is only called if ed.profile.extUrl exists so don't need to check
+                    //all extensions are added to hashExtensions = keyed by path and added to the profile at the end
+                    //let summary = {}       //a summary of the extension, to be added to the manifest
+                    let type = ed.type[0]
+                    let localName = $filter('lastInPath')(ed.path)
+                    if (type == "group") {
+                        //a group will be a complex extension
+                        //todo - need to think about slicing where the contents will be references to other DGs
+                    } else {
+                        //this is a simple, single extension
+                        let extUrl = ed.profile.extUrl
+                        if (extUrl.indexOf('http') == -1) {
+                            //this is a new extension that needs to be defined by canshare
+                            extUrl = `${extensionUrlRoot}/${extUrl}`
+                        }
+
+
+                        //determine where the extension is located. This is defined in the fhirpath
+
+                        let base = 'root'
+                        if (ed.profile.fhirPath) {
+                            //need to remove the first part of the fhirpath (the resource type)
+                            let ar = ed.profile.fhirPath.split('.')
+                            if (ar.length == 1) {
+                                errors.push({ed:ed,issue:'fhirPath is missing resource type',content:[ed.profile.fhirPath]})
+                            } else {
+                                ar.splice(0,1)
+                                base = ar.join('.')
+                            }
+                        }
+
+
+
+                        hashExtensions[base] = hashExtensions[base] || []
+
+                        let vo = {name:localName,ed:ed,url:extUrl,type:ed.type[0]}
+                        if (ed.valueSet) {
+                            vo.valueSet = ed.valueSet
+                        }
+
+                        hashExtensions[base].push(vo)
+
+                        logEd.push({ed:ed,reason:'Single extension',content:[extUrl]})
+
+                        return {name:localName,type:vo.type}       //this acts as a summary of the extension
+
+                    }
+
+                }
+
+
+
+            },
+
+
+            makeProfileFshDgOLD : function (dg,type,fullElementList) {
                 let extensionUrlRoot = "http://canshare.co.nz/StructureDefinition"
                 let valueSetUrlRoot = "https://nzhts.digital.health.nz/fhir/ValueSet"
                 let arFsh = []

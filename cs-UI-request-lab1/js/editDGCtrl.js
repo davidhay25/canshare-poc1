@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('editDGCtrl',
-        function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc,parent,modelDGSvc) {
+        function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc,snapshotSvc, parent,modelDGSvc) {
             $scope.model=model
             $scope.input = {}
             $scope.edit = {}
@@ -100,10 +100,19 @@ angular.module("pocApp")
 
 
             //get the full list of elements for a DG, following any inheritance chain..
+
+
             function getFullElementList() {
+
+
+
+
                 if ($scope.model.name) {    //if creating a new child (with a parent) the name may not be there - or if the parent is set before the name
-                    let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
-                    $scope.allElements = vo.allElements
+                    //let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
+                    //$scope.allElements = vo.allElements
+
+                    $scope.allElements = snapshotSvc.getFullListOfElements($scope.model.name)// vo.allElements
+
                 }
 
                 //console.log(vo)

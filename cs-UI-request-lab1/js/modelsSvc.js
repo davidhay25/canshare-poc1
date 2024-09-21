@@ -1,6 +1,6 @@
 angular.module("pocApp")
 
-    .service('modelsSvc', function($q,$filter,$http,makeQSvc,$timeout) {
+    .service('modelsSvc', function($q,$filter,$http,makeQSvc,$timeout,snapshotSvc) {
         let cache = {}
 
         this.fhir = {}
@@ -674,11 +674,15 @@ angular.module("pocApp")
 
 
 
+            //todo - find and remove all references
             getFullListOfElements(inModel,inTypes,hashAllDG) {
                 //console.log('getFullListOfElements for '+ inModel.name)
                 if (! inModel) {
-                    return
+                    return {}
                 }
+
+                return  {allElements: snapshotSvc.getFullListOfElements(inModel.name)}
+
                 let iterationCount = 0      //a counter to detect excessive iterations (indicates a circular reference)
                 // console.log(`Processing ${inModel.name}`)
                 //create a complete list of elements for a DG (Compositions have a separate function)

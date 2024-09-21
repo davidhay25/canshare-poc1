@@ -463,12 +463,9 @@ angular.module("pocApp")
                 let rootNode = {id:"root", label: "root",shape: 'box',color:'white'}
                 rootNode.data = {dg:{}}
 
-
                 Object.keys(hashAllDG).forEach(function (key) {
 
                     let DG = angular.copy(hashAllDG[key])
-
-
 
                     //create the node
                     //If there are multiple nodes with the same id, vis will crash
@@ -521,17 +518,9 @@ angular.module("pocApp")
                                     //width: 4,
                                     label: ed.path,arrows : {to:true}}
                                 arEdges.push(edge)
-
-
                             }
                         }
-
-
-
                     })
-
-
-
                 })
 
 

@@ -168,6 +168,8 @@
     </nav>
 
 
+
+
     <uib-tabset>
         <uib-tab heading="Form">
             <renderform2 q="fullQ" hash-ed="hashEd" technicalview="input.technical" errors="errorLog"></renderform2>
@@ -207,7 +209,7 @@
             <br/> <br/>
 
             <table class="table table-condensed table-bordered">
-                <tr><th>Text</th><th>Type</th><th>Card.</th><th>SDC</th></tr>
+                <tr><th>Text</th><th>Type</th><th>Card.</th><th>Hidden</th><th>Fixed</th><th>SDC</th></tr>
                 <tr ng-repeat="entry in qReport.entries" ng-if="showReportLine(input.SDCOnly,entry)">
                     <td>
                         <div ng-style="{ 'padding-left': (entry.linkId | pathindent) }">
@@ -216,8 +218,10 @@
                     </td>
                     <td>{{entry.type}}</td>
                     <td>{{entry.mult}}</td>
+                    <td>{{entry.isHidden}}</td>
+                    <td>{{entry.fixedValue}}</td>
                     <td>
-                        <div ng-if="entry.definition">Definition: {{entry.definition}}</div>
+                        <div ng-if="entry.definition">Extraction: {{entry.definition}}</div>
                         <div ng-if="entry.initialExpression">Initial: {{entry.initialExpression}}</div>
                         <div ng-if="entry.extractionContext">Extraction context: {{entry.extractionContext}}</div>
 

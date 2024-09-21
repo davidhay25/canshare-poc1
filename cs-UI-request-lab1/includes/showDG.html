@@ -801,14 +801,33 @@
       </span>
           <br/>
           <pre>{{dgFshLM}}</pre>
+
+
         </uib-tab>
+
+        <uib-tab heading="Profile">
+          The FHIR shorthand that represents this DataGroup as a FHIR Profile.
+          Only includes elements marked as extractable
+          <span class="pull-right">
+       <i class="glyphicon glyphicon-paperclip pull-right clickable"
+          ng-click="copyFshToClipboard(dgFshProfile)"></i>
+      </span>
+          <br/>
+          <pre>{{dgFshProfile}}</pre>
+
+
+        </uib-tab>
+
+
+
+
 
         <uib-tab heading="Table">
           <br/>
           <div class="tableFixHead">
             <table class="table-bordered table">
               <thead>
-              <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>Fixed value</th><th>Source</th></tr>
+              <tr><th>Path</th><th>Title</th><th>Description</th><th>Type</th><th>Mult.</th><th>SDC attributes</th><th>Source</th></tr>
               </thead>
               <tbody>
               <!---     <tr ng-repeat="element in fullElementList">-->
@@ -846,7 +865,13 @@
                 <td>{{element.ed.mult}}</td>
 
                 <td>
-                  {{element.ed.fixedCode}}{{element.ed.fixedCoding}}{{element.ed.fixedDecimal}}{{element.ed.fixedString}}
+                  {{element.ed.fixedCode}}{{element.ed.fixedCoding}}
+                  {{element.ed.fixedDecimal}}{{element.ed.fixedString}}
+                  {{element.ed.fixedQuantity.value}} {{element.ed.fixedQuantity.unit}}
+
+                  <div ng-if="element.ed.definition">Extract: {{element.ed.definition}}</div>
+                  <div ng-if="element.ed.prePop">PrePop: {{element.ed.prePop}}</div>
+
                 </td>
                 <td>{{element.ed.sourceModelName}}</td>
 

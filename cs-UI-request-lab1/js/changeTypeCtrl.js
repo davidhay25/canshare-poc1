@@ -123,6 +123,7 @@ angular.module("pocApp")
 
                 //todo allTypes is a combination of hashAllDG & FHIR DT - could be refactored
                 let vo = modelsSvc.getFullListOfElements(dg,allTypes,hashAllDG)
+
                 $scope.cdFullElementList = modelsSvc.makeOrderedFullList(vo.allElements)
                 let treeData = modelsSvc.makeTreeFromElementList($scope.cdFullElementList)
                 makeDGTree(treeData)

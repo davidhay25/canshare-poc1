@@ -1766,6 +1766,8 @@ angular.module("pocApp")
                 $scope.referencedDGOrdering = orderingSvc.createMoveFromReferences($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
 
                 $scope.dgFshLM = igSvc.makeFshForDG(dg,$scope.fullElementList)
+                $scope.dgFshProfile = igSvc.makeProfileFshDg(dg,$scope.fullElementList)
+
                 makeGraph()     //todo - do we want the graph back?
 
                 //we don't always need to get all the VS - just when the model is
@@ -1864,6 +1866,7 @@ angular.module("pocApp")
 
                             //now get the full list of elements for this DT. Used in the graph details view
                             let dg = $scope.hashAllDG[node.data.model.name]
+                            //<<<<< todo this function not used
                             let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
 
                             $scope.selectedModelFromGraphFull = vo.allElements
