@@ -64,7 +64,17 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
 
 
                 //i. Description (col D) - must start with a capital letter and finish with a full stop
-
+                let description = cols[3]
+                if (description) {
+                    let firstLetter = description[0]
+                    if (firstLetter !== firstLetter.toUpperCase()) {
+                        logger(rowNumber,`Description must start with an upper case letter: ${description}`)
+                    }
+                    let lastLetter = description[description.length-1]
+                    if (lastLetter !== '.') {
+                        logger(rowNumber,`Description must end with a period: ${description}`)
+                    }
+                }
 
 
 
@@ -104,6 +114,10 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                 }
 
                 //o. Updated display terms (col F) - the second "|" in each line must be directly preceded by a character (ie not a space)
+                if (displayTerm) {
+
+                }
+
 
                 //p. All columns are mandatory (col A to E), except col F (updated display terms) is optional
                 if (cols.length < 5) {
@@ -132,7 +146,6 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                 hashValueSetNames[item.vs.name] = true
             })
 
-
             for (const entry of bundleVS.entry) {
                 let vs = entry.resource
                 let item = {name:vs.name,status:vs.status}
@@ -144,7 +157,6 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                 }
 
                 lstReport.push(item)
-
             }
 
             return lstReport
@@ -182,12 +194,22 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
 
                 //todo - need to process display concepts and unpublished concepts
 
-                //add any display concepts
+                //add any display concepts. There will only be one
+
                 if (vo.displayConcept) {
                     let displayInclude = {system:snomed,concept:[]}
 
+                    let ar1 = vo.displayConcept.split('|')
+                    let code = ar1[0]
+                    code = code.replace(/\s/g,'')     //get rid of spaces
+                    let concept = {code: code, display:ar1[1]}
+                    displayInclude.concept.push(concept)
+                    vs.compose.include.push(displayInclude)
+
+/*
                     let ar = vo.displayConcept.split('/n')
                     ar.forEach(function(c){
+
                         c = c.replace(/\s/g,'')     //get rid of spaces
 
                         // c is a concept in code | display | format
@@ -197,7 +219,7 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
 
                     })
                     vs.compose.include.push(displayInclude)
-
+*/
                     //console.log(JSON.stringify(vs))
                 }
 
