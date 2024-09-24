@@ -1,0 +1,83 @@
+<br/>
+<div class="row">
+  <div class="col-md-2">
+    <div ng-show="input.vsBatchData"
+         class="btn-link btn" ng-click="parseVSBatchFile(input.vsBatchData)">Parse content</div>
+  </div>
+  <div class="col-md-2">
+    <div ng-show="previousCMSS">
+      <div class="btn-link btn" ng-click="reloadVSBatch()">Reload previous (Development only)</div>
+
+
+    </div>
+  </div>
+  <div class="col-md-2">
+
+  </div>
+  <div class="col-md-2">
+    <a target="_blank" href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=878499402">ValueSet spreadsheet</a>
+
+  </div>
+</div>
+
+<div class="row">
+
+  <div class="col-md-12">
+    <uib-tabset>
+
+      <uib-tab  heading="Table">
+        <br/>
+
+        <div class="myScroll">
+          <table class="table-bordered table table-condensed">
+            <tr ng-repeat="row  in vsBatchReport">
+              <td> <div class="clickable" ng-click="displayJson(row.vs)">{{row.name}} </div> </td>
+              <td>{{row.status}}</td>
+              <td>{{row.action}}</td>
+              <td>
+                <div class="clickable" ng-click="listConcepts(row.ecl)">{{row.ecl}}</div>
+              </td>
+
+            </tr>
+          </table>
+        </div>
+
+
+
+      </uib-tab>
+
+      <uib-tab heading="Paste from spreadsheet">
+        <div class="myScroll">
+          <textarea id="pasteVSBatchTextbox" rows="20" class="form-control"
+                    ng-paste="handleVSBatchPaste($event)" ng-model="input.vsBatchData"></textarea>
+        </div>
+
+
+      </uib-tab>
+
+      <uib-tab>
+        <uib-tab-heading>Parsing errors <span class="badge">{{arVSBatchLog.length}}</span> </uib-tab-heading>
+
+
+
+        <table class="table table-condensed table-bordered">
+          <tr ng-repeat="row in arVSBatchLog">
+            <td>{{row.line}}</td>
+            <td>{{row.msg}}</td>
+          </tr>
+        </table>
+
+
+        {{arVSBatchLog}}
+
+
+      </uib-tab>
+
+      <uib-tab ng-if="vsBatch" heading="Batch Json">
+        <pre>{{vsBatch | json}}</pre>
+      </uib-tab>
+    </uib-tabset>
+
+  </div>
+</div>
+

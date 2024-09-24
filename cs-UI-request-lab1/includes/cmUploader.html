@@ -123,8 +123,18 @@
 
       <uib-tab>
         <uib-tab-heading>Parsing errors <span class="badge">{{arLog.length}}</span> </uib-tab-heading>
+
+        <div>
+          <div class="pull-right">
+            <checkbox  ng-model="input.hideVSIssues"></checkbox> Hide ValueSet issues
+          </div>
+
+        </div>
+
         <table class="table table-condensed table-bordered">
-          <tr ng-repeat="row in arLog">
+          <tr
+                  ng-if="canShowRow(row)"
+                  ng-repeat="row in arLog">
             <td>{{row.line}}</td>
             <td>{{row.msg}}</td>
           </tr>

@@ -118,7 +118,7 @@ angular.module("pocApp")
 
 
             $scope.viewVS = function (url) {
-
+                //display the contents of a single VS
                 $uibModal.open({
                     templateUrl: 'modalTemplates/viewVS.html',
                     backdrop: 'static',
@@ -136,6 +136,14 @@ angular.module("pocApp")
                 })
             }
 
+            $scope.canShowRow = function (row) {
+                //to show / hide specific rows in the audit
+                if ($scope.input.hideVSIssues && row.msg.indexOf('does not exist on the terminology server') !== -1) {
+                    return false
+                }
+                return true
+            }
+
             $scope.handlePaste = function(event) {
                 setTimeout(function() {
                 var textarea = document.getElementById('pastetextbox');
@@ -151,8 +159,95 @@ angular.module("pocApp")
                 }, 0);  // Wait for the paste to complete before updating the model
             };
 
-            //============================
 
+            // ============ VS Batch upload functions ===========
+
+            //just during development...
+            $scope.reloadVSBatch = function () {
+                //reload the last 'file' copied in...
+
+                $scope.arVSBatchLog = terminologyUpdateSvc.auditVSBatchFile($localStorage.previousVSBatch)
+                $scope.vsBatch = terminologyUpdateSvc.makeVSBatch($localStorage.previousVSBatch)
+                $scope.vsBatchReport = terminologyUpdateSvc.VSBatchReport($scope.vsBatch,$scope.allVSItem)
+
+            }
+
+            $scope.parseVSBatchFile = function (file) {
+
+                let arLines = file.split('\n')
+                console.log(arLines.length)
+
+                arLines.splice(0,1)     //the first line is a header line
+
+                $scope.arVSBatchLog = terminologyUpdateSvc.auditVSBatchFile(arLines)
+
+                $localStorage.previousVSBatch = arLines
+
+                $scope.vsBatch = terminologyUpdateSvc.makeVSBatch(arLines)
+                $scope.vsBatchReport = terminologyUpdateSvc.VSBatchReport($scope.vsBatch,$scope.allVSItem)
+
+            }
+
+            $scope.handleVSBatchPaste = function(event) {
+                setTimeout(function () {
+                    var textarea = document.getElementById('pasteVSBatchTextbox');
+                    textarea.scrollTop = 0;  // Scroll to the top
+                }, 0);  // Wait for the paste to complete before updating the model
+            }
+
+            $scope.listConcepts = function (ecl) {
+                //display the concepts based on the ecl
+               // let ecl = vs.compose.include[0].filter[0].value     //we constructed this VS so we know this path is valid
+                let vo = {ecl:ecl}
+                $http.post(`nzhts/ecl`,vo).then(
+                    function (data) {
+                        let vs = data.data
+
+                        let total = vs.expansion.total
+                        if (total == 0) {
+                            alert("There were no concepts in the expansion")
+                        } else {
+                            $uibModal.open({
+                                templateUrl: 'modalTemplates/conceptList.html',
+                                //backdrop: 'static',
+                                //size : 'lg',
+                                controller : function ($scope,concepts) {
+                                    $scope.concepts = concepts
+                                },
+                                resolve: {
+                                    concepts: function () {
+                                        return vs.expansion.contains
+                                    }
+                                }
+                            })
+                        }
+
+
+
+
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    })
+
+            }
+
+            $scope.displayJson = function (json) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/displayJson.html',
+                    //backdrop: 'static',
+                    //size : 'lg',
+                    controller : function ($scope,json) {
+                        $scope.json = json
+                    },
+                    resolve: {
+                        json: function () {
+                            return json
+                        }
+                    }
+                })
+            }
+
+                //=============================
 
 
             //retrieve all ValueSets
@@ -386,7 +481,6 @@ angular.module("pocApp")
 
                 let vo = {ecl:ecl}
 
-
                 $http.post(`nzhts/ecl`,vo).then(
                     function (data) {
                         $scope.testEclVS = data.data
@@ -394,8 +488,6 @@ angular.module("pocApp")
                     }, function (err) {
                         alert(angular.toJson(err.data))
                     })
-
-
 
             }
 

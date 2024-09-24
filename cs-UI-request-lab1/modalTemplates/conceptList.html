@@ -1,0 +1,40 @@
+
+<div>
+
+    <div class="modal-header">
+
+        <div class="row">
+            <div class="col-md-8 col-sm-8">
+                <h3 class="modal-title">Concept list ({{concepts.length}})</h3>
+            </div>
+
+
+            <div class="col-md-4 col-sm-4">
+                <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
+            </div>
+
+
+        </div>
+
+    </div>
+    <div class="modal-body">
+
+        <table class="table table-bordered table-condensed">
+        <tr><th>Display</th><th>Code</th><th>System</th></tr>
+        <tr ng-repeat="concept in concepts">
+            <td>{{concept.display}}</td>
+            <td>
+                <div  class="clickable" ng-click="lookup(concept)">{{concept.code}}</div></td>
+            <td>{{concept.system}}</td>
+        </tr>
+        </table>
+
+
+    </div>
+
+
+    <div class="modal-header">
+
+        {{url}}
+    </div>
+</div>

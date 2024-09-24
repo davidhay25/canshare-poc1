@@ -1,10 +1,252 @@
 angular.module("pocApp").service('terminologyUpdateSvc', function() {
 
+    function logger(lne,msg) {
+        arLog.push({line:lne,msg:msg})
+    }
 
     return {
+        auditVSBatchFile : function (arLines) {
+            //audit the raw data from the the SS
+            arLog = []  //note: don't use let as the array is in the service scope
+            let rowNumber = 1   //yhis is the row number in the spreadsheet
+
+            let regex = /[a-z0-9-]+/     //regex for id/name
+            let hashName = {}
+            let hashTitle = {}
+
+            for (const lne of arLines) {
+                rowNumber++
+                let cols = lne.split('\t')
+                let name = cols[0]
+                //   a. Value Set ID (col A) - must be all lower case letters or '-'s
+                if (! regex.test(name)) {
+                    logger(rowNumber,`Id has an incorrect format: ${name}`)
+                }
+
+                if (countChar(name,' ') > 0) {
+                    logger(rowNumber,`Id has spaces in it: ${name}`)
+                }
+
+                //  b. Value Set ID (col A) - must be unique in the batch
+                if (hashName[name]) {
+                    logger(rowNumber,`Name is not unique: ${name}`)
+                }
+                hashName[name] = true
+
+                //c. Value Set ID (col A) - must be <= 64 characters
+                if (name.length > 64) {
+                    logger(rowNumber,`Id is too long: ${name} (${name.length} characters)`)
+                }
+
+                //  d. Value Set ID (col A) - must start with "canshare-"
+                if (! name.startsWith('canshare-')) {
+                    logger(rowNumber,`Id must start with 'canshare-': ${name}`)
+                }
+
+                // f. Status (col B) - must be either "Active" or "Retired"
+                if (cols[1] !== 'Active' && cols[1] !== 'Retired') {
+                    logger(rowNumber,`Status must be either 'Active' or 'Retired': ${name}`)
+                }
+
+                let title = cols[2]
+
+                //  g. Title (col C) - must start with "NZ "
+                if (! title.startsWith('NZ ')) {
+                    logger(rowNumber,`Title must start with 'NZ ': ${name}`)
+                }
+
+                //h. Title (col C) - must be unique in the batch
+
+                if (hashTitle[title]) {
+                    logger(rowNumber,`title is not unique: ${title}`)
+                }
+                hashTitle[title] = true
+
+
+                //i. Description (col D) - must start with a capital letter and finish with a full stop
+
+
+
+
+                let ecl = cols[4]
+                //j. ECL (col E) - count of "(" equals the count of ")"
+                if (countChar(ecl,'(') !== countChar(ecl,')')) {
+                    logger(rowNumber,`ecl brackets don't match: ${ecl}`)
+                }
+
+                //k ECL (col E) - count of "|" is an even number
+
+                if (countChar(ecl,'|') % 2 == 1) {
+                    logger(rowNumber,`There is an uneven number of '|' in the ecl: ${ecl}`)
+                }
+
+                //l. Updated display terms (col F) - each line has exactly 2 "|"
+                let displayTerm = cols[5]
+                if (displayTerm && countChar(displayTerm,'|') !== 2) {
+                    logger(rowNumber,`Display terms must have 2 '|' : ${displayTerm}`)
+                }
+
+                //m. Updated display terms (col F) - each line must start with a number
+                if (displayTerm && isNaN(displayTerm[0])) {
+                    logger(rowNumber,`Display terms must start with a number : ${displayTerm}`)
+                }
+                //n. Updated display terms (col F) - the first "|" in each line must be directly followed by a character (ie not space)
+                if (displayTerm) {
+                    let g = displayTerm.indexOf('|')
+                    if (g > -1 && displayTerm.length > g+1) {
+                        if (displayTerm[g+1] == " ") {
+                            logger(rowNumber,`There must not be a space after the first | in display term : ${displayTerm}`)
+                        }
+
+                    } else {
+                        logger(rowNumber,`Missing | in display term : ${displayTerm}`)
+                    }
+                }
+
+                //o. Updated display terms (col F) - the second "|" in each line must be directly preceded by a character (ie not a space)
+
+                //p. All columns are mandatory (col A to E), except col F (updated display terms) is optional
+                if (cols.length < 5) {
+                    logger(rowNumber,`There are missing values`)
+                }
+
+
+            }
+
+            return arLog
+
+            function countChar(str,charToCount) {
+                let count = str.split(charToCount).length - 1
+                return count
+            }
+
+
+        },
+        VSBatchReport : function (bundleVS,allVsItem) {
+            //generate a report of the VS in the batch
+            let lstReport = []
+
+            //create a hash of the current list of vs (from the term server
+            let hashValueSetNames = {}
+            allVsItem.forEach(function (item) {
+                hashValueSetNames[item.vs.name] = true
+            })
+
+
+            for (const entry of bundleVS.entry) {
+                let vs = entry.resource
+                let item = {name:vs.name,status:vs.status}
+                item.vs = vs
+                item.ecl = vs.compose.include[0].filter[0].value     //we constructed this VS so we know this path is valid
+                item.action = 'Create'
+                if (hashValueSetNames[vs.name]) {
+                    item.action = 'Update'
+                }
+
+                lstReport.push(item)
+
+            }
+
+            return lstReport
+
+        },
+        makeVSBatch : function (inLines) {
+
+            let snomed = "http://snomed.info/sct"
+
+            let bundle = {resourceType:"Bundle",type:"batch",entry:[]}
+
+            let makeVS = function(vo) {
+                //console.log(vo)
+                let vs = {resourceType:"ValueSet",id:vo.id}
+                vs.language = "en-x-sctlang-23162100-0210105"
+                vs.url = `https://nzhts.digital.health.nz/fhir/ValueSet/${vo.id}`
+                vs.status = vo.status
+                vs.name = vo.id
+                vs.title = vo.title
+                vs.experimental = false
+                //vs.version = "20230525"
+                vs.version = "20240318"   //<<<<<<<<<<<<<<, this is the line to change
+                vs.identifier = [{system:"http://canshare.co.nz/fhir/NamingSystem/valuesets",value:vo.id}]
+                vs.publisher = "Te Aho o Te Kahu"
+                vs.contact = [{telecom:[{system:"email",value:"info@teaho.govt.nz"}]}]
+                if (vo.description) {
+                    vs.description = vo.description
+                }
+
+
+                //add the ecl as a filter
+                let filter = {property:"constraint",op:"=",value:vo.ecl}
+                let include = {system:"http://snomed.info/sct",version:"http://snomed.info/sct/21000210109",filter:[filter]}
+                vs.compose = {include:[include]}
+
+                //todo - need to process display concepts and unpublished concepts
+
+                //add any display concepts
+                if (vo.displayConcept) {
+                    let displayInclude = {system:snomed,concept:[]}
+
+                    let ar = vo.displayConcept.split('/n')
+                    ar.forEach(function(c){
+                        c = c.replace(/\s/g,'')     //get rid of spaces
+
+                        // c is a concept in code | display | format
+                        let ar1 = c.split('|')
+                        let concept = {code: ar1[0], display:ar1[1]}
+                        displayInclude.concept.push(concept)
+
+                    })
+                    vs.compose.include.push(displayInclude)
+
+                    //console.log(JSON.stringify(vs))
+                }
+
+
+
+                //the poc app updateValueSet has a UI and code for this
+                //will need to update the CodeSystem resource as well so worth checking the updateValueSet code...
+
+
+
+                return vs
+            }
+
+
+            inLines.forEach(function(row,inx){
+
+                        let arData = row.split(/\t/)
+                        //console.log(arData)
+
+
+                     //   if (arData[1] !== 'Retired') {
+                            //console.log(arData[0])
+
+
+                            let id = arData[0].replace(/\s/g, "")
+
+                            let vo = {id:id,status:arData[1].toLowerCase(),title:arData[2],description:arData[3], ecl:arData[4]}
+
+                            //We've added space for display terms and display concepts - not not yet using tem
+                            vo.displayConcept = arData[5]   //if present, add a concept/s containing the contents to the ValueSet as well as the ecl
+                            //vo.unpublished = arData[6]   //if present, add concepts in the unpublished concepts namesystem
+                            let vs = makeVS(vo)
+                            //console.log(vs.id)
+
+                            let entry = {resource:vs,request:{method:"PUT",url:`ValueSet/${vs.id}`}}
+                            bundle.entry.push(entry)
+                      //  }
+
+
+
+
+                })
+
+            return bundle
+
+        },
         auditCMFile : function (arLines,allVsItem) {
             //audit the raw data from the spreadsheet - https://docs.google.com/spreadsheets/d/1qRPZZk9dpwbF8yP9SYkiwzp-nKO_3T__nfz94AzFoGw/edit?gid=874499567#gid=874499567
-            let arLog = []
+            arLog = []  //note: don't use let as the array is in the service scope
             let hashValueSetNames = {}
             allVsItem.forEach(function (item) {
                 hashValueSetNames[item.vs.name] = true
@@ -119,9 +361,7 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
             return arLog
 
 
-            function logger(lne,msg) {
-                arLog.push({line:lne,msg:msg})
-            }
+
 
             function isNumericString(str) {
                 return str.split('').every(char => !isNaN(char));
