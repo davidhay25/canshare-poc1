@@ -104,6 +104,12 @@ angular.module("pocApp")
                 $scope.input.gtable =  item.ed.gtable
                 $scope.input.prePop =  item.ed.prePop
                 $scope.input.definition =  item.ed.definition
+                $scope.input.extractExtensionUrl =  item.ed.extractExtensionUrl
+
+
+                $scope.input.identifierSystem = item.ed.identifierSystem
+
+
 
                 $scope.input.selectedType = item.ed.type[0]
                 setControlOptions($scope.input.selectedType)
@@ -399,6 +405,11 @@ angular.module("pocApp")
                 ed.gtable = $scope.input.gtable
                 ed.prePop = $scope.input.prePop
                 ed.definition = $scope.input.definition
+                ed.extractExtensionUrl = $scope.input.extractExtensionUrl
+
+                ed.identifierSystem = $scope.input.identifierSystem
+
+
                 ed.placeholder = $scope.input.placeholder
                 if ($scope.input.controlHint) {
                     ed.controlHint = $scope.input.controlHint

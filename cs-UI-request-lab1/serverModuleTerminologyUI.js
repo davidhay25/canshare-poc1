@@ -368,6 +368,7 @@ function setup(app) {
 
     */
     //queries against the Terminology Server
+
     app.get('/nzhts',async function(req,res){
         let query = req.query.qry
 
@@ -534,10 +535,7 @@ function setup(app) {
 
         if (cs) {
             let qry = `${nzhtsconfig.serverBase}CodeSystem/${cs.id}`
-
             let result = await putResource(qry,cs)
-
-           // console.log('>>', result)
             if (result) {
                 //A result is returned if there is an error
                 res.status(400).json({msg:result})
@@ -550,9 +548,6 @@ function setup(app) {
 
         }
     })
-
-
-
 
     //use when updating a ValueSet
     app.put('/nzhts/ValueSet',async function(req,res){
@@ -574,6 +569,25 @@ function setup(app) {
         }
     })
 
+    //use when updating a ConceptMap
+    app.put('/nzhts/ConceptMap',async function(req,res){
+
+        let cm = req.body
+
+        if (cm) {
+            let qry = `${nzhtsconfig.serverBase}ConceptMap/${cm.id}`
+            let result = await putResource(qry,cm)
+            if (result) {
+                //A result is returned if there is an error
+                res.status(400).json({msg:"Unable to update ConceptMap"})
+                return
+            }
+            res.json()      //no error
+        } else {
+            res.status(400).json({msg:"Must have urlencoded qry query"})
+
+        }
+    })
 
     //return a list of Q where a particular ValueSet is used
     //todo - this might be useful in the designer

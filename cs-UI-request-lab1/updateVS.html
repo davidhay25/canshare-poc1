@@ -10,6 +10,8 @@
     <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
     <script src="js/libs/moment.min.js"></script>
 
+    <script src="js/libs/ngStorage.min.js"></script>
+
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/common.css"/>
     <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
@@ -21,7 +23,7 @@
     </style>
 
     <script>
-        angular.module("pocApp",['ui.bootstrap','ui.checkbox',"firebase"]).config(function($locationProvider) {
+        angular.module("pocApp",['ui.bootstrap','ui.checkbox',"firebase",'ngStorage']).config(function($locationProvider) {
             $locationProvider.html5Mode(true);
             $locationProvider.hashPrefix('!');
         });
@@ -43,6 +45,10 @@
     <script src="js/showParameters.js"></script>
     <script src="js/loginCtrl.js"></script>
     <script src="js/utilsSvc.js"></script>
+    <script src="js/viewVSCtrl.js"></script>
+
+    <script src="js/terminologyUpdateSvc.js"></script>
+
 
     <script src="js/filters.js"></script>
     <script src="js/customCodeSystemCtrl.js"></script>
@@ -587,7 +593,7 @@
 
 
         </uib-tab>
-        <uib-tab ng-show="false" heading="List VS by date modified">
+        <uib-tab ng-if="false" heading="List VS by date modified">
             <table class="table-bordered table">
                 <tr ng-repeat = "item in sortedVS">
                     <td>{{item.vs.meta.lastUpdated | date : "MMM d, h:mm a y"}} </td>
@@ -605,6 +611,14 @@
             </div>
 
         </uib-tab>
+        <uib-tab heading="Update ConceptMap">
+
+            <ng-include src="'/includes/cmUploader.html'"></ng-include>
+
+
+
+        </uib-tab>
+
     </uib-tabset>
 
 

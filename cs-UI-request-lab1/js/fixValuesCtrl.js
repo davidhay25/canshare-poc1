@@ -18,6 +18,7 @@ angular.module("pocApp")
                         $scope.input.code = current.code
                         $scope.input.display = current.display
                         $scope.input.fsn = current.fsn
+                        $scope.input.system = current.system
                         break
                     case 'Quantity' :
                         $scope.input.unit = current.unit

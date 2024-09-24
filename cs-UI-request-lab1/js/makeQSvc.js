@@ -18,9 +18,15 @@ angular.module("pocApp")
         extExtractionContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
         extHidden = "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
 
+        extExtractionValue = "http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue"
+
         //let extGtableUrl = ""
        // let extSourceQuery = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-sourceQueries"
         systemItemControl = "http://hl7.org/fhir/questionnaire-item-control"
+
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
 
         function addPrePopExtensions(Q) {
             //add the SDC extensions required for pre-pop
@@ -38,6 +44,26 @@ angular.module("pocApp")
                 ext.extension.push({url:'description',valueString:description})
                 Q.extension.push(ext)
             }
+        }
+
+
+
+
+
+        function addFixedValue(item,definition,value,type) {
+            //add a fixed value extension
+
+            //http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue
+            let ext = {url:extExtractionValue,extension:[]}
+            ext.extension.push({url:"definition",valueCanonical:definition})
+
+            let child = {url:'fixed-value'}
+            child[`value${type}`] = value
+            ext.extension.push(child)
+
+            item.extension = item.extension || []
+            item.extension.push(ext)
+
         }
 
         function addUseContext(Q) {
@@ -70,7 +96,7 @@ angular.module("pocApp")
             }
 
             //is this a profile or a core resource type
-            if (extractionContext.indexOf('http') == -1) {
+            if (extractionContext && extractionContext.indexOf('http') == -1) {
                 //this is a core FHIR patient resource. Add the rest of the url
                 extractionContext = `http://hl7.org/fhir/StructureDefinition/${extractionContext}`
             }
@@ -139,7 +165,12 @@ angular.module("pocApp")
                     case 'Group' :
                         controlHint = "display"
                         controlType = "display"
-
+                        break
+                    /*
+                    case 'Identifier' :
+                        controlHint = "Identifier"
+                        controlType = "Identifier"
+*/
 
                 }
 
@@ -673,10 +704,11 @@ angular.module("pocApp")
                             //multiple resources extracted from it, they will be in the items...
 
                             //let arExt = getExtension(vo.Q,extExtractionContextUrl,'Code')
+
                             let arExt = getExtension(vo.Q,extExtractionContextUrl,'String')
                             if (arExt.length) {
                                 sectionItem.extension = sectionItem.extension || []
-                                let ext = {url:extExtractionContextUrl,valueCode:arExt[0]}
+                                let ext = {url:extExtractionContextUrl,valueString:arExt[0]}
                                 sectionItem.extension.push(ext)
                             }
 
@@ -818,6 +850,8 @@ angular.module("pocApp")
                 //resource using the SDC defintion extratcion
                 //examine the DG hierarchy to see if there is a 'type' in any of the DG parents which is the SDC extraction context
                 //note that the extraction context is a complete url (not just a type name)
+                //this is where the context is defined on the DG (as opposed to a referenced DG
+
                 let extractionContext = getExtractionContext(dgName,config.hashAllDG)
 
                 if (extractionContext) {
@@ -825,8 +859,6 @@ angular.module("pocApp")
                     //Q.extension.push({url:extExtractionContextUrl,valueCode:extractionContext})
                     Q.extension.push({url:extExtractionContextUrl,valueString:extractionContext})
                 }
-
-
 
                 let currentItem
                 let hashItems = {}      //items by linkId
@@ -836,7 +868,6 @@ angular.module("pocApp")
                 for (const item of lstQElements) {
                     let ed = item.ed
                     let path = ed.path
-
 
                     //If this is being called from the composition then add the pathprefix to the path (linkId)
                     let newLink = path
@@ -850,7 +881,7 @@ angular.module("pocApp")
                         //console.log(parentItemPath)
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
 
-                        decorateItem(currentItem,ed,extractionContext)
+                        extractionContext = decorateItem(currentItem,ed,extractionContext)
 
                         if (config.enableWhen) {
                             let ar =  addEnableWhen(ed,currentItem,config.pathPrefix)
@@ -868,6 +899,8 @@ angular.module("pocApp")
                         hashItems[parentItemPath].type = "group"
 
                         hashItems[path] = currentItem
+
+
 
 
                     } else {
@@ -953,44 +986,15 @@ angular.module("pocApp")
                 //extraction context is the url of the profile (could be a core type)
                 function decorateItem(item,ed,extractionContext) {
 
+                   // let newItem = {}    //If a new item is needed - ie extension url
+
                     if (! ed.type) {
                         return
                     }
                     let edType = ed.type[0]
 
 
-                    console.log(edType)
-
-                    if (ed.definition) {
-                        //this will be the extract path for this element into the target resource
-                        //right now assumes extracting to a FHIR resource - will need further thought if profiled...
-
-                        item.definition = `${extractionContext}#${ed.definition}`
-/*
-                        let resourceType = extractionContext //the extraction type passed in if the whole DG is extracted to a single resource
-
-
-
-                        if (! resourceType) {
-                            //this is a child element that is extracted into a separate resource
-                            let ar = ed.definition.split('.')
-                            resourceType = ar[0]
-                        }
-
-
-                        //
-
-
-                        //If it doesn't start with 'http' we assume it's a core resource profile
-                        if (ed.definition.indexOf('http') == -1) {
-                            item.definition = `http://hl7.org/fhir/StructureDefinition/${resourceType}#${ed.definition}`
-                        } else {
-                            item.definition = ed.definition
-                        }
-*/
-
-                    }
-
+                    //console.log(edType)
 
                     //If this ed is a reference to another, it can have a different exraction context...
                     if (config.hashAllDG[edType]) {
@@ -999,13 +1003,17 @@ angular.module("pocApp")
                         //this ed is a child ED. Des this DG have an extraction context? Curentlly a FHIR resource, but could be a profile
 
                         //is there an extraction context (dg.type) on this DG or any of its parents
-                        let extractionContext = getExtractionContext(edType,config.hashAllDG)
+                        //todo - check this. I think this extractionContext is in a different scope - ? should change name
+
+                        //the extractionContext is preserved across calls to decorate()
+                        //this allows it to flow into children...
+                        extractionContext = getExtractionContext(edType,config.hashAllDG)
 
                         //let extractionContext = config.hashAllDG[edType].type
                         if (extractionContext) {
                             //extension type can be code or expression
                             item.extension = item.extension || []
-                            item.extension.push({url:extExtractionContextUrl,valueCode:extractionContext})
+                            item.extension.push({url:extExtractionContextUrl,valueString:extractionContext})
 
                            // item.extension.push({url:extExtractionContextUrl,valueExpression:{language:"text/fhirpath",expression:extractionContext}})
                         }
@@ -1032,7 +1040,6 @@ angular.module("pocApp")
                     }
 
                     let vo = getControlDetails(ed)
-
                     item.type = vo.controlType
 
                     //todo - refactor these
@@ -1075,6 +1082,19 @@ angular.module("pocApp")
                         }
                     }
 
+                    if (edType == 'Identifier') {
+
+
+                        if (ed.identifierSystem) {
+                            //an identifier system has been set - add the fixedValue extension to the item
+                            let ar = extractionContext.split('/')
+                            let canonical = `${extractionContext}#${ar[ar.length-1]}.identifier.system`
+                            console.log(canonical)
+                            addFixedValue(item,canonical,ed.identifierSystem,"String")
+                           // addFixedValue(item,``,value,type)
+                        }
+                        //addFixedValue(item,definition,value,type)
+                    }
 
                     if (edType == 'CodeableConcept') {
 
@@ -1197,6 +1217,109 @@ angular.module("pocApp")
                     }
 
 
+                    //important that this segment is the last as it can adjust items (eg the valueset stuff)
+                    if (ed.definition) {
+                        //this will be the extract path for this element into the target resource
+                        //right now assumes extracting to a FHIR resource - will need further thought if profiled...
+
+                        item.definition = `${extractionContext}#${ed.definition}`
+
+                        if (ed.extractExtensionUrl) {
+                            //If there's an extension url on the item, then this item is an extension and
+                            //the definition will refer to the extension (eg Patient.extension). However,
+                            //we need to change the structure so that the element becomes a group
+                            //with child elements for url & value
+
+                            //Save attributes needed for the value child
+                            let copyItem = angular.copy(item)
+                            //let itemType = item.type  //need this for the value child
+
+
+
+
+                            item.type = "group"
+                            item.item = []
+
+                            // add an additional, hidden Q item for the extension url
+                            let urlItem = {linkId:`${item.linkId}.extUrl`,type:'string',text:"extension url"}
+
+                            //the defintion will be {resource type}.extension.url
+                            let ar = ed.definition.split('.')
+                            let extractResourceType = ar[0]
+
+                            urlItem.definition = `${extractionContext}#${extractResourceType}.extension.url`
+                            urlItem.initial = [{valueString:ed.extractExtensionUrl}]
+                            urlItem.extension = [{url:extHidden,valueBoolean:true}]
+                            item.item.push(urlItem)
+
+                            //now the value
+                            let valueItem = {linkId:`${item.linkId}.extValue`,type:copyItem.type,text:"extension value"}
+
+                            //There are attributes of the original model element that need to be copied to the value
+                            //currently only 1 identified
+                            let arCopy = ["answerOption"]
+
+                            for (const name of arCopy) {
+                                if (copyItem[name]) {
+                                    valueItem[name] = copyItem[name]
+                                    delete item[name]
+                                }
+                            }
+
+                            /*
+                            if (copyItem.answerValueSet) {
+                                delete item.answerOption
+                                valueItem.answerOption = copyItem.answerValueSet
+                            }
+                            */
+
+                            //Need to set the type of the valueItem according to the dt in the model. sometimes they
+                            //are the same (string) and sometimes not (codeableconcept)
+
+                            let dtInValue = edType
+                            switch (edType) {
+                                case "CodeableConcept" :
+                                    dtInValue = "Coding"
+                                    break
+                            }
+
+
+                            valueItem.definition = `${extractionContext}#${extractResourceType}.extension.value${capitalizeFirstLetter(dtInValue)}`
+
+                            //valueItem.definition = `${extractionContext}#${extractResourceType}.extension.value${dtInValue}`
+                            item.item.push(valueItem)
+
+                        }
+
+                        /*
+                                                let resourceType = extractionContext //the extraction type passed in if the whole DG is extracted to a single resource
+
+
+
+                                                if (! resourceType) {
+                                                    //this is a child element that is extracted into a separate resource
+                                                    let ar = ed.definition.split('.')
+                                                    resourceType = ar[0]
+                                                }
+
+
+                                                //
+
+
+                                                //If it doesn't start with 'http' we assume it's a core resource profile
+                                                if (ed.definition.indexOf('http') == -1) {
+                                                    item.definition = `http://hl7.org/fhir/StructureDefinition/${resourceType}#${ed.definition}`
+                                                } else {
+                                                    item.definition = ed.definition
+                                                }
+                        */
+
+                    }
+
+
+
+                    return extractionContext
+
                 }
 
                 function correctEW(Q,conditionalED) {
@@ -1257,7 +1380,7 @@ angular.module("pocApp")
 
             },
 
-            makeTreeFromQ : function (Q) {
+            makeTreeFromQDEP : function (Q) {
                 //pass in a Q and return a tree array representation
                 //used in previewQ
                 let treeData = []
@@ -1266,24 +1389,33 @@ angular.module("pocApp")
                 let hashLinkId = {}     //a hash of linkIds
 
                 function processItem(item,parent) {
-                    let node = {id:item.linkId,text:item.text,parent:parent}
-                    node.data = item
-                    if (hashLinkId[item.linkId]) {
-                        issues.push(`linkId: ${item.linkId} is duplicated`)
-                    } else {
-                        hashLinkId[item.linkId] = true
+
+
+
+                        let node = {id:item.linkId,text:item.text,parent:parent}
+                        node.data = item
+                        if (hashLinkId[item.linkId]) {
+                            issues.push(`linkId: ${item.linkId} is duplicated`)
+                        } else {
+                            hashLinkId[item.linkId] = true
+                        }
+                        treeData.push(node)
+
+                        lstElements.push({linkId:item.linkId,item:item})
+
+
+                        if (item.item) {
+                            item.item.forEach(function (child) {
+                                processItem(child,item.linkId)
+                            })
+                        }
                     }
-                    treeData.push(node)
-
-                    lstElements.push({linkId:item.linkId,item:item})
 
 
-                    if (item.item) {
-                        item.item.forEach(function (child) {
-                            processItem(child,item.linkId)
-                        })
-                    }
-                }
+
+
+
+
 
                 let node = {id:'root',parent:"#",text:"root"}
                 treeData.push(node)

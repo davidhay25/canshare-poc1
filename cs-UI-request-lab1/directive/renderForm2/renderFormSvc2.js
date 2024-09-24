@@ -160,6 +160,9 @@ angular.module("formsApp")
                     }
 
 
+                    //todo at this point the node has been created. We need to see if it is an extension
+                    //as the
+
                     treeData.push(node)
 
                     //now look at any sub children

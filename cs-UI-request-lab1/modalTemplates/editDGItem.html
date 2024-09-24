@@ -267,7 +267,29 @@
             </td>
           </tr>
 
-          <tr >
+          <tr ng-show="input.definition.indexOf('extension') > -1">
+            <td>Extension Url</td>
+            <td>
+              <input type="text"
+                     placeholder="Url for extension"
+                     class="form-control" ng-model="input.extractExtensionUrl"/>
+              <div><em>If extracting to an extension, need to set the extension url</em></div>
+            </td>
+          </tr>
+
+          <tr ng-show="input.selectedType == 'Identifier'">
+            <td>System</td>
+            <td>
+              <input type="text"
+                     placeholder="System for this identifier"
+                     class="form-control" ng-model="input.identifierSystem"/>
+              <div><em>If extracting to an identifier, this is the system to use</em></div>
+            </td>
+          </tr>
+
+
+          <!--
+          <tr>
             <td>Hide label text</td>
             <td><checkbox ng-model="input.hideLabel"/>
               <div><em>If checked, there will be no label displayed for this item. NOT CURRENTLY SUPPORTED</em></div>
@@ -282,6 +304,7 @@
                      placeholder="Element label if not the text. XHTML supported."
                      class="form-control" ng-model="input.labelText"/> </td>
           </tr>
+          -->
 
 
 
@@ -439,7 +462,7 @@
           </table>
       </uib-tab>
 
-      <uib-tab heading="Profiling">
+      <uib-tab ng-if="false" heading="Profiling">
         <br/>
         <div class="alert alert-warning" ng-hide="fhirResourceType">
           There is no base FHIR resource type defined.

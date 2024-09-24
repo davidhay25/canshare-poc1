@@ -1,0 +1,141 @@
+<!--
+<div class="pull-right">
+  <a target="_blank" href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653">Concept Map spreadsheet</a>
+</div>
+<div class="clearfix"></div>
+-->
+
+<!--
+<style>
+
+  textarea {
+    height: auto;  /* Adjust height as needed */
+    min-height: 200px;
+    overflow: auto; /* Ensure content doesn't get hidden */
+  }
+</style>
+-->
+
+<br/>
+<div class="row">
+  <div class="col-md-2">
+    <div ng-show="input.cmData"
+         class="btn-link btn" ng-click="parseCMFile(input.cmData)">Parse content</div>
+  </div>
+  <div class="col-md-2">
+    <div ng-show="previousCMSS">
+      <div class="btn-link btn" ng-click="reloadCMSS(input.cmData)">Reload previous (Development only)</div>
+
+
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div>
+      <div class="btn-link btn" ng-click="loadCurrent()">Download from Term. server</div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <a target="_blank" href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653">Concept Map spreadsheet</a>
+
+  </div>
+</div>
+
+<div class="row">
+
+  <div class="col-md-12">
+    <uib-tabset>
+
+      <uib-tab  heading="Table">
+        <br/>
+
+        <div class="row">
+          <div class="col-md-3">
+            <div class="list-group">
+              <div ng-class="{'list-group-item':true,listItemSelected:element == input.cmElement}"
+                   ng-click="selectCmElement(element)"
+                   style="cursor: pointer"
+                   ng-repeat="element in conceptMap.group[0].element">
+                {{element.display}}
+                <span class="pull-right badge">{{element.target.length}}</span>
+              </div>
+
+            </div>
+          </div>
+          <div class="col-md-9" ng-if="input.cmElement">
+
+            <div class="banner">
+              {{input.cmElement.display}} ({{input.cmElement.code}})
+            </div>
+
+            <uib-tabset>
+              <uib-tab heading="Targets">
+                <div class="myScroll">
+                  <table class="table-bordered table-condensed table">
+                    <tr><th>Target VS / code</th><th>Depends On elements</th></tr>
+                    <tr ng-repeat="target in input.cmElement.target">
+
+                      <td>
+                        <div ng-if = "target.code.indexOf('http') > -1 " class="clickable" ng-click="viewVS(target.code)">{{target.display}}</div>
+                          <div ng-if = "target.code.indexOf('http') == -1 ">{{target.display}} ({{target.code}})</div>
+
+                        <!--
+                        <div>{{target.code | lastInUrl}}</div>
+                        -->
+                        <div>Row: {{target.comment}}</div>
+
+                      </td>
+                      <td>
+                        <table class="table-bordered table-condensed table">
+                          <tr><th>Property</th><th>Value</th><th>Display</th></tr>
+                          <tr ng-repeat = "don in target.dependsOn">
+                            <td>{{don.property}}</td>
+                            <td>{{don.value}}</td>
+                            <td>{{don.display}}</td>
+                          </tr>
+                        </table>
+
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+
+
+              </uib-tab>
+
+
+              <uib-tab heading="Element Json">
+                <pre>{{input.cmElement | json}}</pre>
+              </uib-tab>
+
+            </uib-tabset>
+          </div>
+        </div>
+
+      </uib-tab>
+
+      <uib-tab heading="Paste from spreadsheet">
+        <div class="myScroll">
+          <textarea id="pastetextbox" rows="20" class="form-control" ng-paste="handlePaste($event)" ng-model="input.cmData"></textarea>
+        </div>
+
+
+      </uib-tab>
+
+      <uib-tab>
+        <uib-tab-heading>Parsing errors <span class="badge">{{arLog.length}}</span> </uib-tab-heading>
+        <table class="table table-condensed table-bordered">
+          <tr ng-repeat="row in arLog">
+            <td>{{row.line}}</td>
+            <td>{{row.msg}}</td>
+          </tr>
+        </table>
+      </uib-tab>
+
+      <uib-tab ng-if="conceptMap" heading="ConceptMap Json">
+        <pre>{{conceptMap | json}}</pre>
+      </uib-tab>
+    </uib-tabset>
+
+  </div>
+</div>
+

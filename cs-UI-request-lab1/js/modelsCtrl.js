@@ -11,11 +11,11 @@ angular.module("pocApp")
             //let removeZeroedOut = false  //when creating the full element list, remove mult = 0..0
 
             //$scope.newInflater = true  //running the new inflater
-
+/*
             $timeout(function () {
                 console.log('watchers:' + $scope.$$watchers.length);
             },5000)
-
+*/
             //change the background colour of the DG summary according to the environment
             $scope.modelInfoClass = 'modelInfo'
             let host = $location.absUrl()
@@ -1147,6 +1147,9 @@ angular.module("pocApp")
                                 ed1.gtable = ed.gtable
                                 ed1.prePop = ed.prePop
                                 ed1.definition = ed.definition
+                                ed1.extractExtensionUrl = ed.extractExtensionUrl
+                                ed1.identifierSystem = ed.identifierSystem
+
 
                                 ed1.conditionalVS = ed.conditionalVS
 

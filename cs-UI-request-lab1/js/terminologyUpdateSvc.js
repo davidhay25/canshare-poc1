@@ -1,0 +1,347 @@
+angular.module("pocApp").service('terminologyUpdateSvc', function() {
+
+
+    return {
+        auditCMFile : function (arLines,allVsItem) {
+            //audit the raw data from the spreadsheet - https://docs.google.com/spreadsheets/d/1qRPZZk9dpwbF8yP9SYkiwzp-nKO_3T__nfz94AzFoGw/edit?gid=874499567#gid=874499567
+            let arLog = []
+            let hashValueSetNames = {}
+            allVsItem.forEach(function (item) {
+                hashValueSetNames[item.vs.name] = true
+            })
+
+            let types = ['Value Set','Value']
+            let arDon = [ 10,14, 18,22, 26, 30, 34, 38, 42, 46] //dependsOn properties. 10 sets of 3
+
+            let arDonComparison = [11, 15, 19, 23, 27, 31, 35, 39, 43, 47]
+            let arSupportedComparison = ['=','!=','^','!^']
+
+            let firstLine = arLines[0]
+            let ar = firstLine.split('\t')
+            let colCount = ar.length        //all rows should have this number of columns
+
+            rowNumber = 2   //yhis is the row number in the spreadsheet
+            for (const lne of arLines) {
+
+
+
+
+                let cols = lne.split('\t')
+
+                if (! cols[0]) {      //finish the check if the first col is empty
+                    break
+                }
+                rowNumber++
+
+                if (cols.length !== colCount) {
+                    let msg = `There are only ${cols.length} cols - there should be ${colCount}. This can be caused by a newLine character at that col number`
+                    msg += " Note that the row number may be incorrect if there are earlier errors like this - it mucks up the sequence"
+                    logger(rowNumber,msg)}
+
+                if (! cols[1])  { logger(rowNumber,"Col B is empty")}
+                if (! cols[2])  { logger(rowNumber,"Col C is empty")}
+
+                //Col D (3: Type) must be either "Value Set" or "Value"
+                let type = cols[3]
+                if (types.indexOf(type) == -1) { logger(rowNumber,`Col D has an incorrect value: ${type}`)}
+
+                //IF col D (3: Type) = "Value Set" THEN col E (4: Valueset Name) is mandatory
+                if (type == 'Value Set') {
+                    let vsUrl = cols[4]
+                    if (! vsUrl)  { logger(rowNumber,"For a valueSet, Col E must have a value")}
+                    if (vsUrl && ! hashValueSetNames[vsUrl]) {{
+                        logger(rowNumber,`The valueSet ${vsUrl} in col ${4} does not exist on the terminology server`)}
+                    }
+                }
+
+                // IF col D (3: Type) = "Value" THEN col F (5: Concept ID) and col G (6: Concept Display) are mandatory
+                if (type == 'Value') {
+                    if (! cols[5])  { logger(rowNumber,"For a value, Col F must have a value")}
+                    if (! cols[6])  { logger(rowNumber,"For a value, Col G must have a value")}
+                }
+
+                // Attribute (Cols 10,14, 18,22, 26, 30, 34, 38, 42, 46) - IF Attribute has a value, then subsequent REL, SCTID, and Display are all mandatory
+                arDon.forEach(function (colNumber) {
+                    if (cols[colNumber] ) { //Attribute
+                        if (! cols[colNumber+1] || ! cols[colNumber+2] || ! cols[colNumber+2]) {
+                            logger(rowNumber,`If there is a depends on property, then the following 3 cols should have a value`)
+                        }
+
+                        //l. REL (Cols 11, 15, 19, 23, 27, 31, 35, 39, 43, 47) - Must be either "=" or "^" or "!=" or "!^"
+                        let comp =cols[colNumber+1]     //REL
+                        if (arSupportedComparison.indexOf(comp) == -1) {
+                            logger(rowNumber,`The comparison operator in col ${colNumber} is invalid - ${comp}`)
+                        }
+
+                        //m. SCTID (Cols 12, 16, 20, 24, 28, 32, 36, 40, 44, 48) - IF preceding REL is "=" or "!=" THEN SCTID must be numeric
+                        if (comp == '=' || comp == '!=') {
+                            let value = cols[colNumber + 2]
+                            if (! value) {
+                                logger(rowNumber,`The comparison value in col ${colNumber} is missing`)
+                            } else if ( ! isNumericString(value) ) {
+                                logger(rowNumber,`The comparison value in col ${colNumber}  (${value}) must be a number`)
+                            }
+                        }
+
+                        //n. SCTID (Cols 12, 16, 20, 24, 28, 32, 36, 40, 44, 48) - IF preceding REL is "^" or "!^" THEN check if value set with this id exists (WARNING ONLY if it doesn't)
+                        if (comp == '^' || comp == '!^') {
+                            let vsUrl = cols[colNumber + 2]
+                            if (! vsUrl)  { logger(rowNumber,"For a 'contained in operator, Col ${colNumber + 2} must have a valueSet")}
+                            if (vsUrl && ! hashValueSetNames[vsUrl]) {{
+                                logger(rowNumber,`The valueSet ${vsUrl} in col ${colNumber + 2} does not exist on the terminology server`)}
+                            }
+
+                        }
+
+
+                    }
+                })
+
+
+                //check the comparison operators
+                //l. REL (Cols 11, 15, 19, 23, 27, 31, 35, 39, 43, 47) - Must be either "=" or "^" or "!=" or "!^"
+                arDonComparison.forEach(function (colNumber) {
+                    if (cols[colNumber]) {
+                        let comp =cols[colNumber]
+                        if (arSupportedComparison.indexOf(comp) == -1) {
+                            logger(rowNumber,`The comparison value in col ${colNumber} is invalid - ${comp}`)
+                        }
+                    }
+
+                })
+
+                //SCTID (Cols 12, 16, 20, 24, 28, 32, 36, 40, 44, 48) - IF preceding REL is "=" or "!=" THEN SCTID must be numeric
+
+
+
+            }
+
+            return arLog
+
+
+            function logger(lne,msg) {
+                arLog.push({line:lne,msg:msg})
+            }
+
+            function isNumericString(str) {
+                return str.split('').every(char => !isNaN(char));
+            }
+
+            //Notes for team - checking that cincept exists (g) could be compuattionally expensive...
+            //comparison != and !^ not currently supported in UI
+
+
+        },
+        makeCM : function (inLines) {
+
+            //the url that indicates the type of comparison perfromed when evaluating the 'dependsOn' element. If absent, this is assumed to be = (must be the same)
+            let comparisonOperationUrl = "http://canshare.co.nz/fhir/StructureDefinition/do-operator"
+
+            let arLines = angular.copy(inLines)
+
+            //remove the first 2 lines - the header lines in the SS
+         //   arLines.splice(0,2)
+            let arLog = []
+
+            arLog.push(`${arLines.length} lines to process`)
+
+
+            let snomed = "http://snomed.info/sct"
+
+            let cm = {resourceType:"ConceptMap",id:"canshare-select-valueset-map"}
+            cm.url = "http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"
+            cm.identifier = {value:"canshare-select-valueset-map",system:"http://canshare.co.nz/fhir/NamingSystem/conceptmaps"}
+            cm.title = "CanShare select ValueSet ConceptMap"
+            cm.status = "active"
+            cm.version = "1"
+            let group = {source:snomed,target:snomed,element:[]}
+            cm.group = [group]
+
+//each line in the file refers to a specific target for a specific source, with a unique set of dependencies
+//a single source (eg cancer stream) may have multiple lines (targets), so need to analyse the file first, aggregaring by source
+
+            let ctr = 3   //the line counter from the SpreadSheetlines
+            let hashSource = {}     //hashed by source code - ie the thing we are looking for
+
+
+
+            for (const lne of arLines) {
+                let ar = lne.split('\t')
+                ar[0] = ctr++       //replace the sct release with the line number from the ss for debugging. don't think the sct release is needed (if it is later, then make it an object)
+                let sourceCode = ar[1].trim()      //B the code of the thing that is being looked for (eg cancer stream, concer substream). This is the same as the 'property' in the ConceptMap UI
+                let sourceDisplay = ar[2]   //C the display for that code
+
+                //console.log(ar[0],lne)
+
+                //add the line to the hash. Each line represents a possible target (value) with any associated dependencies
+                hashSource[sourceCode] = hashSource[sourceCode] || {display:sourceDisplay,lines:[]}
+                hashSource[sourceCode].lines.push(ar)
+            }
+
+
+//now we can iterate through the hashed sources (each of which represents possibly multiple lines)
+//each source is in a separate element inside the single group - as it's all snomed of the same version
+            for (const key of Object.keys(hashSource)) {
+
+                let item = hashSource[key]  //for a given source (ie property) all the rows in the spreadsheet that refer to that property
+
+                //the element that corresponds to this source. eg Cancer stream
+                let element = {code:key,display:item.display,target:[]}
+                let arLines = item.lines       //these are the lines. each line is a potential target within the element with dependencies
+
+                //now iterate over the lines creating the individual targets. each line becomes 1 target
+                // ie the value of the thing I'm looking for (eg cancer stream) is the target - if the dependencies match
+                arLines.forEach(function(ar){
+
+
+                    let lineNumber = ar[0]          //the line in the spreadsheet where this target is defined
+                    let targetType = ar[3]      //D set to 'Value set' if the target is a ValueSet and 'Value' if a value
+
+                    let targetValueSetName = ar[4]      // E valueset name if targetType is 'Value Set' (was targetRefsetId - refsetid)
+
+                    let targetConceptId = ar[5]     //F conceptId if we're just referring to a single concept
+                    let targetConceptDisplay = ar[6]    //G concept display if targetType is 'Value'
+
+
+
+                    //let targetVSName = ar[4]      // F canshare name of the valueset
+                    //these are the individual dependencies or 'rules' that, if met from data in the UI will trigger the rule
+
+                    let dep0Property = ar[10]    //K the propertyname for the first dependency
+                    let dep0Op = ar[11]          //L the operator - '=' must match, '^' means test concept in set
+                    let dep0Value = ar[12]       //M the actual code value of the dependency
+                    let dep0Display = ar[13]   //N the name of the dependency
+
+                    let dep1Property = ar[14]    //O the propertyname for the second dependency
+                    let dep1Op = ar[15]          //P the operator - '=' must match, '^' means test concept in set
+                    let dep1Value = ar[16]       //Q the actual code value of the dependency
+                    let dep1Display = ar[17]   //R the name of the dependency
+
+                    let dep2Property = ar[18]    //S the propertyname for the third dependency
+                    let dep2Op = ar[19]          //T the operator - '=' must match, '^' means test concept in set
+                    let dep2Value = ar[20]       //U the actual code value of the dependency
+                    let dep2Display = ar[21]    //V the name of the dependency
+
+
+                    let dep3Property = ar[22]
+                    let dep3Op = ar[23]
+                    let dep3Value = ar[24]
+                    let dep3Display = ar[25]
+
+                    let dep4Property = ar[26]
+                    let dep4Op = ar[27]
+                    let dep4Value = ar[28]
+                    let dep4Display = ar[29]
+
+                    let dep5Property = ar[30]
+                    let dep5Op = ar[31]
+                    let dep5Value = ar[32]
+                    let dep5Display = ar[33]
+
+                    //If further properties are needed (ie extra 'conditionals') - then add them according to the pattern above. You'll need to
+                    //add them as 'dependsOn' in the code below...
+
+                    //create the target defined by the line. This could be a ValueSet or a single concept - one or the other
+
+                    let targetCode  //the code of the target - will be a valuesetname or a concept
+                    let targetDisplay
+
+                    if (targetValueSetName) {
+                        //there is a valueset defined
+                        targetCode = `https://nzhts.digital.health.nz/fhir/ValueSet/${targetValueSetName}`
+                        targetDisplay = targetValueSetName
+
+                    } else if (targetConceptId) {
+                        targetCode = targetConceptId
+                        targetDisplay = targetConceptDisplay
+
+                        //it's a single concept
+                    } else {
+                        arLog.push(`>>>> line ${lineNumber} neither valueset nor concept present`)
+                        //todo - what to do?
+                    }
+
+                    //a target is a possible match (containing a vs or concept) for an element (property)
+                    let target = {code:targetCode}
+                    if (targetDisplay) { target.display = targetDisplay}
+                    target.equivalence = 'relatedto'
+                    target.comment = lineNumber     //for debugging purposes in the UI. Provides a link from the rule back to the line number in the spreadsheet,
+                    target.dependsOn = []           //the conditions / rules that must match for the target to apply
+
+                    element.target.push(target)     //add the target. ie the value if all the dependencies line up
+
+                    if (! dep0Property) {
+                        //no special action here, but there used to be so I'll leave thus here...
+                    }
+
+
+                    if (dep0Property) {
+                        target.dependsOn.push(getDep(dep0Property,dep0Op,dep0Value,dep0Display))
+                    }
+
+                    if (dep1Property) {
+                        target.dependsOn.push(getDep(dep1Property,dep1Op,dep1Value,dep1Display))
+                    }
+
+                    if (dep2Property) {
+                        target.dependsOn.push(getDep(dep2Property,dep2Op,dep2Value,dep2Display))
+                    }
+
+                    if (dep3Property) {
+                        target.dependsOn.push(getDep(dep3Property,dep3Op,dep3Value,dep3Display))
+                    }
+
+                    if (dep4Property) {
+                        target.dependsOn.push(getDep(dep4Property,dep4Op,dep4Value,dep4Display))
+                    }
+
+                    if (dep5Property) {
+                        target.dependsOn.push(getDep(dep5Property,dep5Op,dep5Value,dep5Display))
+                    }
+
+                    //if you add more properties above, then add them here...
+
+
+
+                })
+
+                //add the element to the ConceptMap
+                group.element.push(element)
+
+            }
+
+            return {cm:cm}
+
+
+           // fs.writeFileSync(`./${cmFileName}`,JSON.stringify(cm,null,2))
+           // logger(`${cmFileName} file created. Use the 'uploadConceptMap' script to upload to the terminology server.`)
+
+            function getDep(property, operation, value, display) {
+                let dep = {}
+                dep.property = property
+                if (value) {
+                    dep.value = value.trim()
+                }
+
+                dep.system = snomed
+                if (display) {
+                    dep.display = display
+                }
+
+                //if the operation is the 'contained in', then add an extension
+                if (operation == '^') {
+                    dep.extension = [{url:comparisonOperationUrl,valueCode:"in-vs"}]
+                    dep.value =  `https://nzhts.digital.health.nz/fhir/ValueSet/${value}`
+
+
+                }
+                return dep
+
+            }
+
+
+
+        }
+    }
+
+})

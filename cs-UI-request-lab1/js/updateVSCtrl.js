@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('updateCtrl',
-        function ($scope,$http,$uibModal,$q,updateVSSvc,utilsSvc) {
+        function ($scope,$http,$uibModal,$q,updateVSSvc,utilsSvc,terminologyUpdateSvc,$localStorage) {
 
             $scope.version = utilsSvc.getVersion()
 
@@ -51,6 +51,107 @@ angular.module("pocApp")
 
             }
 
+            //============================== update ConceptMap functions
+            //https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653
+
+            $scope.previousCMSS = $localStorage.previousCMSS
+
+            //just during development...
+            $scope.reloadCMSS = function () {
+                //reload the last 'file' copied in...
+                $scope.arLog = terminologyUpdateSvc.auditCMFile($scope.previousCMSS,$scope.allVSItem)
+                //console.log(arLog)
+
+                let vo = terminologyUpdateSvc.makeCM($scope.previousCMSS)
+                //console.log(vo.cm)
+                $scope.conceptMap = vo.cm
+            }
+
+            $scope.selectCmElement = function (element) {
+                $scope.input.cmElement = element
+            }
+
+            $scope.loadCurrent= function () {
+                //download the current CM
+                $scope.canUpdate = false        //stop it being uploaded again
+
+                let qry = `ConceptMap/canshare-select-valueset-map`
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        $scope.conceptMap = data.data
+                    }, function (err) {
+
+                    }
+                ).finally(
+                    function () {
+                        $scope.showWaiting = false
+                    }
+                )
+
+            }
+
+            $scope.parseCMFile = function (file) {
+                //parse a CM 'file' copied from the spreadsheet
+
+                let arLines = file.split('\n')
+                console.log(arLines.length)
+
+                arLines.splice(0,2)     //the first 2 lines are header lines
+
+                $scope.arLog = terminologyUpdateSvc.auditCMFile($scope.previousCMSS,$scope.allVSItem)
+/*
+                arLines.forEach(function (lne,ctr) {
+                    console.log(ctr+3, lne)     //
+                })
+*/
+                //let ar = arLines[0].split('\t')
+                //console.log(ar)
+                $localStorage.previousCMSS = arLines
+
+                let vo = terminologyUpdateSvc.makeCM(arLines)
+                console.log(vo.cm)
+                $scope.conceptMap = vo.cm
+
+            }
+
+
+            $scope.viewVS = function (url) {
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/viewVS.html',
+                    backdrop: 'static',
+                    size : 'lg',
+                    controller: 'viewVSCtrl',
+
+                    resolve: {
+                        url: function () {
+                            return url
+                        }, refsetId : function () {
+                            return ""
+                        }
+                    }
+
+                })
+            }
+
+            $scope.handlePaste = function(event) {
+                setTimeout(function() {
+                var textarea = document.getElementById('pastetextbox');
+                textarea.scrollTop = 0;  // Scroll to the top
+                }, 0);  // Wait for the paste to complete before updating the model
+
+                return
+                var textarea = event.target;
+                setTimeout(function() {
+                    $scope.$apply(function() {
+                        $scope.input.cmData = textarea.value;
+                    });
+                }, 0);  // Wait for the paste to complete before updating the model
+            };
+
+            //============================
 
 
 
