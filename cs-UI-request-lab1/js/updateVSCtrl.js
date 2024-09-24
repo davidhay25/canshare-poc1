@@ -100,7 +100,7 @@ angular.module("pocApp")
 
                 arLines.splice(0,2)     //the first 2 lines are header lines
 
-                $scope.arLog = terminologyUpdateSvc.auditCMFile($scope.previousCMSS,$scope.allVSItem)
+                $scope.arLog = terminologyUpdateSvc.auditCMFile(arLines,$scope.allVSItem)
 /*
                 arLines.forEach(function (lne,ctr) {
                     console.log(ctr+3, lne)     //
@@ -111,7 +111,7 @@ angular.module("pocApp")
                 $localStorage.previousCMSS = arLines
 
                 let vo = terminologyUpdateSvc.makeCM(arLines)
-                console.log(vo.cm)
+               // console.log(vo.cm)
                 $scope.conceptMap = vo.cm
 
             }

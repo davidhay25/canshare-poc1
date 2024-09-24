@@ -23,8 +23,7 @@
         <tr><th>Display</th><th>Code</th><th>System</th></tr>
         <tr ng-repeat="concept in concepts">
             <td>{{concept.display}}</td>
-            <td>
-                <div  class="clickable" ng-click="lookup(concept)">{{concept.code}}</div></td>
+            <td>{{concept.code}}</td>
             <td>{{concept.system}}</td>
         </tr>
         </table>
