@@ -1,0 +1,28 @@
+<div>
+
+  <h3>Unpublished</h3>
+
+
+  <div class="clickable" ng-click="analyseUnpublished()">Analyse</div>
+
+
+  <uib-tabset>
+    <uib-tab heading="CodeSystem">
+      <pre>{{unpublishedReport.cs | json}}</pre>
+    </uib-tab>
+
+    <uib-tab heading="Updated VS">
+      {{unpublishedReport.batch.entry.length}}
+      <pre>{{unpublishedReport.batch | json}}</pre>
+    </uib-tab>
+
+    <uib-tab heading="Originals">
+      {{Object.keys(unpublishedReport.hashOriginal).length}}
+      <pre>{{unpublishedReport.hashOriginal | json}}</pre>
+    </uib-tab>
+
+    
+  </uib-tabset>
+
+  <pre>{{unpublishedReport | json}}</pre>
+</div>

@@ -72,6 +72,172 @@ function setup(app) {
         res.json({token:token,url:"https://authoring.nzhts.digital.health.nz/fhir"})
     })
 
+    app.get('/analyseUnpublished',async function(req,res){
+        let token = await getNZHTSAccessToken()
+        if (token) {
+            let identifier = "http://canshare.co.nz/fhir/NamingSystem/valuesets%7c"
+
+            let qry = `https://authoring.nzhts.digital.health.nz/fhir/ValueSet?identifier=${identifier}&_count=5000&_summary=false`
+            let config = {headers:{authorization:'Bearer ' + token}}
+
+            config['content-type'] = "application/fhir+json"
+
+
+            axios.get(qry,config).then(async function(data) {
+                let bundle = data.data
+                let arLog = []
+                let hash = {}
+
+                //create a ValueSet with all unpublished
+
+                let vsId = 'canshare-all-unpublished'
+                let url = `https://nzhts.digital.health.nz/fhir/ValueSet/${vsId}`
+                let vs = {resourceType:'ValueSet',id:vsId,status:'active',experimental:false}
+
+                vs.url = url
+                vs.name = vsId
+                vs.version = 1
+                vs.identifier = [{system:"http://canshare.co.nz/fhir/NamingSystem/valuesets",value:vsId}]
+                vs.publisher = "Te Aho o Te Kahu"
+                let include = {system:"http://snomed.info/sct",concept:[]}
+                vs.compose = {include: []}
+                vs.compose.include.push(include)
+
+                //go through all the CanShare VS and find all unpublished codes
+                for (const entry of bundle.entry) {
+                    let vs = entry.resource
+                    if (vs.compose && vs.compose.include) {
+                        let pos = -1
+                        for (const inc of vs.compose.include) {
+                            if (inc.system == "http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished") {
+                                for (const concept of inc.concept) {
+                                    //console.log(concept)
+                                    if (isNumericString(concept.code)) {
+                                        if (!hash[concept.code]) {
+                                            include.concept.push({code:concept.code,display:concept.display})
+                                            hash[concept.code] = concept
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                arLog.push(`There are ${include.concept.length} unique concepts in all valueset unpublished entries`)
+
+                let vsUpdateQry = `${nzhtsconfig.serverBase}ValueSet/${vsId}`
+                await axios.put(vsUpdateQry,vs,config)
+                let vsExpandQry = `https://authoring.nzhts.digital.health.nz/fhir/ValueSet/$expand?url=${url}`
+                //
+                //let vsExpandQry = `${nzhtsconfig.serverBase}ValueSet/${vsId}/$expand`
+                console.log(vsExpandQry)
+                let result = await axios.get(vsExpandQry,config)
+
+                arLog.push(`There are ${result.data.expansion.total} concepts in the valueset expansion`)
+
+                //create a has for the concepts that are now in the TS
+                let hasCodesNowInTS = {}
+                result.data.expansion.contains.forEach(function (concept) {
+                    hasCodesNowInTS[concept.code] = concept
+                })
+
+                //now we can create the CodeSystem - and the hash which has the codes the are in the TS so cab ne removed from the
+                //we go through the has of all codes in a VS...
+                let hashStillUnpublished = {}   //the concepts that remain unpublished
+
+
+                let cs = {resourceType:'CodeSystem',id:"canshare-unpublished-concepts",version:"1",status:"active"}
+                cs.name = cs.id
+                cs.identifier = {value:cs.id,system:"http://canshare.co.nz/fhir/NamingSystem/codesystems"}
+                cs.publisher = "Te Aho o Te Kahu"
+                cs.content = "complete"
+                cs.concept = []
+
+                for (const code of Object.keys(hash)) {
+                    if (! hasCodesNowInTS[code]) {
+                        //this code is still not in the TS so it needs to be added to the CS
+                        cs.concept.push(hash[code])
+                        hashStillUnpublished[code] = hash[code]
+                    }
+                }
+
+                //Now we can update the valueSets
+                //create a batch to hold the VS that will need to be updated
+                let batch = {resourceType:"Batch",type:'transaction',entry:[]}
+
+                //and a hash to hold the original (so we can show a diff in the UI
+                let hashOriginal = {}
+                for (const entry of bundle.entry) {
+                    let vs = entry.resource
+
+                    if (vs.compose && vs.compose.include) {
+                        hashOriginal[vs.id] = vs
+                        let pos = -1
+                        for (const inc of vs.compose.include) {
+                            pos ++
+                            if (inc.system == "http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished") {
+                                //there is at least 1 unpublished code
+                                //this will be the new include
+
+                                //let arNewInclude = {concept:[],system:'http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished"'}
+                                let arNewConceptList = []
+                                for (const concept of inc.concept) {
+                                    //console.log(concept)
+                                    if (hashStillUnpublished[concept.code]) {
+                                        //arNewInclude.concept.push(concept)
+                                        arNewConceptList.push(concept)
+                                    }
+                                }
+                                //if there are still unpublished codes then we can update the include. Otherwise it is removed
+                                if (arNewConceptList.length == 0) {
+                                    vs.compose.include.splice(pos,1)
+                                } else {
+                                    inc.concept = arNewConceptList
+                                }
+
+                                let entry = {resource:vs}      //todo - add transaction update stuff
+                                batch.entry.push(entry)
+
+
+
+                            }
+                        }
+
+                        //all VS that have unpublished codes will be updated
+
+
+                    }
+                }
+
+
+
+
+
+
+
+                //res.json(result.data)
+                res.json({log:arLog,cs:cs,batch:batch,hashOriginal:hashOriginal})
+            }).catch(function(ex) {
+                if (ex.response) {
+                    res.status(ex.response.status).json(ex.response.data)
+                } else {
+                    res.status(500).json(ex.message)
+                }
+
+            })
+        } else {
+
+            res.status(500).json({msg:"Unable to get Access Token."})
+        }
+
+        function isNumericString(str) {
+            return str.split('').every(char => !isNaN(char));
+        }
+
+    })
+
     //perform a query against the NZHTS.
     //right now, we get a new access token for each call - todo make more efficient
 
@@ -281,44 +447,6 @@ function setup(app) {
     })
 
 
-    app.post('/nzhts/eclORIG',async function(req,res){
-
-        let ecl = req.body.ecl      //raw ecl
-
-        //console.log(ecl)
-
-        let encodedEcl =encodeURIComponent(ecl)
-
-        let qry = `${nzhtsconfig.serverBase}ValueSet/$expand?url=http://snomed.info/sct?fhir_vs=ecl/${encodedEcl}`
-        qry += "&displayLanguage=en-x-sctlang-23162100-0210105"
-
-        //console.log(qry)
-
-        let token = await getNZHTSAccessToken()
-        if (token) {
-
-            //var decoded = jwt_decode(token);
-            // let timeToExpire = decoded.exp * 1000 - Date.now()       //exp is in seconds
-            // console.log(timeToExpire / (1000 * 60 *60 ));
-
-            let config = {headers:{authorization:'Bearer ' + token}}
-            config['content-type'] = "application/fhir+json"
-
-            axios.get(qry,config).then(function(data) {
-                res.json(data.data)
-            }).catch(function(ex) {
-                if (ex.response) {
-                    console.log(ex.response.data)
-                    res.status(ex.response.status).json(ex.response.data)
-                } else {
-                    res.status(500).json(ex)
-                }
-
-            })
-        } else {
-            res.status(500).json({msg:"Unable to get Access Token."})
-        }
-    })
 
 
     /*
@@ -473,8 +601,6 @@ function setup(app) {
     })
 
 
-
-
     //used for $translate
     app.post('/nzhts',async function(req,res){
         console.log(req.body)
@@ -591,7 +717,7 @@ function setup(app) {
 
     //return a list of Q where a particular ValueSet is used
     //todo - this might be useful in the designer
-    app.get('/term/findQusingVS',async function (req,res) {
+    app.get('/term/findQusingVSDEP',async function (req,res) {
         let vsUrl = req.query.url
 
         let hash = await commonModule.findQusingVS(vsUrl)
@@ -599,11 +725,11 @@ function setup(app) {
         res.json(hash)
 
     })
-
+/*
     app.get('/conceptMap/all', function(req,res) {
         res.json(allConceptMaps)
     })
-
+*/
     app.get('/termServersDEP', function(req,res) {
         let ar = []
         //only return the display and url
@@ -612,12 +738,6 @@ function setup(app) {
         })
         res.json(ar)
     })
-
-    app.get('/searchLibraryDEP', function(req,res) {
-
-        res.json(library)
-    })
-
 
 
     app.get('/termQuery',async function(req,res) {

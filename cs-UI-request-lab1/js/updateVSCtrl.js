@@ -249,6 +249,26 @@ angular.module("pocApp")
 
                 //=============================
 
+            //============ unpublished codes
+
+            $scope.analyseUnpublished = function () {
+                let url = "/analyseUnpublished"
+                $http.get(url).then(
+                    function (data) {
+                        $scope.unpublishedReport = data.data
+
+                    },function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+
+
+
+                //terminologyUpdateSvc.checkUnpublishedCodes($scope.allVSItem)
+            }
+
+
+            //===========================
 
             //retrieve all ValueSets
             getValueSets = function (identifier) {
@@ -302,6 +322,8 @@ angular.module("pocApp")
 
                 return deferred.promise
             }
+            
+
 
             getValueSets().then(
                 function (ar) {

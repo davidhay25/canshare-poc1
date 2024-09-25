@@ -5,6 +5,27 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
     }
 
     return {
+        checkUnpublishedCodes : async function (allVsItem) {
+
+            for (const item of allVsItem) {
+                let vs = item.vs
+                if (vs.compose && vs.compose.include) {
+                    let pos = -1
+                    for (const inc of vs.compose.include) {
+                        if (inc.system == "http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished") {
+                            for (const concept of inc.concept) {
+                                console.log(concept)
+
+                            }
+                        }
+                    }
+                }
+
+            }
+
+
+
+        },
         auditVSBatchFile : function (arLines) {
             //audit the raw data from the the SS
             arLog = []  //note: don't use let as the array is in the service scope
