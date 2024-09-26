@@ -1,7 +1,7 @@
 angular.module("pocApp").service('terminologyUpdateSvc', function() {
 
-    function logger(lne,msg) {
-        arLog.push({line:lne,msg:msg})
+    function logger(lne,msg,name) {
+        arLog.push({line:lne,msg:msg,name})
     }
 
     return {
@@ -49,19 +49,43 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
             //need to pre-process the file. Issue is that the display terms (col 5) can
             //have multiple entries separated by newlines...
             let rows = []
+
+
+            let ctr = -1
             for (const lne of arLines) {
+
                 let cols = lne.split('\t')
                 if (cols.length == 1) {
-
+                    //This is a display term. We add it to the previous lne....
+                    let lne = rows[ctr]     //this is the previous line
+                    console.log(lne)
+                    lne += `#${cols[0]}`
+                    rows[ctr] = lne
                 } else {
-                    rows.push(cols)
+                    ctr ++
+                    rows.push(lne)
                 }
             }
 
-            for (const cols of rows) {
+        /*    for (const lne of arLines) {
+                let cols = lne.split('\t')
+                if (cols.length == 1) {
+                    let lne = rows[ctr]     //this is the previous line
+                    console.log(lne)
+                    lne += `#${cols[0]}`
+                    rows[ctr] = lne
+                } else {
+                    ctr++
+                    rows.push(cols)
+                }
+            }
+*/
+            for (const lne of rows) {
             //for (const lne of arLines) {
                 rowNumber++
-                //templet cols = lne.split('\t')
+                let cols = lne.split('\t')
+
+
 
                 let name = cols[0]
                 if (name) {
@@ -90,27 +114,30 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                         logger(rowNumber,`Id must start with 'canshare-': ${name}`)
                     }
                 } else {
-                    logger(rowNumber,`Missing name`)
+                    logger(rowNumber,`Missing name`,name)
                 }
 
+                if (cols.length !== 6) {
+                    logger(rowNumber,`WARNING: There are only ${cols.length} columns. There's a newline character in there somewhere. Other errors will follow`,name)
+                }
 
                 // f. Status (col B) - must be either "Active" or "Retired"
                 if (cols[1] !== 'Active' && cols[1] !== 'Retired') {
-                    logger(rowNumber,`Status must be either 'Active' or 'Retired': ${name}`)
+                    logger(rowNumber,`Status must be either 'Active' or 'Retired': ${name}`,name)
                 }
 
                 let title = cols[2]
                 //  g. Title (col C) - must start with "NZ "
                 if (! title) {
-                    logger(rowNumber,`Missing title`)
+                    logger(rowNumber,`Missing title`,name)
                 } else {
                     if (! title.startsWith('NZ ')) {
-                        logger(rowNumber,`Title must start with 'NZ ': ${name}`)
+                        logger(rowNumber,`Title must start with 'NZ ': ${name}`,name)
                     }
                     //h. Title (col C) - must be unique in the batch
 
                     if (hashTitle[title]) {
-                        logger(rowNumber,`title is not unique: ${title}`)
+                        logger(rowNumber,`title is not unique: ${title}`,name)
                     }
                     hashTitle[title] = true
                 }
@@ -124,14 +151,14 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                 if (description) {
                     let firstLetter = description[0]
                     if (firstLetter !== firstLetter.toUpperCase()) {
-                        logger(rowNumber,`Description must start with an upper case letter: ${description}`)
+                        logger(rowNumber,`Description must start with an upper case letter: ${description}`,name)
                     }
                     let lastLetter = description[description.length-1]
                     if (lastLetter !== '.') {
-                        logger(rowNumber,`Description must end with a period: ${description}`)
+                        logger(rowNumber,`Description must end with a period: ${description}`,name)
                     }
                 } else {
-                    logger(rowNumber,`Missing description`)
+                    logger(rowNumber,`Missing description`,name)
                 }
 
 
@@ -140,16 +167,16 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                 if (ecl) {
                     //j. ECL (col E) - count of "(" equals the count of ")"
                     if (countChar(ecl,'(') !== countChar(ecl,')')) {
-                        logger(rowNumber,`ecl brackets don't match: ${ecl}`)
+                        logger(rowNumber,`ecl brackets don't match: ${ecl}`,name)
                     }
 
                     //k ECL (col E) - count of "|" is an even number
 
                     if (countChar(ecl,'|') % 2 == 1) {
-                        logger(rowNumber,`There is an uneven number of '|' in the ecl: ${ecl}`)
+                        logger(rowNumber,`There is an uneven number of '|' in the ecl: ${ecl}`,name)
                     }
                 } else {
-                    logger(rowNumber,`Missing ECL`)
+                    logger(rowNumber,`Missing ECL`,name)
                 }
 
 
@@ -157,26 +184,37 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
 
                 //l. Updated display terms (col F) - each line has exactly 2 "|"
                 let displayTerm = cols[5]
-                if (displayTerm && countChar(displayTerm,'|') !== 2) {
-                    logger(rowNumber,`Display terms must have 2 '|' : ${displayTerm}`)
-                }
-
-                //m. Updated display terms (col F) - each line must start with a number
-                if (displayTerm && isNaN(displayTerm[0])) {
-                    logger(rowNumber,`Display terms must start with a number : ${displayTerm}`)
-                }
-                //n. Updated display terms (col F) - the first "|" in each line must be directly followed by a character (ie not space)
                 if (displayTerm) {
-                    let g = displayTerm.indexOf('|')
-                    if (g > -1 && displayTerm.length > g+1) {
-                        if (displayTerm[g+1] == " ") {
-                            logger(rowNumber,`There must not be a space after the first | in display term : ${displayTerm}`)
+                    let ar = displayTerm.split('#')
+                    ar.forEach(function (dt,ctr) {
+                        if (countChar(dt,'|') !== 2) {
+                            logger(rowNumber,`Display terms must have 2 '|' : index ${ctr} ${dt}`,name)
                         }
 
-                    } else {
-                        logger(rowNumber,`Missing | in display term : ${displayTerm}`)
-                    }
+                        //m. Updated display terms (col F) - each line must start with a number
+                        let fixed =  dt.replace(/"/g,'')    //for some reason a quote gets inserted on the first one...
+                        if (isNaN(fixed[0])) {
+                            logger(rowNumber,`Display terms must start with a number : index ${ctr} ${dt}`,name)
+                        }
+                        //n. Updated display terms (col F) - the first "|" in each line must be directly followed by a character (ie not space)
+
+                            let g = dt.indexOf('|')
+                            if (g > -1 && dt.length > g+1) {
+                                if (dt[g+1] == " ") {
+                                    logger(rowNumber,`There must not be a space after the first | in display term : index ${ctr} ${dt}`,name)
+                                }
+
+                            } else {
+                                logger(rowNumber,`Missing | in display term : ${displayTerm}`,name)
+                            }
+
+
+
+                    })
                 }
+
+
+
 
                 //o. Updated display terms (col F) - the second "|" in each line must be directly preceded by a character (ie not a space)
                 if (displayTerm) {
@@ -186,7 +224,7 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
 
                 //p. All columns are mandatory (col A to E), except col F (updated display terms) is optional
                 if (cols.length < 5) {
-                    logger(rowNumber,`There are missing values`)
+                    logger(rowNumber,`There are missing values`,name)
                 }
 
 
@@ -274,20 +312,18 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
 
                     let ar = vo.displayConcept.split('#')
                     ar.forEach(function(c){
-
-                        c = c.replace(/\s/g,'')     //get rid of spaces
-
-                        c = c.replace(/"/g,'')     //get rid of spaces
-
+                        c = c.replace(/"/g,'')     //get rid of quotes - for some reason one seems to be inserted during parsing
                         // c is a concept in code | display | format
                         let ar1 = c.split('|')
-                        let concept = {code: ar1[0], display:ar1[1]}
+                        let code = ar1[0]
+                        code = code.replace(/\s/g,'')     //get rid of spaces
+                        let concept = {code: code, display:ar1[1]}
                         displayInclude.concept.push(concept)
 
                     })
                     vs.compose.include.push(displayInclude)
 
-                    //console.log(JSON.stringify(vs))
+
                 }
 
 
