@@ -46,34 +46,53 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
             let hashName = {}
             let hashTitle = {}
 
+            //need to pre-process the file. Issue is that the display terms (col 5) can
+            //have multiple entries separated by newlines...
+            let rows = []
             for (const lne of arLines) {
-                rowNumber++
                 let cols = lne.split('\t')
+                if (cols.length == 1) {
+
+                } else {
+                    rows.push(cols)
+                }
+            }
+
+            for (const cols of rows) {
+            //for (const lne of arLines) {
+                rowNumber++
+                //templet cols = lne.split('\t')
+
                 let name = cols[0]
-                //   a. Value Set ID (col A) - must be all lower case letters or '-'s
-                if (! regex.test(name)) {
-                    logger(rowNumber,`Id has an incorrect format: ${name}`)
+                if (name) {
+                    //   a. Value Set ID (col A) - must be all lower case letters or '-'s
+                    if (! regex.test(name)) {
+                        logger(rowNumber,`Id has an incorrect format: ${name}`)
+                    }
+
+                    if (countChar(name,' ') > 0) {
+                        logger(rowNumber,`Id has spaces in it: ${name}`)
+                    }
+
+                    //  b. Value Set ID (col A) - must be unique in the batch
+                    if (hashName[name]) {
+                        logger(rowNumber,`Name is not unique: ${name}`)
+                    }
+                    hashName[name] = true
+
+                    //c. Value Set ID (col A) - must be <= 64 characters
+                    if (name.length > 64) {
+                        logger(rowNumber,`Id is too long: ${name} (${name.length} characters)`)
+                    }
+
+                    //  d. Value Set ID (col A) - must start with "canshare-"
+                    if (! name.startsWith('canshare-')) {
+                        logger(rowNumber,`Id must start with 'canshare-': ${name}`)
+                    }
+                } else {
+                    logger(rowNumber,`Missing name`)
                 }
 
-                if (countChar(name,' ') > 0) {
-                    logger(rowNumber,`Id has spaces in it: ${name}`)
-                }
-
-                //  b. Value Set ID (col A) - must be unique in the batch
-                if (hashName[name]) {
-                    logger(rowNumber,`Name is not unique: ${name}`)
-                }
-                hashName[name] = true
-
-                //c. Value Set ID (col A) - must be <= 64 characters
-                if (name.length > 64) {
-                    logger(rowNumber,`Id is too long: ${name} (${name.length} characters)`)
-                }
-
-                //  d. Value Set ID (col A) - must start with "canshare-"
-                if (! name.startsWith('canshare-')) {
-                    logger(rowNumber,`Id must start with 'canshare-': ${name}`)
-                }
 
                 // f. Status (col B) - must be either "Active" or "Retired"
                 if (cols[1] !== 'Active' && cols[1] !== 'Retired') {
@@ -81,18 +100,23 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                 }
 
                 let title = cols[2]
-
                 //  g. Title (col C) - must start with "NZ "
-                if (! title.startsWith('NZ ')) {
-                    logger(rowNumber,`Title must start with 'NZ ': ${name}`)
+                if (! title) {
+                    logger(rowNumber,`Missing title`)
+                } else {
+                    if (! title.startsWith('NZ ')) {
+                        logger(rowNumber,`Title must start with 'NZ ': ${name}`)
+                    }
+                    //h. Title (col C) - must be unique in the batch
+
+                    if (hashTitle[title]) {
+                        logger(rowNumber,`title is not unique: ${title}`)
+                    }
+                    hashTitle[title] = true
                 }
 
-                //h. Title (col C) - must be unique in the batch
 
-                if (hashTitle[title]) {
-                    logger(rowNumber,`title is not unique: ${title}`)
-                }
-                hashTitle[title] = true
+
 
 
                 //i. Description (col D) - must start with a capital letter and finish with a full stop
@@ -106,21 +130,30 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                     if (lastLetter !== '.') {
                         logger(rowNumber,`Description must end with a period: ${description}`)
                     }
+                } else {
+                    logger(rowNumber,`Missing description`)
                 }
 
 
 
                 let ecl = cols[4]
-                //j. ECL (col E) - count of "(" equals the count of ")"
-                if (countChar(ecl,'(') !== countChar(ecl,')')) {
-                    logger(rowNumber,`ecl brackets don't match: ${ecl}`)
+                if (ecl) {
+                    //j. ECL (col E) - count of "(" equals the count of ")"
+                    if (countChar(ecl,'(') !== countChar(ecl,')')) {
+                        logger(rowNumber,`ecl brackets don't match: ${ecl}`)
+                    }
+
+                    //k ECL (col E) - count of "|" is an even number
+
+                    if (countChar(ecl,'|') % 2 == 1) {
+                        logger(rowNumber,`There is an uneven number of '|' in the ecl: ${ecl}`)
+                    }
+                } else {
+                    logger(rowNumber,`Missing ECL`)
                 }
 
-                //k ECL (col E) - count of "|" is an even number
 
-                if (countChar(ecl,'|') % 2 == 1) {
-                    logger(rowNumber,`There is an uneven number of '|' in the ecl: ${ecl}`)
-                }
+
 
                 //l. Updated display terms (col F) - each line has exactly 2 "|"
                 let displayTerm = cols[5]
@@ -198,7 +231,7 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
 
             let snomed = "http://snomed.info/sct"
 
-            let bundle = {resourceType:"Bundle",type:"batch",entry:[]}
+            let bundle = {resourceType:"Bundle",type:"transaction",entry:[]}
 
             let makeVS = function(vo) {
                 //console.log(vo)
@@ -209,8 +242,7 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                 vs.name = vo.id
                 vs.title = vo.title
                 vs.experimental = false
-                //vs.version = "20230525"
-                vs.version = formatDateToYYYYMMDD(new Date()) //  "20240318"   //<<<<<<<<<<<<<<, this is the line to change
+                vs.version = formatDateToYYYYMMDD(new Date())
                 vs.identifier = [{system:"http://canshare.co.nz/fhir/NamingSystem/valuesets",value:vo.id}]
                 vs.publisher = "Te Aho o Te Kahu"
                 vs.contact = [{telecom:[{system:"email",value:"info@teaho.govt.nz"}]}]
@@ -229,20 +261,23 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                 //add any display concepts. There will only be one
 
                 if (vo.displayConcept) {
-                    let displayInclude = {system:snomed,concept:[]}
 
+                    let displayInclude = {system:snomed,concept:[]}
+/*
                     let ar1 = vo.displayConcept.split('|')
                     let code = ar1[0]
                     code = code.replace(/\s/g,'')     //get rid of spaces
                     let concept = {code: code, display:ar1[1]}
                     displayInclude.concept.push(concept)
                     vs.compose.include.push(displayInclude)
+*/
 
-/*
-                    let ar = vo.displayConcept.split('/n')
+                    let ar = vo.displayConcept.split('#')
                     ar.forEach(function(c){
 
                         c = c.replace(/\s/g,'')     //get rid of spaces
+
+                        c = c.replace(/"/g,'')     //get rid of spaces
 
                         // c is a concept in code | display | format
                         let ar1 = c.split('|')
@@ -251,7 +286,7 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
 
                     })
                     vs.compose.include.push(displayInclude)
-*/
+
                     //console.log(JSON.stringify(vs))
                 }
 
@@ -274,7 +309,31 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
             }
 
 
-            inLines.forEach(function(row,inx){
+
+
+            //need to pre-process the file. Issue is that the display terms (col 5) can
+            //have multiple entries separated by newlines...
+            let rows = []
+            let ctr = -1
+            for (const lne of inLines) {
+
+                let cols = lne.split('\t')
+                if (cols.length == 1) {
+                    //This is a display term. We add it to the previous lne....
+                    let lne = rows[ctr]     //this is the previous line
+                    console.log(lne)
+                    lne += `#${cols[0]}`
+                    rows[ctr] = lne
+                } else {
+                    ctr ++
+                    rows.push(lne)
+                }
+            }
+
+            //for (const cols of rows) {
+
+            rows.forEach(function(row,inx){
+            //inLines.forEach(function(row,inx){
 
                         let arData = row.split(/\t/)
                         //console.log(arData)
@@ -289,6 +348,8 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                             let vo = {id:id,status:arData[1].toLowerCase(),title:arData[2],description:arData[3], ecl:arData[4]}
 
                             //We've added space for display terms and display concepts - not not yet using tem
+
+                            //there can be multiple display concepts separated #
                             vo.displayConcept = arData[5]   //if present, add a concept/s containing the contents to the ValueSet as well as the ecl
                             //vo.unpublished = arData[6]   //if present, add concepts in the unpublished concepts namesystem
                             let vs = makeVS(vo)

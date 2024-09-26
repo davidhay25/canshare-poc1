@@ -605,12 +605,47 @@ function setup(app) {
             res.json({})
         }
 
-
     })
 
 
+    //POST a bundle to the server. Used for ValueSet batch upload & Unpublished codes
+    app.post('/nzhts/bundle',async function(req,res){
+
+        if (req.body) {
+            let qry = nzhtsconfig.serverBase //
+
+            let token = await getNZHTSAccessToken()
+            if (token) {
+
+                let config = {headers:{authorization:'Bearer ' + token}}
+                config['content-type'] = "application/fhir+json"
+
+                axios.post(qry,req.body,config).then(function(data) {
+                    res.json(data.data)
+                }).catch(function(ex) {
+
+                    if (ex.response) {
+                        console.log("Status code:",ex.response.status)
+                        console.log("err",ex.response.data)
+                        res.status(ex.response.status).json(ex.response.data)
+                    } else {
+                        res.status(500).json(ex)
+                    }
+
+                })
+            } else {
+                res.status(ex.response.status).json({msg:"Unable to get Access Token."})
+            }
+        } else {
+            res.status(400).json({msg:"Must have bundle as body"})
+
+        }
+
+
+    })
+
     //used for $translate
-    app.post('/nzhts',async function(req,res){
+    app.post('/nzhtsDEP',async function(req,res){
         console.log(req.body)
 
 
