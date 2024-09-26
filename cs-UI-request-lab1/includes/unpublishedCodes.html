@@ -1,28 +1,92 @@
 <div>
+  <style>
+    .different {
+      background-color: mistyrose;
+    }
+  </style>
 
   <h3>Unpublished</h3>
 
-
   <div class="clickable" ng-click="analyseUnpublished()">Analyse</div>
 
+  <pre ng-if="unpublishedReport">{{unpublishedReport.log | json}}</pre>
 
-  <uib-tabset>
+  <uib-tabset ng-if="unpublishedReport">
+
+
+    <uib-tab heading="All VS with unpublished">
+
+      <table class="table-condensed table table-bordered">
+        <tr><th>Name</th><th>New unpublished</th><th>Previous unpublished</th><th></th></tr>
+        <tr ng-repeat="row in unpublishedSummary"
+          ng-class="{different:row.originalUnpublished.length !== row.newUnpublished.length}">
+          <td>
+            <div class="clickable" ng-click="displayJson(row.vs)"> {{row.name}}</div>
+          </td>
+          <td>
+            <div class="badge">{{row.originalUnpublished.length}}</div>
+            <div ng-show="input.showTableCell[$index]">
+              <div ng-repeat="concept in row.originalUnpublished">
+                {{concept.code}} {{concept.display}}
+              </div>
+            </div>
+
+
+          </td>
+          <td><div class="badge">{{row.newUnpublished.length}}</div>
+            <div ng-show="input.showTableCell[$index]">
+              <div ng-repeat="concept in row.newUnpublished">
+                {{concept.code}} {{concept.display}}
+              </div>
+            </div>
+
+           </td>
+          <td>
+            <button class="btn btn-link" ng-click="input.showTableCell[$index] = ! input.showTableCell[$index]">Show</button>
+          </td>
+        </tr>
+      </table>
+
+
+    </uib-tab>
+
+    <uib-tab heading="Changes">
+      <pre>{{unpublishedReport.arChanges | json}}</pre>
+    </uib-tab>
+
     <uib-tab heading="CodeSystem">
-      <pre>{{unpublishedReport.cs | json}}</pre>
+      <uib-tabset>
+        <uib-tab heading="Table">
+          <div>{{unpublishedReport.cs.concept.length}}</div>
+          <table class="table-condensed table table-bordered">
+            <tr ng-repeat="concept in unpublishedReport.cs.concept">
+              <td>{{concept.code}}</td>
+              <td>{{concept.display}}</td>
+            </tr>
+          </table>
+        </uib-tab>
+        <uib-tab heading="Json">
+          <div>{{unpublishedReport.cs.concept.length}}</div>
+          <pre>{{unpublishedReport.cs | json}}</pre>
+        </uib-tab>
+      </uib-tabset>
+
+
     </uib-tab>
 
-    <uib-tab heading="Updated VS">
-      {{unpublishedReport.batch.entry.length}}
-      <pre>{{unpublishedReport.batch | json}}</pre>
+    <uib-tab heading="Updated VS Bundle">
+      <div>{{unpublishedReport.updateBatch.entry.length}}</div>
+      <pre>{{unpublishedReport.updateBatch | json}}</pre>
     </uib-tab>
 
+    <!--
     <uib-tab heading="Originals">
       {{Object.keys(unpublishedReport.hashOriginal).length}}
       <pre>{{unpublishedReport.hashOriginal | json}}</pre>
     </uib-tab>
+-->
 
-    
   </uib-tabset>
 
-  <pre>{{unpublishedReport | json}}</pre>
+
 </div>

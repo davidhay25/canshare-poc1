@@ -86,6 +86,7 @@ function setup(app) {
             axios.get(qry,config).then(async function(data) {
                 let bundle = data.data
                 let arLog = []
+                let arChanges = []
                 let hash = {}
 
                 //create a ValueSet with all unpublished
@@ -165,22 +166,24 @@ function setup(app) {
 
                 //Now we can update the valueSets
                 //create a batch to hold the VS that will need to be updated
-                let batch = {resourceType:"Batch",type:'transaction',entry:[]}
+                let batch = {resourceType:"Bundle",type:'transaction',entry:[]}
+                let updateBatch = {resourceType:"Bundle",type:'transaction',entry:[]}
 
                 //and a hash to hold the original (so we can show a diff in the UI
                 let hashOriginal = {}
                 for (const entry of bundle.entry) {
                     let vs = entry.resource
+                    let isChanged = false
 
                     if (vs.compose && vs.compose.include) {
-                        hashOriginal[vs.id] = vs
+
                         let pos = -1
                         for (const inc of vs.compose.include) {
                             pos ++
                             if (inc.system == "http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished") {
                                 //there is at least 1 unpublished code
                                 //this will be the new include
-
+                                hashOriginal[vs.id] = JSON.parse(JSON.stringify(vs))
                                 //let arNewInclude = {concept:[],system:'http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished"'}
                                 let arNewConceptList = []
                                 for (const concept of inc.concept) {
@@ -188,6 +191,9 @@ function setup(app) {
                                     if (hashStillUnpublished[concept.code]) {
                                         //arNewInclude.concept.push(concept)
                                         arNewConceptList.push(concept)
+                                    } else {
+                                        arChanges.push(`vs ${vs.id} ${concept.code} now published`)
+                                        isChanged = true
                                     }
                                 }
                                 //if there are still unpublished codes then we can update the include. Otherwise it is removed
@@ -197,10 +203,17 @@ function setup(app) {
                                     inc.concept = arNewConceptList
                                 }
 
+                                //this is the bundle of all VS with unpublished
                                 let entry = {resource:vs}      //todo - add transaction update stuff
                                 batch.entry.push(entry)
+                                if (isChanged) {
+                                    //only add to the bundle if changed
+
+                                    updateBatch.entry.push(entry)
+                                }
 
 
+                                break
 
                             }
                         }
@@ -212,13 +225,8 @@ function setup(app) {
                 }
 
 
-
-
-
-
-
                 //res.json(result.data)
-                res.json({log:arLog,cs:cs,batch:batch,hashOriginal:hashOriginal})
+                res.json({log:arLog,cs:cs,batch:batch,hashOriginal:hashOriginal,arChanges:arChanges,updateBatch:updateBatch})
             }).catch(function(ex) {
                 if (ex.response) {
                     res.status(ex.response.status).json(ex.response.data)

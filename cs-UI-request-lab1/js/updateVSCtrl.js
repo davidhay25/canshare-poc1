@@ -116,7 +116,6 @@ angular.module("pocApp")
 
             }
 
-
             $scope.viewVS = function (url) {
                 //display the contents of a single VS
                 $uibModal.open({
@@ -157,7 +156,20 @@ angular.module("pocApp")
                         $scope.input.cmData = textarea.value;
                     });
                 }, 0);  // Wait for the paste to complete before updating the model
-            };
+            }
+            
+            $scope.uploadConceptMap = function () {
+                let ver = 'draft'
+                if ($scope.input.publishCMVer) {
+                    ver = 'release'
+                }
+
+                let msg = `This will update the ${ver} version of the ConceptMap. Are you sure you wish to do this.`
+                if (confirm(msg)) {
+                    alert('not yet enabled')
+                }
+
+            }
 
 
             // ============ VS Batch upload functions ===========
@@ -251,11 +263,15 @@ angular.module("pocApp")
 
             //============ unpublished codes
 
+            $scope.input.showTableCell = []
+
             $scope.analyseUnpublished = function () {
                 let url = "/analyseUnpublished"
                 $http.get(url).then(
                     function (data) {
                         $scope.unpublishedReport = data.data
+                        $scope.unpublishedSummary = terminologyUpdateSvc.summaryUnpublishedCodes(data.data)
+
 
                     },function (err) {
                         alert(angular.toJson(err.data))

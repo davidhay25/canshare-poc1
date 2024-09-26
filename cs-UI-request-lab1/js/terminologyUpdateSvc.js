@@ -5,18 +5,29 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
     }
 
     return {
-        checkUnpublishedCodes : async function (allVsItem) {
+        summaryUnpublishedCodes : function (unpublishedReport) {
+            //summarize the server report
+            //{cs, batch, hashOriginal, arChanges}
+            let report = []
 
-            for (const item of allVsItem) {
-                let vs = item.vs
+            for (const entry of unpublishedReport.batch.entry) {
+                let vs = entry.resource
+                let lne = {name:vs.name,vs:vs}
+                lne.newUnpublished = getUnpublished(vs)
+                let originalVs = unpublishedReport.hashOriginal[vs.name]
+                if (originalVs) {
+                    lne.originalUnpublished = getUnpublished(originalVs)
+                }
+                report.push(lne)
+            }
+            return report
+
+            function getUnpublished(vs) {
                 if (vs.compose && vs.compose.include) {
-                    let pos = -1
                     for (const inc of vs.compose.include) {
                         if (inc.system == "http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished") {
-                            for (const concept of inc.concept) {
-                                console.log(concept)
-
-                            }
+                            return inc.concept
+                            break
                         }
                     }
                 }
@@ -199,7 +210,7 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                 vs.title = vo.title
                 vs.experimental = false
                 //vs.version = "20230525"
-                vs.version = "20240318"   //<<<<<<<<<<<<<<, this is the line to change
+                vs.version = formatDateToYYYYMMDD(new Date()) //  "20240318"   //<<<<<<<<<<<<<<, this is the line to change
                 vs.identifier = [{system:"http://canshare.co.nz/fhir/NamingSystem/valuesets",value:vo.id}]
                 vs.publisher = "Te Aho o Te Kahu"
                 vs.contact = [{telecom:[{system:"email",value:"info@teaho.govt.nz"}]}]
@@ -252,6 +263,14 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
 
 
                 return vs
+            }
+
+            function formatDateToYYYYMMDD(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() is zero-based, so we add 1
+                const day = String(date.getDate()).padStart(2, '0');
+
+                return `${year}${month}${day}`;
             }
 
 

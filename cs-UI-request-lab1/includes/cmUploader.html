@@ -39,7 +39,11 @@
 
   </div>
   <div class="col-md-4">
-    <button ng-show="conceptMap"  class="btn btn-danger pull-right">Upload ConceptMap</button>
+    <div class="pull-right" ng-show="conceptMap">
+      <button   class="btn btn-danger " ng-click="uploadConceptMap()">Upload ConceptMap</button>
+      <checkbox ng-model="input.publishCMVer"></checkbox> Release version
+    </div>
+
   </div>
 
 </div>
