@@ -145,10 +145,21 @@
     </nav>
 
 
-    <a class="btn btn-link pull-right"  download="{{downloadLinkCsvName}}"
+
+    <a class="btn btn-primary pull-right"  download="{{downloadLinkCsvName}}"
        href="{{downloadLinkCsv}}" title="{{downloadLinkCsvName}}" >
         Download VS list
     </a>
+
+    <button ng-hide = "showWaitingTimeout" style="margin-right: 8px"
+            ng-click="setSyndicationStatus()"
+            class="btn-danger btn pull-right">Set Syndication status</button>
+
+    <button class="btn btn-info pull-right" ng-show = "showWaitingTimeout" style="margin-right: 8px">
+        Syndicating. Please wait... {{syndCounter}}
+    </button>
+
+
 
 
     <uib-tabset>
@@ -512,6 +523,8 @@
                             <pre>{{selectedVS | json}}</pre>
                         </uib-tab>
 
+                        <!--
+
                         <uib-tab>
                             <uib-tab-heading>Unpublished concepts <span class="badge">{{prePubCS.concept.length}}</span>
                             </uib-tab-heading>
@@ -544,6 +557,7 @@
 
                         </uib-tab>
 
+                        -->
 
                         <uib-tab heading="History">
                             <button class="btn btn-link pull-right" ng-click="getVersions(selectedVS)">Load versions</button>
@@ -605,13 +619,61 @@
             </table>
 
         </uib-tab>
+
+
+        <uib-tab>
+            <uib-tab-heading>Unpublished concepts
+                <span ng-if="false" class="badge">{{prePubCS.concept.length}}
+                </span>
+            </uib-tab-heading>
+            <br/>
+
+            <uib-tabset>
+                <uib-tab heading="List">
+                    <em>This is the custom ValueSet for unpublished concepts. These are concepts that have been defined
+                        in SNOMED but not yet published. They have a different system url (as they don't yet exist in the
+                        Terminology Server). If they are used by an implementer, then they will be responsible for making
+                        any changes required once the concepts are formally published. </em>
+                    <uib-tabset>
+                        <uib-tab heading="Table">
+                            <br/>
+                            <table class="table table-bordered">
+                                <tr><th>Code</th><th>Display</th></tr>
+                                <tr ng-repeat="concept in prePubCS.concept">
+                                    <td>{{concept.code}}</td>
+                                    <td>{{concept.display}}</td>
+
+                                </tr>
+                            </table>
+
+                        </uib-tab>
+                        <uib-tab heading="Json">
+                            <pre>{{prePubCS | json}}</pre>
+
+                        </uib-tab>
+                    </uib-tabset>
+
+                </uib-tab>
+                <uib-tab heading="Audit">
+                    <ng-include src="'/includes/unpublishedCodes.html'"></ng-include>
+                </uib-tab>
+            </uib-tabset>
+
+
+
+
+
+        </uib-tab>
+
+
+
         <uib-tab heading="Non-SNOMED ValueSets">
             <div ng-controller="customCodeSystemCtrl">
                 <ng-include src="'/includes/customCodeSystem.html'"></ng-include>
             </div>
 
         </uib-tab>
-        <uib-tab heading="Update ConceptMap">
+        <uib-tab heading="ConceptMap">
 
             <ng-include src="'/includes/cmUploader.html'"></ng-include>
 
@@ -627,7 +689,7 @@
 
         </uib-tab>
 
-        <uib-tab heading="Unpublished codes">
+        <uib-tab ng-if = "false" heading="Unpublished codes">
 
             <ng-include src="'/includes/unpublishedCodes.html'"></ng-include>
 

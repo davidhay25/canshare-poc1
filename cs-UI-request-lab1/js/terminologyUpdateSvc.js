@@ -117,7 +117,8 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                     logger(rowNumber,`Missing name`,name)
                 }
 
-                if (cols.length !== 6) {
+
+                if (cols.length !== 6 && (rowNumber !== rows.length+1)) {
                     logger(rowNumber,`WARNING: There are only ${cols.length} columns. There's a newline character in there somewhere. Other errors will follow`,name)
                 }
 
@@ -434,7 +435,8 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                 }
                 rowNumber++
 
-                if (cols.length !== colCount) {
+                //the last row won't have any errors...
+                if (cols.length !== colCount && (rowNumber !== arLines.length+2)) {
                     let msg = `There are only ${cols.length} cols - there should be ${colCount}. This can be caused by a newLine character at that col number`
                     msg += " Note that the row number may be incorrect if there are earlier errors like this - it mucks up the sequence"
                     logger(rowNumber,msg)}

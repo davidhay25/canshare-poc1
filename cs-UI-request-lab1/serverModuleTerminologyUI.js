@@ -88,6 +88,8 @@ function setup(app) {
                 let arLog = []
                 let arChanges = []
                 let hash = {}
+                let cntVSBefore = 0           //count of ValueSets with unpublished codes
+                let cntVSAfter = 0
 
                 //create a ValueSet with all unpublished
 
@@ -111,6 +113,7 @@ function setup(app) {
                         let pos = -1
                         for (const inc of vs.compose.include) {
                             if (inc.system == "http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished") {
+                                cntVSBefore ++
                                 for (const concept of inc.concept) {
                                     //console.log(concept)
                                     if (isNumericString(concept.code)) {
@@ -200,6 +203,7 @@ function setup(app) {
                                 if (arNewConceptList.length == 0) {
                                     vs.compose.include.splice(pos,1)
                                 } else {
+                                    cntVSAfter ++
                                     inc.concept = arNewConceptList
                                 }
 
@@ -218,11 +222,14 @@ function setup(app) {
                             }
                         }
 
-                        //all VS that have unpublished codes will be updated
+
 
 
                     }
                 }
+
+
+                arLog.push(`There are ${cntVSBefore} ValueSets with unpublished codes. ${cntVSAfter} of them still have some after the check.`)
 
 
                 //res.json(result.data)
@@ -644,6 +651,98 @@ function setup(app) {
 
     })
 
+
+    app.post('/nzhts/setSyndication',async function(req,res) {
+        let serverHost = "https://authoring.nzhts.digital.health.nz/"
+        let arLog = []
+
+        let token = await getNZHTSAccessToken()
+        if (token) {
+
+            let config = {headers:{authorization:'Bearer ' + token}}
+            config['Content-Type'] = "application/fhir+json"
+
+            try {
+
+                //set the codesystem
+                let csId = "canshare-unpublished-concepts"
+
+                const csOptions = {
+                    method: 'POST',
+                    url: `${serverHost}synd/setSyndicationStatus`,
+                    params: {resourceType: 'CodeSystem', id: csId, syndicate: 'true'},
+                    headers: {'Content-Type': 'application/json', authorization:'Bearer ' + token},
+                };
+
+                const { csData } = await axios.request(csOptions)
+                arLog.push(`CodeSystem ${csId} update`)
+
+                //Set ConceptMaps. Only a specific CM for now - and a 1-off....
+                let cmId = "canshare-select-valueset-map"
+
+                const options = {
+                    method: 'POST',
+                    url: `${serverHost}synd/setSyndicationStatus`,
+                    params: {resourceType: 'ConceptMap', id: cmId, syndicate: 'true'},
+                    headers: {'Content-Type': 'application/json', authorization:'Bearer ' + token},
+
+                };
+
+                const { data } = await axios.request(options);
+                arLog.push(`ConceptMap ${cmId} update`)
+
+
+                //now the ValueSets
+                //get the canshare valueset list
+                let qry = `${serverHost}fhir/ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&_count=5000`
+                let response = await axios.get(qry,config)
+                let bundle = response.data
+                let ctr = 0
+                for (const entry of bundle.entry) {
+                    let vs = entry.resource
+
+                    //set the syndication status regardless of current status
+                    const options = {
+                        method: 'POST',
+                        url: `${serverHost}synd/setSyndicationStatus`,
+                        params: {resourceType: 'ValueSet', id: vs.id, syndicate: 'true'},
+                        headers: {'Content-Type': 'application/json', authorization:'Bearer ' + token},
+                    };
+
+                    //console.log(ctr++,vs.url)
+                    const { data } = await axios.request(options);
+
+                }
+                arLog.push(`${bundle.entry.length} ValueSets updated`)
+                res.json(arLog)
+
+            } catch(ex) {
+
+                if (ex.response) {
+
+                    console.log(ex.response.status)
+                    console.log(JSON.stringify(ex.response.data,null,2))
+                } else {
+                    console.log(ex)
+                }
+
+            }
+
+
+
+        } else {
+            res.status(ex.response.status).json({msg:"Unable to get Access Token."})
+        }
+
+
+
+
+
+
+    })
+
+    //=========================
+
     //used for $translate
     app.post('/nzhtsDEP',async function(req,res){
         console.log(req.body)
@@ -739,7 +838,7 @@ function setup(app) {
     })
 
     //use when updating a ConceptMap
-    app.put('/nzhts/ConceptMap',async function(req,res){
+    app.put('/nzhts/ConceptMap/:id',async function(req,res){
 
         let cm = req.body
 

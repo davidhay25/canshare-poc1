@@ -19,27 +19,27 @@
 <br/>
 <div class="row">
   <div class="col-md-2">
-    <div ng-show="input.cmData"
-         class="btn-link btn" ng-click="parseCMFile(input.cmData)">Parse content</div>
+    <button ng-show="input.cmData"
+         class="btn-link btn" ng-click="parseCMFile(input.cmData)">Parse content</button>
   </div>
   <div class="col-md-2">
     <div ng-show="previousCMSS">
-      <div class="btn-link btn" ng-click="reloadCMSS(input.cmData)">Reload previous (Development only)</div>
+      <button class="btn-link btn" ng-click="reloadCMSS(input.cmData)">Reload previous (Development only)</button>
 
 
     </div>
   </div>
   <div class="col-md-2">
     <div>
-      <div class="btn-link btn" ng-click="loadCurrent()">Download from Term. server</div>
+      <button class="btn-link btn" ng-click="loadCurrent()">Download from Term. server</button>
     </div>
   </div>
   <div class="col-md-2">
-    <a target="_blank" href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653">Concept Map spreadsheet</a>
+    <a class="btn" target="_blank" href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653">Concept Map spreadsheet</a>
 
   </div>
   <div class="col-md-4">
-    <div class="pull-right" ng-show="conceptMap">
+    <div class="pull-right" ng-show="conceptMap && user.email">
       <button   class="btn btn-danger " ng-click="uploadConceptMap()">Upload ConceptMap</button>
       <checkbox ng-model="input.publishCMVer"></checkbox> Release version
     </div>
@@ -140,8 +140,7 @@
         </div>
 
         <table class="table table-condensed table-bordered">
-          <tr
-                  ng-if="canShowRow(row)"
+          <tr ng-if="canShowRow(row)"
                   ng-repeat="row in arLog">
             <td>{{row.line}}</td>
             <td>{{row.msg}}</td>

@@ -15,12 +15,14 @@
 
   </div>
   <div class="col-md-2">
-    <a target="_blank" href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=878499402">ValueSet spreadsheet</a>
+    <a class="btn" target="_blank" href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=878499402">ValueSet spreadsheet</a>
 
   </div>
 
   <div class="col-md-4">
-    <button ng-show="vsBatch" class="btn btn-danger pull-right">Upload ValueSet Batch</button>
+    <button ng-show="vsBatch && user.email"
+            ng-click="uploadVS()"
+            class="btn btn-danger pull-right">Upload ValueSet Batch</button>
   </div>
 
 

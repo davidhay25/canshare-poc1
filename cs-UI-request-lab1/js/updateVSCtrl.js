@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('updateCtrl',
-        function ($scope,$http,$uibModal,$q,updateVSSvc,utilsSvc,terminologyUpdateSvc,$localStorage) {
+        function ($scope,$http,$uibModal,$q,updateVSSvc,utilsSvc,terminologyUpdateSvc,$localStorage,$interval) {
 
             $scope.version = utilsSvc.getVersion()
 
@@ -149,14 +149,18 @@ angular.module("pocApp")
                 textarea.scrollTop = 0;  // Scroll to the top
                 }, 0);  // Wait for the paste to complete before updating the model
 
-                return
+                //return
+                /*
                 var textarea = event.target;
                 setTimeout(function() {
                     $scope.$apply(function() {
                         $scope.input.cmData = textarea.value;
                     });
                 }, 0);  // Wait for the paste to complete before updating the model
+                */
             }
+
+
             
             $scope.uploadConceptMap = function () {
                 let ver = 'draft'
@@ -166,11 +170,40 @@ angular.module("pocApp")
 
                 let msg = `This will update the ${ver} version of the ConceptMap. Are you sure you wish to do this.`
                 if (confirm(msg)) {
-                    alert('not yet enabled')
+                    //if the 'release version' is not checked then add '-dev' as a suffix to the id
+
+                    //Add '-dev' to the id if not release
+                    if (! $scope.input.publishCMVer) {
+                        let id = $scope.conceptMap.id
+                        //ensure the suffix is only added once
+
+                        if (id.indexOf('-dev' == -1)) {
+                            $scope.conceptMap.id = `${$scope.conceptMap.id}-dev`
+                            $scope.conceptMap.url = `${$scope.conceptMap.url}-dev`
+                            $scope.conceptMap.title = `${$scope.conceptMap.title}-development version`
+                        }
+
+                    }
+
+
+                    //return
+                    let url = `/nzhts/ConceptMap/${$scope.conceptMap.id}`
+                    $http.put(url,$scope.conceptMap).then(
+                        function (data) {
+                            alert("Map updated")
+                        }, function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+
+
+
                 }
 
             }
 
+
+            //app.post('/nzhts/setSyndication',async function(req,res) {
 
             // ============ VS Batch upload functions ===========
 
@@ -259,7 +292,60 @@ angular.module("pocApp")
                 })
             }
 
-                //=============================
+            $scope.uploadVS = function () {
+                let msg = `This will uploads the ValueSet. Are you sure you wish to do this.`
+                if (confirm(msg)) {
+
+
+                    return
+                    let url = `/nzhts/bundle`
+                    $http.post(url,$scope.vsBatch).then(
+                        function (data) {
+                            alert("ValusSet uploaded")
+                        }, function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+
+                }
+            }
+
+            //=============================
+
+            $scope.setSyndicationStatus = function () {
+                if (confirm("Are you sure you wish to set the syndication status for all resources. This will take over a minute.")) {
+                    $scope.showWaiting = true
+                    $scope.showWaitingTimeout = true
+
+                    $scope.syndCounter = 0
+                    let intervalPromise
+                    intervalPromise = $interval(function() {
+                        $scope.syndCounter++;
+                    }, 1000);
+
+                    // Cancel the interval on scope destroy to avoid memory leaks
+                    $scope.$on('$destroy', function() {
+                        if ($scope.running) {
+                            $interval.cancel(intervalPromise);
+                        }
+                    });
+
+                    //return
+
+                    $http.post('/nzhts/setSyndication').then(function () {
+                        alert(`Syndication updated for all resources. It took ${$scope.syndCounter} seconds.`)
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }).then(
+                        function () {
+                            $scope.showWaiting = false
+                            $scope.showWaitingTimeout = false
+                            $interval.cancel(intervalPromise);
+                        }
+                    )
+                }
+
+            }
 
             //============ unpublished codes
 
@@ -470,9 +556,6 @@ angular.module("pocApp")
                 if (confirm(msg)) {
 
                     console.log(angular.toJson($scope.selectedVS,null,2))
-
-
-
                     performUpdate($scope.selectedVS)
 
                 }
