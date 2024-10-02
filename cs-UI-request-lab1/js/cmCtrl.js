@@ -15,12 +15,11 @@ angular.module("pocApp")
 
             // $scope.local.conceptMapTab = 3      //select the UI tab while developing
             $scope.local.uiValues = {}          //a hash of values selected in the UI
-            //$scope.input.showHelp = true
+
 
             $scope.log= []
 
             let snomed = "http://snomed.info/sct"
-
             let vsPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/"
 
             //functions to get ConceptMap & expanded ValueSet..
@@ -86,11 +85,10 @@ angular.module("pocApp")
                 //save the conceptMap and VS in the db
                 let vo = {cm:$scope.fullSelectedCM,vs:$scope.hashExpandedVs,when:new Date()}
                 $scope.cacheDate = vo.when
-                //https://localforage.github.io/localForage/#data-api-setitem
+
                 localforage.setItem('cmData', vo).then(function (value) {
                     // Do other things once the value has been saved.
                     console.log(value);
-                   // delete $scope.refreshingCache
                     alert("Cache has been updated from the Terminology Server.")
                     setup()
                 }).catch(function(err) {
@@ -1068,7 +1066,8 @@ angular.module("pocApp")
             //------------- end of main form UI functions
 
             //open a specific ConceptMap
-            $scope.selectCMItem = function (item,expand) {
+            //if checkInCache is true then see if the VS is in the cache first - only retrieve from the TS if not
+            $scope.selectCMItem = function (item,checkInCache) {
                 $scope.selectedCM = item.cm
                 delete $scope.fullSelectedCM
                 delete $scope.resultParameters
@@ -1083,12 +1082,9 @@ angular.module("pocApp")
 
                 $scope.loadingCM = true
 
-                if ($scope.input.loadComplete) {
-                    expand = true
-                }
 
                 //get the map
-                querySvc.getOneConceptMap(item.cm.url,expand).then(
+                querySvc.getOneConceptMap(item.cm.url,true).then(
                     function (ar) {
                         //now retrieve all the ValueSets (effectively refresh the cache)
                         $scope.fullSelectedCM = ar[0]       //todo what of there's > 1
@@ -1310,7 +1306,6 @@ angular.module("pocApp")
                 let serviceUrl = "https://nzhts.digital.health.nz/fhir/ValueSet/canshare-cancer-service"
                 let serviceConcepts = $scope.hashExpandedVs[serviceUrl]
 
-
                 $scope.input.allService = [{display:"No default"}]    //for default
 
                 if (serviceConcepts) {
@@ -1322,20 +1317,8 @@ angular.module("pocApp")
                     alert(`The service ValueSet ${serviceUrl} was not found`)
                 }
 
-/*
-                //cancer service options are fixed - todo get from CM
-                $scope.cmProperties['cancer-service'].options.push({code:"394803006",display:"Clinical haematology"})
-                $scope.cmProperties['cancer-service'].options.push({code:"394593009",display:"Medical oncology"})
-                $scope.cmProperties['cancer-service'].options.push({code:"418002000",display:"Paediatric oncology"})
-                $scope.cmProperties['cancer-service'].options.push({code:"419815003",display:"Radiation oncology"})
-                $scope.cmProperties['cancer-service'].options.push({code:"0",display:"No service"})
-*/
-
                 let treeData = querySvc.makeTree($scope.fullSelectedCM,$scope.cmProperties)
                 showCmTree(treeData)
-
-                //stuff for the histology UI - no longer used
-                //$scope.histology = $scope.hashExpandedVs['https://nzhts.digital.health.nz/fhir/ValueSet/canshare-who-histology']
 
             }
 
@@ -1351,21 +1334,7 @@ angular.module("pocApp")
             }
 
 
-            function makeHashParams() {
-                let params = {}
-                for (const key of Object.keys($scope.cmProperties)) {
 
-                    let v = $scope.local.cmPropertyValue[key]
-                    console.log(key,v)
-                    if (v) {
-                        params[key] = v
-
-                    }
-
-                }
-                return params
-
-            }
 
 
             $scope.lookupByRowNumber = function (rowNumber) {
@@ -1373,507 +1342,6 @@ angular.module("pocApp")
             }
 
             //====================  deprecated functions here....
-
-            //when a concept is selected from the histology typeahead in the histology UI
-            $scope.histoSelectedDEP = function (concept) {
-
-                performReverseLookup('histologic-type-primary',concept)
-                console.log($scope.reverseLookup)
-
-                //populate the data from reverse todo ?move to seperate fuction
-                for (const prop of Object.keys($scope.reverseLookup.hashProperty)) {
-
-                    $scope.cmProperties[prop].options = $scope.reverseLookup.hashProperty[prop]
-
-                    //set the default values is between 1 and 3 (will be rendered as radios in the UI
-                    if ($scope.cmProperties[prop].options && $scope.cmProperties[prop].options.length < 4) {
-                        $scope.local.cmPropertyValue[prop] = $scope.cmProperties[prop].options[0].code
-
-
-
-                    }
-
-                    //$scope.local.cmPropertyValue[prop] = $scope.reverseLookup.hashProperty[prop]
-                }
-
-                console.log($scope.cmProperties)
-
-
-
-            }
-
-
-
-            $scope.resetUIDataDEP = function () {
-                delete $scope.displayMatchNumber
-                delete $scope.input.cmProperty
-                delete $scope.cmExpandedVS
-                delete $scope.matchingVS
-                setup()
-                delete $scope.selectedElement
-                $scope.local.cm.property = {}
-                delete $scope.reverseLookup
-
-
-
-            }
-
-            //construct a list of all the potential targets for a given property
-            //invoked when the property to be populated is selected
-            $scope.makeListOfTargetsDEP = function (key) {
-                if (! key) {return}
-                delete $scope.selectedElement
-                delete $scope.selectedTarget
-                delete $scope.cmExpandedVS
-                delete $scope.displayMatchNumber
-                let concept = $scope.cmProperties[key].concept
-                $scope.hashProperties = {} //a hash of all properties in all dependsOn and all their possible values
-
-                for (const element of $scope.fullSelectedCM.group[0].element) {
-                    if (element.code == concept.code) {     //this is the set of targets which could match this code
-                        $scope.selectedElement = element
-
-                        //now create the list of all properties referenced in all the dependsOn elements..
-                        if (element.target) {
-
-                            element.target.forEach(function (target) {
-                                if (target.dependsOn) {
-                                    target.dependsOn.forEach(function(don) {
-                                        let property = don.property   //this is the 'determinant'
-                                        let canAdd = true
-                                        $scope.hashProperties[property] = $scope.hashProperties[property] || []
-                                        if (don['x-operator'] == 'in-vs') {
-                                            //this is actually a reference to a valueset. the don will match if the supplied value
-                                            // of the property is in the valueset. So we need to add the contents of the VS to the
-                                            // set of possible values
-                                            let options = $scope.hashExpandedVs[don.value]
-                                            console.log(options)
-                                            options.forEach(function (concept) {
-                                                let ar = $scope.hashProperties[property].filter(c =>c.code == concept.code)
-                                                if (ar.length == 0) {
-                                                    $scope.hashProperties[property].push(concept)
-                                                }
-                                            })
-
-                                            canAdd = false  //just to stop the value being added .
-                                        } else {
-                                            let v = don.value //the value is actually a code
-                                            let ar = $scope.hashProperties[property].filter(c =>c.code == v)
-                                            if (ar.length == 0) {
-                                                $scope.hashProperties[property].push({code:v,display:don.display})
-                                            }
-                                        }
-
-
-
-                                    })
-                                }
-
-                            })
-
-
-                        }
-
-
-                        //special handling for primary-site-laterality. The primary site is all sites
-                        //return the set of all codes
-                        if (key == 'primary-site-laterality') {
-                            $scope.hashProperties['primary-site'] = []     //empty the list assembled from dependsOn
-                            $scope.hashExpandedVs['https://nzhts.digital.health.nz/fhir/ValueSet/canshare-topography'].forEach(function (concept) {
-                                $scope.hashProperties['primary-site'].push(concept)
-                            })
-
-                        }
-
-
-
-
-                        console.log(element)
-                        console.log($scope.hashProperties)
-
-                        Object.keys($scope.hashProperties).forEach(function (key) {
-                            //now sort the hash contents
-                            $scope.hashProperties[key].sort(function (a,b) {
-                                if (a.display > b.display) {
-                                    return 1
-                                } else {
-                                    return -1
-                                }
-
-                            })
-                        })
-
-                        break
-                    }
-                }
-            }
-
-
-
-
-            //expand a ValueSet
-            $scope.cmExpandVSDEP = function (url) {
-                delete $scope.cmExpandedVS
-                delete $scope.selectedTarget
-                delete $scope.lstMatchingConcepts
-                delete $scope.matchingVS
-
-
-                let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=en-x-sctlang-23162100-0210105`
-                console.log(qry)
-                let encodedQry = encodeURIComponent(qry)
-                $scope.showWaiting = true
-                $http.get(`nzhts?qry=${encodedQry}`).then(
-                    function (data) {
-                        $scope.cmExpandedVS = data.data
-
-
-                        if ($scope.cmExpandedVS.expansion && $scope.cmExpandedVS.expansion.contains) {
-
-                            $scope.cmExpandedVS.expansion.contains.sort(function(a,b) {
-                                if (a.display > b.display) {
-                                    return 1
-                                } else {
-                                    return -1
-                                }
-                            })
-
-                        }
-
-
-
-
-                    }, function (err) {
-
-                    }
-                ).finally(
-                    function () {
-                        $scope.showWaiting = false
-                    }
-                )
-            }
-
-
-
-            $scope.showTargetDEP = function (target) {
-                if ($scope.selectedTarget && target.code == $scope.selectedTarget.code) {
-                    delete $scope.selectedTarget
-                } else {
-                    $scope.selectedTarget = target
-                }
-
-            }
-
-            $scope.selectTargetDEP = function (target) {
-                $scope.selectedTarget = target
-            }
-
-
-
-
-            function expandVDEP(url) {
-                let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=${nzDisplayLanguage}`
-                let encodedQry = encodeURIComponent(qry)
-                $scope.showWaiting = true
-                $http.get(`nzhts?qry=${encodedQry}`).then(
-                    function (data) {
-                        $scope.expandedVS = data.data
-                    }, function (err) {
-
-                    }
-                ).finally(
-                    function () {
-                        $scope.showWaiting = false
-                    }
-                )
-            }
-
-
-            $scope.getFirstValueDEP = function (lst) {
-                if (lst && lst.length > 0) {
-                    return lst[0].code
-                }
-
-            }
-            //get all the concepts for a single property - this is applying the rules engine...
-            //called from the Rules tab
-            $scope.getOptionsOnePropertyDEP = function() {
-                //console.log($scope.local.cm.property)
-                delete $scope.lstMatchingConcepts
-                delete $scope.cmExpandedVS      //so it's not in the display area
-                delete $scope.displayMatchNumber
-                //call the rules engine to determine the possible concepts. The engine needs:
-
-                //  the list of user selected values for all properties so far  - local.cm.property
-                //  the property that needs the list - input.cmProperty & $scope.selectedElement
-
-                //
-
-                //rules engine takes:
-                //
-                let vo = cmSvc.rulesEngine($scope.local.cm.property,
-                    $scope.selectedElement,$scope.hashExpandedVs)
-
-                $scope.matchingVS = vo.lstVS
-                $scope.matchedRules = vo.lstMatches
-
-                //look uo the matched elements (to display in the UI as well as the table)
-                $scope.displayMatchNumber = "Match: "
-                $scope.selectedElement.target.forEach(function (target) {
-                    if (target.matched) {
-                        $scope.displayMatchNumber += target.comment + " "
-                    }
-                })
-                if ( $scope.displayMatchNumber == "Match: ") {
-                    $scope.displayMatchNumber = 'No matching targets'
-                }
-
-                let qry = `/nzhts/expandMultipleVs`
-                $http.post(qry,vo.lstVS).then(
-                    function (data) {
-                        console.log(data)
-                        $scope.lstMatchingConcepts = data.data
-                    }, function (err) {
-                        console.log(err)
-                    }
-                )
-
-            }
-
-
-
-            //create an array of params representing the selected value of all properties
-            function makeParamsDEP() {
-                let params = []
-                for (const key of Object.keys($scope.cmProperties)) {
-
-                    let v = $scope.local.cmPropertyValue[key]
-                    console.log(key,v)
-                    if (v) {
-
-                        let item = {}
-                        item.property = key
-                        item.value = v
-                        //myParams.push(item)
-
-                        params.push(item)
-                    }
-
-                }
-                return params
-
-            }
-
-
-            //generate the translate query from the canshare lookup tab
-            function makeTranslateQueryDEP(conceptWeWant,cmUrl)  {
-
-                conceptWeWant.system = conceptWeWant.system || "http://snomed.info/sct"
-
-                let myParams = []    //an array of simplified parameters for my parser
-
-                let translateParameters = {resourceType:"Parameters", parameter:[]}
-                //the conceptmap url
-                translateParameters.parameter.push({name:"url",valueUri: cmUrl })
-
-                //the conceptWeWant
-                translateParameters.parameter.push({name:"coding",valueCoding:conceptWeWant})
-
-                //add the dependencies
-                if ($scope.local.cmPropertyValue) {
-                    Object.keys($scope.local.cmPropertyValue).forEach(function (key) {
-                        let p = $scope.local.cmPropertyValue[key]
-                        p.system = snomed
-//console.log(p)
-                        let depParam1 = {name:"dependency",part :[]}
-                        translateParameters.parameter.push(depParam1)
-                        let part1 = {"name":"element","valueUri":key}
-                        depParam1.part.push(part1)
-                        //let ccValue = {coding:[{system:snomed,code:$scope.input.dep1}]}
-                        let ccValue = {coding:[p]}
-                        let part2 = {"name":"concept","valueCodeableConcept":ccValue}
-                        depParam1.part.push(part2)
-
-                        //my parameters
-                        let item = {}
-                        item.property = key
-                        item.value = p
-                        myParams.push(item)
-
-
-                    })
-                }
-
-
-                $scope.translateParameters = translateParameters
-
-                return {parameters:translateParameters,myParams : myParams}
-
-            }
-
-            function performTranslateDEP(parameters) {
-                let deferred = $q.defer()
-                //let parameters = vo.parameters  //the parameters resource
-                $http.post('nzhts',parameters).then(
-                    function (data) {
-                        let resultParameters = data.data
-                        let resultParametersList = []
-                        //make a list of matches from the parameters
-                        if (resultParameters.parameter){
-                            resultParameters.parameter.forEach(function (param) {
-                                if (param.name == 'match' && param.part) {
-                                    param.part.forEach(function (part) {
-                                        if (part.name == 'concept') {
-                                            resultParametersList.push(part.valueCoding)
-                                        }
-                                    })
-                                }
-
-                            })
-                        }
-
-                        deferred.resolve(resultParametersList)
-
-
-                        console.log(data)
-                    },function (err) {
-
-                        deferred.reject(err.data)
-
-                    }
-                )
-
-                return deferred.promise
-            }
-
-
-
-
-            $scope.editRuleDEP = function (target) {
-
-                $uibModal.open({
-                    backdrop: 'static',      //means can't close by clicking on the backdrop.
-                    keyboard: false,       //same as above.
-                    size : 'lg',
-                    templateUrl: 'modalTemplates/editRule.html',
-
-                    controller: function ($scope,target) {
-                        $scope.input = {}
-                        $scope.target = target
-
-                        $scope.properties = []
-                        $scope.properties.push("cancer-service")
-                        $scope.properties.push("cancer-stream")
-                        $scope.properties.push("cancer-substream")
-                        $scope.properties.push("cancer-type")
-                        $scope.properties.push("primary-site-laterality")
-                        $scope.properties.push("histologic-type-primary")
-
-                        if (target) {
-                            $scope.input.url = target.code
-                            $scope.input.display = target.display
-                            $scope.input.dependsOn = target.dependsOn
-                        } else {
-                            $scope.input.dependsOn = []
-                        }
-
-                        $scope.addTrigger = function () {
-                            let trigger = {property:$scope.input.newTriggerProperty}
-                            trigger.display = $scope.input.newTriggerDisplay
-                            trigger.value = $scope.input.newTriggerValue
-                            $scope.input.dependsOn.push(trigger)
-                            delete $scope.input.newTriggerProperty
-                            delete $scope.input.newTriggerDisplay
-                            delete $scope.input.newTriggerValue
-                        }
-
-                    },
-                    resolve: {
-                        target: function () {
-                            return target
-                        }
-                    }
-
-                }).result.then(function (vo) {
-
-                })
-
-            }
-
-
-            //called when a property option in the UI changes
-            $scope.cmLookupDEP = function (inputProp,v,propKey) {
-                //propKey is the property name = eg cancer-service
-
-
-
-                //console.log(inputProp,v,propKey)
-                //determine the set of properties that are inpts into this one.
-                //these are the properties 'before' the one we're looking at
-                //eg if we're after the property 'cancer-stream' then we're only interested in patient-sex and cancer-service
-
-                // $scope.local.uiValues  has the values selected thus far. a hash keyed on property. content is Coding
-
-                for (const prop of Object.keys($scope.cmProperties)) {
-                    console.log(prop)
-                    if (prop == propKey) {
-                        break
-                    }
-                }
-
-
-
-
-
-                return;
-
-                //just set the next one
-                let nextProperty = $scope.cmProperties[inputProp.next]
-
-                //
-
-                let params = makeHashParams()   //a hash of all data thus far ?todo only the preceeding ones
-
-                //find the cm element that corresponds to the option being populated - it has the potential targets
-
-
-                //parameters:
-                //  property - the property name for which concepts are sought - eg cancer-stream
-                //  hashInput - a hash keyed by property name that has all the properties where the user has selected a value
-                //  element -  has all the possible targets for that property (each property has one element in the CM)
-
-
-                //let vo = cmSvc.getOptionsOneProperty($scope.input.cmProperty,$scope.local.cm.property,$scope.selectedElement)
-
-                let vo = cmSvc.rulesEngine(params,$scope.selectedElement)
-
-                console.log(vo)
-
-
-                return
-
-
-                //get the set of options for each of the properties based on the current values of all properties
-                let currentValues = makeParams()
-
-                for (const key of Object.keys($scope.cmProperties)) {
-                    if (key !== 'cancer-service' && key !== propKey) {
-
-                        let prop = $scope.cmProperties[key]
-
-                        let lookingForProperty = prop.concept
-                        let results = querySvc.processMyTranslate(lookingForProperty,currentValues,$scope.fullSelectedCM)
-                        console.log(key,lookingForProperty,results)
-
-
-                        $scope.cmProperties[key].options = results
-                    }
-
-                }
-
-
-
-            }
 
 
 
