@@ -14,7 +14,7 @@ angular.module("pocApp")
                 $scope.inputVs = `${vsPrefix}${srch.substr(1)}`
             }
 
-            $scope.localStorage = $localStorage
+         //   $scope.localStorage = $localStorage
 
             $scope.loadingCM = false
 
@@ -47,21 +47,6 @@ angular.module("pocApp")
 
             //display the tree view of a ConceptMap
 
-            //when a source is selected in the ConceptMap mapper, set the possible 'depends on' properties
-            $scope.setDependsOnProperties = function (source) {
-                if (source) {
-                    delete $scope.translateParameters
-                    let vo = querySvc.getCMProperties($scope.fullSelectedCM,source.code)
-                    $scope.doProperties = vo.hashProperties // querySvc.getCMProperties($scope.fullSelectedCM)
-                }
-
-            }
-
-            $scope.selectQfromVSList = function(Q) {
-                $scope.selectedQ = Q
-                $scope.dummyQR = {}
-                $scope.dummyFormData = {}
-            }
 
 
             //whether to show a particular VS
@@ -174,6 +159,7 @@ angular.module("pocApp")
             }
             $scope.changeInstance($scope.input.tsInstance)
 
+            //expand a ValueSet
             $scope.expandVSInTS = function (vs) {
                 delete $scope.expandedVS
                 delete $scope.expansionError
@@ -208,6 +194,7 @@ angular.module("pocApp")
 
             }
 
+            //when a VS is selected in the UI
             $scope.selectVSItem = function (item) {
                 //retrieve the complete VS. we know the id, but we'll still search by url as that's the recommended
                 // way to do it, and we want to show the url to the user...
@@ -215,7 +202,7 @@ angular.module("pocApp")
                 delete $scope.expandedVS
                 delete $scope.selectedVS
                 delete $scope.expandQry
-                delete $scope.qUsingVS
+                //delete $scope.qUsingVS
                 delete $scope.dummyQR
                 delete $scope.expansionError
                 delete $scope.input.filter
@@ -236,13 +223,10 @@ angular.module("pocApp")
                         //it's a query so a bundle is expected
                         if (data.data && data.data.entry) {
                             if (data.data.entry.length !== 1) {
-                                alert("There were ${} matching ValueSets. This is very likely an issue with duplicated resrces on the terminology server")
+                                alert(`There were ${data.data.entry.length} matching ValueSets. This is very likely an issue with duplicated resources on the terminology server`)
                             } else {
                                 $scope.selectedVS = data.data.entry[0].resource
-
-                                $scope.expandVSInTS($scope.selectedVS)
-
-
+                                $scope.expandVSInTS($scope.selectedVS)  //perform the expansion
                             }
                         } else {
                             alert("The ValueSet was not found")
@@ -259,9 +243,6 @@ angular.module("pocApp")
                 )
 
             }
-
-
-
 
             $scope.selectVS = function (vs) {
                 $scope.selectedVS = vs
@@ -302,6 +283,23 @@ angular.module("pocApp")
                     $scope.selectedServer = $scope.allServers[0]
                 }
             }
+
+            //when a source is selected in the ConceptMap mapper, set the possible 'depends on' properties
+            $scope.setDependsOnPropertiesDEP = function (source) {
+                if (source) {
+                    delete $scope.translateParameters
+                    let vo = querySvc.getCMProperties($scope.fullSelectedCM,source.code)
+                    $scope.doProperties = vo.hashProperties // querySvc.getCMProperties($scope.fullSelectedCM)
+                }
+
+            }
+
+            $scope.selectQfromVSListDEP = function(Q) {
+                $scope.selectedQ = Q
+                $scope.dummyQR = {}
+                $scope.dummyFormData = {}
+            }
+
 
         }
     )

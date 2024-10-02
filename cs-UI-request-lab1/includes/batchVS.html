@@ -101,15 +101,16 @@
         <pre>{{vsBatch | json}}</pre>
       </uib-tab>
 
-      <uib-tab ng-if="batchVSLog" heading="Errors during update">
+      <uib-tab ng-if="batchVsErrors" heading="Errors during update">
         <table class="table-bordered table">
-          <tr ng-repeat="lne in batchVSLog">
+          <tr ng-repeat="lne in batchVsErrors.errors">
             <td>{{lne.id}}</td>
-            <td>{{lne.msg}}</td>
+            <td>{{lne.error}}{{lne.httpError}}{{lne.httpStatus}}
+
+            </td>
           </tr>
         </table>
 
-        <pre>{{batchVSLog | json}}</pre>
       </uib-tab>
 
 

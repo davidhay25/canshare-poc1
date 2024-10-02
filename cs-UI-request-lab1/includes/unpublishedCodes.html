@@ -6,11 +6,34 @@
   </style>
 
 
-  <div ng-hide = "analysingUnpublished" class="clickable pull-right" ng-click="analyseUnpublished()">Perform analysis </div>
-  <div ng-show = "analysingUnpublished" class="pull-right">Performing analysis, please wait...</div>
 
 
-  <pre ng-if="unpublishedReport">{{unpublishedReport.log | json}}</pre>
+<div class="row">
+  <div class="col-md-9">
+    <ul>
+      <li ng-repeat="lne in unpublishedReport.log">
+        {{lne}}
+      </li>
+    </ul>
+
+  </div>
+  <div class="col-md-3">
+    <div ng-hide = "analysingUnpublished" class="clickable pull-right" ng-click="analyseUnpublished()">Perform analysis </div>
+    <div ng-show = "analysingUnpublished" class="pull-right">Performing analysis, please wait...</div>
+
+    <div ng-show = "unpublishedReport">
+      <br/>
+      <button class="btn btn-danger pull-right" ng-click="updateUnpublished()">Update Server</button>
+
+    </div>
+
+
+    <div class="clearfix"></div>
+  </div>
+</div>
+
+
+
 
   <uib-tabset ng-if="unpublishedReport">
 
@@ -61,7 +84,7 @@
       <pre>{{unpublishedReport.arChanges | json}}</pre>
     </uib-tab>
 
-    <uib-tab heading="CodeSystem">
+    <uib-tab heading="New CodeSystem">
       <uib-tabset>
         <uib-tab heading="Table">
 
@@ -84,6 +107,18 @@
     <uib-tab heading="Updated VS Bundle">
       <br/>
       <pre>{{unpublishedReport.updateBatch | json}}</pre>
+    </uib-tab>
+
+    <uib-tab ng-if="unpublishedUploadErrors" heading="Errors during update">
+      <table class="table-bordered table">
+        <tr ng-repeat="lne in unpublishedUploadErrors.errors">
+          <td>{{lne.id}}</td>
+          <td>{{lne.error}}{{lne.httpError}}{{lne.httpStatus}}
+
+          </td>
+        </tr>
+      </table>
+
     </uib-tab>
 
     <!--

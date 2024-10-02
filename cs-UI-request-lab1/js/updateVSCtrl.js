@@ -308,13 +308,6 @@ angular.module("pocApp")
                     let jobId  //the job assigned to the long running job on the server
                     let intervalPromiseVS //the polling interval
 
-/*
-                    $scope.uploadVSCounter = 0
-                    let intervalPromiseVS
-                    intervalPromiseVS = $interval(function() {
-                        $scope.uploadVSCounter++;
-                    }, 1000);
-*/
                     // Cancel the interval on scope destroy to avoid memory leaks
                     $scope.$on('$destroy', function() {
                         if ($scope.running) {
@@ -322,12 +315,11 @@ angular.module("pocApp")
                         }
                     });
 
-
-                    // return
                     let url = `/nzhts/bundle`
                     $http.post(url,$scope.vsBatch).then(
                         function (data) {
                             jobId = data.data.jobId
+                            //let errs = []
                             intervalPromiseVS = $interval(function() {
                                 let qry = `/job/status/${jobId}`
                                 $http.get(qry).then(
@@ -335,15 +327,24 @@ angular.module("pocApp")
                                         let jobStatus = data.data
                                         $scope.vsUploadProgress = jobStatus.progress
                                         switch (data.data.status) {
-                                            case 'error' :
+                                            case 'errorDEP' :
                                                 stopUIDisplay(intervalPromiseVS)
                                                 $scope.vsUploadProgress = `Error: ${jobStatus.error}`
+
+                                                //todo - there may be multiple errors...
                                                 alert(`There was an error: ${jobStatus.error}`)
 
                                                 break
                                             case 'complete' :
                                                 stopUIDisplay(intervalPromiseVS)
                                                 delete $scope.vsUploadProgress
+                                                if (jobStatus.errors && jobStatus.errors.length > 0) {
+                                                    $scope.batchVsErrors = jobStatus.errors
+                                                    alert("There were errors - see the error tab.")
+                                                }
+
+
+
                                                 alert("The update is complete.")
 
                                                 break
@@ -363,38 +364,6 @@ angular.module("pocApp")
                         })
 
 
-/*
-                    // return
-                    let url = `/nzhts/bundle`
-                    $http.post(url,$scope.vsBatch).then(
-                        function (data) {
-                            console.log(data.data)
-                            //as the server processes each vs singly, need to examine the response to see if there were any errors
-                            $scope.batchVSLog = data.data
-
-                            let errCnt = 0
-                            data.data.forEach(function (lne) {
-                                if (! lne.success) {
-                                    $scope.batchVSLog = $scope.batchVSLog || []
-                                    $scope.batchVSLog.push(lne)
-                                }
-
-                            })
-
-                            if (! errCnt) {
-                                alert(`All ValueSets successfully uploaded. It took ${$scope.uploadVSCounter} seconds`)
-                            } else {
-                                alert(`There were ${errCnt} ValueSets that had errors. See the Error log tab for details.`)
-                            }
-                        }, function (err) {
-                            alert(angular.toJson(err.data))
-                        }
-                    ).finally(function () {
-                        $scope.showWaiting = false
-                        $scope.showUploadingVS = false
-                    })
-
-                    */
 
                 }
             }
@@ -454,22 +423,7 @@ angular.module("pocApp")
                     }, function (err) {
 
                     })
-/*
-                    $http.post('/nzhts/setSyndication').then(function () {
-                        alert(`Syndication updated for all resources. It took ${$scope.syndCounter} seconds.`)
-                    }, function (err) {
-                        alert(angular.toJson(err.data))
-                    }).then(
-                        function () {
-                            $scope.showWaiting = false
-                            $scope.showWaitingTimeout = false
-                            $interval.cancel(intervalPromise);
-                        }
-                    )
-                    */
                 }
-
-
 
             }
 
@@ -496,10 +450,7 @@ angular.module("pocApp")
                         //hashOriginal - hash or original VS by id when there was a change
                         //arChanges - list of codes that are now published
                         //updateBatch - bundle of ValueSets where one or more unpublished codes are now published
-
-
-
-
+                        //cs - codesystem
 
                         $scope.unpublishedSummary = terminologyUpdateSvc.summaryUnpublishedCodes(data.data)
                     },function (err) {
@@ -514,6 +465,36 @@ angular.module("pocApp")
                 //terminologyUpdateSvc.checkUnpublishedCodes($scope.allVSItem)
             }
 
+            $scope.updateUnpublished = function () {
+                if (confirm("This will update the ValueSets that need changing, and the new CodeSystem")) {
+                    let updateBatch = $scope.unpublishedReport.updateBatch
+
+                    //add the Code System
+                    updateBatch.entry.push({resource:$scope.unpublishedReport.cs})
+
+                    console.log(updateBatch)
+
+
+                    return
+
+
+                    let url = `/nzhts/bundlewait`
+                    $http.post(url,$scope.vsBatch).then(
+                        function (data) {
+                            let jobStatus = data.data
+                            if (jobStatus.errors && jobStatus.errors.length > 0) {
+                                $scope.unpublishedUploadErrors = jobStatus.errors
+                                alert("There were errors - see the error tab.")
+                            }
+
+                        }, function (err) {
+                            alert(angular.toJson(err.data))
+                        })
+
+
+
+                }
+            }
 
             $scope.selectFromUnpublished = function (vs) {
                 $scope.selectVSItem({vs:vs})

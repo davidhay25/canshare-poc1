@@ -1,5 +1,5 @@
 //functions to provide terminology services
-//don't use ajax as need to inject tokens when accessing the NZHTS
+//don't use browser based ajax as need to inject tokens when accessing the NZHTS
 
 const axios = require("axios");
 const fs = require("fs")
@@ -13,21 +13,8 @@ let jobs = {}
 
 //load the config file for accessing NZHTS (the file is excluded from git)
 const nzhtsconfig = JSON.parse(fs.readFileSync("./nzhtsconfig.config").toString())
-//console.log(nzhtsconfig)
 
-//let nztsBase = "https://authoring.nzhts.digital.health.nz/fhir/" //? mpve to config
-/*
-let servers = []
-
-//servers.push({display:"CanShare",url:"http://localhost:9199/baseR4/"})
-servers.push({display:"CanShare",url:"http://localhost:8080/fhir/"})
-servers.push({display:"Public hapi R4",url:"http://hapi.fhir.org/baseR4/"})
-servers.push({display:"Terminz",url:"https://terminz.azurewebsites.net/fhir/"})
-servers.push({display:"Ontoserver",url:"https://r4.ontoserver.csiro.au/fhir/"})
-*/
 let currentToken = {token:null,expires:null}    //expires is the date.getTime() of when the token expires
-
-
 
 async function getNZHTSAccessToken() {
 
@@ -48,7 +35,6 @@ async function getNZHTSAccessToken() {
     try {
         let result = await axios.post(url,body)
         //if here, then we need a new token
-        //console.log('new token')
         let expires = result.data['expires_in']     //number of seconds till expiry. Currently 24 hours...
         currentToken.token = result.data['access_token']
         //set the expiry to an hour (even though, in theory, we have 24 hours)
@@ -585,10 +571,10 @@ function setup(app) {
     })
 
 
-    //POST a bundle to the server. Used for ValueSet batch upload & Unpublished codes
+    //Process a bundle asynchronously. Assumes that the user will poll for the job status
+    // Used for ValueSet batch upload
     //Actually, Ontoserver won't allow a batch to have PUT so we can't use that. Instead, we process each item individually...
     app.post('/nzhts/bundle',async function(req,res){
-
         if (req.body) {
             //let qry = nzhtsconfig.serverBase //
             let bundle = req.body
@@ -611,6 +597,31 @@ function setup(app) {
         }
     })
 
+    //process the bundle, but wait for the processing to complete before returning.
+    //use when the bundle is small and the client polling overhead is not needed.
+    app.post('/nzhts/bundlewait',async function(req,res){
+        if (req.body) {
+            //let qry = nzhtsconfig.serverBase //
+            let bundle = req.body
+            let token = await getNZHTSAccessToken()
+            if (token) {
+
+                let jobId = Object.keys(jobs).length + 1 //Job id is the new length of the jobs hash
+                jobs[jobId] = {status:'active',description:"Process bundle"}
+
+                //an async call, but we won't wait
+                await processPutBundleJob(token,jobId,bundle)
+
+                res.json(jobs[jobId])
+
+            } else {
+                res.status(ex.response.status).json({msg:"Unable to get Access Token."})
+            }
+        } else {
+            res.status(400).json({msg:"Must have bundle as body"})
+        }
+    })
+
     async function processPutBundleJob(token,jobId,bundle) {
         let config = {headers:{authorization:'Bearer ' + token}}
         config['content-type'] = "application/fhir+json"
@@ -623,22 +634,32 @@ function setup(app) {
 
             try {
                 await axios.put(updateQry,entry.resource,config)
+                await setSyndicationStatus(entry.resource,token)
+
                 jobs[jobId].progress = ` ${ctr}/${cnt}`
                 console.log(entry.resource.id)
 
-
             } catch (ex) {
-                jobs[jobId].status = `error`
+                //jobs[jobId].status = `error`
+
+                //make a note of the errors
+                jobs[jobId].errors = jobs[jobId].errors || []
+                let errMsg = {id:entry.resource.id}
+
                 if (ex.response) {
-                    jobs[jobId].httpStatus = ex.response.status
-                    jobs[jobId].httpError = ex.response.data
+
+                    errMsg.httpStatus = ex.response.status
+                    errMsg.httpError = ex.response.data
 
                 } else if (ex.message){
-                    jobs[jobId].error = ex.message
+                    errMsg.error = ex.message
                 }
                 else {
                     console.log(ex)
                 }
+
+                jobs[jobId].errors.push(errMsg)
+
             }
 
         }

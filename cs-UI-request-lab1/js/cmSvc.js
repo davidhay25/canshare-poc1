@@ -5,10 +5,6 @@ angular.module("pocApp")
         let config= {}
 
 
-        async function fillListFromValueSet(lst,vsUrl) {
-
-        }
-
         return {
             rulesEngine :  function (hashInput,element,hashExpandedVs) {
                 //get the options for a property. The actual property is not needed as we're just looking in the element
@@ -308,6 +304,49 @@ angular.module("pocApp")
 
             },
 
+            getAllVSinCM : function (CM,lstVsUrl) {
+                //get all the VS referenced by a CM. Update the lstVsUrl
+
+                CM.group.forEach(function (group) {
+                    group.element.forEach(function (element) {
+                        element.target.forEach(function (target) {
+
+                            if (target.code && target.code.startsWith('http')) {
+                                lstVsUrl.push(target.code)
+                            }
+
+                            if (target.dependsOn) {
+                                target.dependsOn.forEach(function (dep) {
+                                    dep['x-operator'] = "="
+                                    if (dep.extension) {
+                                        dep.extension.forEach(function (ext) {
+                                            if (ext.url == 'http://canshare.co.nz/fhir/StructureDefinition/do-operator') {
+                                                dep['x-operator'] = ext.valueCode
+
+                                                if (ext.valueCode == 'in-vs') {
+                                                    //dep.value is a ValueSet url. We will need the contents of this valueset for rules processing
+                                                    if (lstVsUrl.indexOf(dep.value) == -1) {
+                                                        lstVsUrl.push(dep.value)
+                                                    }
+
+                                                }
+
+                                            }
+                                        })
+                                    }
+
+                                })
+                            }
+
+
+                        })
+                    })
+
+                })
+                return lstVsUrl
+
+            },
+
             sortConceptList : function (lst) {
                 //sort a list of concepts alphabetically, placing anuthing starting with 'other' at th ebottom
 
@@ -359,10 +398,6 @@ angular.module("pocApp")
                 //the VS is not available
 
                 let hashExpanded = {}
-
-
-
-
                 let promises = []
 
                 lst.forEach(function (url) {
@@ -387,19 +422,7 @@ angular.module("pocApp")
 
                 )
 
-/*
-                $q.all(promises).then(function(results) {
-                    // All promises resolved successfully
 
-                    deferred.resolve(hashExpanded)
-
-                }).catch(function(error) {
-                    // At least one promise was rejected. This shouldn't actually happen as addToHash() never rejects
-                    console.error('Error:', error);
-                    console.log(hashExpanded)
-                    deferred.resolve(hashExpanded)
-                })
-*/
                 return deferred.promise
 
 
