@@ -20,9 +20,21 @@
   </div>
 
   <div class="col-md-4">
-    <button ng-show="vsBatch && user.email"
-            ng-click="uploadVS()"
+
+
+    <button ng-show="vsBatch && user.email && !showUploadingVS"
+            ng-click="uploadVSBatch()"
             class="btn btn-danger pull-right">Upload ValueSet Batch</button>
+
+
+    <button class="btn btn-info pull-right" ng-show = "showUploadingVS" style="margin-right: 8px">
+      Uploading ValueSets.  {{vsUploadProgress}}
+    </button>
+
+
+
+
+
   </div>
 
 
@@ -56,10 +68,12 @@
       </uib-tab>
 
       <uib-tab heading="Paste from spreadsheet">
-        <div class="myScroll">
+
           <textarea id="pasteVSBatchTextbox" rows="20" class="form-control"
                     ng-paste="handleVSBatchPaste($event)" ng-model="input.vsBatchData"></textarea>
-        </div>
+
+
+        <div class="clickable pull-right" ng-click="clearText()">Clear text</div>
 
 
       </uib-tab>
@@ -86,6 +100,19 @@
       <uib-tab ng-if="vsBatch" heading="Batch Json">
         <pre>{{vsBatch | json}}</pre>
       </uib-tab>
+
+      <uib-tab ng-if="batchVSLog" heading="Errors during update">
+        <table class="table-bordered table">
+          <tr ng-repeat="lne in batchVSLog">
+            <td>{{lne.id}}</td>
+            <td>{{lne.msg}}</td>
+          </tr>
+        </table>
+
+        <pre>{{batchVSLog | json}}</pre>
+      </uib-tab>
+
+
     </uib-tabset>
 
   </div>

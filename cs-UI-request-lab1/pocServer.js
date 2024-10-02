@@ -5,10 +5,18 @@ let fs = require('fs')
 let http = require('http');
 const axios = require("axios");
 
+
+
 console.log('port',process.env.POCSERVERBASE)
 
 //the port that the POC server listens on for HTML & API calls
 let port = process.env.POCSERVERBASE || 9500
+
+
+// Object to store clients by their IDs
+const clients = new Map();
+
+
 
 //the Mongo database used by the models (and associated) apps
 const mongoDbName = process.env.MONGODB || "canShare"

@@ -38,6 +38,8 @@
 
     </script>
 
+
+
     <script src="js/libs/angular-bootstrap-checkbox.js"></script>
     <script src="js/updateVSCtrl.js"></script>
     <script src="js/querySvc.js"></script>
@@ -155,14 +157,15 @@
             ng-click="setSyndicationStatus()"
             class="btn-danger btn pull-right">Set Syndication status</button>
 
+
     <button class="btn btn-info pull-right" ng-show = "showWaitingTimeout" style="margin-right: 8px">
-        Syndicating. Please wait... {{syndCounter}}
+        Syndicating. Progress: {{syndProgress}}
     </button>
 
 
 
 
-    <uib-tabset>
+    <uib-tabset active="input.topTabActive">
         <uib-tab heading="Edit ValueSet">
             <br/>
 
@@ -175,7 +178,7 @@
                             <div class="row">
 
                                 <div class="col-md-6">
-                                    <checkbox ng-model="input.includeRetired"></checkbox> Include retired
+                                    <checkbox ng-model="input.includeRetired"></checkbox> Include retired & draft
                                 </div>
 
                                 <div class="col-md-6">
@@ -271,6 +274,7 @@
                                         <select ng-model="input.status" class="form-control" ng-change = makeVS()>
                                             <option value="active">Active</option>
                                             <option value="retired">Retired</option>
+                                            <option value="draft">Draft</option>
                                         </select>
                                     </td>
                                 </tr>
@@ -336,7 +340,7 @@
                                             <div class="col-md-2">
                                                 <button
                                                         ng-show="input.ecl"
-                                                        class="btn btn-link" ng-click="testECL(input.ecl)">Test ECL</button>
+                                                        class="btn btn-link" ng-click="listConcepts(input.ecl)">Test ECL</button>
                                             </div>
                                         </div>
 

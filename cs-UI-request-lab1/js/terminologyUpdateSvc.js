@@ -20,6 +20,17 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                 }
                 report.push(lne)
             }
+
+            report.sort(function (a,b) {
+                if (a.name > b.name) {
+                    return 1
+                } else {
+                    return -1
+                }
+            })
+
+
+
             return report
 
             function getUnpublished(vs) {
@@ -270,7 +281,7 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
 
             let snomed = "http://snomed.info/sct"
 
-            let bundle = {resourceType:"Bundle",type:"transaction",entry:[]}
+            let bundle = {resourceType:"Bundle",type:"batch",entry:[]}
 
             let makeVS = function(vo) {
                 //console.log(vo)

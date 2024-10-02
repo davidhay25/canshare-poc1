@@ -73,6 +73,11 @@ angular.module("pocApp")
 
             }
 
+            //select the development version of the ConceptMap
+            $scope.selectDev = function () {
+
+            }
+
             //as the expansion is performed by a child controller, we use this event to get the hash
             $scope.$on('hashExpandedVs',function (event,data) {
                 $scope.hashExpandedVs = data
@@ -1062,6 +1067,7 @@ angular.module("pocApp")
 
             //------------- end of main form UI functions
 
+            //open a specific ConceptMap
             $scope.selectCMItem = function (item,expand) {
                 $scope.selectedCM = item.cm
                 delete $scope.fullSelectedCM
@@ -1081,8 +1087,10 @@ angular.module("pocApp")
                     expand = true
                 }
 
+                //get the map
                 querySvc.getOneConceptMap(item.cm.url,expand).then(
                     function (ar) {
+                        //now retrieve all the ValueSets (effectively refresh the cache)
                         $scope.fullSelectedCM = ar[0]       //todo what of there's > 1
 
                         //add the operator to the DependsOn element from the extension (makes UI processing easier

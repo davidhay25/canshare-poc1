@@ -5,6 +5,7 @@ angular.module("pocApp")
             $scope.version = utilsSvc.getVersion()
 
             $scope.input = {}
+            $scope.input.topTabActive = 0
             $scope.isDirty = false;
             let nzDisplayLanguage = "en-x-sctlang-23162100-0210105"
             let snomed = "http://snomed.info/sct"
@@ -168,7 +169,7 @@ angular.module("pocApp")
                     ver = 'release'
                 }
 
-                let msg = `This will update the ${ver} version of the ConceptMap. Are you sure you wish to do this.`
+                let msg = `This will update the ${ver} version of the ConceptMap. Are you sure you wish to do this. It will take several seconds.`
                 if (confirm(msg)) {
                     //if the 'release version' is not checked then add '-dev' as a suffix to the id
 
@@ -181,6 +182,7 @@ angular.module("pocApp")
                             $scope.conceptMap.id = `${$scope.conceptMap.id}-dev`
                             $scope.conceptMap.url = `${$scope.conceptMap.url}-dev`
                             $scope.conceptMap.title = `${$scope.conceptMap.title}-development version`
+                            $scope.conceptMap.status = 'draft'
                         }
 
                     }
@@ -247,6 +249,7 @@ angular.module("pocApp")
                 $http.post(`nzhts/ecl`,vo).then(
                     function (data) {
                         let vs = data.data
+                       // $scope.testEclVS = vs
 
                         let total = vs.expansion.total
                         if (total == 0) {
@@ -292,20 +295,106 @@ angular.module("pocApp")
                 })
             }
 
-            $scope.uploadVS = function () {
-                let msg = `This will uploads the ValueSet. Are you sure you wish to do this.`
+            $scope.clearText = function () {
+                delete $scope.input.vsBatchData
+            }
+
+            $scope.uploadVSBatch = function () {
+                let msg = `This will upload the ValueSet batch. It can take up to 5 minutes to complete (depending on the size). Are you sure you wish to do this.`
                 if (confirm(msg)) {
 
+                    $scope.showWaiting = true
+                    $scope.showUploadingVS = true
+                    let jobId  //the job assigned to the long running job on the server
+                    let intervalPromiseVS //the polling interval
 
-                    return
+/*
+                    $scope.uploadVSCounter = 0
+                    let intervalPromiseVS
+                    intervalPromiseVS = $interval(function() {
+                        $scope.uploadVSCounter++;
+                    }, 1000);
+*/
+                    // Cancel the interval on scope destroy to avoid memory leaks
+                    $scope.$on('$destroy', function() {
+                        if ($scope.running) {
+                            $interval.cancel(intervalPromiseVS);
+                        }
+                    });
+
+
+                    // return
                     let url = `/nzhts/bundle`
                     $http.post(url,$scope.vsBatch).then(
                         function (data) {
-                            alert("ValusSet uploaded")
+                            jobId = data.data.jobId
+                            intervalPromiseVS = $interval(function() {
+                                let qry = `/job/status/${jobId}`
+                                $http.get(qry).then(
+                                    function (data) {
+                                        let jobStatus = data.data
+                                        $scope.vsUploadProgress = jobStatus.progress
+                                        switch (data.data.status) {
+                                            case 'error' :
+                                                stopUIDisplay(intervalPromiseVS)
+                                                $scope.vsUploadProgress = `Error: ${jobStatus.error}`
+                                                alert(`There was an error: ${jobStatus.error}`)
+
+                                                break
+                                            case 'complete' :
+                                                stopUIDisplay(intervalPromiseVS)
+                                                delete $scope.vsUploadProgress
+                                                alert("The update is complete.")
+
+                                                break
+                                        }
+
+                                    }, function (err) {
+                                        alert(angular.toJson(err.data))
+                                    }
+                                )
+
+
+                            }, 1000);
+
+                            console.log(data.data)
+                        },function (err) {
+                            alert(angular.toJson(err.data))
+                        })
+
+
+/*
+                    // return
+                    let url = `/nzhts/bundle`
+                    $http.post(url,$scope.vsBatch).then(
+                        function (data) {
+                            console.log(data.data)
+                            //as the server processes each vs singly, need to examine the response to see if there were any errors
+                            $scope.batchVSLog = data.data
+
+                            let errCnt = 0
+                            data.data.forEach(function (lne) {
+                                if (! lne.success) {
+                                    $scope.batchVSLog = $scope.batchVSLog || []
+                                    $scope.batchVSLog.push(lne)
+                                }
+
+                            })
+
+                            if (! errCnt) {
+                                alert(`All ValueSets successfully uploaded. It took ${$scope.uploadVSCounter} seconds`)
+                            } else {
+                                alert(`There were ${errCnt} ValueSets that had errors. See the Error log tab for details.`)
+                            }
                         }, function (err) {
                             alert(angular.toJson(err.data))
                         }
-                    )
+                    ).finally(function () {
+                        $scope.showWaiting = false
+                        $scope.showUploadingVS = false
+                    })
+
+                    */
 
                 }
             }
@@ -317,11 +406,8 @@ angular.module("pocApp")
                     $scope.showWaiting = true
                     $scope.showWaitingTimeout = true
 
-                    $scope.syndCounter = 0
+                    let jobId  //the job assigned to the long running job on the server
                     let intervalPromise
-                    intervalPromise = $interval(function() {
-                        $scope.syndCounter++;
-                    }, 1000);
 
                     // Cancel the interval on scope destroy to avoid memory leaks
                     $scope.$on('$destroy', function() {
@@ -332,6 +418,43 @@ angular.module("pocApp")
 
                     //return
 
+                    $http.post('/nzhts/setSyndication').then(function (data) {
+                        jobId = data.data.jobId
+                        //alert(`The Syndication process has been initiated. You can see progress in the `)
+                        //Now start the polling to get the job status...
+                        intervalPromise = $interval(function() {
+                            let qry = `/job/status/${jobId}`
+                            $http.get(qry).then(
+                                function (data) {
+                                    let jobStatus = data.data
+                                    $scope.syndProgress = jobStatus.progress
+                                    switch (data.data.status) {
+                                        case 'error' :
+                                            stopUIDisplay(intervalPromise)
+                                            $scope.syndProgress = `Error: ${jobStatus.error}`
+                                            alert(`There was an error: ${jobStatus.error}`)
+
+                                            break
+                                        case 'complete' :
+                                            stopUIDisplay(intervalPromise)
+                                            delete $scope.syndProgress
+                                            alert("The syndication is complete.")
+
+                                            break
+                                    }
+
+                                }, function (err) {
+                                    alert(angular.toJson(err.data))
+                                }
+                            )
+
+
+                        }, 1000);
+
+                    }, function (err) {
+
+                    })
+/*
                     $http.post('/nzhts/setSyndication').then(function () {
                         alert(`Syndication updated for all resources. It took ${$scope.syndCounter} seconds.`)
                     }, function (err) {
@@ -343,8 +466,19 @@ angular.module("pocApp")
                             $interval.cancel(intervalPromise);
                         }
                     )
+                    */
                 }
 
+
+
+            }
+
+            //used by the long running functions - setSyndicationStatus & batch vs upload
+            function stopUIDisplay(intervalPromise) {
+                $interval.cancel(intervalPromise);
+                $scope.showWaiting = false
+                $scope.showWaitingTimeout = false
+                $scope.showUploadingVS = false
             }
 
             //============ unpublished codes
@@ -352,23 +486,40 @@ angular.module("pocApp")
             $scope.input.showTableCell = []
 
             $scope.analyseUnpublished = function () {
+                $scope.analysingUnpublished = true
                 let url = "/analyseUnpublished"
                 $http.get(url).then(
                     function (data) {
                         $scope.unpublishedReport = data.data
+                        //log - log for display
+                        //batch - all VS with unpublished codes at the start of the analysis (ie current state)
+                        //hashOriginal - hash or original VS by id when there was a change
+                        //arChanges - list of codes that are now published
+                        //updateBatch - bundle of ValueSets where one or more unpublished codes are now published
+
+
+
+
+
                         $scope.unpublishedSummary = terminologyUpdateSvc.summaryUnpublishedCodes(data.data)
-
-
                     },function (err) {
                         alert(angular.toJson(err.data))
                     }
-                )
+                ).finally(function () {
+                    $scope.analysingUnpublished = false
+                })
 
 
 
                 //terminologyUpdateSvc.checkUnpublishedCodes($scope.allVSItem)
             }
 
+
+            $scope.selectFromUnpublished = function (vs) {
+                $scope.selectVSItem({vs:vs})
+                $scope.input.topTabActive = 0
+
+            }
 
             //===========================
 
@@ -598,7 +749,12 @@ angular.module("pocApp")
 
             }
 
-            $scope.testECL = function (ecl) {
+            $scope.testECLDEP = function (ecl) {
+
+                //displays the ECL in a modal list
+                $scope.listConcepts(ecl)
+
+            /*    return
 
                 let vo = {ecl:ecl}
 
@@ -609,7 +765,7 @@ angular.module("pocApp")
                     }, function (err) {
                         alert(angular.toJson(err.data))
                     })
-
+*/
             }
 
             $scope.canSave = function () {
@@ -621,7 +777,7 @@ angular.module("pocApp")
             $scope.showVS = function (item) {
 
                 if (! $scope.input.includeRetired) {
-                    if (item.vs.status == 'retired') {
+                    if (item.vs.status == 'retired' || item.vs.status == 'draft') {
                         return false
                     }
                 }

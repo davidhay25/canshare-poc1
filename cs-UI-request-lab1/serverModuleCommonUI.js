@@ -13,12 +13,7 @@ console.log(`FHIR server root from env is ${process.env.SERVERBASE}`)
 console.log(`Log database from env is ${process.env.LOGDB}`)
 console.log(`Custom ops from env is ${process.env.CUSTOMOPS}`)
 
-/*
-let serverBase = process.env.SERVERBASE
-if (serverBase[serverBase.length-1] !== '/') {
-    serverBase += '/'
-}
-*/
+
 
 let serverBase = utilModule.checkUrlSlash(process.env.SERVERBASE)
 

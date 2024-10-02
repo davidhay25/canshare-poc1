@@ -3,26 +3,20 @@
 
 const axios = require("axios");
 const fs = require("fs")
-//const commonModule = require("./serverModuleCommonUI");
-
-//going to try caching ValueSets on the server to avoid the expensive calls to the term server.
-//
-let vsCache = {}
-let vsCacheStats = {hit:0,miss:0}
-
+//const { v4: uuidv4 } = require('uuid'); // For generating unique IDs
 const commonModule = require("./serverModuleCommonUI.js")
 
 let jwt_decode = require( "jwt-decode")
-console.log(jwt_decode)
-//let library = require("./library.json")
 
+//A hash to hold async long running jobs - eg batch updating Valuesets or setting sync
+let jobs = {}
 
 //load the config file for accessing NZHTS (the file is excluded from git)
 const nzhtsconfig = JSON.parse(fs.readFileSync("./nzhtsconfig.config").toString())
 //console.log(nzhtsconfig)
 
 //let nztsBase = "https://authoring.nzhts.digital.health.nz/fhir/" //? mpve to config
-
+/*
 let servers = []
 
 //servers.push({display:"CanShare",url:"http://localhost:9199/baseR4/"})
@@ -30,10 +24,13 @@ servers.push({display:"CanShare",url:"http://localhost:8080/fhir/"})
 servers.push({display:"Public hapi R4",url:"http://hapi.fhir.org/baseR4/"})
 servers.push({display:"Terminz",url:"https://terminz.azurewebsites.net/fhir/"})
 servers.push({display:"Ontoserver",url:"https://r4.ontoserver.csiro.au/fhir/"})
-
+*/
 let currentToken = {token:null,expires:null}    //expires is the date.getTime() of when the token expires
 
+
+
 async function getNZHTSAccessToken() {
+
 
     //If there is a saved token then check the expiry and if not expired then return immediately.
     //Otherwise, get a new token.
@@ -64,14 +61,34 @@ async function getNZHTSAccessToken() {
 }
 
 
-
 function setup(app) {
+
+    //get the status of a specific job
+    app.get('/job/status/:token',function (req,res) {
+        let status = jobs[req.params.token]
+        if (status) {
+            res.json(status)
+        } else {
+            res.status(404).send({msg:'Not found'})
+        }
+    })
+
+    //get the status of all jobs
+    app.get('/job/list',function (req,res) {
+        res.json(jobs)
+    })
+
+
 
     app.get('/token',async function (req,res) {
         let token = await getNZHTSAccessToken()
         res.json({token:token,url:"https://authoring.nzhts.digital.health.nz/fhir"})
     })
 
+    //Analyse the unpublished codes. Specifically wanting to check if there are unpublished codes in a VS
+    //that have since been published. In this case the VS will need to be updated (removing the unpublished code -
+    //as we assume that the VS ECL now incorporates those codes). The CodeSystem is re-built from codes that
+    //remain unpublished. This routine just perfroms the analysis and creates the updated VS / CS. It doesn't u[date the server.
     app.get('/analyseUnpublished',async function(req,res){
         let token = await getNZHTSAccessToken()
         if (token) {
@@ -79,23 +96,25 @@ function setup(app) {
 
             let qry = `https://authoring.nzhts.digital.health.nz/fhir/ValueSet?identifier=${identifier}&_count=5000&_summary=false`
             let config = {headers:{authorization:'Bearer ' + token}}
-
             config['content-type'] = "application/fhir+json"
 
-
+            //get all the CanShare valuesets...
             axios.get(qry,config).then(async function(data) {
                 let bundle = data.data
-                let arLog = []
-                let arChanges = []
-                let hash = {}
+                let arLog = []              // key metrics to dsiplay
+                let arChanges = []          //codes that were unpublished, but have now been published
+                let hashUnpublished = {}               //a hash of all unpublished concepts by code.
                 let cntVSBefore = 0           //count of ValueSets with unpublished codes
                 let cntVSAfter = 0
 
-                //create a ValueSet with all unpublished
 
+                //Because it would take a long time to individually check eac concept by calling $lookup. we create
+                //a valueset containing all the codes then expand it. If the expansion contains the code then it was found.
+                //if not, then it wasn't
+                //create a ValueSet with all unpublished
                 let vsId = 'canshare-all-unpublished'
                 let url = `https://nzhts.digital.health.nz/fhir/ValueSet/${vsId}`
-                let vs = {resourceType:'ValueSet',id:vsId,status:'active',experimental:false}
+                let vs = {resourceType:'ValueSet',id:vsId,status:'draft',experimental:false}        //draft VS won't be syndicated
 
                 vs.url = url
                 vs.name = vsId
@@ -115,13 +134,14 @@ function setup(app) {
                             if (inc.system == "http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished") {
                                 cntVSBefore ++
                                 for (const concept of inc.concept) {
-                                    //console.log(concept)
+                                    //we check that the conceptcode is numeric (it should always be). It it isn't then the expansion will barf...
                                     if (isNumericString(concept.code)) {
-                                        if (!hash[concept.code]) {
+                                        if (!hashUnpublished[concept.code]) {
                                             include.concept.push({code:concept.code,display:concept.display})
-                                            hash[concept.code] = concept
+                                            hashUnpublished[concept.code] = concept
                                         }
-
+                                    } else {
+                                        arLog.push(`ValueSet '${vs.id}' has a non-numeric 'unpublished' code - ${concept.code}`)
                                     }
                                 }
                             }
@@ -129,28 +149,27 @@ function setup(app) {
                     }
                 }
 
-                arLog.push(`There are ${include.concept.length} unique concepts in all valueset unpublished entries`)
+                arLog.push(`There are currently ${include.concept.length} unique concepts in all ValueSets unpublished entries`)
 
+                //save the ValueSet so we can expand it...
                 let vsUpdateQry = `${nzhtsconfig.serverBase}ValueSet/${vsId}`
-                await axios.put(vsUpdateQry,vs,config)
+                await axios.put(vsUpdateQry,vs,config)//now expand it
+
+                //now expand it
                 let vsExpandQry = `https://authoring.nzhts.digital.health.nz/fhir/ValueSet/$expand?url=${url}`
-                //
-                //let vsExpandQry = `${nzhtsconfig.serverBase}ValueSet/${vsId}/$expand`
                 console.log(vsExpandQry)
                 let result = await axios.get(vsExpandQry,config)
 
-                arLog.push(`There are ${result.data.expansion.total} concepts in the valueset expansion`)
+                arLog.push(`There are ${result.data.expansion.total} concepts in the ValueSet expansion (ie codes that are in a VS as unpublished, but have been published since the VS was updated)`)
 
-                //create a has for the concepts that are now in the TS
+                //create a hash for the concepts that are now in the TS - ie all those that are in the VS expansion
                 let hasCodesNowInTS = {}
                 result.data.expansion.contains.forEach(function (concept) {
                     hasCodesNowInTS[concept.code] = concept
                 })
 
                 //now we can create the CodeSystem - and the hash which has the codes the are in the TS so cab ne removed from the
-                //we go through the has of all codes in a VS...
                 let hashStillUnpublished = {}   //the concepts that remain unpublished
-
 
                 let cs = {resourceType:'CodeSystem',id:"canshare-unpublished-concepts",version:"1",status:"active"}
                 cs.name = cs.id
@@ -159,17 +178,21 @@ function setup(app) {
                 cs.content = "complete"
                 cs.concept = []
 
-                for (const code of Object.keys(hash)) {
+                //go through all the codes from the VS marked as unpublished...
+                for (const code of Object.keys(hashUnpublished)) {
                     if (! hasCodesNowInTS[code]) {
                         //this code is still not in the TS so it needs to be added to the CS
-                        cs.concept.push(hash[code])
-                        hashStillUnpublished[code] = hash[code]
+                        cs.concept.push(hashUnpublished[code])
+                        hashStillUnpublished[code] = hashUnpublished[code]
                     }
                 }
+                //at this point the CS has been created
+                arLog.push(`The updated CodeSystem will have ${cs.concept.length} concepts in it - down from ${include.concept.length}.`)
 
                 //Now we can update the valueSets
                 //create a batch to hold the VS that will need to be updated
                 let batch = {resourceType:"Bundle",type:'transaction',entry:[]}
+
                 let updateBatch = {resourceType:"Bundle",type:'transaction',entry:[]}
 
                 //and a hash to hold the original (so we can show a diff in the UI
@@ -178,27 +201,27 @@ function setup(app) {
                     let vs = entry.resource
                     let isChanged = false
 
-                    if (vs.compose && vs.compose.include) {
-
-                        let pos = -1
+                    if (vs.compose && vs.compose.include ) {
+                        let pos = -1    //this will be the position of the specific include element within the compose.include array...
                         for (const inc of vs.compose.include) {
                             pos ++
                             if (inc.system == "http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished") {
                                 //there is at least 1 unpublished code
                                 //this will be the new include
-                                hashOriginal[vs.id] = JSON.parse(JSON.stringify(vs))
-                                //let arNewInclude = {concept:[],system:'http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished"'}
-                                let arNewConceptList = []
+                                hashOriginal[vs.id] = JSON.parse(JSON.stringify(vs))    //a clone as we may be updating the original
+
+                                let arNewConceptList = []   //this will be the set of concepts still unpublished for this VS
                                 for (const concept of inc.concept) {
-                                    //console.log(concept)
+                                    //if it's still unpublished, add it to the list...
                                     if (hashStillUnpublished[concept.code]) {
-                                        //arNewInclude.concept.push(concept)
                                         arNewConceptList.push(concept)
                                     } else {
+                                        //otherwise make a note that it is now published
                                         arChanges.push(`vs ${vs.id} ${concept.code} now published`)
-                                        isChanged = true
+                                        isChanged = true    //so we know this VS has changes
                                     }
                                 }
+
                                 //if there are still unpublished codes then we can update the include. Otherwise it is removed
                                 if (arNewConceptList.length == 0) {
                                     vs.compose.include.splice(pos,1)
@@ -216,23 +239,19 @@ function setup(app) {
                                     updateBatch.entry.push(entry)
                                 }
 
-
                                 break
 
                             }
                         }
-
-
-
-
                     }
                 }
 
 
                 arLog.push(`There are ${cntVSBefore} ValueSets with unpublished codes. ${cntVSAfter} of them still have some after the check.`)
-
+                arLog.push(`There are ${updateBatch.entry.length} ValueSets that will need to be updated.`)
 
                 //res.json(result.data)
+
                 res.json({log:arLog,cs:cs,batch:batch,hashOriginal:hashOriginal,arChanges:arChanges,updateBatch:updateBatch})
             }).catch(function(ex) {
                 if (ex.response) {
@@ -258,7 +277,7 @@ function setup(app) {
 
     let cachedAnalysis;         //cache the analysis. Just for dev as I'm impatient
 
-    app.get('/analyseVS',async function(req,res){
+    app.get('/analyseVSDEP',async function(req,res){
         if (cachedAnalysis) {
             res.json(cachedAnalysis)
         } else {
@@ -386,8 +405,6 @@ function setup(app) {
         let id = req.query.id
 
         let qry = `https://authoring.nzhts.digital.health.nz/synd/getSyndicationStatus?id=${id}&resourceType=${resourceType}`
-                                   //let qry = `${serverHost}synd/getSyndicationStatus?id=${vs.id}&resourceType=ValueSet`
-//console.log(qry)
 
         let token = await getNZHTSAccessToken()
         if (token) {
@@ -463,53 +480,6 @@ function setup(app) {
 
 
 
-
-    /*
-    app.post('/nzhts/emptycache',function (req,res) {
-        vsCache = {}
-        vsCacheStats = {hit:0,miss:0}
-        res.json({})
-    })
-
-    app.get('/nzhts/cachestats',function (req,res) {
-        let vo = vsCacheStats
-        vo.size = getSizeOfObject(vsCache)
-        res.json(vo)
-
-        function getSizeOfObject ( object ) {
-            //the memory usage of an obect - from https://stackoverflow.com/questions/1248302/how-to-get-the-size-of-a-javascript-object#11900218
-            var objectList = [];
-            var stack = [ object ];
-            var bytes = 0;
-
-            while ( stack.length ) {
-                var value = stack.pop();
-
-                if ( typeof value === 'boolean' ) {
-                    bytes += 4;
-                }
-                else if ( typeof value === 'string' ) {
-                    bytes += value.length * 2;
-                }
-                else if ( typeof value === 'number' ) {
-                    bytes += 8;
-                }
-                else if (
-                    typeof value === 'object'
-                    && objectList.indexOf( value ) === -1
-                ) {
-                    objectList.push( value );
-
-                    for( var i in value ) {
-                        stack.push( value[ i ] );
-                    }
-                }
-            }
-            return bytes;
-        }
-    })
-
-    */
     //queries against the Terminology Server
 
     app.get('/nzhts',async function(req,res){
@@ -577,7 +547,7 @@ function setup(app) {
     })
 
 
-    app.get('/generateQA',async function(req,res){
+    app.get('/generateQADEP',async function(req,res){
 
         let token = await getNZHTSAccessToken()
 
@@ -616,70 +586,107 @@ function setup(app) {
 
 
     //POST a bundle to the server. Used for ValueSet batch upload & Unpublished codes
+    //Actually, Ontoserver won't allow a batch to have PUT so we can't use that. Instead, we process each item individually...
     app.post('/nzhts/bundle',async function(req,res){
 
         if (req.body) {
-            let qry = nzhtsconfig.serverBase //
-
+            //let qry = nzhtsconfig.serverBase //
+            let bundle = req.body
             let token = await getNZHTSAccessToken()
             if (token) {
 
-                let config = {headers:{authorization:'Bearer ' + token}}
-                config['content-type'] = "application/fhir+json"
+                let jobId = Object.keys(jobs).length + 1 //Job id is the new length of the jobs hash
+                jobs[jobId] = {status:'active',description:"Process bundle"}
 
-                axios.post(qry,req.body,config).then(function(data) {
-                    res.json(data.data)
-                }).catch(function(ex) {
+                //an async call, but we won't wait
+                processPutBundleJob(token,jobId,bundle)
 
-                    if (ex.response) {
-                        console.log("Status code:",ex.response.status)
-                        console.log("err",ex.response.data)
-                        res.status(ex.response.status).json(ex.response.data)
-                    } else {
-                        res.status(500).json(ex)
-                    }
+                res.json({jobId:jobId,status:"active"})
 
-                })
             } else {
                 res.status(ex.response.status).json({msg:"Unable to get Access Token."})
             }
         } else {
             res.status(400).json({msg:"Must have bundle as body"})
-
         }
-
-
     })
 
+    async function processPutBundleJob(token,jobId,bundle) {
+        let config = {headers:{authorization:'Bearer ' + token}}
+        config['content-type'] = "application/fhir+json"
+        let ctr = 0
+        let cnt = bundle.entry.length
+        for (const entry of bundle.entry) {
+            //assume it's a PUT update
+            ctr++
+            let updateQry = `https://authoring.nzhts.digital.health.nz/fhir/${entry.resource.resourceType}/${entry.resource.id}`
 
+            try {
+                await axios.put(updateQry,entry.resource,config)
+                jobs[jobId].progress = ` ${ctr}/${cnt}`
+                console.log(entry.resource.id)
+
+
+            } catch (ex) {
+                jobs[jobId].status = `error`
+                if (ex.response) {
+                    jobs[jobId].httpStatus = ex.response.status
+                    jobs[jobId].httpError = ex.response.data
+
+                } else if (ex.message){
+                    jobs[jobId].error = ex.message
+                }
+                else {
+                    console.log(ex)
+                }
+            }
+
+        }
+        jobs[jobId].status = `complete`
+    }
+
+
+    //set the syndication status for all resources
+    //creates a long running job and returns immediately
     app.post('/nzhts/setSyndication',async function(req,res) {
-        let serverHost = "https://authoring.nzhts.digital.health.nz/"
-        let arLog = []
-
         let token = await getNZHTSAccessToken()
         if (token) {
 
-            let config = {headers:{authorization:'Bearer ' + token}}
-            config['Content-Type'] = "application/fhir+json"
+            let jobId = Object.keys(jobs).length + 1 //Job is is the new length of the jobs hash
+            jobs[jobId] = {status:'active',description:"Set syndication status for all"}
 
-            try {
+            //it's an async function, but we don't wait for it to finish
+            setSyndicationForAllJob(token,jobId)
+            res.json({jobId:jobId,status:"active"})
 
-                //set the codesystem
-                let csId = "canshare-unpublished-concepts"
+        } else {
+            res.status(ex.response.status).json({msg:"Unable to get Access Token."})
+        }
+    })
 
-                const csOptions = {
-                    method: 'POST',
-                    url: `${serverHost}synd/setSyndicationStatus`,
-                    params: {resourceType: 'CodeSystem', id: csId, syndicate: 'true'},
-                    headers: {'Content-Type': 'application/json', authorization:'Bearer ' + token},
-                };
 
-                const { csData } = await axios.request(csOptions)
-                arLog.push(`CodeSystem ${csId} update`)
+    //A job that will set the synd. status for all resources
+    async function setSyndicationForAllJob(token,jobId) {
+        let serverHost = "https://authoring.nzhts.digital.health.nz/"
+        let config = {headers:{authorization:'Bearer ' + token}}
+        config['Content-Type'] = "application/fhir+json"
+        try {
 
-                //Set ConceptMaps. Only a specific CM for now - and a 1-off....
-                let cmId = "canshare-select-valueset-map"
+            //set the codesystem
+            let csId = "canshare-unpublished-concepts"
 
+            const csOptions = {
+                method: 'POST',
+                url: `${serverHost}synd/setSyndicationStatus`,
+                params: {resourceType: 'CodeSystem', id: csId, syndicate: 'true'},
+                headers: {'Content-Type': 'application/json', authorization:'Bearer ' + token},
+            };
+
+            const { csData } = await axios.request(csOptions)
+            jobs[jobId].progress = `${csId} done`
+
+            //Set ConceptMaps.
+            for (cmId of ['canshare-select-valueset-map','canshare-select-valueset-map-dev']) {
                 const options = {
                     method: 'POST',
                     url: `${serverHost}synd/setSyndicationStatus`,
@@ -689,109 +696,63 @@ function setup(app) {
                 };
 
                 const { data } = await axios.request(options);
-                arLog.push(`ConceptMap ${cmId} update`)
+                jobs[jobId].progress = `${cmId} done`
+            }
 
 
-                //now the ValueSets
-                //get the canshare valueset list
-                let qry = `${serverHost}fhir/ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&_count=5000`
-                let response = await axios.get(qry,config)
-                let bundle = response.data
-                let ctr = 0
-                for (const entry of bundle.entry) {
-                    let vs = entry.resource
 
-                    //set the syndication status regardless of current status
+
+
+            //now the ValueSets
+            //get the canshare valueset list
+            let qry = `${serverHost}fhir/ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&_count=5000`
+            let response = await axios.get(qry,config)
+            let bundle = response.data
+            let ctr = 0
+            let cnt = bundle.entry.length
+            for (const entry of bundle.entry) {
+                let vs = entry.resource
+
+                if (vs.status !== 'draft') {
+                    //set the syndication status unless draft status
                     const options = {
                         method: 'POST',
                         url: `${serverHost}synd/setSyndicationStatus`,
                         params: {resourceType: 'ValueSet', id: vs.id, syndicate: 'true'},
                         headers: {'Content-Type': 'application/json', authorization:'Bearer ' + token},
                     };
-
-                    //console.log(ctr++,vs.url)
+                    ctr++
+                    console.log(vs.url)
                     const { data } = await axios.request(options);
-
+                    jobs[jobId].progress = `VS ${ctr}/${cnt}`
                 }
-                arLog.push(`${bundle.entry.length} ValueSets updated`)
-                res.json(arLog)
 
-            } catch(ex) {
 
-                if (ex.response) {
-
-                    console.log(ex.response.status)
-                    console.log(JSON.stringify(ex.response.data,null,2))
-                } else {
-                    console.log(ex)
-                }
 
             }
+            //arLog.push(`${bundle.entry.length} ValueSets updated`)
 
+            jobs[jobId].status = `complete`
+            //res.json(arLog)
 
+        } catch(ex) {
+            jobs[jobId].status = `error`
+            if (ex.response) {
+                jobs[jobId].httpStatus = ex.response.status
+                jobs[jobId].error = ex.response.data
 
-        } else {
-            res.status(ex.response.status).json({msg:"Unable to get Access Token."})
+            } else if (ex.message){
+                jobs[jobId].error = ex.message
+            }
+            else {
+                console.log(ex)
+            }
+
         }
-
-
-
-
-
-
-    })
+    }
 
     //=========================
 
-    //used for $translate
-    app.post('/nzhtsDEP',async function(req,res){
-        console.log(req.body)
-
-
-        //let qry = req.query.query || `https://authoring.nzhts.digital.health.nz/fhir/ValueSet/$expand?url=https://nzhts.digital.health.nz/fhir/ValueSet/canshare-data-absent-reason`
-        if (req.body) {
-            let qry = nzhtsconfig.serverBase + "ConceptMap/$translate" // decodeURIComponent(req.query.qry)
-
-            //need to re-urlencode the |
-           // qry = qry.split('|').join("%7c")
-
-
-            //todo - check expiry and refresh if needed
-            console.log(qry)
-
-            let token = await getNZHTSAccessToken()
-            if (token) {
-
-                //var decoded = jwt_decode(token);
-                // let timeToExpire = decoded.exp * 1000 - Date.now()       //exp is in seconds
-                // console.log(timeToExpire / (1000 * 60 *60 ));
-
-                let config = {headers:{authorization:'Bearer ' + token}}
-                config['content-type'] = "application/fhir+json"
-
-                axios.post(qry,req.body,config).then(function(data) {
-                    res.json(data.data)
-                }).catch(function(ex) {
-
-                    if (ex.response) {
-                        console.log("Status code:",ex.response.status)
-                        console.log("err",ex.response.data)
-                        res.status(ex.response.status).json(ex.response.data)
-                    } else {
-                        res.status(500).json(ex)
-                    }
-
-                })
-            } else {
-                res.status(ex.response.status).json({msg:"Unable to get Access Token."})
-            }
-        } else {
-            res.status(400).json({msg:"Must have urlencoded qry query"})
-
-        }
-
-
-    })
 
 
     //get a Codesystem based on it's id
@@ -824,7 +785,11 @@ function setup(app) {
 
         if (vs) {
             let qry = `${nzhtsconfig.serverBase}ValueSet/${vs.id}`
-            let result = await putResource(qry,vs)
+            let noSyndicate = false
+            if (vs.status && vs.status == 'draft') {
+                noSyndicate = true
+            }
+            let result = await putResource(qry,vs,noSyndicate)
             if (result) {
                 //A result is returned if there is an error
                 res.status(400).json({msg:"Unable to update ValueSet"})
@@ -856,31 +821,6 @@ function setup(app) {
 
         }
     })
-
-    //return a list of Q where a particular ValueSet is used
-    //todo - this might be useful in the designer
-    app.get('/term/findQusingVSDEP',async function (req,res) {
-        let vsUrl = req.query.url
-
-        let hash = await commonModule.findQusingVS(vsUrl)
-        console.log('hash',hash)
-        res.json(hash)
-
-    })
-/*
-    app.get('/conceptMap/all', function(req,res) {
-        res.json(allConceptMaps)
-    })
-*/
-    app.get('/termServersDEP', function(req,res) {
-        let ar = []
-        //only return the display and url
-        servers.forEach(function (svr) {
-            ar.push({display:svr.display,url:svr.url})
-        })
-        res.json(ar)
-    })
-
 
     app.get('/termQuery',async function(req,res) {
 
@@ -936,7 +876,7 @@ async function setSyndicationStatus(resource,token) {
 
 
 //put a single resource. Returns any error
-async function putResource(qry,resource) {
+async function putResource(qry,resource,noSyndicate) {
 
     //let qry = `${nzhtsconfig.serverBase}ValueSet/${vs.id}`
     let token = await getNZHTSAccessToken()
@@ -954,7 +894,10 @@ async function putResource(qry,resource) {
             //we always want to set the syndication status
             //just temp copied out for now
             //if it fails will trigger an exception
-            await setSyndicationStatus(resource,token)
+          if (! noSyndicate) {
+              await setSyndicationStatus(resource,token)
+          }
+
            // return response
 
 
