@@ -18,6 +18,30 @@ angular.module("pocApp")
         }
 
             return {
+                getAllConceptMapsDEP : function() {
+                    //todo - part of implementing
+                    let qry = `ConceptMap?identifier=http://canshare.co.nz/fhir/NamingSystem/conceptmaps%7c&_summary=false`
+
+                    qry += ""
+
+
+                    console.log(qry)
+                    let encodedQry = encodeURIComponent(qry)
+
+                    $http.get(`nzhts?qry=${encodedQry}`).then(
+                        function (data) {
+
+                            let bundle = data.data
+                            if (bundle && bundle.entry) {
+                                bundle.entry.forEach(function (entry) {
+                                    console.log(entry.resource.url)
+                                })
+                            }
+                        }, function (err) {
+                            console.log(err)
+                        }
+                    )
+                },
                 makeTree : function (cm,cmProperties) {
                     //generate a tree view of the conceptmap
                     //assume only 1 group

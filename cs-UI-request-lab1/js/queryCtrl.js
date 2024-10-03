@@ -157,6 +157,8 @@ angular.module("pocApp")
                     }
                 )
             }
+
+            //this is the initial load.
             $scope.changeInstance($scope.input.tsInstance)
 
             //expand a ValueSet

@@ -108,13 +108,14 @@
 
             <div class="col-md-3">
                 <div class="navbar-text">
-
+<!--
                    <select class="form-control pull-left"
                            ng-change="changeInstance(input.tsInstance)"
                            ng-model="input.tsInstance">
                        <option value="authoring">Authoring Instance</option>
                        <option value="prod">Production Instance</option>
                    </select>
+                    -->
                 </div>
             </div>
 
@@ -153,7 +154,21 @@
         <uib-tab >
             <uib-tab-heading>CanShare ValueSets <span class="badge">{{allVSItem.length}}</span> </uib-tab-heading>
             <br/>
+
+            <div class="pull-right">
+                  <select class="form-control"
+                        ng-change="changeInstance(input.tsInstance)"
+                        ng-model="input.tsInstance">
+                    <option value="authoring">Authoring Instance</option>
+                    <option value="prod">Production Instance</option>
+                </select>
+            </div>
+
+            <!--
             <em class="pull-right">This tab will make queries against the New Zealand National Terminology server</em>
+            -->
+
+
             <div ng-show="showLoadingMessage">Loading ValueSets, please wait...</div>
             <br/>
             <div class="row">
@@ -274,7 +289,7 @@
                     <img ng-show="showWaiting || refreshingCache || loadingCM" src="css/ajax_loader_blue_32.gif"/>
                 </div>
 
-
+<!--
                 <div class="pull-right">
                     <a class="btn btn-link" target="_blank" href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653">Spreadsheet</a></div>
 
@@ -283,6 +298,7 @@
                     <a class="btn btn-link" style="padding-right: 8px"  target="_blank" href="https://docs.google.com/document/d/1stRV8lUzL4Tl8yNEt0cvvwMBuVlS-9_8rWOGbvsEclw/edit">Documentation</a></div>
 
 
+                -->
 
 
                 <ng-include src = "'./includes/cmUI.html'"></ng-include>

@@ -16,6 +16,9 @@ angular.module("pocApp")
             $scope.local.uiValues = {}          //a hash of values selected in the UI
             $scope.log= []
 
+            //temp
+            //querySvc.getAllConceptMaps()
+
             let snomed = "http://snomed.info/sct"
             let vsPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/"
 
@@ -120,13 +123,6 @@ angular.module("pocApp")
                     }
                 )
 
-                //locate all VS in the CM
-
-                //if a vs is not already in the cache, then add it to the list to retrieve
-
-                //retrieve the VS
-
-                //render the UI
 
 
             }
@@ -234,7 +230,8 @@ angular.module("pocApp")
 
             //handler when a value is selected
             $scope.uiValueSelected = function (propKey,value) {
-                //called when a selection is made for a property in the UI.
+                //called when a selection is made for a property in the UI
+                // oct 4 - or when a default value is set in populateUIControl()
                 //first perform the reverse lookup to ensure the preceeding values are correct
                 //  Mostly the empty ones - but also check that existing values are correct (?when would they not be)
                 //  We then populate options for the next one...
@@ -265,7 +262,8 @@ angular.module("pocApp")
                     return
                 }
 
-                //this is the reverse lookup stuff.
+                //this is the reverse lookup stuff. ie, with the value seleced, are previous values
+                //consistent with the rules
                 //sets $scope.reverseLookup which {targets:[],element: {},hashProperty:{}}
                 performReverseLookup(propKey,value)
                 if ($scope.reverseLookup) {
@@ -323,29 +321,36 @@ angular.module("pocApp")
 
                 }
 
+
+
                 //---------------- now can process the next property in the sequence
-                let def = $scope.cmProperties[propKey]
-                if (def && def.next) {  //next is the property after this one (defined in the initial setup)
-                    //def.next is the next control in the order
-                    $scope.log.push({msg:`Populate UI control for ${def.next}`})
-                    $scope.populateUIControl(def.next)  //populate the UI with the set of possible values. Will check all following properties
+                //unless we only want to set this one
 
-                    //if the property that was selected (propKey) is the cancer type, then it may be possible
-                    //to default the primary site.
 
-                    if (propKey == 'cancer-type') {
-                        getDefaultPrimarySite(value,function (value) {
-                            if (value) {
-                                //there was a single primary site which was set.
-                                //we need to invoke the forward engine to set the laterality...
-                                $scope.uiValueSelected  ('primary-site',value)
-                            }
+                    let def = $scope.cmProperties[propKey]
+                    if (def && def.next) {
+                        //next is the property after this one (defined in the initial setup)
+                        //def.next is the next control in the order
+                        $scope.log.push({msg:`Populate UI control for ${def.next}`})
+                        $scope.populateUIControl(def.next)  //populate the UI with the set of possible values. Will check all following properties
 
-                        })
+                        //if the property that was selected (propKey) is the cancer type, then it may be possible
+                        //to default the primary site.
+                        if (propKey == 'cancer-type') {
+                            getDefaultPrimarySite(value,function (value) {
+                                if (value) {
+                                    //there was a single primary site which was set.
+                                    //we need to invoke the forward engine to set the laterality...
+                                    $scope.uiValueSelected  ('primary-site',value)
+                                }
+
+                            })
+
+                        }
 
                     }
 
-                }
+
 
 
                 //so that the dropdowns work, make sure the value (local.cmPropertyValue) is from the list cmProperties[k].options
@@ -374,7 +379,6 @@ angular.module("pocApp")
                 $scope.log.push({msg:`check default primary site: ${concept.code}`})
                 let siteCodes = []      //there can be multiple site codes for a given diagnosis
                 let system = snomed // concept.system || snomed
-                //let code ='93849006'// '93689003' //concept.code
                 let code = concept.code //'93849006'// '93689003' //concept.code
                 let findingSiteCode = 363698007  //the code for the finding site attribute
 
@@ -481,16 +485,6 @@ angular.module("pocApp")
 
 
 
-                //delete $scope.reverseLookup
-
-                //if there is already a value for this property then leave it alone and don't
-                //progress further. - no, we need to check that it is still relevant.
-                /*
-                if ($scope.local.cmPropertyValue[propKey]) {
-                    $scope.log.push({msg:`${propKey} already has a value - leave it`  })
-                   return
-                }
-*/
                // $scope.local.uiTitle = `Looking for possible values for ${propKey}`
                 //propKey is the property we're wanting to populate
                 //strategy is that we want to find the matching target in the CM based solely on the values
@@ -509,18 +503,17 @@ angular.module("pocApp")
 
 
                 if (! cmElement.code) {
-                    $scope.log.push({msg:`An element in the Concept map for the code ${propertyCode} could not be located`})
+                    //would indicate an issue with the ConceptMap
+                    $scope.log.push({msg:`An element in the Concept map for the code ${propertyCode} could not be located. This is an issue with the ConceptMap`})
                     return
                 }
 
                 $scope.log.push({msg:`Found cm element for ${propKey}`,obj:cmElement,objTitle:"CM element"})
 
-                //a hash of all the data entered - but only those 'before' this element
+                //a hash of all the data entered
+                // now all of them - at one point was only those 'before' this element
                 $scope.uiHashValues = {}
-
                 for (const prop of Object.keys($scope.cmProperties)) {
-                    //break when we reach the property being populated.
-                    //does assume the object retains the order...
                     if (prop == propKey) {
                         // 27-may - use all values break
                     }
@@ -550,14 +543,8 @@ angular.module("pocApp")
 
                     $scope.log.push({msg:`${$scope.uiMatchingVS.length} valueset or concept returned`,obj:$scope.uiMatchingVS,objTitle:"ValueSet or concept"})
 
-                    //actually, all VS are aggregated. We look at the first entry only to see if it is a single concept
-                    /* if ($scope.uiMatchingVS.length > 1) {
-                        $scope.log.push({msg:`WARNING: Only the first one evaluated. `})
-                    }
-                    */
-
                     if ($scope.uiMatchingVS[0].indexOf('http') == -1) {
-                        //this is a single concept. We can get the display details from the first element of $scope.uiMatchingTargets
+                        //this is a single concept (not a VS). We can get the display details from the first element of $scope.uiMatchingTargets
 
                         let target = $scope.uiMatchingTargets[0]
                         $scope.singleConcept = {code:target.code,display:target.display,system:target.system}
@@ -577,14 +564,12 @@ angular.module("pocApp")
                         $scope.cmProperties[propKey].options = [$scope.singleConcept]
 
 
-
-
-
-                        //$//scope.uiHashValues[prop] = $scope.local.cmPropertyValue[prop] //$scope.local.cmPropertyValue has the data entered thus far.
-
+                        //Oct 4 as we've selected a value we need to perform the processing
+                        //associated with selecting it.
+                        $scope.uiValueSelected(propKey, $scope.singleConcept   )
 
                         //as there is only a single concept, which is not editable then move on to the next one
-                        //todo - this does mean we won't see the details
+
                         let next = $scope.cmProperties[propKey].next
                         if (next && ! noNext) {
                             //$scope.log.push({msg:`WARNING: Only the first one evaluated. `})
@@ -599,12 +584,6 @@ angular.module("pocApp")
                         //from the forwards engine (ie a concept that is in both)
 
 
-                        //empty the current set of options
-                        //$scope.cmProperties[propKey].options = []
-
-                        //actually, we now have all the expanded VS in memory (after implementing the reverseengine
-                        //and this routine does check all valuesets
-
                         //first create the complete set of concepts from the forward engine
                         //this is a de-duping exercise...
                         let forwardList = []
@@ -618,7 +597,6 @@ angular.module("pocApp")
                                     }
                                 }
 
-                                //$scope.lstMatchingConceptsForUI = $scope.cmProperties[propKey].options
                                 $scope.log.push({msg:`List of concepts `,obj:$scope.cmProperties[propKey].options,objTitle:"Possible concepts"})
 
                             } else {
@@ -643,54 +621,6 @@ angular.module("pocApp")
                                 delete $scope.local.cmPropertyValue[propKey]
                             }
                         }
-
-
-
-                        /*
-
-                        //TOTO REPLACE empty the properties list
-                        if ( $scope.cmProperties[propKey].options.length == 0) {
-                            //There's nothing yet so the full forward list can be used
-                            $scope.cmProperties[propKey].options = forwardList
-                        } else {
-                            //there's already a list - need to change it to the intersection...
-                            $scope.cmProperties[propKey].options = []
-
-                            //go through the forwardlist...
-                            for (let concept of forwardList)  {
-                                //is it in the existing list
-                                let ar = existingList.filter(concept1 => concept1.code == concept.code )
-
-                                //they are in both....
-                                if (ar.length > 0) {
-                                    //yes! we can add it...
-                                    $scope.cmProperties[propKey].options.push(concept)
-                                }
-                            }
-
-
-
-                        }
-                        */
-
-
-
-
-
-
-/*
-                        //now that we've updated the list of options, we have to update the value as well (for angular)
-                        if ($scope.local.cmPropertyValue[propKey]) {
-                            let currentCode = $scope.local.cmPropertyValue[propKey].code
-                            for (const v of $scope.cmProperties[propKey].options ) {
-                                if (v.code == currentCode) {
-                                    $scope.local.cmPropertyValue[propKey] = v
-                                    break
-                                }
-                            }
-                        }
-                        */
-
 
                     }
 
