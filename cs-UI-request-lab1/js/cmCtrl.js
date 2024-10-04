@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('cmCtrl',
-        function ($scope,$http,$q,querySvc,cmSvc,$uibModal,utilsSvc) {
+        function ($scope,$http,$q,querySvc,cmSvc,$uibModal,utilsSvc,$timeout) {
 
             $scope.local = {cmOptions : {},cm:{property:{}}}
             $scope.default = {}
@@ -376,6 +376,24 @@ angular.module("pocApp")
 
             function getDefaultPrimarySite(concept,cb) {
                 //alert(`check default primary site: ${concept.code}`)
+
+                $scope.lookUpCache = $scope.lookUpCache || {}     //cache to improve performance
+                /* the cache doesn't seem to work - the concept is not defaulting - not sure why
+
+
+                if ($scope.lookUpCache[concept.code]) {
+                    if ($scope.lookUpCache[concept.code] == "notfound") {
+                        cb()
+                    } else {
+                        console.log($scope.lookUpCache[concept.code])
+                        cb($scope.lookUpCache[concept.code])
+
+                    }
+                    return
+                }
+
+                 */
+
                 $scope.log.push({msg:`check default primary site: ${concept.code}`})
                 let siteCodes = []      //there can be multiple site codes for a given diagnosis
                 let system = snomed // concept.system || snomed
@@ -419,17 +437,26 @@ angular.module("pocApp")
                             })
                             $scope.log.push({msg:sum})
 
+
+                            //look for the code in the list.
+                            let foundConcept = null
+                            for (const code of siteCodes) {
+                                for (const concept of $scope.cmProperties['primary-site'].options) {
+                                    if (concept.code == code) {
+                                        $scope.local.cmPropertyValue['primary-site'] = concept
+                                        foundConcept = concept
+                                        break
+                                    }
+                                }
+                            }
+
+                            /* original - mostly working
+
                             let defaultSiteConceptCode = siteCodes[0]
 
                             let foundConcept = null
-                            /*
-                            if ($scope.cmProperties['primary-site'].options.length == 1) {
-                                $scope.local.cmPropertyValue['primary-site'] = concept
-                                foundConcept = concept
-                            }
-                            */
 
-
+                            //is
                             for (const concept of $scope.cmProperties['primary-site'].options) {
                                 if (concept.code == defaultSiteConceptCode) {
                                     $scope.local.cmPropertyValue['primary-site'] = concept
@@ -437,15 +464,17 @@ angular.module("pocApp")
                                     break
                                 }
                             }
-
+*/
 
                             if (foundConcept) {
-                                console.log('found')
+                                console.log(`${foundConcept.code} found`)
                                 $scope.log.push({msg:`Code is in list, setting as default`})
+                                $scope.lookUpCache[concept.code] = foundConcept
                                 cb(foundConcept)
                             } else {
                                 $scope.log.push({msg:`Code not found in list, ignoring`})
-                                console.log('not found')
+                                console.log(`${foundConcept.code} not found`)
+                                $scope.lookUpCache[concept.code] = "notfound"
                                 cb()
                             }
 
