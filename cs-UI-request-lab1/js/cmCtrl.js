@@ -65,23 +65,37 @@ angular.module("pocApp")
                 }
             }
 
+
+
+
             //select the development version of the ConceptMap
             //could later generalize this to multiple CM
             $scope.selectDev = function () {
 
-                let url = "http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"
+                let url = "http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map-dev"
                 //load the CM
 
                 querySvc.getOneConceptMap(url,true).then(
                     function (ar) {
                         //now retrieve all the ValueSets (effectively refresh the cache)
+
+
                         $scope.fullSelectedCM = ar[0]       //todo what of there's > 1
+                        console.log($scope.fullSelectedCM)
+
 
 
                         let lstVsUrl = []   //list of all ValueSets that are used by 'in-vs' rules
 
                         //parse the CM to get all referenced VS. Update the lstVsUrl
                         cmSvc.getAllVSinCM($scope.fullSelectedCM,lstVsUrl)
+
+
+                        lstVsUrl.sort()
+                        lstVsUrl.forEach(function (url) {
+                            console.log('|' + url + '|  ' + url.length)
+                           // console.log(url.match(/[^\x20-\x7E]/g))
+                        })
 
                         let newVS = []  //this will be  a list of new ValueSets that need to be retrieved
                         if (lstVsUrl.length > 0) {
@@ -92,17 +106,23 @@ angular.module("pocApp")
                             }
                         }
 
-                        if (newVS.length > 1 ) {
+                        console.log(newVS)
+
+                        if (newVS.length > 0 ) {
                             //there are new ValueSets in the dev version that need to be retrieved and added to the cache
 
                             $scope.showWaiting = true
-                            cmSvc.getVSContentsHash(lstVsUrl).then(
-                                function (hashNewVS) {
+                            cmSvc.getVSContentsHash(newVS).then(
+                                function (vo) {
+                                    let hashNewVS = vo.hashExpanded
+                                    $scope.expandErrors = vo.errors
                                     console.log('vs size',utilsSvc.getSizeOfObject(hashNewVS)/1024 )
                                     //now we can add the VS to the full hash
 
                                     for (const url of Object.keys(hashNewVS) ) {
-                                        $scope.hashExpandedVs[url] = hashNewVS[url]
+                                        //- just while testing $scope.hashExpandedVs[url] = hashNewVS[url]
+
+                                        alert(url)
                                     }
 
                                 },
@@ -1048,6 +1068,7 @@ angular.module("pocApp")
                 delete $scope.myResult
                 delete $scope.translateError
                 delete $scope.expandedCMVS
+                delete $scope.expandErrors
 
                 $scope.loadingCM = true
 
@@ -1111,12 +1132,23 @@ angular.module("pocApp")
 
                         //expand all the valuesets
                         if (lstVsUrl.length > 0) {
+
+
+                            lstVsUrl.sort()
+                            lstVsUrl.forEach(function (url) {
+                                console.log('|' + url + '|  ' + url.length)
+                                // console.log(url.match(/[^\x20-\x7E]/g))
+                            })
+
+
                             $scope.showWaiting = true
                             cmSvc.getVSContentsHash(lstVsUrl).then(
                                 function (data) {
-                                    console.log('vs size',utilsSvc.getSizeOfObject(data)/1024 )
+                                    let hashExpanded = data.hashExpanded
+                                    $scope.expandErrors = data.errors
+                                    console.log('vs size',utilsSvc.getSizeOfObject(hashExpanded)/1024 )
 
-                                    $scope.$broadcast('hashExpandedVs',data)    //the list is processed by cmCtrl
+                                    $scope.$broadcast('hashExpandedVs',hashExpanded)    //the list is processed by cmCtrl
                                 },
                                 function (err) {
                                     alert(err)
@@ -1243,6 +1275,36 @@ angular.module("pocApp")
             function setup() {
                 $scope.local.cmPropertyValue = {}
                 //these are the properties
+
+                $http.get('/cmConfig').then(
+                    function (data) {
+                        $scope.cmProperties = data.data
+
+                        //get the list of services from the ConceptMap
+                        let serviceUrl = "https://nzhts.digital.health.nz/fhir/ValueSet/canshare-cancer-service"
+                        let serviceConcepts = $scope.hashExpandedVs[serviceUrl]
+
+                        $scope.input.allService = [{display:"No default"}]    //for default
+
+                        if (serviceConcepts) {
+                            for (const concept of serviceConcepts) {
+                                $scope.cmProperties['cancer-service'].options.push(concept)
+                                $scope.input.allService.push(concept)
+                            }
+                        } else {
+                            alert(`The service ValueSet ${serviceUrl} was not found`)
+                        }
+
+                        let treeData = querySvc.makeTree($scope.fullSelectedCM,$scope.cmProperties)
+                        showCmTree(treeData)
+
+
+                    },function (err) {
+                        alert("Error getting ConceptMap config")
+                    }
+                )
+
+                /*
                 $scope.cmProperties = {}
 
                 $scope.cmProperties['patient-sex'] = {concept: {code:"184100006"},UI:'Patient sex',
@@ -1274,8 +1336,11 @@ angular.module("pocApp")
                 $scope.cmProperties['patient-sex'].options.push({code:"F",display:"Female"})
                 $scope.cmProperties['patient-sex'].options.push({code:"M",display:"Male"})
 
+console.log(JSON.stringify($scope.cmProperties,null,2))
 
+                */
 
+                /*
                 //get the list of services from the ConceptMap
                 let serviceUrl = "https://nzhts.digital.health.nz/fhir/ValueSet/canshare-cancer-service"
                 let serviceConcepts = $scope.hashExpandedVs[serviceUrl]
@@ -1293,6 +1358,8 @@ angular.module("pocApp")
 
                 let treeData = querySvc.makeTree($scope.fullSelectedCM,$scope.cmProperties)
                 showCmTree(treeData)
+
+                */
 
             }
 

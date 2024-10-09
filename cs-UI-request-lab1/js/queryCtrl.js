@@ -7,7 +7,7 @@ angular.module("pocApp")
 
             let vsPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/"
 
-            //allows a valueset to be specified in the call...
+            //allows a valueset to be specified in the call... - the name part of the url - eg canshare-tnm8-breast-cm
             let srch = $window.location.search;
             $scope.inputVs = null
             if (srch) {
@@ -116,6 +116,38 @@ angular.module("pocApp")
 
             // ========================== end of conceptmap functions ====================
 
+
+            $scope.adhocQuery = function (qry) {
+                delete $scope.adhocResult
+                delete $scope.adhocError
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+
+                let config = {headers:{'x-ts-instance':$scope.input.tsInstance}}
+
+                $http.get(`nzhts?qry=${encodedQry}`,config).then(
+                    function (data) {
+                        $scope.adhocResult = data.data
+
+                    }, function (err) {
+                        $scope.adhocError = err
+                    }
+                ).finally(
+                    function () {
+                        $scope.showWaiting = false
+                    }
+                )
+
+            }
+
+            $scope.selectAdhoc = function (resource) {
+                $scope.selectedAdhocResource = resource
+            }
+
+            $scope.addCanshareIdent = function (type){
+                $scope.input.adHocQuery = $scope.input.adHocQuery || ""
+                $scope.input.adHocQuery += `?identifier=http://canshare.co.nz/fhir/NamingSystem/${type}%7c&_summary=false`
+            }
 
             //get the canshare valuesets from the TS
             $scope.showLoadingMessage = true
@@ -272,6 +304,8 @@ angular.module("pocApp")
                     }
                 )
             }
+
+            //============ deprecated
 
             function setServerDEP() {
                 if ($localStorage.currentServer) {

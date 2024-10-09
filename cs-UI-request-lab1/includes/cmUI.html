@@ -37,7 +37,12 @@
     </div>
 
     <br/>
+
+
+
   <uib-tabset active="local.conceptMapTab">
+
+
 
       <uib-tab heading="UI">
         <br/>
@@ -112,7 +117,9 @@
                       </tr>
                   </table>
 
-                  <uib-tabset ng-show="false">
+                  <div class="pull-right">{{fullSelectedCM.title}}</div>
+
+                  <uib-tabset ng-if="false">
                       <uib-tab heading="Progressive">
                           <br/>
                           <table class="table table-bordered">
@@ -534,6 +541,10 @@
                           </uib-tabset>
 
 
+                      </uib-tab>
+
+                      <uib-tab ng-if = "expandErrors.length > 0" heading="Errors">
+                          <pre>{{expandErrors | json}}</pre>
                       </uib-tab>
 
 

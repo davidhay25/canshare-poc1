@@ -60,7 +60,8 @@ angular.module("pocApp")
             //just during development...
             $scope.reloadCMSS = function () {
                 //reload the last 'file' copied in...
-                $scope.arLog = terminologyUpdateSvc.auditCMFile($scope.previousCMSS,$scope.allVSItem)
+                let vo1 = terminologyUpdateSvc.auditCMFile($scope.previousCMSS,$scope.allVSItem)
+                $scope.arLog = vo1.log
                 //console.log(arLog)
 
                 let vo = terminologyUpdateSvc.makeCM($scope.previousCMSS)
@@ -101,7 +102,11 @@ angular.module("pocApp")
 
                 arLines.splice(0,2)     //the first 2 lines are header lines
 
-                $scope.arLog = terminologyUpdateSvc.auditCMFile(arLines,$scope.allVSItem)
+                let vo1 = terminologyUpdateSvc.auditCMFile(arLines,$scope.allVSItem)
+                $scope.arLog = vo1.log
+
+
+
 /*
                 arLines.forEach(function (lne,ctr) {
                     console.log(ctr+3, lne)     //
@@ -366,6 +371,53 @@ angular.module("pocApp")
 
 
                 }
+            }
+
+            $scope.expandAllVS = function () {
+
+                //$scope.action= "Expanding ECL"
+                makeMultipleRequests().then((results) => {
+                    $scope.expandProgress = "Expansion complete."
+                    $scope.$digest()
+
+                })
+
+                async function makeMultipleRequests(ecls) {
+                    let results = [];
+                    $scope.expandError = []
+
+                    let cnt = $scope.vsBatchReport.length
+                    let ctr = 0
+                    for (let row of $scope.vsBatchReport) {
+                        if (row.ecl) {
+                            $scope.expandProgress = `${ctr}/${cnt} ${row.name}`
+                            console.log(row.name)
+                            let result = await makeRequest(row.ecl);
+                            if (result == 'error') {
+                                $scope.expandError.push({name:row.name,ecl:row.ecl,url:row.vs.url})
+                            }
+                            results.push({name:row.name,result:result});
+                        }
+                       ctr ++
+                        if (ctr > 200) {
+                          //  break
+                        }
+
+                    }
+
+                    return results
+                }
+
+                async function makeRequest(ecl) {
+                    try {
+                        let response = await $http.post(`nzhts/ecl`,{ecl:ecl})
+                        return 'ok' //response.data;
+                    } catch (error) {
+
+                        return 'error'
+                    }
+                }
+
             }
 
             //=============================

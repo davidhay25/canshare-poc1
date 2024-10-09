@@ -53,8 +53,8 @@ angular.module("pocApp")
                 $scope.selectedCsItem = item
 
                 //If we expand the ValueSet, then we can re-create the codesystem
-
-                let qry = `ValueSet/$expand?url=${vs.url}&_summary=false`
+                //let qry = `ValueSet/$expand?url=${vs.url}&_summary=false`
+                let qry = `ValueSet/$expand?url=${vs.url}`
                 let encodedQry = encodeURIComponent(qry)
                 $scope.showWaiting = true
                 $http.get(`nzhts?qry=${encodedQry}`).then(
@@ -63,10 +63,11 @@ angular.module("pocApp")
                         //now we can create the internal model from the expansion
                         let expandedVs = data.data
                         $scope.input.name = vs.id || vs.name.replace(/_/g,'-')     //the expanded vs doesn't include the vs name etc.
+                        $scope.input.status = vs.status
                         $scope.input.title = vs.title
                         $scope.input.description = vs.description
                         $scope.model = {concepts:[]}
-                        for (concept of expandedVs.expansion.contains) {
+                        for (const concept of expandedVs.expansion.contains) {
                             delete concept.system       //not needed in the codesystem
                             $scope.model.concepts.push(concept)
                         }
@@ -93,8 +94,6 @@ angular.module("pocApp")
 
             //load all codesystems
             $scope.loadAllVS = function () {
-
-
                 let qry = `ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/nonsnomed-valuesets%7c&_sort=title&_count=5000&_summary=false`
                 console.log(qry)
                 let encodedQry = encodeURIComponent(qry)
@@ -180,9 +179,13 @@ angular.module("pocApp")
                 let dateString = ar[0]
                 let versionString = dateString.replace(/-/g, "");
 
+                let status = $scope.input.status || 'active'
+
+
                 $scope.ccDirty = true
                 let name = $scope.input.name.replace(/_/g,'-')
-                $scope.cs = {resourceType:"CodeSystem",status:'active'}
+
+                $scope.cs = {resourceType:"CodeSystem",status:status}
                 $scope.cs.id = name       //can't have underscore in an id
 
                 let vsUrl = `https://nzhts.digital.health.nz/fhir/ValueSet/${name}`
@@ -202,7 +205,9 @@ angular.module("pocApp")
                 $scope.cs.concept = $scope.model.concepts
 
 
-                $scope.vs = {resourceType:"ValueSet",status:'active'}
+
+
+                $scope.vs = {resourceType:"ValueSet",status:status}
                 $scope.vs.id = name
                 $scope.vs.url = vsUrl
                 $scope.vs.version = versionString

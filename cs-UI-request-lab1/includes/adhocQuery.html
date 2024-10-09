@@ -1,0 +1,90 @@
+<div>
+
+  <div class="row">
+    <br/>
+    <div class="col-md-8">
+      <input class="form-control" ng-model="input.adHocQuery"
+             placeholder="Enter query - eg ValueSet?url=https://nzhts.digital.health.nz/fhir/ValueSet/canshare-tnm8-breast-cm&_summary=false"/>
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-link"
+              ng-show="input.adHocQuery.indexOf('ValueSet') > -1"
+              ng-click="addCanshareIdent('valuesets')">Add ValueSetCanshare identifier</button>
+
+      <button class="btn btn-link"
+              ng-show="input.adHocQuery.indexOf('ConceptMap') > -1"
+              ng-click="addCanshareIdent('conceptmaps')">Add ConceptMap identifier</button>
+
+      <button class="btn btn-link"
+              ng-show="input.adHocQuery.indexOf('CodeSystem') > -1"
+              ng-click="addCanshareIdent('codesystems')">Add CodeSystem identifier</button>
+
+
+
+
+
+    </div>
+    <div class="col-md-1">
+      <button class="btn btn-primary" ng-click="adhocQuery(input.adHocQuery)">Execute</button>
+    </div>
+  </div>
+
+  <br/>
+
+  <div ng-show="adhocError">
+    <pre>{{adhocError | json}}</pre>
+  </div>
+
+
+  <div class="row" ng-show="adhocResult">
+    <div class="col-md-3">
+
+      <div class="myScroll">
+        <div class="list-group">
+          <div class="list-group-item"
+               ng-click="selectAdhoc(entry.resource)"
+               ng-repeat = "entry in adhocResult.entry">
+            {{entry.resource.title}}
+          </div>
+        </div>
+      </div>
+
+
+
+
+      {{adhocResult.total}}
+    </div>
+    <div class="col-md-9">
+
+
+
+
+      <uib-tabset>
+
+        <uib-tab heading="Response Json">
+          <div ng-show="adhocResult">
+            <pre>{{adhocResult | json}}</pre>
+          </div>
+
+        </uib-tab>
+
+        <uib-tab ng-show="selectedAdhocResource" heading="Selected resource Json">
+          <pre>{{selectedAdhocResource | json}}</pre>
+        </uib-tab>
+
+
+
+
+
+
+      </uib-tabset>
+
+
+
+
+
+    </div>
+  </div>
+
+
+</div>

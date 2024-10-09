@@ -69,7 +69,7 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                 if (cols.length == 1) {
                     //This is a display term. We add it to the previous lne....
                     let lne = rows[ctr]     //this is the previous line
-                    console.log(lne)
+                    //console.log(lne)
                     lne += `#${cols[0]}`
                     rows[ctr] = lne
                 } else {
@@ -369,7 +369,7 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                 if (cols.length == 1) {
                     //This is a display term. We add it to the previous lne....
                     let lne = rows[ctr]     //this is the previous line
-                    console.log(lne)
+                    //console.log(lne)
                     lne += `#${cols[0]}`
                     rows[ctr] = lne
                 } else {
@@ -378,17 +378,12 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                 }
             }
 
-            //for (const cols of rows) {
 
             rows.forEach(function(row,inx){
             //inLines.forEach(function(row,inx){
 
                         let arData = row.split(/\t/)
-                        //console.log(arData)
 
-
-                     //   if (arData[1] !== 'Retired') {
-                            //console.log(arData[0])
 
 
                             let id = arData[0].replace(/\s/g, "")
@@ -417,27 +412,36 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
         },
         auditCMFile : function (arLines,allVsItem) {
             //audit the raw data from the spreadsheet - https://docs.google.com/spreadsheets/d/1qRPZZk9dpwbF8yP9SYkiwzp-nKO_3T__nfz94AzFoGw/edit?gid=874499567#gid=874499567
-            arLog = []  //note: don't use let as the array is in the service scope
+
+            //todo - check that all combinations of target filters are unique across the rows
+            //for a single property
+            //create a hash of all the dependsOn in all targets for an element / property
+            //and combination should be unique
+            //-- check this logic with Linda
+            //analogy of the CM with a decode ROM in a microprocessor...
+
+            arLog = []  //note: don't use LET as the array is in the service scope
             let hashValueSetNames = {}
             allVsItem.forEach(function (item) {
-                hashValueSetNames[item.vs.name] = true
+                hashValueSetNames[item.vs.name] = item.vs
             })
 
-            let types = ['Value Set','Value']
+            //create a hash of valueSet by url so we can check for ubknown vs
+           // let hashVS = {}
+
+
+            let types = ['Value Set','Value'] //possible valuse of col[3]
             let arDon = [ 10,14, 18,22, 26, 30, 34, 38, 42, 46] //dependsOn properties. 10 sets of 3
 
-            let arDonComparison = [11, 15, 19, 23, 27, 31, 35, 39, 43, 47]
+            let arDonComparison = [11, 15, 19, 23, 27, 31, 35, 39, 43, 47] //the comparison col
             let arSupportedComparison = ['=','!=','^','!^']
 
             let firstLine = arLines[0]
             let ar = firstLine.split('\t')
             let colCount = ar.length        //all rows should have this number of columns
 
-            rowNumber = 2   //yhis is the row number in the spreadsheet
+            rowNumber = 2   //the first row is headers
             for (const lne of arLines) {
-
-
-
 
                 let cols = lne.split('\t')
 
@@ -446,11 +450,12 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                 }
                 rowNumber++
 
-                //the last row won't have any errors...
+                //the last row length is not the same as the colCount
                 if (cols.length !== colCount && (rowNumber !== arLines.length+2)) {
                     let msg = `There are only ${cols.length} cols - there should be ${colCount}. This can be caused by a newLine character at that col number`
                     msg += " Note that the row number may be incorrect if there are earlier errors like this - it mucks up the sequence"
-                    logger(rowNumber,msg)}
+                    logger(rowNumber,msg)
+                }
 
                 if (! cols[1])  { logger(rowNumber,"Col B is empty")}
                 if (! cols[2])  { logger(rowNumber,"Col C is empty")}
@@ -466,6 +471,17 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                     if (vsUrl && ! hashValueSetNames[vsUrl]) {{
                         logger(rowNumber,`The valueSet ${vsUrl} in col ${4} does not exist on the terminology server`)}
                     }
+
+                    if (vsUrl) {
+                        let vs = hashValueSetNames[vsUrl]
+                        if (vs.status !== "active") {
+                            logger(rowNumber,`The valueSet ${vsUrl} in col ${4} has a status of ${vs.status}`)
+                        }
+                    }
+
+
+
+
                 }
 
                 // IF col D (3: Type) = "Value" THEN col F (5: Concept ID) and col G (6: Concept Display) are mandatory
@@ -504,10 +520,7 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                             if (vsUrl && ! hashValueSetNames[vsUrl]) {{
                                 logger(rowNumber,`The valueSet ${vsUrl} in col ${colNumber + 2} does not exist on the terminology server`)}
                             }
-
                         }
-
-
                     }
                 })
 
@@ -530,7 +543,7 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
 
             }
 
-            return arLog
+            return {log:arLog}
 
 
 
@@ -542,6 +555,9 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
             //Notes for team - checking that cincept exists (g) could be compuattionally expensive...
             //comparison != and !^ not currently supported in UI
 
+
+        },
+        makeVSListFromCM : function (arLines) {
 
         },
         makeCM : function (inLines) {

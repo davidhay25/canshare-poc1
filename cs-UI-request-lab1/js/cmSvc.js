@@ -312,7 +312,8 @@ angular.module("pocApp")
                         element.target.forEach(function (target) {
 
                             if (target.code && target.code.startsWith('http')) {
-                                lstVsUrl.push(target.code)
+                                //lstVsUrl.push(target.code)
+                                addUrlToList(target.code)
                             }
 
                             if (target.dependsOn) {
@@ -325,9 +326,12 @@ angular.module("pocApp")
 
                                                 if (ext.valueCode == 'in-vs') {
                                                     //dep.value is a ValueSet url. We will need the contents of this valueset for rules processing
-                                                    if (lstVsUrl.indexOf(dep.value) == -1) {
-                                                        lstVsUrl.push(dep.value)
-                                                    }
+
+                                                    addUrlToList(dep.value)
+
+                                                  //  if (lstVsUrl.indexOf(dep.value) == -1) {
+                                                   //     lstVsUrl.push(dep.value)
+                                                  //  }
 
                                                 }
 
@@ -344,6 +348,13 @@ angular.module("pocApp")
 
                 })
                 return lstVsUrl
+
+                function addUrlToList(url) {
+                    if (lstVsUrl.indexOf(url) == -1) {
+                        lstVsUrl.push(url)
+                    }
+
+                }
 
             },
 
@@ -399,13 +410,14 @@ angular.module("pocApp")
 
                 let hashExpanded = {}
                 let promises = []
+                let errors = []         //any errors
 
                 lst.forEach(function (url) {
 
                     //this placeholder will be replaced with the expanded contents - unless the VS is not found
                     //this avoids calling the expand multiple times... as the calling routine will cache this concept...
                     hashExpanded[url] = [{system:"http://example.com",code:"notfound",display:"ValueSet not found"}]
-                    promises.push(addToHash(url,hashExpanded))
+                    promises.push(addToHash(url,hashExpanded,errors))
                 })
 
 
@@ -413,11 +425,16 @@ angular.module("pocApp")
                     function(results) {
                     // All promises resolved successfully
 
-                    deferred.resolve(hashExpanded)
+                        console.log(errors)
+                        //hashExpanded['errors'] = errors     //todo really should use a VO here...
+                    deferred.resolve({hashExpanded:hashExpanded,errors:errors})
 
                 }, function () {
                     //console.log(hashExpanded)
-                    deferred.resolve(hashExpanded)
+                        console.log(errors)
+                        //hashExpanded['errors'] = errors     //todo really should use a VO here...
+                        deferred.resolve({hashExpanded:hashExpanded,errors:errors})
+                    //deferred.resolve(hashExpanded)
                     }
 
                 )
@@ -428,7 +445,7 @@ angular.module("pocApp")
 
                 //retrieve the expanded VS from the server and add to hashExpanded
                 //ignore any errors - mostly 404
-                function addToHash(url,hash) {
+                function addToHash(url,hash,errors) {
                     //console.log(url)
                     let defer = $q.defer()
                     let qry = `ValueSet/$expand?url=${url}&_summary=false&displayLanguage=en-x-sctlang-23162100-0210105`
@@ -461,6 +478,10 @@ angular.module("pocApp")
                         },
                         function (err) {
                             //ignore any errors
+
+                            let errLne = {url:url,status:err.status,oo:err.data}
+                            errors.push(errLne)
+
                             console.log(`${url} fail`)
 
                           //  hash[response.data.url] = ar

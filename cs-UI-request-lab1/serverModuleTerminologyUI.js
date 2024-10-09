@@ -13,6 +13,8 @@ let jobs = {}
 
 //load the config file for accessing NZHTS (the file is excluded from git)
 const nzhtsconfig = JSON.parse(fs.readFileSync("./nzhtsconfig.config").toString())
+const cmconfig = JSON.parse(fs.readFileSync("./artifacts/cmConfig.json").toString())
+
 
 let currentToken = {token:null,expires:null}    //expires is the date.getTime() of when the token expires
 
@@ -48,6 +50,11 @@ async function getNZHTSAccessToken() {
 
 
 function setup(app) {
+
+    app.get('/cmConfig',function (req,res) {
+        res.json(cmconfig)
+
+    })
 
     //get the status of a specific job
     app.get('/job/status/:token',function (req,res) {
@@ -471,9 +478,6 @@ function setup(app) {
     app.get('/nzhts',async function(req,res){
         let query = req.query.qry
 
-
-
-
         let headers = req.headers
 
 
@@ -487,14 +491,11 @@ function setup(app) {
 
         //let qry = req.query.query || `https://authoring.nzhts.digital.health.nz/fhir/ValueSet/$expand?url=https://nzhts.digital.health.nz/fhir/ValueSet/canshare-data-absent-reason`
         if (req.query.qry) {
-            //let qry = nzhtsconfig.serverBase +  decodeURIComponent(req.query.qry)
             let qry = tsInstance +  decodeURIComponent(req.query.qry)
 
             //need to re-urlencode the |
             qry = qry.split('|').join("%7c")
 
-            //todo - check expiry and refresh if needed
-           // console.log(qry)
 
             let token = await getNZHTSAccessToken()
             console.log(`nzhts query: ${req.query.qry}`)

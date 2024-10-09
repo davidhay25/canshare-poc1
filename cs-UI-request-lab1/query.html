@@ -149,6 +149,9 @@
         </div>
     </nav>
 
+
+
+
     <uib-tabset active="input.mainTabActive">
 
         <uib-tab >
@@ -289,21 +292,22 @@
                     <img ng-show="showWaiting || refreshingCache || loadingCM" src="css/ajax_loader_blue_32.gif"/>
                 </div>
 
-<!--
                 <div class="pull-right">
-                    <a class="btn btn-link" target="_blank" href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653">Spreadsheet</a></div>
+                    <div class="btn btn-link pull-right" ng-click="selectDev()">Switch to development version</div>
+                </div>
 
-
-                <div class="pull-right">
-                    <a class="btn btn-link" style="padding-right: 8px"  target="_blank" href="https://docs.google.com/document/d/1stRV8lUzL4Tl8yNEt0cvvwMBuVlS-9_8rWOGbvsEclw/edit">Documentation</a></div>
-
-
-                -->
 
 
                 <ng-include src = "'./includes/cmUI.html'"></ng-include>
 
             </div>
+        </uib-tab>
+
+        <uib-tab  heading="Ad hoc query">
+
+            <ng-include src = "'./includes/adhocQuery.html'"></ng-include>
+
+
         </uib-tab>
 
 

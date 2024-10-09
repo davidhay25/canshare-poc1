@@ -97,6 +97,39 @@
 
       </uib-tab>
 
+      <uib-tab ng-if = "vsBatchReport" heading="Check all ECL">
+
+
+        <div class="row">
+          <div class="col-md-3">
+
+            <button class="btn btn-link" ng-click="expandAllVS()">Check all ECL expressions</button>
+            <br/> <br/>
+
+            {{action}}
+            <br/> <br/>
+            {{expandProgress}}
+          </div>
+          <div class="col-md-9">
+            <h3>ValueSets with invalid ECL ({{expandError.length}})</h3>
+            <table class="table-bordered table">
+              <tr><th>Name</th><th>ECL</th></tr>
+              <tr ng-repeat="lne in expandError">
+                <td style="width: 30%">
+                  <div class="clickable" ng-click="selectFromUnpublished({url:lne.url})">
+                    {{lne.name}}
+                  </div>
+                </td>
+                <td>{{lne.ecl}}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+
+
+      </uib-tab>
+
       <uib-tab ng-if="vsBatch" heading="Batch Json">
         <pre>{{vsBatch | json}}</pre>
       </uib-tab>

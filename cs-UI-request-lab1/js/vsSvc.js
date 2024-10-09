@@ -30,7 +30,8 @@ angular.module("pocApp")
             updateCacheFromList : function(lst,cb) {
                 let that = this
                 cmSvc.getVSContentsHash(lst).then(
-                    function (hash) {
+                    function (vo) {
+                        let hash = vo.hashExpanded
                         console.log(hash)
                         that.setVSContents(hash)
                         //hashVS = hash

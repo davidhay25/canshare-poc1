@@ -41,6 +41,16 @@
             </tr>
 
             <tr>
+              <td>VS Status</td>
+              <td>
+                <select ng-model="input.status" class="form-control"  ng-change="generateResources()">
+                  <option value="active">Active</option>
+                  <option value="retired">Retired</option>
+                  <option value="draft">Draft</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
               <td>Title</td>
               <td><input type="text"  ng-blur="generateResources()" class="form-control" ng-model="input.title"/> </td>
             </tr>
