@@ -420,6 +420,8 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
             //-- check this logic with Linda
             //analogy of the CM with a decode ROM in a microprocessor...
 
+            let hashVSUsed = {}
+
             arLog = []  //note: don't use LET as the array is in the service scope
             let hashValueSetNames = {}
             allVsItem.forEach(function (item) {
@@ -477,6 +479,10 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                         if (vs.status !== "active") {
                             logger(rowNumber,`The valueSet ${vsUrl} in col ${4} has a status of ${vs.status}`)
                         }
+
+                        hashVSUsed[vsUrl] = hashVSUsed[vsUrl] || []
+                        hashVSUsed[vsUrl].push({type:'target',row:rowNumber})
+
                     }
 
 
@@ -520,6 +526,11 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                             if (vsUrl && ! hashValueSetNames[vsUrl]) {{
                                 logger(rowNumber,`The valueSet ${vsUrl} in col ${colNumber + 2} does not exist on the terminology server`)}
                             }
+
+                            if ( vsUrl) {
+                                hashVSUsed[vsUrl] = hashVSUsed[vsUrl] || []
+                                hashVSUsed[vsUrl].push({type:'don',row:rowNumber,target:cols[4]})
+                            }
                         }
                     }
                 })
@@ -543,7 +554,23 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
 
             }
 
-            return {log:arLog}
+            //make the VS Hash alphabetical
+            let lstVSUsed = []
+            for (const key of Object.keys(hashVSUsed)) {
+                let item = {url:key,rows:hashVSUsed[key]}
+                lstVSUsed.push(item)
+            }
+            lstVSUsed.sort(function (a,b) {
+                if (a.url > b.url) {
+                    return 1
+                } else {
+                    return -1
+                }
+            })
+
+            console.log(lstVSUsed)
+
+            return {log:arLog,lstVSUsed:lstVSUsed}
 
 
 

@@ -52,6 +52,18 @@ angular.module("pocApp")
 
             }
 
+            $scope.showLink = function (name) {
+
+
+                let host = `http://poc.canshare.co.nz/query.html?${name}`
+
+                $scope.localCopyToClipboard (host)
+                alert(`Link: ${host} \ncopied to clipBoard`);
+
+            }
+
+
+
             //============================== update ConceptMap functions
             //https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653
 
@@ -62,6 +74,7 @@ angular.module("pocApp")
                 //reload the last 'file' copied in...
                 let vo1 = terminologyUpdateSvc.auditCMFile($scope.previousCMSS,$scope.allVSItem)
                 $scope.arLog = vo1.log
+                $scope.lstVSUsed = vo1.lstVSUsed
                 //console.log(arLog)
 
                 let vo = terminologyUpdateSvc.makeCM($scope.previousCMSS)
@@ -782,23 +795,23 @@ angular.module("pocApp")
 
             }
 
-            $scope.testECLDEP = function (ecl) {
+            $scope.testECL = function (ecl) {
 
                 //displays the ECL in a modal list
-                $scope.listConcepts(ecl)
+               // $scope.listConcepts(ecl)
 
-            /*    return
+
 
                 let vo = {ecl:ecl}
 
                 $http.post(`nzhts/ecl`,vo).then(
                     function (data) {
-                        $scope.testEclVS = data.data
+                        $scope.testECLData = data.data
 
                     }, function (err) {
                         alert(angular.toJson(err.data))
                     })
-*/
+
             }
 
             $scope.canSave = function () {
@@ -1288,6 +1301,29 @@ angular.module("pocApp")
 
             };
 
+            $scope.localCopyToClipboard = function(text) {
+                let textArea = document.createElement("textarea");
+                textArea.value = text;
+
+                // Avoid scrolling to bottom
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.position = "fixed";
+
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    let successful = document.execCommand('copy');
+                    let msg = successful ? 'successful' : 'unsuccessful';
+                    console.log('Fallback: Copying text command was ' + msg);
+                } catch (err) {
+                    alert('Fallback: Oops, unable to copy', err);
+                }
+
+                document.body.removeChild(textArea);
+            }
 
 
         }

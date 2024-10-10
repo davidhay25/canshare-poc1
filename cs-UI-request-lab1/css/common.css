@@ -1,5 +1,13 @@
 
 
+.retiredVS {
+    background-color: lightsalmon;
+}
+
+.draftVS {
+    background-color: lightgoldenrodyellow;
+}
+
 .background {
     background-color: #f7f7f7;
     border: 1px solid gainsboro;

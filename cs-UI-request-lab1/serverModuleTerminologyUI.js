@@ -91,6 +91,19 @@ function setup(app) {
             let config = {headers:{authorization:'Bearer ' + token}}
             config['content-type'] = "application/fhir+json"
 
+            //get the current custom CodeSystem so we can update the version
+            let csVersion = 1
+            try {
+                let csQry = "https://authoring.nzhts.digital.health.nz/fhir/CodeSystem/canshare-unpublished-concepts"
+                let response = await axios.get(csQry,config)
+                csVersion = parseInt(response.data.version)  + 1
+            } catch (ex) {
+                //shouldn't be any errors - CS is definately there ad we're just after the version
+
+            }
+
+console.log('ver',csVersion)
+
             //get all the CanShare valuesets...
             axios.get(qry,config).then(async function(data) {
                 let bundle = data.data
@@ -164,11 +177,16 @@ function setup(app) {
                 //now we can create the CodeSystem - and the hash which has the codes the are in the TS so cab ne removed from the
                 let hashStillUnpublished = {}   //the concepts that remain unpublished
 
-                let cs = {resourceType:'CodeSystem',id:"canshare-unpublished-concepts",version:"1",status:"active"}
-                cs.name = cs.id
+                let cs = {resourceType:'CodeSystem',id:"canshare-unpublished-concepts",version:csVersion,status:"active"}
+                cs.name = "Canshare_unpublished_concepts"
+                cs.title = "Concepts that are not yet formally published"
+                cs.url = "http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished"
                 cs.identifier = {value:cs.id,system:"http://canshare.co.nz/fhir/NamingSystem/codesystems"}
                 cs.publisher = "Te Aho o Te Kahu"
+                cs.caseSensitive = true
                 cs.content = "complete"
+                //let contact = {telecom:[{system:'email',value:''}]}
+                cs.contact = [{telecom:[{system:'email',value:'info@teaho.govt.nz'}]}]
                 cs.concept = []
 
                 //go through all the codes from the VS marked as unpublished...
@@ -572,6 +590,75 @@ function setup(app) {
     })
 
 
+    //----------- get the member count for all ValueSet
+    app.get('/memberCount',async function(req,res){
+        let serverHost = "https://authoring.nzhts.digital.health.nz/"
+        let token = await getNZHTSAccessToken()
+        let config = {headers: {authorization: 'Bearer ' + token}}
+        config['content-type'] = "application/fhir+json"
+
+        if (token) {
+
+            let jobId = Object.keys(jobs).length + 1 //Job id is the new length of the jobs hash
+            jobs[jobId] = {status:'active',description:"Get member count"}
+
+            let qry = `${serverHost}fhir/ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&_count=5000`
+            let response = await axios.get(qry,config)
+            let bundle = response.data
+
+            //an async call, but we won't wait
+            processGetMemberCountJob(token,jobId,bundle)
+
+            res.json({jobId:jobId,status:"active"})
+
+        } else {
+            res.status(ex.response.status).json({msg:"Unable to get Access Token."})
+        }
+    })
+
+    async function processGetMemberCountJob(token,jobId,bundle) {
+
+        jobs[jobId].result = []
+
+        let config = {headers: {authorization: 'Bearer ' + token}}
+        config['content-type'] = "application/fhir+json"
+        let ctr = 0
+        let cnt = bundle.entry.length
+        for (const entry of bundle.entry) {
+            //Call expand on the valueset
+            let vs = entry.resource
+            if (vs.status !== 'retired') {
+                let vsExpandQry = `https://authoring.nzhts.digital.health.nz/fhir/ValueSet/$expand?url=${vs.url}&_summary=false`
+                console.log(vsExpandQry)
+                try {
+                    let result = await axios.get(vsExpandQry,config)
+                    console.log(result.data)
+                    jobs[jobId].result.push({url:vs.url,count:result.data.expansion.total})
+                } catch (ex) {
+                    //If the expansion fails, record that in the result
+                    jobs[jobId].result.push({url:vs.url,count:-1})
+
+                }
+
+                jobs[jobId].progress = ` ${ctr}/${cnt}`
+                console.log(entry.resource.id)
+
+                ctr++
+
+            }
+            if (ctr > 20) {
+                break
+            }
+
+        }
+        console.log(jobs[jobId])
+
+        jobs[jobId].status = `complete`
+    }
+
+
+
+
     //Process a bundle asynchronously. Assumes that the user will poll for the job status
     // Used for ValueSet batch upload
     //Actually, Ontoserver won't allow a batch to have PUT so we can't use that. Instead, we process each item individually...
@@ -721,10 +808,6 @@ function setup(app) {
                 jobs[jobId].progress = `${cmId} done`
             }
 
-
-
-
-
             //now the ValueSets
             //get the canshare valueset list
             let qry = `${serverHost}fhir/ValueSet?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c&_count=5000`
@@ -735,19 +818,22 @@ function setup(app) {
             for (const entry of bundle.entry) {
                 let vs = entry.resource
 
-                if (vs.status !== 'draft') {
+                let toSyndicate = (vs.status == 'draft') ? false : true
+
+
+              //  if (vs.status !== 'draft') {
                     //set the syndication status unless draft status
                     const options = {
                         method: 'POST',
                         url: `${serverHost}synd/setSyndicationStatus`,
-                        params: {resourceType: 'ValueSet', id: vs.id, syndicate: 'true'},
+                        params: {resourceType: 'ValueSet', id: vs.id, syndicate: toSyndicate},
                         headers: {'Content-Type': 'application/json', authorization:'Bearer ' + token},
                     };
                     ctr++
                     console.log(vs.url)
                     const { data } = await axios.request(options);
                     jobs[jobId].progress = `VS ${ctr}/${cnt}`
-                }
+               // }
 
 
 

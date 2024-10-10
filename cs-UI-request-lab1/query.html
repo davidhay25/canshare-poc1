@@ -20,13 +20,13 @@
     <!--
     <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
 
-    -->
-
     <style>
         .inactive {
             background-color: #f2dede;
         }
     </style>
+    -->
+
 
     <script>
         angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage']).config(function($locationProvider) {
@@ -183,7 +183,7 @@
                     <br/>
                     <div class="myScroll">
                         <div class="list-group">
-                            <div ng-class="{'list-group-item':true,listItemSelected:selectedItem==item,inactive:item.vs.status == 'retired'}"
+                            <div ng-class="{'list-group-item':true,listItemSelected:selectedItem==item,retiredVS:item.vs.status == 'retired'}"
                                  ng-show="showVS(item)"
                                  style="cursor: pointer" ng-repeat="item in allVSItem" ng-click="selectVSItem(item)">
                                 {{item.display}}

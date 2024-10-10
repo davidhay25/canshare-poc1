@@ -16,11 +16,13 @@
     <link rel="stylesheet" type="text/css" href="css/common.css"/>
     <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
 
+    <!--
     <style>
         .retired {
             background-color: lightsalmon;
         }
     </style>
+    -->
 
     <script>
         angular.module("pocApp",['ui.bootstrap','ui.checkbox',"firebase",'ngStorage']).config(function($locationProvider) {
@@ -166,6 +168,9 @@
 
 
     <uib-tabset active="input.topTabActive">
+
+
+
         <uib-tab heading="Edit ValueSet">
             <br/>
 
@@ -192,7 +197,7 @@
                                     <br/>
                                     <div class="myScroll">
                                         <div class="list-group">
-                                            <div ng-class="{'list-group-item':true,listItemSelected:selectedItem.vs.id==item.vs.id,retired:item.vs.status == 'retired'}"
+                                            <div ng-class="{'list-group-item':true,listItemSelected:selectedItem.vs.id==item.vs.id,retiredVS:item.vs.status == 'retired',draftVS:item.vs.status == 'draft'}"
                                                  ng-show="showVS(item)"
                                                  style="cursor: pointer" ng-repeat="item in allVSItem" ng-click="selectVSItem(item)">
                                                 {{item.display}}
@@ -208,7 +213,7 @@
                         <uib-tab  heading="Last updated">
                             <div class="myScroll">
                                 <div class="list-group">
-                                    <div ng-class="{'list-group-item':true,listItemSelected:selectedItem.vs.id==item.vs.id,retired:item.vs.status == 'retired'}"
+                                    <div ng-class="{'list-group-item':true,listItemSelected:selectedItem.vs.id==item.vs.id,retiredVS:item.vs.status == 'retired',draftVS:item.vs.status == 'draft'}"
                                          style="cursor: pointer" ng-repeat="item in sortedVS" ng-click="selectVSItem(item)">
                                         <div>{{item.display}}</div>
                                         <div class="pull-right"><em>{{item.vs.meta.lastUpdated | ageSeconds}}</em></div>
@@ -261,10 +266,25 @@
                                 <tr>
                                     <td>Id</td>
                                     <td>
-                                        <input type="text"
-                                               ng-disabled="! isNew"
-                                               ng-blur = checkNewVS(input.id)
-                                               class="form-control" ng-model="input.id"/>
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <input type="text"
+                                                       ng-disabled="! isNew"
+                                                       ng-blur = checkNewVS(input.id)
+                                                       class="form-control" ng-model="input.id"/>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <button
+                                                        ng-click="showLink(input.id)"
+                                                        class="pull-right btn btn-link">Link to ValueSet</button>
+                                            </div>
+                                        </div>
+
+
+
+
+
+
                                     </td>
                                 </tr>
 
@@ -691,6 +711,30 @@
 
 
 
+        </uib-tab>
+        <uib-tab  heading="Test ECL">
+            <br/>
+            <div class="row">
+                <div class="col-md-5">
+                    <textarea class="form-control" rows=10 ng-model="input.testECL"></textarea>
+
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-link" ng-click="testECL(input.testECL)">Expand</button>
+
+                </div>
+                <div class="col-md-5">
+                    <table class="table-bordered table">
+                        <tr ng-repeat = 'concept in testECLData.expansion.contains'>
+                            <td>{{concept.display}}</td>
+                            <td>{{concept.code}}</td>
+                            <td>{{concept.system}}</td>
+                        </tr>
+                    </table>
+
+
+                </div>
+            </div>
         </uib-tab>
 
         <uib-tab ng-if = "false" heading="Unpublished codes">

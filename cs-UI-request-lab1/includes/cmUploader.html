@@ -148,6 +148,26 @@
         </table>
       </uib-tab>
 
+
+      <uib-tab ng-if="conceptMap" heading="ValueSets used">
+        <br/>
+        <table class="table table-bordered">
+          <tr><th>ValueSet Name</th><th>Rows where referenced</th></tr>
+          <tr ng-repeat="item in lstVSUsed">
+            <td>
+              <div  class="clickable" ng-click="viewVS(item.url)">{{item.url}}</div>
+
+            </td>
+            <td>
+              <div ng-repeat="row in item.rows">
+                {{row.type}}: {{row.row}} <span ng-show="row.target">(target = <span class="clickable" ng-click="viewVS(row.target)">{{row.target}}</span>)</span>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+      </uib-tab>
+
       <uib-tab ng-if="conceptMap" heading="ConceptMap Json">
         <pre>{{conceptMap | json}}</pre>
       </uib-tab>
