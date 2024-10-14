@@ -420,12 +420,18 @@ angular.module("pocApp")
             //=============================
 
             $scope.getMemberCountDate = function () {
-                return $localStorage.memberCount.date
+                if ($localStorage.memberCount) {
+                    return $localStorage.memberCount.date
+                }
+
             }
 
             $scope.getMCOneVS = function (url) {
-                let count = $localStorage.memberCount.members[url]
-                return count || ''
+                let count = ""
+                if ($localStorage.memberCount) {
+                    count = $localStorage.memberCount.members[url]
+                }
+                return count
             }
 
             $scope.updateAllMemberCount = function () {

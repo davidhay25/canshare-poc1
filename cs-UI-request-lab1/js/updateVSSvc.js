@@ -92,8 +92,12 @@ angular.module("pocApp")
                 return downLoad
 
                 function getMC(url) {
-                    let mc = memberCount.members[url]
-                    return mc || ""
+
+                    if (memberCount) {
+                        return memberCount.members[url]
+                    }
+
+                    return ""
 
                 }
 
