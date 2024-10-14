@@ -16,7 +16,7 @@ angular.module("pocApp")
         let extMemberCount = "http://canshare.co.nz/fhir/StructureDefinition/vs-expanded-count"
 
         return {
-            getMemberCount : function (vs) {
+            getMemberCountDEP : function (vs) {
                 if (vs && vs.extension) {
                     for (ext of vs.extension) {
                         if (ext.url == extMemberCount) {
@@ -27,7 +27,7 @@ angular.module("pocApp")
                 }
                 return ""
             },
-            setMemberCount : function (vs,count) {
+            setMemberCountDEP : function (vs,count) {
                 vs.extension = vs.extension  || []
                 let found = false
                 for (ext of vs.extension) {
@@ -42,7 +42,7 @@ angular.module("pocApp")
                 }
 
             },
-            makeDownload : function (arItem) {
+            makeDownload : function (arItem,memberCount) {
                 let that = this
                 let ar = []
                 ar.push(`Url\tId\tStatus\tTitle\tDescription\tLastUpdated\tECL\tMember count\tUpdated display\tUnpublished codes\n`)
@@ -56,7 +56,8 @@ angular.module("pocApp")
                     lne += `\t${tidyText(vs.description)}`
                     lne += `\t${vs.meta.lastUpdated}`
                     lne += `\t${that.getEcl(vs)}`
-                    lne += `\t${that.getMemberCount(vs)}`
+
+                    lne += `\t${getMC(vs.url)}`
                     //lne += `\t"line1\nline2\nline3"`
 
                     let arUpd = getUpdatedDisplay(vs)
@@ -82,11 +83,19 @@ angular.module("pocApp")
                     }
 
 
+
+
+
                     ar.push(lne)
                 })
                 let downLoad = ar.join('\n')
                 return downLoad
 
+                function getMC(url) {
+                    let mc = memberCount.members[url]
+                    return mc || ""
+
+                }
 
                 function getUnpublishedCodes(vs) {
                     let ar = []

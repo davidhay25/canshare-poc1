@@ -119,18 +119,10 @@ angular.module("pocApp")
                 $scope.arLog = vo1.log
 
 
-
-/*
-                arLines.forEach(function (lne,ctr) {
-                    console.log(ctr+3, lne)     //
-                })
-*/
-                //let ar = arLines[0].split('\t')
-                //console.log(ar)
                 $localStorage.previousCMSS = arLines
 
                 let vo = terminologyUpdateSvc.makeCM(arLines)
-               // console.log(vo.cm)
+
                 $scope.conceptMap = vo.cm
 
             }
@@ -168,15 +160,7 @@ angular.module("pocApp")
                 textarea.scrollTop = 0;  // Scroll to the top
                 }, 0);  // Wait for the paste to complete before updating the model
 
-                //return
-                /*
-                var textarea = event.target;
-                setTimeout(function() {
-                    $scope.$apply(function() {
-                        $scope.input.cmData = textarea.value;
-                    });
-                }, 0);  // Wait for the paste to complete before updating the model
-                */
+
             }
 
 
@@ -435,6 +419,92 @@ angular.module("pocApp")
 
             //=============================
 
+            $scope.getMemberCountDate = function () {
+                return $localStorage.memberCount.date
+            }
+
+            $scope.getMCOneVS = function (url) {
+                let count = $localStorage.memberCount.members[url]
+                return count || ''
+            }
+
+            $scope.updateAllMemberCount = function () {
+                let msg = `This will determine the count of all ValueSet concepts. It can take up to 5 minutes to complete (depending on the size). Are you sure you wish to do this.`
+                if (confirm(msg)) {
+
+                    $scope.showWaiting = true
+                    $scope.showGettingMC = true
+                    let jobId  //the job assigned to the long running job on the server
+                    let intervalPromiseVS //the polling interval
+
+                    // Cancel the interval on scope destroy to avoid memory leaks
+                    $scope.$on('$destroy', function() {
+                        if ($scope.running) {
+                            $interval.cancel(intervalPromiseVS);
+                        }
+                    });
+
+                    let url = `/memberCount`
+                    $http.get(url).then(
+                        function (data) {
+                            jobId = data.data.jobId
+
+                            intervalPromiseVS = $interval(function() {
+                                let qry = `/job/status/${jobId}`
+                                $http.get(qry).then(
+                                    function (data) {
+                                        let jobStatus = data.data
+                                        $scope.mcProgress = jobStatus.progress
+
+                                            console.log(data.data)
+
+                                            if (data.data.status == 'complete' ) {
+                                                stopUIDisplay(intervalPromiseVS)
+                                                delete $scope.mcProgress
+                                                if (jobStatus.errors && jobStatus.errors.length > 0) {
+                                                    $scope.batchVsErrors = jobStatus.errors
+                                                    alert("There were errors - see the error tab.")
+                                                }
+
+                                                let hashCount = {}
+                                                for (const item of jobStatus.result) {
+                                                    hashCount[item.url] = item.count
+                                                }
+
+
+                                                $localStorage.memberCount = {date: new Date(),members:hashCount}
+                                                $scope.makeVSDownload()
+                                                alert("The update is complete.")
+                                            }
+                                    }, function (err) {
+                                        alert(angular.toJson(err.data))
+                                    }
+                                )
+
+
+                            }, 1000);
+
+                            console.log(data.data)
+                        },function (err) {
+                            alert(angular.toJson(err.data))
+                        })
+
+
+
+                }
+
+                function stopUIDisplay(intervalPromise) {
+                    $interval.cancel(intervalPromise);
+                    $scope.showWaiting = false
+
+                    $scope.showGettingMC = false
+                }
+            }
+
+
+
+            //-------------------
+
             $scope.setSyndicationStatus = function () {
                 if (confirm("Are you sure you wish to set the syndication status for all resources. This will take over a minute.")) {
                     $scope.showWaiting = true
@@ -540,16 +610,20 @@ angular.module("pocApp")
                     console.log(updateBatch)
 
 
-                    return
+                    //return
 
 
                     let url = `/nzhts/bundlewait`
-                    $http.post(url,$scope.vsBatch).then(
+
+                    $http.post(url,updateBatch).then(
                         function (data) {
+
                             let jobStatus = data.data
                             if (jobStatus.errors && jobStatus.errors.length > 0) {
                                 $scope.unpublishedUploadErrors = jobStatus.errors
                                 alert("There were errors - see the error tab.")
+                            } else  {
+                                alert("Update complete.")
                             }
 
                         }, function (err) {
@@ -564,7 +638,6 @@ angular.module("pocApp")
             $scope.selectFromUnpublished = function (vs) {
                 $scope.selectVSItem({vs:vs})
                 $scope.input.topTabActive = 0
-
             }
 
             //===========================
@@ -623,16 +696,20 @@ angular.module("pocApp")
             }
             
 
+            $scope.makeVSDownload = function() {
+                //create download
+                let download = updateVSSvc.makeDownload($scope.allVSItem,$localStorage.memberCount)
+
+                $scope.downloadLinkCsv = window.URL.createObjectURL(new Blob([download ],{type:"text/tsv"}))
+                $scope.downloadLinkCsvName = `allValueSets.tsv`
+
+            }
 
             getValueSets().then(
                 function (ar) {
                     $scope.allVSItem = ar
 
-                    //create download
-                    let download = updateVSSvc.makeDownload($scope.allVSItem)
-
-                    $scope.downloadLinkCsv = window.URL.createObjectURL(new Blob([download ],{type:"text/tsv"}))
-                    $scope.downloadLinkCsvName = `allValueSets.tsv`
+                    $scope.makeVSDownload()
 
                     //console.log(ar)
                     delete $scope.showLoadingMessage
@@ -997,7 +1074,7 @@ angular.module("pocApp")
 
             //update the member count for the selected VS. Adds the membercount extension
             //not currently used...
-            $scope.updateMemberCount = function (vs) {
+            $scope.updateMemberCountDEP = function (vs) {
 
                 let qry = `ValueSet/$expand?url=${vs.url}&_summary=false&displayLanguage=${nzDisplayLanguage}`
                 let currentMemberCount = updateVSSvc.getMemberCount(vs)
@@ -1046,7 +1123,7 @@ angular.module("pocApp")
             }
 
 
-            $scope.getMemberCount = function (vs) {
+            $scope.getMemberCountDEP = function (vs) {
                 return updateVSSvc.getMemberCount(vs)
               /*  if (vs && vs.extension) {
                     for (ext of vs.extension) {

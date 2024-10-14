@@ -148,13 +148,6 @@
         </div>
     </nav>
 
-
-
-    <a class="btn btn-primary pull-right"  download="{{downloadLinkCsvName}}"
-       href="{{downloadLinkCsv}}" title="{{downloadLinkCsvName}}" >
-        Download VS list
-    </a>
-
     <button ng-hide = "showWaitingTimeout" style="margin-right: 8px"
             ng-click="setSyndicationStatus()"
             class="btn-danger btn pull-right">Set Syndication status</button>
@@ -737,9 +730,43 @@
             </div>
         </uib-tab>
 
-        <uib-tab ng-if = "false" heading="Unpublished codes">
+        <uib-tab heading="Table">
+            <br/>
+            <div class="row">
+                <div class="col-md-6">
+                    Member count last updated: {{getMemberCountDate() | date}}
 
-            <ng-include src="'/includes/unpublishedCodes.html'"></ng-include>
+                    <button class="btn btn-link"
+                            ng-hide = "showGettingMC"
+                            ng-click="updateAllMemberCount()">Update member count</button>
+
+                    <button class="btn btn-info pull-right" ng-if = "showGettingMC" style="margin-right: 8px">
+                        Updating member count.  {{mcProgress}}
+                    </button>
+
+
+                </div>
+                <div class="col-md-6">
+                    <a ng-show="downloadLinkCsvName" class="btn btn-link pull-right"  download="{{downloadLinkCsvName}}"
+                       href="{{downloadLinkCsv}}" title="{{downloadLinkCsvName}}" >
+                        Download VS list
+                    </a>
+                </div>
+            </div>
+
+
+            <table class="table table-bordered">
+                <tr
+                        ng-class="{retiredVS:item.vs.status == 'retired',draftVS:item.vs.status == 'draft'}"
+                        ng-repeat="item in allVSItem">
+                    <td>{{item.vs.title}}</td>
+                    <td>{{item.vs.description}}</td>
+                    <td>{{item.vs.status}}</td>
+                    <td>{{getMCOneVS(item.vs.url)}}</td>
+                </tr>
+            </table>
+
+
 
 
 

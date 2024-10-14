@@ -102,7 +102,7 @@ function setup(app) {
 
             }
 
-console.log('ver',csVersion)
+//console.log('ver',csVersion)
 
             //get all the CanShare valuesets...
             axios.get(qry,config).then(async function(data) {
@@ -163,16 +163,20 @@ console.log('ver',csVersion)
 
                 //now expand it
                 let vsExpandQry = `https://authoring.nzhts.digital.health.nz/fhir/ValueSet/$expand?url=${url}`
-                console.log(vsExpandQry)
+                //console.log(vsExpandQry)
                 let result = await axios.get(vsExpandQry,config)
 
                 arLog.push(`There are ${result.data.expansion.total} concepts in the ValueSet expansion (ie codes that are in a VS as unpublished, but have been published since the VS was updated)`)
 
                 //create a hash for the concepts that are now in the TS - ie all those that are in the VS expansion
                 let hasCodesNowInTS = {}
-                result.data.expansion.contains.forEach(function (concept) {
-                    hasCodesNowInTS[concept.code] = concept
-                })
+
+                if (result.data.expansion && result.data.expansion.contains) {
+                    result.data.expansion.contains.forEach(function (concept) {
+                        hasCodesNowInTS[concept.code] = concept
+                    })
+                }
+
 
                 //now we can create the CodeSystem - and the hash which has the codes the are in the TS so cab ne removed from the
                 let hashStillUnpublished = {}   //the concepts that remain unpublished
@@ -181,7 +185,7 @@ console.log('ver',csVersion)
                 cs.name = "Canshare_unpublished_concepts"
                 cs.title = "Concepts that are not yet formally published"
                 cs.url = "http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished"
-                cs.identifier = {value:cs.id,system:"http://canshare.co.nz/fhir/NamingSystem/codesystems"}
+                cs.identifier = [{value:cs.id,system:"http://canshare.co.nz/fhir/NamingSystem/codesystems"}]
                 cs.publisher = "Te Aho o Te Kahu"
                 cs.caseSensitive = true
                 cs.content = "complete"
@@ -311,7 +315,7 @@ console.log('ver',csVersion)
 
                         if (expandedVS.expansion && expandedVS.expansion.contains) {
                             analysis.vsLength.push({url:expandedVS.url,title:vs.title,expandedCount:expandedVS.expansion.contains.length})
-                            console.log(qryVs,expandedVS.url,expandedVS.expansion.contains.length)
+                       //     console.log(qryVs,expandedVS.url,expandedVS.expansion.contains.length)
                             for (const concept of expandedVS.expansion.contains) {
                                 let key = `${concept.system}|${concept.code}|`
                                 analysis.conceptVS[key] = analysis.conceptVS[key] || {concept:concept,vs:[]}
@@ -629,29 +633,27 @@ console.log('ver',csVersion)
             let vs = entry.resource
             if (vs.status !== 'retired') {
                 let vsExpandQry = `https://authoring.nzhts.digital.health.nz/fhir/ValueSet/$expand?url=${vs.url}&_summary=false`
-                console.log(vsExpandQry)
                 try {
                     let result = await axios.get(vsExpandQry,config)
-                    console.log(result.data)
+
                     jobs[jobId].result.push({url:vs.url,count:result.data.expansion.total})
                 } catch (ex) {
                     //If the expansion fails, record that in the result
                     jobs[jobId].result.push({url:vs.url,count:-1})
-
                 }
 
                 jobs[jobId].progress = ` ${ctr}/${cnt}`
-                console.log(entry.resource.id)
+                //console.log(entry.resource.id)
 
                 ctr++
 
             }
             if (ctr > 20) {
-                break
+              //  break
             }
 
         }
-        console.log(jobs[jobId])
+        //console.log(jobs[jobId])
 
         jobs[jobId].status = `complete`
     }
@@ -697,7 +699,7 @@ console.log('ver',csVersion)
                 let jobId = Object.keys(jobs).length + 1 //Job id is the new length of the jobs hash
                 jobs[jobId] = {status:'active',description:"Process bundle"}
 
-                //an async call, but we won't wait
+                //Let the job complete
                 await processPutBundleJob(token,jobId,bundle)
 
                 res.json(jobs[jobId])

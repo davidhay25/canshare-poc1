@@ -23,7 +23,9 @@
 
     <div ng-show = "unpublishedReport">
       <br/>
-      <button class="btn btn-danger pull-right" ng-click="updateUnpublished()">Update Server</button>
+      <button class="btn btn-danger pull-right"
+              ng-if="unpublishedReport.updateBatch.entry.length > 0"
+              ng-click="updateUnpublished()">Update Server</button>
 
     </div>
 
@@ -121,12 +123,7 @@
 
     </uib-tab>
 
-    <!--
-    <uib-tab heading="Originals">
-      {{Object.keys(unpublishedReport.hashOriginal).length}}
-      <pre>{{unpublishedReport.hashOriginal | json}}</pre>
-    </uib-tab>
--->
+
 
   </uib-tabset>
 

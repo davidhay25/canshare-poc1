@@ -18,11 +18,22 @@ angular.module("pocApp")
         extExtractionContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
         extHidden = "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
 
+        //this specifies a specific value or an expression to set the value
         extExtractionValue = "http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue"
 
         //let extGtableUrl = ""
        // let extSourceQuery = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-sourceQueries"
         systemItemControl = "http://hl7.org/fhir/questionnaire-item-control"
+
+
+        //resources that have the patient reference attached.
+        //todo - might want to externalize into a config file ot similar
+        //todo - anf maybe for references outside of patient ones...
+        let resourcesForReference = {}
+        resourcesForReference['Observation'] = {path:'subject'}
+        resourcesForReference['Condition'] = {path:'subject'}
+        resourcesForReference['MedicationStatement'] = {path:'subject'}
+        resourcesForReference['Patient'] = {}   //treated as a special case
 
         function capitalizeFirstLetter(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
@@ -50,21 +61,50 @@ angular.module("pocApp")
 
 
 
-        function addFixedValue(item,definition,value,type) {
-            //add a fixed value extension
+        function addFixedValue(item,definition,type,value,expression) {
+            //add a fixed value extension. Can either be a value or an expression
 
             //http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue
             let ext = {url:extExtractionValue,extension:[]}
             ext.extension.push({url:"definition",valueCanonical:definition})
 
-            let child = {url:'fixed-value'}
-            child[`value${type}`] = value
-            ext.extension.push(child)
+            if (value) {
+                let child = {url:'fixed-value'}
+                child[`value${type}`] = value
+                ext.extension.push(child)
+            } else if (expression){
+                let child = {url:'expression'}
+                child[`value${type}`] = expression
+                ext.extension.push(child)
+            } else {
+                return  //todo shoul add error...
+            }
+
 
             item.extension = item.extension || []
             item.extension.push(ext)
 
         }
+
+        function addReference(item,definition,type,expression) {
+            //add a fixed value extension. Can either be a value or an expression
+
+            //http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue
+            let ext = {url:extExtractionValue,extension:[]}
+            ext.extension.push({url:"definition",valueCanonical:definition})
+
+
+            let child = {url:'expression'}
+            child[`valueExpression`] = {language:"text/fhirpath",expression:expression}
+            ext.extension.push(child)
+
+
+            item.extension = item.extension || []
+            item.extension.push(ext)
+
+        }
+
+
 
         function addUseContext(Q) {
             //adds the use context for the FHIRPath Lab. Need to configure this in some way
@@ -482,8 +522,6 @@ angular.module("pocApp")
                 let report = {entries:[]}
                 let thing = {text:Q.name}
 
-
-
                 //see if there is an extraction context on the Q
 
 
@@ -521,10 +559,11 @@ angular.module("pocApp")
                     thing.mult = mult
 
                     //look for fixed values. These are values with answerOption, and initialSelected set
+                    //todo fix!! answerOption is an array....
                     if (item.answerOption) {
                         //currently only using code & CodeableConcept
                         Object.keys(item.answerOption).forEach(function (key) {
-                            console.log(key)
+                            //console.log(key)
                             if (item.answerOption[key].initialSelected) {
                                 console.log(item.answerOption[key])
                                 let opt = item.answerOption[key]
@@ -594,6 +633,8 @@ angular.module("pocApp")
                 //strategy is to gather the DG from the comp sections, create DG Qs then assemble them into the comp Q
                 //assumption is that the composition itself doesn't change the DG contents - it is just a selector of DGs
 
+                //automatically adds the tab container level so UI has tabs for sections
+
                 let that = this
                 let errorLog = []
                 let allEW = []      //all EnableWhens - for validation
@@ -622,7 +663,6 @@ angular.module("pocApp")
                 }
 
                 //http://hl7.org/fhir/ValueSet/questionnaire-item-control
-                //
                 containerSection.extension.push(ext)
 
                 Q.item.push(containerSection)
@@ -660,6 +700,12 @@ angular.module("pocApp")
 
                             let config = {expandVS:true,enableWhen:true,pathPrefix : pathPrefix,calledFromComp:true}
                             config.hashAllDG = hashAllDG
+
+                            const guid = crypto.randomUUID();
+                            console.log(guid);
+
+
+                            config.patientId = guid //'testPatient'    //will be a uuid
                             //If there's a type value on the DG, this is the FHIR resource type that can be extracted from it
                        /*     if (dg.type) {
                                 config.fhirType = dg.type
@@ -718,7 +764,6 @@ angular.module("pocApp")
                                 sectionItem.item.push(child)
                             }
 
-
                         }
                     }
 
@@ -741,6 +786,7 @@ angular.module("pocApp")
             makeHierarchicalQFromDG : function  (lstElements,config) {
                 //Used in the new Q renderer
                 //config.enableWhen will cause the enableWhens to be set
+                //config.patientId is the patient id to use for the fixed value extension
                 //config.pathPrefix is used for enable when targets. Only used from composition. It may be null
                 let pathPrefix = ""
                 if (config.pathPrefix) {
@@ -993,6 +1039,10 @@ angular.module("pocApp")
                     }
                     let edType = ed.type[0]
 
+                    const guid = crypto.randomUUID();
+                    console.log(guid);
+
+                    let patientId = guid// "patient-id"    //todo - should be a guid...
 
                     //console.log(edType)
 
@@ -1000,6 +1050,43 @@ angular.module("pocApp")
                     if (config.hashAllDG[edType]) {
 
                         console.log("is DG", config.hashAllDG[edType])
+
+                        //This is a resource that should have a patient reference
+                        let referencedDG = config.hashAllDG[edType]
+                        console.log(referencedDG)
+                        if (resourcesForReference[referencedDG.type]) {
+                            let refConfig = resourcesForReference[referencedDG.type]
+                            console.log('for patref --->',edType)
+
+                            if (referencedDG.type == 'Patient') {
+                                //set the patient id...
+                                let definition = `http://hl7.org/fhir/StructureDefinition/Patient#Patient.id`         //path in
+                                let type = "Id"
+                                let value = patientId //`Patient/${patientId}`
+
+                                //addReference(item,definition,type,expression)
+
+
+                                addFixedValue(item,definition,type,value)
+                            } else {
+                                ///\"http://hl7.org/fhir/StructureDefinition/Patient#Patient.identifier.system"
+                                let definition = `http://hl7.org/fhir/StructureDefinition/${referencedDG.type}#${referencedDG.type}.subject.reference`         //path in
+                                let type = "String"
+                                let value = patientId //`Patient/${patientId}`
+
+                                //addReference(item,definition,type,expression)
+
+
+                                addFixedValue(item,definition,type,value)
+
+                            }
+
+
+
+
+                        }
+
+
                         //this ed is a child ED. Des this DG have an extraction context? Curentlly a FHIR resource, but could be a profile
 
                         //is there an extraction context (dg.type) on this DG or any of its parents
@@ -1090,10 +1177,8 @@ angular.module("pocApp")
                             let ar = extractionContext.split('/')
                             let canonical = `${extractionContext}#${ar[ar.length-1]}.identifier.system`
                             console.log(canonical)
-                            addFixedValue(item,canonical,ed.identifierSystem,"String")
-                           // addFixedValue(item,``,value,type)
+                            addFixedValue(item,canonical,"String",ed.identifierSystem)
                         }
-                        //addFixedValue(item,definition,value,type)
                     }
 
                     if (edType == 'CodeableConcept') {
@@ -1180,7 +1265,7 @@ angular.module("pocApp")
                         */
                     }
 
-                    //This is a pre-pop extression
+                    //There is a pre-pop extression
                     if (ed.prePop) {
                         //let ext = {url:extPrePopUrl}
                         let ext = {url:extInitialExpressionUrl}
@@ -1215,6 +1300,7 @@ angular.module("pocApp")
                         item.extension.push(ext)
 
                     }
+
 
 
                     //important that this segment is the last as it can adjust items (eg the valueset stuff)
