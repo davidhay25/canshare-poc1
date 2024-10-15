@@ -756,9 +756,11 @@
 
 
             <table class="table table-bordered">
+                <tr><th>Id</th><th>Title</th><th>Description</th><th>Status</th><th>Count</th></tr>
                 <tr
                         ng-class="{retiredVS:item.vs.status == 'retired',draftVS:item.vs.status == 'draft'}"
                         ng-repeat="item in allVSItem">
+                    <td>{{item.vs.id}}</td>
                     <td>{{item.vs.title}}</td>
                     <td>{{item.vs.description}}</td>
                     <td>{{item.vs.status}}</td>
