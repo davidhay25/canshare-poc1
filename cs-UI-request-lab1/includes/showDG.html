@@ -258,6 +258,15 @@
                 <tr ng-if="selectedModel.checkedOut"><td>Checked out</td>
                   <td>{{selectedModel.checkedOut}}</td></tr>
 
+                <tr ng-if="selectedModel.namedQueries"><td>Named Queries</td>
+                  <td>
+                    <div ng-repeat = "nq in selectedModel.namedQueries">
+                      {{nq}}
+                    </div>
+
+                  </td>
+                </tr>
+
               </table>
 
             </div>
@@ -588,28 +597,28 @@
                     </td>
                   </tr>
 
+                  <tr>
+                    <td class="detailName">Source reference</td>
+                    <td>
+
+                      {{selectedNode.data.ed.sourceReference}}
+                    </td>
+                  </tr>
+
 
                   <tr ng-if="selectedNode.data.ed.definition">
-                    <td class="detailName">Definition</td>
+                    <td class="detailName">Extraction</td>
                     <td>
 
                       {{selectedNode.data.ed.definition}}
                     </td>
                   </tr>
 
+
                   <tr ng-if="selectedNode.data.ed.extractExtensionUrl">
                     <td class="detailName">Extension Url</td>
                     <td>
                       {{selectedNode.data.ed.extractExtensionUrl}}
-                    </td>
-                  </tr>
-
-
-                  <tr>
-                    <td class="detailName">Source reference</td>
-                    <td>
-
-                      {{selectedNode.data.ed.sourceReference}}
                     </td>
                   </tr>
 

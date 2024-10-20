@@ -6,6 +6,7 @@ angular.module("pocApp")
             $scope.input = {}
 
 
+
             $scope.input.collapsibleOptions = ['default-open','default-closed']
 
             //need a default base for editing
@@ -20,6 +21,7 @@ angular.module("pocApp")
             }
             $scope.fullElementList = fullElementList
             let dgName = fullElementList[0].ed.path     //it's aways the first element in the list...
+            let dg = hashAllDG[dgName]
 
             $scope.options = []     //a list of options. Will be saved as ed.options
             $scope.units = [] //a list of units. Will be saved as ed.units
@@ -486,9 +488,38 @@ angular.module("pocApp")
                 }
 
             }
-            
-            $scope.testPrePop = function (prePop,displayElement) {
+
+            //test that the pre-pop expression is valid
+            //todo maybe compile the expression with js path
+            $scope.testPrePop = function (expression,displayElement) {
                 delete $scope.testPPResult
+                $scope.testPPResultOutcome = "fail"
+
+                let validNames = ['patient','user','encounter']
+                if (dg && dg.namedQueries) {
+                    validNames.push(...dg.namedQueries)
+                }
+
+                if (expression.slice(0,1) !== '%') {
+                    $scope.testPPResult = "Expression should start with '%{variable} eg %patient.name"
+                    //alert("Expression should start with '%{variable} eg %patient.name")
+                    return
+                }
+
+                let ar = expression.split('.')
+                let variableName = ar[0].slice(1)       //drop the %
+                if (validNames.indexOf(variableName) == -1) {
+                    $scope.testPPResult = `The valid variable names are ${validNames.join(', ')}`
+                   // alert(`The valid variable names are ${validNames.join(', ')}`)
+                    return
+                }
+
+                $scope.testPPResultOutcome = "pass"
+                $scope.testPPResult = "Valid"
+
+
+
+                /*
                 let expression = `%Launch${prePop}`
                 let qry = `/Q/prePop?fp=${expression}&ts=${new Date().toISOString()}`
                 $http.get(qry).then(
@@ -501,6 +532,8 @@ angular.module("pocApp")
                         console.log(err)
                     }
                 )
+
+                */
             }
 
             $scope.save = function() {

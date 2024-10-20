@@ -1,3 +1,6 @@
+
+
+
 angular.module("pocApp")
     .controller('formViewerCtrl',
         function ($scope,$http,$uibModal,$localStorage,$q,makeQuestionnaireSvc,snapshotSvc,modelCompSvc) {
@@ -70,7 +73,7 @@ angular.module("pocApp")
                 $scope.selectedModel = dg
                 $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name,dg)// vo.allElements
 
-                makeQuestionnaireSvc.makeHierarchicalQFromDG($scope.fullElementList,$scope.hashAllDG,function (Q) {
+                makeQuestionnaireSvc.makeHierarchicalQFromDG(dg,$scope.fullElementList,$scope.hashAllDG,function (Q) {
                     $scope.Q = Q
                     if ($scope.input.autoClipboard) {
                         localCopyToClipboard(angular.toJson($scope.Q,true))

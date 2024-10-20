@@ -1,6 +1,7 @@
 angular.module("pocApp")
     .controller('editDGCtrl',
-        function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc,snapshotSvc, parent,modelDGSvc) {
+        function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc,snapshotSvc, parent,modelDGSvc,$http) {
+
             $scope.model=model
             $scope.input = {}
             $scope.edit = {}
@@ -38,7 +39,52 @@ angular.module("pocApp")
                     getFullElementList()    //update the full element list
                 }
             }
-            
+
+
+            //Load all the Named queries
+            function loadNamedQueries() {
+                let qry = "/model/namedquery"
+                $http.get(qry).then(
+                    function (data) {
+                        $scope.namedQueries = data.data
+
+                        //todo - what happens when a NQ definition is deleted?
+                        $scope.input.nq = {}    //this is a hash of all named queries in the model
+                        if ($scope.model && $scope.model.namedQueries) {
+                            for (const nqName of $scope.model.namedQueries) { //the dg has only the name
+                                $scope.input.nq[nqName] = true
+                            }
+                        }
+
+
+/*
+                        $scope.hashNamedQueries = {}
+                        data.data.forEach(function (nq) {
+                            $scope.hashNamedQueries[nq.name] = nq
+                        })
+*/
+
+                       // $scope.nqCanAdd = []
+
+
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+            }
+            loadNamedQueries()
+
+            /*
+                        $scope.addNQ = function (nq) {
+
+                           // $scope.model.namedQueries = $scope.model.namedQueries || []
+                           // $scope.model.namedQueries.push(nq.name)
+
+                            $scope.model.prePopQuery = nq.name
+
+                        }
+
+                        */
 
             //check that there isn't a circular loop. Each DG should only once in the hierarchy
             function checkParentalHierarchy(parentName) {
@@ -78,7 +124,7 @@ angular.module("pocApp")
 
             }
 
-            //start with the DGs...
+
             //create the list of DG's that can be added as child elements. Don't include this one...
             if (isNew) {
                 $scope.input.types = Object.keys(hashTypes) //an array for the new type dropdown
@@ -103,33 +149,22 @@ angular.module("pocApp")
 
 
             function getFullElementList() {
-
-
-
-
                 if ($scope.model.name) {    //if creating a new child (with a parent) the name may not be there - or if the parent is set before the name
-                    //let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
-                    //$scope.allElements = vo.allElements
-
                     $scope.allElements = snapshotSvc.getFullListOfElements($scope.model.name)// vo.allElements
 
                 }
-
-                //console.log(vo)
-
-
             }
 
             //if not new, set the UI names & parent
+            //the editing is directly on the $scope.model (there's an onchange handler that updates it as these values are changed
             if (! isNew) {
-
-                //remove this model type from the list of possible models
-
 
                 $scope.input.newModelName = model.name
                 $scope.input.newModelTitle = model.title
                 $scope.input.sourceReference = model.sourceReference
                 $scope.input.newModelDescription = model.description
+
+                $scope.input.namedQueries = model.namedQueries          //the array of named queries this DG requires...
                 $scope.input.type = model.type
                 if (model.parent) {
                     $scope.input.newModelParent = model.parent
@@ -139,7 +174,6 @@ angular.module("pocApp")
               
             } else {
                 if (parent) {
-                    //$scope.input.newModelParent = model.parent
                     //if there's a parent passed in for a new DG, then set the parent dropdown
 
                     for (name of $scope.input.possibleParents) {
@@ -155,23 +189,14 @@ angular.module("pocApp")
 
 
 
-
-            //$scope.input.valueSets = Object.keys(hashValueSets)
-           // $scope.input.valueSets.sort()
-
-
             $scope.input.cards = ["0..1","1..1","0..*",'1..*']
             $scope.input.card = $scope.input.cards[0]
 
 
-            $scope.tabSelected = function (tab) {
+            $scope.tabSelectedDEP = function (tab) {
                 $scope.selectedTab = tab
             }
 
-
-            $scope.checkItemName = function () {
-                
-            }
 
             $scope.canEdit = function (element) {
                 //can the element be overridden - ie it comes from a referenced datatype not defined directly on the model
@@ -189,9 +214,6 @@ angular.module("pocApp")
                 $scope.model.title = $scope.model.title || $scope.model.name
                 $scope.input.newModelTitle = $scope.model.title
                 getFullElementList()
-
-
-
 
             }
 
@@ -238,7 +260,6 @@ angular.module("pocApp")
             //return true if there is an override element in the model for this path..
             $scope.hasBeenOverridden = function(element) {
                 //the path in the model.diff won't have the first field
-//console.log(element)
                 if (! $scope.model || !$scope.model.diff) {
                     //when adding a new DG
                     return false
@@ -362,9 +383,6 @@ angular.module("pocApp")
                     $scope.input.title = name.charAt(0).toUpperCase() + name.slice(1)
                 }
 
-
-                //check to see if this name is the same as an inherited one
-                //checkDuplicatePath(name)
             }
 
             //add a new item
@@ -374,26 +392,13 @@ angular.module("pocApp")
                 //$scope.model.status = 'changed'
                 element.path = $scope.input.path
                 element.title = $scope.input.title
-                //element.sourceReference = $scope.input.sourceReference
                 element.type = [$scope.input.type]
                 element.description = $scope.input.description
-                /*
-                                if ($scope.input.valueSet) {
-                                    element.valueSet = $scope.input.valueSet
-                                }
 
-                                if ($scope.input.code) {
-                                    element.code = [{code:$scope.input.code}]
-                                }
-                */
                 element.mult = $scope.input.card
                 $scope.model.diff = $scope.model.diff || []
                 $scope.model.diff.push(element)
-/*
-                $scope.model.changes = $scope.model.changes || []
-                msg = `Added new element`
-                $scope.model.changes.push({edPath: element.path, msg:msg})
-*/
+
                 delete $scope.input.path
                 delete $scope.input.title
                 delete $scope.input.type
@@ -403,7 +408,6 @@ angular.module("pocApp")
 
                 getFullElementList()
             }
-
 
 
             $scope.remove = function (inx) {
@@ -429,6 +433,16 @@ angular.module("pocApp")
 
             $scope.save = function () {
                 $scope.model.type = $scope.input.type
+
+                //update the named queries
+                delete $scope.model.namedQueries
+                for (const key of Object.keys($scope.input.nq)) {
+                    if ($scope.input.nq[key]) {
+                        $scope.model.namedQueries = $scope.model.namedQueries || []
+                        $scope.model.namedQueries.push(key)
+                    }
+                }
+
                 if (isNew) {
                     if ($scope.isUnique) {
                         $scope.model.diff = $scope.model.diff || []

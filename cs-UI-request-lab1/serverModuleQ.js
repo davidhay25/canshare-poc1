@@ -8,12 +8,12 @@ const sample = require("./artifacts/sampleBundle.json")
 
 
 function setup(app) {
-    app.get('/Q/prepop',async function(req,res){
+    app.get('/Q/prepopDEP',async function(req,res){
         let fp = req.query.fp
 
         console.log(fp)
 
-        //the fp will be appropriate from within a Q - eg %LaunchPatient.identifier.first().value
+        //the fp will be appropriate from within a Q - eg %patient.identifier.first().value
         //we need to convert it into a form to query a Bundle Bundle.entry.resource.where(resourceType='Patient').identifier.first().value
         //This will be a likely implementer pattern - retrieve the candidate bundle (eg resources associated
         //with a path request) when execute the queries against that todo: ? a blog post

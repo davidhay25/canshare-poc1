@@ -15,7 +15,7 @@
 
 <div>
   <div class="row">
-    <div class="col-md-4 col-sm-4">
+    <div ng-class="leftPane">
 
       <div class="myScroll">
         <div id="designTree"></div>
@@ -34,7 +34,13 @@
 
 
     </div>
-    <div class="col-md-4  col-sm-4">
+    <div ng-class="middlePane">
+
+
+      <div  ng-if="selectedItemFromOO" heading="Item">
+        <pre>{{selectedItemFromOO | json}}</pre>
+      </div>
+
 
       <div class="rounded-box">
         <div class="pull-right btn btn-link" ng-click="prePop()">Pre-pop</div>
@@ -51,7 +57,7 @@
 
 
     </div>
-    <div class="col-md-4  col-sm-4">
+    <div ng-class="rightPane">
 
       <div class="rounded-box">
         <div class="pull-right"><img ng-if="savingQ" src="css/ajax_loader_blue_32.gif"/></div>
@@ -66,6 +72,11 @@
       </div>
 
 
+
+      <div class="pull-right">
+        <i ng-if="middlePane !== 'hidden'" class="clickable icon glyphicon glyphicon-arrow-left" ng-click="toggleUI()"></i>
+        <i ng-if="middlePane == 'hidden'" class="clickable icon glyphicon glyphicon-arrow-right" ng-click="toggleUI()"></i>
+      </div>
       <uib-tabset>
 
 
@@ -555,6 +566,7 @@
 
         <uib-tab  ng-if="technicalview" heading="Model">
           <uib-tabset>
+
             <uib-tab  ng-if="technicalview" heading="ED">
               <pre>{{selectedEd | json}}</pre>
             </uib-tab>
@@ -562,6 +574,10 @@
             <uib-tab  ng-if="technicalview" heading="Item">
               <pre>{{selectedItem | json}}</pre>
             </uib-tab>
+
+
+
+
           </uib-tabset>
 
         </uib-tab>
@@ -574,7 +590,7 @@
 
         <uib-tab ng-if="technicalview" heading="Q">
 
-          <span class="btn btn-link" ng-click="validate(q)">Perform validation</span>
+          <span class="btn btn-link" ng-click="validate(q)">Validate</span>
 
 
           <span class="clickable pull-right" style="padding: 8px" ng-click = "copyToClipboard()">
@@ -593,14 +609,16 @@
           <div class="clearfix"></div>
 
 
-
-
           <div ng-if="oo" >
             <table class="table table-bordered">
               <tr ng-repeat="iss in oo.issue track by $index" ng-if="showIssue(iss)">
                 <td>{{iss.severity}}</td>
                 <td>{{iss.diagnostics}}
-                  <div><em>{{iss.location[0]}}</em></div>
+                  <div>
+                    <em class="clickable" ng-click="selectByLinkId(iss.location[0])">
+                      {{iss.location[0]}}
+                    </em>
+                  </div>
                   <div>{{iss.details.text}}</div>
                   <div ng-repeat = "exp in iss.expression">
                     <em>{{exp}}</em>
@@ -612,7 +630,7 @@
           </div>
 
 
-          <pre>{{q | json}}</pre>
+          <pre ng-hide = "oo" >{{q | json}}</pre>
 
 
 

@@ -208,6 +208,10 @@
             </div>
             <br/> <br/>
 
+
+
+
+            <h4>Elements</h4>
             <table class="table table-condensed table-bordered">
                 <tr><th>Text</th><th>Type</th><th>Card.</th><th>Hidden</th><th>Fixed</th><th>SDC</th></tr>
                 <tr ng-repeat="entry in qReport.entries" ng-if="showReportLine(input.SDCOnly,entry)">
@@ -221,9 +225,14 @@
                     <td>{{entry.isHidden}}</td>
                     <td>{{entry.fixedValue}}</td>
                     <td>
-                        <div ng-if="entry.definition">Extraction: {{entry.definition}}</div>
-                        <div ng-if="entry.initialExpression">Initial: {{entry.initialExpression}}</div>
-                        <div ng-if="entry.extractionContext">Extraction context: {{entry.extractionContext}}</div>
+                        <div ng-if="entry.definition"><strong>Extraction: </strong>{{entry.definition}}</div>
+                        <div ng-if="entry.initialExpression"><strong>Initial: </strong>{{entry.initialExpression}}</div>
+                        <div ng-if="entry.extractionContext"><strong>Extraction context: </strong>{{entry.extractionContext}}</div>
+                        <div ng-if="entry.populationContext">
+                            <strong>Population context:</strong>
+                            name=<strong>{{entry.populationContext.name}}</strong>
+                            expression={{entry.populationContext.expression}}
+                        </div>
 
 
 
@@ -233,7 +242,27 @@
                 </tr>
             </table>
 
+            <h4>Set value (fixed string or expression)</h4>
 
+            <table class="table table-condensed table-bordered">
+                <tr><th>Path</th><th>Fixed value</th><th>Expression</th></tr>
+                <tr ng-repeat="sv in qReport.setValue">
+                    <td>{{sv.path}}</td>
+                    <td>{{sv.value}}</td>
+                    <td>{{sv.expression}}</td>
+                </tr>
+            </table>
+
+
+            <h4>Launch Contexts</h4>
+            <table class="table table-condensed table-bordered">
+                <tr><th>Name</th><th>Type</th><th>Description</th></tr>
+                <tr ng-repeat="lc in qReport.launchContext">
+                    <td>{{lc.name}}</td>
+                    <td>{{lc.type}}</td>
+                    <td>{{lc.description}}</td>
+                </tr>
+            </table>
 
             </uib-tab>
 

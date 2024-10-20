@@ -30,6 +30,22 @@ angular.module('formsApp')
 
                 //https://dev.fhirpath-lab.com/Questionnaire/tester?id=https%3A%2F%2Ffhir.forms-lab.com%2FQuestionnaire%2Fpre-pop-test-lforms
 
+                $scope.leftPane = "col-md-4"
+                $scope.middlePane = "col-md-4"
+                $scope.rightPane = "col-md-4"
+
+                //toggle the display of the middle pane (rendered UI)
+                $scope.toggleUI = function () {
+                    if ($scope.middlePane == "col-md-4") {
+                        $scope.middlePane = "hidden"
+                        $scope.rightPane = "col-md-8"
+                    } else {
+                        $scope.middlePane = "col-md-4"
+                        $scope.rightPane = "col-md-4"
+                    }
+
+                }
+
                 //get the options for a choice element. Prefer the ValueSet, then options
                 $scope.getOptions = function (item) {
 
@@ -74,9 +90,9 @@ angular.module('formsApp')
 
                 function setupQ () {
 
-                    console.log($scope.q)
-                    console.log($scope.hashEd)
-                    console.log($scope.errors)
+                    //console.log($scope.q)
+                    //console.log($scope.hashEd)
+                    //console.log($scope.errors)
 
                     let obj = $scope.q
                     $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([angular.toJson(obj,true) ],{type:"application/json"}))
@@ -88,6 +104,11 @@ angular.module('formsApp')
                     let qry = `${$scope.serverbase}Questionnaire/${$scope.q.id}`
 
                     $scope.redirectUrl = `${$scope.labUI}Questionnaire/tester?tab=csiro+renderer&id=${qry}` //redirectUrl
+
+
+                    //add the patient context.
+                    //todo - pass this into the directive...
+                    $scope.redirectUrl += "&subject=Patient/596395"
 
                     //This was code to allow multiple of this directive in a single page. Didn't work. May no longer be needed.
                     $scope.treenode = $scope.treenode || "designTreeX"
@@ -243,14 +264,16 @@ angular.module('formsApp')
                     let x = $(`#${$scope.treenode}`).jstree(
                         {'core': {'multiple': false, 'data': treeData, 'themes': {name: 'proton', responsive: true}}}
                     ).on('changed.jstree', function (e, data) {
-                        //seems to be the node selection event...
+
 
                         if (data.node) {
+                            delete $scope.selectedItemFromOO
                             //$scope.selectedNode = data.node;
                             $scope.selectedItem = data.node.data.item
                             $scope.selectedEd = $scope.hashEd[$scope.selectedItem.linkId]
 
-                            console.log($scope.selectedItem,$scope.selectedEd)
+                            console.log($scope.selectedEd)
+                            console.log($scope.selectedItem)
 
                             //create the list of controls that represent the children of the selected ed
                             $scope.listItems = renderFormsSvc2.createControlList($scope.selectedItem,$scope.hashEd)
@@ -258,10 +281,24 @@ angular.module('formsApp')
                             markDisabled($scope.listItems)
 
                         }
-
                         $scope.$digest();       //as the event occurred outside of angular...
                     })
+                }
 
+                $scope.selectByLinkId = function (linkId) {
+                    //linkId is currently text - eg "linkId='myMedication.drugName'"
+                    //scruffy code to get rid of the offending text
+                    linkId = linkId.replace("linkId='","")
+                    linkId = linkId.replace("'","")
+                    //alert(linkId)
+                    $scope.selectedEd = $scope.hashEd[linkId]
+                    $scope.selectedItem = $scope.hashItem[linkId]
+
+                    $scope.selectedItemFromOO = $scope.selectedItem     //to show in the middle tab
+
+                    $scope.listItems = renderFormsSvc2.createControlList($scope.selectedItem,$scope.hashEd)
+                    //mark the elements that are currently disabled (due to enableWhen) so the css class can be applied
+                    markDisabled($scope.listItems)
 
                 }
 

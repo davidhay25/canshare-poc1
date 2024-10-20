@@ -2,7 +2,24 @@ angular.module("pocApp")
 
     .service('utilsSvc', function($q,$http) {
 
+
+        hashNQ = {}     //Nmaed Queries
+
+        $http.get("/model/namedquery").then(
+            function (data) {
+
+                data.data.forEach(function (nq) {
+                    hashNQ[nq.name] = nq
+                })
+            }, function (err) {
+                alert(angular.toJson(err.data))
+            }
+        )
+
         return {
+            getNQbyName : function (name) {
+                return hashNQ[name]
+            },
             getVersion : function(){
                 return "0.9.5"
             },
@@ -33,7 +50,7 @@ angular.module("pocApp")
 
         },
 
-        fhirDataTypes : function(){
+            fhirDataTypes : function(){
                 //theres also a list in snapShot Svc
                 return ['boolean','code','date','dateTime','decimal','integer','string','Address','Attachment','CodeableConcept','ContactPoint','Group','HumanName','Identifier','Period','Quantity','Ratio']
             },

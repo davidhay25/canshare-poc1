@@ -2,7 +2,7 @@
 
 angular.module("pocApp")
 
-    .service('makeQSvc', function($http,codedOptionsSvc,QutilitiesSvc,snapshotSvc,$filter,vsSvc,orderingSvc) {
+    .service('makeQSvc', function($http,codedOptionsSvc,QutilitiesSvc,snapshotSvc,$filter,vsSvc,orderingSvc,utilsSvc) {
 
         let unknownCodeSystem = "http://example.com/fhir/CodeSystem/example"
         let extLaunchContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
@@ -20,6 +20,10 @@ angular.module("pocApp")
 
         //this specifies a specific value or an expression to set the value
         extExtractionValue = "http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue"
+
+        //defines a query that provides context data for pre-population of child elements
+        extPopulationContext = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemPopulationContext"
+        extVariable = "http://hl7.org/fhir/StructureDefinition/variable"
 
         //let extGtableUrl = ""
        // let extSourceQuery = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-sourceQueries"
@@ -48,16 +52,19 @@ angular.module("pocApp")
 
         function addPrePopExtensions(Q) {
             //add the SDC extensions required for pre-pop
+            //these are added to the
             Q.extension = Q.extension || []
-            addExtension("LaunchPatient","Patient","The patient that is to be used to pre-populate the form")
-            addExtension("LaunchPractitioner","Practitioner","The practitioner that is to be used to pre-populate the form")
+            addExtension("patient","Patient","The patient that is to be used to pre-populate the form")
+            addExtension("user","Practitioner","The practitioner that is to be used to pre-populate the form")
+           // addExtension("encounter","Encounter","The current encounter")
+
 
             //let ext = {url:extSourceQuery,valueReference:{reference:"#PrePopQuery"}}
 
             function addExtension(name,type,description) {
                 let ext = {url:extLaunchContextUrl,extension:[]}
 
-                ext.extension.push({url:'name',valueId:name})
+                ext.extension.push({url:'name',valueCoding:{code:name}})
                 ext.extension.push({url:'type',valueCode:type})
                 ext.extension.push({url:'description',valueString:description})
                 Q.extension.push(ext)
@@ -123,6 +130,40 @@ angular.module("pocApp")
 
         function addPublisher(Q) {
             Q.publisher = "DEMO: David Hay"
+        }
+
+        //adds the named queries for a DG as variable extensions
+        //nq = {name: description: content: }
+        function addNamedQuery (item,name,namedQueries) {
+
+            let nq = namedQueries[name]
+            if (! nq) {
+                //todo - should there ba an error message or log?
+                return
+            }
+
+            let ext = {url:extVariable}
+            ext.valueExpression = {language:"application/x-fhir-query",expression:nq.contents,name:nq.name}
+
+            item.extension = item.extension || []
+            item.extension.push(ext)
+
+        }
+        function addNamedQueryDEP (nqName,item) {
+
+            let nq = utilsSvc.getNQbyName(nqName)
+            if (!nq) {
+                alert(`Named Query: ${nqName} not found`)
+            }
+
+            //http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue
+            let ext = {url:extPopulationContext}
+
+            ext.valueExpression = {language:"application/x-fhir-query",expression:nq.contents,name:nq.name}
+
+            item.extension = item.extension || []
+            item.extension.push(ext)
+
         }
 
         //get the extraction context from the DG
@@ -491,17 +532,21 @@ angular.module("pocApp")
                          break
                  }
 
-
         }
 
         //find a specific extension
         function getExtension(item,url,type) {
             let result = []
-            if (item.extension) {
+            if (item && item.extension) {
                 for (const ext of item.extension) {
                     if (ext.url == url) {
-                        let vName = `value${type}`
-                        result.push(ext[vName])
+                        if (type) {
+                            let vName = `value${type}`
+                            result.push(ext[vName])
+                        } else {
+                            result.push(ext)
+                        }
+
                     }
                 }
             }
@@ -516,15 +561,36 @@ angular.module("pocApp")
             }
         }
 
-        return {
+        let services =  {
 
-            getSDCEdSummary : function (ed) {
-                //return the key SDC elements for this ED. Used when generating the
+            testExpression : function (expression) {
+                //test an expression
+                //exceute against test data
 
+            },
+
+            getNamedQueries : function (cb) {
+                let qry = "/model/namedquery"
+                $http.get(qry).then(
+                    function (data) {
+                        let hash = {}
+                        data.data.forEach(function (nq) {
+                            hash[nq.name] = nq
+                        })
+                        cb(hash)
+                    },function (err) {
+                        alert(angular.toJson(err.data))
+                        cb({})
+                    })
             },
 
             makeReport : function (Q) {
                 //generate a report object for the SDC table view (that displays key extraction / population details)
+
+
+                //todo - add any fixed values from the new extension as a separate set of values (as not part of an element)
+
+
 
                 let report = {entries:[]}
                 let thing = {text:Q.name}
@@ -538,14 +604,8 @@ angular.module("pocApp")
                     thing.extractionContext = ar1[0]
                 }
 
-                /*
-                let extractionContext = getExtractionContext(Q)
 
-                if (extractionContext) {
-                    thing.extractionContext = extractionContext
-                }
 
-                */
 
                 report.entries.push(thing)
 
@@ -595,7 +655,6 @@ angular.module("pocApp")
                         thing.fixedValue = `Units: ${ar2[0].code}`
                     }
 
-
                     //check for hidden values
                     let ar0 = getExtension(item,extHidden,'Boolean')
                     if (ar0.length > 0) {
@@ -615,8 +674,51 @@ angular.module("pocApp")
                         thing.extractionContext = ar1[0]
                     }
 
+                    //check for population contexts
+                    let ar3 = getExtension(item,extPopulationContext,'Expression')
+                    if (ar3.length > 0) {
+                        thing.populationContext = ar3[0]
+                    }
 
-                    //console.log(item,thing)
+                    //check for fixed values (our new extension)
+
+                    let ar4 = getExtension(item,extExtractionValue)   //without a type the whole extension is returned
+                    if (ar4.length > 0) {
+                        report.setValue = []
+                        for (const ext of ar4) {
+                            let v = {}
+                            console.log(ext)
+                            ext.extension.forEach(function (child) {
+                                switch (child.url) {
+                                    case 'definition' :
+                                        //the path in the extract where this element is to be inserted
+                                        v.path = child.valueCanonical
+                                        break
+                                    case 'fixed-value' :
+                                        //the actual value
+                                        v.value = child.valueString
+                                        break
+                                    case 'dynamic-value':
+                                        //an expression
+                                        v.expression = child.valueExpression
+                                        break
+                                    default :
+                                        //shouldn't happen - what to do?
+                                        break
+                                }
+
+
+                            })
+
+                            report.setValue.push(v)
+
+                            //add to entries
+                           // let sv = {text:'setValue'}
+                            //report.entries.push(sv)
+
+                        }
+
+                    }
 
                     report.entries.push(thing)
                     if (item.item) {
@@ -626,6 +728,35 @@ angular.module("pocApp")
                     }
                 }
 
+
+                //get the launch contexts. These are fixed ATM but worth displaying
+                let arLC = getExtension(Q,extLaunchContextUrl)
+
+
+                report.launchContext = []
+                for (const ext of arLC) {
+                    let item = {}
+                    ext.extension.forEach(function (child) {
+
+                        switch (child.url) {
+                            case "name" :
+                                item.name = child.valueCoding.code
+                                break
+                            case "type" :
+                                item.type = child.valueCode
+                                break
+                            case "description" :
+                                item.description = child.valueString
+                                break
+                        }
+
+                        
+                    })
+                    report.launchContext.push(item)
+
+                }
+
+                console.log(report.launchContext)
 
                 Q.item.forEach(function (item) {
                     processItem(report,item)
@@ -709,7 +840,7 @@ angular.module("pocApp")
                             config.hashAllDG = hashAllDG
 
                             const guid = createUUID() // crypto.randomUUID();
-                            console.log(guid);
+
 
 
                             config.patientId = guid //'testPatient'    //will be a uuid
@@ -719,13 +850,16 @@ angular.module("pocApp")
                             }
 */
                             //-------- make the Q for the DG....
-                            console.log(`${dgType} ${dgElementList.length}`)
-                            let vo = that.makeHierarchicalQFromDG(dgElementList,config)
+                            //console.log(`${dgType} ${dgElementList.length}`)
+
+                            let vo = that.makeHierarchicalQFromDG(dg,dgElementList,config)
 
                             allEW.push(...vo.allEW)
 
                             let dgQ = vo.Q
                             let hashByPath = vo.hashEd          //EDs from the child
+
+
 
                             //the list of all EDs
                             Object.keys(vo.hashEd).forEach(function (linkId) {
@@ -767,9 +901,12 @@ angular.module("pocApp")
 
 
 
-                            for (const child of dgQ.item[0].item){
-                                sectionItem.item.push(child)
+                            if (dgQ && dgQ.item[0]) {
+                                for (const child of dgQ.item[0].item){
+                                    sectionItem.item.push(child)
+                                }
                             }
+
 
                         }
                     }
@@ -790,17 +927,24 @@ angular.module("pocApp")
 
             },
 
-            makeHierarchicalQFromDG : function  (lstElements,config) {
+            makeHierarchicalQFromDG : function  (dg,lstElements,config) {
                 //Used in the new Q renderer
                 //config.enableWhen will cause the enableWhens to be set
                 //config.patientId is the patient id to use for the fixed value extension
                 //config.pathPrefix is used for enable when targets. Only used from composition. It may be null
+                //config.namedQueries allows the NQ to be passed in
                 let pathPrefix = ""
                 if (config.pathPrefix) {
                     pathPrefix = config.pathPrefix + "."
                 }
 
-                let dgName = lstElements[0].ed.path     //first line is the DG name
+
+                if (! lstElements || lstElements.length == 0) {
+                    return  {allEW:[],hashEd :{} ,hashVS:{}, errorLog:[] }    //this results when there is a missing DG referenced...
+
+                }
+
+                let dgName = dg.name //lstElements[0].ed.path     //first line is the DG name
 
 
 
@@ -899,6 +1043,16 @@ angular.module("pocApp")
                 addUseContext(Q)
                 addPublisher(Q)
 
+                //add the named queries as variables in the Q
+                if (dg.namedQueries) {
+                    //let item = Q.item[0]
+                    dg.namedQueries.forEach(function (nqName) {
+                        addNamedQuery(Q,nqName,config.namedQueries)
+                    })
+
+                }
+
+
                 //add definition based data extraction. This is where the DG can be extracted to a FHIR
                 //resource using the SDC defintion extratcion
                 //examine the DG hierarchy to see if there is a 'type' in any of the DG parents which is the SDC extraction context
@@ -934,7 +1088,7 @@ angular.module("pocApp")
                         //console.log(parentItemPath)
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
 
-                        extractionContext = decorateItem(currentItem,ed,extractionContext)
+                        extractionContext = decorateItem(currentItem,ed,extractionContext,dg)
 
                         if (config.enableWhen) {
                             let ar =  addEnableWhen(ed,currentItem,config.pathPrefix)
@@ -958,7 +1112,7 @@ angular.module("pocApp")
 
                     } else {
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
-                        decorateItem(currentItem,ed,extractionContext)
+                        decorateItem(currentItem,ed,extractionContext,dg)
                         if (config.enableWhen) {
                             let ar = addEnableWhen(ed,currentItem,config.pathPrefix)
                             allEW.push(...ar)
@@ -1028,6 +1182,29 @@ angular.module("pocApp")
 
                 correctEW(Q,conditionalED)
 
+                //add any named queries to the first item of the Q
+/*
+                if (dg.prePopQuery) {
+                    let item = Q.item[0]
+                    addNamedQuery(item,dg.name,dg.prePopQuery)
+                }
+*/
+/*
+
+                //add the named queries as variables in the Q
+                if (dg.namedQueries) {
+                    let item = Q.item[0]
+                    dg.namedQueries.forEach(function (nqName) {
+                        addNamedQuery(nqName,item)
+                    })
+
+                }
+*/
+
+
+
+
+
                 return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog, allEW : newAllEW}
 
                 function adjustEWPath() {
@@ -1037,7 +1214,7 @@ angular.module("pocApp")
 
                 //add details to item
                 //extraction context is the url of the profile (could be a core type)
-                function decorateItem(item,ed,extractionContext) {
+                function decorateItem(item,ed,extractionContext,dg) {
 
                    // let newItem = {}    //If a new item is needed - ie extension url
 
@@ -1277,8 +1454,13 @@ angular.module("pocApp")
                         //let ext = {url:extPrePopUrl}
                         let ext = {url:extInitialExpressionUrl}
 
+                        //todo - not sure if 'Launch is needed
                         //Assume a naming convention for context names - '%Launch{resourcetype}
-                        let expression = `%Launch${ed.prePop}`
+                        //let expression = `%Launch${ed.prePop}`
+                        let expression = `${ed.prePop}`
+                        //let expression = `%${dg.name}.${ed.prePop}`
+
+
                         ext.valueExpression = {language:"text/fhirpath",expression:expression}
                         item.extension = item.extension || []
                         item.extension.push(ext)
@@ -1900,4 +2082,8 @@ angular.module("pocApp")
             }
 
         }
+
+        return services
+
+
     })

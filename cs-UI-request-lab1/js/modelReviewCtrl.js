@@ -562,35 +562,24 @@ angular.module("pocApp")
                     let config = {expandVS:true,enableWhen:true}
                     config.hashAllDG = $scope.hashAllDG
 
-
-
                     if (dg.type) {
                         config.fhirType = dg.type // Used for definition based extraction
                     }
 
-                    let voQ = makeQSvc.makeHierarchicalQFromDG($scope.fullElementList,config) //,$scope.hashAllDG)
-                    $scope.fullQ = voQ.Q
-                    $scope.hashEd = voQ.hashEd
-                    $scope.errorLog = voQ.errorLog
-                    console.log(voQ.errorLog)
+                    //need the named queries for Q variables
+                    makeQSvc.getNamedQueries(function (hash) {
+                        config.namedQueries = hash
 
-                    //A report focussed on pre-popupation & extraction
-                    let voReport =  makeQSvc.makeReport($scope.fullQ)
-                    $scope.qReport =voReport.report
+                        let voQ = makeQSvc.makeHierarchicalQFromDG(dg,$scope.fullElementList,config) //,$scope.hashAllDG)
+                        $scope.fullQ = voQ.Q
+                        $scope.hashEd = voQ.hashEd
+                        $scope.errorLog = voQ.errorLog
+                        console.log(voQ.errorLog)
 
-
-                    return //   I don't think the tree is needed here
-                    //The DG element tree
-                    let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
-                    //makeDGTree(treeData)
-
-
-                    let rootNodeId = $scope.fullElementList[0].path
-                    //let treeData = modelsSvc.makeTreeFromElementList($scope.allCompElements)
-
-
-                    //console.log(treeData)
-                    makeDGTree(treeData,rootNodeId)
+                        //A report focussed on pre-popupation & extraction
+                        let voReport =  makeQSvc.makeReport($scope.fullQ)
+                        $scope.qReport =voReport.report
+                    })
 
                 })
 

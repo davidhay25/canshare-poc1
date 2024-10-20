@@ -601,7 +601,6 @@ async function setup(app,mongoDbName) {
     })
 
 
-
     //create / update a single composition. In theory the name param is not needed, but cleaner
     app.put('/model/comp/:name', async function(req,res) {
 
@@ -621,6 +620,50 @@ async function setup(app,mongoDbName) {
             const cursor = await database.collection("comp").replaceOne(query,comp,{upsert:true})
             await saveHistory(comp,userEmail || "unknown User")
             res.json(comp)
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+
+
+    })
+
+    //todo return all Compositions that reference this DG
+    app.get('/model/comp/:name/dg', async function(req,res) {
+
+    })
+
+    //get all named queries
+    app.get('/model/namedquery', async function(req,res) {
+
+        let query = {active:true}
+        try {
+            const cursor = await database.collection("namedquery").find(query).toArray()
+            let arQuery = []
+            cursor.forEach(function (doc) {
+                delete doc['_id']
+                arQuery.push(doc)
+            })
+            res.json(arQuery)
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+    })
+
+
+    //add / edit named query
+    //create / update a single composition. In theory the name param is not needed, but cleaner
+    app.put('/model/namedquery/:name', async function(req,res) {
+
+        let namedquery = req.body
+        const query = {name:namedquery.name}
+        try {
+            const cursor = await database.collection("namedquery").replaceOne(query,namedquery,{upsert:true})
+
+            res.json(namedquery)
         } catch(ex) {
             console.log(ex)
             res.status(500).json(ex.message)

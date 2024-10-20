@@ -16,7 +16,57 @@ angular.module("pocApp")
                 }
             }
 
-            console.log($window.location)
+            
+            function loadNamedQueries() {
+                let qry = "/model/namedquery"
+                $http.get(qry).then(
+                    function (data) {
+                        $scope.namedQueries = data.data
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+            }
+            loadNamedQueries()
+
+            $scope.updateNamedQuery = function (name,description,contents,active) {
+
+                if (! active) {
+                    if (! confirm("Are you sure you wish to remove this Named Query?")) {
+                        return
+                    }
+                } else {
+                    for (nq1 of $scope.namedQueries) {
+                        if (name == nq1.name) {
+                            alert("This is a duplicate name. You need to choose another.")
+                            return
+                            break
+                        }
+                    }
+                }
+
+
+
+
+
+                let qry = `/model/namedquery/${name}`
+
+                let nq = {name:name,description:description,contents:contents,active:active}
+
+                $http.put(qry,nq).then(
+                    function (data) {
+                        $scope.namedQueries = data.data
+                        delete $scope.input.nqName
+                        delete $scope.input.nqDescription
+                        delete $scope.input.nqContents
+                        loadNamedQueries()
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+
+            }
+
 
             $scope.input.filter = {}
 
@@ -115,13 +165,7 @@ angular.module("pocApp")
                     })
             }
             $scope.refreshCompSummary()
-
-
-
-
-
-
-
+            
             $scope.updateRepo = function () {
                 if (confirm("This will update all DGs in the Library with the loacal ones. Are you sure you wish to do this?")) {
 

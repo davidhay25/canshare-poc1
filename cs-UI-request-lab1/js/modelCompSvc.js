@@ -431,35 +431,22 @@ angular.module("pocApp")
 
                 //note the assumptions of a single level hierarchy - a parent cannot have another parent
                 function processComp(comp) {
+                    comp.sections.forEach(function (section) {
+                        let pathRoot = `${comp.name}.${section.name}`   //section root is model name + section name
+                        hashAllElements[pathRoot] = {ed:section}
 
-                        //todo - check for removed sections in th eoverride
-
-
-                        comp.sections.forEach(function (section) {
-
-                            let pathRoot = `${comp.name}.${section.name}`   //section root is model name + section name
-                            hashAllElements[pathRoot] = {ed:section}
-
-                            //each item is assumed to be a DG - think about others (Z & override) later
-                            section.items.forEach(function (item) {
-                               //{name: title: type: mult:}
-
-                                processSectionItem(item,pathRoot)
-
-
-                            })
-
-                            //let DG = types[section.name]
-
-
+                        //each item is assumed to be a DG - think about others (Z & override) later
+                        section.items.forEach(function (item) {
+                            processSectionItem(item,pathRoot)
                         })
+                    })
 
                 }
 
-                //perfrom the actual composiution processing. After this, hashAllElements will have been created
+                //perform the actual composiution processing. After this, hashAllElements will have been created
 
                 processComp(comp)
-
+/* Not using composition overrides any more
 
                 //Now process any overrides todo - are we still doing this - or is everything in the section DG
                 if (comp.override) {
@@ -467,7 +454,7 @@ angular.module("pocApp")
                         hashAllElements[path] = {ed:comp.override[path]}
                     })
                 }
-
+*/
 
                 //now generate the list of elements from the hash. Although not guaranteed, the order seems to be that of update...
                 let ar = []

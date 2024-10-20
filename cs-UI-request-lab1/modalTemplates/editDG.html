@@ -133,6 +133,20 @@
 
                 <div class="row">
                     <div class="col-md-2">
+                        Prepop query
+                    </div>
+                    <div class="col-md-6">
+                        <textarea class="form-control" ng-model="model.prePopQuery"></textarea>
+                    </div>
+                    <div class="col-md-4">
+                        A query that will extract data to be used for pre-populating members of this DG.
+                        The name of the variable in the Q will be the DG name.
+                    </div>
+                </div>
+                <br/>
+
+                <div class="row">
+                    <div class="col-md-2">
                         Description
                     </div>
                     <div class="col-md-10">
@@ -296,7 +310,7 @@
 
             </uib-tab>
 
-            <uib-tab heading="Expanded model"  select="tabSelected('expanded')">
+            <uib-tab heading="Expanded model" >
                 <em class="pull-right">Full expansion - parents and DataGroups</em>
                 <table class="table table-bordered">
                     <tr><th>Path</th><th>Title</th><th>Type</th><th>Code</th><th>Card.</th><th>Fixed value</th><th>Source DG</th></tr>
@@ -330,14 +344,7 @@
                         <td>{{element.ed.mult}}</td>
                         <td>
                             {{element.ed.fixedCoding}}
-                            <!--
-                            <div ng-show = "element.ed.type[0] == 'CodeableConcept'
-                                && (! element.ed.fixedCoding)
-                                && (element.sourceModelName !== model.name)">
 
-                                <span class="clickable" ng-click="setFixedCode(element)">Set value</span>
-                            </div>
-                            -->
                         </td>
                         <td>{{element.sourceModelName}}</td>
 
@@ -346,121 +353,80 @@
 
 
 
-<!-- <pre>{{allElements | json}}</pre>
-                <uib-tabset>
-                    <uib-tab heading="Table">
-                        <table class="table table-bordered">
-                            <tr><th>Path</th><th>Title</th><th>Type</th><th>Code</th><th>Card.</th></tr>
-                            <tr ng-repeat="element in allElements" ng-class = "{required:isRequired(element),overridden: hasBeenOverridden(element)}">
-                                <td>
-                                    <div  ng-style="{ 'padding-left': (element.path | pathindent) }">
-                                    {{element.path | dropFirstInPath}}
-                                    </div>
-                                </td>
-                                <td>{{element.title}}</td>
-                                <td>
-                                    <div ng-repeat="type in element.type">
-                                        {{type}}
-
-                                    </div>
-
-                                    <div ng-show="element.valueSet">
-                                        {{element.valueSet}}
-                                    </div>
-
-                                </td>
-                                <td>
-
-                                    <div ng-repeat="code in element.code">
-                                        {{code.code}}
-                                    </div>
-
-                                </td>
-                                <td>{{element.mult}}</td>
-
-                            </tr>
-                        </table>
-
-                    </uib-tab>
-                    <uib-tab heading="List">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <ul class="list-unstyled">
-                                    <li ng-style="{ 'padding-left': (element.path | pathindent) }"
-
-                                        ng-repeat="element in allElements">
-                                        <div ng-click="selectElement(element)" class="clickable" style="cursor: pointer">
-
-                                    <span ng-class = "{required:isRequired(element),overridden: hasBeenOverridden(element)}">
-                                        {{element.path | dropFirstInPath}}
-
-                                    </span>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <pre>{{selectedElement | json}}</pre>
-                                <br/>
-                                <div ng-show="selectedElementOverridden">
-                                    <div class="alert alert-info">
-                                        This element has been defined in this model,
-                                        replacing the original definition. Click the button below to remove that override
-                                        and replace the element with the original
-                                        <br/> <br/>
-                                        <button class="btn btn-danger pull-right" ng-click="removeOverride(selectedElement)">Remove Override</button>
-                                        <div class="clearfix"/>
-                                    </div>
-
-
-                                </div>
-                                <div ng-show="selectedElement && ! selectedElementOverridden && (selectedElement.type[0] == 'CodeableConcept')">
-                                    <div><strong>Override the ValueSet for this element</strong></div>
-                                    <br/>
-                                    <input type="text" class="form-control" placeholder="VS Url or name" ng-model="input.newVS"/>
-
-                                    <br/>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <button class="btn btn-primary pull-right"
-                                                    ng-click = "applyOverride(selectedElement,input.newVS)">Apply override</button>
-
-                                        </div>
-                                    </div>
-
-
-                                </div>
-
-
-                                <div ng-show="selectedElement && canEdit(selectedElement)">
-                                    Override this element in the model which has been inherited from the referenced
-                                    type, removing it.
-
-                                </div>
-
-                                <div ng-show="selectedElement && ! canEdit(selectedElement)">
-                                    If you want to remove this element, delete it in the 'Base model content' tab
-
-                                </div>
-
-
-
-                            </div>
-                        </div>
-                    </uib-tab>
-                </uib-tabset>
-                -->
-
-
             </uib-tab>
 
-            <uib-tab heading="Import">
+            <uib-tab ng-if = "false" heading="Import">
                 <button class="btn btn-link pull-right" ng-click="import(input.import)">Import</button>
 
                 <br/>
 
                 <textarea rows="10" ng-model="input.import" class="form-control"></textarea>
 
+
+            </uib-tab>
+
+            <uib-tab heading="Pre-pop">
+                <br/>
+
+
+                <em>Named queries used by this DG. Will appear as variables in the Questionnaire</em>
+                <table class="table table-bordered">
+                    <tr ng-repeat="nq in namedQueries">
+                        <td>{{nq.name}}</td>
+                        <td>{{nq.description}}</td>
+                        <td>{{nq.contents}}</td>
+                        <td> <checkbox ng-model="input.nq[nq.name]" </td>
+
+                    </tr>
+                </table>
+
+                <em>Named queries will be rendered as Variable extensions in the Q.
+                This means they are available for pre-population expressions in this DG</em>
+
+                <!--
+                               <div class="row">
+                                   <div class="col-md-6">
+                                       <textarea class="form-control" ng-model="model.prePopQuery"></textarea>
+                                   </div>
+                                   <div class="col-md-6">
+
+                                   </div>
+                               </div>
+
+                                <table class="table table-bordered">
+                                    <tr ng-repeat="nqName in model.namedQueries">
+                                        <td>{{nqName}}</td>
+                                        <td>{{hashNamedQueries[nqName].description}}</td>
+                                        <td>{{hashNamedQueries[nqName].contents}}</td>
+
+                                        <td><button class="btn-link btn" ng-click="removeNQ($index)">Remove</button> </td>
+                                    </tr>
+                                </table>
+
+
+                                <strong>All named queries</strong>
+
+                                <div class="row">
+
+                                    <div class="col-md-5">
+                                        <select class="form-control" ng-model="input.selectedNQ"
+                                                ng-options="nq.description for nq in namedQueries"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div>{{input.selectedNQ.description}}</div>
+                                        <div>{{input.selectedNQ.contents}}</div>
+
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button class="btn btn-primary" ng-click="addNQ(input.selectedNQ)">Add</button>
+                                    </div>
+
+                                </div>
+
+                                <em>These are the FHIR queries (if any) that will provide data that can be used by elements
+                                    within the DataGroup for pre-population</em>
+
+                                -->
 
             </uib-tab>
 

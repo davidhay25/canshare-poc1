@@ -827,6 +827,10 @@ angular.module("pocApp")
                 let dg = allDgSnapshot[dgName]
                 if (dg) {       //not sure what to do if null - shouldn;t happen!
                     title = dg.title
+                } else {
+                    console.error(`No DG called ${dgName} found`)
+                    alert(`No DG called ${dgName} found`)
+                    return []
                 }
 
 
@@ -843,6 +847,7 @@ angular.module("pocApp")
                     })
                 } else {
                     console.error(`No DG called ${dgName} found`)
+                    //alert(`No DG called ${dgName} found`)
                 }
 
 

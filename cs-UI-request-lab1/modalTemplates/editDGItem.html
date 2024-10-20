@@ -238,7 +238,9 @@
                 </div>
 
               </div>
-            <div><pre ng-if="testPPResult">{{testPPResult | json}}</pre></div>
+            <div ng-if="testPPResult" ng-class="testPPResultOutcome">
+              {{testPPResult}}
+            </div>
             </td>
           </tr>
 

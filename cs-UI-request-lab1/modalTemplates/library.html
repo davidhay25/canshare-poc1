@@ -142,7 +142,7 @@
                        popover-trigger="'mouseenter'">
                     {{item.local.diff.length}}
                   </div>
-                
+
 
                 </td>
                 <td>{{item.library.diff.length}}</td>
@@ -377,6 +377,47 @@
             </td>
           </tr>
         </table>
+
+      </uib-tab>
+
+      <uib-tab heading="Named queries" >
+        <div class="row">
+          <div class="col-md-9">
+            <table class="table-bordered table">
+              <tr ng-repeat="query in namedQueries">
+                <td>{{query.name}}</td>
+                <td>{{query.description}}</td>
+                <td>{{query.contents}}</td>
+                <td>
+                  <button class="btn btn-link" ng-click="updateNamedQuery(query.name,query.contents,false)">Delete</button>
+                </td>
+              </tr>
+
+              <tr>
+                <td><input class="form-control" ng-model="input.nqName"/> </td>
+                <td><input class="form-control" ng-model="input.nqDescription"/> </td>
+                <td>
+                  <textarea class="form-control" ng-model="input.nqContents"></textarea>
+                </td>
+                <td>
+                  <button
+                          ng-if = "input.nqName && input.nqContents"
+                          class="btn btn-link" ng-click="updateNamedQuery(input.nqName,input.nqDescription,input.nqContents,true)">Add</button>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="col-md-3">
+            <div><a target="_blank" href="https://build.fhir.org/ig/HL7/sdc/populate.html#exp-pop">SDC Expression pre-pop</a></div>
+            <div><a target="_blank" href="https://build.fhir.org/ig/HL7/sdc/expressions.html">Using expressions</a></div>
+            <div><a target="_blank" href="https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirquery">Query enhancements</a></div>
+
+
+
+
+          </div>
+        </div>
+
 
       </uib-tab>
 

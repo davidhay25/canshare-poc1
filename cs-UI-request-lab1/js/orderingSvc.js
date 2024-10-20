@@ -51,6 +51,10 @@ angular.module("pocApp")
                 //perform the actual re-ordering. update lst
                 let lstOrdering = []
 
+                if (! dg) {
+                    return
+                }
+
                 if (dg.ordering && dg.ordering.length >0) {
                     //there is ordering defined on the DG
                     lstOrdering = dg.ordering

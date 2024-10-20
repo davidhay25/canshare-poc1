@@ -521,8 +521,9 @@ angular.module("pocApp")
                         if (!hash[parentPath]) {
 
                             errors.push(parentPath)
-                            //alert(`The paths in DG ${dgName} have become corrupted. The path ${parentPath} could not be found. You'll need to remove the element with the path ${ed.path } from the diff tab.`)
+                            alert(`The paths in DG ${dgName} have become corrupted. The path ${parentPath} could not be found. You'll need to remove the element with the path ${ed.path } from the diff tab.`)
 
+                           // alert(`The DG ${}`)
                             //there's been an issue - an element has been dropped. not sure why...
                             //for now, add it into the hash  todo - need a more definitive solution later
                             //temp let dummyEd = {path:parentPath,title:"Inserted element",description:"Issue here",type:['Group'],mult:'0..1'}
@@ -540,7 +541,7 @@ angular.module("pocApp")
                 })
 
                 if (errors.length > 0) {
-                    alert("There were missing elements in the DG. The safest course is to abandon this DG and re-create it. You could try reverting and checking out to see if there is a good copy in the library.")
+                   // alert("There were missing elements in the DG. The safest course is to abandon this DG and re-create it. You could try reverting and checking out to see if there is a good copy in the library.")
                 }
 
                 // now we can build the ordered list

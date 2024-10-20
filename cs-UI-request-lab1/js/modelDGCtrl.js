@@ -758,6 +758,8 @@ angular.module("pocApp")
                     return
                 }
 
+
+
                 if (! canDelete) {
                     alert("You must delete any child nodes first.")
                     return
