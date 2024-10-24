@@ -7,6 +7,8 @@ angular.module("pocApp")
 
 
 
+
+
             $scope.input.collapsibleOptions = ['default-open','default-closed']
 
             //need a default base for editing
@@ -22,6 +24,44 @@ angular.module("pocApp")
             $scope.fullElementList = fullElementList
             let dgName = fullElementList[0].ed.path     //it's aways the first element in the list...
             let dg = hashAllDG[dgName]
+            $scope.dg = dg
+             if (dg.type) {
+                 let baseFhirUrl = "http://hl7.org/fhir/R4B/"     //hard code to R4B. may need to become a parameter...
+                 $scope.linkToSpec = `${baseFhirUrl}${dg.type}.html`
+               //  $scope.type = dg.type
+             }
+
+             //execute the namedquert expression
+            $scope.testxquery = function (queryName) {
+                $http.get(`/model/namedquery/${queryName}`).then(
+                    function (data) {
+                        $uibModal.open({
+                            //backdrop: 'static',      //means can't close by clicking on the backdrop.
+                            //keyboard: false,       //same as above.
+                            size : 'lg',
+                            templateUrl: 'modalTemplates/xquery.html',
+                            controller: 'xqueryCtrl',
+                            resolve: {
+                                query: function () {
+                                    return data.data
+                                }
+                            }
+
+                        }).result.then(function (concept) {
+                            console.log(concept)
+
+
+                        })
+
+                    }, function (err) {
+                        alert("Named query not found")
+                    }
+                )
+
+
+
+            }
+
 
             $scope.options = []     //a list of options. Will be saved as ed.options
             $scope.units = [] //a list of units. Will be saved as ed.units
@@ -491,7 +531,7 @@ angular.module("pocApp")
 
             //test that the pre-pop expression is valid
             //todo maybe compile the expression with js path
-            $scope.testPrePop = function (expression,displayElement) {
+            $scope.testPrePopDEP = function (expression,displayElement) {
                 delete $scope.testPPResult
                 $scope.testPPResultOutcome = "fail"
 

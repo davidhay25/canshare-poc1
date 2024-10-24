@@ -72,7 +72,14 @@ angular.module("pocApp")
         }
 
 
+        function addItemControl(item,code) {
+            let ext = {url:extItemControlUrl}
 
+            let cc = {coding:[{code: code,system:'http://hl7.org/fhir/questionnaire-item-control'}]}
+            ext.valueCodeableConcept = cc
+            item.extension = item.extension || []
+            item.extension.push(ext)
+        }
 
 
         function addFixedValue(item,definition,type,value,expression) {
@@ -149,7 +156,10 @@ angular.module("pocApp")
             item.extension.push(ext)
 
         }
-        function addNamedQueryDEP (nqName,item) {
+
+        //Population context is used as a bridge between a named query (a variable in the Q)
+        //and how it can be pre-populated
+        function addPopulationContext (nqName,item) {
 
             let nq = utilsSvc.getNQbyName(nqName)
             if (!nq) {
@@ -159,7 +169,10 @@ angular.module("pocApp")
             //http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue
             let ext = {url:extPopulationContext}
 
-            ext.valueExpression = {language:"application/x-fhir-query",expression:nq.contents,name:nq.name}
+
+            ext.valueExpression = {language:"text/fhirpath"}
+            ext.valueExpression.name = nq.itemName //the name that subsequent expressions will use
+            ext.valueExpression.expression = `%${nq.name}.entry.resource` //the 'iterator'
 
             item.extension = item.extension || []
             item.extension.push(ext)
@@ -588,27 +601,67 @@ angular.module("pocApp")
                 //generate a report object for the SDC table view (that displays key extraction / population details)
 
 
-                //todo - add any fixed values from the new extension as a separate set of values (as not part of an element)
 
-
-
-                let report = {entries:[]}
+                let report = {entries:[],variableUsage:{},errors:[]}
                 let thing = {text:Q.name}
+                //A hash showing for each variable where it is used...
+                //report.variableUsage = {}
+
+                //errors discovered during the report creation
+               // report.errors = []
 
                 //see if there is an extraction context on the Q
-
-
-                //let ar1 = getExtension(Q,extExtractionContextUrl,'Code')
+                //we assume there is only 1 and it on the Q - not descendent items (at the moment)
                 let ar1 = getExtension(Q,extExtractionContextUrl,'String')
                 if (ar1.length > 0) {
                     thing.extractionContext = ar1[0]
                 }
 
-
-
-
                 report.entries.push(thing)
+                
+                //get the variables - assume they are defined on the Q root
+                let ar2 = getExtension(Q,extVariable,'Expression')
+                ar2.forEach(function (ext) {
+                    let thing = {text:Q.name}
+                    thing.variable = ext.name
+                    thing.expression = ext.expression  //varable type is x-query
+                    //thing.kind = 'variable'
+                    report.entries.push(thing)
 
+                    report.variableUsage[ext.name] = []
+
+                })
+
+
+                //get the launch contexts. These are fixed ATM but worth displaying
+                let arLC = getExtension(Q,extLaunchContextUrl)
+
+                report.launchContext = []
+                for (const ext of arLC) {
+                    let item = {}
+                    ext.extension.forEach(function (child) {
+
+                        switch (child.url) {
+                            case "name" :
+                                item.name = child.valueCoding.code
+                                break
+                            case "type" :
+                                item.type = child.valueCode
+                                break
+                            case "description" :
+                                item.description = child.valueString
+                                break
+                        }
+
+
+                    })
+
+                    report.launchContext.push(item)
+                    report.variableUsage[item.name] = []
+
+                }
+
+                console.log(report.launchContext)
                 function processItem(report,item) {
                     let thing = {linkId:item.linkId,text:item.text,type:item.type,definition:item.definition}
 
@@ -643,7 +696,6 @@ angular.module("pocApp")
                                     thing.fixedValue = opt.valueString
                                 }
 
-
                             }
                         })
                     }
@@ -665,6 +717,16 @@ angular.module("pocApp")
                     let ar = getExtension(item,extInitialExpressionUrl,'Expression')
                     if (ar.length > 0) {
                         thing.initialExpression = ar[0].expression
+
+                        //add to the variable usage hash
+                        let ar1 = thing.initialExpression.split('.')
+                        let variable = ar1[0].substr(1)
+                        if (report.variableUsage[variable]) {
+                            report.variableUsage[variable] = report.variableUsage[variable] || []
+                            report.variableUsage[variable].push(item.linkId)
+                        } else {
+                            report.errors.push({msg:`variable ${variable} not found at ${item.linkId}`})
+                        }
                     }
 
                     //check for extraction context
@@ -681,7 +743,6 @@ angular.module("pocApp")
                     }
 
                     //check for fixed values (our new extension)
-
                     let ar4 = getExtension(item,extExtractionValue)   //without a type the whole extension is returned
                     if (ar4.length > 0) {
                         report.setValue = []
@@ -729,44 +790,18 @@ angular.module("pocApp")
                 }
 
 
-                //get the launch contexts. These are fixed ATM but worth displaying
-                let arLC = getExtension(Q,extLaunchContextUrl)
 
-
-                report.launchContext = []
-                for (const ext of arLC) {
-                    let item = {}
-                    ext.extension.forEach(function (child) {
-
-                        switch (child.url) {
-                            case "name" :
-                                item.name = child.valueCoding.code
-                                break
-                            case "type" :
-                                item.type = child.valueCode
-                                break
-                            case "description" :
-                                item.description = child.valueString
-                                break
-                        }
-
-                        
-                    })
-                    report.launchContext.push(item)
-
-                }
-
-                console.log(report.launchContext)
 
                 Q.item.forEach(function (item) {
                     processItem(report,item)
                 })
 
+                console.log(report)
                 return {report:report}
 
             },
 
-            makeHierarchicalQFromComp : function (comp,hashAllDG) {
+            makeHierarchicalQFromComp : function (comp,hashAllDG,namedQueries) {
                 //construct a Q from the composition
                 //strategy is to gather the DG from the comp sections, create DG Qs then assemble them into the comp Q
                 //assumption is that the composition itself doesn't change the DG contents - it is just a selector of DGs
@@ -838,28 +873,30 @@ angular.module("pocApp")
 
                             let config = {expandVS:true,enableWhen:true,pathPrefix : pathPrefix,calledFromComp:true}
                             config.hashAllDG = hashAllDG
+                            config.namedQueries = namedQueries
 
                             const guid = createUUID() // crypto.randomUUID();
 
 
 
                             config.patientId = guid //'testPatient'    //will be a uuid
-                            //If there's a type value on the DG, this is the FHIR resource type that can be extracted from it
-                       /*     if (dg.type) {
-                                config.fhirType = dg.type
-                            }
-*/
-                            //-------- make the Q for the DG....
-                            //console.log(`${dgType} ${dgElementList.length}`)
+
 
                             let vo = that.makeHierarchicalQFromDG(dg,dgElementList,config)
 
                             allEW.push(...vo.allEW)
 
                             let dgQ = vo.Q
-                            let hashByPath = vo.hashEd          //EDs from the child
 
-
+                            //if there are any variables defined by the DG then add them to the root
+                            //they would have been added by the DG routine, but the Q root is ignored here.
+                            //add the named queries as variables in the Q.
+                            if (dg.namedQueries) {
+                                //let item = Q.item[0]
+                                dg.namedQueries.forEach(function (nqName) {
+                                    addNamedQuery(Q,nqName,config.namedQueries)
+                                })
+                            }
 
                             //the list of all EDs
                             Object.keys(vo.hashEd).forEach(function (linkId) {
@@ -875,7 +912,6 @@ angular.module("pocApp")
                             //any errors
                             //console.log(`${dgType} ${vo.errorLog.length}`)
                             if (vo.errorLog.length > 0) {
-
                                 errorLog.push(...vo.errorLog)
                             }
 
@@ -891,23 +927,54 @@ angular.module("pocApp")
                             //multiple resources extracted from it, they will be in the items...
 
                             //let arExt = getExtension(vo.Q,extExtractionContextUrl,'Code')
-
+/* - temp
                             let arExt = getExtension(vo.Q,extExtractionContextUrl,'String')
                             if (arExt.length) {
                                 sectionItem.extension = sectionItem.extension || []
                                 let ext = {url:extExtractionContextUrl,valueString:arExt[0]}
                                 sectionItem.extension.push(ext)
                             }
+                            */
 
 
 
                             if (dgQ && dgQ.item[0]) {
-                                for (const child of dgQ.item[0].item){
-                                    sectionItem.item.push(child)
+
+                                //todo - added this level of nesting as CSIRO renderer doesn't support pre-pop in tabs
+                                //makes the tree bad though...
+                                let dgItem = {linkId:`${comp.name}.${section.name}.section`,text:section.title,type:'group',repeats:true,item:[]}
+
+
+                                if (dgQ.item[0].extension) {
+
+                                    for (const ext of dgQ.item[0].extension) {
+
+                                    }
+
+                                    dgItem.extension = dgItem.extension || []
+                                    dgItem.extension.push(...dgQ.item[0].extension)
+                                    dgItem.repeats = true
+
+
+                               //     sectionItem.extension = sectionItem.extension || []
+                                //    sectionItem.extension.push(...dgQ.item[0].extension)
+                                 //   sectionItem.repeats = true
                                 }
+
+
+
+
+
+
+
+                                for (const child of dgQ.item[0].item){
+                                    dgItem.item.push(child)
+                                   //temp  sectionItem.item.push(child)
+                                }
+
+                                sectionItem.item.push(dgItem)
+
                             }
-
-
                         }
                     }
 
@@ -923,7 +990,6 @@ angular.module("pocApp")
                 }
 
                 return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog,allEW:allEW}
-
 
             },
 
@@ -941,7 +1007,6 @@ angular.module("pocApp")
 
                 if (! lstElements || lstElements.length == 0) {
                     return  {allEW:[],hashEd :{} ,hashVS:{}, errorLog:[] }    //this results when there is a missing DG referenced...
-
                 }
 
                 let dgName = dg.name //lstElements[0].ed.path     //first line is the DG name
@@ -1052,21 +1117,21 @@ angular.module("pocApp")
 
                 }
 
+                let extractionContext
 
                 //add definition based data extraction. This is where the DG can be extracted to a FHIR
                 //resource using the SDC defintion extratcion
                 //examine the DG hierarchy to see if there is a 'type' in any of the DG parents which is the SDC extraction context
                 //note that the extraction context is a complete url (not just a type name)
                 //this is where the context is defined on the DG (as opposed to a referenced DG
-
+/*
                 let extractionContext = getExtractionContext(dgName,config.hashAllDG)
 
                 if (extractionContext) {
                     Q.extension = Q.extension || []
-                    //Q.extension.push({url:extExtractionContextUrl,valueCode:extractionContext})
                     Q.extension.push({url:extExtractionContextUrl,valueString:extractionContext})
                 }
-
+*/
                 let currentItem
                 let hashItems = {}      //items by linkId
                 let hashEd = {}         //has of ED by path (=linkId)
@@ -1111,11 +1176,37 @@ angular.module("pocApp")
 
 
                     } else {
+                        //this is the first item in the Q.
+
+                        console.log(`>>>>>>>>>. ${pathPrefix}${path}` )
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
                         decorateItem(currentItem,ed,extractionContext,dg)
                         if (config.enableWhen) {
                             let ar = addEnableWhen(ed,currentItem,config.pathPrefix)
                             allEW.push(...ar)
+                        }
+
+                        //this is the first item in the Q. We place any extraction context defined on the DG
+                        // here so it is in the right place for repeated elements...
+                        //note that it is already defined - don't use 'let'
+
+                        extractionContext = getExtractionContext(dgName,config.hashAllDG)
+                        if (extractionContext) {
+                            currentItem.extension = currentItem.extension || []
+                            currentItem.extension.push({url:extExtractionContextUrl,valueString:extractionContext})
+                        }
+
+                        //we'll also add a population context here. This is to support any pre-pop
+                        //todo - does it make sense for a DG to have multiple NQ? For now, we'll just grab the first one
+                        if (dg.namedQueries && dg.namedQueries.length > 0) {
+                            addPopulationContext (dg.namedQueries[0],currentItem)
+                            currentItem.repeats = true  //if pre-pop from a NQ then must be able to repeat
+
+                            //we'll also add the extension to render pre-pop as a table.
+                            //todo - this could be an option on the DG
+
+                            addItemControl(currentItem,'gtable')
+
                         }
 
                         hashItems[path] = currentItem
@@ -1271,7 +1362,7 @@ angular.module("pocApp")
                         }
 
 
-                        //this ed is a child ED. Des this DG have an extraction context? Curentlly a FHIR resource, but could be a profile
+                        //this ed is a child ED. Des this DG have an extraction context? Curentlly a FHIR resource type, but could be a profile
 
                         //is there an extraction context (dg.type) on this DG or any of its parents
                         //todo - check this. I think this extractionContext is in a different scope - ? should change name
@@ -1315,30 +1406,39 @@ angular.module("pocApp")
 
                     //todo - refactor these
                     if (vo.controlHint == 'autocomplete') {
+                        addItemControl(item,'autocomplete')
+                        /*
                         let ext = {url:extItemControlUrl}
 
                         let cc = {coding:[{code: 'autocomplete',system:'http://hl7.org/fhir/questionnaire-item-control'}]}
                         ext.valueCodeableConcept = cc
                         item.extension = ed.extension || []
                         item.extension.push(ext)
+                        */
                     }
 
                     if (vo.controlHint == 'radio') {
+                        addItemControl(item,'radio-button')
+                        /*
                         let ext = {url:extItemControlUrl}
 
                         let cc = {coding:[{code: 'radio-button',system:'http://hl7.org/fhir/questionnaire-item-control'}]}
                         ext.valueCodeableConcept = cc
                         item.extension = ed.extension || []
                         item.extension.push(ext)
+                        */
                     }
 
                     if (vo.controlHint == 'check-box') {
+                        addItemControl(item,'check-box')
+                        /*
                         let ext = {url:extItemControlUrl}
 
                         let cc = {coding:[{code: 'check-box',system:'http://hl7.org/fhir/questionnaire-item-control'}]}
                         ext.valueCodeableConcept = cc
                         item.extension = ed.extension || []
                         item.extension.push(ext)
+                        */
                     }
 
 
@@ -1655,54 +1755,6 @@ angular.module("pocApp")
 
             },
 
-            makeTreeFromQDEP : function (Q) {
-                //pass in a Q and return a tree array representation
-                //used in previewQ
-                let treeData = []
-                let issues = []         //any issues found during
-                let lstElements = []    //a flat list of elements
-                let hashLinkId = {}     //a hash of linkIds
-
-                function processItem(item,parent) {
-
-
-
-                        let node = {id:item.linkId,text:item.text,parent:parent}
-                        node.data = item
-                        if (hashLinkId[item.linkId]) {
-                            issues.push(`linkId: ${item.linkId} is duplicated`)
-                        } else {
-                            hashLinkId[item.linkId] = true
-                        }
-                        treeData.push(node)
-
-                        lstElements.push({linkId:item.linkId,item:item})
-
-
-                        if (item.item) {
-                            item.item.forEach(function (child) {
-                                processItem(child,item.linkId)
-                            })
-                        }
-                    }
-
-
-
-
-
-
-
-                let node = {id:'root',parent:"#",text:"root"}
-                treeData.push(node)
-                Q.item.forEach(function (item) {
-                    processItem(item,'root')
-                })
-
-
-                return {treeData:treeData,issues : issues,lstElements:lstElements}
-
-
-            },
 
             getAllEW : function (Q) {
                 //Create a hash of all the 'EnableWhens' in a Q
@@ -1806,280 +1858,6 @@ angular.module("pocApp")
 
             },
 
-            makeQFromDGDEP : function (lstElements,hashAllDG) {
-
-
-                let dgName = lstElements[0].ed.path
-
-                //get the full DG so we can get the ultimate parent
-                let fullDG = snapshotSvc.getDG(dgName)
-                console.log(fullDG)
-
-                let qUrl = `http://canshare.co.nz/fhir/questionnaire-name/${dgName}`
-                let Q = {resourceType:"Questionnaire",status:'draft',url:qUrl,item:[]}
-                let section = []
-
-                if (fullDG.ultimateParent == 'Section') {
-                    //if it's a section, then each ed within the section is a full DG, so process each
-                    //one individually and aggregate all of them is a list. This means the 'boxing' around
-                    //the DGs is preserved
-
-
-                    let hash = {}
-                    lstElements.forEach(function (item) {
-                        if (item.ed.path) {
-                            let ar = item.ed.path.split('.')
-                            let name = ar[0]
-                            hash[name] = true
-                        }
-
-                    })
-
-                    console.log(hash)
-
-                    let vo = this.internalMakeQFromDG(lstElements,hashAllDG) //{Q:Q,section:section}
-                    Q.item.push(vo.section)
-                    section.push(vo.section)
-
-
-
-                } else {
-                    let vo = this.internalMakeQFromDG(lstElements,hashAllDG) //{Q:Q,section:section}
-                    Q.item.push(vo.section)
-                    section.push(vo.section)
-                }
-
-
-                return {Q:Q,section:section}
-            },
-
-            //this is used by the DG form creation
-            makeQFromDGDEPX : function (lstElements,hashAllDG) {
-                //generate a Q based on the list of elements that represents a DG
-
-                if (! lstElements || lstElements.length == 0) {
-                    return {}
-                }
-
-                let dgName = lstElements[0].ed.path
-
-                //construct a list of paths to hide
-                let basePathsToHide = []    //a list of all paths where hideInQ is set. Any elements starting with this path are also set
-                lstElements.forEach(function (thing) {
-                    //Actually, there shouldn't be anything with the mult 0..0 any more - but hideInQ is certainly there
-                    if (thing.ed.hideInQ || (thing.ed.mult == '0..0')) {
-                        basePathsToHide.push(thing.ed.path)  //the full path
-                    }
-                })
-
-                //now create the list of ED to include in the Q
-                //we do this first so that we can exclude all child elements of hidden elements as well
-                let lstQElements = []
-                lstElements.forEach(function (thing,ctr) {
-                    if (ctr > 0) {
-                        let ed = thing.ed
-                        let okToAdd = true
-                        if (ed.mult == '0..0') {okToAdd = false}
-                        if (okToAdd) {
-                            for (const pth of basePathsToHide) {
-                                if (ed.path == pth || ed.path.isChildPath(pth)) {
-                                    okToAdd = false
-                                    break
-                                }
-                            }
-                        }
-                        if (okToAdd) {
-                            lstQElements.push(ed)
-                        }
-                    }
-                })
-
-                //now can build the Q
-                let qUrl = `http://canshare.co.nz/fhir/questionnaire-name/${dgName}`
-                let Q = {resourceType:"Questionnaire",status:'draft',url:qUrl,item:[]}
-
-                //there's a single section (item) for the DG (This is a Q section - not the same as the composition section)
-                let section = {text:lstElements[0].ed.title,linkId:`${dgName}-section`,item:[]}
-                section.definition = lstElements[0].ed.path
-                section.type = "group"
-
-                Q.item.push(section)
-
-
-                let group //= topGroup
-
-                //strategy is to represent the DG as a flattened structure off the section item with up to 2 levels
-                //if an element (ed) is a FHIR DT (excl group) then it is appended to the section item
-                //if the element is a group or DT then a Q group item is created and added to the section.
-                //  components of the group / DT are then added to that group item
-
-
-                let processingDGPath = null     //When processing a DT / group, what the path of that group is
-
-                lstQElements.forEach(function (ed) {
-
-                    let path = ed.path
-                    let type = ed.type[0]
-
-                    //if the ed is a DT or a Group then create a Q group item to hold the contents.
-                    //set the processingDGPath to the path of the ED so we know when we get past it
-
-                    //console.log(processingDGPath,path,path.isChildPath(processingDGPath))
-
-                    if (processingDGPath) {
-                        //if we're already processing a group / DG , is the path of this ed the same? (ie are we still processing a member of that DT / group
-                        if (stillOnProcessingPath(ed,path,processingDGPath)) {
-                            //if ( path.isChildPath(processingDGPath)) {
-                            //yes, we're still on the same path, so just create and add an item to the group
-                            let item = {text:ed.title,linkId:ed.path,type:'string'}
-                            decorateItem(ed,item)
-                            group.item.push(item)
-                        } else {
-                            //no, we've move on to something different. What sort is it
-                            checkEd(ed)    //will set processingDGPath if a group / DG. clear otherwise
-                        }
-
-                    } else {
-                        //we're not currently processing a group / ED
-                        checkEd(ed)
-                    }
-
-                    if (false) {
-
-
-                        if (hashAllDG[type]) {
-                            //console.log('new group',ed)
-                            //this is not a group datatype - slightly confusing...
-                            group = makeGroup(ed)
-                            addEnableWhen(ed,group)  //If there are any conditionals
-
-                            processingDGPath = path
-                        } else {
-                            //need to see if we've finished procesing a path
-                            if (processingDGPath) {
-                                //yes, we have started processing a DG group. Are we still on that path?
-
-                                if ( !path.isChildPath(processingDGPath)) {
-                                    //group = topGroup  - this puts everyting at the top
-                                    //We've moved on past the DG.
-
-                                    //may13
-
-
-                                    //todo - may not want to use the DG being processed for the group ?What should the text be
-                                    //let groupEd = {title:"Group",path:`${ed.title}-group`}
-                                    let groupEd = {title:ed.title,path:`${ed.title}-group`}
-                                    group = makeGroup(groupEd)       //create a new group for the elements following the referenced DG
-
-                                    //todo - this doesn't appear to do anything...
-
-                                    processingDGPath = null
-                                }
-
-                            }
-
-                            let item = {text:ed.title,linkId:ed.path,type:'string'}
-
-                            decorateItem(ed,item)
-
-                            if (type == 'Group') {
-                                item.type = "display"
-                            }
-
-
-                            group.item.push(item)
-
-
-
-
-
-                            /* - don't think we're supporting that now...
-                            //have to check here to ensure 'other' item is after main one
-                            if (ed.otherType) {
-                                //if there's an 'otherType set then the function will return the items to insert (as conditionals need to be set)
-                                let lstItem = addOtherItem(ed,item)    //if the element has the 'otherType' set then add the extra item + ew
-                                //the function returns the items to add, in order
-                                lstItem.forEach(function (newItem) {
-                                    group.item.push(newItem)
-                                })
-                            } else {
-                                //if there's no otherType then just add the new item
-
-                            }
-                            */
-                        }
-                    }
-
-                })
-
-                //the section is just the first item in the Q - maybe remove
-                return {Q:Q,section:section}
-
-                //Is the path still part of the processing path?
-                function stillOnProcessingPath(ed,path,processingDGPath) {
-                    //first use the 'isChildPath' function.
-                    if (! path.isChildPath(processingDGPath)) {
-                        //not on the path, return false
-                        return false
-                    }
-                    //the path is still on the path - is it a DG??
-                    let type = ed.type[0]
-                    if (hashAllDG[type]) {
-                        return false
-                    } else {
-                        return true
-                    }
-
-
-
-                }
-
-                function checkEd(ed) {
-                    let path = ed.path
-                    let type = ed.type[0]
-
-                    if (hashAllDG[type] || type=="Group") {
-                        //it's a DG or group.
-                        processingDGPath = path
-                        group = makeGroup(ed) //will add to section
-                        addEnableWhen(ed,group)  //If there are any conditionals
-                        //section.item.push(group)
-                    } else {
-                        //just a FHIR DT - add to the section
-                        delete processingDGPath
-                        let item = {text:ed.title,linkId:ed.path,type:'string'}
-                        decorateItem(ed,item)
-                        section.item.push(item)
-                    }
-                }
-
-
-
-                //set the other attributes of the item from the ed
-                function decorateItem(ed,item) {
-                    if (ed.autoPop) {item.text += ' (Auto populated)'}
-                    item.definition = ed.path
-                    addEnableWhen(ed,item)  //If there are any contitionals
-                    setControlType(ed,item)  //set the control type to use - also expands any ValueSet
-                    QutilitiesSvc.setFixedValue(ed,item)
-                }
-
-                function makeGroup(ed) {
-                    let text = ed.title || ed.path
-                    let group = {text:text,linkId: ed.path,type:'group',item:[]}
-                    group.definition = ed.path
-
-                    //group.linkId = ed.path
-                    section.item.push(group)
-
-                    //add a display element may2024
-                    //let display = {text:text,linkId: `${ed.path}-display`,type:'display'}
-                    //group.item.push(display)
-
-                    return group
-                }
-
-            }
 
         }
 

@@ -476,12 +476,17 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
 
                     if (vsUrl) {
                         let vs = hashValueSetNames[vsUrl]
-                        if (vs.status !== "active") {
-                            logger(rowNumber,`The valueSet ${vsUrl} in col ${4} has a status of ${vs.status}`)
+                        if (vs) {
+                            if (vs.status !== "active") {
+                                logger(rowNumber,`The valueSet ${vsUrl} in col ${4} has a status of ${vs.status}`)
+                            }
+
+                            hashVSUsed[vsUrl] = hashVSUsed[vsUrl] || []
+                            hashVSUsed[vsUrl].push({type:'target',row:rowNumber})
+                        } else {
+                            logger(rowNumber,`The valueSet ${vsUrl} in col ${4} is unknown.`)
                         }
 
-                        hashVSUsed[vsUrl] = hashVSUsed[vsUrl] || []
-                        hashVSUsed[vsUrl].push({type:'target',row:rowNumber})
 
                     }
 

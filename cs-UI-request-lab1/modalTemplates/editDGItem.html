@@ -179,7 +179,11 @@
         <table class="table-bordered table table-condensed">
           <tr>
             <td  style="width: 20%;">Hide in Q</td>
-            <td><checkbox ng-model="input.hideInQ"> </td>
+            <td><checkbox ng-model="input.hideInQ"></checkbox>
+
+              <a ng-if="linkToSpec" class='pull-right' target="_blank" ng-href="{{linkToSpec}}">View {{dg.type}} in spec</a>
+
+            </td>
           </tr>
 
           <tr >
@@ -221,26 +225,43 @@
           <tr>
             <td>PrePop expression</td>
             <td>
-              <div class="row">
-                <div class="col-md-10">
-                  <input type="text"
-                         placeholder="FHIRPath pre-pop expression - eg Patient.name.first().family"
-                         class="form-control" ng-model="input.prePop"/>
+
+              <div ng-if = "dg.namedQueries.length > 0">
+                <div class="row">
+                  <div class="col-md-11">
+                  <textarea
+                          placeholder="FHIRPath pre-pop expression - eg %patient.family"
+                          class="form-control" ng-model="input.prePop"></textarea>
+
+                  </div>
+
+                  <!--
+                  <div class="col-md-1">
+                    <span class="btn btn-link" ng-click="testPrePop(input.prePop,'testPPResult')">Test</span>
+
+                  </div>
+                  -->
+
+                  <div class="col-md-1">
+
+                    <a style="display:block ; margin-top: 8px" href="https://hl7.org/fhir/fhirpath.html" target="_blank">Spec</a>
+                  </div>
 
                 </div>
-                <div class="col-md-1">
-                  <span class="btn btn-link" ng-click="testPrePop(input.prePop,'testPPResult')">Test</span>
+                <div><em>Expression source: <span class="clickable" ng-click="testxquery(dg.namedQueries[0])">{{dg.namedQueries[0]}}</span> </em></div>
 
+                <div ng-if="testPPResult" ng-class="testPPResultOutcome">
+                  {{testPPResult}}
                 </div>
-                <div class="col-md-1">
-
-                  <a style="display:block ; margin-top: 8px" href="https://hl7.org/fhir/fhirpath.html" target="_blank">Spec</a>
-                </div>
-
               </div>
-            <div ng-if="testPPResult" ng-class="testPPResultOutcome">
-              {{testPPResult}}
-            </div>
+              <div ng-if = "! dg.namedQueries || dg.namedQueries.length < 1">
+                <em>To enable pre-population you need to select a named query for this DG. This is
+                  done from the main DG editor (the link at the top of the DG display page).</em>
+              </div>
+
+
+
+
             </td>
           </tr>
 
@@ -256,6 +277,7 @@
 
                 </div>
                 <div class="col-md-1">
+
                   <span class="btn btn-link" ng-click="testPrePop(input.definition,'testExtract')">Test</span>
 
                 </div>
@@ -265,6 +287,7 @@
                 </div>
 
               </div>
+
               <div><pre ng-if="testExtract">{{testExtract | json}}</pre></div>
             </td>
           </tr>

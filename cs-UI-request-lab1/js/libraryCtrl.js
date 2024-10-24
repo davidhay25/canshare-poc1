@@ -29,14 +29,14 @@ angular.module("pocApp")
             }
             loadNamedQueries()
 
-            $scope.updateNamedQuery = function (name,description,contents,active) {
+            $scope.updateNamedQuery = function (name,itemName,description,contents,active) {
 
                 if (! active) {
                     if (! confirm("Are you sure you wish to remove this Named Query?")) {
                         return
                     }
                 } else {
-                    for (nq1 of $scope.namedQueries) {
+                    for (const nq1 of $scope.namedQueries) {
                         if (name == nq1.name) {
                             alert("This is a duplicate name. You need to choose another.")
                             return
@@ -51,12 +51,13 @@ angular.module("pocApp")
 
                 let qry = `/model/namedquery/${name}`
 
-                let nq = {name:name,description:description,contents:contents,active:active}
+                let nq = {name:name,itemName:itemName,description:description,contents:contents,active:active}
 
                 $http.put(qry,nq).then(
                     function (data) {
                         $scope.namedQueries = data.data
                         delete $scope.input.nqName
+                        delete $scope.input.nqItemName
                         delete $scope.input.nqDescription
                         delete $scope.input.nqContents
                         loadNamedQueries()
@@ -67,6 +68,24 @@ angular.module("pocApp")
 
             }
 
+
+            $scope.testxquery = function (xqry) {
+                $uibModal.open({
+                    size : 'xlg',
+                    backdrop: 'static',
+                    templateUrl: 'modalTemplates/xquery.html',
+                    controller: 'xqueryCtrl',
+
+
+                    resolve: {
+                        query: function () {
+                            return xqry || "Condition?patient={{%patient.id}}"
+                        }
+                    }
+                })
+
+
+            }
 
             $scope.input.filter = {}
 

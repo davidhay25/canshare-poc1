@@ -9,8 +9,10 @@ angular.module('formsApp')
                 hashEd : '=',        //hash of all elementDefinitions by path (=ed)
                 technicalview : '=', //show technical items
                 treenode : '@',       //where to mount the tree
-                errors: '='             //errors to display in the UI
+                errors: '=',             //errors to display in the UI
+                patientid :'='          //patient id to use when calling the lab...
             },
+
 
             //https://fhirpath-lab.com/Questionnaire/tester
 
@@ -20,6 +22,8 @@ angular.module('formsApp')
 
 
                 console.log($scope)
+
+                let localPatientId = $scope.patientId || "45086382"
 
 
                 $scope.datePopup = {}
@@ -108,7 +112,7 @@ angular.module('formsApp')
 
                     //add the patient context.
                     //todo - pass this into the directive...
-                    $scope.redirectUrl += "&subject=Patient/596395"
+                    $scope.redirectUrl += `&subject=Patient/${localPatientId}`
 
                     //This was code to allow multiple of this directive in a single page. Didn't work. May no longer be needed.
                     $scope.treenode = $scope.treenode || "designTreeX"

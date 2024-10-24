@@ -91,13 +91,13 @@
     <script src="js/cmSvc.js"></script>
     <script src="js/snapShotSvc.js"></script>
     <script src="js/QutilitiesSvc.js"></script>
+    <script src="js/xquery.js"></script>
 
-
-
+<!--
     <script src="directive/renderForm/renderFormSvc.js"></script>
     <script src="directive/renderForm/renderFormDir.js"></script>
     <script src="directive/renderSingleItem/renderSingleItemDir.js"></script>
-
+-->
 
     <!-- While developing new directive -->
     <script src="directive/renderForm2/renderFormSvc2.js"></script>
@@ -202,7 +202,7 @@
 
         </uib-tab>
 
-        <uib-tab heading="SDC extraction elements">
+        <uib-tab heading="SDC elements">
             <div class="pull-right">
                 <checkbox ng-model="input.SDCOnly"></checkbox> Show only with SDC instructions
             </div>
@@ -225,8 +225,9 @@
                     <td>{{entry.isHidden}}</td>
                     <td>{{entry.fixedValue}}</td>
                     <td>
-                        <div ng-if="entry.definition"><strong>Extraction: </strong>{{entry.definition}}</div>
                         <div ng-if="entry.initialExpression"><strong>Initial: </strong>{{entry.initialExpression}}</div>
+                        <div ng-if="entry.definition"><strong>Extraction: </strong>{{entry.definition}}</div>
+
                         <div ng-if="entry.extractionContext"><strong>Extraction context: </strong>{{entry.extractionContext}}</div>
                         <div ng-if="entry.populationContext">
                             <strong>Population context:</strong>
@@ -234,6 +235,12 @@
                             expression={{entry.populationContext.expression}}
                         </div>
 
+                        <span ng-if="entry.variable" class="pull-right clickable"
+                              style="cursor: pointer"
+                              ng-click="testxquery(entry)">Test</span>
+
+
+                        <div ng-if="entry.variable"><strong>Variable: </strong><em>{{entry.variable}}</em>: {{entry.expression}}</div>
 
 
 
@@ -256,11 +263,17 @@
 
             <h4>Launch Contexts</h4>
             <table class="table table-condensed table-bordered">
-                <tr><th>Name</th><th>Type</th><th>Description</th></tr>
+                <tr><th>Name</th><th>Type</th><th>Description</th><th>Used</th></tr>
                 <tr ng-repeat="lc in qReport.launchContext">
                     <td>{{lc.name}}</td>
                     <td>{{lc.type}}</td>
                     <td>{{lc.description}}</td>
+                    <td>
+
+                        <div ng-repeat="item in qReport.variableUsage[lc.name]">
+                            {{item}}
+                        </div>
+                    </td>
                 </tr>
             </table>
 

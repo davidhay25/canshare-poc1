@@ -178,12 +178,12 @@
                 <div class="col-md-3">
                     <input placeholder="Filter on VS title or url" type="text" class="form-control"
                            ng-model="input.filterlist"/>
-                    <div>  <checkbox ng-model="input.includeRetired"></checkbox> Include retired
+                    <div>  <checkbox ng-model="input.includeRetired"></checkbox> Include retired & draft
                     </div>
                     <br/>
                     <div class="myScroll">
                         <div class="list-group">
-                            <div ng-class="{'list-group-item':true,listItemSelected:selectedItem==item,retiredVS:item.vs.status == 'retired'}"
+                            <div ng-class="{'list-group-item':true,listItemSelected:selectedItem==item,retiredVS:item.vs.status == 'retired',draftVS:item.vs.status == 'draft'}"
                                  ng-show="showVS(item)"
                                  style="cursor: pointer" ng-repeat="item in allVSItem" ng-click="selectVSItem(item)">
                                 {{item.display}}

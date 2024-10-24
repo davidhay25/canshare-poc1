@@ -1,0 +1,87 @@
+<div>
+  <!--<div ng-controller="newResourceCtrl">-->
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-8 col-sm-8">
+        <h3 class="modal-title">
+          Variable tester
+        </h3>
+      </div>
+
+
+      <div class="col-md-4 col-sm-4">
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
+        <button ng-show = "input.name"
+                class="btn btn-primary pull-right" ng-click="save()">Save</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-body">
+
+      <div class="row">
+          <div class="col-md-1">
+              Query
+          </div>
+          <div class="col-md-9">
+              <textarea class="form-control" ng-model="input.expression"></textarea>
+          </div>
+          <div class="col-md-2">
+              <button class="btn btn-link" ng-click="execute(input.expression)">Execute</button>
+          </div>
+      </div>
+
+
+      <hr/>
+
+
+      <div class="row">
+          <div class="col-md-3">
+             <div class="list-group">
+                 <div ng-class="{'list-group-item':true, listItemSelected:selectedResource.id == entry.resource.id}"
+                      ng-click="selectResource(entry.resource)"
+                      style="cursor: pointer"
+                      ng-repeat="entry in response.entry">
+                     {{entry.resource.id}}
+                 </div>
+             </div>
+          </div>
+          <div class="col-md-9">
+
+              <div class="row" ng-if="selectedResource">
+                  <div class="col-md-2">
+                      FHIRPath
+                  </div>
+                  <div class="col-md-8">
+                      <textarea class="form-control" ng-model="input.fhirPath"></textarea>
+                      <div>
+                          {{fhirPathResult}}
+                      </div>
+                  </div>
+                  <div class="col-md-2">
+                      <button class="btn btn-link" ng-click="executeFhirPath(input.fhirPath,selectedResource)">Execute</button>
+                  </div>
+              </div>
+
+
+              <pre ng-show="selectedResource">{{selectedResource | json}}</pre>
+
+
+          </div>
+      </div>
+
+  </div>
+  <div class="modal-header">
+      <div class="row">
+          <div class="col-md-2">
+              Patient Id
+          </div>
+          <div class="col-md-2">
+              <input type="text" class="form-control" ng-model="input.patientId"/>
+          </div>
+
+      </div>
+
+  </div>
+</div>

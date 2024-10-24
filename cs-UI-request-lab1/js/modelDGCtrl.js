@@ -1,7 +1,7 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('modelDGCtrl',
-        function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc,$timeout,librarySvc,traceSvc,orderingSvc) {
+        function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc,$timeout,librarySvc,traceSvc,orderingSvc,$http) {
 
 
 
@@ -22,6 +22,30 @@ angular.module("pocApp")
 
                 $scope.makeSnapshots()
                 $scope.refreshFullList($scope.selectedModel)
+
+            }
+
+            $scope.testxquery = function (queryName) {
+                $http.get(`/model/namedquery/${queryName}`).then(
+                    function (data) {
+                        $uibModal.open({
+                            //backdrop: 'static',      //means can't close by clicking on the backdrop.
+                            //keyboard: false,       //same as above.
+                            size : 'xlg',
+                            templateUrl: 'modalTemplates/xquery.html',
+                            controller: 'xqueryCtrl',
+                            resolve: {
+                                query: function () {
+                                    return data.data
+                                }
+                            }
+                        })
+                    }, function (err) {
+                        alert("Named query not found")
+                    }
+                )
+
+
 
             }
 

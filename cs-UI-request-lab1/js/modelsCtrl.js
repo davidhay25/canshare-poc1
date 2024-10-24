@@ -1682,34 +1682,16 @@ angular.module("pocApp")
 
                 //build the Q. This is to find any errors - we don't otherwise use the Q in this app anymore
                 //actually - it is used when saving a version -
-                let vo1 = makeQSvc.makeHierarchicalQFromComp(comp,$scope.hashAllDG)
-               // $scope.currentQ = vo1.Q
-                $scope.compQErrors = vo1.errorLog
-                console.log(vo1)
 
-                /*
-                vsSvc.getAllVS($scope.allCompElements, function () {
-                    //$scope.showWaiting = false
-                    let vo = makeQSvc.makeHierarchicalQFromComp(comp,true)//,$scope.hashAllDG)
+                makeQSvc.getNamedQueries(function (hashNamedQueries) {
+                    let vo1 = makeQSvc.makeHierarchicalQFromComp(comp,$scope.hashAllDG,hashNamedQueries)
 
-                    $scope.fullQ = vo.Q         //will invoke the Q renderer directive
-                   // $scope.hashEd = vo.hashEd
-                    console.log(vo.errorLog)
+                    $scope.compQErrors = vo1.errorLog
+                    console.log(vo1)
                 })
-                */
 
-                /*
 
-                if (autoQ) {
-                    //generate the Q and also retrieve all the ValueSetsvo1.
 
-                    makeCompQSvc.makeQ($scope.allCompElements, $scope.hashAllDG, function (Q) {
-                        $scope.fullQ = Q
-                    })
-                }
-*/
-
-                //$scope.hashCompElements = vo.hashAllElements
 
                 let download = modelCompSvc.makeTSVDownload(vo.allElements)
 

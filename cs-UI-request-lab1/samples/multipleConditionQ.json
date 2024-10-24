@@ -1,0 +1,218 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "canshare-myCondition-bp",
+  "meta": {
+    "versionId": "2",
+    "lastUpdated": "2024-10-22T00:19:59.7629577+00:00"
+  },
+  "extension": [
+    {
+      "extension": [
+        {
+          "url": "name",
+          "valueCoding": {
+            "code": "patient"
+          }
+        },
+        {
+          "url": "type",
+          "valueCode": "Patient"
+        },
+        {
+          "url": "description",
+          "valueString": "The patient that is to be used to pre-populate the form"
+        }
+      ],
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+    },
+    {
+      "extension": [
+        {
+          "url": "name",
+          "valueCoding": {
+            "code": "user"
+          }
+        },
+        {
+          "url": "type",
+          "valueCode": "Practitioner"
+        },
+        {
+          "url": "description",
+          "valueString": "The practitioner that is to be used to pre-populate the form"
+        }
+      ],
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "patientconditions",
+        "language": "application/x-fhir-query",
+        "expression": "Condition?patient={{%patient.id}}"
+      }
+    }
+  ],
+  "url": "http://canshare.co.nz/questionnaire/myCondition-bp",
+  "name": "myCondition",
+  "status": "active",
+  "publisher": "Brian Postlethwaite",
+  "useContext": [
+    {
+      "code": {
+        "system": "http://terminology.hl7.org/CodeSystem/usage-context-type",
+        "code": "user",
+        "display": "User Type"
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "code": "extract",
+            "display": "Demo Extract"
+          }
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemPopulationContext",
+          "valueExpression": {
+            "name": "condition",
+            "language": "text/fhirpath",
+            "expression": "%patientconditions.entry.resource"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueString": "http://hl7.org/fhir/StructureDefinition/Condition"
+        }
+      ],
+      "linkId": "myCondition",
+      "text": "myCondition",
+      "type": "group",
+      "repeats": true,
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": {
+                "language": "text/fhirpath",
+                "expression": "%condition.code.text"
+              }
+            }
+          ],
+          "linkId": "myCondition.name",
+          "text": "name",
+          "type": "string"
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": {
+                "language": "text/fhirpath",
+                "expression": "%condition.clinicalStatus.coding"
+              }
+            }
+          ],
+          "linkId": "myCondition.clinicalStatus",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Condition#Condition.clinicalStatus.coding",
+          "text": "clinical status",
+          "type": "choice",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                "code": "active",
+                "display": "Active"
+              }
+            },
+            {
+              "valueCoding": {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                "code": "inactive",
+                "display": "Inactive"
+              }
+            },
+            {
+              "valueCoding": {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                "code": "recurrence",
+                "display": "Recurrence"
+              }
+            },
+            {
+              "valueCoding": {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                "code": "relapse",
+                "display": "Relapse"
+              }
+            },
+            {
+              "valueCoding": {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                "code": "remission",
+                "display": "Remission"
+              }
+            },
+            {
+              "valueCoding": {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                "code": "resolved",
+                "display": "Resolved"
+              }
+            }
+          ]
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": {
+                "language": "text/fhirpath",
+                "expression": "%condition.severity.coding"
+              }
+            }
+          ],
+          "linkId": "myCondition.severity",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Condition#Condition.severity.coding",
+          "text": "severity",
+          "type": "choice",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "system": "http://snomed.info/sct",
+                "code": "255604002",
+                "display": "Mild"
+              }
+            },
+            {
+              "valueCoding": {
+                "system": "http://snomed.info/sct",
+                "code": "6736007",
+                "display": "Moderate severity"
+              }
+            },
+            {
+              "valueCoding": {
+                "system": "http://snomed.info/sct",
+                "code": "24484000",
+                "display": "Severe"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "myCondition.notes",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Condition#Condition.note.text",
+          "text": "notes",
+          "type": "string"
+        }
+      ]
+    }
+  ]
+}

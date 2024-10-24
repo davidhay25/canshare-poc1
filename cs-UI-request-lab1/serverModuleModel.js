@@ -634,6 +634,26 @@ async function setup(app,mongoDbName) {
 
     })
 
+    //get a single named query
+    app.get('/model/namedquery/:name', async function(req,res) {
+        let query = {name:req.params.name}
+        try {
+            const cursor = await database.collection("namedquery").find(query).toArray()
+            let arQuery = []
+            if (cursor && cursor.length == 1) {
+                res.json(cursor[0])
+            } else {
+                res.status(404)
+
+            }
+
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+    })
+
     //get all named queries
     app.get('/model/namedquery', async function(req,res) {
 
@@ -655,7 +675,7 @@ async function setup(app,mongoDbName) {
 
 
     //add / edit named query
-    //create / update a single composition. In theory the name param is not needed, but cleaner
+    //create / update a single named query. In theory the name param is not needed, but cleaner
     app.put('/model/namedquery/:name', async function(req,res) {
 
         let namedquery = req.body

@@ -53,7 +53,7 @@ angular.module("pocApp")
             $scope.showVS = function (item) {
 
                 if (! $scope.input.includeRetired) {
-                    if (item.vs.status == 'retired') {
+                    if (item.vs.status == 'retired' || item.vs.status == 'draft') {
                         return false
                     }
                 }

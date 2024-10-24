@@ -103,6 +103,30 @@ angular.module("pocApp")
                 }
             )
 
+            $scope.testxquery = function (xqry) {
+                $uibModal.open({
+                    //backdrop: 'static',      //means can't close by clicking on the backdrop.
+                    //keyboard: false,       //same as above.
+                    size : 'lg',
+                    templateUrl: 'modalTemplates/xquery.html',
+
+                    controller: 'xqueryCtrl',
+
+                    resolve: {
+                        query: function () {
+                            return xqry
+                        }
+                    }
+
+                }).result.then(function (concept) {
+                    console.log(concept)
+
+
+                })
+
+
+            }
+
             $scope.hasFixedValue = function (ed) {
                 if (ed) {
                      if (ed.fixedCode || ed.fixedRatio || ed.fixedQuantity || ed.fixedCoding) {
@@ -682,19 +706,27 @@ angular.module("pocApp")
                         //alert("all VS available")
                         $scope.showWaiting = false
 
-
-                        let vo = makeQSvc.makeHierarchicalQFromComp(comp,$scope.hashAllDG)
-
-                        $scope.fullQ = vo.Q         //will invoke the Q renderer directive
-                        $scope.hashEd = vo.hashEd
-                        $scope.errorLog = vo.errorLog
-
-                        //A report focussed on pre-popupation & extraction
-                        let voReport =  makeQSvc.makeReport($scope.fullQ)
-                        $scope.qReport =voReport.report
+                        makeQSvc.getNamedQueries(function (hashNamedQueries) {
 
 
-                        console.log(vo.errorLog)
+                            let vo = makeQSvc.makeHierarchicalQFromComp(comp,$scope.hashAllDG,hashNamedQueries)
+
+                            $scope.fullQ = vo.Q         //will invoke the Q renderer directive
+                            $scope.hashEd = vo.hashEd
+                            $scope.errorLog = vo.errorLog
+
+                            //A report focussed on pre-popupation & extraction
+                            let voReport =  makeQSvc.makeReport($scope.fullQ)
+                            $scope.qReport =voReport.report
+
+
+                            console.log(vo.errorLog)
+
+                        })
+
+
+
+
                     })
                 }
             }
