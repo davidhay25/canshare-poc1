@@ -6,10 +6,10 @@ angular.module("pocApp")
             $scope.query = query
             $scope.input = {}
 
-            $scope.input.expression = query.contents
+            $scope.input.expression = query.expression
 
             //get the resource type - assume a structure like AllergyIntolerance?patient={{%patient.id}}
-            let ar = query.contents.split('?')
+            let ar = query.expression.split('?')
             let resourceType = ar[0]
 
             $scope.input.fhirPath = `%${query.itemName}`

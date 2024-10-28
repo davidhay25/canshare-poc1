@@ -7,9 +7,8 @@ angular.module("pocApp")
 
 
 
-
-
-            $scope.input.collapsibleOptions = ['default-open','default-closed']
+            $scope.input.collapsibleOptions = ['none','default-open','default-closed']
+            $scope.input.collapsible = $scope.input.collapsibleOptions[0]
 
             //need a default base for editing
             $scope.fixed = {}
@@ -21,6 +20,7 @@ angular.module("pocApp")
             if (initialTab == 'profile') {
                 $scope.input.mainTabActive = 3
             }
+
             $scope.fullElementList = fullElementList
             let dgName = fullElementList[0].ed.path     //it's aways the first element in the list...
             let dg = hashAllDG[dgName]
@@ -31,7 +31,7 @@ angular.module("pocApp")
                //  $scope.type = dg.type
              }
 
-             //execute the namedquert expression
+             //execute the namedquery expression
             $scope.testxquery = function (queryName) {
                 $http.get(`/model/namedquery/${queryName}`).then(
                     function (data) {
@@ -67,6 +67,7 @@ angular.module("pocApp")
             $scope.units = [] //a list of units. Will be saved as ed.units
 
             $scope.fhirResourceType = igSvc.findResourceType(hashAllDG[dgName],hashAllDG)
+
 
             //parentEd is the ed to which the new one is going to be added. It's ignored during editing existing
             //we want to be sure that any path added at this level is unique (but OK at other levels)

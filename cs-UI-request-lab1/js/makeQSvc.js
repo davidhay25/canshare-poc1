@@ -34,6 +34,7 @@ angular.module("pocApp")
         //todo - might want to externalize into a config file ot similar
         //todo - anf maybe for references outside of patient ones...
         let resourcesForReference = {}
+        resourcesForReference['AllergyIntolerance'] = {path:'patient'}
         resourcesForReference['Observation'] = {path:'subject'}
         resourcesForReference['Condition'] = {path:'subject'}
         resourcesForReference['MedicationStatement'] = {path:'subject'}
@@ -619,7 +620,300 @@ angular.module("pocApp")
 
                 report.entries.push(thing)
                 
-                //get the variables - assume they are defined on the Q root
+                //get the variables - assume they are defined on the Q root for now...
+                let ar2 = getExtension(Q,extVariable,'Expression')
+                ar2.forEach(function (ext) {
+                    let thing = {text:Q.name}
+                    thing.variable = ext.name
+                    thing.expression = ext.expression  //varable type is x-query
+                    //thing.kind = 'variable'
+                    report.entries.push(thing)
+
+                    report.variableUsage[ext.name] = []
+
+                })
+
+
+                //get the launch contexts. These are fixed ATM but worth displaying
+                let arLC = getExtension(Q,extLaunchContextUrl)
+
+                report.launchContext = []
+                for (const ext of arLC) {
+                    let item = {}
+                    ext.extension.forEach(function (child) {
+
+                        switch (child.url) {
+                            case "name" :
+                                item.name = child.valueCoding.code
+                                break
+                            case "type" :
+                                item.type = child.valueCode
+                                break
+                            case "description" :
+                                item.description = child.valueString
+                                break
+                        }
+
+
+                    })
+
+                    report.launchContext.push(item)
+                    report.variableUsage[item.name] = []
+
+                }
+
+                console.log(report.launchContext)
+                function processItem(report,item) {
+                    let thing = {linkId:item.linkId,text:item.text,type:item.type,definition:item.definition}
+
+
+                    let mult = "0.."
+                    if (item.required) {
+                        mult = "1.."
+                    }
+                    if (item.repeats) {
+                        mult += "*"
+                    } else {
+                        mult += "1"
+                    }
+
+                    thing.mult = mult
+
+                    //look for fixed values. These are values with answerOption, and initialSelected set
+                    //todo fix!! answerOption is an array....
+                    if (item.answerOption) {
+                        //currently only using code & CodeableConcept
+                        Object.keys(item.answerOption).forEach(function (key) {
+                            //console.log(key)
+                            if (item.answerOption[key].initialSelected) {
+                                console.log(item.answerOption[key])
+                                let opt = item.answerOption[key]
+                                console.log(opt)
+                                if (opt.valueCoding) {
+                                    thing.fixedValue = `${opt.valueCoding.code} | ${opt.valueCoding.display} | ${opt.valueCoding.system}`
+                                } else if (opt.valueCode) {
+                                    thing.fixedValue = opt.valueCode
+                                } else if (opt.valueString) {
+                                    thing.fixedValue = opt.valueString
+                                }
+
+                            }
+                        })
+                    }
+
+
+                    //now process the extensions. Some we recognize here - others are added with the url
+
+                    if (item.extension) {
+                        item.extension.forEach(function (ext) {
+
+                            switch (ext.url) {
+                                case extQuantityUnit :
+                                    thing.fixedValue = `Units: ${ext.valueCoding.code}`
+                                    break
+                                case extHidden:
+                                    thing.isHidden = ext.valueBoolean
+                                    break
+                                case  extInitialExpressionUrl:
+
+                                    thing.initialExpression = ext.valueExpression.expression
+
+                                    //add to the variable usage hash
+                                    let ar1 = thing.initialExpression.split('.')
+                                    let variable = ar1[0].substr(1)
+                                    if (report.variableUsage[variable]) {
+                                        report.variableUsage[variable] = report.variableUsage[variable] || []
+                                        report.variableUsage[variable].push(item.linkId)
+                                    } else {
+                                        report.errors.push({msg:`variable ${variable} not found at ${item.linkId}`})
+                                    }
+                                    break
+                                case extExtractionContextUrl:
+                                    thing.extractionContext = ext.valueString
+                                    break
+
+                                case extPopulationContext:
+                                    thing.populationContext = ext.valueExpression
+
+                                    break
+
+                                case extExtractionValue:
+                                    report.setValue = report.setValue || []
+
+
+                                    let v = {}
+                                    console.log(ext)
+                                    ext.extension.forEach(function (child) {
+                                        switch (child.url) {
+                                            case 'definition' :
+                                                //the path in the extract where this element is to be inserted
+                                                v.path = child.valueCanonical
+                                                break
+                                            case 'fixed-value' :
+                                                //the actual value
+                                                v.value = child.valueString || child.valueId
+                                                break
+                                            case 'dynamic-value':
+                                                //an expression
+                                                v.expression = child.valueExpression
+                                                break
+                                            default :
+                                                //shouldn't happen - what to do?
+                                                break
+                                        }
+
+
+                                    })
+
+                                    report.setValue.push(v)
+
+                                        //add to entries
+                                        // let sv = {text:'setValue'}
+                                        //report.entries.push(sv)
+
+
+                                    break
+
+                                case extItemControlUrl :
+                                    thing.itemControl = thing.itemControl || []
+                                    thing.itemControl.push(ext.valueCodeableConcept)
+                                    break
+
+                                default:
+                                    thing.unknownExtension = thing.unknownExtension || []
+                                    thing.unknownExtension.push(ext)
+                                    break
+
+                            }
+
+                        })
+                    }
+
+                    //look for extQuantityUnit extension. This is used in quantity to set the unit
+                    //In the model, for a Quantity set the 'fixedValue' property - setting the units
+                 /*   let ar2 = getExtension(item,extQuantityUnit,'Coding')
+                    if (ar2.length > 0) {
+                        thing.fixedValue = `Units: ${ar2[0].code}`
+                    }
+
+                    //check for hidden values
+                    let ar0 = getExtension(item,extHidden,'Boolean')
+                    if (ar0.length > 0) {
+                        thing.isHidden = ar0[0]
+                    }
+
+                    //check for initial expression - used in CodeableConcept pre-pop
+                    let ar = getExtension(item,extInitialExpressionUrl,'Expression')
+                    if (ar.length > 0) {
+                        thing.initialExpression = ar[0].expression
+
+                        //add to the variable usage hash
+                        let ar1 = thing.initialExpression.split('.')
+                        let variable = ar1[0].substr(1)
+                        if (report.variableUsage[variable]) {
+                            report.variableUsage[variable] = report.variableUsage[variable] || []
+                            report.variableUsage[variable].push(item.linkId)
+                        } else {
+                            report.errors.push({msg:`variable ${variable} not found at ${item.linkId}`})
+                        }
+                    }
+
+                    //check for extraction context
+                    //let ar1 = getExtension(item,extExtractionContextUrl,'Code')
+                    let ar1 = getExtension(item,extExtractionContextUrl,'String')
+                    if (ar1.length > 0) {
+                        thing.extractionContext = ar1[0]
+                    }
+
+                    //check for population contexts
+                    let ar3 = getExtension(item,extPopulationContext,'Expression')
+                    if (ar3.length > 0) {
+                        thing.populationContext = ar3[0]
+                    }
+
+                    //check for fixed values (our new extension)
+                    let ar4 = getExtension(item,extExtractionValue)   //without a type the whole extension is returned
+                    if (ar4.length > 0) {
+                        report.setValue = []
+                        for (const ext of ar4) {
+                            let v = {}
+                            console.log(ext)
+                            ext.extension.forEach(function (child) {
+                                switch (child.url) {
+                                    case 'definition' :
+                                        //the path in the extract where this element is to be inserted
+                                        v.path = child.valueCanonical
+                                        break
+                                    case 'fixed-value' :
+                                        //the actual value
+                                        v.value = child.valueString
+                                        break
+                                    case 'dynamic-value':
+                                        //an expression
+                                        v.expression = child.valueExpression
+                                        break
+                                    default :
+                                        //shouldn't happen - what to do?
+                                        break
+                                }
+
+
+                            })
+
+                            report.setValue.push(v)
+
+                            //add to entries
+                           // let sv = {text:'setValue'}
+                            //report.entries.push(sv)
+
+                        }
+
+                    }
+
+                    */
+
+                    report.entries.push(thing)
+                    if (item.item) {
+                        item.item.forEach(function (child) {
+                            processItem(report,child)
+                        })
+                    }
+                }
+
+
+
+
+                Q.item.forEach(function (item) {
+                    processItem(report,item)
+                })
+
+                console.log(report)
+                return {report:report}
+
+            },
+            makeReportCOPY : function (Q) {
+                //generate a report object for the SDC table view (that displays key extraction / population details)
+
+
+
+                let report = {entries:[],variableUsage:{},errors:[]}
+                let thing = {text:Q.name}
+                //A hash showing for each variable where it is used...
+                //report.variableUsage = {}
+
+                //errors discovered during the report creation
+                // report.errors = []
+
+                //see if there is an extraction context on the Q
+                //we assume there is only 1 and it on the Q - not descendent items (at the moment)
+                let ar1 = getExtension(Q,extExtractionContextUrl,'String')
+                if (ar1.length > 0) {
+                    thing.extractionContext = ar1[0]
+                }
+
+                report.entries.push(thing)
+
+                //get the variables - assume they are defined on the Q root for now...
                 let ar2 = getExtension(Q,extVariable,'Expression')
                 ar2.forEach(function (ext) {
                     let thing = {text:Q.name}
@@ -774,7 +1068,7 @@ angular.module("pocApp")
                             report.setValue.push(v)
 
                             //add to entries
-                           // let sv = {text:'setValue'}
+                            // let sv = {text:'setValue'}
                             //report.entries.push(sv)
 
                         }
@@ -788,9 +1082,6 @@ angular.module("pocApp")
                         })
                     }
                 }
-
-
-
 
                 Q.item.forEach(function (item) {
                     processItem(report,item)
@@ -844,6 +1135,9 @@ angular.module("pocApp")
                 let hashEd = {}         //has of ED by path (=linkId)
                 let hashVS = {}         //all valueSets
 
+
+                let patientId = createUUID() // crypto.randomUUID();
+
                 for (const section of comp.sections) {
                     if (section.items && section.items.length > 0) {
                         //let sectionItem = {linkId:`sect-${section.name}`,text:section.title,type:'group',item:[]}
@@ -875,11 +1169,9 @@ angular.module("pocApp")
                             config.hashAllDG = hashAllDG
                             config.namedQueries = namedQueries
 
-                            const guid = createUUID() // crypto.randomUUID();
+                           // const guid = createUUID() // crypto.randomUUID();
 
-
-
-                            config.patientId = guid //'testPatient'    //will be a uuid
+                            config.patientId = patientId //'testPatient'    //will be a uuid
 
 
                             let vo = that.makeHierarchicalQFromDG(dg,dgElementList,config)
@@ -940,9 +1232,35 @@ angular.module("pocApp")
 
                             if (dgQ && dgQ.item[0]) {
 
+
+
+
                                 //todo - added this level of nesting as CSIRO renderer doesn't support pre-pop in tabs
                                 //makes the tree bad though...
                                 let dgItem = {linkId:`${comp.name}.${section.name}.section`,text:section.title,type:'group',repeats:true,item:[]}
+
+
+                                //-----------
+                                //see if this is a DG that extracts to a resource with a patient reference
+                                //wellington oct29
+
+
+
+
+                                if (resourcesForReference[dg.type]) {
+                                    //if (dg.type == 'Condition') {
+                                    let definition = `http://hl7.org/fhir/StructureDefinition/${dg.type}#${dg.type}.subject.reference`         //path in
+                                    let type = "String"
+                                    let value = config.patientId //`Patient/${patientId}`
+
+                                    //addReference(item,definition,type,expression)
+
+                                    addFixedValue(dgItem,definition,type,value)
+                                }
+
+
+                                //---------------
+
 
 
                                 if (dgQ.item[0].extension) {
@@ -997,6 +1315,7 @@ angular.module("pocApp")
                 //Used in the new Q renderer
                 //config.enableWhen will cause the enableWhens to be set
                 //config.patientId is the patient id to use for the fixed value extension
+                config.patientId = config.patientId || createUUID()
                 //config.pathPrefix is used for enable when targets. Only used from composition. It may be null
                 //config.namedQueries allows the NQ to be passed in
                 let pathPrefix = ""
@@ -1010,10 +1329,6 @@ angular.module("pocApp")
                 }
 
                 let dgName = dg.name //lstElements[0].ed.path     //first line is the DG name
-
-
-
-                //console.log(dgType)
 
                 //if config.expandVS is true, then the contents of the VS will be expanded as options into the item. May need to limit the length...
                 let errorLog = []
@@ -1124,14 +1439,7 @@ angular.module("pocApp")
                 //examine the DG hierarchy to see if there is a 'type' in any of the DG parents which is the SDC extraction context
                 //note that the extraction context is a complete url (not just a type name)
                 //this is where the context is defined on the DG (as opposed to a referenced DG
-/*
-                let extractionContext = getExtractionContext(dgName,config.hashAllDG)
 
-                if (extractionContext) {
-                    Q.extension = Q.extension || []
-                    Q.extension.push({url:extExtractionContextUrl,valueString:extractionContext})
-                }
-*/
                 let currentItem
                 let hashItems = {}      //items by linkId
                 let hashEd = {}         //has of ED by path (=linkId)
@@ -1153,7 +1461,7 @@ angular.module("pocApp")
                         //console.log(parentItemPath)
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
 
-                        extractionContext = decorateItem(currentItem,ed,extractionContext,dg)
+                        extractionContext = decorateItem(currentItem,ed,extractionContext,dg,config)
 
                         if (config.enableWhen) {
                             let ar =  addEnableWhen(ed,currentItem,config.pathPrefix)
@@ -1176,11 +1484,12 @@ angular.module("pocApp")
 
 
                     } else {
-                        //this is the first item in the Q.
+                        //this is the first item in the DG Q.
 
                         console.log(`>>>>>>>>>. ${pathPrefix}${path}` )
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
-                        decorateItem(currentItem,ed,extractionContext,dg)
+                        decorateItem(currentItem,ed,extractionContext,dg,config)
+
                         if (config.enableWhen) {
                             let ar = addEnableWhen(ed,currentItem,config.pathPrefix)
                             allEW.push(...ar)
@@ -1305,21 +1614,22 @@ angular.module("pocApp")
 
                 //add details to item
                 //extraction context is the url of the profile (could be a core type)
-                function decorateItem(item,ed,extractionContext,dg) {
+                function decorateItem(item,ed,extractionContext,dg,config) {
 
                    // let newItem = {}    //If a new item is needed - ie extension url
 
                     if (! ed.type) {
                         return
                     }
-                    let edType = ed.type[0]
 
-                    const guid = createUUID() //crypto.randomUUID();
-                    console.log(guid);
+                    let edType = ed.type[0]     //actually be the name of the DG
 
-                    let patientId = guid// "patient-id"    //todo - should be a guid...
+                  //  const guid = createUUID() //crypto.randomUUID();
+                   // console.log(guid);
 
-                    //console.log(edType)
+                  //  let patientId = guid// "patient-id"    //todo - should be a guid...
+
+                    console.log(edType)
 
                     //If this ed is a reference to another, it can have a different exraction context...
                     if (config.hashAllDG[edType]) {
@@ -1328,6 +1638,7 @@ angular.module("pocApp")
 
                         //This is a resource that should have a patient reference
                         let referencedDG = config.hashAllDG[edType]
+
                         console.log(referencedDG)
                         if (resourcesForReference[referencedDG.type]) {
                             let refConfig = resourcesForReference[referencedDG.type]
@@ -1337,27 +1648,23 @@ angular.module("pocApp")
                                 //set the patient id...
                                 let definition = `http://hl7.org/fhir/StructureDefinition/Patient#Patient.id`         //path in
                                 let type = "Id"
-                                let value = patientId //`Patient/${patientId}`
+                                let value = config.patientId //`Patient/${patientId}`
 
                                 //addReference(item,definition,type,expression)
-
 
                                 addFixedValue(item,definition,type,value)
                             } else {
+                                //I'm not sure how useful this is. I think it's only going to work on
+                                //referenced dG's - may be a little complicated...
                                 ///\"http://hl7.org/fhir/StructureDefinition/Patient#Patient.identifier.system"
                                 let definition = `http://hl7.org/fhir/StructureDefinition/${referencedDG.type}#${referencedDG.type}.subject.reference`         //path in
                                 let type = "String"
-                                let value = patientId //`Patient/${patientId}`
+                                let value = config.patientId //`Patient/${patientId}`
 
                                 //addReference(item,definition,type,expression)
 
-
                                 addFixedValue(item,definition,type,value)
-
                             }
-
-
-
 
                         }
 

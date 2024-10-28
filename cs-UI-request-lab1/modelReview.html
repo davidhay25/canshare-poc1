@@ -242,6 +242,15 @@
 
                         <div ng-if="entry.variable"><strong>Variable: </strong><em>{{entry.variable}}</em>: {{entry.expression}}</div>
 
+                        <div ng-repeat="ext in entry.itemControl">
+                            <strong>Item control: </strong> {{ext.coding[0].code}}
+
+                        </div>
+
+                        <div ng-repeat="ext in entry.unknownExtension">
+                            <strong>Unknown: </strong> {{ext.url}}
+
+                        </div>
 
 
                     </td>

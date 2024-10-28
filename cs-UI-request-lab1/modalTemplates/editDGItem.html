@@ -181,7 +181,7 @@
             <td  style="width: 20%;">Hide in Q</td>
             <td><checkbox ng-model="input.hideInQ"></checkbox>
 
-              <a ng-if="linkToSpec" class='pull-right' target="_blank" ng-href="{{linkToSpec}}">View {{dg.type}} in spec</a>
+              <a ng-if="linkToSpec" class='pull-right' target="_blank" ng-href="{{linkToSpec}}">View {{fhirResourceType}} in spec</a>
 
             </td>
           </tr>
@@ -259,9 +259,6 @@
                   done from the main DG editor (the link at the top of the DG display page).</em>
               </div>
 
-
-
-
             </td>
           </tr>
 
@@ -270,10 +267,20 @@
             <td>
               <div class="row">
                 <div class="col-md-10">
-                  <input type="text"
-                         placeholder="FHIRPath extraction expression - eg Specimen.bodySite"
-                         class="form-control" ng-model="input.definition"/>
-                  <div><em>Note that you need a Resource context on the DG</em></div>
+
+
+                  <div ng-if="fhirResourceType">
+                    <input type="text"
+                           placeholder="FHIRPath extraction expression - eg Specimen.bodySite"
+                           class="form-control" ng-model="input.definition"/>
+
+                  </div>
+
+                  <div ng-if="! dg.type">
+                    <em>You must set the resource context on the DG to enable resource extraction. This is
+                      done from the main DG editor (the link at the top of the DG display page). </em>
+                  </div>
+
 
                 </div>
                 <div class="col-md-1">
