@@ -3,13 +3,13 @@ angular.module("pocApp")
         function ($scope,query,$http) {
 
 
-            $scope.query = query
+            $scope.query = query  // expression is in query.contents {expression: }
             $scope.input = {}
 
-            $scope.input.expression = query.expression
+            $scope.input.expression = query.contents
 
             //get the resource type - assume a structure like AllergyIntolerance?patient={{%patient.id}}
-            let ar = query.expression.split('?')
+            let ar = query.contents.split('?')
             let resourceType = ar[0]
 
             $scope.input.fhirPath = `%${query.itemName}`
@@ -33,6 +33,7 @@ angular.module("pocApp")
 
             $scope.selectResource = function (resource) {
                 $scope.selectedResource = resource
+                delete $scope.fhirPathResult
             }
 
             //assume an xquery expression
@@ -60,14 +61,14 @@ angular.module("pocApp")
             }
 
 
-            $scope.executeFhirPath = function (fhirPath,resource) {
+            $scope.executeFhirPath = function (fp,resource) {
 
 
-                fhirPath = fhirPath.replace(`%${query.itemName}`,resourceType)
+                fp = fp.replace(`%${query.itemName}`,resourceType)
 
                     try {
-                        let result = fhirpath.evaluate(resource, fhirPath, null, fhirpath_r4_model)
-                        console.log(fhirPath,result)
+                        let result = fhirpath.evaluate(resource, fp, null, fhirpath_r4_model)
+                        console.log(fp,result)
                         $scope.fhirPathResult = result
                         //return result
 

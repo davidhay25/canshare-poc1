@@ -40,9 +40,9 @@
             <span class=" clickable spacer"
                  ng-click="newModel('dg',selectedModel)">New child</span>
 
-
+<!--
           <span class="pull-right"> <strong>FHIR resource:{{selectedModel.type}}</strong></span>
-
+-->
         </div>
 
 
@@ -118,7 +118,7 @@
         </div>
       </div>
 
-     <div> <strong>FHIR resource:</strong></div>
+     <div> <strong>FHIR resource:</strong>{{selectedModel.type}}</div>
 
       <table class="table table-condensed" style="margin-top: 8px">
 

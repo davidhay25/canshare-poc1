@@ -165,6 +165,7 @@ angular.module("pocApp")
             let nq = utilsSvc.getNQbyName(nqName)
             if (!nq) {
                 alert(`Named Query: ${nqName} not found`)
+                return
             }
 
             //http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue
@@ -625,7 +626,9 @@ angular.module("pocApp")
                 ar2.forEach(function (ext) {
                     let thing = {text:Q.name}
                     thing.variable = ext.name
-                    thing.expression = ext.expression  //varable type is x-query
+                    //thing.expression = ext.expression  //varable type is x-query
+                    thing.contents = ext.expression  //varable type is x-query
+                    thing.itemName = ext.name       //the name the variable is referred to
                     //thing.kind = 'variable'
                     report.entries.push(thing)
 
@@ -688,7 +691,7 @@ angular.module("pocApp")
                             if (item.answerOption[key].initialSelected) {
                                 console.log(item.answerOption[key])
                                 let opt = item.answerOption[key]
-                                console.log(opt)
+                                //console.log(opt)
                                 if (opt.valueCoding) {
                                     thing.fixedValue = `${opt.valueCoding.code} | ${opt.valueCoding.display} | ${opt.valueCoding.system}`
                                 } else if (opt.valueCode) {
@@ -1313,7 +1316,7 @@ angular.module("pocApp")
 
             makeHierarchicalQFromDG : function  (dg,lstElements,config) {
                 //Used in the new Q renderer
-                //config.enableWhen will cause the enableWhens to be set
+                //config.enableWhen (boolean) will cause the enableWhens to be set. It's a debugging flag...
                 //config.patientId is the patient id to use for the fixed value extension
                 config.patientId = config.patientId || createUUID()
                 //config.pathPrefix is used for enable when targets. Only used from composition. It may be null
@@ -1363,7 +1366,7 @@ angular.module("pocApp")
                 //now create the list of ED to include in the Q
                 //we do this first so that we can exclude all child elements of hidden elements as well
                 let lstQElements = []
-               // let hashEdsWithConditional = {}     //eds that have a conditional and won't be added to the Q.
+
                 lstElements.forEach(function (thing) {
                         let ed = thing.ed
                         let okToAdd = true
@@ -1374,8 +1377,12 @@ angular.module("pocApp")
                                     okToAdd = false
                                     break
                                 }
+
                             }
+
                         }
+
+                    //console.log(ed.path,okToAdd)
 
                         //now we need to look at the conditional ValueSets. If an item has condtional ValueSets defined
                         //then an ed is constructed for each VS with an enableWhen defined.
@@ -1425,7 +1432,6 @@ angular.module("pocApp")
 
                 //add the named queries as variables in the Q
                 if (dg.namedQueries) {
-                    //let item = Q.item[0]
                     dg.namedQueries.forEach(function (nqName) {
                         addNamedQuery(Q,nqName,config.namedQueries)
                     })
@@ -1435,7 +1441,7 @@ angular.module("pocApp")
                 let extractionContext
 
                 //add definition based data extraction. This is where the DG can be extracted to a FHIR
-                //resource using the SDC defintion extratcion
+                //resource using the SDC definition extraction
                 //examine the DG hierarchy to see if there is a 'type' in any of the DG parents which is the SDC extraction context
                 //note that the extraction context is a complete url (not just a type name)
                 //this is where the context is defined on the DG (as opposed to a referenced DG
@@ -1444,6 +1450,13 @@ angular.module("pocApp")
                 let hashItems = {}      //items by linkId
                 let hashEd = {}         //has of ED by path (=linkId)
                 let hashVS = {}         //hash of all ValueSets defined
+
+
+
+
+          //     for (const item of lstQElements) {
+             //       console.log(item.ed.path)
+             //   }
 
                 for (const item of lstQElements) {
                     let ed = item.ed
@@ -1458,7 +1471,7 @@ angular.module("pocApp")
 
                     if (currentItem) {
                         let parentItemPath = $filter('dropLastInPath')(path)
-                        //console.log(parentItemPath)
+                        console.log(path,parentItemPath)
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
 
                         extractionContext = decorateItem(currentItem,ed,extractionContext,dg,config)
@@ -1473,13 +1486,41 @@ angular.module("pocApp")
                         }
 
                         //here is where the new item is added to it's parent...
-                        hashItems[parentItemPath] = hashItems[parentItemPath] || {}
-                        hashItems[parentItemPath].item = hashItems[parentItemPath].item || []
-                        hashItems[parentItemPath].item.push(currentItem)
-                        hashItems[parentItemPath].type = "group"
+                        //We need to deal with 'out of order' elements - ie where we get to an item before its parent...
+                        let canadd = true
+                        console.log(`Adding: ${path} to  ${parentItemPath}`)
+                        if (! hashItems[parentItemPath]) {
+                            console.error(`${parentItemPath} not present - adding...`)
 
-                        hashItems[path] = currentItem
+                            //create an element to add...
+                            hashItems[parentItemPath] = {placeHolder:true,linkId:parentItemPath}
 
+                            //we assume the grandparent is there
+                            let grandParentPath = $filter('dropLastInPath')(parentItemPath)
+                            hashItems[grandParentPath].item = hashItems[grandParentPath].item || []
+                            let t = hashItems[parentItemPath]
+                            hashItems[grandParentPath].item.push(t)
+
+                        } else {
+                            if (hashItems[path] && hashItems[path].placeHolder) {
+                                console.error(`${path} is placeholder`)
+                                //This is an out of order item that was previously added as a placeholder
+                                //we don't want to re-add it - but do need to copy all the attributes across
+                                Object.assign(hashItems[path],currentItem)
+                                delete  hashItems[path].placeHolder
+                                hashItems[path].type = 'group'      //this must be a froup if it has children...
+                                canadd = false  //nothing else to do...
+                            }
+                        }
+
+                        if (canadd) {
+                            //this is where the parent item exists so the current one can just be added
+                            //hashItems[parentItemPath] = hashItems[parentItemPath] || {}     //in theory, the parent should always have been added
+                            hashItems[parentItemPath].item = hashItems[parentItemPath].item || []
+                            hashItems[parentItemPath].item.push(currentItem)
+                            hashItems[parentItemPath].type = "group"
+                            hashItems[path] = currentItem   //ready to act as a parent...
+                        }
 
 
 
@@ -1518,12 +1559,15 @@ angular.module("pocApp")
 
                         }
 
+                        //this sets the Q.item to the first entry (currentItem) - all the others are references off that
                         hashItems[path] = currentItem
                         Q.item = [currentItem]
 
                     }
 
                 }
+
+                console.log(hashItems)
 
 
                 //validate the enablewhens - but not if the generation is called from the composition
@@ -1629,17 +1673,17 @@ angular.module("pocApp")
 
                   //  let patientId = guid// "patient-id"    //todo - should be a guid...
 
-                    console.log(edType)
+                    //console.log(edType)
 
                     //If this ed is a reference to another, it can have a different exraction context...
                     if (config.hashAllDG[edType]) {
 
-                        console.log("is DG", config.hashAllDG[edType])
+                        //console.log("is DG", config.hashAllDG[edType])
 
                         //This is a resource that should have a patient reference
                         let referencedDG = config.hashAllDG[edType]
 
-                        console.log(referencedDG)
+                        //console.log(referencedDG)
                         if (resourcesForReference[referencedDG.type]) {
                             let refConfig = resourcesForReference[referencedDG.type]
                             console.log('for patref --->',edType)
@@ -1906,7 +1950,8 @@ angular.module("pocApp")
 
                         item.definition = `${extractionContext}#${ed.definition}`
 
-                        if (ed.extractExtensionUrl) {
+                        //todo - want to check this more...
+                        if (false && ed.extractExtensionUrl) {
                             //If there's an extension url on the item, then this item is an extension and
                             //the definition will refer to the extension (eg Patient.extension). However,
                             //we need to change the structure so that the element becomes a group
@@ -1920,7 +1965,7 @@ angular.module("pocApp")
 
 
                             item.type = "group"
-                            item.item = []
+                            item.item = item.item || []
 
                             // add an additional, hidden Q item for the extension url
                             let urlItem = {linkId:`${item.linkId}.extUrl`,type:'string',text:"extension url"}
@@ -1973,28 +2018,7 @@ angular.module("pocApp")
 
                         }
 
-                        /*
-                                                let resourceType = extractionContext //the extraction type passed in if the whole DG is extracted to a single resource
 
-
-
-                                                if (! resourceType) {
-                                                    //this is a child element that is extracted into a separate resource
-                                                    let ar = ed.definition.split('.')
-                                                    resourceType = ar[0]
-                                                }
-
-
-                                                //
-
-
-                                                //If it doesn't start with 'http' we assume it's a core resource profile
-                                                if (ed.definition.indexOf('http') == -1) {
-                                                    item.definition = `http://hl7.org/fhir/StructureDefinition/${resourceType}#${ed.definition}`
-                                                } else {
-                                                    item.definition = ed.definition
-                                                }
-                        */
 
                     }
 
@@ -2052,14 +2076,9 @@ angular.module("pocApp")
                     })
 
 
-
                     return Q
 
-
-
                 }
-
-
             },
 
 

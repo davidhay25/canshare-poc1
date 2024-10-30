@@ -594,7 +594,7 @@
 
 
           <span class="clickable pull-right" style="padding: 8px" ng-click = "copyToClipboard()">
-            Copy to clipboard
+            Copy to clipboard ({{Qsize}} K)
           </span>
 
           <a class="btn btn-link" download="{{downloadLinkJsonName}}"
@@ -621,7 +621,7 @@
                   </div>
                   <div>{{iss.details.text}}</div>
                   <div ng-repeat = "exp in iss.expression">
-                    <em>{{exp}}</em>
+                    <em><span class="clickable" ng-click="getItemFromOO(exp)">{{exp}}</span></em>
                   </div>
                 </td>
 

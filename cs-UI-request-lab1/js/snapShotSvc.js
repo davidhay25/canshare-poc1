@@ -668,7 +668,7 @@ angular.module("pocApp")
 
             if (dg.ssOrder) {
                 //make a hash by path of the current ss
-                console.log(`Setting fixed path for ${dg.name}`)
+                //console.log(`Setting fixed path for ${dg.name}`)
                 logger(`Setting fixed path`,dg.name)
                 let hash = {}
                 dg.snapshot.forEach(function (ed) {
@@ -685,8 +685,10 @@ angular.module("pocApp")
                             newSnapshot.push(ed)
                             delete hash[path]
                         } else {
-                            console.log(`${dg.name}: path ${path} not found`)
-                            logger(`path ${path} not found`,dg.name)
+                            //THis occurs when there is something in ssOrder that is
+                            //not in the DG. todo - do need to look into this as part of ordering
+                            //console.warn(`${dg.name}: path ${path} not found`)
+                            logger(`path ${path} not found (TBI)`,dg.name)
                         }
                     }
                 })

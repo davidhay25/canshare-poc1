@@ -600,6 +600,11 @@ angular.module("pocApp")
                         $scope.errorLog = voQ.errorLog
                         console.log(voQ.errorLog)
 
+
+
+                        console.log(`Size of world: ${size/1024} K`)
+
+
                         //A report focussed on pre-popupation & extraction
                         let voReport =  makeQSvc.makeReport($scope.fullQ)
                         $scope.qReport =voReport.report

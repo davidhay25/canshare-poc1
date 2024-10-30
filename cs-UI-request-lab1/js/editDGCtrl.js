@@ -436,8 +436,9 @@ angular.module("pocApp")
 
                 //update the named queries
                 delete $scope.model.namedQueries
+
                 for (const key of Object.keys($scope.input.nq)) {
-                    if ($scope.input.nq[key]) {
+                    if (key && $scope.input.nq[key]) {
                         $scope.model.namedQueries = $scope.model.namedQueries || []
                         $scope.model.namedQueries.push(key)
                     }

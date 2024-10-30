@@ -18,12 +18,14 @@ angular.module('formsApp')
 
 
             templateUrl: 'directive/renderForm2/renderFormDir2.html',
-            controller: function($scope,renderFormsSvc2,questionnaireSvc,vsSvc,$http){
+            controller: function($scope,renderFormsSvc2,questionnaireSvc,vsSvc,$http,$uibModal,utilsSvc){
 
 
                 console.log($scope)
 
                 let localPatientId = $scope.patientId || "45086382"
+
+
 
 
                 $scope.datePopup = {}
@@ -85,6 +87,7 @@ angular.module('formsApp')
                     function() {return $scope.q},
                     function() {
                         if ($scope.q) {
+                            $scope.Qsize = Math.floor (utilsSvc.getSizeOfObject($scope.q)/1024)
                             setupQ()
                         }
                     }
@@ -342,6 +345,36 @@ angular.module('formsApp')
                     )
                 }
 
+                $scope.getItemFromOO = function (expression) {
+
+                    let result = fhirpath.evaluate($scope.q, expression, null, fhirpath_r4_model)
+                    if (result && result.length > 0) {
+                        let item = result[0]
+
+                        $uibModal.open({
+                            //backdrop: 'static',      //means can't close by clicking on the backdrop.
+                            //keyboard: false,       //same as above.
+                            //size : 'lg',
+                            templateUrl: 'modalTemplates/showItem.html',
+
+                            controller: function($scope,item,ed){
+                                $scope.item = item
+                                $scope.ed = ed
+                            },
+
+                            resolve: {
+                                item: function () {
+                                    return item
+                                }, ed: function () {
+                                    return $scope.hashEd[item.linkId]
+                                }
+                            }
+                        })
+
+                    }
+
+
+                }
 
                 $scope.copyToClipboard = function () {
 
