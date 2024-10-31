@@ -1327,6 +1327,7 @@ angular.module("pocApp")
                 }
 
 
+
                 if (! lstElements || lstElements.length == 0) {
                     return  {allEW:[],hashEd :{} ,hashVS:{}, errorLog:[] }    //this results when there is a missing DG referenced...
                 }
@@ -1350,7 +1351,7 @@ angular.module("pocApp")
                 let basePathsToHide = []    //a list of all paths where hideInQ is set. Any elements starting with this path are also set
                 lstElements.forEach(function (thing) {
                     //Actually, there shouldn't be anything with the mult 0..0 any more - but hideInQ is certainly there
-
+console.log(thing.ed.path)
                     if (thing.ed.mult == '0..0') {
                         basePathsToHide.push(thing.ed.path)  //the full path
                     } else if (thing.ed.hideInQ) {
@@ -1359,9 +1360,9 @@ angular.module("pocApp")
                             basePathsToHide.push(thing.ed.path)  //the full path
                         }
                     }
-
                 })
 
+                //console.log(basePathsToHide)
 
                 //now create the list of ED to include in the Q
                 //we do this first so that we can exclude all child elements of hidden elements as well
@@ -1418,6 +1419,8 @@ angular.module("pocApp")
                 })
 
 
+
+
                 let Q = {resourceType:'Questionnaire'}
                 Q.id = `canshare-${firstElement.ed.path}`
                 Q.name = firstElement.ed.path
@@ -1471,7 +1474,7 @@ angular.module("pocApp")
 
                     if (currentItem) {
                         let parentItemPath = $filter('dropLastInPath')(path)
-                        console.log(path,parentItemPath)
+                        //console.log(path,parentItemPath)
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
 
                         extractionContext = decorateItem(currentItem,ed,extractionContext,dg,config)
@@ -1487,8 +1490,8 @@ angular.module("pocApp")
 
                         //here is where the new item is added to it's parent...
                         //We need to deal with 'out of order' elements - ie where we get to an item before its parent...
-                        let canadd = true
-                        console.log(`Adding: ${path} to  ${parentItemPath}`)
+                        let canAdd = true
+                        //console.log(`Adding: ${path} to  ${parentItemPath}`)
                         if (! hashItems[parentItemPath]) {
                             console.error(`${parentItemPath} not present - adding...`)
 
@@ -1496,6 +1499,7 @@ angular.module("pocApp")
                             hashItems[parentItemPath] = {placeHolder:true,linkId:parentItemPath}
 
                             //we assume the grandparent is there
+                            //todo - will generate an exception if not - how best to check?
                             let grandParentPath = $filter('dropLastInPath')(parentItemPath)
                             hashItems[grandParentPath].item = hashItems[grandParentPath].item || []
                             let t = hashItems[parentItemPath]
@@ -1509,11 +1513,11 @@ angular.module("pocApp")
                                 Object.assign(hashItems[path],currentItem)
                                 delete  hashItems[path].placeHolder
                                 hashItems[path].type = 'group'      //this must be a froup if it has children...
-                                canadd = false  //nothing else to do...
+                                canAdd = false  //nothing else to do...
                             }
                         }
 
-                        if (canadd) {
+                        if (canAdd) {
                             //this is where the parent item exists so the current one can just be added
                             //hashItems[parentItemPath] = hashItems[parentItemPath] || {}     //in theory, the parent should always have been added
                             hashItems[parentItemPath].item = hashItems[parentItemPath].item || []

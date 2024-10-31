@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>Examine DG</title>
+
+    <script src="js/libs/jquery-1.9.0.min.js"></script>
+    <script src="js/libs/angular.min1-5.js"></script>
+    <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+    <script src="js/libs/moment.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
+
+    <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
+    <script src="js/libs/jstree.min.js"></script>
+
+    <script>
+        angular.module("pocApp",['ui.bootstrap','ngStorage']).config(function($locationProvider) {
+
+            // enable html5Mode for pushstate ('#'-less URLs)
+            $locationProvider.html5Mode(true);
+            $locationProvider.hashPrefix('!');
+        });
+        angular.module("pocApp").constant("moment", moment);
+
+        //this allows the directives (which are in the formsApp) to be used. see https://stackoverflow.com/questions/15641730/angular-js-directives-in-different-modules
+        angular.module("formsApp",[])
+        angular.module('topApp', ['pocApp', 'formsApp'])
+
+
+        String.prototype.isChildPath = function (parent) {
+            let test = parent + "."
+            if (this.indexOf(test) > -1) {
+                return true
+            } else {
+                return false
+            }
+        };
+
+
+
+    </script>
+
+
+    <script src="js/libs/ngStorage.min.js"></script>
+    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
+    <script src="js/examineDGCtrl.js"></script>
+    <script src="js/snapShotSvc.js"></script>
+    <script src="js/utilsSvc.js"></script>
+<!--
+    <script src="js/modelViewerCtrl.js"></script>
+    <script src="js/modelsSvc.js"></script>
+
+
+
+
+    <script src="js/viewVSCtrl.js"></script>
+
+
+    <script src="js/utilsSvc.js"></script>
+    <script src="js/libs/vis.min.js"></script>
+    <script src="js/showParameters.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/orderingSvc.js"></script>
+    <script src="js/modelsDemoSvc.js"></script>
+    <script src="js/modelCompSvc.js"></script>
+
+    <script src="js/makeQSvc.js"></script>
+    <script src="js/codedOptionsSvc.js"></script>
+        <script src="directive/renderForm/renderFormSvc.js"></script>
+    <script src="directive/renderForm/renderFormDir.js"></script>
+    <script src="directive/renderSingleItem/renderSingleItemDir.js"></script>
+    -->
+
+
+
+<!--
+    <script src="js/models/ObservationModels.js"></script>
+    <script src="js/models/StagingModels.js"></script>
+-->
+</head>
+
+<body style="padding: 8px;padding-top: 80px">
+    <div ng-app="topApp" ng-controller="examineDGCtrl" class="container-fluid">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+        <div class="container-fluid">
+            <div class="col-md-5">
+                <span>
+
+                </span>
+            </div>
+
+            <div class="col-md-3">
+                <div class="navbar-text">
+
+                </div>
+            </div>
+
+
+            <div class="col-md-1 col-sm-1">
+                <form class="navbar-form navbar-left">
+                    <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+                </form>
+            </div>
+            <div class="col-md-1">
+                <div class="navbar-text">
+
+                </div>
+            </div>
+            <div class="col-md-2">
+
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="row">
+        <div class="col-md-4">
+
+            <div class="myScroll">
+                <div class="list-group" >
+                    <div ng-class="{'list-group-item':true,listItemSelected:input.selectedDGName == name}"
+                         ng-click="selectDG(name)" style="cursor: pointer"
+                         ng-repeat="name in lstAllDG">
+                        {{name}}
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="col-md-8">
+
+            <uib-tabset ng-show="selectedRawDG">
+
+                <uib-tab heading="Raw Json">
+                    <pre>{{selectedRawDG | json}}</pre>
+
+                </uib-tab>
+
+            </uib-tabset>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

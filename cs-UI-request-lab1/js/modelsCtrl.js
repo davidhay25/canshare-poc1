@@ -54,7 +54,7 @@ angular.module("pocApp")
 
             $scope.makeSnapshots = function() {
                 console.log('-------->   building snapshots...')
-                let voSs = snapshotSvc.makeSnapshots($scope.hashAllDG,true)
+                let voSs = snapshotSvc.makeSnapshots($scope.hashAllDG)
                 $scope.snapshotLog = voSs.log
                 $scope.ssErrorTypes = ['All']
                 for (let log of voSs.log) {

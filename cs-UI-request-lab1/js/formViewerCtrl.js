@@ -21,7 +21,7 @@ angular.module("pocApp")
                 $scope.hashAllDG = $localStorage.world.dataGroups
                 $scope.hashAllComp = $localStorage.world.compositions
 
-                snapshotSvc.makeSnapshots($scope.hashAllDG,true)
+                snapshotSvc.makeSnapshots($scope.hashAllDG)
 
                 $scope.arDG = []
                 Object.keys($scope.world.dataGroups).forEach(function (key) {

@@ -96,7 +96,9 @@
 
       <button class="btn btn-link" ng-click="deleteDG(selectedModel.name)">Delete</button>
 
-      <a class="btn" ng-href="modelReview.html?{{selectedModel.name}}" target="_blank">Review</a>
+      <a class="btn btn-link"
+         ng-if="! canEdit(selectedModel)"
+         ng-href="modelReview.html?{{selectedModel.name}}" target="_blank">Review</a>
 
       <button class="btn btn-link" ng-click="showLink('dg')">Link</button>
 

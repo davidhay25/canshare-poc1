@@ -17,6 +17,8 @@ angular.module("pocApp")
         hashHistory = {}        //history of changes as the dg hierarchy is traversed
         hashChildren = {}       //all direct children for a DG - used for the summary
 
+        focusDGName = ""        //if set, will log processing details of this DG. For debugging
+
 
         //Before creating the snapshots
         function clearInternalCaches() {
@@ -25,24 +27,30 @@ angular.module("pocApp")
             lstAllDGTitle = []      //an alphabetical list by title
             logToConsole = false    //whether to log to console. Passed in the makeSnapshots call
             log = []                //the main log
-            //errors = []
             logIndex=0              //An incremental index for log entries
             hashHierarchy = {}      //the hierarchy for each dg
             hashChildren = {}       //all direct children for a DG - used for the summary
             hashReferences = {}     //references by DG. This is used for the summary - not in processing...
             hashHistory = {}        ////history of changes as the dg hierarchy is traversed
+            focusDGName = ""        //if set, will log processing details of this DG. For debugging
         }
 
+
+        function specificLogger(dgName,msg,obj) {
+            //will log to console the specific processing for this DG
+            if (dgName === focusDGName) {
+                console.log(msg)
+                if (obj) {
+                    console.log(obj)
+                }
+            }
+        }
 
         function logger(msg,dgName,isError,details) {
             if (logToConsole) {
                 console.log(dgName,msg)
             }
-            /*
-            if (isError) {
-                errors.push({msg:msg,dgName:dgName})
-            }
-            */
+
             let logEntry = {msg:msg,dgName:dgName,isError:isError,index:logIndex++}
             if (details) {
                 logEntry.details = details
@@ -61,7 +69,7 @@ angular.module("pocApp")
         //with the references DG as well as present as the override diff. We remove them here into a separate
         //element on the DG (as a hash) and apply them once the snapshot has been completely created
         //note that the override only contains overrides for references.
-        function createDgOverride(dg) {
+        function createDgOverrideDEP(dg) {
 
             //so we first create a hash containing all references
             let hashReferenceEds = {}
@@ -109,7 +117,11 @@ angular.module("pocApp")
         //also add them to the snapshot
         function makeFullDiff(dg,allDg) {
 
+            specificLogger(dg.name,"Starting creation of full diff")
+
             let arHierarchy = makeDgHierarchy(dg,allDg)     //the list of DG's that are parents of this one
+
+            specificLogger(dg.name,"DG Heirarchy",arHierarchy)
 
             //the ultimate parent is the last one...
             dg.ultimateParent = arHierarchy[arHierarchy.length-1]
@@ -128,12 +140,16 @@ angular.module("pocApp")
             for (let i=arHierarchy.length-1;i > -1;--i) {
                 let dgName = arHierarchy[i]
 
+                specificLogger(dg.name,`EDs from ${dgName}`)
+
                 let changesThisDg = []      //changes made by diffs in this parental DG
                 arHx.push({dgName:dgName,changes:changesThisDg})
 
                 let cDg = allDg[dgName]  //cDg = component Dg.
                 //let cDg = angular.copy(allDg[dgName])  //cDg = component Dg.
                 for (const ed1 of cDg.diff) {
+
+
 
                     let ed = angular.copy(ed1)
 
@@ -148,14 +164,15 @@ angular.module("pocApp")
 
                     //does this ed already exist in the full diff (based on the path)
                     let path = ed.path
+
                     let pos = arFullDiffPath.indexOf(path)
 
                     ed.sourceModelName = dgName     //the DG where this ed was added.
                     if (pos == -1) {
-                        //no it doesn't  - add it to the list.
-                        // Even if it is 0..0 - it could be removing part of a referenced DG so we need it for later
 
-                        //ed.sourceModelName = dgName     //the DG where this ed was added.
+                        //no it doesn't  - add it to the list.
+                        // *** Even if it is 0..0 - it could be removing part of a referenced DG  from a parent so we need it for later
+                        specificLogger(dg.name,`Adding ${path} ${ed.type[0]} (${ed.mult})`)
                         arFullDiffPath.push(path)
                         hashEdPath[path] = ed   //and store the ed in the hash
                         changesThisDg.push({msg:`Added ${ed.path}`,ed:ed })
@@ -164,6 +181,7 @@ angular.module("pocApp")
                     } else {
                         //yes, it already exists
                         //update the hash with the new ed
+                        specificLogger(dg.name,`Replacing ${path} ${ed.type[0]} (${ed.mult})`)
                        // ed.sourceModelName = dgName     //the DG where this ed was added.
                         hashEdPath[path] = ed
                         changesThisDg.push({msg:`Replaced ${ed.path}`,ed:ed })
@@ -189,6 +207,10 @@ angular.module("pocApp")
 
                 //we always add it to the full diff. If it has been overridden, then the most recent value will be at the path
                 dg.fullDiff.push(edClone)
+
+                if (dg.name == 'BreastHistoPreviousBiopsyResult') {
+                  //  console.log(path,edClone.mult)
+                }
 
 
             })
@@ -425,6 +447,8 @@ angular.module("pocApp")
                         //it means that all DG references have been inserted into the snapshot and the DG snapshot is complete
                         //at that point the overrides can be applied.
 
+                        specificLogger(dg.name,`Processing: cycle #${ctr}`)
+
                         let moreRefsToInsert = false
                         dg.fullDiff.forEach(function (ed) {
                             //the .dgToBeInserted flag is set when creating the fullDiff element to indicate that this element
@@ -433,6 +457,7 @@ angular.module("pocApp")
                             if (ed.dgToBeInserted) {
                                 let msg1 = `Checking ${dg.name}.${ed.path} to insert ${ed.dgToBeInserted}`
                                 logger(msg1,dg.name)
+                                specificLogger(dg.name,msg1)
                                 let insertPath = ed.path        //the path in the dg where the elements from the referenced DG are to be inserted
 
                                 let dgToInsert = allDgSnapshot[ed.dgToBeInserted]
@@ -453,17 +478,19 @@ angular.module("pocApp")
                                             //where we were removing the overrides, inserting from the referenced DG and then
                                             //replacing the elements that were overriden.
                                             let canInsert = true
-                                            //for (const ed2 of dg.fullDiff) {
+
                                             //this could be made more efficient with a hash - but this is simpler
                                             for (const ed2 of dg.snapshot) {  //20 aug 2020
                                                 if (ed2.path == path) {
                                                     canInsert = false
+                                                    specificLogger(dg.name,`Path ${path} already in insert list`)
                                                     break
                                                 }
                                             }
 
                                             if (canInsert) {
                                                 arElements.push(ed1)
+                                                specificLogger(dg.name,`Adding ${path} to insert list`)
                                             }
 
 
@@ -476,6 +503,7 @@ angular.module("pocApp")
                                         //the log entry. Include the elements that are being inserted
                                         let msg = `Inserting ${arElements.length} elements into ${dg.name}.${ed.path} from ${dgToInsert.name} (${dgToInsert.title})`
                                         logger(msg,dg.name,false,arElements)
+                                        specificLogger(dg.name,`--> ${msg}`,arElements)
 
                                         if (dg.name == "ColorectalHistoTumour") {
                                            // console.log(ed.path,dgToInsert.name,arElements)
@@ -495,6 +523,7 @@ angular.module("pocApp")
                                 } else {
                                     let msg = `Can't find DG ${ed.dgToBeInserted} at ${dg.name}.${ed.path}`
                                     logger(msg,dg.name,true)
+                                    specificLogger(dg.name,`${msg} cycle #${ctr}`)
                                 }
                             }
                         })
@@ -502,13 +531,10 @@ angular.module("pocApp")
                         //if moreRefsToInsert is true, it means that there are reference elements in the DG to other DGs that haven't been completed yet
                         if (! moreRefsToInsert) {
                             logger(`DG: ${dg.name} has a completed snapshot !`,dg.name)
+                            specificLogger(dg.name,`Snapshot complete`,dg.snapshot)
                             //todo - remove any specific elements from the diff
 
-                            if (false && dg.name == "ColorectalHistoTumour") {
-                                console.log(">>>>>>>> insert complete")
-                                let v = angular.copy(dg)
-                                console.log(dg.snapshot)
-                            }
+
 
                             //now that the DG is complete, remove those where references have been 'zeroed out' in the diff and
                             //replace those changed in the diff
@@ -532,6 +558,9 @@ angular.module("pocApp")
                                 }
                             })
 
+                            specificLogger(dg.name,`Paths to remove`,hashHidden)
+
+
                             //create a new snapshot list that excludes 0..0 elements (and any children)
                             //also need to accomodate overrides from the main DG - eg fixing a value
                             hashReferences[dg.name] = []  ////now that we are building the definitive snapshot, we can build the references hash
@@ -540,6 +569,10 @@ angular.module("pocApp")
                             dg.snapshot.forEach(function (ed) {
                                 let canInclude = true
                                 for (const key of Object.keys(hashHidden)) {
+
+
+
+
                                     if (ed.path == key || ed.path.isChildPath(key)) {
                                         //this is an excluded or child-of excluded element so don't include it
                                         canInclude = false
@@ -558,7 +591,36 @@ angular.module("pocApp")
                                     finalSnapshot.push(ed)
                                 }
                             })
-                            dg.snapshot = finalSnapshot
+
+                            //now that we have the 'final' snapshot we remove all elements that don't have a parent.
+                            //this can occur when the DG has a 'floating' element - likely caused by previous bugs that left eds in the diff
+
+                            let hash = {}
+                            dg.snapshot=[]
+                            finalSnapshot.forEach(function (ed) {
+                                hash[ed.path] = true
+                            })
+
+                            finalSnapshot.forEach(function (ed) {
+                                let path = ed.path
+                                let ar = path.split('.')
+                                if (ar.length > 1) {
+                                    ar.pop()
+                                    let parentPath = ar.join('.')
+                                    if (hash[parentPath]) {
+                                        dg.snapshot.push(ed)
+                                    } else {
+                                        specificLogger(dg.name,`${path} removed as has no parent`)
+                                    }
+                                } else {
+                                    dg.snapshot.push(ed)
+                                }
+                            })
+
+
+                            //dg.snapshot = finalSnapshot
+
+
 
                             //ensure that the children of groups are contiguous
                             adjustGroupOrdering(dg)
@@ -707,10 +769,18 @@ angular.module("pocApp")
         }
 
 
+
         return {
-            makeSnapshots: function (hashAllDG,inLogToConsole) {
+            processOneDG : function (dg) {
+
+            },
+            makeSnapshots: function (hashAllDG,inFocusDGName) {
                 clearInternalCaches()
-                logToConsole = false // inLogToConsole
+
+                focusDGName = inFocusDGName     //a specific DG to log activity
+                specificLogger(focusDGName,`Detailed logging for ${focusDGName} enabled`)
+
+                logToConsole = false
 
                 allDgSnapshot = angular.copy(hashAllDG) //this will be a local clone
 

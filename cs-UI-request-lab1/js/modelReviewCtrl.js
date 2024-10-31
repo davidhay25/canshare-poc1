@@ -54,7 +54,7 @@ angular.module("pocApp")
                     //need to generate the snapshot for all DG. This is needed for the Q generation
                     //the snapshots are all held within the service...
 
-                    snapshotSvc.makeSnapshots($scope.hashAllDG,true)
+                    snapshotSvc.makeSnapshots($scope.hashAllDG)
 
                     //assign the snapshot svc to the modelSvc so that it can read the snapshots of DGs
                     modelCompSvc.setSnapshotSvc(snapshotSvc)
@@ -572,6 +572,10 @@ angular.module("pocApp")
                 $scope.setCommentsThisModel()   //retrieve comments for this model
                 $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)
 
+
+
+
+
                 //adjust according to 'insertAfter' values
                 orderingSvc.sortFullListByInsertAfter($scope.fullElementList,dg,$scope.hashAllDG)
 
@@ -602,7 +606,7 @@ angular.module("pocApp")
 
 
 
-                        console.log(`Size of world: ${size/1024} K`)
+
 
 
                         //A report focussed on pre-popupation & extraction
