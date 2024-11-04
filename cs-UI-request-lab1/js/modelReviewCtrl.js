@@ -76,26 +76,28 @@ angular.module("pocApp")
 
                             if (modelName) {
                                 if ($scope.hashAllCompositions[modelName]) {
-
-
+                                    //this was a composition
+                                    $scope.modelType = 'comp'
+                                    $scope.selectedModel = $scope.hashAllCompositions[modelName]
                                     $scope.selectComposition($scope.hashAllCompositions[modelName],$scope.compVersion)
                                     $scope.selectedFromUrl = true      //to indicate that the modelname was passed in on the url
 
 
                                 } else if ($scope.hashAllDG[modelName]) {
+                                    //this is a DG
+                                    $scope.modelType = 'dg'
+                                    $scope.selectedModel = $scope.hashAllDG[modelName]
                                     $scope.selectDG($scope.hashAllDG[modelName])
+
                                     $scope.selectedFromUrl = true      //to indicate that the modelname was passed in on the url
                                 } else {
 
                                     alert(`The model name: ${modelName} was not found in the library for either Composition or DataGroup`)
                                 }
 
-
-
+                            } else {
+                                alert("You need to supply the name of a DG or Composition in the call")
                             }
-
-
-
 
                         }
                     )
@@ -103,11 +105,23 @@ angular.module("pocApp")
                 }
             )
 
+
+
+            $scope.rebuildQ = function () {
+                if ( $scope.modelType == 'dg') {
+                    //call the select function with the disable conditional flag set
+                    $scope.selectDG($scope.selectedModel,true)
+                } else {
+                    $scope.selectComposition($scope.selectedModel,$scope.compVersion,true)
+                }
+
+            }
+
             $scope.testxquery = function (xqry) {
                 $uibModal.open({
-                    //backdrop: 'static',      //means can't close by clicking on the backdrop.
-                    //keyboard: false,       //same as above.
-                    size : 'lg',
+                    backdrop: 'static',      //means can't close by clicking on the backdrop.
+                    keyboard: false,       //same as above.
+                    size : 'xlg',
                     templateUrl: 'modalTemplates/xquery.html',
 
                     controller: 'xqueryCtrl',
@@ -565,15 +579,12 @@ angular.module("pocApp")
             }
 
             //todo - ? disable select capability
-            $scope.selectDG = function (dg) {
+            $scope.selectDG = function (dg,disableConditional) {
                 console.log(dg)
                 //todo just for dev atm - not sure if
                 $scope.selectedComp = dg
                 $scope.setCommentsThisModel()   //retrieve comments for this model
                 $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)
-
-
-
 
 
                 //adjust according to 'insertAfter' values
@@ -589,6 +600,11 @@ angular.module("pocApp")
                     //the second option expands the valuesets as options into the Q - todo make this an option
                     let config = {expandVS:true,enableWhen:true}
                     config.hashAllDG = $scope.hashAllDG
+
+                    //disable the generation of conditional operations
+                    if (disableConditional) {
+                        config.enableWhen = false
+                    }
 
                     if (dg.type) {
                         config.fhirType = dg.type // Used for definition based extraction
@@ -638,14 +654,13 @@ angular.module("pocApp")
                 return colour
             }
 
-            $scope.selectComposition = function (comp,version) {
+            $scope.selectComposition = function (comp,version,hideConditional) {
 
                 if (! comp) {
                     return
                 }
 
                 $scope.selectedComp = comp
-
 
                 if (version) {
                     //if a version is specified then retrieve that version
@@ -685,40 +700,22 @@ angular.module("pocApp")
 
                 } else {
                     let voComp = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)
-                    makeQ(voComp,comp)
+                    makeQ(voComp,comp,hideConditional)
                 }
 
 
-                //we need to get all the valueses in the composition - which meand we need
-                //all the elements...
-                //$scope.showWaiting = true
 
-
-                /*
-                vsSvc.getAllVS(voComp.allElements, function () {
-                    //alert("all VS available")
-                    $scope.showWaiting = false
-
-
-                    let vo = makeQSvc.makeHierarchicalQFromComp(comp,$scope.hashAllDG)
-
-                    $scope.fullQ = vo.Q         //will invoke the Q renderer directive
-                    $scope.hashEd = vo.hashEd
-                    $scope.errorLog = vo.errorLog
-
-                    console.log(vo.errorLog)
-
-                })
- */
-                function makeQ(voComp,comp) {
+                function makeQ(voComp,comp,hideConditional) {
                     vsSvc.getAllVS(voComp.allElements, function () {
                         //alert("all VS available")
                         $scope.showWaiting = false
 
                         makeQSvc.getNamedQueries(function (hashNamedQueries) {
 
+                            //let compConfig = {hideConditional : hideConditional}
+                            let compConfig = {hideEnableWhen : true}
 
-                            let vo = makeQSvc.makeHierarchicalQFromComp(comp,$scope.hashAllDG,hashNamedQueries)
+                            let vo = makeQSvc.makeHierarchicalQFromComp(comp,$scope.hashAllDG,hashNamedQueries,compConfig)
 
                             $scope.fullQ = vo.Q         //will invoke the Q renderer directive
                             $scope.hashEd = vo.hashEd
@@ -748,99 +745,8 @@ angular.module("pocApp")
                 return false
             }
 
-            function makeDGTreeDEP(treeData,rootNodeId) {
-                $('#compositionTree').jstree('destroy');
-
-                $scope.compTree = $('#compositionTree').jstree(
-                    {'core': {'multiple': false, 'data': treeData,
-                            'themes': {name: 'proton', responsive: true}}}
-                ).on('changed.jstree', function (e, data) {
-
-                    if (data.node) {
-                        $scope.selectedCompositionNode = data.node;
-                        $scope.commentsThisPath = $scope.commentsThisComp[$scope.selectedCompositionNode.data.ed.path]
-                        $scope.currentLinkId = $scope.selectedCompositionNode.data.ed.path
-
-                        console.log(data.node)
-
-
-                    }
-
-                    $scope.$digest();       //as the event occurred outside of angular...
-                }).bind("loaded.jstree", function (event, data) {
-                    let id = treeData[0].id
-                    $(this).jstree("open_node",id);
-
-
-                });
-
-            }
-
-
-            function makeCompTreeDEP(treeData,rootNodeId) {
-                $('#compositionTree').jstree('destroy');
-
-                $scope.compTree = $('#compositionTree').jstree(
-                    {'core': {'multiple': false, 'data': treeData,
-                            'themes': {name: 'proton', responsive: true}}}
-                ).on('changed.jstree', function (e, data) {
-
-                    if (data.node) {
-                        $scope.selectedCompositionNode = data.node;
-                        $scope.commentsThisPath = $scope.commentsThisComp[$scope.selectedCompositionNode.data.ed.path]
-
-
-                        $scope.selectedED = data.node.data.ed
-                        $scope.currentLinkId = $scope.selectedCompositionNode.data.ed.path
-
-                        console.log(data.node)
 
 
 
-                    }
-
-                    $scope.$digest();       //as the event occurred outside of angular...
-                }).bind("loaded.jstree", function (event, data) {
-                    let id = treeData[0].id
-                    $(this).jstree("open_node",id);
-
-                    let treeObject = $(this).jstree(true).get_json('#', { 'flat': false })
-
-
-                    let strategy = null
-                    //asyncCall(treeObject,$scope.selectedComp,                        strategy)
-
-
-                    //$scope.$digest();
-                });
-
-            }
-
-            async function asyncCallDEP(treeObject,comp,strategy) {
-                console.log('calling');
-                console.time('q')
-
-
-                //$scope.fullQ = await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
-
-                let voQ = await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
-
-                //$scope.fullQ = await makeQSvc.makeQFromTree(treeObject,comp,strategy)
-                $scope.fullQ = voQ.Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
-                $scope.Qlog = voQ.log   //the log of activity that occurred as the Q was created
-                //this is a version structured for tabs.
-                //$scope.fullQTab = voQ.Q //await makeQSvc.makeQFromTreeTab(treeObject,comp,strategy)
-                $scope.$digest();
-
-            }
-
-            /*
-            //todo - temp, for debugging
-            $timeout(function(){
-                $scope.selectComposition($scope.hashAllCompositions['PathRequest'])
-               // makeAllCommentsSummary()
-            },500)
-
-*/
 
         })

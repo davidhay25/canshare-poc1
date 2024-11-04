@@ -45,39 +45,33 @@ angular.module("pocApp")
                     function (data) {
                         console.log(data.data)
                         $scope.response = data.data
-
-
-
                     }, function (err) {
                         console.log(err.data)
                     }
                 )
+            }
 
 
+            $scope.executeFhirPathOnBundle = function (fp) {
 
-
-
-
+                try {
+                    let result = fhirpath.evaluate($scope.response, fp, null, fhirpath_r4_model)
+                    $scope.fhirPathResultBundle = result
+                } catch (ex) {
+                    alert(angular.toJson(ex))
+                }
             }
 
 
             $scope.executeFhirPath = function (fp,resource) {
-
-
                 fp = fp.replace(`%${query.itemName}`,resourceType)
-
                     try {
                         let result = fhirpath.evaluate(resource, fp, null, fhirpath_r4_model)
-                        console.log(fp,result)
                         $scope.fhirPathResult = result
-                        //return result
 
                     } catch (ex) {
                         alert(angular.toJson(ex))
-                        console.log(ex)
-
                     }
-
 
             }
 

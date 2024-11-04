@@ -26,7 +26,10 @@ angular.module("pocApp")
             }
 
             $scope.testxquery = function (queryName) {
+
+
                 $http.get(`/model/namedquery/${queryName}`).then(
+
                     function (data) {
                         $uibModal.open({
                             //backdrop: 'static',      //means can't close by clicking on the backdrop.
@@ -173,7 +176,7 @@ angular.module("pocApp")
                 for (const diff of $scope.selectedModel.diff) {
                     //if (diff.path !== diffToDelete.path && diff.path.startsWith(diffToDelete.path)) {
                     if (diff.path.isChildPath(diffToDelete.path)) {
-                        alert("This diff has child elements so can't be removed")
+                        alert(`This diff has child elements so can't be removed (${diff.path})`)
                         return
                     }
                 }

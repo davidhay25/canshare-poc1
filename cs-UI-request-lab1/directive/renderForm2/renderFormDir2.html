@@ -240,7 +240,12 @@
                     <tr ng-repeat="ew in selectedEd.enableWhen">
                       <td>{{ew.source | dropFirstInPath}}</td>
                       <td>{{ew.operator}}</td>
-                      <td>{{ew.value.code}} | {{ew.value.display}}</td>
+                      <td>
+
+                        <div ng-if="ew.value.code">{{ew.value.code}} | {{ew.value.display}}</div>
+                        <div ng-hide="ew.value.code">{{ew.value}}</div>
+
+                      </td>
                     </tr>
                   </table>
 

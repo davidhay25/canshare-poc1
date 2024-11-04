@@ -48,24 +48,19 @@ angular.module("pocApp")
                     function (data) {
                         $scope.namedQueries = data.data
 
-                        //todo - what happens when a NQ definition is deleted?
                         $scope.input.nq = {}    //this is a hash of all named queries in the model
                         if ($scope.model && $scope.model.namedQueries) {
                             for (const nqName of $scope.model.namedQueries) { //the dg has only the name
-                                $scope.input.nq[nqName] = true
+
+                                //only add to the input.nq if the named query actually exists.
+                                //otherwise it will be removed from the DG
+                                if ($scope.namedQueries.filter(item => item.name == nqName).length > 0) {
+                                    $scope.input.nq[nqName] = true
+                                }
+
+
                             }
                         }
-
-
-/*
-                        $scope.hashNamedQueries = {}
-                        data.data.forEach(function (nq) {
-                            $scope.hashNamedQueries[nq.name] = nq
-                        })
-*/
-
-                       // $scope.nqCanAdd = []
-
 
                     }, function (err) {
                         alert(angular.toJson(err.data))
@@ -74,17 +69,7 @@ angular.module("pocApp")
             }
             loadNamedQueries()
 
-            /*
-                        $scope.addNQ = function (nq) {
 
-                           // $scope.model.namedQueries = $scope.model.namedQueries || []
-                           // $scope.model.namedQueries.push(nq.name)
-
-                            $scope.model.prePopQuery = nq.name
-
-                        }
-
-                        */
 
             //check that there isn't a circular loop. Each DG should only once in the hierarchy
             function checkParentalHierarchy(parentName) {
@@ -227,13 +212,7 @@ angular.module("pocApp")
                     }
 
                     $scope.model.name = name  //we can use the 'isUnique' to know if the model can be added
-                    /*
-                                    let ar = $scope.input.types.filter(type => type == name)
-                                    console.log(ar.length)
-                                    $scope.isUnique = (ar.length == 0) //temp
-                    */
-                    //check on the library. Is this going to be a performance hit?
-                    //  if ($scope.isUnique) {
+
                     modelsSvc.isUniqueNameOnLibrary(name,'dg').then(
                         function () {
                             //name is unique
@@ -287,22 +266,6 @@ angular.module("pocApp")
                 return result
             }
 
-            //select element from base model list (so can edit the elements defined by the model)
-            $scope.selectElementFromListDEP = function (element) {
-                $scope.selectedElementFromList = element
-                delete $scope.edit.code
-                delete $scope.edit.title
-                delete $scope.edit.mult
-
-                //use local vars for updateing
-                $scope.edit = $scope.edit || {}
-                $scope.edit.title = element.title
-                //$scope.edit.mult = element.title
-                $scope.edit.mult = element.mult
-                if (element.code && element.code.length > 0) {
-                    $scope.edit.code = element.code[0].code
-                }
-            }
 
 
             //select an element from the expanded elements list
@@ -320,47 +283,6 @@ angular.module("pocApp")
             }
 
 
-            $scope.applyOverrideDEP = function (element,vsUrl) {
-                let newElement = angular.copy(element)
-                let ar = element.path.split('.')
-                ar.splice(0,1)
-                newElement.path = ar.join('.')
-                newElement.valueSet = vsUrl
-                $scope.model.diff.push(newElement)
-                //rebuild the all elements
-                let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
-                console.log(vo)
-                $scope.allElements = vo.allElements
-
-                $scope.selectElement(element)
-
-            }
-
-            $scope.removeOverrideDEP = function (element) {
-                if (confirm("Are you sure you wish to remove this Override, returning the definition to the original")) {
-                    let ar = element.path.split('.')
-                    ar.splice(0,1)
-                    let pathToCompare = ar.join('.')
-                    let pos = -1
-                    $scope.model.diff.forEach(function (e,inx) {
-                        if (e.path == pathToCompare) {
-                            pos=inx
-                        }
-                    })
-                    if (pos > -1) {
-                        $scope.model.diff.splice(pos,1)
-                        delete $scope.selectedElementOverridden
-
-                        //rebuild the all elements
-                        let vo = modelsSvc.getFullListOfElements($scope.model,hashTypes,true)
-                        console.log(vo)
-                        $scope.allElements = vo.allElements
-
-                        $scope.selectElement(element)
-
-                    }
-                }
-            }
 
             //check if this path has been used in the DG
             $scope.checkDuplicatePath = function(path) {
@@ -436,6 +358,7 @@ angular.module("pocApp")
 
                 //update the named queries
                 delete $scope.model.namedQueries
+
 
                 for (const key of Object.keys($scope.input.nq)) {
                     if (key && $scope.input.nq[key]) {

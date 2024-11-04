@@ -557,8 +557,10 @@
     //eg seg1.seg2 is a child of seg1.  seg1path is not.
     //Add here to ensure it is available before any functions that use it are loaded...
     String.prototype.isChildPath = function (parent) {
+
         let test = parent + "."
-        if (this.indexOf(test) > -1) {
+        if (this.startsWith(test) ) {
+       // if (this.indexOf(test) > -1) {
             return true
         } else {
             return false

@@ -614,7 +614,7 @@ angular.module("pocApp")
 
                 //see if there is an extraction context on the Q
                 //we assume there is only 1 and it on the Q - not descendent items (at the moment)
-                let ar1 = getExtension(Q,extExtractionContextUrl,'String')
+                let ar1 = getExtension(Q,extExtractionContextUrl,'Canonical')
                 if (ar1.length > 0) {
                     thing.extractionContext = ar1[0]
                 }
@@ -732,7 +732,7 @@ angular.module("pocApp")
                                     }
                                     break
                                 case extExtractionContextUrl:
-                                    thing.extractionContext = ext.valueString
+                                    thing.extractionContext = ext.valueCanonical
                                     break
 
                                 case extPopulationContext:
@@ -894,213 +894,15 @@ angular.module("pocApp")
                 return {report:report}
 
             },
-            makeReportCOPY : function (Q) {
-                //generate a report object for the SDC table view (that displays key extraction / population details)
 
-
-
-                let report = {entries:[],variableUsage:{},errors:[]}
-                let thing = {text:Q.name}
-                //A hash showing for each variable where it is used...
-                //report.variableUsage = {}
-
-                //errors discovered during the report creation
-                // report.errors = []
-
-                //see if there is an extraction context on the Q
-                //we assume there is only 1 and it on the Q - not descendent items (at the moment)
-                let ar1 = getExtension(Q,extExtractionContextUrl,'String')
-                if (ar1.length > 0) {
-                    thing.extractionContext = ar1[0]
-                }
-
-                report.entries.push(thing)
-
-                //get the variables - assume they are defined on the Q root for now...
-                let ar2 = getExtension(Q,extVariable,'Expression')
-                ar2.forEach(function (ext) {
-                    let thing = {text:Q.name}
-                    thing.variable = ext.name
-                    thing.expression = ext.expression  //varable type is x-query
-                    //thing.kind = 'variable'
-                    report.entries.push(thing)
-
-                    report.variableUsage[ext.name] = []
-
-                })
-
-
-                //get the launch contexts. These are fixed ATM but worth displaying
-                let arLC = getExtension(Q,extLaunchContextUrl)
-
-                report.launchContext = []
-                for (const ext of arLC) {
-                    let item = {}
-                    ext.extension.forEach(function (child) {
-
-                        switch (child.url) {
-                            case "name" :
-                                item.name = child.valueCoding.code
-                                break
-                            case "type" :
-                                item.type = child.valueCode
-                                break
-                            case "description" :
-                                item.description = child.valueString
-                                break
-                        }
-
-
-                    })
-
-                    report.launchContext.push(item)
-                    report.variableUsage[item.name] = []
-
-                }
-
-                console.log(report.launchContext)
-                function processItem(report,item) {
-                    let thing = {linkId:item.linkId,text:item.text,type:item.type,definition:item.definition}
-
-
-                    let mult = "0.."
-                    if (item.required) {
-                        mult = "1.."
-                    }
-                    if (item.repeats) {
-                        mult += "*"
-                    } else {
-                        mult += "1"
-                    }
-
-                    thing.mult = mult
-
-                    //look for fixed values. These are values with answerOption, and initialSelected set
-                    //todo fix!! answerOption is an array....
-                    if (item.answerOption) {
-                        //currently only using code & CodeableConcept
-                        Object.keys(item.answerOption).forEach(function (key) {
-                            //console.log(key)
-                            if (item.answerOption[key].initialSelected) {
-                                console.log(item.answerOption[key])
-                                let opt = item.answerOption[key]
-                                console.log(opt)
-                                if (opt.valueCoding) {
-                                    thing.fixedValue = `${opt.valueCoding.code} | ${opt.valueCoding.display} | ${opt.valueCoding.system}`
-                                } else if (opt.valueCode) {
-                                    thing.fixedValue = opt.valueCode
-                                } else if (opt.valueString) {
-                                    thing.fixedValue = opt.valueString
-                                }
-
-                            }
-                        })
-                    }
-
-                    //look for extQuantityUnit extension. This is used in quantity to set the unit
-                    //In the model, for a Quantity set the 'fixedValue' property - setting the units
-                    let ar2 = getExtension(item,extQuantityUnit,'Coding')
-                    if (ar2.length > 0) {
-                        thing.fixedValue = `Units: ${ar2[0].code}`
-                    }
-
-                    //check for hidden values
-                    let ar0 = getExtension(item,extHidden,'Boolean')
-                    if (ar0.length > 0) {
-                        thing.isHidden = ar0[0]
-                    }
-
-                    //check for initial expression - used in CodeableConcept pre-pop
-                    let ar = getExtension(item,extInitialExpressionUrl,'Expression')
-                    if (ar.length > 0) {
-                        thing.initialExpression = ar[0].expression
-
-                        //add to the variable usage hash
-                        let ar1 = thing.initialExpression.split('.')
-                        let variable = ar1[0].substr(1)
-                        if (report.variableUsage[variable]) {
-                            report.variableUsage[variable] = report.variableUsage[variable] || []
-                            report.variableUsage[variable].push(item.linkId)
-                        } else {
-                            report.errors.push({msg:`variable ${variable} not found at ${item.linkId}`})
-                        }
-                    }
-
-                    //check for extraction context
-                    //let ar1 = getExtension(item,extExtractionContextUrl,'Code')
-                    let ar1 = getExtension(item,extExtractionContextUrl,'String')
-                    if (ar1.length > 0) {
-                        thing.extractionContext = ar1[0]
-                    }
-
-                    //check for population contexts
-                    let ar3 = getExtension(item,extPopulationContext,'Expression')
-                    if (ar3.length > 0) {
-                        thing.populationContext = ar3[0]
-                    }
-
-                    //check for fixed values (our new extension)
-                    let ar4 = getExtension(item,extExtractionValue)   //without a type the whole extension is returned
-                    if (ar4.length > 0) {
-                        report.setValue = []
-                        for (const ext of ar4) {
-                            let v = {}
-                            console.log(ext)
-                            ext.extension.forEach(function (child) {
-                                switch (child.url) {
-                                    case 'definition' :
-                                        //the path in the extract where this element is to be inserted
-                                        v.path = child.valueCanonical
-                                        break
-                                    case 'fixed-value' :
-                                        //the actual value
-                                        v.value = child.valueString
-                                        break
-                                    case 'dynamic-value':
-                                        //an expression
-                                        v.expression = child.valueExpression
-                                        break
-                                    default :
-                                        //shouldn't happen - what to do?
-                                        break
-                                }
-
-
-                            })
-
-                            report.setValue.push(v)
-
-                            //add to entries
-                            // let sv = {text:'setValue'}
-                            //report.entries.push(sv)
-
-                        }
-
-                    }
-
-                    report.entries.push(thing)
-                    if (item.item) {
-                        item.item.forEach(function (child) {
-                            processItem(report,child)
-                        })
-                    }
-                }
-
-                Q.item.forEach(function (item) {
-                    processItem(report,item)
-                })
-
-                console.log(report)
-                return {report:report}
-
-            },
-
-            makeHierarchicalQFromComp : function (comp,hashAllDG,namedQueries) {
+            makeHierarchicalQFromComp : function (comp,hashAllDG,namedQueries,compConfig) {
                 //construct a Q from the composition
                 //strategy is to gather the DG from the comp sections, create DG Qs then assemble them into the comp Q
                 //assumption is that the composition itself doesn't change the DG contents - it is just a selector of DGs
 
                 //automatically adds the tab container level so UI has tabs for sections
+                compConfig = compConfig || {}
+
 
                 let that = this
                 let errorLog = []
@@ -1171,6 +973,9 @@ angular.module("pocApp")
                             let config = {expandVS:true,enableWhen:true,pathPrefix : pathPrefix,calledFromComp:true}
                             config.hashAllDG = hashAllDG
                             config.namedQueries = namedQueries
+                            if (compConfig.hideEnableWhen) {
+                                config.enableWhen = false
+                            }
 
                            // const guid = createUUID() // crypto.randomUUID();
 
@@ -1547,7 +1352,7 @@ console.log(thing.ed.path)
                         extractionContext = getExtractionContext(dgName,config.hashAllDG)
                         if (extractionContext) {
                             currentItem.extension = currentItem.extension || []
-                            currentItem.extension.push({url:extExtractionContextUrl,valueString:extractionContext})
+                            currentItem.extension.push({url:extExtractionContextUrl,valueCanonical:extractionContext})
                         }
 
                         //we'll also add a population context here. This is to support any pre-pop
@@ -1730,7 +1535,7 @@ console.log(thing.ed.path)
                         if (extractionContext) {
                             //extension type can be code or expression
                             item.extension = item.extension || []
-                            item.extension.push({url:extExtractionContextUrl,valueString:extractionContext})
+                            item.extension.push({url:extExtractionContextUrl,valueCanonical:extractionContext})
 
                            // item.extension.push({url:extExtractionContextUrl,valueExpression:{language:"text/fhirpath",expression:extractionContext}})
                         }

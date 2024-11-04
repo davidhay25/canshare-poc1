@@ -620,6 +620,8 @@ angular.module("pocApp")
 
                             //dg.snapshot = finalSnapshot
 
+                            //adjust EnableWhen elements
+                            adjustEnableWhen(dg)
 
 
                             //ensure that the children of groups are contiguous
@@ -648,6 +650,32 @@ angular.module("pocApp")
             }
         }
 
+        function adjustEnableWhen(dg) {
+            //adjust the paths of any dependencies
+            //adapted from qutilitiesSvc.updateEWSourcePath
+
+            for (const ed of dg.snapshot) {
+                if (ed.enableWhen) {
+                    for (const ew of ed.enableWhen) {
+
+                        //this checks that the first path of the source / controller path is the same as the dg
+                        //I think there are more complex issues with 'refereced' dgs - but I'll wait till I have an example to work with.
+
+                        let arControllerPath = ew.source.split('.')  //the control element - question / source
+                        if (arControllerPath[0] !== dg.name) {
+                            arControllerPath[0] = dg.name
+                            ew.source = arControllerPath.join('.')
+                        }
+
+
+
+                    }
+
+                }
+            }
+
+
+        }
 
         function adjustGroupOrdering(dg) {
             //ensure that the 'children' of group elements are immediately after the 'parent'. The tree is OK, but the lists are wrong...
@@ -686,10 +714,7 @@ angular.module("pocApp")
 
 
 
-
             dg.snapshot = lst
-
-
 
         }
 

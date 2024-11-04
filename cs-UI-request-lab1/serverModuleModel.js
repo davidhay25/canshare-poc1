@@ -638,12 +638,16 @@ async function setup(app,mongoDbName) {
     app.get('/model/namedquery/:name', async function(req,res) {
         let query = {name:req.params.name}
         try {
+            console.log(`gettting ${query}`)
             const cursor = await database.collection("namedquery").find(query).toArray()
             let arQuery = []
+            console.log(cursor)
+
             if (cursor && cursor.length == 1) {
                 res.json(cursor[0])
             } else {
-                res.status(404)
+
+                res.status(404).json({})
 
             }
 

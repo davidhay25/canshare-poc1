@@ -52,11 +52,12 @@
 
     <script>
         //add a function to determine if a given path is a child of another. Used when excluding paths
-        //eg seg1.seg2 is a child of seg1.  seg1path is not.
+        //eg seg1.seg2 is a child of seg1.  seg1{path} is not.
         //Add here to ensure it is available before any functions that use it are loaded...
         String.prototype.isChildPath = function (parent) {
             let test = parent + "."
-            if (this.indexOf(test) > -1) {
+            if (this.startsWith(test)) {
+              //  if (this.indexOf(test) > -1) {
                 return true
             } else { return false}
 
@@ -168,9 +169,6 @@
             </div>
         </div>
     </nav>
-
-
-
 
     <uib-tabset>
         <uib-tab heading="Form">
@@ -291,6 +289,11 @@
             </uib-tab>
 
         <uib-tab heading="Q">
+
+            <div class="pull-right"><button class="btn btn-link" ng-click="rebuildQ()">Rebuild without dependencies</button></div>
+            <div class="clearfix"></div>
+
+
             <pre>{{fullQ | json}}</pre>
         </uib-tab>
 

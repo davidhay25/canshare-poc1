@@ -63,7 +63,8 @@ angular.module("pocApp")
 
             }
 
-            $scope.focusDGName = 'BreastHistoPreviousBiopsyResult'
+            //$scope.focusDGName = 'BreastHistoPreviousBiopsyResult'
+            $scope.focusDGName = 'BreastHistoReportLymphNodes'
             $scope.makeSnapshots()
             $scope.checkParents( $scope.focusDGName)
 
