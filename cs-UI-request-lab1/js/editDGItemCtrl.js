@@ -7,8 +7,8 @@ angular.module("pocApp")
 
 
 
-            $scope.input.collapsibleOptions = ['none','default-open','default-closed']
-            $scope.input.collapsible = $scope.input.collapsibleOptions[0]
+            $scope.input.collapsibleOptions = ['default-open','default-closed']
+            //$scope.input.collapsible = $scope.input.collapsibleOptions[0]
 
             //need a default base for editing
             $scope.fixed = {}
@@ -16,24 +16,27 @@ angular.module("pocApp")
 
             let snomed = "http://snomed.info/sct"
 
-            //set the initial tab displayed
-            if (initialTab == 'profile') {
-                $scope.input.mainTabActive = 3
-            }
+
 
             $scope.fullElementList = fullElementList
             let dgName = fullElementList[0].ed.path     //it's aways the first element in the list...
             let dg = hashAllDG[dgName]
             $scope.dg = dg
+
              if (dg.type) {
                  let baseFhirUrl = "http://hl7.org/fhir/R4B/"     //hard code to R4B. may need to become a parameter...
                  $scope.linkToSpec = `${baseFhirUrl}${dg.type}.html`
-               //  $scope.type = dg.type
              }
 
              $scope.deleteOtherOption = function () {
                  delete $scope.input.otherType
              }
+
+            $scope.deleteCollapsible = function () {
+                delete $scope.input.collapsible
+            }
+
+
 
              //execute the namedquery expression
             $scope.testxquery = function (queryName) {
@@ -157,8 +160,8 @@ angular.module("pocApp")
                 $scope.input.identifierSystem = item.ed.identifierSystem
 
 
-
                 $scope.input.selectedType = item.ed.type[0]
+
                 setControlOptions($scope.input.selectedType)
 
                 //set the options list
