@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('editDGItemCtrl',
-        function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal,$http,parentEd,igSvc,initialTab,vsSvc) {
+        function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal,$http,parentEd,igSvc,initialTab,vsSvc,utilsSvc) {
             $scope.item = item      //will be {ed:} if editing an existing item
             $scope.allTypes = allTypes
             $scope.input = {}
@@ -36,6 +36,15 @@ angular.module("pocApp")
                 delete $scope.input.collapsible
             }
 
+             //does the collapsible option make sense
+             $scope.canShowCollapsible = function () {
+                 if ($scope.input.selectedType == 'Group') {
+                     return true
+                 }
+                 if (utilsSvc.fhirDataTypes().indexOf($scope.input.selectedType) == -1) {
+                     return true
+                 }
+             }
 
 
              //execute the namedquery expression
@@ -468,15 +477,11 @@ angular.module("pocApp")
                 ed.hideLabel = $scope.input.hideLabel
                 ed.labelText = $scope.input.labelText
 
-
-
                 ed.conditionalVS = $scope.conditionalVS
 
 
                 if ($scope.input.otherType) {
                     ed.otherType = $scope.input.otherType
-
-
                 } else {
                     //delete any otherType conditional that may be present
                     //deleteOtherConditional()
@@ -493,9 +498,6 @@ angular.module("pocApp")
                     ed.profile.extUrl = $scope.input.extUrl
                     ed.profile.isReference = $scope.input.isReference
                 }
-
-                //There's a
-                //$scope.fixed.elName is set by the modal - fixedCoding or fixedQuantity etc.
 
                 if ($scope.fixed && $scope.fixed.elName) {
                     ed[$scope.fixed.elName] = $scope.fixed.value

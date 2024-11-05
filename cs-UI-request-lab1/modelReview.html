@@ -32,7 +32,7 @@
     </style>
 
     <script>
-        angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage']).config(function($locationProvider) {
+        let app = angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage']).config(function($locationProvider) {
 
             // enable html5Mode for pushstate ('#'-less URLs)
             $locationProvider.html5Mode(true);
@@ -43,6 +43,37 @@
         angular.module("pocApp").config(['$compileProvider', function ($compileProvider) {
             $compileProvider.aHrefSanitizationWhitelist(/^\s*(http|https?|ftp|mailto|blob):/);
         }]);
+
+/*
+        //https://www.tutorialsteacher.com/angularjs/angularjs-exception-handling
+        app.config(function ($provide) {
+
+            $provide.decorator('$exceptionHandler', function ($delegate) {
+
+                return function (exception, cause) {
+                    //  $delegate(exception, cause);
+//console.log(cause)
+                    console.log("Untrapped exception",exception.stack)
+                    //$http.post("model/access",{})
+
+                    // logErrorsToBackend(exception, cause);
+
+                    let obj = {type:'err',module:'model',msg:exception.stack}
+                    $.ajax({
+                        type: "POST",
+                        url: "/telemetry",
+                        contentType: "application/json",
+                        data: JSON.stringify(obj)
+                    });
+
+                    let msg = "There was an unexpected error. Details have been saved to the server, " +
+                        "but your last action may have failed. You should restart the browser and check."
+
+                    alert(msg);
+                };
+            });
+        });
+*/
 
         //this allows the directives (which are in the formsApp) to be used. see https://stackoverflow.com/questions/15641730/angular-js-directives-in-different-modules
         angular.module("formsApp",[])

@@ -176,24 +176,28 @@
           </div>
         </div>
 
-
-
-
-
       </div>
-
-
     </div>
 
+    <!-- ?what is disabled doing
     <div ng-repeat="ew in entry.ed.enableWhen" ng-show="entry.isDisabled">
-      <em>{{ew.source | dropFirstInPath}}{{ew.operator}}{{ew.value.display}}</em>
+      -->
+      <div ng-repeat="ew in entry.ed.enableWhen" ng-show="entry.isDisabled">
+      <em>{{ew.source | dropFirstInPath}} {{ew.operator}} {{ew.value.display}}</em>
     </div>
 
 
+
+<!-- Other doesn't have a corresponding ED-->
+    <div ng-repeat="ew in entry.item.enableWhen">
+      <em ng-show="ew.answerCoding.code == '74964007'">{{ew.question | dropFirstInPath}} is 'Other'</em>
+    </div>
+
+<!--
     <div ng-show="entry.ed.prePop && ! entry.ed.autoPop"><em style="padding-left: 12px; color: grey">Pre-populated</em></div>
 
     <div ng-show="entry.ed.autoPop"><em style="padding-left: 12px; color: grey">{{entry.ed.autoPop}}</em></div>
-
+-->
 
   </div>
 

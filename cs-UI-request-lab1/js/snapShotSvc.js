@@ -654,6 +654,8 @@ angular.module("pocApp")
             //adjust the paths of any dependencies
             //adapted from qutilitiesSvc.updateEWSourcePath
 
+            //return
+
             for (const ed of dg.snapshot) {
                 if (ed.enableWhen) {
                     for (const ew of ed.enableWhen) {
@@ -663,7 +665,36 @@ angular.module("pocApp")
 
                         let arControllerPath = ew.source.split('.')  //the control element - question / source
                         if (arControllerPath[0] !== dg.name) {
-                            arControllerPath[0] = dg.name
+                            //This is either from an inherited DG or a referenced one.
+
+
+                            //note that the ed.path does not have the DG name prefix whereas the controller path does
+                            //but - it will always be equl to or larger than the controller path (as it is within th ehierarchy for a referenced dg
+                            let arThisPath = ed.path.split('.')      // this ed - the one that is dependant
+
+                            let diff = arThisPath.length - arControllerPath.length
+
+                            console.log(dg.name,arControllerPath.length,arThisPath.length,diff)
+                            console.log(dg.name,ew.source,ed.path)
+
+                            if (diff == 0) {
+                                arControllerPath[0] = dg.name
+                            } else {
+                                //need to prepend the path to this referenced DG
+                                let ar = arThisPath.slice(1,diff)
+                                if (ar[0] !== dg.name) {
+                                    ar.splice(0,0,dg.name)
+                                }
+
+                                arControllerPath = ar.concat(arControllerPath)
+                            }
+
+
+                            //temp
+
+
+
+
                             ew.source = arControllerPath.join('.')
                         }
 

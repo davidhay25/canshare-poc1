@@ -295,41 +295,57 @@ angular.module("pocApp")
 
         //If the ed has the 'otherType set, then an additional item mutst be created - possibl with an enableWhen
         //The function returns the items to insert (including the source) - possibly not needed, but I'll leave it like this for now
-        function addOtherItemDEP(ed,sourceItem) {
-            let arItems = []        //the function returns the list of items
+        function addOtherItem(ed,sourceItem) {
+            let newItem       //the function returns the list of items
             switch (ed.otherType) {
-                case "always" :
+                case "never" :
                     //just add the extra item
-                    let item = {text:`Other ${ed.title}`,linkId:`${ed.path}-other`,type:'string'}
-                    arItems.push(sourceItem)
-                    arItems.push(item)
+                   // let item = {text:`Other ${ed.title}`,linkId:`${ed.path}-other`,type:'string'}
+                   // arItems.push(sourceItem)
+                   // arItems.push(item)
                     break
                 case "sometimes" :
                     //add the additional item, plus a conditional on the sourceItem
-                    let item1 = {text:`Other ${ed.title}`,linkId:`${ed.path}-other`,type:'string'}
+                    newItem = {text:`Other ${ed.title}`,linkId:`${ed.path}-other`,type:'string'}
 
                     let qEW = {}
                     qEW.question = sourceItem.linkId
                     qEW.operator = '='
                     qEW.answerCoding = {code:"74964007",system:'http://snomed.info/sct'}
-                    item1.enableWhen = sourceItem.enableWhen || []
-                    item1.enableWhen.push(qEW)
 
-                    arItems.push(sourceItem)
-                    arItems.push(item1)
+                    newItem.enableWhen = sourceItem.enableWhen || []
+                    newItem.enableWhen.push(qEW)
+
                     break
                 case "textonly" :
                     //the original item (a CC) is NOT included. In this case only the text box is added
                     //even though the source is not included in the Q, the linkId of the inserted item has '-other' appended
                     //though the text is copied form the source
-                    let item2 = {text:`${ed.title}`,linkId:`${ed.path}-other`,type:'string'}
-                    arItems.push(item2)
+
+                    //todo - add a fixed value extension (from default) AND a hide extension to original item
+
+
+                    //hide the original
+                    sourceItem.extension = sourceItem.extension || []
+                    sourceItem.extension.push({url:extHidden,valueBoolean:true})
+
+
+/*
+                    //addFixedValue(sourceItem,definition,type,value)
+                    typeof
+                        let concept = ed.fixedCoding
+                    delete concept.fsn
+                    item.answerOption = [{valueCoding:concept,initialSelected:true}]
+
+*/
+                    newItem = {text:`${ed.title}`,linkId:`${ed.path}-other`,type:'string'}
+
 
                     break
 
 
             }
-            return arItems
+            return newItem
         }
 
         //Add the 'enable when' to the Q
@@ -337,29 +353,20 @@ angular.module("pocApp")
         //When used by the Composition, we add a prefix which is {compname}.{section name}. (note the trailing dot)
         function addEnableWhen(ed,item,inPathPrefix) {
 
-            //return
-
-            let allEW = []  //track all EW created as the Q is created. Used to check the links once the Q is cinisher
+            let allEW = []  //track all EW created as the Q is created. Used to check the links once the Q is finished
             let pathPrefix = ""
             if (inPathPrefix) {
                 pathPrefix = inPathPrefix + "."
             }
 
-            //need to adjust for embedded DGs
-            //let sourcePath =
-
-
-
             if (ed && ed.enableWhen && ed.enableWhen.length > 0) {
-                //console.log(ed,'has ew')
-                 //item.enableWhen = []
 
                 ed.enableWhen.forEach(function (ew) {
                     let qEW = {}
 
                     //When an EW is in a contained DG, then the paths of the source (in the EW) need to be updated
-                    let source = QutilitiesSvc.updateEWSourcePath(ed.path,ew.source)
-
+                 //temp   let source = QutilitiesSvc.updateEWSourcePath(ed.path,ew.source)
+                    let source = ew.source
                     qEW.question = `${pathPrefix}${source}` //linkId of source is relative to the parent (DG)
 
                     //qEW.question = `${pathPrefix}${ew.source}` //linkId of source is relative to the parent (DG)
@@ -367,8 +374,6 @@ angular.module("pocApp")
                     //if the ew.value is an object then assume a Coding. Otherwise a boolean (we only support these 2)
 
                     let canAdd = false
-
-
 
 
                     if (typeof ew.value == 'boolean' || ew.operator == 'exists') {
@@ -1179,49 +1184,49 @@ console.log(thing.ed.path)
                 let lstQElements = []
 
                 lstElements.forEach(function (thing) {
-                        let ed = thing.ed
-                        let okToAdd = true
-                        if (ed.mult == '0..0') {okToAdd = false}
-                        if (okToAdd) {
-                            for (const pth of basePathsToHide) {
-                                if (ed.path == pth || ed.path.isChildPath(pth)) {
-                                    okToAdd = false
-                                    break
-                                }
-
+                    let ed = thing.ed
+                    let okToAdd = true
+                    if (ed.mult == '0..0') {okToAdd = false}
+                    if (okToAdd) {
+                        for (const pth of basePathsToHide) {
+                            if (ed.path == pth || ed.path.isChildPath(pth)) {
+                                okToAdd = false
+                                break
                             }
 
                         }
 
-                        //now we need to look at the conditional ValueSets. If an item has condtional ValueSets defined
-                        //then an ed is constructed for each VS with an enableWhen defined.
-                        //todo - should the original be defined - what about the linkId
+                    }
 
-                        if (thing.ed.conditionalVS && thing.ed.conditionalVS.length > 0) {
-                            let ctr = 1
-                            let adjustedPath = `${pathPrefix}${thing.ed.path}`
-                            conditionalED[adjustedPath] = []
-                            thing.ed.conditionalVS.forEach(function (cvs) {
-                                let newThing = angular.copy(thing)
-                                //delete newThing.enableWhen
+                    //now we need to look at the conditional ValueSets. If an item has condtional ValueSets defined
+                    //then an ed is constructed for each VS with an enableWhen defined.
+                    //todo - should the original be defined - what about the linkId
 
-                                let ew = {source:cvs.path,operator:'=',value:cvs.value}
+                    if (thing.ed.conditionalVS && thing.ed.conditionalVS.length > 0) {
+                        let ctr = 1
+                        let adjustedPath = `${pathPrefix}${thing.ed.path}`
+                        conditionalED[adjustedPath] = []
+                        thing.ed.conditionalVS.forEach(function (cvs) {
+                            let newThing = angular.copy(thing)
+                            //delete newThing.enableWhen
 
-                                newThing.ed.enableWhen = [ew]
-                                newThing.ed.valueSet = cvs.valueSet
-                                newThing.ed.path =`${thing.ed.path}-${ctr++}`
-                                lstQElements.push(newThing)
+                            let ew = {source:cvs.path,operator:'=',value:cvs.value}
 
-                                //the hash has a list of all the new eds that were created to replace the one with the conditional ValueSet
-                                conditionalED[adjustedPath].push(`${pathPrefix}${newThing.ed.path}`)
-                            })
+                            newThing.ed.enableWhen = [ew]
+                            newThing.ed.valueSet = cvs.valueSet
+                            newThing.ed.path =`${thing.ed.path}-${ctr++}`
+                            lstQElements.push(newThing)
 
-                           okToAdd = false     //don't show the original
-                        }
+                            //the hash has a list of all the new eds that were created to replace the one with the conditional ValueSet
+                            conditionalED[adjustedPath].push(`${pathPrefix}${newThing.ed.path}`)
+                        })
 
-                        if (okToAdd) {
-                            lstQElements.push(thing)
-                        }
+                       okToAdd = false     //don't show the original
+                    }
+
+                    if (okToAdd) {
+                        lstQElements.push(thing)
+                    }
                 })
 
 
@@ -1259,13 +1264,6 @@ console.log(thing.ed.path)
                 let hashItems = {}      //items by linkId
                 let hashEd = {}         //has of ED by path (=linkId)
                 let hashVS = {}         //hash of all ValueSets defined
-
-
-
-
-          //     for (const item of lstQElements) {
-             //       console.log(item.ed.path)
-             //   }
 
                 for (const item of lstQElements) {
                     let ed = item.ed
@@ -1330,6 +1328,12 @@ console.log(thing.ed.path)
                             hashItems[parentItemPath].item.push(currentItem)
                             hashItems[parentItemPath].type = "group"
                             hashItems[path] = currentItem   //ready to act as a parent...
+
+                            //We also need to process 'other' items. These are used in choice elements when the desired option is not in the options list
+                            let newItem = addOtherItem(ed,currentItem)
+                            if (newItem) {
+                                hashItems[parentItemPath].item.push(newItem)
+                            }
                         }
 
 

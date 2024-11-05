@@ -218,7 +218,7 @@ angular.module('formsApp')
                         }
                     )
 
-                    console.log(newNote,ed)
+                   // console.log(newNote,ed)
 
                 }
 

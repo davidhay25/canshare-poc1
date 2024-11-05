@@ -98,7 +98,6 @@
 
             </td>
 
-
           </tr>
 
           <tr>
@@ -202,18 +201,29 @@
             </td>
           </tr>
 
-          <tr>
+          <tr ng-if="canShowCollapsible()">
             <td>Set collapsible option</td>
             <td>
               <div class="row">
                 <div class="col-md-6">
+                  <!--
                   <select class="form-control" ng-model="input.collapsible"
                           ng-options = "opt for opt in input.collapsibleOptions"></select>
+-->
+                  <span ng-repeat = "opt in input.collapsibleOptions">
+                    <input type="radio"
+                           ng-model="input.collapsible" value="{{opt}}"> {{opt}}
+                  </span>
+
+
+                </div>
+                <div class="col-md-6">
+                  <div class="pull-right clickable" ng-click="deleteCollapsible()">clear</div>
                 </div>
               </div>
 
 
-              <div><em>Allows a group to be expanded / collapsed. Only makes sense for Groups or DataGroups.</em></div>
+              <div><em>Allows a group or DataGroup to be expanded / collapsed. </em></div>
             </td>
           </tr>
 
