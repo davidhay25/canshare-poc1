@@ -67,9 +67,6 @@
                                       Currently this potential control element has no option either in the options or ValueSet
                                   </div>
 
-
-
-
                                   <div ng-show="options.length > 0">
                                       <div class="row">
                                           <div class="col-md-3">
@@ -79,7 +76,9 @@
                                           </div>
 
                                           <div class="col-md-9">
-                                              <select class="form-control" ng-model="input.ewValue"
+                                              <select
+                                                      ng-if = "input.ewOp !== 'exists'"
+                                                      class="form-control" ng-model="input.ewValue"
                                                       ng-options="showConcept(concept) for concept in options">
                                               </select>
                                           </div>

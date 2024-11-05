@@ -21,7 +21,7 @@ angular.module("pocApp")
                 return hashNQ[name]
             },
             getVersion : function(){
-                return "0.9.5"
+                return "0.9.6"
             },
             makeSafeString : function(s) {
             if (s) {

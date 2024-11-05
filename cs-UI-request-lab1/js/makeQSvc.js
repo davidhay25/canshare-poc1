@@ -1188,7 +1188,7 @@ console.log(thing.ed.path)
 
                         }
 
-                    //console.log(ed.path,okToAdd)
+
 
                         //now we need to look at the conditional ValueSets. If an item has condtional ValueSets defined
                         //then an ed is constructed for each VS with an enableWhen defined.
@@ -1206,6 +1206,7 @@ console.log(thing.ed.path)
                                 //delete newThing.enableWhen
 
                                 let ew = {source:cvs.path,operator:'=',value:cvs.value}
+
                                 newThing.ed.enableWhen = [ew]
                                 newThing.ed.valueSet = cvs.valueSet
                                 newThing.ed.path =`${thing.ed.path}-${ctr++}`

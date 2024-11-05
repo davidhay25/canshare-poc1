@@ -452,12 +452,16 @@ angular.module("pocApp")
 
                     if (ed.hideInQ) {
                         arStyle.push("text-decoration: line-through")
+                    } else {
+                        //if there is hideInQ then it has precedence over showing enablewhen
+
+                        if (ed.enableWhen && ed.enableWhen.length > 0) {
+                            arStyle.push("text-decoration-line: underline")
+                            arStyle.push("text-decoration-style: dotted")
+                        }
+
                     }
 
-                    if (ed.enableWhen && ed.enableWhen.length > 0) {
-                        arStyle.push("text-decoration-line: underline")
-                        arStyle.push("text-decoration-style: dotted")
-                    }
 
 
                     //construct the style element for the 'a'

@@ -122,7 +122,7 @@
             <td>
               <span ng-repeat = "opt in qControlOptions">
                   <input type="radio"
-                         ng-change="setControlHint(selectedNode.data.ed,opt)"
+                         ng-change="setControlHintDEP(selectedNode.data.ed,opt)"
                          ng-model="input.controlHint" value="{{opt}}"> {{opt}}
                 </span>
 
@@ -132,11 +132,13 @@
           <tr  ng-if="input.selectedType == 'CodeableConcept'">
             <td>'Other' type</td>
             <td>
-              <span ng-repeat = "opt in ['sometimes','textonly']">
+              <span ng-repeat = "opt in ['sometimes','textonly','never']">
                   <input type="radio"
-                         ng-change="setControlHint(selectedNode.data.ed,opt)"
+                         ng-change="setControlHintDEP(selectedNode.data.ed,opt)"
                          ng-model="input.otherType" value="{{opt}}"> {{opt}} &nbsp;
                 </span>
+
+              <span class="pull-right clickable" ng-click = "deleteOtherOption()">Clear </span>
 
             </td>
           </tr>

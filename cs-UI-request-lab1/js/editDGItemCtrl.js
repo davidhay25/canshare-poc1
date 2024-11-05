@@ -31,6 +31,10 @@ angular.module("pocApp")
                //  $scope.type = dg.type
              }
 
+             $scope.deleteOtherOption = function () {
+                 delete $scope.input.otherType
+             }
+
              //execute the namedquery expression
             $scope.testxquery = function (queryName) {
                 $http.get(`/model/namedquery/${queryName}`).then(

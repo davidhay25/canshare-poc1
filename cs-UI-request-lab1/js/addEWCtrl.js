@@ -94,6 +94,10 @@ angular.module("pocApp")
                         break
                 }
 
+                if (vo.op == 'exists') {
+
+                }
+
 
                 $scope.$close(vo)
 
