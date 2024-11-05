@@ -367,8 +367,12 @@ angular.module("pocApp")
                     //if the ew.value is an object then assume a Coding. Otherwise a boolean (we only support these 2)
 
                     let canAdd = false
-                    if (typeof ew.value == 'boolean') {
-                        //this is a boolean
+
+
+
+
+                    if (typeof ew.value == 'boolean' || ew.operator == 'exists') {
+                        //this is a boolean or an 'exists check
                         qEW.answerBoolean = ew.value
                         canAdd = true
                     } else {
@@ -379,8 +383,9 @@ angular.module("pocApp")
                             delete qEW.answerCoding.fsn  //the preferred term...
 
                             qEW.answerCoding.system = qEW.answerCoding.system || unknownCodeSystem
-                            //qEW.answerCoding.system = qEW.answerCoding.system || "http://example.com/fhir/CodeSystem/example"
                             canAdd = true
+                        } else {
+
                         }
                     }
 
@@ -1188,18 +1193,13 @@ console.log(thing.ed.path)
 
                         }
 
-
-
                         //now we need to look at the conditional ValueSets. If an item has condtional ValueSets defined
                         //then an ed is constructed for each VS with an enableWhen defined.
                         //todo - should the original be defined - what about the linkId
 
                         if (thing.ed.conditionalVS && thing.ed.conditionalVS.length > 0) {
                             let ctr = 1
-                          // hashEdsWithConditional[thing.ed.path] = [] //this will have a list of all the ed's created
-
                             let adjustedPath = `${pathPrefix}${thing.ed.path}`
-
                             conditionalED[adjustedPath] = []
                             thing.ed.conditionalVS.forEach(function (cvs) {
                                 let newThing = angular.copy(thing)

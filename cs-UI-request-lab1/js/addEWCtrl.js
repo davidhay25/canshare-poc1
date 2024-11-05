@@ -6,7 +6,7 @@ angular.module("pocApp")
             $scope.targetED = targetED
 
             $scope.input = {}
-            $scope.operations=["=","!="]
+            $scope.operations=["=","!=","exists"]
             $scope.input.ewOp = $scope.operations[0]
 
             $scope.input.ewBoolean = true       //default when adding a boolean
@@ -95,7 +95,7 @@ angular.module("pocApp")
                 }
 
                 if (vo.op == 'exists') {
-
+                    vo.value = true
                 }
 
 

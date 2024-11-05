@@ -12,8 +12,10 @@
 
       <div class="col-md-4 col-sm-4">
         <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+          <!--
         <button ng-show = "input.name"
                 class="btn btn-primary pull-right" ng-click="save()">Close</button>
+          -->
       </div>
     </div>
 
@@ -96,7 +98,7 @@
                                   </div>
 
                                   <button class="btn-primary btn pull-right"
-                                          ng-show="input.ewOp && input.ewValue"
+                                          ng-show="input.ewOp == 'exists' || (input.ewOp && input.ewValue)"
                                           ng-click="addEnableWhen('cc')">Add</button>
 
                               </div>
