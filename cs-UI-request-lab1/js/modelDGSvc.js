@@ -103,8 +103,8 @@ angular.module("pocApp")
 
                             //adjusts the source (controller) path for contained DG's with conditionals
                             //also called when rendering a Q...
-                            let source = QutilitiesSvc.updateEWSourcePath(item.ed.path,ew.source)
-
+                            //let source = QutilitiesSvc.updateEWSourcePath(item.ed.path,ew.source)
+let source = ew.source
                             //let sourceEd = hashElements[ew.source]
                             let sourceEd = hashElements[source]
 

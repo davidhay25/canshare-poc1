@@ -655,10 +655,14 @@ angular.module("pocApp")
             //adapted from qutilitiesSvc.updateEWSourcePath
 
             //return
+            let printLog = false
+            //if (dg.name == 'PatientSummary') {printLog = true}
 
             for (const ed of dg.snapshot) {
                 if (ed.enableWhen) {
                     for (const ew of ed.enableWhen) {
+
+                        //ew.source format is [dgName].seg1.seg2...
 
                         //this checks that the first path of the source / controller path is the same as the dg
                         //I think there are more complex issues with 'refereced' dgs - but I'll wait till I have an example to work with.
@@ -666,11 +670,44 @@ angular.module("pocApp")
                         let arControllerPath = ew.source.split('.')  //the control element - question / source
                         if (arControllerPath[0] !== dg.name) {
                             //This is either from an inherited DG or a referenced one.
+                            //the adjustment is different for a referenced vs an inherited one
+                            //if it's a child, then removing the first segment should have a valid element
+                            arControllerPath.splice(0,1) //remove the dg name
+                            let testElementPath = arControllerPath.join('.')
+                            let hash = allDgSnapshot[dg.name]
+
+                            if (hash[testElementPath]) {
+                                //yes, this is a child
+                                ew.source = test
+                            } else {
+                                //no, this is a referenced DG
+                                let arThisPath = ed.path.split('.')      // this ed - the one that is dependant
+                                //if (arThisPath.length !== )
+                                let ar =arThisPath // arControllerPath.slice(1) //removes the dgname from the source
+                                arThisPath.splice(0,0,dg.name)
+                                let arFullPath = arThisPath.concat(ar) //start from the insert point
+                                ew.source = arFullPath.join('.')
+
+                            }
 
 
+
+                            if (printLog) {
+                                console.log(`source from ew: ${ew.source}  current path: ${ed.path}`)
+                            }
+
+
+
+
+                            //arControllerPath.splice(0,1)
+                           // arControllerPath[0] = dg.name
+                           // let ar1 = arThisPath.concat(arControllerPath)
+                           // ew.source = ar1.join('.')
+
+/*
                             //note that the ed.path does not have the DG name prefix whereas the controller path does
                             //but - it will always be equl to or larger than the controller path (as it is within th ehierarchy for a referenced dg
-                            let arThisPath = ed.path.split('.')      // this ed - the one that is dependant
+
 
                             let diff = arThisPath.length - arControllerPath.length
 
@@ -682,20 +719,18 @@ angular.module("pocApp")
                             } else {
                                 //need to prepend the path to this referenced DG
                                 let ar = arThisPath.slice(1,diff)
+
+                                //need to insert the path in the host where this is...
+
                                 if (ar[0] !== dg.name) {
-                                    ar.splice(0,0,dg.name)
+                               //     ar.splice(0,0,dg.name)
                                 }
 
                                 arControllerPath = ar.concat(arControllerPath)
                             }
 
-
-                            //temp
-
-
-
-
                             ew.source = arControllerPath.join('.')
+                            */
                         }
 
 

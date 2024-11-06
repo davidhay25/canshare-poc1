@@ -13,6 +13,9 @@ angular.module("pocApp")
 
 
             updateEWSourcePath : function(currentPath,sourcePath) {
+
+
+
                 //adjustment for embedded DG path. This occurs when a DG with a conditional
                 //is a child element of another DG. The path of the source (the controlling element)
                 //is not correct - it needs to be adjusted to allow for the containing DG

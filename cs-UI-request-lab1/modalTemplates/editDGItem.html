@@ -281,7 +281,7 @@
                 <div class="col-md-10">
 
 
-                  <div ng-if="fhirResourceType">
+                  <div>
                     <input type="text"
                            placeholder="FHIRPath extraction expression - eg Specimen.bodySite"
                            class="form-control" ng-model="input.definition"/>
@@ -289,12 +289,13 @@
                   </div>
 
                   <div ng-if="! dg.type">
-                    <em>You must set the resource context on the DG to enable resource extraction. This is
+                    <em>You must set the resource context on this or a referencing DG to enable resource extraction. This is
                       done from the main DG editor (the link at the top of the DG display page). </em>
                   </div>
 
 
                 </div>
+                <!--
                 <div class="col-md-1">
 
                   <span class="btn btn-link" ng-click="testPrePop(input.definition,'testExtract')">Test</span>
@@ -304,6 +305,7 @@
 
                   <a style="display:block ; margin-top: 8px" href="https://hl7.org/fhir/fhirpath.html" target="_blank">Spec</a>
                 </div>
+                -->
 
               </div>
 

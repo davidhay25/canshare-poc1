@@ -1482,13 +1482,6 @@ console.log(thing.ed.path)
 
                     let edType = ed.type[0]     //actually be the name of the DG
 
-                  //  const guid = createUUID() //crypto.randomUUID();
-                   // console.log(guid);
-
-                  //  let patientId = guid// "patient-id"    //todo - should be a guid...
-
-                    //console.log(edType)
-
                     //If this ed is a reference to another, it can have a different exraction context...
                     if (config.hashAllDG[edType]) {
 
@@ -1534,11 +1527,13 @@ console.log(thing.ed.path)
 
                         //the extractionContext is preserved across calls to decorate()
                         //this allows it to flow into children...
-                        extractionContext = getExtractionContext(edType,config.hashAllDG)
+                        //If the DG has no extraction context, it won't be updated...
+
+                        extractionContext = getExtractionContext(edType,config.hashAllDG) || extractionContext
 
                         //let extractionContext = config.hashAllDG[edType].type
                         if (extractionContext) {
-                            //extension type can be code or expression
+                            //The DG defines a new extraction context
                             item.extension = item.extension || []
                             item.extension.push({url:extExtractionContextUrl,valueCanonical:extractionContext})
 
@@ -1605,8 +1600,6 @@ console.log(thing.ed.path)
                         item.extension.push(ext)
                         */
                     }
-
-
 
                     //set the ValueSet or options from the ed to the item
                     //the fixed takes precedence, then ValueSet then options
@@ -1758,11 +1751,16 @@ console.log(thing.ed.path)
 
 
                     //important that this segment is the last as it can adjust items (eg the valueset stuff)
-                    if (ed.definition) {
+                    if (ed.definition && extractionContext) {
                         //this will be the extract path for this element into the target resource
-                        //right now assumes extracting to a FHIR resource - will need further thought if profiled...
+                        //right now assumes extracting to a core FHIR resource - will need further thought if profiled...
 
-                        item.definition = `${extractionContext}#${ed.definition}`
+                        //may need to adjust definition to add type (eg NZName) for 'utility' DG's used elsewhere
+                        let definition = ed.definition
+                        let ar = extractionContext.split('/')
+                        let resourceType = ar[ar.length-1]      //todo - this assumes core types only...  need to think about profiles later
+                        definition = definition.replace('%root%',resourceType)
+                        item.definition = `${extractionContext}#${definition}`
 
                         //todo - want to check this more...
                         if (false && ed.extractExtensionUrl) {
