@@ -674,13 +674,15 @@ angular.module("pocApp")
                             //if it's a child, then removing the first segment should have a valid element
                             arControllerPath.splice(0,1) //remove the dg name
                             let testElementPath = arControllerPath.join('.')
-                            let hash = allDgSnapshot[dg.name]
 
-                            if (hash[testElementPath]) {
-                                //yes, this is a child
-                                ew.source = test
+                            //see if there are any paths in the DG that match this element (they won't have the dg name as a prefix)
+                            let ar1 = dg.snapshot.filter(el => el.path == testElementPath)
+
+                            if (ar1.length > 0) {
+                                //yes, this is a child - or at least there is a matching element
+                                ew.source = `${dg.name}.${testElementPath}`
                             } else {
-                                //no, this is a referenced DG
+                                //no, this must be a referenced DG
                                 let arThisPath = ed.path.split('.')      // this ed - the one that is dependant
                                 //if (arThisPath.length !== )
                                 let ar =arThisPath // arControllerPath.slice(1) //removes the dgname from the source
