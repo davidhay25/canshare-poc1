@@ -730,8 +730,10 @@
             </div>
         </uib-tab>
 
-        <uib-tab heading="Table">
+        <uib-tab heading="Member Count">
             <br/>
+
+
             <div class="row">
                 <div class="col-md-6">
                     Member count last updated: {{getMemberCountDate() | date}}
@@ -759,7 +761,7 @@
                 <tr><th>Id</th><th>Title</th><th>Description</th><th>Status</th><th>Count</th></tr>
                 <tr
                         ng-class="{retiredVS:item.vs.status == 'retired',draftVS:item.vs.status == 'draft'}"
-                        ng-repeat="item in allVSItem">
+                        ng-repeat="item in listForMemberCount">
                     <td>{{item.vs.id}}</td>
                     <td>{{item.vs.title}}</td>
                     <td>{{item.vs.description}}</td>

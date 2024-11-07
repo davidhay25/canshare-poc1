@@ -653,6 +653,9 @@ angular.module("pocApp")
                 //return a list of subsetted canshare valuesets
                 identifier = identifier || "http://canshare.co.nz/fhir/NamingSystem/valuesets%7c"
 
+                //a combined list of snoned & non-snomed for the member count
+                $scope.listForMemberCount = []
+
                 let deferred = $q.defer()
 
                 let qry = `ValueSet?identifier=${identifier}&_sort=title&_count=5000&_summary=false`
@@ -684,7 +687,10 @@ angular.module("pocApp")
                                     ar.push(item)
                                 }
 
-
+                                //update the list for the membercount
+                                let item1 = {vs:entry.resource}
+                                //item1.display = entry.resource.title || entry.resource.name
+                                $scope.listForMemberCount.push(item1)
 
                             })
 

@@ -1418,47 +1418,14 @@ console.log(thing.ed.path)
                     }
                 }
 
-                /*
-                if (! config.calledFromComp) {
 
-                    for (const ew of allEW) {
-                        if (! hashEd[ew.question] && !  conditionalED[ew.question]) {
-                            errorLog.push({msg:`EnableWhen on ${ew.target} refers to a missing element: ${ew.question}`})
-                        }
-                    }
-                } else {
-                    //Hiwever, if it was called by the composition then
-                }
-*/
                 //at this point the Q has been built, but if there were any elements with conditionalVS
                 //then that element will not have been added to the Q (conditional items for each possible VS will have been)
                 //and any other items that have a dependency on that one will need to be corrected...
 
 
 
-                //console.log(conditionalED)
-
                 correctEW(Q,conditionalED)
-
-                //add any named queries to the first item of the Q
-/*
-                if (dg.prePopQuery) {
-                    let item = Q.item[0]
-                    addNamedQuery(item,dg.name,dg.prePopQuery)
-                }
-*/
-/*
-
-                //add the named queries as variables in the Q
-                if (dg.namedQueries) {
-                    let item = Q.item[0]
-                    dg.namedQueries.forEach(function (nqName) {
-                        addNamedQuery(nqName,item)
-                    })
-
-                }
-*/
-
 
 
 
@@ -1845,8 +1812,6 @@ console.log(thing.ed.path)
                     function checkItem(item) {
 
                         if (item.enableWhen) {
-                            //console.log(item.enableWhen)
-
                             let newEWList = []
 
                             item.enableWhen.forEach(function (ew) {

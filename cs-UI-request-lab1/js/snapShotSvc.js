@@ -994,7 +994,8 @@ angular.module("pocApp")
                     title = dg.title
                 } else {
                     console.error(`No DG called ${dgName} found`)
-                    alert(`No DG called ${dgName} found`)
+                    //should be obvious where there's nothing there...
+                    //alert(`No DG called ${dgName} found`)
                     return []
                 }
 

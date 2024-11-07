@@ -121,7 +121,8 @@ function setup(app) {
                 let vsId = 'canshare-all-unpublished'
                 let url = `https://nzhts.digital.health.nz/fhir/ValueSet/${vsId}`
                 let vs = {resourceType:'ValueSet',id:vsId,status:'draft',experimental:false}        //draft VS won't be syndicated
-
+                vs.title = "Canshare unpublished SNOMED-CT codes"
+                vs.description = "SNOMED-CT codes created in advance of formal publication"
                 vs.url = url
                 vs.name = vsId
                 vs.version = 1
