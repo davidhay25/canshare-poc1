@@ -656,7 +656,7 @@ angular.module("pocApp")
 
             //return
             let printLog = false
-            //if (dg.name == 'PatientSummary') {printLog = true}
+            if (dg.name == 'BreastHistoClinicalInformation') {printLog = true}
 
             for (const ed of dg.snapshot) {
                 if (ed.enableWhen) {
@@ -667,6 +667,10 @@ angular.module("pocApp")
                         //this checks that the first path of the source / controller path is the same as the dg
                         //I think there are more complex issues with 'refereced' dgs - but I'll wait till I have an example to work with.
 
+                        if (printLog) {
+                            console.log(`Target:${ed.path}  Source/Control:${ew.source}`)
+                        }
+
                         let arControllerPath = ew.source.split('.')  //the control element - question / source
                         if (arControllerPath[0] !== dg.name) {
                             //This is either from an inherited DG or a referenced one.
@@ -674,19 +678,32 @@ angular.module("pocApp")
                             //if it's a child, then removing the first segment should have a valid element
                             arControllerPath.splice(0,1) //remove the dg name
                             let testElementPath = arControllerPath.join('.')
+                            if (printLog) {
+                                console.log(`testElementPath: ${testElementPath}`)
+                            }
 
                             //see if there are any paths in the DG that match this element (they won't have the dg name as a prefix)
                             let ar1 = dg.snapshot.filter(el => el.path == testElementPath)
 
                             if (ar1.length > 0) {
                                 //yes, this is a child - or at least there is a matching element
+                                if (printLog) {
+                                    console.log(`found in DG`)
+                                }
                                 ew.source = `${dg.name}.${testElementPath}`
                             } else {
+
+                                if (printLog) {
+                                    console.log(`NOT found in DG`)
+                                }
+
                                 //no, this must be a referenced DG
-                                let arThisPath = ed.path.split('.')      // this ed - the one that is dependant
-                                //if (arThisPath.length !== )
-                                let ar =arThisPath // arControllerPath.slice(1) //removes the dgname from the source
+                                let arThisPath = ed.path.split('.')      // this ed - the one that is dependent
+
+                               // let ar = arThisPath // arControllerPath.slice(1) //removes the dgname from the source
+                                let ar = arControllerPath.slice(1) //removes the dgname from the source
                                 arThisPath.splice(0,0,dg.name)
+
                                 let arFullPath = arThisPath.concat(ar) //start from the insert point
                                 ew.source = arFullPath.join('.')
 
@@ -695,7 +712,7 @@ angular.module("pocApp")
 
 
                             if (printLog) {
-                                console.log(`source from ew: ${ew.source}  current path: ${ed.path}`)
+                                console.log(`Final: source from ew: ${ew.source}  current path: ${ed.path}`)
                             }
 
 
@@ -733,6 +750,10 @@ angular.module("pocApp")
 
                             ew.source = arControllerPath.join('.')
                             */
+                        } else {
+                            if (printLog) {
+                                console.log(`Defined in this DG (first segment matches)`)
+                            }
                         }
 
 

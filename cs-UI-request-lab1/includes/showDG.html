@@ -281,6 +281,20 @@
                   </td>
                 </tr>
 
+                <tr ng-if="selectedModel.fixedValues"><td>Fixed values</td>
+                  <td>
+                    <div ng-repeat = "fv in selectedModel.fixedValues">
+
+                      <div>{{fv.path}}</div>
+                      <div style="padding-bottom: 6px"><em  style="padding-left: 8px">{{fv.value}}</em></div>
+
+                    </div>
+
+                  </td>
+                </tr>
+
+
+
               </table>
 
             </div>

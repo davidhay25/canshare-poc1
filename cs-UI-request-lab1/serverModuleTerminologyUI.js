@@ -633,7 +633,13 @@ function setup(app) {
             //Call expand on the valueset
             let vs = entry.resource
             if (vs.status !== 'retired') {
-                let vsExpandQry = `https://authoring.nzhts.digital.health.nz/fhir/ValueSet/$expand?url=${vs.url}&_summary=false`
+
+
+
+                let vsExpandQry = `${nzhtsconfig.serverBaseProd}ValueSet/$expand?url=${vs.url}&_summary=false`
+//console.log(vsExpandQry)
+
+                //let vsExpandQry = `https://authoring.nzhts.digital.health.nz/fhir/ValueSet/$expand?url=${vs.url}&_summary=false`
                 try {
                     let result = await axios.get(vsExpandQry,config)
 
@@ -650,7 +656,7 @@ function setup(app) {
 
             }
             if (ctr > 20) {
-              //  break
+               // break
             }
 
         }

@@ -383,52 +383,35 @@
                 <em>Named queries will be rendered as Variable extensions in the Q.
                 This means they are available for pre-population expressions in this DG</em>
 
-                <!--
-                               <div class="row">
-                                   <div class="col-md-6">
-                                       <textarea class="form-control" ng-model="model.prePopQuery"></textarea>
-                                   </div>
-                                   <div class="col-md-6">
-
-                                   </div>
-                               </div>
-
-                                <table class="table table-bordered">
-                                    <tr ng-repeat="nqName in model.namedQueries">
-                                        <td>{{nqName}}</td>
-                                        <td>{{hashNamedQueries[nqName].description}}</td>
-                                        <td>{{hashNamedQueries[nqName].contents}}</td>
-
-                                        <td><button class="btn-link btn" ng-click="removeNQ($index)">Remove</button> </td>
-                                    </tr>
-                                </table>
-
-
-                                <strong>All named queries</strong>
-
-                                <div class="row">
-
-                                    <div class="col-md-5">
-                                        <select class="form-control" ng-model="input.selectedNQ"
-                                                ng-options="nq.description for nq in namedQueries"/>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div>{{input.selectedNQ.description}}</div>
-                                        <div>{{input.selectedNQ.contents}}</div>
-
-                                    </div>
-                                    <div class="col-md-1">
-                                        <button class="btn btn-primary" ng-click="addNQ(input.selectedNQ)">Add</button>
-                                    </div>
-
-                                </div>
-
-                                <em>These are the FHIR queries (if any) that will provide data that can be used by elements
-                                    within the DataGroup for pre-population</em>
-
-                                -->
 
             </uib-tab>
+
+            <uib-tab heading="Fixed values">
+                <br/>
+
+
+                <em>Fixed values defined by this DG</em>
+                <table class="table table-bordered">
+                    <tr><th>Path</th><th>Value</th></tr>
+                    <tr ng-repeat="fv in input.fixedValues">
+                        <td>{{fv.path}}</td>
+                        <td>{{fv.value}}</td>
+                        <td><div class="clickable" ng-click="removeFixedValue($index)">Remove</div></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" class="form-control" placeholder="The path being fixed" ng-model="input.fvPath"/></td>
+                        <td><input type="text" class="form-control" placeholder="The value being fixed" ng-model="input.fvValue"/></td>
+                        <td><div class="clickable" ng-click="addFixedValue(input.fvPath,input.fvValue)">Add</div> </td>
+
+                    </tr>
+
+                </table>
+
+                <em>Fixed values are directly rendered at the root of the Q using the FV extension TODO: distinguish from fixed value in element - ie these are for resource</em>
+
+
+            </uib-tab>
+
 
             <uib-tab heading="Json">
                 <pre>{{model | json}}</pre>

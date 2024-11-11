@@ -732,6 +732,7 @@ angular.module("pocApp")
                 let ar = item.path.split(".")       //this i sthe full path - with prepended dg name
                 let dgName = ar[0]      //so the DG name is the first segment (should be the same as selectedModel
 
+                let dg = $scope.hashAllDG[dgName]
                 ar.splice(0,1)          //remove the first element (the dg name)
                 let pathToDelete =  ar.join(".") // $filter('dropFirstInPath')(item.path)   //remove the DT name from the path
 
@@ -743,7 +744,7 @@ angular.module("pocApp")
                         traceSvc.addAction({action:'delete-slice',model:$scope.selectedModel,
                             path:slicePathToDelete,description:'delete slice'})
 
-                        let dg = $scope.hashAllDG[dgName]
+                        //let dg = $scope.hashAllDG[dgName]
                         if (dg && dg.diff) {
                             let ar1 = []
                             dg.diff.forEach(function (ed) {
@@ -754,8 +755,6 @@ angular.module("pocApp")
                             })
                             dg.diff = ar1
 
-
-
                             //rebuild fullList and re-draw the tree
                             $scope.refreshFullList($scope.selectedModel)
                         }
@@ -763,10 +762,26 @@ angular.module("pocApp")
                     return
                 }
 
+                //check that this element isn't a source element for a conditional
+                for (const thing of $scope.fullElementList) {
+                    let ed = thing.ed    //note the ed path has the dg name prefix in fullElementList
+                    if (ed.enableWhen) {
+                       // let source = `${dg.name}.${ed.path}`
+                        for (const ew of ed.enableWhen) {
+                            if (ew.source == item.path) {
+                                alert(`This element is a controlling element (conditional) for ${ed.path} so can't be deleted`)
+                                return
+                                break
+                            }
+                        }
+
+                    }
+                }
+
 
                 //check that there aren't any child elements off this one
                 let canDelete = true
-                let dg = $scope.hashAllDG[dgName]
+                //let dg = $scope.hashAllDG[dgName]
                 if (dg && dg.diff) {
                     dg.diff.forEach(function (ed) {
 

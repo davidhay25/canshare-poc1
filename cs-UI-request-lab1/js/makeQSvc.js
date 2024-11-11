@@ -85,6 +85,7 @@ angular.module("pocApp")
 
         function addFixedValue(item,definition,type,value,expression) {
             //add a fixed value extension. Can either be a value or an expression
+            //definition is the path in the resource (added to the 'item.definition' value
 
             //http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue
             let ext = {url:extExtractionValue,extension:[]}
@@ -181,6 +182,23 @@ angular.module("pocApp")
 
         }
 
+        //add fixed values to the item
+        function addFixedValues(item,lstFV) {
+            if (lstFV && lstFV.length > 0) {
+                for (const fv of lstFV) {
+                    //todo - need to support other types
+                    //the the resource type - first segment in path is trtpe
+                    let ar = fv.path.split('.')
+                    let resourceType = ar[0]
+
+                    let path = `http://hl7.org/fhir/StructureDefinition/${resourceType}#${fv.path}`
+
+
+                    addFixedValue(item,path,'String',fv.value)
+                }
+            }
+        }
+
         //get the extraction context from the DG
         function getExtractionContext(dgName,hashAllDG) {
             let dg = hashAllDG[dgName]
@@ -193,6 +211,7 @@ angular.module("pocApp")
                     if (dg.parent) {
                         dg = hashAllDG[dg.parent]
                     } else {
+
                         break
                     }
                 }
@@ -313,6 +332,9 @@ angular.module("pocApp")
                     qEW.operator = '='
                     qEW.answerCoding = {code:"74964007",system:'http://snomed.info/sct'}
 
+                    //If the original had definition set (ie where the element is extracted to) then add it to the new element as well
+                    newItem.definition = sourceItem.definition
+
                     newItem.enableWhen = sourceItem.enableWhen || []
                     newItem.enableWhen.push(qEW)
 
@@ -320,25 +342,22 @@ angular.module("pocApp")
                 case "textonly" :
                     //the original item (a CC) is NOT included. In this case only the text box is added
                     //even though the source is not included in the Q, the linkId of the inserted item has '-other' appended
-                    //though the text is copied form the source
+                    //though the text is copied from the source
 
-                    //todo - add a fixed value extension (from default) AND a hide extension to original item
+                    newItem = {text:`${ed.title}`,linkId:`${ed.path}-other`,type:'string'}
+
+                    //todo need to confirm how this will work - what should the definition on the original be?
+                    if (sourceItem.definition) {
+                        //assume the definition is to a cc - eg something like Condition.code
+
+                        let unknown = {system:'http://snomed.info/sct',code:"74964007",display:"Other"}
+                        addFixedValue(newItem,sourceItem.definition,'Coding',unknown)
+                    }
 
 
                     //hide the original
                     sourceItem.extension = sourceItem.extension || []
                     sourceItem.extension.push({url:extHidden,valueBoolean:true})
-
-
-/*
-                    //addFixedValue(sourceItem,definition,type,value)
-                    typeof
-                        let concept = ed.fixedCoding
-                    delete concept.fsn
-                    item.answerOption = [{valueCoding:concept,initialSelected:true}]
-
-*/
-                    newItem = {text:`${ed.title}`,linkId:`${ed.path}-other`,type:'string'}
 
 
                     break
@@ -1062,9 +1081,6 @@ angular.module("pocApp")
                                 //see if this is a DG that extracts to a resource with a patient reference
                                 //wellington oct29
 
-
-
-
                                 if (resourcesForReference[dg.type]) {
                                     //if (dg.type == 'Condition') {
                                     let definition = `http://hl7.org/fhir/StructureDefinition/${dg.type}#${dg.type}.subject.reference`         //path in
@@ -1091,22 +1107,18 @@ angular.module("pocApp")
                                     dgItem.extension.push(...dgQ.item[0].extension)
                                     dgItem.repeats = true
 
-
-                               //     sectionItem.extension = sectionItem.extension || []
-                                //    sectionItem.extension.push(...dgQ.item[0].extension)
-                                 //   sectionItem.repeats = true
                                 }
 
 
 
-
-
-
-
-                                for (const child of dgQ.item[0].item){
-                                    dgItem.item.push(child)
-                                   //temp  sectionItem.item.push(child)
+                                //if the item has children then add them
+                                if (dgQ.item[0].item) {
+                                    for (const child of dgQ.item[0].item){
+                                        dgItem.item.push(child)
+                                        //temp  sectionItem.item.push(child)
+                                    }
                                 }
+
 
                                 sectionItem.item.push(dgItem)
 
@@ -1244,6 +1256,8 @@ console.log(thing.ed.path)
                 addUseContext(Q)
                 addPublisher(Q)
 
+
+
                 //add the named queries as variables in the Q
                 if (dg.namedQueries) {
                     dg.namedQueries.forEach(function (nqName) {
@@ -1358,6 +1372,10 @@ console.log(thing.ed.path)
                         if (extractionContext) {
                             currentItem.extension = currentItem.extension || []
                             currentItem.extension.push({url:extExtractionContextUrl,valueCanonical:extractionContext})
+                            //if there's an extraction context, then add any 'DG scope' fixed values.
+                            //fixed values can also be defined on an item... todo TBD
+                            addFixedValues(currentItem,dg.fixedValues)
+
                         }
 
                         //we'll also add a population context here. This is to support any pre-pop
@@ -1423,8 +1441,6 @@ console.log(thing.ed.path)
                 //then that element will not have been added to the Q (conditional items for each possible VS will have been)
                 //and any other items that have a dependency on that one will need to be corrected...
 
-
-
                 correctEW(Q,conditionalED)
 
 
@@ -1451,6 +1467,7 @@ console.log(thing.ed.path)
 
                     //If this ed is a reference to another, it can have a different exraction context...
                     if (config.hashAllDG[edType]) {
+                        //let referencedDG = config.hashAllDG[edType]
 
                         //console.log("is DG", config.hashAllDG[edType])
 
@@ -1503,6 +1520,12 @@ console.log(thing.ed.path)
                             //The DG defines a new extraction context
                             item.extension = item.extension || []
                             item.extension.push({url:extExtractionContextUrl,valueCanonical:extractionContext})
+
+                            //if there's an extraction context, then add any 'DG scope' fixed values.
+                            //fixed values can also be defined on an item... todo TBD
+                            //this is for referenced DGs
+                            addFixedValues(item,referencedDG.fixedValues)
+
 
                            // item.extension.push({url:extExtractionContextUrl,valueExpression:{language:"text/fhirpath",expression:extractionContext}})
                         }
@@ -1583,10 +1606,15 @@ console.log(thing.ed.path)
 
                         if (ed.identifierSystem) {
                             //an identifier system has been set - add the fixedValue extension to the item
-                            let ar = extractionContext.split('/')
-                            let canonical = `${extractionContext}#${ar[ar.length-1]}.identifier.system`
-                            console.log(canonical)
-                            addFixedValue(item,canonical,"String",ed.identifierSystem)
+                            if ( extractionContext)  {
+                                let ar = extractionContext.split('/')
+                                let canonical = `${extractionContext}#${ar[ar.length-1]}.identifier.system`
+                                console.log(canonical)
+                                addFixedValue(item,canonical,"String",ed.identifierSystem)
+                            } else {
+                                alert(`Processing ${dgName} which has an identifier extraction set but there's no extraction context on the DG`)
+                            }
+
                         }
                     }
 

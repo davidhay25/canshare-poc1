@@ -7,6 +7,8 @@ angular.module("pocApp")
             $scope.edit = {}
             $scope.isNew = isNew        //if new, then allow the model metadata to be set
 
+            $scope.input.fixedValues = []   //all the fixed values defined by this DG (not shared like Named Queries)
+
             //construct a has of all types (DT + FHIR) for the full list of elements routine
             $scope.allTypes = angular.copy(hashTypes)
 
@@ -40,6 +42,18 @@ angular.module("pocApp")
                 }
             }
 
+
+            //fixed value stuff
+            $scope.addFixedValue = function (path,value) {
+                let fv = {path:path,value:value}
+                $scope.input.fixedValues.push(fv)
+                delete $scope.input.fvPath
+                delete $scope.input.fvValue
+            }
+
+            $scope.removeFixedValue = function (inx) {
+                $scope.input.fixedValues.splice(inx,1)
+            }
 
             //Load all the Named queries
             function loadNamedQueries() {
@@ -155,6 +169,7 @@ angular.module("pocApp")
                     $scope.input.newModelParent = model.parent
                 }
 
+                $scope.input.fixedValues = model.fixedValues || []
                 getFullElementList()
               
             } else {
@@ -355,6 +370,8 @@ angular.module("pocApp")
 
             $scope.save = function () {
                 $scope.model.type = $scope.input.type
+
+                model.fixedValues = $scope.input.fixedValues
 
                 //update the named queries
                 delete $scope.model.namedQueries
