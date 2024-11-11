@@ -183,7 +183,14 @@ angular.module("pocApp")
         }
 
         //add fixed values to the item
-        function addFixedValues(item,lstFV) {
+        function addFixedValues(item,dg) {
+
+
+            let lstFV = snapshotSvc.getFixedValues(dg.name)
+
+           //let lstFV =  dg.fixedValues
+
+
             if (lstFV && lstFV.length > 0) {
                 for (const fv of lstFV) {
                     //todo - need to support other types
@@ -203,6 +210,11 @@ angular.module("pocApp")
         function getExtractionContext(dgName,hashAllDG) {
             let dg = hashAllDG[dgName]
             let extractionContext
+
+
+            extractionContext = snapshotSvc.getExtractResource(dgName)
+
+/*
             while (dg) {
                 if (dg.type) {
                     extractionContext = dg.type
@@ -216,6 +228,7 @@ angular.module("pocApp")
                     }
                 }
             }
+*/
 
             //is this a profile or a core resource type
             if (extractionContext && extractionContext.indexOf('http') == -1) {
@@ -641,27 +654,28 @@ angular.module("pocApp")
                 //errors discovered during the report creation
                // report.errors = []
 
-                //see if there is an extraction context on the Q
-                //we assume there is only 1 and it on the Q - not descendent items (at the moment)
+                //see if there is an extraction context on the Q (there may be some on child groups)
                 let ar1 = getExtension(Q,extExtractionContextUrl,'Canonical')
                 if (ar1.length > 0) {
                     thing.extractionContext = ar1[0]
+                    thing.isSDC = true
                 }
 
                 report.entries.push(thing)
                 
                 //get the variables - assume they are defined on the Q root for now...
+                //todo - not going to work for compositions I think
                 let ar2 = getExtension(Q,extVariable,'Expression')
                 ar2.forEach(function (ext) {
                     let thing = {text:Q.name}
                     thing.variable = ext.name
-                    //thing.expression = ext.expression  //varable type is x-query
                     thing.contents = ext.expression  //varable type is x-query
                     thing.itemName = ext.name       //the name the variable is referred to
-                    //thing.kind = 'variable'
                     report.entries.push(thing)
 
                     report.variableUsage[ext.name] = []
+
+                    thing.isSDC = true
 
                 })
 
@@ -714,11 +728,12 @@ angular.module("pocApp")
                     //look for fixed values. These are values with answerOption, and initialSelected set
                     //todo fix!! answerOption is an array....
                     if (item.answerOption) {
+                        thing.isSDC = true
                         //currently only using code & CodeableConcept
                         Object.keys(item.answerOption).forEach(function (key) {
                             //console.log(key)
                             if (item.answerOption[key].initialSelected) {
-                                console.log(item.answerOption[key])
+                                //console.log(item.answerOption[key])
                                 let opt = item.answerOption[key]
                                 //console.log(opt)
                                 if (opt.valueCoding) {
@@ -737,6 +752,7 @@ angular.module("pocApp")
                     //now process the extensions. Some we recognize here - others are added with the url
 
                     if (item.extension) {
+                        thing.isSDC = true
                         item.extension.forEach(function (ext) {
 
                             switch (ext.url) {
@@ -1374,7 +1390,7 @@ console.log(thing.ed.path)
                             currentItem.extension.push({url:extExtractionContextUrl,valueCanonical:extractionContext})
                             //if there's an extraction context, then add any 'DG scope' fixed values.
                             //fixed values can also be defined on an item... todo TBD
-                            addFixedValues(currentItem,dg.fixedValues)
+                            addFixedValues(currentItem,dg)
 
                         }
 
@@ -1524,7 +1540,7 @@ console.log(thing.ed.path)
                             //if there's an extraction context, then add any 'DG scope' fixed values.
                             //fixed values can also be defined on an item... todo TBD
                             //this is for referenced DGs
-                            addFixedValues(item,referencedDG.fixedValues)
+                            addFixedValues(item,referencedDG)
 
 
                            // item.extension.push({url:extExtractionContextUrl,valueExpression:{language:"text/fhirpath",expression:extractionContext}})

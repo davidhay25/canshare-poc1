@@ -103,22 +103,10 @@ angular.module("pocApp")
 
                             //adjusts the source (controller) path for contained DG's with conditionals
                             //also called when rendering a Q...
-                            //let source = QutilitiesSvc.updateEWSourcePath(item.ed.path,ew.source)
-let source = ew.source
-                            //let sourceEd = hashElements[ew.source]
+                            let source = ew.source
                             let sourceEd = hashElements[source]
 
-
-                            /* - aug2024 - not sure that this is right
-                            //for inherited elements the first segment is always the current dg name
-                            let ar = item.ed.path.split('.')
-                            ar[0] = dgName
-                            let newPath = ar.join('.')
-*/
                             let entry = {path:item.ed.path,ew:ew,ed:sourceEd}
-                          //  entry.source = source
-
-                            //let entry = {path:newPath,ew:ew,ed:sourceEd}
                             if (! sourceEd) {
                                 entry.error = `Warning! source ed not found at path ${ew.source}`
                             }

@@ -741,7 +741,7 @@ angular.module("pocApp")
             $scope.showReportLine = function (SDCOnly,entry) {
                 if (! SDCOnly) {return true}
 
-                if (entry.definition || entry.initialExpression) {return true}
+                if (entry.isSDC) {return true}
 
                 return false
             }

@@ -623,6 +623,8 @@ angular.module("pocApp")
                             //adjust EnableWhen elements
                             adjustEnableWhen(dg)
 
+                            //adjustFhirResource(dg)      //sets the FHIR resource to extract to
+
 
                             //ensure that the children of groups are contiguous
                             adjustGroupOrdering(dg)
@@ -650,13 +652,22 @@ angular.module("pocApp")
             }
         }
 
-        function adjustEnableWhen(dg) {
-            //adjust the paths of any dependencies
-            //adapted from qutilitiesSvc.updateEWSourcePath
+        function adjustFhirResource(dg) {
+            //Set the 'extract FHIR resource' to any in the hierarchy
 
-            //return
+
+
+        }
+
+        function adjustFixedValues(dg) {
+
+        }
+
+        //Adjust the conditionals when they are either inherited or referenced from anoth DG
+        function adjustEnableWhen(dg) {
+
             let printLog = false
-            if (dg.name == 'BreastHistoClinicalInformation') {printLog = true}
+            if (dg.name == 'BreastHistoClinicalInformationXX') {printLog = true}
 
             for (const ed of dg.snapshot) {
                 if (ed.enableWhen) {
@@ -665,8 +676,6 @@ angular.module("pocApp")
                         //ew.source format is [dgName].seg1.seg2...
 
                         //this checks that the first path of the source / controller path is the same as the dg
-                        //I think there are more complex issues with 'refereced' dgs - but I'll wait till I have an example to work with.
-
                         if (printLog) {
                             console.log(`Target:${ed.path}  Source/Control:${ew.source}`)
                         }
@@ -718,38 +727,6 @@ angular.module("pocApp")
 
 
 
-                            //arControllerPath.splice(0,1)
-                           // arControllerPath[0] = dg.name
-                           // let ar1 = arThisPath.concat(arControllerPath)
-                           // ew.source = ar1.join('.')
-
-/*
-                            //note that the ed.path does not have the DG name prefix whereas the controller path does
-                            //but - it will always be equl to or larger than the controller path (as it is within th ehierarchy for a referenced dg
-
-
-                            let diff = arThisPath.length - arControllerPath.length
-
-                            console.log(dg.name,arControllerPath.length,arThisPath.length,diff)
-                            console.log(dg.name,ew.source,ed.path)
-
-                            if (diff == 0) {
-                                arControllerPath[0] = dg.name
-                            } else {
-                                //need to prepend the path to this referenced DG
-                                let ar = arThisPath.slice(1,diff)
-
-                                //need to insert the path in the host where this is...
-
-                                if (ar[0] !== dg.name) {
-                               //     ar.splice(0,0,dg.name)
-                                }
-
-                                arControllerPath = ar.concat(arControllerPath)
-                            }
-
-                            ew.source = arControllerPath.join('.')
-                            */
                         } else {
                             if (printLog) {
                                 console.log(`Defined in this DG (first segment matches)`)
@@ -883,10 +860,60 @@ angular.module("pocApp")
         }
 
 
-
         return {
-            processOneDG : function (dg) {
+            getExtractResource : function (dgName) {
+                let dg = allDgSnapshot[dgName]
+                if (dg) {
+                    if (dg.type) {
+                        return dg.type
+                    } else {
+                        if (dg.parent)  {      //only if there's no type set and there is a parent...
+                            let parentDG = allDgSnapshot[dg.parent]
+                            while (parentDG) {
+                                if (parentDG.type) {
+                                    return parentDG.type
+                                    break
+                                } else {
+                                    if (parentDG.parent) {
+                                        let parentName = parentDG.parent
+                                        parentDG = allDgSnapshot[parentName]
+                                    } else {
 
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            },
+            getFixedValues : function (dgName) {
+                let dg = allDgSnapshot[dgName]
+                if (dg) {
+                    if (dg.fixedValues && dg.fixedValues.length > 0) {
+                        return dg.fixedValues
+                    } else {
+                        if (dg.parent)  {      //only if there's no type set and there is a parent...
+                            let parentDG = allDgSnapshot[dg.parent]
+                            while (parentDG) {
+                                if (parentDG.fixedValues) {
+                                    return parentDG.fixedValues
+                                    break
+                                } else {
+                                    if (parentDG.parent) {
+                                        let parentName = parentDG.parent
+                                        parentDG = allDgSnapshot[parentName]
+                                    } else {
+
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
             },
             makeSnapshots: function (hashAllDG,inFocusDGName) {
                 clearInternalCaches()
