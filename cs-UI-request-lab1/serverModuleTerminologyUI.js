@@ -521,7 +521,7 @@ function setup(app) {
 
 
             let token = await getNZHTSAccessToken()
-            console.log(`nzhts query: ${req.query.qry}`)
+            //console.log(`nzhts query: ${req.query.qry}`)
             if (token) {
 
                 var decoded = jwt_decode(token);

@@ -42,6 +42,7 @@ const modelModule = require("./serverModuleModel")
 const reviewModule = require("./serverModuleReview")
 const validatorModule = require("./serverModuleValidator")
 const QModule = require("./serverModuleQ")
+const libraryModule = require("./serverModuleLibrary")
 
 const compVersionsModule = require("./serverModuleCompVersions")
 
@@ -73,6 +74,7 @@ reviewModule.setup(app,mongoDbName)
 validatorModule.setup(app)
 QModule.setup(app)
 compVersionsModule.setup(app)
+libraryModule.setup(app)
 
 //common calls (not specifically related to requester or lab. ?move to separate module
 

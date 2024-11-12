@@ -7,15 +7,23 @@ angular.module("pocApp")
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
 
-            //let autoQ = false   //whether to automatically generate a Q
-            //let removeZeroedOut = false  //when creating the full element list, remove mult = 0..0
 
-            //$scope.newInflater = true  //running the new inflater
-/*
-            $timeout(function () {
-                console.log('watchers:' + $scope.$$watchers.length);
-            },5000)
-*/
+            $scope.updateTest = function() {
+                if (confirm("This will copy all DG & Compositions from the Production Library to the Test Library. Are you sure?")) {
+                    $scope.showWaiting = true
+                    $http.post('/library/backupTestToLocal',{}).then(
+                        function (data) {
+                            $scope.showWaiting = false
+                            alert("Backup complete. All DataGroups & Compositions have been copied from the Production Library to the Test Library.")
+                        }, function (err) {
+                            $scope.showWaiting = false
+                            alert(angular.toJson(err))
+                        }
+                    )
+                }
+
+            }
+
             //change the background colour of the DG summary according to the environment
             $scope.modelInfoClass = 'modelInfo'
             let host = $location.absUrl()
@@ -1131,7 +1139,7 @@ angular.module("pocApp")
                                 ed1.title = ed.title
                                 ed1.notes = ed.notes
                                 ed1.rules = ed.rules
-                                ed1.placeholder = ed.placeholder
+                                ed1.placeHolder = ed.placeHolder
                                 ed1.description = ed.description
                                 ed1.mult = ed.mult
                                 ed1.valueSet = ed.valueSet

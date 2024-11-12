@@ -14,6 +14,10 @@ angular.module("pocApp")
         //extQuantityUnit = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
         extQuantityUnit = "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption"
 
+        extPlaceHolderUrl = "http://hl7.org/fhir/StructureDefinition/entryFormat"
+
+        extAllocateIdUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-allocateId"
+
 
         extExtractionContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
         extHidden = "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
@@ -31,14 +35,15 @@ angular.module("pocApp")
 
 
         //resources that have the patient reference attached.
+        //The actual reference is to a variable with the name 'PatientID'
         //todo - might want to externalize into a config file ot similar
         //todo - anf maybe for references outside of patient ones...
-        let resourcesForReference = {}
-        resourcesForReference['AllergyIntolerance'] = {path:'patient'}
-        resourcesForReference['Observation'] = {path:'subject'}
-        resourcesForReference['Condition'] = {path:'subject'}
-        resourcesForReference['MedicationStatement'] = {path:'subject'}
-        resourcesForReference['Patient'] = {}   //treated as a special case
+        let resourcesForPatientReference = {}
+        resourcesForPatientReference['AllergyIntolerance'] = {path:'patient'}
+        resourcesForPatientReference['Observation'] = {path:'subject'}
+        resourcesForPatientReference['Condition'] = {path:'subject'}
+        resourcesForPatientReference['MedicationStatement'] = {path:'subject'}
+        resourcesForPatientReference['Patient'] = {}   //treated as a special case
 
         function capitalizeFirstLetter(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
@@ -354,23 +359,36 @@ angular.module("pocApp")
                     break
                 case "textonly" :
                     //the original item (a CC) is NOT included. In this case only the text box is added
+                    //a textbox is displayed that will populate CC.text, with cc.coding set to  {code:"74964007",system:'http://snomed.info/sct'}
                     //even though the source is not included in the Q, the linkId of the inserted item has '-other' appended
                     //though the text is copied from the source
+
+
+
 
                     newItem = {text:`${ed.title}`,linkId:`${ed.path}-other`,type:'string'}
 
                     //todo need to confirm how this will work - what should the definition on the original be?
                     if (sourceItem.definition) {
-                        //assume the definition is to a cc - eg something like Condition.code
+                        //assume the definition is to a cc - eg something like Condition.code.coding (the syntax is important)
+                        //the new element will have Condition.code.text
 
+                        //create the text box definition
+                        let ar = sourceItem.definition.split('.')
+                        ar[ar.length-1] = 'text'
+                        let newDefinition = ar.join('.')
+                        newItem.definition = newDefinition
+
+
+                        //add a fixed value setting the code to 'unknown'
                         let unknown = {system:'http://snomed.info/sct',code:"74964007",display:"Other"}
                         addFixedValue(newItem,sourceItem.definition,'Coding',unknown)
                     }
 
 
                     //hide the original
-                    sourceItem.extension = sourceItem.extension || []
-                    sourceItem.extension.push({url:extHidden,valueBoolean:true})
+                   //temp - while debugging sourceItem.extension = sourceItem.extension || []
+                    // sourceItem.extension.push({url:extHidden,valueBoolean:true})
 
 
                     break
@@ -1097,8 +1115,9 @@ angular.module("pocApp")
                                 //see if this is a DG that extracts to a resource with a patient reference
                                 //wellington oct29
 
-                                if (resourcesForReference[dg.type]) {
-                                    //if (dg.type == 'Condition') {
+                                if (resourcesForPatientReference[dg.type]) {
+                                    //This is a resource that has a reference to the patient
+
                                     let definition = `http://hl7.org/fhir/StructureDefinition/${dg.type}#${dg.type}.subject.reference`         //path in
                                     let type = "String"
                                     let value = config.patientId //`Patient/${patientId}`
@@ -1491,8 +1510,8 @@ console.log(thing.ed.path)
                         let referencedDG = config.hashAllDG[edType]
 
                         //console.log(referencedDG)
-                        if (resourcesForReference[referencedDG.type]) {
-                            let refConfig = resourcesForReference[referencedDG.type]
+                        if (resourcesForPatientReference[referencedDG.type]) {
+                            let refConfig = resourcesForPatientReference[referencedDG.type]
                             console.log('for patref --->',edType)
 
                             if (referencedDG.type == 'Patient') {
@@ -1556,9 +1575,7 @@ console.log(thing.ed.path)
                     }
 
                     if (ed.mult) {
-                        //required bolding
                         if (ed.mult.indexOf('1..') > -1) {
-                            //need to add to any existing stype
                             item.required = true
                         }
                         //multiple
@@ -1573,38 +1590,17 @@ console.log(thing.ed.path)
                     //todo - refactor these
                     if (vo.controlHint == 'autocomplete') {
                         addItemControl(item,'autocomplete')
-                        /*
-                        let ext = {url:extItemControlUrl}
 
-                        let cc = {coding:[{code: 'autocomplete',system:'http://hl7.org/fhir/questionnaire-item-control'}]}
-                        ext.valueCodeableConcept = cc
-                        item.extension = ed.extension || []
-                        item.extension.push(ext)
-                        */
                     }
 
                     if (vo.controlHint == 'radio') {
                         addItemControl(item,'radio-button')
-                        /*
-                        let ext = {url:extItemControlUrl}
 
-                        let cc = {coding:[{code: 'radio-button',system:'http://hl7.org/fhir/questionnaire-item-control'}]}
-                        ext.valueCodeableConcept = cc
-                        item.extension = ed.extension || []
-                        item.extension.push(ext)
-                        */
                     }
 
                     if (vo.controlHint == 'check-box') {
                         addItemControl(item,'check-box')
-                        /*
-                        let ext = {url:extItemControlUrl}
 
-                        let cc = {coding:[{code: 'check-box',system:'http://hl7.org/fhir/questionnaire-item-control'}]}
-                        ext.valueCodeableConcept = cc
-                        item.extension = ed.extension || []
-                        item.extension.push(ext)
-                        */
                     }
 
                     //set the ValueSet or options from the ed to the item
@@ -1717,6 +1713,33 @@ console.log(thing.ed.path)
                         }
                         */
                     }
+
+                    //placeholder
+                    if (ed.placeHolder) {
+                        let ext = {url:extPlaceHolderUrl,valueString:ed.placeHolder}
+                        item.extension = item.extension || []
+                        item.extension.push(ext)
+
+                    }
+
+                    if (ed.autoPop){
+                        let foItem = {linkId:'xxx',text:ed.autoPop,type:'display'}
+
+
+                        let ext1 = {url:extItemControlUrl}
+                        ext1.valueCodeableConcept = {
+                            coding: [{
+                                code: "flyover",
+                                system: systemItemControl
+                            }]
+                        }
+
+
+                        foItem.extension = [ext1]
+                        item.item=[foItem]
+
+                    }
+
 
                     //There is a pre-pop extression
                     if (ed.prePop) {

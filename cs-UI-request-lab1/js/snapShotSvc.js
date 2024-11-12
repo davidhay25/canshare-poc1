@@ -854,7 +854,6 @@ angular.module("pocApp")
 
                 dg.snapshot = newSnapshot
 
-
             }
 
         }
@@ -862,6 +861,7 @@ angular.module("pocApp")
 
         return {
             getExtractResource : function (dgName) {
+                //retrieves the FHIR resource to extract to following the inheritance chain
                 let dg = allDgSnapshot[dgName]
                 if (dg) {
                     if (dg.type) {
@@ -889,6 +889,7 @@ angular.module("pocApp")
                 }
             },
             getFixedValues : function (dgName) {
+                //retrieves the extract fixed values following the inheritance chain
                 let dg = allDgSnapshot[dgName]
                 if (dg) {
                     if (dg.fixedValues && dg.fixedValues.length > 0) {

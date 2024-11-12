@@ -150,7 +150,7 @@ angular.module("pocApp")
                 $scope.input.path =  $filter('dropFirstInPath')(item.ed.path)
                 $scope.input.controlHint =  item.ed.controlHint
                 $scope.input.otherType =  item.ed.otherType
-                $scope.input.placeholder =  item.ed.placeholder
+                $scope.input.placeHolder =  item.ed.placeHolder
 
                 $scope.input.hideLabel =  item.ed.hideLabel
                 $scope.input.labelText =  item.ed.labelText
@@ -469,7 +469,7 @@ angular.module("pocApp")
                 ed.identifierSystem = $scope.input.identifierSystem
 
 
-                ed.placeholder = $scope.input.placeholder
+                ed.placeHolder = $scope.input.placeHolder
                 if ($scope.input.controlHint) {
                     ed.controlHint = $scope.input.controlHint
                 }

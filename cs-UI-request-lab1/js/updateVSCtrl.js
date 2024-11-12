@@ -710,7 +710,12 @@ angular.module("pocApp")
 
             $scope.makeVSDownload = function() {
                 //create download
-                let download = updateVSSvc.makeDownload($scope.allVSItem,$localStorage.memberCount)
+
+
+
+
+                //let download = updateVSSvc.makeDownload($scope.allVSItem,$localStorage.memberCount)
+                let download = updateVSSvc.makeDownload($scope.listForMemberCount,$localStorage.memberCount)
 
                 $scope.downloadLinkCsv = window.URL.createObjectURL(new Blob([download ],{type:"text/tsv"}))
                 $scope.downloadLinkCsvName = `allValueSets.tsv`

@@ -174,9 +174,15 @@
 <!--
         <button class="pull-right btn-link btn" ng-click="showTrace()">Trace</button>
 -->
+
+
+
         <button class="pull-right btn-link btn" ng-click="clearLocal()">Clear local</button>
 
         <button class="pull-right btn-link btn" ng-click="export()">Import / Export</button>
+
+        <button ng-if = "user.email" class="pull-right btn-link btn" ng-click="updateTest()">Update Test</button>
+
 <!--
         <a style="padding-top: 8px; padding-right: 20px" class = 'pull-right' href="modelReview.html" target="_blank">Reviewer</a>
 -->
