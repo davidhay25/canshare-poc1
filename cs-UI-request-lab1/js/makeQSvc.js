@@ -2,7 +2,7 @@
 
 angular.module("pocApp")
 
-    .service('makeQSvc', function($http,codedOptionsSvc,QutilitiesSvc,snapshotSvc,$filter,vsSvc,orderingSvc,utilsSvc) {
+    .service('makeQSvc', function($http,codedOptionsSvc,QutilitiesSvc,snapshotSvc,$filter,vsSvc,orderingSvc,utilsSvc,qHelperSvc) {
 
         let unknownCodeSystem = "http://example.com/fhir/CodeSystem/example"
         let extLaunchContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
@@ -37,13 +37,17 @@ angular.module("pocApp")
         //resources that have the patient reference attached.
         //The actual reference is to a variable with the name 'PatientID'
         //todo - might want to externalize into a config file ot similar
-        //todo - anf maybe for references outside of patient ones...
+
         let resourcesForPatientReference = {}
         resourcesForPatientReference['AllergyIntolerance'] = {path:'patient'}
         resourcesForPatientReference['Observation'] = {path:'subject'}
         resourcesForPatientReference['Condition'] = {path:'subject'}
         resourcesForPatientReference['MedicationStatement'] = {path:'subject'}
-        resourcesForPatientReference['Patient'] = {}   //treated as a special case
+        resourcesForPatientReference['Specimen'] = {path:'subject'}
+        resourcesForPatientReference['ServiceRequest'] = {path:'subject'}
+        resourcesForPatientReference['Procedure'] = {path:'subject'}
+        resourcesForPatientReference['Task'] = {path:'for'}
+        //resourcesForPatientReference['Patient'] = {}   //treated as a special case
 
         function capitalizeFirstLetter(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
@@ -87,6 +91,11 @@ angular.module("pocApp")
             item.extension.push(ext)
         }
 
+        function addReference(item,definition,variablename) {
+            //uses
+            l//et definition =
+            alert('add ref')
+        }
 
         function addFixedValue(item,definition,type,value,expression) {
             //add a fixed value extension. Can either be a value or an expression
@@ -102,7 +111,8 @@ angular.module("pocApp")
                 ext.extension.push(child)
             } else if (expression){
                 let child = {url:'expression'}
-                child[`value${type}`] = expression
+                child.valueExpression = {language:"text/fhirpath",expression:expression}
+                //child[`value${type}`] = expression
                 ext.extension.push(child)
             } else {
                 return  //todo shoul add error...
@@ -114,7 +124,7 @@ angular.module("pocApp")
 
         }
 
-        function addReference(item,definition,type,expression) {
+        function addReferenceDEP(item,definition,type,expression) {
             //add a fixed value extension. Can either be a value or an expression
 
             //http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue
@@ -1116,9 +1126,11 @@ angular.module("pocApp")
                                 //wellington oct29
 
                                 if (resourcesForPatientReference[dg.type]) {
-                                    //This is a resource that has a reference to the patient
+                                    //This is a resource that has a reference to the patient. We assume that there is a variable
+                                    //called 'patientID' that we can set
+                                    let elementName = resourcesForPatientReference[dg.type] //the element on the resource with the reference
 
-                                    let definition = `http://hl7.org/fhir/StructureDefinition/${dg.type}#${dg.type}.subject.reference`         //path in
+                                    let definition = `http://hl7.org/fhir/StructureDefinition/${dg.type}#${dg.type}.${elementName}.reference`         //path in
                                     let type = "String"
                                     let value = config.patientId //`Patient/${patientId}`
 
@@ -1179,7 +1191,7 @@ angular.module("pocApp")
             makeHierarchicalQFromDG : function  (dg,lstElements,config) {
                 //Used in the new Q renderer
                 //config.enableWhen (boolean) will cause the enableWhens to be set. It's a debugging flag...
-                //config.patientId is the patient id to use for the fixed value extension
+                //config.patientId is the patient id to use for the fixed value extension  //TODO NOT USED ANYMORE
                 config.patientId = config.patientId || createUUID()
                 //config.pathPrefix is used for enable when targets. Only used from composition. It may be null
                 //config.namedQueries allows the NQ to be passed in
@@ -1213,7 +1225,6 @@ angular.module("pocApp")
                 let basePathsToHide = []    //a list of all paths where hideInQ is set. Any elements starting with this path are also set
                 lstElements.forEach(function (thing) {
                     //Actually, there shouldn't be anything with the mult 0..0 any more - but hideInQ is certainly there
-console.log(thing.ed.path)
                     if (thing.ed.mult == '0..0') {
                         basePathsToHide.push(thing.ed.path)  //the full path
                     } else if (thing.ed.hideInQ) {
@@ -1290,6 +1301,50 @@ console.log(thing.ed.path)
                 addPrePopExtensions(Q)      //launchPatient & LaunchPractitioner
                 addUseContext(Q)
                 addPublisher(Q)
+
+                //we always add the patientID variable extension. If there's no references needed, it's just ignored...
+                Q.extension = Q.extension || []
+                let ext = {url:extAllocateIdUrl,valueString:'patientID'}
+                Q.extension.push(ext)
+
+
+                //need to mark items for inter-resource references
+                let testRef = [
+                    {
+                        source:"BasicPathRequest.request",
+                        definition:"http://hl7.org/fhir/StructureDefinition/ServiceRequest#ServiceRequest.specimen.reference",
+                        target:"BasicPathRequest.specimen",
+                        idName:"specimenID"
+                    }
+                ]
+                //markReferences()
+
+
+                for (const ref of testRef) {
+                    //add the reference target to the root
+                    let ext = {url:extAllocateIdUrl,valueString:ref.idName}
+                    Q.extension.push(ext)
+
+                    for (const item of lstQElements) {
+                        let ed = item.ed
+                        let path = ed.path
+                        if (path == ref.source) {
+                            console.log('source')
+                            ed.markReference = ref
+                        }
+                        if (path == ref.target) {
+                            ed.markTarget = ref
+                        }
+
+                    }
+                }
+
+
+
+
+
+                //targets will need to
+
 
 
 
@@ -1483,9 +1538,6 @@ console.log(thing.ed.path)
 
                 return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog, allEW : newAllEW}
 
-                function adjustEWPath() {
-                    //when a DG is child of another (
-                }
 
 
                 //add details to item
@@ -1500,41 +1552,49 @@ console.log(thing.ed.path)
 
                     let edType = ed.type[0]     //actually be the name of the DG
 
+
+
+
                     //If this ed is a reference to another, it can have a different exraction context...
                     if (config.hashAllDG[edType]) {
-                        //let referencedDG = config.hashAllDG[edType]
 
-                        //console.log("is DG", config.hashAllDG[edType])
-
-                        //This is a resource that should have a patient reference
                         let referencedDG = config.hashAllDG[edType]
+                        let extractType = snapshotSvc.getExtractResource(edType)    //the FHIR type this DG extracts to, if any...
 
-                        //console.log(referencedDG)
-                        if (resourcesForPatientReference[referencedDG.type]) {
-                            let refConfig = resourcesForPatientReference[referencedDG.type]
-                            console.log('for patref --->',edType)
+                        //todo - could use markTarget (if that works out)
+                        if (extractType == 'Patient') {
+                            //For a patient, we also add the allocateId extension - in this context it sets the patient id
+                            item.extension = item.extension || []
+                            item.extension.push({url:extAllocateIdUrl,valueString: 'patientID'})
+                        }
 
-                            if (referencedDG.type == 'Patient') {
-                                //set the patient id...
-                                let definition = `http://hl7.org/fhir/StructureDefinition/Patient#Patient.id`         //path in
-                                let type = "Id"
-                                let value = config.patientId //`Patient/${patientId}`
+                        if (ed.markTarget) {
+                            //this is a resource that is tha target of another. It needs the allocateId extension
+                            item.extension = item.extension || []
+                            item.extension.push({url:extAllocateIdUrl,valueString: ed.markTarget.idName})
+                        }
 
-                                //addReference(item,definition,type,expression)
-
-                                addFixedValue(item,definition,type,value)
-                            } else {
-                                //I'm not sure how useful this is. I think it's only going to work on
-                                //referenced dG's - may be a little complicated...
-                                ///\"http://hl7.org/fhir/StructureDefinition/Patient#Patient.identifier.system"
-                                let definition = `http://hl7.org/fhir/StructureDefinition/${referencedDG.type}#${referencedDG.type}.subject.reference`         //path in
-                                let type = "String"
-                                let value = config.patientId //`Patient/${patientId}`
-
-                                //addReference(item,definition,type,expression)
-
-                                addFixedValue(item,definition,type,value)
+                        //this is an item that is extracted
+                        if (extractType) {
+                            //This is a resource that should have a patient reference
+                            if (resourcesForPatientReference[extractType]) {
+                                let elementName = resourcesForPatientReference[extractType].path
+                                let definition = `http://hl7.org/fhir/StructureDefinition/${extractType}#${extractType}.${elementName}.reference`
+                                let expression = "%patientID"
+                                addFixedValue(item,definition,null,null,expression)
                             }
+
+                            if (ed.markReference) {
+                                //This is a reference to a marked target
+                                //target
+
+                                let expression = `%${ed.markReference.idName}`
+                                addFixedValue(item,ed.markReference.definition,null,null,expression)
+
+
+                            }
+
+
 
                         }
 
@@ -1839,12 +1899,7 @@ console.log(thing.ed.path)
                                 }
                             }
 
-                            /*
-                            if (copyItem.answerValueSet) {
-                                delete item.answerOption
-                                valueItem.answerOption = copyItem.answerValueSet
-                            }
-                            */
+
 
                             //Need to set the type of the valueItem according to the dt in the model. sometimes they
                             //are the same (string) and sometimes not (codeableconcept)

@@ -860,6 +860,33 @@ angular.module("pocApp")
 
 
         return {
+            getExtractableDG : function (dgName) {
+                let that = this
+                let arReferences = []
+                let fhirDT = utilsSvc.fhirDataTypes()
+
+                let dg = allDgSnapshot[dgName]
+                let allEd = dg.snapshot
+
+                allEd.forEach(function (ed) {
+
+                    let type = ed.type[0]
+                    if (fhirDT.indexOf(type) == -1) {
+                        console.log('---> ',ed.path,type)
+
+                        //this is LIM DT - is it extractable?
+                        let extractResource = that.getExtractResource(type)
+                        let fullPath = `${dgName}.${ed.path}`
+                        let item = {path:fullPath,dgName:type,fhirType:extractResource}
+                        console.log(item)
+                        arReferences.push(item)
+
+                        //   getExtractResource
+                    }
+                })
+                return arReferences
+
+            },
             getExtractResource : function (dgName) {
                 //retrieves the FHIR resource to extract to following the inheritance chain
                 let dg = allDgSnapshot[dgName]

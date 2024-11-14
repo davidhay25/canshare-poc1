@@ -62,9 +62,9 @@ async function setup(app) {
         //compositions
         let qryComp = `${source}/model/allCompositions`
 
-        let responseComp = await axios.get(qry)
+        let responseComp = await axios.get(qryComp)
 
-        let allCompositions = response.data //JSON.parse(response.data)
+        let allCompositions = responseComp.data //JSON.parse(response.data)
         //let config = {headers:{'x-user-email': 'uploadscript.dummy.com'}}
 
         for (const comp of allCompositions) {

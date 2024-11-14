@@ -145,8 +145,6 @@ angular.module("pocApp")
 
 
             //get the full list of elements for a DG, following any inheritance chain..
-
-
             function getFullElementList() {
                 if ($scope.model.name) {    //if creating a new child (with a parent) the name may not be there - or if the parent is set before the name
                     $scope.allElements = snapshotSvc.getFullListOfElements($scope.model.name)// vo.allElements
@@ -154,6 +152,14 @@ angular.module("pocApp")
                 }
             }
 
+
+            function getExtractedResourcesDEP() {
+                //returns all 'referenced' DGs that are defined as extractable. They are candidates for references
+                if ($scope.model.name) {
+                    $scope.extractedResources =  snapshotSvc.getExtractableDG($scope.model.name)
+                }
+
+            }
             //if not new, set the UI names & parent
             //the editing is directly on the $scope.model (there's an onchange handler that updates it as these values are changed
             if (! isNew) {
@@ -170,7 +176,11 @@ angular.module("pocApp")
                 }
 
                 $scope.input.fixedValues = model.fixedValues || []
+
+                $scope.extractedResources =  snapshotSvc.getExtractableDG(model.name)
+
                 getFullElementList()
+
               
             } else {
                 if (parent) {

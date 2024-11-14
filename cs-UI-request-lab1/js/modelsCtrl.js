@@ -1728,6 +1728,10 @@ angular.module("pocApp")
                 delete $scope.errorLog
                 $scope.relationshipsSummary = snapshotSvc.getRelationshipsSummary(dg.name)
 
+
+                //just testing
+                snapshotSvc.getExtractableDG(dg.name)
+
                 $scope.refreshUpdates()     //update the xref
 
 

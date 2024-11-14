@@ -3,7 +3,7 @@
 
 angular.module("pocApp")
 
-    .service('QutilitiesSvc', function() {
+    .service('QutilitiesSvc', function(utilsSvc) {
         let cache = {}
 
         this.fhir = {}
@@ -11,8 +11,22 @@ angular.module("pocApp")
 
         return {
 
+            getExtractableDGDEP : function (allDGItems) {
+                //locate all DG's referenced by this one that can be extracted to a specific resource
+                let fhirDT = utilsSvc.fhirDataTypes()
+                allDGItems.forEach(function (item) {
+                    let ed = item.ed
+                    let type = ed.type[0]
+                    if (fhirDT.indexOf(type) == -1) {
+                        console.log(type)
+                        //this is LIM DT - is it extractable?
+                     //   getExtractResource
+                    }
 
-            updateEWSourcePath : function(currentPath,sourcePath) {
+                })
+            },
+
+            updateEWSourcePathDEP : function(currentPath,sourcePath) {
 
 
 
