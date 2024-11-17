@@ -520,9 +520,6 @@
                         There are no options defined
                       </div>
 
-
-
-
                     </td>
                   </tr>
 
@@ -663,6 +660,14 @@
                     <td>
 
                       {{selectedNode.data.ed.collapsible}}
+                    </td>
+                  </tr>
+
+                  <tr ng-if = "selectedNode.data.ed.selectedNQ">
+                    <td  class="detailName">Selected Named query</td>
+                    <td>
+
+                      {{selectedNode.data.ed.selectedNQ}}
                     </td>
                   </tr>
 

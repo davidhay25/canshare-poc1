@@ -389,7 +389,6 @@
             <uib-tab heading="Fixed values">
                 <br/>
 
-
                 <em>Fixed values defined by this DG </em>
                 <table class="table table-bordered">
                     <tr><th>Path</th><th>Value</th></tr>
@@ -414,23 +413,80 @@
 
 
             <uib-tab heading="Resource references">
-                <em>References between extracted resources</em>
+
+                <h4>Current References</h4>
+                <table class="table-bordered table">
+                    <tr><th>Source in DG</th><th>Resource path</th><th>Target in DG</th><th>Reference name</th><th></th></tr>
+                    <tr ng-repeat="ref in input.resourceReferences">
+                        <td>{{ref.source}}</td>
+                        <td>{{ref.definition}}</td>
+                        <td>{{ref.target}}</td>
+                        <td>{{ref.idName}}</td>
+                        <td>
+                            <i class="glyphicon glyphicon-remove-sign pull-right clickable"
+                            ng-click="removeRR($index)"></i>
+                        </td>
+                    </tr>
+                </table>
 
 
+                <h4>New Reference</h4>
+                    <table class="table-bordered table">
+                        <tr>
+                            <td>Source</td>
+                            <td>
+                                <select class="form-control" ng-model="input.rrSource"
+                                        ng-change="getPathsForSource()"
+                                        ng-options = "v.path for v in extractedResources" />
+
+                                </td>
+                            <td>{{input.rrSource.fhirType}}</td>
+                            <td>The root ED for this resource in the DG</td>
+                        </tr>
+                        <tr>
+                            <td>Target</td>
+                            <td>
+                                <select class="form-control" ng-model="input.rrTarget"
+                                        ng-change="getPathsForSource()"
+                                        ng-options = "v.path for v in extractedResources" />
+
+                            </td>
+                            <td>{{input.rrTarget.fhirType}}</td>
+                            <td>The root ED for target resource in the DG</td>
+                        </tr>
+                        <tr>
+                            <td>Resource path</td>
+                            <td>
+                                <select class="form-control" ng-model="input.rrTarget"
+                                        ng-options = "v.path for v in definitions" />
 
 
+                                </td>
+                            <td></td>
+                            <td>The path in the extracted source resource</td>
+                        </tr>
 
-                    <pre>{{extractedResources | json}}</pre>
+                        <tr>
+                            <td>Name</td>
+                            <td><input type="text" class="form-control"
+                                       placeholder="specimenID"ng-model="input.rrName"/> </td>
+                            <td></td>
+                            <td>The unique name for the reference </td>
+                        </tr>
+                    </table>
 
+                <div>
+                    <div class="btn btn-primary pull-right"
+                            ng-show = "input.rrSource && input.rrDefinition && input.rrTarget && input.rrName"
+                            ng-click = "addRR(input.rrSource,input.rrDefinition,input.rrTarget,input.rrName)">
+                    Add Reference</div>
+                </div>
+                <br/>
 
-
-
-
-
-                <div>When a DG has references to other DGs that are extracted as separate
+                <em>When a DG has references to other DGs that are extracted as separate
                 resources, this tab defines any references between them. References to Patient
                     resources are automatically created and don't need to be defined here.
-                    </div>
+                    </em>
 
 
             </uib-tab>

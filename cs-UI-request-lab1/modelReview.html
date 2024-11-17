@@ -19,6 +19,8 @@
     <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
     <script src="js/libs/jstree.min.js"></script>
 
+
+
     <style>
         .form-background  {
             background-color: #f7f7f7;
@@ -30,6 +32,15 @@
             border-radius: 5px;
         }
     </style>
+
+<!--
+    <link rel="stylesheet" type="text/css" href="https://lhcforms-static.nlm.nih.gov/lforms-versions/36.3.2/webcomponent/styles.css"/>
+
+    <script src="https://lhcforms-static.nlm.nih.gov/lforms-versions/36.3.2/webcomponent/assets/lib/zone.min.js"></script>
+    <script src="https://lhcforms-static.nlm.nih.gov/lforms-versions/36.3.2/webcomponent/lhc-forms.js"></script>
+    <script src="https://lhcforms-static.nlm.nih.gov/lforms-versions/36.3.2/fhir/R4/lformsFHIR.min.js"></script>
+
+-->
 
     <script>
         let app = angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage']).config(function($locationProvider) {
@@ -140,6 +151,11 @@
     <script src="directive/renderForm2/renderFormDir2.js"></script>
     <script src="js/questionnaireSvc.js"></script>
 
+
+
+
+
+
 <!--
     <script src="js/models/ObservationModels.js"></script>
     <script src="js/models/StagingModels.js"></script>
@@ -197,11 +213,23 @@
                 <a href="https://teaho.govt.nz/" target="_blank">
                     <img width="150" height="auto" class="pull-right"
                          style="padding: 3px"
+                         src="images/canshareLogo.png"/>
+                </a>
+            </div>
+<!--
+            <div class="col-md-2">
+                <a href="https://teaho.govt.nz/" target="_blank">
+                    <img width="150" height="auto" class="pull-right"
+                         style="padding: 3px"
                          src="images/TAK-logo-midgreen.png"/>
                 </a>
             </div>
+            -->
         </div>
     </nav>
+
+
+        <div id="myFormContainer"></div>
 
     <uib-tabset>
         <uib-tab heading="Form">
@@ -243,22 +271,37 @@
 
             <h4>Elements</h4>
             <table class="table table-condensed table-bordered">
-                <tr><th>Text</th><th>Type</th><th>Card.</th><th>Hidden</th><th>Fixed</th><th>SDC</th></tr>
-                <tr ng-repeat="entry in qReport.entries" ng-if="showReportLine(input.SDCOnly,entry)">
+                <tr><th>Text</th><th>Lvl</th><th>Type</th><th>Card.</th><th>Hidden</th><th>Fixed</th><th>SDC</th></tr>
+                <tr
+                        ng-class="{background:entry.linkId.split('.').length == 2}"
+                    ng-repeat="entry in qReport.entries" ng-if="showReportLine(input.SDCOnly,entry)">
                     <td>
                         <div ng-style="{ 'padding-left': (entry.linkId | pathindent) }">
                             {{entry.text}}
                         </div>
                     </td>
+                    <td>{{entry.linkId.split('.').length -1}}</td>
                     <td>{{entry.type}}</td>
                     <td>{{entry.mult}}</td>
                     <td>{{entry.isHidden}}</td>
                     <td>{{entry.fixedValue}}</td>
                     <td>
-                        <div ng-if="entry.initialExpression"><strong>Initial: </strong>{{entry.initialExpression}}</div>
-                        <div ng-if="entry.definition"><strong>Extraction: </strong>{{entry.definition}}</div>
+                        <div ng-if="entry.initialExpression">
+                            <strong>Initial: </strong>{{entry.initialExpression}}
+                        </div>
+                        <div ng-if="entry.definition">
+                            <strong>Extraction: </strong>{{entry.definition}}
+                        </div>
 
-                        <div ng-if="entry.extractionContext"><strong>Extraction context: </strong>{{entry.extractionContext}}</div>
+                        <div ng-if="entry.allocateId">
+                            <strong>Allocate Id: </strong>{{entry.allocateId}}
+                        </div>
+
+
+                        <div ng-if="entry.extractionContext">
+                            <strong>Extraction context: </strong>{{entry.extractionContext}}
+                        </div>
+
                         <div ng-if="entry.populationContext">
                             <strong>Population context:</strong>
                             name=<strong>{{entry.populationContext.name}}</strong>
@@ -277,10 +320,23 @@
 
                         </div>
 
+
+                        <div ng-repeat="sv in entry.setValue">
+                            <strong>Set value: </strong> {{sv.path}}
+                            <div>
+                                <div style="margin-left: 8px" ng-if="sv.value"><strong>Fixed: </strong>{{sv.value}}</div>
+                                <div style="margin-left: 8px" ng-if="sv.expression"><strong>Expression: </strong>{{sv.expression}}</div>
+                            </div>
+
+                        </div>
+
+
                         <div ng-repeat="ext in entry.unknownExtension">
                             <strong>Unknown: </strong> {{ext.url}}
 
                         </div>
+
+
 
 
                     </td>
@@ -291,11 +347,17 @@
             <h4>Set value (fixed string or expression)</h4>
 
             <table class="table table-condensed table-bordered">
-                <tr><th>Path</th><th>Fixed value</th><th>Expression</th></tr>
+                <tr><th>Path</th><th>Fixed value / Expression</th></tr>
                 <tr ng-repeat="sv in qReport.setValue">
-                    <td>{{sv.path}}</td>
-                    <td>{{sv.value}}</td>
-                    <td>{{sv.expression}}</td>
+                    <td>
+                        {{sv.linkId}}
+                        <div>{{sv.path}}</div>
+                    </td>
+                    <td>
+                        <div ng-if="sv.value"><strong>FV: </strong>{{sv.value}}</div>
+                        <div ng-if="sv.expression"><strong>Exp: </strong>{{sv.expression}}</div>
+                    </td>
+
                 </tr>
             </table>
 

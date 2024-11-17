@@ -228,6 +228,13 @@
           </tr>
 
 
+          <tr>
+            <td>Table layout</td>
+            <td>
+              <checkbox ng-model="input.gTable"></checkbox> Lay out repetitions in a table
+
+            </td>
+          </tr>
 
           <tr>
             <td>PlaceHolder text</td>
@@ -235,6 +242,69 @@
             <em>Placeholder text. Really only makes sense for string or text</em>
             </td>
           </tr>
+
+          <tr>
+            <td>Population context</td>
+
+            <td>
+
+
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <select class="form-control" ng-model="input.selectedNQ"
+                              ng-options="nq.name for nq in allNamedQueries">
+                      </select>
+                      <em>The named query that will be the source of the data</em>
+                    </div>
+                    <div class="col-md-4">
+                      <strong style="background-color: aliceblue">%{{input.selectedNQ.itemName}}</strong>
+                      <div><em>The name used for pre-pop by children</em></div>
+                    </div>
+                    <div class="col-md-2">
+                      <div class="clickable pull-right" ng-click="testxquery(input.selectedNQ.name)">Test query</div>
+                    </div>
+
+              </div>
+
+
+              <!--
+              <div class="row">
+                <div class="col-md-2">
+                  Name
+                </div>
+                <div class="col-md-9">
+                  <input type="text" class="form-control"  ng-model="input.popContextName"/>
+                  <em>The name to use when pre-populating multiple resources from a bundle.</em>
+                </div>
+              </div>
+ -->
+<!--
+              <div class="row">
+              <div class="col-md-2">
+                Expression
+              </div>
+              <div class="col-md-9">
+                <input type="text" class="form-control"  ng-model="input.popContextExp"/>
+                <em>The expression to use. </em>
+              </div>
+
+
+            </div>
+              -->
+
+
+
+
+
+
+          </td>
+
+
+
+
+          </tr>
+
 
           <tr>
             <td>PrePop expression</td>

@@ -860,7 +860,69 @@ angular.module("pocApp")
 
 
         return {
+            getNamedQueries : function (dgName) {
+                //get all the named queries used by any member of this DG
+
+                let allNamedQueries = {}    //all of the named queries used
+                let fhirDT = utilsSvc.fhirDataTypes()
+
+                let dg = allDgSnapshot[dgName]
+                if (!dg) {
+                    console.error(`${dgname} not a valid DG`)
+                    return []
+                }
+
+                addNQ(dg,{path:dg.name})       //any named queries on this DG
+
+                dg.snapshot.forEach(function (ed) {
+                    let type = ed.type[0]
+                    if (fhirDT.indexOf(type) == -1) {
+                        //this is a DG
+                        let refDG = allDgSnapshot[type]
+                        addNQ(refDG,ed)
+                    }
+                })
+
+                function addNQ(dg,ed) {
+                    if (!dg){return}
+
+                    let testDG = dg
+                    while (testDG) {
+                        if (testDG.namedQueries) {
+                            testDG.namedQueries.forEach(function (name) {
+                                let fullNQ = utilsSvc.getNQbyName(name)
+
+                                allNamedQueries[name] = allNamedQueries[name] || {itemName:fullNQ.itemName,name:name,paths:[]}
+
+
+
+                                allNamedQueries[name].paths.push({path:ed.path})
+
+                                //allNamedQueries[name] = tmp
+
+                            })
+                            break
+                        } else {
+                            testDG =  allDgSnapshot[testDG.parent]
+                        }
+                    }
+
+                }
+               // console.log(allNamedQueries)
+
+                let lst = []
+                for (const key of Object.keys(allNamedQueries) ) {
+                    let tmp = allNamedQueries[key]
+
+
+                    lst.push(tmp)
+                }
+                console.log(lst)
+                return lst
+
+            },
             getExtractableDG : function (dgName) {
+                //get all the referenced DG's within this one that are extracted into a resource
                 let that = this
                 let arReferences = []
                 let fhirDT = utilsSvc.fhirDataTypes()
@@ -872,13 +934,13 @@ angular.module("pocApp")
 
                     let type = ed.type[0]
                     if (fhirDT.indexOf(type) == -1) {
-                        console.log('---> ',ed.path,type)
+                        //console.log('---> ',ed.path,type)
 
                         //this is LIM DT - is it extractable?
                         let extractResource = that.getExtractResource(type)
                         let fullPath = `${dgName}.${ed.path}`
                         let item = {path:fullPath,dgName:type,fhirType:extractResource}
-                        console.log(item)
+                        //console.log(item)
                         arReferences.push(item)
 
                         //   getExtractResource

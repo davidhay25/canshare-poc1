@@ -1152,7 +1152,7 @@ angular.module("pocApp")
                                 ed1.hideInQ = ed.hideInQ
                                 ed1.autoPop = ed.autoPop
                                 ed1.collapsible = ed.collapsible
-                                ed1.gtable = ed.gtable
+                                //ed1.gtable = ed.gtable
                                 ed1.prePop = ed.prePop
                                 ed1.definition = ed.definition
                                 ed1.extractExtensionUrl = ed.extractExtensionUrl
@@ -1188,6 +1188,9 @@ angular.module("pocApp")
 
                                 ed1.options = ed.options
                                 ed1.units = ed.units
+                                ed1.selectedNQ = ed.selectedNQ
+                                ed1.gTable = ed.gTable
+
                                 traceSvc.addAction({action:'edit-override',model:$scope.selectedModel,path:displayPath})
 
                                 break

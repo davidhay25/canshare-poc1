@@ -626,6 +626,7 @@ angular.module("pocApp")
 
 
 
+
                         //A report focussed on pre-popupation & extraction
                         let voReport =  makeQSvc.makeReport($scope.fullQ)
                         $scope.qReport =voReport.report

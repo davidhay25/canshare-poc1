@@ -18,7 +18,7 @@ angular.module("pocApp")
 
         return {
             getNQbyName : function (name) {
-                return hashNQ[name]
+                return hashNQ[name] || {}
             },
             getVersion : function(){
                 return "0.9.6"

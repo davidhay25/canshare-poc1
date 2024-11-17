@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('editDGItemCtrl',
-        function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal,$http,parentEd,igSvc,initialTab,vsSvc,utilsSvc) {
+        function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal,$http,parentEd,igSvc,initialTab,vsSvc,utilsSvc,snapshotSvc) {
             $scope.item = item      //will be {ed:} if editing an existing item
             $scope.allTypes = allTypes
             $scope.input = {}
@@ -28,12 +28,35 @@ angular.module("pocApp")
                  $scope.linkToSpec = `${baseFhirUrl}${dg.type}.html`
              }
 
+             //all the named queries used by any inherited or referenced DG
+             $scope.allNamedQueries = snapshotSvc.getNamedQueries(dg.name)      //an Array of named queries
+
+
+
              $scope.deleteOtherOption = function () {
                  delete $scope.input.otherType
              }
 
             $scope.deleteCollapsible = function () {
                 delete $scope.input.collapsible
+            }
+
+            $scope.testxquery = function (name) {
+
+                $uibModal.open({
+                    //backdrop: 'static',      //means can't close by clicking on the backdrop.
+                    //keyboard: false,       //same as above.
+                    size : 'xlg',
+                    templateUrl: 'modalTemplates/xquery.html',
+                    controller: 'xqueryCtrl',
+                    resolve: {
+                        query: function () {
+                            return utilsSvc.getNQbyName(name)
+                        }
+                    }
+                })
+
+
             }
 
              //does the collapsible option make sense
@@ -48,7 +71,7 @@ angular.module("pocApp")
 
 
              //execute the namedquery expression
-            $scope.testxquery = function (queryName) {
+            $scope.testxqueryDEP = function (queryName) {
                 $http.get(`/model/namedquery/${queryName}`).then(
                     function (data) {
                         $uibModal.open({
@@ -238,6 +261,21 @@ angular.module("pocApp")
                         $scope.input.type = typ
                     }
                 }
+
+                //If there's a selected named query, set the dropdown
+                if (item.ed.selectedNQ) {
+                    for (const nq of $scope.allNamedQueries) {
+                        if (nq.name == item.ed.selectedNQ) {
+                            $scope.input.selectedNQ = nq
+                            break
+                        }
+                    }
+
+                }
+
+
+
+                $scope.input.gTable = item.ed.gTable
 
                 $scope.input.mult = item.ed.mult
 
@@ -457,11 +495,12 @@ angular.module("pocApp")
                 ed.title = $scope.input.title
                 ed.units = $scope.units
                 ed.mult = $scope.input.mult
+                ed.gTable = $scope.input.gTable
                 ed.valueSet = $scope.input.valueSet
                 ed.hideInQ = $scope.input.hideInQ
                 ed.autoPop = $scope.input.autoPop
                 ed.collapsible = $scope.input.collapsible
-                ed.gtable = $scope.input.gtable
+                //ed.gTable = $scope.input.gTable
                 ed.prePop = $scope.input.prePop
                 ed.definition = $scope.input.definition
                 ed.extractExtensionUrl = $scope.input.extractExtensionUrl
@@ -521,6 +560,11 @@ angular.module("pocApp")
                 }
 
                 ed.options = $scope.options
+
+                if ($scope.input.selectedNQ) {
+                    ed.selectedNQ = $scope.input.selectedNQ.name
+                }
+
 
                 return ed
             }

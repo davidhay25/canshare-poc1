@@ -162,6 +162,7 @@ angular.module("pocApp")
 
             let nq = namedQueries[name]
             if (! nq) {
+                alert(`Named Query: ${name} not found`)
                 //todo - should there ba an error message or log?
                 return
             }
@@ -203,9 +204,6 @@ angular.module("pocApp")
 
             let lstFV = snapshotSvc.getFixedValues(dg.name)
 
-           //let lstFV =  dg.fixedValues
-
-
             if (lstFV && lstFV.length > 0) {
                 for (const fv of lstFV) {
                     //todo - need to support other types
@@ -229,21 +227,6 @@ angular.module("pocApp")
 
             extractionContext = snapshotSvc.getExtractResource(dgName)
 
-/*
-            while (dg) {
-                if (dg.type) {
-                    extractionContext = dg.type
-                    break
-                } else {
-                    if (dg.parent) {
-                        dg = hashAllDG[dg.parent]
-                    } else {
-
-                        break
-                    }
-                }
-            }
-*/
 
             //is this a profile or a core resource type
             if (extractionContext && extractionContext.indexOf('http') == -1) {
@@ -648,11 +631,6 @@ angular.module("pocApp")
 
         let services =  {
 
-            testExpression : function (expression) {
-                //test an expression
-                //exceute against test data
-
-            },
 
             getNamedQueries : function (cb) {
                 let qry = "/model/namedquery"
@@ -784,6 +762,10 @@ angular.module("pocApp")
                         item.extension.forEach(function (ext) {
 
                             switch (ext.url) {
+                                case extAllocateIdUrl:
+                                    thing.allocateId = ext.valueString
+                                    break
+
                                 case extQuantityUnit :
                                     thing.fixedValue = `Units: ${ext.valueCoding.code}`
                                     break
@@ -818,7 +800,8 @@ angular.module("pocApp")
 
 
                                     let v = {}
-                                    console.log(ext)
+                                    v.linkId = item.linkId    //where the extension was located
+                                    //console.log(ext)
                                     ext.extension.forEach(function (child) {
                                         switch (child.url) {
                                             case 'definition' :
@@ -829,9 +812,16 @@ angular.module("pocApp")
                                                 //the actual value
                                                 v.value = child.valueString || child.valueId
                                                 break
-                                            case 'dynamic-value':
+                                            case 'dynamic-value': //todo - is this used
                                                 //an expression
                                                 v.expression = child.valueExpression
+                                                break
+                                            case 'expression':
+                                                //an expression
+                                                if (child.valueExpression) {
+                                                    v.expression = child.valueExpression.expression
+                                                }
+
                                                 break
                                             default :
                                                 //shouldn't happen - what to do?
@@ -865,103 +855,32 @@ angular.module("pocApp")
                         })
                     }
 
-                    //look for extQuantityUnit extension. This is used in quantity to set the unit
-                    //In the model, for a Quantity set the 'fixedValue' property - setting the units
-                 /*   let ar2 = getExtension(item,extQuantityUnit,'Coding')
-                    if (ar2.length > 0) {
-                        thing.fixedValue = `Units: ${ar2[0].code}`
-                    }
-
-                    //check for hidden values
-                    let ar0 = getExtension(item,extHidden,'Boolean')
-                    if (ar0.length > 0) {
-                        thing.isHidden = ar0[0]
-                    }
-
-                    //check for initial expression - used in CodeableConcept pre-pop
-                    let ar = getExtension(item,extInitialExpressionUrl,'Expression')
-                    if (ar.length > 0) {
-                        thing.initialExpression = ar[0].expression
-
-                        //add to the variable usage hash
-                        let ar1 = thing.initialExpression.split('.')
-                        let variable = ar1[0].substr(1)
-                        if (report.variableUsage[variable]) {
-                            report.variableUsage[variable] = report.variableUsage[variable] || []
-                            report.variableUsage[variable].push(item.linkId)
-                        } else {
-                            report.errors.push({msg:`variable ${variable} not found at ${item.linkId}`})
-                        }
-                    }
-
-                    //check for extraction context
-                    //let ar1 = getExtension(item,extExtractionContextUrl,'Code')
-                    let ar1 = getExtension(item,extExtractionContextUrl,'String')
-                    if (ar1.length > 0) {
-                        thing.extractionContext = ar1[0]
-                    }
-
-                    //check for population contexts
-                    let ar3 = getExtension(item,extPopulationContext,'Expression')
-                    if (ar3.length > 0) {
-                        thing.populationContext = ar3[0]
-                    }
-
-                    //check for fixed values (our new extension)
-                    let ar4 = getExtension(item,extExtractionValue)   //without a type the whole extension is returned
-                    if (ar4.length > 0) {
-                        report.setValue = []
-                        for (const ext of ar4) {
-                            let v = {}
-                            console.log(ext)
-                            ext.extension.forEach(function (child) {
-                                switch (child.url) {
-                                    case 'definition' :
-                                        //the path in the extract where this element is to be inserted
-                                        v.path = child.valueCanonical
-                                        break
-                                    case 'fixed-value' :
-                                        //the actual value
-                                        v.value = child.valueString
-                                        break
-                                    case 'dynamic-value':
-                                        //an expression
-                                        v.expression = child.valueExpression
-                                        break
-                                    default :
-                                        //shouldn't happen - what to do?
-                                        break
-                                }
-
-
-                            })
-
-                            report.setValue.push(v)
-
-                            //add to entries
-                           // let sv = {text:'setValue'}
-                            //report.entries.push(sv)
-
-                        }
-
-                    }
-
-                    */
 
                     report.entries.push(thing)
+
                     if (item.item) {
                         item.item.forEach(function (child) {
                             processItem(report,child)
                         })
                     }
                 }
-
-
-
-
+                
                 Q.item.forEach(function (item) {
                     processItem(report,item)
                 })
+
+
+                //add setValues into entries to make display easier
+                report.entries.forEach(function (entry) {
+                    report.setValue.forEach(function (value) {
+                        if (value.linkId == entry.linkId) {
+                            entry.setValue = entry.setValue || []
+                            entry.setValue.push(value)
+                        }
+
+                    })
+                })
+
 
                 console.log(report)
                 return {report:report}
@@ -1312,7 +1231,7 @@ angular.module("pocApp")
                 let testRef = [
                     {
                         source:"BasicPathRequest.request",
-                        definition:"http://hl7.org/fhir/StructureDefinition/ServiceRequest#ServiceRequest.specimen.reference",
+                        definition:"ServiceRequest.specimen.reference",
                         target:"BasicPathRequest.specimen",
                         idName:"specimenID"
                     }
@@ -1321,6 +1240,7 @@ angular.module("pocApp")
 
 
                 for (const ref of testRef) {
+
                     //add the reference target to the root
                     let ext = {url:extAllocateIdUrl,valueString:ref.idName}
                     Q.extension.push(ext)
@@ -1348,13 +1268,12 @@ angular.module("pocApp")
 
 
 
-                //add the named queries as variables in the Q
-                if (dg.namedQueries) {
-                    dg.namedQueries.forEach(function (nqName) {
-                        addNamedQuery(Q,nqName,config.namedQueries)
-                    })
-
+                //add the named queries as variables in root of the Q
+                let namedQueries = snapshotSvc.getNamedQueries(dg.name)     //follows the DG hierarchy
+                for (const nq of namedQueries) {
+                    addNamedQuery(Q,nq.name,config.namedQueries)
                 }
+
 
                 let extractionContext
 
@@ -1471,13 +1390,18 @@ angular.module("pocApp")
                         //we'll also add a population context here. This is to support any pre-pop
                         //todo - does it make sense for a DG to have multiple NQ? For now, we'll just grab the first one
                         if (dg.namedQueries && dg.namedQueries.length > 0) {
-                            addPopulationContext (dg.namedQueries[0],currentItem)
-                            currentItem.repeats = true  //if pre-pop from a NQ then must be able to repeat
+
+                            //todo - think this is not needed here
+
+                            //todo - there isn't aways a repeating group with a table. ?this is a configurable setting?
+
+                            //temp   addPopulationContext (dg.namedQueries[0],currentItem)
+                            //temp currentItem.repeats = true  //if pre-pop from a NQ then must be able to repeat
 
                             //we'll also add the extension to render pre-pop as a table.
                             //todo - this could be an option on the DG
 
-                            addItemControl(currentItem,'gtable')
+                            //temp addItemControl(currentItem,'gtable')
 
                         }
 
@@ -1586,10 +1510,12 @@ angular.module("pocApp")
 
                             if (ed.markReference) {
                                 //This is a reference to a marked target
-                                //target
+                                //definition format: http://hl7.org/fhir/StructureDefinition/ServiceRequest#ServiceRequest.specimen.ref
+                                let ar = ed.markReference.definition.split('.')
+                                let definition = `http://hl7.org/fhir/StructureDefinition/${ar[0]}#${ed.markReference.definition}`
 
                                 let expression = `%${ed.markReference.idName}`
-                                addFixedValue(item,ed.markReference.definition,null,null,expression)
+                                addFixedValue(item,definition,null,null,expression)
 
 
                             }
@@ -1625,6 +1551,18 @@ angular.module("pocApp")
                            // item.extension.push({url:extExtractionContextUrl,valueExpression:{language:"text/fhirpath",expression:extractionContext}})
                         }
                     }
+
+
+                    //if this item has a selected Named Query, then add it as a population context
+                    if (ed.selectedNQ) {
+                        addPopulationContext (ed.selectedNQ,item)
+                    }
+
+                    //Will display child elements in a table
+                    if (ed.gTable) {
+                        addItemControl(item,'gtable')
+                    }
+
 
                     //The only way an element here will have hideInQ set but still be included is for fixed values.
                     //they get added to the Q - but with the hidden extension

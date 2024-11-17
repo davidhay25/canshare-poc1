@@ -55,6 +55,59 @@ angular.module("pocApp")
                 $scope.input.fixedValues.splice(inx,1)
             }
 
+
+
+
+            //----------- resource references
+
+            $scope.getPathsForSource = function () {
+
+                //get all the elements in the source Resource that are references
+                //called when both source and target resources are known so that the list is only valid references
+                if ($scope.input.rrSource && $scope.input.rrTarget) {
+
+                    let qry = `/fsh/fhirtype/${$scope.input.rrSource.fhirType}`
+                    $http.get(qry).then(
+                        function (data) {
+                            let arElements = data.data
+                            let sourceProfile = `http://hl7.org/fhir/StructureDefinition/${$scope.input.rrTarget.fhirType}`
+                            console.log(data.data)
+                            $scope.definitions = []
+                            arElements.forEach(function (el) {
+                                if (el.types) {
+                                    for (const typ of el.types) {
+                                        if (typ.code == 'Reference' && typ.targetProfile) {
+                                            if (typ.targetProfile == sourceProfile) {
+                                                $scope.definitions.push(el)
+                                                break
+                                            }
+                                        }
+                                    }
+                                }
+                            })
+                            console.log($scope.definitions)
+                        }
+
+                    )
+
+
+                }
+
+            }
+
+            $scope.addRR = function (source,definition,target,name) {
+                let rr = {source:source.path,definition:definition,target:target.path,idName:name}
+                $scope.input.resourceReferences.push(rr)
+                delete $scope.input.rrSource
+                delete $scope.input.rrDefinition
+                delete $scope.input.rrTarget
+                delete $scope.input.rrName
+            }
+
+            $scope.removeRR = function (inx) {
+                $scope.input.resourceReferences.splice(inx,1)
+            }
+
             //Load all the Named queries
             function loadNamedQueries() {
                 let qry = "/model/namedquery"
@@ -176,6 +229,7 @@ angular.module("pocApp")
                 }
 
                 $scope.input.fixedValues = model.fixedValues || []
+                $scope.input.resourceReferences = model.resourceReferences || []
 
                 $scope.extractedResources =  snapshotSvc.getExtractableDG(model.name)
 
@@ -382,6 +436,7 @@ angular.module("pocApp")
                 $scope.model.type = $scope.input.type
 
                 model.fixedValues = $scope.input.fixedValues
+                model.resourceReferences = $scope.input.resourceReferences
 
                 //update the named queries
                 delete $scope.model.namedQueries

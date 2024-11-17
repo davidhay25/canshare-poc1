@@ -47,9 +47,6 @@ angular.module("pocApp")
                         alert("Named query not found")
                     }
                 )
-
-
-
             }
 
             //set the current order of the DG
