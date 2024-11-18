@@ -893,9 +893,6 @@ angular.module("pocApp")
                                 let fullNQ = utilsSvc.getNQbyName(name)
 
                                 allNamedQueries[name] = allNamedQueries[name] || {itemName:fullNQ.itemName,name:name,paths:[]}
-
-
-
                                 allNamedQueries[name].paths.push({path:ed.path})
 
                                 //allNamedQueries[name] = tmp

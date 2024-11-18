@@ -17,6 +17,14 @@ angular.module("pocApp")
             $scope.input.patientId = 45086382
             //let patientId = 45086382      //todo - pass in as a param
 
+
+            getResourceType = function (expression) {
+                let ar=expression.split('?')
+                $scope.resourceType = ar[0]
+                $scope.linkToSpec=`https://hl7.org/fhir/R4B/${$scope.resourceType}.html`
+            }
+            getResourceType($scope.input.expression)
+
             let server = "https://hapi.fhir.org/baseR4/"
 
             let replacement = {}        //parameter replacement.
@@ -29,6 +37,16 @@ angular.module("pocApp")
                     expression = expression.replace(placeHolder,repl)
                 }
                 return expression
+            }
+
+            $scope.expChanged = function () {
+                $scope.input.dirty=true
+                getResourceType($scope.input.expression)
+            }
+
+            $scope.save = function () {
+                $scope.$close({expression:$scope.input.expression})
+
             }
 
             $scope.selectResource = function (resource) {
@@ -46,7 +64,7 @@ angular.module("pocApp")
                         console.log(data.data)
                         $scope.response = data.data
                     }, function (err) {
-                        console.log(err.data)
+                        alert(angular.toJson(err.data.issue))
                     }
                 )
             }

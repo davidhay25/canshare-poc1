@@ -1551,7 +1551,7 @@ angular.module("pocApp")
                 }).result.then(function (newModel) {
                     if (newModel) {
                         //if a model is returned, then it is a new one and needs to be added to the world
-                        traceSvc.addAction({action:'new-model',model:newModel})
+                        //traceSvc.addAction({action:'new-model',model:newModel})
 
                         if ($scope.user) {
                             newModel.author = $scope.user.email
@@ -1571,7 +1571,7 @@ angular.module("pocApp")
                                 parentDG.diff.forEach(function (ed) {
 
 
-                                    if (ed.enableWhen || ed.conditionalVS) {
+                                    if (ed.enableWhen || (ed.conditionalVS && ed.conditionalVS.length > 0) ) {
                                         let newEd = angular.copy(ed)
 
                                         if (newEd.enableWhen) {
@@ -1730,10 +1730,11 @@ angular.module("pocApp")
 
                 delete $scope.errorLog
                 $scope.relationshipsSummary = snapshotSvc.getRelationshipsSummary(dg.name)
+                $scope.dgNamedQueries = snapshotSvc.getNamedQueries(dg.name)
 
 
                 //just testing
-                snapshotSvc.getExtractableDG(dg.name)
+                //snapshotSvc.getExtractableDG(dg.name)
 
                 $scope.refreshUpdates()     //update the xref
 

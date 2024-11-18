@@ -45,12 +45,7 @@ angular.module("pocApp")
                     }
                 }
 
-
-
-
-
                 let qry = `/model/namedquery/${name}`
-
                 let nq = {name:name,itemName:itemName,description:description,contents:contents,active:active}
 
                 $http.put(qry,nq).then(
@@ -65,11 +60,11 @@ angular.module("pocApp")
                         alert(angular.toJson(err.data))
                     }
                 )
-
             }
 
 
             $scope.testxquery = function (xqry) {
+                //xqry = {name: itemName: description: contents}
                 $uibModal.open({
                     size : 'xlg',
                     backdrop: 'static',
@@ -79,12 +74,49 @@ angular.module("pocApp")
 
                     resolve: {
                         query: function () {
-                            return xqry || "Condition?patient={{%patient.id}}"
+                            return xqry
                         }
                     }
-                })
+                }).result.then(
+                    function (vo) {
+                       // alert(vo.expression)
+
+                        xqry.contents = vo.expression
+
+                        let qry = `/model/namedquery/${name}`
+                        //let nq = {name:name,itemName:itemName,description:description,contents:contents,active:active}
+
+                        $http.put(qry,xqry).then(
+                            function (data) {
+                                //$scope.namedQueries = data.data
+/*
+                                for (qry of $scope.namedQueries) {
+                                    if (qry.name == xqry.name) {
+                                        qry.contents = vo.expression
+                                        break
+                                    }
+                                }
+
+                               */
+                               // loadNamedQueries()
+                            }, function (err) {
+                                alert(angular.toJson(err.data))
+                            }
+                        )
 
 
+/*
+                        $scope.updateNamedQuery (xqry.name,xqry.itemName,xqry.description,vo.expression,true)
+
+                        for (qry of $scope.namedQueries) {
+                            if (qry.name == xqry.name) {
+                                qry.contents = vo.expression
+                                break
+                            }
+                        }
+                        */
+                    }
+                )
             }
 
             $scope.input.filter = {}

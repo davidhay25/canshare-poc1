@@ -1,12 +1,15 @@
 angular.module("pocApp")
 
-    .service('modelDGSvc', function($http,$q,$localStorage,QutilitiesSvc) {
+    .service('modelDGSvc', function($http,$q,$localStorage,snapshotSvc) {
 
         let config = {}
         let vsUrlPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/" //the url prefix
 
 
         return {
+
+
+
             auditDGDiff : function (dg,hashAllDG) {
                 //locate any 0..0 diff elements in the DG that do not correspond with parents. Occurs when parents are updated
 

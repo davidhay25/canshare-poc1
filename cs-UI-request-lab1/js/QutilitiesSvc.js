@@ -11,6 +11,8 @@ angular.module("pocApp")
 
         return {
 
+
+
             getExtractableDGDEP : function (allDGItems) {
                 //locate all DG's referenced by this one that can be extracted to a specific resource
                 let fhirDT = utilsSvc.fhirDataTypes()

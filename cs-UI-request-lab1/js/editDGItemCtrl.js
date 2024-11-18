@@ -1,6 +1,7 @@
 angular.module("pocApp")
     .controller('editDGItemCtrl',
-        function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal,$http,parentEd,igSvc,initialTab,vsSvc,utilsSvc,snapshotSvc) {
+        function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal,$http,parentEd,
+                  igSvc,initialTab,vsSvc,utilsSvc,snapshotSvc) {
             $scope.item = item      //will be {ed:} if editing an existing item
             $scope.allTypes = allTypes
             $scope.input = {}
@@ -8,7 +9,6 @@ angular.module("pocApp")
 
 
             $scope.input.collapsibleOptions = ['default-open','default-closed']
-            //$scope.input.collapsible = $scope.input.collapsibleOptions[0]
 
             //need a default base for editing
             $scope.fixed = {}
@@ -32,6 +32,18 @@ angular.module("pocApp")
              $scope.allNamedQueries = snapshotSvc.getNamedQueries(dg.name)      //an Array of named queries
 
 
+            //todo - similar to collapsible - ? can combine
+            $scope.canHavePopulationContext = function () {
+
+
+
+                if ($scope.input.selectedType == 'Group') {
+                    return true
+                }
+                if (utilsSvc.fhirDataTypes().indexOf($scope.input.selectedType) == -1) {
+                    return true
+                }
+            }
 
              $scope.deleteOtherOption = function () {
                  delete $scope.input.otherType
@@ -42,6 +54,11 @@ angular.module("pocApp")
             }
 
             $scope.testxquery = function (name) {
+                 let nq = utilsSvc.getNQbyName(name)
+                if (! nq.contents) {
+                    alert(`Named Query ${name} not found`)
+                    return
+                }
 
                 $uibModal.open({
                     //backdrop: 'static',      //means can't close by clicking on the backdrop.
@@ -51,7 +68,7 @@ angular.module("pocApp")
                     controller: 'xqueryCtrl',
                     resolve: {
                         query: function () {
-                            return utilsSvc.getNQbyName(name)
+                            return nq
                         }
                     }
                 })
@@ -68,6 +85,58 @@ angular.module("pocApp")
                      return true
                  }
              }
+
+            //locate all the SDC variables at this
+
+            $scope.getVariablesAtPath = function () {
+                let variables = []
+                //item.ed
+
+                let dgName = fullElementList[0].ed.path
+
+                //start with all the named queries on the DG
+                let nqs = snapshotSvc.getNamedQueries(dgName)
+                nqs.forEach(function (nq) {
+                    addVariable(nq,'namedQuery')
+                })
+
+                //now look for variables (like population context) from all parents
+                let hashAllElements = {}
+                fullElementList.forEach(function (item) {
+                    hashAllElements[item.ed.path] = item.ed
+                })
+
+                //let dg = hashAllDG
+                let arPath = parentEd.path.split('.')
+                while (arPath.length > 0) {
+                    let pathToCheck = arPath.join('.')
+                    if (hashAllElements[pathToCheck] && hashAllElements[pathToCheck].selectedNQ) {
+                        let nq = utilsSvc.getNQbyName(hashAllElements[pathToCheck].selectedNQ)
+                        if (nq) {
+                            addVariable(nq,'popContext')
+                        }
+
+                    }
+                    arPath.pop()
+                }
+
+
+
+                return variables
+
+                function addVariable(nq,source) {
+                   //let ar = variables.filter(v => v.itemName == nq.itemName)
+                  //  if (ar.length == 0) {
+                        let item = {itemName:nq.itemName,name:nq.name,source:source}
+                        variables.push(item)
+                  //  }
+
+
+                }
+
+            }
+             $scope.contextAtPath = $scope.getVariablesAtPath()
+            console.log($scope.contextAtPath)
 
 
              //execute the namedquery expression

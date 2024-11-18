@@ -268,15 +268,15 @@
                 <tr ng-if="selectedModel.checkedOut"><td>Checked out</td>
                   <td>{{selectedModel.checkedOut}}</td></tr>
 
-
-
-                <tr ng-if="selectedModel.namedQueries"><td>Named Queries</td>
+                <tr ng-if="dgNamedQueries.length > 0"><td>Named Queries</td>
                   <td>
-                    <div ng-repeat = "nq in selectedModel.namedQueries">
 
-                      <div class="clickable" ng-click="testxquery(nq)">{{nq}}</div>
+                    <div ng-repeat = "nq in dgNamedQueries">
+                      <div class="clickable" ng-click="testxquery(nq.name)">{{nq.name}}</div>
+
 
                     </div>
+
 
                   </td>
                 </tr>
@@ -663,11 +663,13 @@
                     </td>
                   </tr>
 
-                  <tr ng-if = "selectedNode.data.ed.selectedNQ">
+                  <tr>
                     <td  class="detailName">Selected Named query</td>
                     <td>
 
+
                       {{selectedNode.data.ed.selectedNQ}}
+
                     </td>
                   </tr>
 

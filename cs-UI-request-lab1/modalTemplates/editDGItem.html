@@ -243,12 +243,10 @@
             </td>
           </tr>
 
-          <tr>
+          <tr ng-if="canHavePopulationContext()">
             <td>Population context</td>
 
             <td>
-
-
 
                   <div class="row">
                     <div class="col-md-6">
@@ -258,8 +256,12 @@
                       <em>The named query that will be the source of the data</em>
                     </div>
                     <div class="col-md-4">
-                      <strong style="background-color: aliceblue">%{{input.selectedNQ.itemName}}</strong>
-                      <div><em>The name used for pre-pop by children</em></div>
+                      <div ng-show="input.selectedNQ">
+                        <strong style="background-color: aliceblue">%{{input.selectedNQ.itemName}}</strong>
+                        <div><em>The name used for pre-pop by children</em></div>
+                      </div>
+
+
                     </div>
                     <div class="col-md-2">
                       <div class="clickable pull-right" ng-click="testxquery(input.selectedNQ.name)">Test query</div>
@@ -312,7 +314,7 @@
 
               <div ng-if = "dg.namedQueries.length > 0">
                 <div class="row">
-                  <div class="col-md-11">
+                  <div class="col-md-8">
                   <textarea
                           placeholder="FHIRPath pre-pop expression - eg %patient.family"
                           class="form-control" ng-model="input.prePop"></textarea>
@@ -326,13 +328,27 @@
                   </div>
                   -->
 
-                  <div class="col-md-1">
-
+                  <div class="col-md-4">
+                    <strong>Contexts in scope</strong>
+                    <div ng-repeat="ctx in contextAtPath"
+                        class="clickable"
+                         ng-click="testxquery(ctx.name)">
+                       {{ctx.itemName}} ({{ctx.source}})
+                    </div>
+                    <!--
                     <a style="display:block ; margin-top: 8px" href="https://hl7.org/fhir/fhirpath.html" target="_blank">Spec</a>
+                    -->
                   </div>
+                </div>
+<!--
+                <div><em>Expression source:
+                  <span class="clickable" ng-click="testxquery(dg.namedQueries[0])">{{dg.namedQueries[0]}}</span> </em>
 
                 </div>
-                <div><em>Expression source: <span class="clickable" ng-click="testxquery(dg.namedQueries[0])">{{dg.namedQueries[0]}}</span> </em></div>
+                  {{contextAtPath}}
+                -->
+
+
 
                 <div ng-if="testPPResult" ng-class="testPPResultOutcome">
                   {{testPPResult}}

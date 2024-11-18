@@ -383,15 +383,55 @@
 
         <div class="myScroll">
           <table class="table-bordered table">
-            <tr><th>Variable name</th><th>Item name</th><th>Description</th><th>Contents</th><th></th></tr>
+            <tr><th>Variable name
+
+              <i class="glyphicon glyphicon-info-sign clickable"
+                 uib-popover="The name used to identify this query"
+                 popover-placement="top"
+                 popover-trigger="'mouseenter'"></i>
+
+            </th><th>Item name
+              <i class="glyphicon glyphicon-info-sign clickable"
+                 uib-popover="The name used by expressions to refer to the results of the query"
+                 popover-placement="top"
+                 popover-trigger="'mouseenter'"></i>
+            </th><th>Description</th><th>Contents</th><th></th></tr>
+
+
             <tr ng-repeat="query in namedQueries">
               <td>{{query.name}}</td>
               <td>{{query.itemName}}</td>
               <td>{{query.description}}</td>
               <td>{{query.contents}}</td>
               <td>
+
+                <i class="glyphicon glyphicon-flash clickable"
+                   style="color: green"
+                   uib-popover="Test"
+                   popover-placement="top"
+                   popover-trigger="'mouseenter'"
+                   ng-click="testxquery(query)"
+
+                ></i>
+
+                <i class="glyphicon glyphicon-remove clickable"
+                   style="color: red"
+                   uib-popover="Remove"
+                   popover-placement="top"
+                   popover-trigger="'mouseenter'"
+                   ng-click="updateNamedQuery(query.name,query.contents,false)"
+
+                ></i>
+
+
+<!--
+                <i class="glyphicon glyphicon-edit clickable"></i>
+
+
                 <div><button class="btn btn-link" ng-click="testxquery(query)">Execute</button></div>
                 <button class="btn btn-link" ng-click="updateNamedQuery(query.name,query.contents,false)">Delete</button>
+
+                -->
               </td>
             </tr>
 
@@ -403,6 +443,26 @@
                 <textarea class="form-control" ng-model="input.nqContents"></textarea>
               </td>
               <td>
+
+
+
+
+                <i class="glyphicon glyphicon-flash clickable"
+                   ng-if = "input.nqContents"
+                   uib-popover="Test"
+                   popover-placement="top"
+                   popover-trigger="'mouseenter'"
+                   ng-click="testxquery(query)"></i>
+
+
+                <i style="color: green" class="glyphicon glyphicon-ok clickable"
+                   ng-if = "input.nqName && input.nqItemName && input.nqContents"
+                   uib-popover="Test"
+                   popover-placement="top"
+                   popover-trigger="'mouseenter'"
+                   ng-click="updateNamedQuery(input.nqName,input.nqItemName,input.nqDescription,input.nqContents,true)"></i>
+
+<!--
                 <button
                         ng-if = "input.nqContents"
                         class="btn btn-link" ng-click="testxquery({contents:input.nqContents})">Execute</button>
@@ -410,6 +470,8 @@
                 <button
                         ng-if = "input.nqName && input.nqItemName && input.nqContents"
                         class="btn btn-link" ng-click="updateNamedQuery(input.nqName,input.nqItemName,input.nqDescription,input.nqContents,true)">Add</button>
+              -->
+
               </td>
 
 
