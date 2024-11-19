@@ -315,10 +315,13 @@
 
         <table class="table table-bordered table-condensed">
           <tr><th>Title</th><th>Local sections</th><th>Local Meta</th><th>Library sections</th><th>Library Meta</th><th>Note</th></tr>
-          <tr ng-repeat="item in summaryComp" ng-if="showComp(item)">
+          <tr ng-repeat="item in summaryComp"
+              ng-class="{dtDeleted: item.library.deleted,dtDifferent:item.library.deleted}"
+              ng-if="showComp(item)">
             <td>
               <strong>{{item.title}}</strong>
               <div class="clickable"
+
                    ng-if="item.library && ! item.local"
                    ng-click="downloadComp(item.library)">Download</div>
 
@@ -370,7 +373,7 @@
             </td>
             <td>
               {{item.note}}
-              <div class="clickable" ng-if="item.library && user.email"
+              <div class="clickable" ng-if="item.library && user.email && ! item.library.deleted"
                    ng-click="deleteComposition(item.library)">Delete in library</div>
 
             </td>
