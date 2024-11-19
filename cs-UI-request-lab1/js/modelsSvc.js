@@ -514,7 +514,14 @@ angular.module("pocApp")
                 elements.forEach(function (item,inx) {
                     let ed = item.ed
                     let path = ed.path
-                    hash[path] = {ed:ed,children:[]}  //add to the hash in case it is a parent...
+                    if (! hash[path]) {
+                        //add to the hash in case it is a parent. but check first in case the list is out of order..
+                        hash[path] = {ed:ed,children:[]}
+                    } else {
+                        //If it is already there, then it got added to set the children, so add the ed
+                        hash[path].ed = ed
+                    }
+
 
                     //add the ed to the parent
                     let ar = ed.path.split('.')
@@ -524,8 +531,13 @@ angular.module("pocApp")
                         let parentPath = ar.join('.')
                         if (!hash[parentPath]) {
 
-                            errors.push(parentPath)
-                            alert(`The paths in DG ${dgName} have become corrupted. The path ${parentPath} could not be found. You'll need to remove the element with the path ${ed.path } from the diff tab.`)
+                            //2024-11-19 - this can occur when the elements array is out of order.
+                            //I think we can just add it, with the child added. The ed will be added at the top of this loop
+                            hash[parentPath] = {children:[]}
+                            hash[parentPath].children.push(hash[path])
+
+                            //2024-11-19 - errors.push(parentPath)
+                            //2024-11-19 - alert(`The paths in DG ${dgName} have become corrupted. The path ${parentPath} could not be found. You'll need to remove the element with the path ${ed.path } from the diff tab.`)
 
                            // alert(`The DG ${}`)
                             //there's been an issue - an element has been dropped. not sure why...

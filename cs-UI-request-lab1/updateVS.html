@@ -152,6 +152,7 @@
             ng-click="setSyndicationStatus()"
             class="btn-danger btn pull-right">Set Syndication status</button>
 
+    <button ng-if = "user.email" class="pull-right btn-link btn" ng-click="updateTest()">Update Test</button>
 
     <button class="btn btn-info pull-right" ng-show = "showWaitingTimeout" style="margin-right: 8px">
         Syndicating. Progress: {{syndProgress}}

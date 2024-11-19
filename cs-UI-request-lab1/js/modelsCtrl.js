@@ -8,21 +8,7 @@ angular.module("pocApp")
 
 
 
-            $scope.updateTest = function() {
-                if (confirm("This will copy all DG & Compositions from the Production Library to the Test Library. Are you sure?")) {
-                    $scope.showWaiting = true
-                    $http.post('/library/backupTestToLocal',{}).then(
-                        function (data) {
-                            $scope.showWaiting = false
-                            alert("Backup complete. All DataGroups & Compositions have been copied from the Production Library to the Test Library.")
-                        }, function (err) {
-                            $scope.showWaiting = false
-                            alert(angular.toJson(err))
-                        }
-                    )
-                }
 
-            }
 
             //change the background colour of the DG summary according to the environment
             $scope.modelInfoClass = 'modelInfo'
