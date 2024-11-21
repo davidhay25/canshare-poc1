@@ -868,7 +868,7 @@ angular.module("pocApp")
 
                 let dg = allDgSnapshot[dgName]
                 if (!dg) {
-                    console.error(`${dgname} not a valid DG`)
+                    console.error(`${dgName} not a valid DG`)
                     return []
                 }
 

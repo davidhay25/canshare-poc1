@@ -442,6 +442,9 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
             let ar = firstLine.split('\t')
             let colCount = ar.length        //all rows should have this number of columns
 
+            //we reduce the column count as we're removinf column b
+            colCount = colCount - 1
+
             rowNumber = 2   //the first row is headers
             for (const lne of arLines) {
 
@@ -451,6 +454,9 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                     break
                 }
                 rowNumber++
+
+                //remove the second element. This is 'col B' in the spreadsheet and will be ignored for now
+                cols.splice(1,1)
 
                 //the last row length is not the same as the colCount
                 if (cols.length !== colCount && (rowNumber !== arLines.length+2)) {
