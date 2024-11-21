@@ -628,6 +628,11 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
             for (const lne of arLines) {
                 let ar = lne.split('\t')
                 ar[0] = ctr++       //replace the sct release with the line number from the ss for debugging. don't think the sct release is needed (if it is later, then make it an object)
+
+                //remove the second element. This is 'col B' in the spreadsheet and will be ignored for now
+                ar.splice(1,1)
+
+
                 let sourceCode = ar[1].trim()      //B the code of the thing that is being looked for (eg cancer stream, concer substream). This is the same as the 'property' in the ConceptMap UI
                 let sourceDisplay = ar[2]   //C the display for that code
 
@@ -775,6 +780,216 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
 
            // fs.writeFileSync(`./${cmFileName}`,JSON.stringify(cm,null,2))
            // logger(`${cmFileName} file created. Use the 'uploadConceptMap' script to upload to the terminology server.`)
+
+            function getDep(property, operation, value, display) {
+                let dep = {}
+                dep.property = property
+                if (value) {
+                    dep.value = value.trim()
+                }
+
+                dep.system = snomed
+                if (display) {
+                    dep.display = display
+                }
+
+                //if the operation is the 'contained in', then add an extension
+                if (operation == '^') {
+                    dep.extension = [{url:comparisonOperationUrl,valueCode:"in-vs"}]
+                    dep.value =  `https://nzhts.digital.health.nz/fhir/ValueSet/${value}`
+
+
+                }
+                return dep
+
+            }
+
+
+
+        },
+        makeCMOriginal : function (inLines) {
+
+            //the url that indicates the type of comparison perfromed when evaluating the 'dependsOn' element. If absent, this is assumed to be = (must be the same)
+            let comparisonOperationUrl = "http://canshare.co.nz/fhir/StructureDefinition/do-operator"
+
+            let arLines = angular.copy(inLines)
+
+            //remove the first 2 lines - the header lines in the SS
+            //   arLines.splice(0,2)
+            let arLog = []
+
+            arLog.push(`${arLines.length} lines to process`)
+
+
+            let snomed = "http://snomed.info/sct"
+
+            let cm = {resourceType:"ConceptMap",id:"canshare-select-valueset-map"}
+            cm.url = "http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"
+            cm.identifier = {value:"canshare-select-valueset-map",system:"http://canshare.co.nz/fhir/NamingSystem/conceptmaps"}
+            cm.title = "CanShare select ValueSet ConceptMap"
+            cm.status = "active"
+            cm.version = "1"
+            let group = {source:snomed,target:snomed,element:[]}
+            cm.group = [group]
+
+//each line in the file refers to a specific target for a specific source, with a unique set of dependencies
+//a single source (eg cancer stream) may have multiple lines (targets), so need to analyse the file first, aggregaring by source
+
+            let ctr = 3   //the line counter from the SpreadSheetlines
+            let hashSource = {}     //hashed by source code - ie the thing we are looking for
+
+
+
+            for (const lne of arLines) {
+                let ar = lne.split('\t')
+                ar[0] = ctr++       //replace the sct release with the line number from the ss for debugging. don't think the sct release is needed (if it is later, then make it an object)
+                let sourceCode = ar[1].trim()      //B the code of the thing that is being looked for (eg cancer stream, concer substream). This is the same as the 'property' in the ConceptMap UI
+                let sourceDisplay = ar[2]   //C the display for that code
+
+                //console.log(ar[0],lne)
+
+                //add the line to the hash. Each line represents a possible target (value) with any associated dependencies
+                hashSource[sourceCode] = hashSource[sourceCode] || {display:sourceDisplay,lines:[]}
+                hashSource[sourceCode].lines.push(ar)
+            }
+
+
+//now we can iterate through the hashed sources (each of which represents possibly multiple lines)
+//each source is in a separate element inside the single group - as it's all snomed of the same version
+            for (const key of Object.keys(hashSource)) {
+
+                let item = hashSource[key]  //for a given source (ie property) all the rows in the spreadsheet that refer to that property
+
+                //the element that corresponds to this source. eg Cancer stream
+                let element = {code:key,display:item.display,target:[]}
+                let arLines = item.lines       //these are the lines. each line is a potential target within the element with dependencies
+
+                //now iterate over the lines creating the individual targets. each line becomes 1 target
+                // ie the value of the thing I'm looking for (eg cancer stream) is the target - if the dependencies match
+                arLines.forEach(function(ar){
+
+
+                    let lineNumber = ar[0]          //the line in the spreadsheet where this target is defined
+                    let targetType = ar[3]      //D set to 'Value set' if the target is a ValueSet and 'Value' if a value
+
+                    let targetValueSetName = ar[4]      // E valueset name if targetType is 'Value Set' (was targetRefsetId - refsetid)
+
+                    let targetConceptId = ar[5]     //F conceptId if we're just referring to a single concept
+                    let targetConceptDisplay = ar[6]    //G concept display if targetType is 'Value'
+
+
+
+                    //let targetVSName = ar[4]      // F canshare name of the valueset
+                    //these are the individual dependencies or 'rules' that, if met from data in the UI will trigger the rule
+
+                    let dep0Property = ar[10]    //K the propertyname for the first dependency
+                    let dep0Op = ar[11]          //L the operator - '=' must match, '^' means test concept in set
+                    let dep0Value = ar[12]       //M the actual code value of the dependency
+                    let dep0Display = ar[13]   //N the name of the dependency
+
+                    let dep1Property = ar[14]    //O the propertyname for the second dependency
+                    let dep1Op = ar[15]          //P the operator - '=' must match, '^' means test concept in set
+                    let dep1Value = ar[16]       //Q the actual code value of the dependency
+                    let dep1Display = ar[17]   //R the name of the dependency
+
+                    let dep2Property = ar[18]    //S the propertyname for the third dependency
+                    let dep2Op = ar[19]          //T the operator - '=' must match, '^' means test concept in set
+                    let dep2Value = ar[20]       //U the actual code value of the dependency
+                    let dep2Display = ar[21]    //V the name of the dependency
+
+
+                    let dep3Property = ar[22]
+                    let dep3Op = ar[23]
+                    let dep3Value = ar[24]
+                    let dep3Display = ar[25]
+
+                    let dep4Property = ar[26]
+                    let dep4Op = ar[27]
+                    let dep4Value = ar[28]
+                    let dep4Display = ar[29]
+
+                    let dep5Property = ar[30]
+                    let dep5Op = ar[31]
+                    let dep5Value = ar[32]
+                    let dep5Display = ar[33]
+
+                    //If further properties are needed (ie extra 'conditionals') - then add them according to the pattern above. You'll need to
+                    //add them as 'dependsOn' in the code below...
+
+                    //create the target defined by the line. This could be a ValueSet or a single concept - one or the other
+
+                    let targetCode  //the code of the target - will be a valuesetname or a concept
+                    let targetDisplay
+
+                    if (targetValueSetName) {
+                        //there is a valueset defined
+                        targetCode = `https://nzhts.digital.health.nz/fhir/ValueSet/${targetValueSetName}`
+                        targetDisplay = targetValueSetName
+
+                    } else if (targetConceptId) {
+                        targetCode = targetConceptId
+                        targetDisplay = targetConceptDisplay
+
+                        //it's a single concept
+                    } else {
+                        arLog.push(`>>>> line ${lineNumber} neither valueset nor concept present`)
+                        //todo - what to do?
+                    }
+
+                    //a target is a possible match (containing a vs or concept) for an element (property)
+                    let target = {code:targetCode}
+                    if (targetDisplay) { target.display = targetDisplay}
+                    target.equivalence = 'relatedto'
+                    target.comment = lineNumber     //for debugging purposes in the UI. Provides a link from the rule back to the line number in the spreadsheet,
+                    target.dependsOn = []           //the conditions / rules that must match for the target to apply
+
+                    element.target.push(target)     //add the target. ie the value if all the dependencies line up
+
+                    if (! dep0Property) {
+                        //no special action here, but there used to be so I'll leave thus here...
+                    }
+
+
+                    if (dep0Property) {
+                        target.dependsOn.push(getDep(dep0Property,dep0Op,dep0Value,dep0Display))
+                    }
+
+                    if (dep1Property) {
+                        target.dependsOn.push(getDep(dep1Property,dep1Op,dep1Value,dep1Display))
+                    }
+
+                    if (dep2Property) {
+                        target.dependsOn.push(getDep(dep2Property,dep2Op,dep2Value,dep2Display))
+                    }
+
+                    if (dep3Property) {
+                        target.dependsOn.push(getDep(dep3Property,dep3Op,dep3Value,dep3Display))
+                    }
+
+                    if (dep4Property) {
+                        target.dependsOn.push(getDep(dep4Property,dep4Op,dep4Value,dep4Display))
+                    }
+
+                    if (dep5Property) {
+                        target.dependsOn.push(getDep(dep5Property,dep5Op,dep5Value,dep5Display))
+                    }
+
+                    //if you add more properties above, then add them here...
+
+
+
+                })
+
+                //add the element to the ConceptMap
+                group.element.push(element)
+
+            }
+
+            return {cm:cm}
+
+
+            // fs.writeFileSync(`./${cmFileName}`,JSON.stringify(cm,null,2))
+            // logger(`${cmFileName} file created. Use the 'uploadConceptMap' script to upload to the terminology server.`)
 
             function getDep(property, operation, value, display) {
                 let dep = {}

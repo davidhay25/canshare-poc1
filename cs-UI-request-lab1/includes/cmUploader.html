@@ -122,6 +122,7 @@
       </uib-tab>
 
       <uib-tab heading="Paste from spreadsheet">
+        <div class="alert alert-warning">NOTE: The second column (column B) will be removed</div>
         <div class="myScroll">
           <textarea id="pastetextbox" rows="20" class="form-control" ng-paste="handlePaste($event)" ng-model="input.cmData"></textarea>
         </div>
