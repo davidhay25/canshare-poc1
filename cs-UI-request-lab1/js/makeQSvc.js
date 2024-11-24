@@ -872,13 +872,16 @@ angular.module("pocApp")
 
                 //add setValues into entries to make display easier
                 report.entries.forEach(function (entry) {
-                    report.setValue.forEach(function (value) {
-                        if (value.linkId == entry.linkId) {
-                            entry.setValue = entry.setValue || []
-                            entry.setValue.push(value)
-                        }
+                    if (report.setValue) {
+                        report.setValue.forEach(function (value) {
+                            if (value.linkId == entry.linkId) {
+                                entry.setValue = entry.setValue || []
+                                entry.setValue.push(value)
+                            }
 
-                    })
+                        })
+                    }
+
                 })
 
 
@@ -1214,7 +1217,9 @@ angular.module("pocApp")
                 Q.name = firstElement.ed.path
                 Q.title = firstElement.title
                 Q.status = 'active'
+                Q.title = dg.title
                 Q.url = `http://canshare.co.nz/questionnaire/${firstElement.ed.path}`
+                Q.description = dg.description
 
 
                 addPrePopExtensions(Q)      //launchPatient & LaunchPractitioner

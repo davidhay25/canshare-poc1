@@ -6,10 +6,6 @@ angular.module("pocApp")
                   snapshotSvc,vsSvc,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
-
-
-
-
             //change the background colour of the DG summary according to the environment
             $scope.modelInfoClass = 'modelInfo'
             let host = $location.absUrl()
@@ -19,6 +15,8 @@ angular.module("pocApp")
                 $scope.modelInfoClass = 'modelInfoTest'
             }
 
+
+
             $scope.version = utilsSvc.getVersion()
             $scope.input = {}
             $scope.input.showFullModel = true
@@ -26,9 +24,11 @@ angular.module("pocApp")
             $scope.input.metaProcedures = ['Small diagnostic sample','Resection','Radiation therapy','SACT therapy']
             $scope.input.metaCategories = ['Histopathology request','Histopathology report','Treatment summary']
 
-            $localStorage.trace = $localStorage.trace || {on:false,limit:500,contents:[]}
+            //always reset trace. an emergency fix - I'll remove trace later
+            $localStorage.trace = {on:false,limit:500,contents:[]}
+            $localStorage.trace.on = false
 
-            $scope.toggleTrace = function () {
+            $scope.toggleTraceDEP = function () {
                 $localStorage.trace.on = ! $localStorage.trace.on
             }
 
@@ -39,6 +39,37 @@ angular.module("pocApp")
             //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
             $scope.hashAllDG = $localStorage.world.dataGroups
 
+            //todo - only works for DG at present...
+            $scope.loadReview = function () {
+                vsSvc.getAllVS($scope.fullElementList, function () {
+                    $scope.showWaiting = false
+
+                    //the second option expands the valuesets as options into the Q - todo make this an option
+                    let config = {expandVS:true,enableWhen:true}
+                    config.hashAllDG = $scope.hashAllDG
+                    config.fhirType = $scope.selectedModel.type// Used for definition based extraction
+                    //need the named queries for Q variables
+                    makeQSvc.getNamedQueries(function (hash) {
+                        config.namedQueries = hash
+                        let voQ = makeQSvc.makeHierarchicalQFromDG($scope.selectedModel,$scope.fullElementList,config) //,$scope.hashAllDG)
+
+                        let qry = `/Questionnaire/${$scope.selectedModel.name}`
+                        $http.put(qry,voQ.Q).then(
+                            function () {
+                                const url = `modelReview.html?q-${$scope.selectedModel.name}`
+                                const features = 'noopener,noreferrer'
+                                window.open(url, '_blank', features)
+                            }, function (ex) {
+                                alert(angular.toJson(ex.data))
+                            }
+                        )
+                    })
+
+                })
+
+
+                //window.location.href = `modelReview.html?${$scope.selectedModel.name}`
+            }
 
             // -------------------------------------
             //snapshot generator functions
@@ -462,20 +493,7 @@ angular.module("pocApp")
             }
 
 
-            //show the Q preview. Lots of diagnostic stuff.
-            $scope.previewQDEP = function (Q) {
-                $uibModal.open({
-                    templateUrl: 'modalTemplates/previewQ.html',
-                    //backdrop: 'static',
-                    size : 'lg',
-                    controller: 'previewQCtrl',
-                    resolve: {
-                        Q: function () {
-                            return Q
-                        }
-                    }
-                })
-            }
+
 
             //all the questionnaire objects (not actual Q)
             //$scope.allQObject = $localStorage.allQObject
@@ -817,6 +835,7 @@ angular.module("pocApp")
 
 
             }
+
             $scope.makeAllDTList()         //initial invokation on load
 
 
@@ -842,7 +861,7 @@ angular.module("pocApp")
                 htmlElement = htmlElement || '#allDGTree'
                 $(htmlElement).jstree('destroy');
                 $scope.allDGTree = $(htmlElement).jstree(
-                    {'core': {'multiple': false, 'data': treeData,
+                    {'core': {'multiple': false, 'data': treeData,  worker: true, animation:0,
                             'themes': {name: 'proton', responsive: true}}}
                 ).on('changed.jstree', function (e, data) {
 
@@ -1755,17 +1774,20 @@ angular.module("pocApp")
                 $scope.dgFshLM = igSvc.makeFshForDG(dg,$scope.fullElementList)
                 $scope.dgFshProfile = igSvc.makeProfileFshDg(dg,$scope.fullElementList)
 
+
+
+                /* - temp - 23 Nov 2024 see if it makes a difference
                 makeGraph()     //todo - do we want the graph back?
 
-                //we don't always need to get all the VS - just when the model is
-              //  if (loadVS) {
-                    //always get all the valueset contents
-                    var startTime = performance.now()
-                    vsSvc.getAllVS($scope.fullElementList, function () {
-                        var endTime = performance.now()
-                        console.log(`Call to getAllVS took ${endTime - startTime} milliseconds`)
-                    })
-             //   }
+
+
+                //always get all the valueset contents
+                var startTime = performance.now()
+                vsSvc.getAllVS($scope.fullElementList, function () {
+                    var endTime = performance.now()
+                    console.log(`Call to getAllVS took ${endTime - startTime} milliseconds`)
+                })
+                */
 
 
 
@@ -1945,19 +1967,8 @@ angular.module("pocApp")
                         //$scope.dgReferencesOrdering = orderingSvc.getOrderingForReferences($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
                         $scope.orderingByToMove = orderingSvc.getOrderingByToMove($scope.selectedModel) // elements with multiple move instructions {dupsExist:dupsExist,hash:hash}
 
-
                         let treeData = modelsSvc.makeTreeFromElementList($scope.fullElementList)
                         drawDGTree(treeData)
-
-                        /* todo - recator to use new service
-
-                        //re-create the Questionnaire
-                        vsSvc.getAllVS($scope.fullElementList, function () {
-                            let voQ = makeQSvc.makeQFromDG($scope.fullElementList,$scope.hashAllDG)
-                            $scope.dgQ = voQ.Q
-
-                        })
-                        */
 
                         $scope.$digest()
 

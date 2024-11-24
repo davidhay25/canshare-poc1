@@ -26,26 +26,26 @@
           <tr><th>ValueSet Name</th><th>Where used</th></tr>
           </thead>
           <tbody>
-          <tr ng-repeat="v in arVsSummary" ng-class="{issue:v.issue}" ng-if="v[0].isValueSet">
+          <tr ng-repeat="v in ::arVsSummary" ng-class="{issue:v.issue}" ng-if="v[0].isValueSet">
             <td>
               <span class = 'clickable' ng-click="viewVS(v.url)">{{v.url}}</span>
             </td>
 
             <td>
-              <div ng-repeat = "item in v">
+              <div ng-repeat = "item in ::v">
                 <div ng-if="item.DGName">
-                  DG: <span class="clickable" ng-click="termSelectDG(item)" >{{item.DGName}}</span>.
-                  Path: <span class="clickable" ng-click="termSelectDGItem(item)">{{item.path}}</span>
+                  DG: <span class="clickable" ng-click="termSelectDG(item)" >{{::item.DGName}}</span>.
+                  Path: <span class="clickable" ng-click="termSelectDGItem(item)">{{::item.path}}</span>
                   <span ng-if = item.options>
-                  There are <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}} options</span> defined.
+                  There are <span class="clickable " ng-click="viewOptions(item)">{{::item.options.length}} options</span> defined.
                 </span>
                 </div>
 
                 <div ng-if="item.compName">
-                  Comp: <span class="clickable" ng-click="termSelectComp(item)" >{{item.compName}}</span>.
-                  Path: <span class="clickable" ng-click="termSelectCompItem(item)">{{item.path}}</span>
+                  Comp: <span class="clickable" ng-click="termSelectComp(item)" >{{::item.compName}}</span>.
+                  Path: <span class="clickable" ng-click="termSelectCompItem(item)">{{::item.path}}</span>
                   <span ng-if = item.options>
-                  There are <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}} options</span> defined.
+                  There are <span class="clickable " ng-click="viewOptions(item)">{{::item.options.length}} options</span> defined.
                 </span>
                 </div>
 
@@ -76,26 +76,26 @@
           <tr><th>DG Name-Path</th><th>Where used</th></tr>
           </thead>
           <tbody>
-          <tr ng-repeat="v in arVsSummary" ng-class="{issue:v.issue}" ng-if="! v[0].isValueSet">
+          <tr ng-repeat="v in ::arVsSummary" ng-class="{issue:v.issue}" ng-if="! v[0].isValueSet">
             <td>
               {{v.url}}
             </td>
 
             <td>
-              <div ng-repeat = "item in v">
+              <div ng-repeat = "item in ::v">
                 <div ng-if="item.DGName">
-                  DG: <span class="clickable" ng-click="termSelectDG(item)" >{{item.DGName}}</span>.
-                  Path: <span class="clickable" ng-click="termSelectDGItem(item)">{{item.path}}</span>
+                  DG: <span class="clickable" ng-click="termSelectDG(item)" >{{::item.DGName}}</span>.
+                  Path: <span class="clickable" ng-click="termSelectDGItem(item)">{{::item.path}}</span>
                   <span ng-if = item.options>
-                  There are <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}} options</span> defined.
+                  There are <span class="clickable " ng-click="viewOptions(item)">{{::item.options.length}} options</span> defined.
                 </span>
                 </div>
 
                 <div ng-if="item.compName">
-                  Comp: <span class="clickable" ng-click="termSelectComp(item)" >{{item.compName}}</span>.
-                  Path: <span class="clickable" ng-click="termSelectCompItem(item)">{{item.path}}</span>
+                  Comp: <span class="clickable" ng-click="termSelectComp(item)" >{{::item.compName}}</span>.
+                  Path: <span class="clickable" ng-click="termSelectCompItem(item)">{{::item.path}}</span>
                   <span ng-if = item.options>
-                  There are <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}} options</span> defined.
+                  There are <span class="clickable " ng-click="viewOptions(item)">{{::item.options.length}} options</span> defined.
                 </span>
                 </div>
 
@@ -128,14 +128,14 @@
             <th>Element title</th><th>Element description</th><th>Element ValueSet</th><th># options</th></tr>
           </thead>
           <tbody>
-          <tr ng-repeat="item in termSummary">
+          <tr ng-repeat="item in ::termSummary">
             <td>
-              <span class="clickable" ng-click="termSelectDG(item)">{{item.DGName}}</span>
+              <span class="clickable" ng-click="termSelectDG(item)">{{::item.DGName}}</span>
             </td>
             <td>{{item.DGTitle}}</td>
 
             <td>
-              <span class="clickable" ng-click="termSelectDGItem(item)">{{item.path}}</span>
+              <span class="clickable" ng-click="termSelectDGItem(item)">{{::item.path}}</span>
             </td>
 
 
@@ -143,11 +143,11 @@
             <td>{{item.title}}</td>
             <td>{{item.description}}</td>
             <td>
-              <span class = 'clickable' ng-click="viewVS(item.valueSet)">{{item.valueSet}}</span>
+              <span class = 'clickable' ng-click="viewVS(item.valueSet)">{{::item.valueSet}}</span>
 
             </td>
             <td>
-              <span class="clickable " ng-click="viewOptions(item)">{{item.options.length}}</span>
+              <span class="clickable " ng-click="viewOptions(item)">{{::item.options.length}}</span>
             </td>
           </tr>
           </tbody>
@@ -170,13 +170,13 @@
             <tr><th>Code|System</th><th>Display</th><th>Where used</th></tr>
           </thead>
           <tbody>
-          <tr ng-repeat="(k,v) in codeSummary" ng-if="canShowCodeReportLine(k)">
+          <tr ng-repeat="(k,v) in ::codeSummary" ng-if="canShowCodeReportLine(k)">
             <td>{{k}}</td>
             <td>{{v.display}}</td>
             <td>
               <div ng-repeat="item in v.lst">
-                DG: <span class="clickable" ng-click="termSelectDG(item)" >{{item.DGName}}</span>
-                Path: <span class="clickable" ng-click="termSelectDGItem(item)">{{item.path}}</span>
+                DG: <span class="clickable" ng-click="termSelectDG(item)" >{{::item.DGName}}</span>
+                Path: <span class="clickable" ng-click="termSelectDGItem(item)">{{::item.path}}</span>
                 Type: <span>{{item.type}}</span>
 
               </div>
@@ -202,17 +202,17 @@
         </tr>
       </thead>
       <tbody>
-      <tr ng-repeat="item in compTermSummary">
-        <td>{{item.compName}}</td>
-        <td>{{item.ov.path}}</td>
-        <td>{{item.ov.title}}</td>
-        <td>{{item.ov.description}}</td>
+      <tr ng-repeat="item in ::compTermSummary">
+        <td>{{::item.compName}}</td>
+        <td>{{::item.ov.path}}</td>
+        <td>{{::item.ov.title}}</td>
+        <td>{{::item.ov.description}}</td>
         <td>
-          <span class = 'clickable' ng-click="viewVS(item.ov.valueSet)">{{item.ov.valueSet}}</span>
+          <span class = 'clickable' ng-click="viewVS(item.ov.valueSet)">{{::item.ov.valueSet}}</span>
 
         </td>
         <td>
-          <span class = 'clickable' ng-click="viewVS(item.ov.oldValueSet)">{{item.ov.oldValueSet}}</span>
+          <span class = 'clickable' ng-click="viewVS(item.ov.oldValueSet)">{{::item.ov.oldValueSet}}</span>
 
         </td>
       </tr>
@@ -233,13 +233,13 @@
           <tr><th>Name</th><th>Type</th><th>Path</th><th>Note</th></tr>
           </thead>
           <tbody>
-          <tr ng-repeat="item in notesSummary">
+          <tr ng-repeat="item in ::notesSummary">
             <td>
-              <span class="clickable" ng-click="termSelectDG(item)">{{item.hiddenDGName}}</span>
+              <span class="clickable" ng-click="termSelectDG(item)">{{::item.hiddenDGName}}</span>
             </td>
             <td>{{item.type}}</td>
             <td>
-              <span class="clickable" ng-click="termSelectDGItem(item)">{{item.path}}</span>
+              <span class="clickable" ng-click="termSelectDGItem(item)">{{::item.path}}</span>
 
             </td>
             <td>{{item.notes}}</td>

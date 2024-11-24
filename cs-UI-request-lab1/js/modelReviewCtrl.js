@@ -18,7 +18,7 @@ angular.module("pocApp")
             //in the table view, hide common DG like HCP as the details are not relevant to reviewers
             $scope.input.hideSomeDG = true
 
-            let DGsToHideInCompTable = ['NZPersonName','HealthcarePractitionerSummary','NZAddress']
+            //let DGsToHideInCompTable = ['NZPersonName','HealthcarePractitionerSummary','NZAddress']
 
 
             let search = $window.location.search;
@@ -34,78 +34,148 @@ angular.module("pocApp")
 
             }
 
+            $scope.loadQ = function (qName) {
+                let qry = `/Questionnaire/${qName}`
+                $http.get(qry).then(
+                    function (data) {
+                        $scope.fullQ = data.data
+                        $scope.hashEd = {}
 
-            $http.get('/model/allDG').then(
-                function (data) {
-                    //console.log(data.data)
-                    $scope.hashAllDG = {}
-                    data.data.forEach(function (dg) {
-                        $scope.hashAllDG[dg.name] = dg
+                        //A report focussed on pre-popupation & extraction
+                        let voReport =  makeQSvc.makeReport($scope.fullQ)
+                        $scope.qReport =voReport.report
+                        $scope.input.mainTabActive = 1
 
-                        //has both dgs & fhir dta
-                       // $scope.input.types = modelsSvc.getAllTypes($scope.hashAllDG)
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+            }
 
-
-                    })
-
-                    //has both dgs & fhir dta
-                    $scope.input.types = modelsSvc.getAllTypes($scope.hashAllDG)
-
-
-                    //need to generate the snapshot for all DG. This is needed for the Q generation
-                    //the snapshots are all held within the service...
-
-                    snapshotSvc.makeSnapshots($scope.hashAllDG)
-
-                    //assign the snapshot svc to the modelSvc so that it can read the snapshots of DGs
-                    modelCompSvc.setSnapshotSvc(snapshotSvc)
+            if (modelName) {
+                if (modelName.startsWith('q-')) {
+                    //a Q reference was passed
+                    let qName = modelName.slice(2)
+                    $scope.loadQ(qName)
 
 
-                    //todo - if we decide that this app won't have the ability to select dg/comp
-                    //then we don't need to get all the composiitons (will always need all the DGs)
-                    //but keep it for now (though there is a performance hit...
-                    $http.get('/model/allCompositions').then(
+                } else {
+                    $http.get('/model/allDG').then(
                         function (data) {
                             //console.log(data.data)
-                            $scope.hashAllCompositions = {}
-                            data.data.forEach(function (comp) {
-                                $scope.hashAllCompositions[comp.name] = comp
+                            $scope.hashAllDG = {}
+                            data.data.forEach(function (dg) {
+                                $scope.hashAllDG[dg.name] = dg
+
+                                //has both dgs & fhir dta
+                                // $scope.input.types = modelsSvc.getAllTypes($scope.hashAllDG)
+
+
                             })
 
-
-                            //now that we have all the DG & Compositions, was a modelName passed in?
-
-                            if (modelName) {
-                                if ($scope.hashAllCompositions[modelName]) {
-                                    //this was a composition
-                                    $scope.modelType = 'comp'
-                                    $scope.selectedModel = $scope.hashAllCompositions[modelName]
-                                    $scope.selectComposition($scope.hashAllCompositions[modelName],$scope.compVersion)
-                                    $scope.selectedFromUrl = true      //to indicate that the modelname was passed in on the url
+                            //has both dgs & fhir dta
+                            $scope.input.types = modelsSvc.getAllTypes($scope.hashAllDG)
 
 
-                                } else if ($scope.hashAllDG[modelName]) {
-                                    //this is a DG
-                                    $scope.modelType = 'dg'
-                                    $scope.selectedModel = $scope.hashAllDG[modelName]
-                                    $scope.selectDG($scope.hashAllDG[modelName])
+                            //need to generate the snapshot for all DG. This is needed for the Q generation
+                            //the snapshots are all held within the service...
 
-                                    $scope.selectedFromUrl = true      //to indicate that the modelname was passed in on the url
-                                } else {
+                            snapshotSvc.makeSnapshots($scope.hashAllDG)
 
-                                    alert(`The model name: ${modelName} was not found in the library for either Composition or DataGroup`)
+                            //assign the snapshot svc to the modelSvc so that it can read the snapshots of DGs
+                            modelCompSvc.setSnapshotSvc(snapshotSvc)
+
+
+                            //todo - if we decide that this app won't have the ability to select dg/comp
+                            //then we don't need to get all the composiitons (will always need all the DGs)
+                            //but keep it for now (though there is a performance hit...
+                            $http.get('/model/allCompositions').then(
+                                function (data) {
+                                    //console.log(data.data)
+                                    $scope.hashAllCompositions = {}
+                                    data.data.forEach(function (comp) {
+                                        $scope.hashAllCompositions[comp.name] = comp
+                                    })
+
+
+                                    //now that we have all the DG & Compositions, was a modelName passed in?
+
+                                    if (modelName) {
+                                        if ($scope.hashAllCompositions[modelName]) {
+                                            //this was a composition
+                                            $scope.modelType = 'comp'
+                                            $scope.selectedModel = $scope.hashAllCompositions[modelName]
+                                            $scope.selectComposition($scope.hashAllCompositions[modelName],$scope.compVersion)
+                                            $scope.selectedFromUrl = true      //to indicate that the modelname was passed in on the url
+
+                                            $scope.input.mainTabActive = 1
+
+                                        } else if ($scope.hashAllDG[modelName]) {
+                                            //this is a DG
+                                            $scope.modelType = 'dg'
+                                            $scope.selectedModel = $scope.hashAllDG[modelName]
+                                            $scope.selectDG($scope.hashAllDG[modelName])
+
+                                            $scope.selectedFromUrl = true      //to indicate that the modelname was passed in on the url
+                                            $scope.input.mainTabActive = 1
+                                        } else {
+
+                                            alert(`The model name: ${modelName} was not found in the library for either Composition or DataGroup`)
+                                        }
+
+                                    } else {
+                                        alert("You need to supply the name of a DG or Composition in the call")
+                                    }
+
                                 }
-
-                            } else {
-                                alert("You need to supply the name of a DG or Composition in the call")
-                            }
+                            )
 
                         }
                     )
+                }
+
+            } else {
+                //alert("You'll need to paste in a Questionnaire (Json) format")
+            }
+
+
+            function loadAllQNames() {
+                $http.get('/Questionnaire/getSummary').then(
+                    function (data) {
+                        $scope.lstQ = data.data.lstQ
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+            }
+            loadAllQNames()
+
+            //paste in a Q
+            $scope.pasteQ = function (Qstring) {
+                let testQ = {}
+                try {
+                    testQ = JSON.parse(Qstring)
+                } catch {
+                    alert("This is not a valid Json string")
+                }
+
+                try {
+                    $scope.hashEd = {}
+                    //A report focussed on pre-popupation & extraction
+                    let voReport =  makeQSvc.makeReport(testQ)
+                    $scope.qReport =voReport.report
+                    $scope.fullQ = $scope.fullQ
+                    $scope.input.mainTabActive = 1
+                } catch {
+                    alert("This is a valid Json string, but there were errors parsing it.")
 
                 }
-            )
 
+
+
+
+
+            }
 
 
             $scope.rebuildQ = function () {
@@ -207,20 +277,7 @@ angular.module("pocApp")
 
             }
 
-            //When an ed is selected in a table
-            $scope.selectEDDEP = function (ed) {
-                $scope.selectedED = ed
-                $scope.currentLinkId = ed.path
 
-                //this is just making up a node to match the tree
-                //todo - change details to just use ED - issue is section multiplicity
-                $scope.selectedCompositionNode = {data:{ed:ed}}
-
-                //now create the set of comments for this path
-                $scope.commentsThisPath = $scope.commentsThisComp[$scope.selectedCompositionNode.data.ed.path]
-
-
-            }
 
             //when an element is selected in a form
             $scope.$on('elementSelected',function(event,vo) {
@@ -253,93 +310,6 @@ angular.module("pocApp")
             })
 
 
-            //called by the table view to determine if a row is displayed
-            $scope.showTableRowDEP = function (ed) {
-                if (ed.mult == '0..0') {
-                    return false
-                }
-
-                //path = {compname}.{section}.{sectionDG}.{topchildindg}
-
-                let arPath = ed.path.split('.')
-                if (arPath.length < 4) {
-                    //ignore the section and section group paths
-                    return false
-                }
-
-                let canShow = true
-
-                if ($scope.input.tableFilter) {
-                    if (ed.title) {
-                        let title = ed.title.toLowerCase()
-                        let srch = $scope.input.tableFilter.toLowerCase()
-                        if (title.indexOf(srch) == -1) {
-                            canShow = false
-                        }
-                    }
-                }
-
-                //If there's a specific section requested - only show conetnts of that section
-
-                if ($scope.input.tableSection) {
-                    if ($scope.input.tableSection.name == 'all') {
-                        //return canShow
-                    } else {
-                        //need to check the second element of the ed path which is the section name...
-                        //let ar = ed.path.split('.')
-                        if (arPath[1] !== $scope.input.tableSection.name) {
-                            canShow = false
-                        }
-                    }
-                }
-
-                //If the row is a child of type HealthcarePractitionerSummary then hide
-                //$scope.pathsToIgnore is created when the comp is selected
-                //todo - make optional, extend to others if it wprks
-                //todo add NZPersonName
-                //todo - maybe assemble the list of $scope.pathsToIgnore when the comp is selected. There may be an issue with order...
-                if ($scope.input.hideSomeDG) {
-                    //if the type is HCP then add to ignorepath
-                        //if (ed.type && ed.type[0] == 'HealthcarePractitionerSummary') {
-
-                    Object.keys($scope.pathsToIgnore).forEach(function (key) {
-                        //if (ed.path.startsWith(key)  &&  ed.path.length > key.length ) {
-                        if (ed.path.isChildPath(key)  ) {
-                            canShow = false
-                        }
-
-                    })
-
-
-                    /*
-                    if (ed.type && DGsToHideInCompTable.indexOf(ed.type[0]) > -1) {
-                        $scope.pathsToIgnore[ed.path] = true
-
-                    } else {
-                        Object.keys($scope.pathsToIgnore).forEach(function (key) {
-                            if (ed.path.startsWith(key)) {
-                                canShow = false
-                            }
-
-                        })
-                    }
-                    */
-                }
-
-
-
-
-
-
-
-
-
-
-
-
-                return canShow
-
-            }
 
 
             //add a comment to the current comp
@@ -462,32 +432,6 @@ angular.module("pocApp")
                         }
                     )
 
-/*
-
-                    let hashCommentsForPath = $localStorage.world.comments[compName]
-
-                    //todo - not saving. move to db.
-
-                    Object.keys(hashCommentsForPath).forEach(function (key) {
-                        if (key == c.path) {
-
-                            hashCommentsForPath[key].forEach(function(com){
-                                if (com.id == c.id) {
-                                    com.disposition = c.disposition
-                                    com.dispositionNote = c.dispositionNote
-
-                                }
-                            })
-
-                        }
-                    })
-
-                    */
-
-
-
-
-                    //comment.disposition = c.disposition
                 })
             }
 
@@ -620,12 +564,6 @@ angular.module("pocApp")
                         $scope.hashEd = voQ.hashEd
                         $scope.errorLog = voQ.errorLog
                         console.log(voQ.errorLog)
-
-
-
-
-
-
 
                         //A report focussed on pre-popupation & extraction
                         let voReport =  makeQSvc.makeReport($scope.fullQ)

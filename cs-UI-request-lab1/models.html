@@ -118,12 +118,14 @@
 
             <div class="col-md-1">
                 <div class="navbar-text" >
+                    <!--
                     <div class="btn" ng-click = "toggleTrace()" class="clickable">
                         <span ng-if="localStorage.trace.on"><span style="color: red">
                             <strong>Trace on</strong></span> </span>
                         <span ng-hide="localStorage.trace.on">Trace off</span>
                         <span class="badge">{{localStorage.trace.contents.length}}</span>
                     </div>
+                    -->
 
 
                 </div>
@@ -481,6 +483,8 @@
 
         </uib-tab>
 
+        <!-- temp to see if increases watchers
+
         <uib-tab heading="Snapshot generation log" select="setInitialTab(2)">
             <br/>
 
@@ -489,19 +493,23 @@
 
         </uib-tab>
 
-
-        <uib-tab heading="Reports"  select="setInitialTab(3)">
-            <ng-include src="'/includes/terminology.html'"></ng-include>
-        </uib-tab>
-
-        <!--
-        <uib-tab heading="Profiling"  select="setInitialTab(4)">
-            <div ng-controller="profilingSummaryCtrl">
-                <ng-include src="'/includes/profilingSummary.html'"></ng-include>
-            </div>
-
-        </uib-tab>
         -->
+
+
+              <uib-tab heading="Reports"  select="setInitialTab(3)">
+                  <ng-include src="'/includes/terminology.html'"></ng-include>
+              </uib-tab>
+
+
+
+              <!--
+              <uib-tab heading="Profiling"  select="setInitialTab(4)">
+                  <div ng-controller="profilingSummaryCtrl">
+                      <ng-include src="'/includes/profilingSummary.html'"></ng-include>
+                  </div>
+
+              </uib-tab>
+              -->
 
 
 
@@ -531,7 +539,7 @@
 
         </uib-tab>
 
-
+<!--
         <uib-tab heading="IG artifacts">
             <br/>
 
@@ -560,6 +568,7 @@
 
 
         </uib-tab>
+        -->
 
 
 
@@ -575,7 +584,6 @@
 
         let test = parent + "."
         if (this.startsWith(test) ) {
-       // if (this.indexOf(test) > -1) {
             return true
         } else {
             return false
@@ -707,6 +715,9 @@
 <script src="js/codedOptionsSvc.js"></script>
 <script src="js/vsSvc.js"></script>
 
+<!-- Taken out 23 Nov
+
+
 <script src="directive/renderForm/renderFormSvc.js"></script>
 <script src="directive/renderForm/renderFormDir.js"></script>
 <script src="directive/renderSingleItem/renderSingleItemDir.js"></script>
@@ -717,6 +728,12 @@
 
 
 <script src="js/libs/comment-fold.js"></script>
+
+
+
+-->
+
+<script src="js/qHelperSvc.js"></script>
 <script src="js/xquery.js"></script>
 
 <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
@@ -753,7 +770,7 @@
 
 <script src="js/libs/fhirpath.min.js"></script>
 <script src="js/libs/fhirpath.r4.min.js"></script>
-<script src="js/qHelperSvc.js"></script>
+
 
 
 <!--

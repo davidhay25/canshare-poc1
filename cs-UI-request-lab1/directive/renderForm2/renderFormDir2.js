@@ -141,7 +141,7 @@ angular.module('formsApp')
                 }
 
 
-                $scope.prePop = function () {
+                $scope.prePopDEP = function () {
                     //using the pre-pop expressions in the Q call the server and initialize dataEntered
                     for (const exp of $scope.prepopExpression) {
                         let qry = `/Q/prepop?fp=${exp.expression}`

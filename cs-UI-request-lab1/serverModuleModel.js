@@ -1087,11 +1087,76 @@ async function setup(app,mongoDbName) {
     })
 
 
-    // ============== questionnnaire objects - not Q resources
+    // ============== questionnnaire objects - not Q resources - deprecated
+
+
+
+    //create / update a single QuestionnaireObject (QO).
+    app.put('/Questionnaire/:name', async function(req,res) {
+        let name = req.params.name
+        let q = req.body
+
+
+
+        const query = {name:name}
+        console.log(query)
+        try {
+
+            const cursor = await database.collection("questionnaire").replaceOne(query,q,{upsert:true})
+            res.json(q)
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+    })
+
+    //get a list of all saved Qs  - removing the contents
+    app.get('/Questionnaire/getSummary', async function(req,res) {
+        try {
+            const cursor = await database.collection("questionnaire").find({}).toArray()
+            let ar = []
+            cursor.forEach(function (doc) {
+                delete doc['_id']
+                delete doc.item
+                delete doc.extension
+                delete doc.useContext
+                ar.push(doc)
+
+            })
+
+            res.json({lstQ:ar})
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+    })
+
+    //get a single Questionnaire by name
+    app.get('/Questionnaire/:name', async function(req,res) {
+        let name = req.params.name
+        const query = {name:name}
+        try {
+            const cursor = await database.collection("questionnaire").find(query).toArray()
+            if (cursor.length == 1) {
+                let q = cursor[0]
+                delete q['_id']
+                res.json(q)
+            } else {
+                res.status(404).json({msg:'Q not found, or there are multiple with the same name'})
+            }
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+    })
+
 
 
     //get all active datagroups. For now, return the whiole thing - if size becomes an issue, then just return the meta element
-    app.get('/model/allQObject', async function(req,res) {
+    app.get('/model/allQObjectDEP', async function(req,res) {
         //retrieve the QO
 
         const colQO = database.collection("qobject");
@@ -1134,30 +1199,8 @@ async function setup(app,mongoDbName) {
     })
 
 
-    //make a copy of all documents
-    async function backupCopy(json) {
 
 
-    }
-
-    //create / update a single QuestionnaireObject (QO). In theory the name param is not needed, but cleaner
-    app.put('/model/QObject/:name', async function(req,res) {
-        let name = req.params.name
-        let qo = req.body
-        qo.updated = true           //so we know it was updated
-        const query = {name:name}
-        try {
-            let backup = {type:'qo',date: new Date(), data:qo}
-            await database.collection("backup").insertOne(backup)
-
-            const cursor = await database.collection("qobject").replaceOne(query,qo,{upsert:true})
-            res.json(qo)
-        } catch(ex) {
-            console.log(ex)
-            res.status(500).json(ex.message)
-
-        }
-    })
 
 
 

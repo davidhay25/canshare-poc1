@@ -10,6 +10,10 @@ angular.module("pocApp")
             let nzDisplayLanguage = "en-x-sctlang-23162100-0210105"
             let snomed = "http://snomed.info/sct"
 
+            //delete any previous batch - cal remove later
+            delete $localStorage.previousVSBatch
+            delete $localStorage.previousCMSS
+
             //let extMemberCount = "http://canshare.co.nz/fhir/StructureDefinition/vs-expanded-count"
 
             //the version is used to identify which include section is used for which purpose
@@ -84,10 +88,10 @@ angular.module("pocApp")
             //============================== update ConceptMap functions
             //https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653
 
-            $scope.previousCMSS = $localStorage.previousCMSS
+            //$scope.previousCMSS = $localStorage.previousCMSS
 
             //just during development...
-            $scope.reloadCMSS = function () {
+            $scope.reloadCMSSDEP = function () {
                 //reload the last 'file' copied in...
                 let vo1 = terminologyUpdateSvc.auditCMFile($scope.previousCMSS,$scope.allVSItem)
                 $scope.arLog = vo1.log
@@ -136,7 +140,7 @@ angular.module("pocApp")
                 $scope.arLog = vo1.log
 
 
-                $localStorage.previousCMSS = arLines
+                //$localStorage.previousCMSS = arLines
 
                 let vo = terminologyUpdateSvc.makeCM(arLines)
 
@@ -229,7 +233,7 @@ angular.module("pocApp")
             // ============ VS Batch upload functions ===========
 
             //just during development...
-            $scope.reloadVSBatch = function () {
+            $scope.reloadVSBatchDEP = function () {
                 //reload the last 'file' copied in...
 
                 $scope.arVSBatchLog = terminologyUpdateSvc.auditVSBatchFile($localStorage.previousVSBatch)
@@ -247,7 +251,7 @@ angular.module("pocApp")
 
                 $scope.arVSBatchLog = terminologyUpdateSvc.auditVSBatchFile(arLines)
 
-                $localStorage.previousVSBatch = arLines
+               // $localStorage.previousVSBatch = arLines
 
                 $scope.vsBatch = terminologyUpdateSvc.makeVSBatch(arLines)
                 $scope.vsBatchReport = terminologyUpdateSvc.VSBatchReport($scope.vsBatch,$scope.allVSItem)

@@ -100,6 +100,11 @@
          ng-if="! canEdit(selectedModel)"
          ng-href="modelReview.html?{{selectedModel.name}}" target="_blank">Review</a>
 
+
+
+
+        <button class="btn btn-link" ng-click="loadReview()">New review</button>
+
       <button class="btn btn-link" ng-click="showLink('dg')">Link</button>
 
       <div class="pull-right">
@@ -869,10 +874,6 @@
 
         </uib-tab>
 
-
-
-
-
         <uib-tab heading="Table">
           <br/>
           <div class="tableFixHead">
@@ -935,6 +936,8 @@
           </div>
 
         </uib-tab>
+
+        <!--
         <uib-tab heading="Graph" select="fitGraph()">
 
           <em class="pull-right">DT inheritance hierarchy and referenced DTs</em>
@@ -980,21 +983,13 @@
                                  popover-placement="right"
                                  popover-trigger="'mouseenter'">{{ed.path}}</div>
 
-                            <!--
-                            <div style="padding-left: 8px"><em >{{ed.description}}</em></div>
-    -->
+
                           </td>
                           <td>{{ed.type[0]}}
                             <div class="clickable"><em>{{ed.valueSet}}</em></div>
                             <div><em>{{ed.fixedCoding}}</em></div>
                           </td>
-                          <!--
-                          <td>
-                              <div ng-repeat="code in code">
-                                  {{code}}
-                              </div>
-                          </td>
-                          -->
+
                           <td>{{ed.mult}}</td>
                         </tr>
                       </table>
@@ -1010,21 +1005,13 @@
                             <div class="clickableDotted" uib-popover="{{item.ed.description}}"
                                  popover-placement="right"
                                  popover-trigger="'mouseenter'">{{item.ed.path | dropFirstInPath}}</div>
-                            <!--
-                            {{item.ed.path}}
-                            <div style="padding-left: 8px"><em >{{item.ed.description}}</em></div> -->
+
                           </td>
                           <td>{{item.ed.type[0]}}
                             <div class="clickable"><em>{{item.ed.valueSet}}</em></div>
                             <div><em>{{item.ed.fixedCoding}}</em></div>
                           </td>
-                          <!--
-                          <td>
-                              <div ng-repeat="code in code">
-                                  {{code}}
-                              </div>
-                          </td>
-                          -->
+
                           <td>{{item.ed.mult}}</td>
                         </tr>
                       </table>
@@ -1046,6 +1033,8 @@
 
 
         </uib-tab>
+
+        -->
 
         <uib-tab heading="Order element">
           <pre>{{selectedModel.ssOrder | json}}</pre>

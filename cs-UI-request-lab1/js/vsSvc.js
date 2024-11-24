@@ -23,7 +23,6 @@ angular.module("pocApp")
 
                 }
 
-
                 that.updateCacheFromList(lst, cb)
             },
 

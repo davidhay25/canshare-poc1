@@ -43,8 +43,9 @@
 
 
       <div class="rounded-box">
+        <!--
         <div class="pull-right btn btn-link" ng-click="prePop()">Pre-pop</div>
-
+-->
         <div class="myScroll">
           <div ng-repeat="entry in listItems">
             <div>
@@ -572,13 +573,20 @@
         <uib-tab  ng-if="technicalview" heading="Model">
           <uib-tabset>
 
-            <uib-tab  ng-if="technicalview" heading="ED">
+            <uib-tab  ng-if="technicalview" heading="Item">
+
+              <strong>Todo: add SDC summary - incl. context from parent</strong>
+              <div class="myScroll">
+                <pre>{{selectedItem | json}}</pre>
+              </div>
+
+            </uib-tab>
+
+            <uib-tab  ng-if="technicalview && selectedEd" heading="ED">
               <pre>{{selectedEd | json}}</pre>
             </uib-tab>
 
-            <uib-tab  ng-if="technicalview" heading="Item">
-              <pre>{{selectedItem | json}}</pre>
-            </uib-tab>
+
 
 
 

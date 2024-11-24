@@ -55,36 +55,6 @@
             $compileProvider.aHrefSanitizationWhitelist(/^\s*(http|https?|ftp|mailto|blob):/);
         }]);
 
-/*
-        //https://www.tutorialsteacher.com/angularjs/angularjs-exception-handling
-        app.config(function ($provide) {
-
-            $provide.decorator('$exceptionHandler', function ($delegate) {
-
-                return function (exception, cause) {
-                    //  $delegate(exception, cause);
-//console.log(cause)
-                    console.log("Untrapped exception",exception.stack)
-                    //$http.post("model/access",{})
-
-                    // logErrorsToBackend(exception, cause);
-
-                    let obj = {type:'err',module:'model',msg:exception.stack}
-                    $.ajax({
-                        type: "POST",
-                        url: "/telemetry",
-                        contentType: "application/json",
-                        data: JSON.stringify(obj)
-                    });
-
-                    let msg = "There was an unexpected error. Details have been saved to the server, " +
-                        "but your last action may have failed. You should restart the browser and check."
-
-                    alert(msg);
-                };
-            });
-        });
-*/
 
         //this allows the directives (which are in the formsApp) to be used. see https://stackoverflow.com/questions/15641730/angular-js-directives-in-different-modules
         angular.module("formsApp",[])
@@ -124,13 +94,9 @@
     <script src="js/libs/vis.min.js"></script>
     <script src="js/showParameters.js"></script>
 
-<!--
-    <script src="js/modelsDemoSvc.js"></script>
 
-    -->
     <script src="js/vsSvc.js"></script>
     <script src="js/orderingSvc.js"></script>
-    <script src="js/makeCompQSvcDEP.js"></script>
     <script src="js/cmSvc.js"></script>
     <script src="js/snapShotSvc.js"></script>
     <script src="js/QutilitiesSvc.js"></script>
@@ -140,11 +106,7 @@
 
     <script src="js/qHelperSvc.js"></script>
 
-    <!--
-        <script src="directive/renderForm/renderFormSvc.js"></script>
-        <script src="directive/renderForm/renderFormDir.js"></script>
-        <script src="directive/renderSingleItem/renderSingleItemDir.js"></script>
-    -->
+
 
     <!-- While developing new directive -->
     <script src="directive/renderForm2/renderFormSvc2.js"></script>
@@ -152,14 +114,6 @@
     <script src="js/questionnaireSvc.js"></script>
 
 
-
-
-
-
-<!--
-    <script src="js/models/ObservationModels.js"></script>
-    <script src="js/models/StagingModels.js"></script>
--->
 </head>
 
 <body style="padding: 8px;padding-top: 80px">
@@ -168,16 +122,16 @@
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
         <div class="container-fluid">
-            <div class="col-md-2">
+            <div class="col-md-3">
                     <span>
                         <a class="navbar-brand" href="#">
-                            Review model
+                            Questionnaire viewer
                         </a>
                     </span>
 
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="navbar-text">
 <!--
                     <select class="form-control" ng-model="selectedComp" ng-hide="selectedFromUrl"
@@ -229,9 +183,47 @@
     </nav>
 
 
-        <div id="myFormContainer"></div>
+    <uib-tabset active="input.mainTabActive">
 
-    <uib-tabset>
+        <uib-tab heading="Select Q">
+
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>Saved Questionnaires</h5>
+                    <table class="table table-bordered">
+                        <tr ng-repeat="Q in lstQ">
+                            <td>
+                                <div class="clickable" ng-click="loadQ(Q.name)">{{Q.name}}</div>
+                            </td>
+                            <td>{{Q.description}}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5>Paste in a new Questionnaire</h5>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-link pull-right"
+                                    ng-click="pasteQ(input.pastedQ)" ng-if="input.pastedQ">Parse Questionnaire</button>
+                        </div>
+                    </div>
+
+
+                    <textarea class="form-control" ng-model="input.pastedQ" rows="20"></textarea>
+                </div>
+            </div>
+
+
+
+
+
+            <pre>{{lstQ | json}}</pre>
+
+
+        </uib-tab>
+
         <uib-tab heading="Form">
             <renderform2 q="fullQ" hash-ed="hashEd" technicalview="input.technical" errors="errorLog"></renderform2>
         </uib-tab>
@@ -385,648 +377,14 @@
             <div class="pull-right"><button class="btn btn-link" ng-click="rebuildQ()">Rebuild without dependencies</button></div>
             <div class="clearfix"></div>
 
-
             <pre>{{fullQ | json}}</pre>
         </uib-tab>
 
 
 
+
         </uib-tabset>
 
-<!--
-        <renderform2 q="fullQ" hash-ed="hashEd" technicalview="input.technical" errors="errorLog"></renderform2>
--->
-
-
-<!--
-
-    <uib-tabset ng-if="false && selectedComp">
-        <uib-tab>
-            <uib-tab-heading>
-                <span ng-if="selectedComp.kind == 'dg'">Data Group</span>
-                <span ng-if="selectedComp.kind == 'comp'">Composition</span>
-            </uib-tab-heading>
-
-
-
-            <div class="row">
-                <div class="col-md-8">
-
-                    <uib-tabset>
-                        <br/>
-
-                        <uib-tab heading="Tree"  select="tabSelect('tree')">
-                            <div class="pull-right clickable" ng-click="expandCompTree()">Expand all ({{allCompElements.length}})</div>
-
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div class="myScroll">
-                                        <div id="compositionTree"></div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-
-                                </div>
-                            </div>
-
-
-
-
-                        </uib-tab>
-
-                        <uib-tab ng-if = 'false' heading = "comp list">
-                            <div class="myScroll">
-                                <table class="table-bordered table">
-                                    <tr ng-repeat = "row in allCompElements">
-                                        <td>{{row.ed.path.split('.').length}}</td>
-                                        <td>{{row.ed.path}}</td>
-                                    </tr>
-                                </table>
-                            </div>
-
-                        </uib-tab>
-
-                        <uib-tab heading="Form"  select="tabSelect('form')">
-                            <div class="pull-right"><em>This form is only to assist with reviewing and does not represent what a 'real' form might look like.</em></div>
-                            <div class="form-background">
-                                <renderform q="fullQ" qr="{}"></renderform>
-                            </div>
-
-
-                        </uib-tab>
-
-                        <uib-tab select="tabSelect('summary')">
-                            <uib-tab-heading>
-                                <span ng-if="selectedComp.kind == 'dg'">Data Group Summary</span>
-                                <span ng-if="selectedComp.kind == 'comp'">Composition Summary</span>
-                            </uib-tab-heading>
-                            <br/>
-                            <div ng-if="selectedComp.kind == 'comp'">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <table class="table">
-                                            <tr>
-                                                <td>Name</td>
-                                                <td><input type="text" class="form-control" disabled = "true" ng-model="selectedComp.name"/></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Title</td>
-                                                <td><input type="text" class="form-control" disabled = "true" ng-model="selectedComp.title"/></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Description</td>
-                                                <td><textarea disabled="true"
-                                                              class="form-control" ng-model="selectedComp.description" ></textarea> </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Category</td>
-                                                <td><input type="text" class="form-control" disabled = "true" ng-model="selectedComp.description"/></td>
-                                            </tr>
-
-                                        </table>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <table class="table">
-
-                                            <tr>
-                                                <td>Tumour stream</td>
-                                                <td><input type="text" class="form-control" disabled = "true" ng-model="selectedComp.meta.tumourStream"/></td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>Organ</td>
-                                                <td><input type="text" class="form-control" disabled = "true" ng-model="selectedComp.meta.organ"/></td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>Procedure</td>
-
-                                                <td><input type="text" class="form-control" disabled = "true" ng-model="selectedComp.meta.procedure"/></td>
-
-
-
-
-                                            </tr>
-
-
-                                            <tr>
-                                                <td>Source reference</td>
-
-                                                <td><textarea disabled="true"
-                                                              class="form-control" ng-model="selectedComp.sourceReference" ></textarea> </td>
-
-
-
-                                            </tr>
-
-
-                                        </table>
-                                    </div>
-                                </div>
-
-
-                            </div>
-                        </uib-tab>
-                        <uib-tab ng-if="selectedComp.kind == 'dg'" heading="Table (DG)"  select="tabSelect('dg')">
-                        </uib-tab>
-                        <uib-tab ng-if="selectedComp.kind == 'comp'" heading="Table (Composition)" select="tabSelect('table')">
-                            <br/>
-                            <div class="row" style="margin-top: 8px;margin-bottom: 8px">
-                                <div class="col-md-2">
-                                    Sections
-                                </div>
-                                <div class="col-md-3">
-                                    <select ng-model="input.tableSection" class="form-control"
-                                            ng-options="section.title for section in input.tableSections"></select>
-                                </div>
-                                <div class="col-md-2">
-                                    <input type="text" class = "form-control" placeholder="title filter" ng-model="input.tableFilter"/>
-                                </div>
-                                <div class="col-md-5">
-                                    <div class="pull-right">
-                                        <checkbox ng-model="input.hideSomeDG"></checkbox> Hide common DG
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            <div class="tableFixHead">
-                                <table class="table table-bordered">
-                                    <thead>
-                                    <tr><th>Title</th><th>Description</th><th>Type</th><th>Card.</th><th>Cond.</th></tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr ng-style="{ 'background-color': getRowColour(item.ed) }"
-                                        ng-class="{listItemSelected:item.ed==selectedED}"
-                                        ng-click="selectED(item.ed)"
-                                        ng-if="showTableRow(item.ed)"
-                                        ng-repeat="item in allCompElements track by $index">
-
-
-
-                                        <td><div ng-style="{ 'padding-left': (item.ed.path | pathindentCompTable) }">{{item.ed.title}}</div>
-
-
-                                        </td>
-
-                                        <td>{{item.ed.description}}
-
-                                        </td>
-
-
-                                        <td>
-
-
-                                            <div ng-if="item.ed.type[0] == 'CodeableConcept'">
-                                                <button ng-if="item.ed.valueSet"
-                                                        ng-click="viewVS(item.ed.valueSet)"
-                                                        class="btn-link btn">{{item.ed.type[0]}}</button>
-                                                <div ng-hide="item.ed.valueSet">
-                                                    {{item.ed.type[0]}}
-                                                </div>
-
-                                            </div>
-
-                                            <div ng-hide="item.ed.type[0] == 'CodeableConcept'">
-                                                {{item.ed.type[0]}}
-                                            </div>
-
-
-
-                                        </td>
-
-                                        <td>
-
-
-
-                                            <div ng-if = "item.host">{{item.host.mult}}</div>
-                                            <div ng-hide = "item.host">{{item.ed.mult}}</div>
-
-                                        </td>
-                                        <td>
-                                            <div ng-if="item.ed.enableWhen.length > 0">Yes</div>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                        </uib-tab>
-
-
-
-
-
-
-
-
-
-                    </uib-tabset>
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <uib-tabset>
-                        <uib-tab heading="Details">
-
-
-
-                            <div ng-if="showAllCommentSummary">
-                                Show help
-
-
-
-
-                            </div>
-                            <div ng-if="selectedCompositionNode && ! showAllCommentSummary">
-
-                                <div class="banner">Details</div>
-
-
-                                <div ng-if="selectedCompositionNode.data.ed.kind == 'section'">
-                                    {{selectedCompositionNode.data.ed.title}}
-                                    todo test this...
-
-                                </div>
-
-                                <div ng-hide = "selectedCompositionNode.data.ed.kind == 'section' || selectedCompositionNode.data.ed.kind == 'root'">
-
-                                    <div class="row">
-                                        <div class="col-md-3 ">
-                                            Title
-                                        </div>
-                                        <div class="col-md-9">
-                                            {{selectedCompositionNode.data.ed.title}}
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            Description
-                                        </div>
-                                        <div class="col-md-9">
-                                            {{selectedCompositionNode.data.ed.description}}
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            Type
-                                        </div>
-                                        <div class="col-md-9">
-                                            <div ng-repeat="type in selectedCompositionNode.data.ed.type">
-                                                <div ng-if="fhirDataTypes.indexOf(type) > -1" class="pull-right">
-                                                    <a target = "_blank" ng-href="{{fhirRoot}}datatypes.html#{{type}}">Details in spec</a>
-                                                </div>
-                                                {{type}}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            Cardinality
-                                        </div>
-                                        <div class="col-md-9">
-                                            {{selectedCompositionNode.data.ed.mult}}
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            Obligation
-                                        </div>
-                                        <div class="col-md-9">
-
-
-
-                                            <div ng-if = "selectedCompositionNode.data.host">
-
-                                            </div>
-                                            <div ng-hide = "selectedCompositionNode.data.host">
-                                                {{getObligation(selectedCompositionNode.data.ed)}}
-
-
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                    <div class="row" ng-if="selectedCompositionNode.data.ed.options.length > 0">
-                                        <div class="col-md-3">
-                                            Options
-                                        </div>
-                                        <div class="col-md-9">
-                                            <ul>
-                                                <li ng-repeat="option in selectedCompositionNode.data.ed.options">
-                                                    {{option.display}}
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-
-                                    <div ng-if = "false" class="row" >
-                                        <div class="col-md-3">
-                                            Full Path
-                                        </div>
-                                        <div class="col-md-9">
-
-                                            <div ng-repeat="segment in getPathSegments(selectedCompositionNode.data.ed.path) track by $index">
-                                                <div ng-if="$index > 0"> {{segment}}</div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                    <div ng-if="hasFixedValue(selectedCompositionNode.data.ed)" class="row" >
-                                        <div class="col-md-3">
-                                            Fixed value
-                                        </div>
-                                        <div class="col-md-9">
-                                            <div ng-if="selectedCompositionNode.data.ed.fixedCode">
-                                                {{selectedCompositionNode.data.ed.fixedCode}}
-                                            </div>
-
-                                            <div ng-if="selectedCompositionNode.data.ed.fixedRatio">
-                                                <div ng-if="selectedCompositionNode.data.ed.fixedRatio.numerator.unit">Numerator unit: {{selectedCompositionNode.data.ed.fixedRatio.numerator.unit}}</div>
-                                                <div ng-if="selectedCompositionNode.data.ed.fixedRatio.denominator.unit">Denominator unit: {{selectedCompositionNode.data.ed.fixedRatio.denominator.unit}}</div>
-                                                <div ng-if="selectedCompositionNode.data.ed.fixedRatio.denominator.value">Denominator value: {{selectedCompositionNode.data.ed.fixedRatio.denominator.value}}</div>
-                                            </div>
-
-                                            <div ng-if="selectedCompositionNode.data.ed.fixedQuantity">
-                                                <span ng-if = "selectedCompositionNode.data.ed.fixedQuantity.unit">
-                                                  Unit: {{selectedCompositionNode.data.ed.fixedQuantity.unit}}
-                                                </span>
-
-                                                <span ng-if = "selectedCompositionNode.data.ed.fixedQuantity.value">
-                                                  Value: {{selectedCompositionNode.data.ed.fixedQuantity.value}}
-                                                </span>
-                                            </div>
-
-                                            <div ng-if="selectedCompositionNode.data.ed.fixedCoding">
-                                                {{selectedCompositionNode.data.ed.fixedCoding.code}} | {{selectedCompositionNode.data.ed.fixedCoding.display}} | {{selectedCompositionNode.data.ed.fixedCoding.system}}
-                                            </div>
-
-                                            <span ng-if="selectedCompositionNode.data.ed.fixedCoding ||
-                                                selectedCompositionNode.data.ed.fixedQuantity || selectedCompositionNode.data.ed.fixedRatio"
-                                                class="pull-right"></span>
-
-                                        </div>
-                                    </div>
-
-                                    <div ng-if = "hasDefaultValue(selectedCompositionNode.data.ed)" class="row" >
-                                        <div class="col-md-3">
-                                            Default value
-                                        </div>
-                                        <div class="col-md-9">
-                                            <div class="col-md-9">
-                                                <div ng-if="selectedCompositionNode.data.ed.defaultCode">
-                                                    {{selectedCompositionNode.data.ed.defaultCode}}
-                                                </div>
-
-                                                <div ng-if="selectedCompositionNode.data.ed.defaultRatio">
-                                                    <div ng-if="selectedCompositionNode.data.ed.defaultRatio.numerator.unit">Numerator unit: {{selectedCompositionNode.data.ed.defaultRatio.numerator.unit}}</div>
-                                                    <div ng-if="selectedCompositionNode.data.ed.defaultRatio.denominator.unit">Denominator unit: {{selectedCompositionNode.data.ed.defaultRatio.denominator.unit}}</div>
-                                                    <div ng-if="selectedCompositionNode.data.ed.defaultRatio.denominator.value">Denominator value: {{selectedCompositionNode.data.ed.defaultRatio.denominator.value}}</div>
-                                                </div>
-
-                                                <div ng-if="selectedCompositionNode.data.ed.defaultQuantity">
-                                                <span ng-if = "selectedCompositionNode.data.ed.defaultQuantity.unit">
-                                                  Unit: {{selectedCompositionNode.data.ed.defaultQuantity.unit}}
-                                                </span>
-
-                                                    <span ng-if = "selectedCompositionNode.data.ed.defaultQuantity.value">
-                                                  Value: {{selectedCompositionNode.data.ed.defaultQuantity.value}}
-                                                </span>
-                                                </div>
-
-                                                <div ng-if="selectedCompositionNode.data.ed.defaultCoding">
-                                                    {{selectedCompositionNode.data.ed.defaultCoding.code}} | {{selectedCompositionNode.data.ed.defaultCoding.display}} | {{selectedCompositionNode.data.ed.defaultCoding.system}}
-                                                </div>
-
-                                                <span ng-if="selectedCompositionNode.data.ed.defaultCoding ||
-                                                selectedCompositionNode.data.ed.defaultQuantity || selectedCompositionNode.data.ed.defaultRatio"
-                                                      class="pull-right"></span>
-
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-
-                                    <div ng-if = "true" class="row" ng-if="selectedCompositionNode.data.ed.type[0] == 'CodeableConcept' ">
-                                        <div class="col-md-3">
-                                            ValueSet
-                                        </div>
-                                        <div class="col-md-9">
-                                            <div><em>{{selectedCompositionNode.data.ed.valueSet}}</em>
-
-                                                <div ng-hide="selectedCompositionNode.data.ed.valueSet">
-                                                    No ValueSet specified
-                                                </div>
-
-
-                                            </div>
-                                            <div>
-                                                <button ng-if="selectedCompositionNode.data.ed.valueSet"
-                                                        ng-click="viewVS(selectedCompositionNode.data.ed.valueSet)"
-                                                        class="btn-link btn">View VS</button>
-
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row" ng-if="selectedCompositionNode.data.ed.enableWhen">
-                                        <div class="col-md-3">
-                                            Conditional
-                                        </div>
-                                        <div class="col-md-9">
-                                            <table class="table">
-                                                <tr><th>Source</th><th>Op.</th><th>Value</th></tr>
-                                                <tr ng-repeat="ew in selectedCompositionNode.data.ed.enableWhen">
-                                                    <td>{{ew.source}}</td>
-                                                    <td>{{ew.operator}}</td>
-                                                    <td>{{ew.value.code}} | {{ew.value.display}}</td>
-                                                </tr>
-                                            </table>
-
-                                        </div>
-                                    </div>
-
-                                    <div class="row" ng-if="selectedCompositionNode.data.ed.sourceReference">
-                                        <div class="col-md-3">
-                                            Source Ref
-                                        </div>
-                                        <div class="col-md-9">
-                                            {{selectedCompositionNode.data.ed.sourceReference}}
-
-                                        </div>
-                                    </div>
-
-
-                                </div>
-
-                                <div class="row" ng-if = "selectedCompositionNode.data.ed.zElement">
-                                    <div class="col-md-3">
-
-                                    </div>
-                                    <div class="col-md-9">
-                                        <em>This element has been added directly (a 'Z' element)</em>
-                                    </div>
-                                </div>
-
-
-                                <div class="banner">Comments</div>
-
-                                <table class="table table-condensed" ng-if="commentsThisPath.length > 0">
-                                    <tr><th>Comment</th><th>Disposition</th></tr>
-                                    <tr ng-repeat = "com in commentsThisPath">
-                                        <td>{{com.comment}}</td>
-                                        <td>{{com.disposition.display}}
-                                            <div><em>{{com.dispositionNote}}</em></div>
-
-                                        </td>
-                                    </tr>
-
-                                </table>
-
-                                <strong>New comment</strong>
-
-                                <textarea class="form-control" ng-model="input.comment"></textarea>
-                                <br/>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <input type="text" class="form-control" ng-model="input.author" placeholder="Your name"/>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <button ng-if="input.comment"
-                                                class="btn btn-link pull-right" ng-click="addComment(input.comment)">Add comment</button>
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </uib-tab>
-                        <uib-tab heading="Form">
-                            The rendered version of the form (from the POC)
-                        </uib-tab>
-                        <uib-tab heading="Json">
-                            <pre>{{selectedED | json}}</pre>
-                        </uib-tab>
-                    </uib-tabset>
-
-
-
-
-
-
-                </div>
-
-            </div>
-
-
-
-        </uib-tab>
-
-        <uib-tab>
-            <uib-tab-heading>All comments <span class="badge">{{allComments.length}}</span> </uib-tab-heading>
-
-
-            <uib-tabset>
-                <div>
-                    <div class="pull-right">
-                        <checkbox ng-model="input.newCommentsOnly"></checkbox> New comments only
-                    </div>
-                </div>
-
-                <uib-tab heading="List of comments">
-                    <table class="table-condensed table-bordered table">
-                        <tr><th>Path</th><th>Author</th><th>Comment</th><th>Disposition</th></tr>
-                        <tr ng-repeat="comment in allComments"
-                            ng-if="showCommentLine(comment)">
-                            <td>
-
-                                {{comment.path | compositionSummaryPath}}
-                            </td>
-                            <td>{{comment.author}}</td>
-                            <td>{{comment.comment}}</td>
-
-                            <td>
-                                <div ng-if="comment.disposition">
-                                    {{comment.disposition.display}}
-                                    <div><em>{{comment.dispositionNote}}</em></div>
-                                </div>
-                                <div ng-if="! comment.disposition">
-                                    <div class="clickable" ng-click="addDisposition(comment)">Add disposition</div>
-                                </div>
-
-                            </td>
-                        </tr>
-                    </table>
-
-                </uib-tab>
-
-                <uib-tab ng-if="selectedComp.kind == 'comp'" heading="Comments by section">
-                    <div ng-repeat="(k,v) in commentsBySection">
-                        <div><strong>{{k}}</strong></div>
-                        <table class="table table-bordered">
-                            <tr><th>Path</th><th>Author</th><th>Comment</th><th>Disposition</th></tr>
-                            <tr ng-repeat="item in v"
-                                ng-if="showCommentLine(item.comment)">
-                                <td width="15%">
-
-                                    {{item.path | compositionSummaryPath}}
-
-                                </td>
-                                <td width="15%">{{item.comment.author}}</td>
-                                <td width="45%">{{item.comment.comment}}</td>
-                                <td>
-                                    <div ng-if="item.comment.disposition">
-                                        {{item.comment.disposition.display}}
-                                        <div><em>{{item.comment.dispositionNote}}</em></div>
-                                    </div>
-                                    <div ng-if="! item.comment.disposition">
-                                        <div class="clickable" ng-click="addDisposition(item.comment)">Add disposition</div>
-                                    </div>
-
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-
-                </uib-tab>
-
-            </uib-tabset>
-
-
-        </uib-tab>
-
-        <uib-tab ng-if="false" heading="Json">
-            <pre>{{selectedComp | json}}</pre>
-        </uib-tab>
-
-        <uib-tab heading="Model">
-            <br/>
-            <div class="row">
-
-                <div class="col-md-4">
-                    <em>Stuff about the model</em>
-                </div>
-                <div class="col-md-8">
-                    <img width="100%" src="images/LIM-org.png" usemap="#image_map"/>
-                </div>
-            </div>
-
-
-
-        </uib-tab>
-
-    </uib-tabset>
-
--->
 
 </div>
 
