@@ -92,7 +92,7 @@
         "options": [],
         "fullVS": "canshare-who-histology",
         "UI": "Primary Histology",
-        "next": "test-property",
+
         "previous": "primary-site-laterality"
     }
 }

@@ -391,20 +391,23 @@
 
                 <em>Fixed values defined by this DG </em>
                 <table class="table table-bordered">
-                    <tr><th>Path</th><th>Value</th></tr>
+                    <tr><th>Path</th><th>Type</th><th>Value</th></tr>
                     <tr ng-repeat="fv in input.fixedValues">
                         <td>{{fv.path}}</td>
+                        <td>{{fv.type}}</td>
                         <td>{{fv.value}}</td>
                         <td><div class="clickable" ng-click="removeFixedValue($index)">Remove</div></td>
                     </tr>
                     <tr>
                         <td><input type="text" class="form-control" placeholder="The path being fixed" ng-model="input.fvPath"/></td>
+                        <td><input type="text" class="form-control" placeholder="The FHIR type being fixed - eg String, Coding" ng-model="input.fvType"/></td>
                         <td><input type="text" class="form-control" placeholder="The value being fixed" ng-model="input.fvValue"/></td>
-                        <td><div class="clickable" ng-click="addFixedValue(input.fvPath,input.fvValue)">Add</div> </td>
+                        <td><div class="clickable" ng-click="addFixedValue(input.fvPath,input.fvType,input.fvValue)">Add</div> </td>
 
                     </tr>
 
                 </table>
+                <div><em><strong>If the value is an object, use a jsom string with double quotes around key & value</strong></em></div>
 
                 <em>Fixed values are directly rendered at the root of the Q using the itemExtractionValue extension TODO: distinguish from fixed value in element - ie these are for resource</em>
 

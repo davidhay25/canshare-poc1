@@ -20,13 +20,7 @@ angular.module('formsApp')
             templateUrl: 'directive/renderForm2/renderFormDir2.html',
             controller: function($scope,renderFormsSvc2,questionnaireSvc,vsSvc,$http,$uibModal,utilsSvc){
 
-
-                console.log($scope)
-
                 let localPatientId = $scope.patientId || "45086382"
-
-
-
 
                 $scope.datePopup = {}
                 $scope.dataEntered = {}
@@ -58,7 +52,7 @@ angular.module('formsApp')
                     let concepts = []
                     if (item.answerValueSet) {
                         let options = vsSvc.getOneVS(item.answerValueSet)
-                        console.log(options)
+
                         return options
                     } else {
                         if (item.answerOption) {
@@ -97,14 +91,11 @@ angular.module('formsApp')
 
                 function setupQ () {
 
-                    //console.log($scope.q)
-                    //console.log($scope.hashEd)
-                    //console.log($scope.errors)
+
 
                     let obj = $scope.q
                     $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([angular.toJson(obj,true) ],{type:"application/json"}))
                     $scope.downloadLinkJsonName = `${$scope.q.name}.json`
-
 
 
                     //create the redirect url to fhirPathLab.
@@ -118,20 +109,22 @@ angular.module('formsApp')
                     $scope.redirectUrl += `&subject=Patient/${localPatientId}`
 
                     //This was code to allow multiple of this directive in a single page. Didn't work. May no longer be needed.
-                    $scope.treenode = $scope.treenode || "designTreeX"
+
+                    $scope.treenode = "designTree"//   $scope.treenode || "designTreeX"
                     //add the node
-                    let html = `<div id="${$scope.treenode}"></div>`
-                    $( "#designTree" ).after( ( html ) );
+                   // let html = `<div id="${$scope.treenode}"></div>`
+               //     $( "#designTree" ).after( ( html ) );
 
                     //$scope.q is set from the directive attributes. setupQ() is only called when it is not null
                     let vo = renderFormsSvc2.makeTreeFromQ($scope.q)
 
                     $scope.treeData = vo.treeData
+                    console.log(vo.treeData)
 
                     $scope.prepopExpression = vo.prepopExpression   //for evaluating pre-pop
                     $scope.hashItem = vo.hashItem   //also for pre-pop - eg date
 
-                    //console.log($scope.prepopExpression)
+
 
 
                     drawTree(vo.treeData)       //for drawing the tree
@@ -151,7 +144,7 @@ angular.module('formsApp')
                                 if (data.data && data.data.result && data.data.result.length > 0) {
                                     $scope.dataEntered[exp.linkId] = data.data.result[0]
 
-                                    console.log(data.data.result[0])
+
                                 }
 
                                 let item = $scope.hashItem[exp.linkId]
@@ -170,7 +163,7 @@ angular.module('formsApp')
 
 
 
-                    console.log($scope.dataEntered)
+
 
                 }
 
@@ -183,14 +176,14 @@ angular.module('formsApp')
                     $http.get(url).then(
                         function (data) {
                             // [{name: id: note: user:}]
-                            console.log(data)
+
                             //create a hash by path
                             $scope.hashNotes = {}
                             for (const note of data.data) {
                                 $scope.hashNotes[note.path] = $scope.hashNotes[note.path] || []
                                 $scope.hashNotes[note.path].push(note)
                             }
-                            console.log($scope.hashNotes)
+
                         },
                         function (err) {
                             console.log(err)
@@ -218,7 +211,7 @@ angular.module('formsApp')
                         }
                     )
 
-                   // console.log(newNote,ed)
+
 
                 }
 
@@ -245,7 +238,7 @@ angular.module('formsApp')
                         if (item.enableWhen && item.enableWhen.length > 0) {
 
                             entry.isDisabled = ! (renderFormsSvc2.isEnabled(item,$scope.dataEntered))
-                            //console.log(item.linkId,entry.isDisabled)
+
                         }
 
 
@@ -255,7 +248,7 @@ angular.module('formsApp')
 
 
                 let drawTree = function(treeData){
-                    //console.log(treeData)
+
                     treeData.forEach(function (item) {
                         item.state = {opened : true}
                         if (item.parent == 'root') {
@@ -264,7 +257,7 @@ angular.module('formsApp')
                     })
 
 
-                    console.log(`#${$scope.treenode}`)
+
 
                     $(`#${$scope.treenode}`).jstree('destroy');
 
@@ -279,8 +272,7 @@ angular.module('formsApp')
                             $scope.selectedItem = data.node.data.item
                             $scope.selectedEd = $scope.hashEd[$scope.selectedItem.linkId]
 
-                            console.log($scope.selectedEd)
-                            console.log($scope.selectedItem)
+
 
                             //create the list of controls that represent the children of the selected ed
                             $scope.listItems = renderFormsSvc2.createControlList($scope.selectedItem,$scope.hashEd)
@@ -314,7 +306,7 @@ angular.module('formsApp')
                 $scope.onFocus = function (item) {
                     $scope.selectedItem = item
                     $scope.selectedEd = $scope.hashEd[$scope.selectedItem.linkId]
-                    console.log(item)
+
                 }
 
                 //validate the Q
@@ -328,7 +320,7 @@ angular.module('formsApp')
                         function (data) {
                             $scope.validating = false
                             $scope.oo = data.data
-                            //console.log(data.data)
+
                             $scope.oo.issue.forEach(function (iss) {
                                 if (iss.severity == 'error') {
                                     $scope.errorCount ++
@@ -340,7 +332,7 @@ angular.module('formsApp')
                         },function (err) {
                             $scope.validating = false
                             $scope.oo = err.data
-                            //console.log(err.data)
+
                         }
                     )
                 }
@@ -403,18 +395,13 @@ angular.module('formsApp')
                         $http.put(qry,$scope.q,config).then(
                             function (data) {
                                 $scope.savingQ = false
-                               // $scope.$digest()
-                                //let redirectUrl = `https://fhirpath-lab.com/Questionnaire/tester?tab=csiro+renderer&id=${qry}`
-                                //console.log(redirectUrl)
-                                //$scope.redirectUrl = redirectUrl
+
 
                                 let msg = `Q has been saved on the server. I'll try to load the renderer with the url ${$scope.redirectUrl}`
                                 msg += " If that fails, then try the direct link that has appeared."
                                 alert(msg)
                                 if (openLab) {
 
-                                    //https://fhirpath-lab.com/Questionnaire/tester?tab=csiro+renderer&id=....
-                                    //let redirectUrl = `${$scope.serverbase}Questionnaire/tester?id=${encodeURI(qry)}`
 
 
                                     copyToClipboard($scope.redirectUrl)
@@ -448,7 +435,7 @@ angular.module('formsApp')
                 //called by a cell to indicate if it should be shown
                 $scope.showConditional = function (entry) {
 
-console.log(entry)
+
                     return true
 
                     if (! cell.meta) {

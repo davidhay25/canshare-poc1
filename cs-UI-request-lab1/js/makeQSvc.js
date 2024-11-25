@@ -93,8 +93,23 @@ angular.module("pocApp")
 
         function addReference(item,definition,variablename) {
             //uses
-            l//et definition =
+            //l//et definition =
             alert('add ref')
+        }
+
+
+        function addUnits(item,ed) {
+            if (ed.units && ed.units.length > 0) {
+
+                ed.units.forEach(function (unit) {
+                    item.extension = item.extension || []
+                    item.extension.push({url:extQuantityUnit,valueCoding:{code:unit,system:'http://unitsofmeasure.org'}})
+
+                })
+
+               // extQuantityUnit = "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption"
+
+            }
         }
 
         function addFixedValue(item,definition,type,value,expression) {
@@ -106,8 +121,21 @@ angular.module("pocApp")
             ext.extension.push({url:"definition",valueCanonical:definition})
 
             if (value) {
+                console.log(value)
                 let child = {url:'fixed-value'}
                 child[`value${type}`] = value
+
+/*
+                try {
+                    child[`value${type}`] = angular.toJson(value)
+                } catch (ex) {
+                    child[`value${type}`] = value
+                }
+
+*/
+
+
+
                 ext.extension.push(child)
             } else if (expression){
                 let child = {url:'expression'}
@@ -214,7 +242,7 @@ angular.module("pocApp")
                     let path = `http://hl7.org/fhir/StructureDefinition/${resourceType}#${fv.path}`
 
 
-                    addFixedValue(item,path,'String',fv.value)
+                    addFixedValue(item,path,fv.type,fv.value)
                 }
             }
         }
@@ -1568,6 +1596,8 @@ angular.module("pocApp")
                         addItemControl(item,'gtable')
                     }
 
+                    //add any units
+                    addUnits(item,ed)
 
                     //The only way an element here will have hideInQ set but still be included is for fixed values.
                     //they get added to the Q - but with the hidden extension

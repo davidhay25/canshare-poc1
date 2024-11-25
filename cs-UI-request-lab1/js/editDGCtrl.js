@@ -43,11 +43,20 @@ angular.module("pocApp")
             }
 
 
+
+
             //fixed value stuff
-            $scope.addFixedValue = function (path,value) {
-                let fv = {path:path,value:value}
+            $scope.addFixedValue = function (path,type,value) {
+
+
+                let v = angular.fromJson(value)
+
+
+                let fv = {path:path,type:type}
+                fv.value = v
                 $scope.input.fixedValues.push(fv)
                 delete $scope.input.fvPath
+                delete $scope.input.fvType
                 delete $scope.input.fvValue
             }
 

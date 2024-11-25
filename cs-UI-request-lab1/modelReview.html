@@ -188,25 +188,26 @@
         <uib-tab heading="Select Q">
 
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <h5>Saved Questionnaires</h5>
                     <table class="table table-bordered">
                         <tr ng-repeat="Q in lstQ">
                             <td>
-                                <div class="clickable" ng-click="loadQ(Q.name)">{{Q.name}}</div>
+                                <div class="clickable" ng-click="selectQ(Q.name)">{{Q.name}}</div>
                             </td>
                             <td>{{Q.description}}</td>
                         </tr>
                     </table>
                 </div>
-                <div class="col-md-8">
+                <div class="col-md-6">
                     <div class="row">
                         <div class="col-md-8">
                             <h5>Paste in a new Questionnaire</h5>
                         </div>
                         <div class="col-md-4">
                             <button class="btn btn-link pull-right"
-                                    ng-click="pasteQ(input.pastedQ)" ng-if="input.pastedQ">Parse Questionnaire</button>
+                                    ng-click="pasteQ(input.pastedQ)"
+                                    ng-if="input.pastedQ">Parse Questionnaire</button>
                         </div>
                     </div>
 
@@ -219,43 +220,16 @@
 
 
 
-            <pre>{{lstQ | json}}</pre>
+
 
 
         </uib-tab>
 
-        <uib-tab heading="Form">
+        <uib-tab  heading="Form">
             <renderform2 q="fullQ" hash-ed="hashEd" technicalview="input.technical" errors="errorLog"></renderform2>
         </uib-tab>
 
-        <uib-tab heading="All comments">
-            <table class="table-condensed table-bordered table">
-                <tr><th>Path</th><th>Author</th><th>Comment</th><th>Disposition</th></tr>
-                <tr ng-repeat="comment in allComments"
-                    ng-if="showCommentLine(comment)">
-                    <td>
-
-                        {{comment.path | compositionSummaryPath}}
-                    </td>
-                    <td>{{comment.author}}</td>
-                    <td>{{comment.comment}}</td>
-
-                    <td>
-                        <div ng-if="comment.disposition">
-                            {{comment.disposition.display}}
-                            <div><em>{{comment.dispositionNote}}</em></div>
-                        </div>
-                        <div ng-if="! comment.disposition">
-                            <div class="clickable" ng-click="addDisposition(comment)">Add disposition</div>
-                        </div>
-
-                    </td>
-                </tr>
-            </table>
-
-        </uib-tab>
-
-        <uib-tab heading="SDC elements">
+        <uib-tab  heading="SDC elements">
             <div class="pull-right">
                 <checkbox ng-model="input.SDCOnly"></checkbox> Show only with SDC instructions
             </div>
@@ -266,7 +240,7 @@
                 <tr><th>Text</th><th>Lvl</th><th>Type</th><th>Card.</th><th>Hidden</th><th>Fixed</th><th>SDC</th></tr>
                 <tr
                         ng-class="{background:entry.linkId.split('.').length == 2}"
-                    ng-repeat="entry in qReport.entries" ng-if="showReportLine(input.SDCOnly,entry)">
+                        ng-repeat="entry in qReport.entries" ng-if="showReportLine(input.SDCOnly,entry)">
                     <td>
                         <div ng-style="{ 'padding-left': (entry.linkId | pathindent) }">
                             {{entry.text}}
@@ -370,9 +344,36 @@
                 </tr>
             </table>
 
-            </uib-tab>
+        </uib-tab>
 
-        <uib-tab heading="Q">
+        <uib-tab  heading="All comments">
+            <table class="table-condensed table-bordered table">
+                <tr><th>Path</th><th>Author</th><th>Comment</th><th>Disposition</th></tr>
+                <tr ng-repeat="comment in allComments"
+                    ng-if="showCommentLine(comment)">
+                    <td>
+
+                        {{comment.path | compositionSummaryPath}}
+                    </td>
+                    <td>{{comment.author}}</td>
+                    <td>{{comment.comment}}</td>
+
+                    <td>
+                        <div ng-if="comment.disposition">
+                            {{comment.disposition.display}}
+                            <div><em>{{comment.dispositionNote}}</em></div>
+                        </div>
+                        <div ng-if="! comment.disposition">
+                            <div class="clickable" ng-click="addDisposition(comment)">Add disposition</div>
+                        </div>
+
+                    </td>
+                </tr>
+            </table>
+
+        </uib-tab>
+
+        <uib-tab  heading="Questionnaire Json">
 
             <div class="pull-right"><button class="btn btn-link" ng-click="rebuildQ()">Rebuild without dependencies</button></div>
             <div class="clearfix"></div>

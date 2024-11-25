@@ -31,7 +31,12 @@ angular.module("pocApp")
                 if ($window.location.hash) {
                     $scope.compVersion = $window.location.hash.substr(1)
                 }
+            }
 
+            $scope.selectQ = function (qName) {
+                delete $scope.selectedModel
+                delete  $scope.fullQ
+                $scope.loadQ(qName)
             }
 
             $scope.loadQ = function (qName) {
@@ -60,6 +65,7 @@ angular.module("pocApp")
 
 
                 } else {
+                    //todo this is the older style - can be removed once compositions is enabled
                     $http.get('/model/allDG').then(
                         function (data) {
                             //console.log(data.data)
@@ -157,6 +163,7 @@ angular.module("pocApp")
                     testQ = JSON.parse(Qstring)
                 } catch {
                     alert("This is not a valid Json string")
+                    return
                 }
 
                 try {

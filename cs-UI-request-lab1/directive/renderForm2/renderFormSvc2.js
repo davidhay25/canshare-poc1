@@ -131,8 +131,6 @@ angular.module("formsApp")
                         arStyle.push("color : blue")
                     }
 
-
-
                     //process extensions
                     if (item.extension) {
                         for (const ext of item.extension) {
