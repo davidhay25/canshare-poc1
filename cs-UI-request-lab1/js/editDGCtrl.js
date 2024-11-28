@@ -48,8 +48,14 @@ angular.module("pocApp")
             //fixed value stuff
             $scope.addFixedValue = function (path,type,value) {
 
+                let v = value
+                try {
+                    //try to convert to an object. If it isn't then the value remins simple
+                    v = angular.fromJson(value)
+                } catch (ex) {
 
-                let v = angular.fromJson(value)
+                }
+
 
 
                 let fv = {path:path,type:type}
@@ -69,10 +75,13 @@ angular.module("pocApp")
 
             //----------- resource references
 
-            $scope.getPathsForSource = function () {
+            $scope.getPathsForSource = function (rrSource) {
 
                 //get all the elements in the source Resource that are references
                 //called when both source and target resources are known so that the list is only valid references
+                //let fhirType = rrSource.type
+
+
                 if ($scope.input.rrSource && $scope.input.rrTarget) {
 
                     let qry = `/fsh/fhirtype/${$scope.input.rrSource.fhirType}`
@@ -86,10 +95,15 @@ angular.module("pocApp")
                                 if (el.types) {
                                     for (const typ of el.types) {
                                         if (typ.code == 'Reference' && typ.targetProfile) {
-                                            if (typ.targetProfile == sourceProfile) {
-                                                $scope.definitions.push(el)
-                                                break
+                                            for (const prof of typ.targetProfile) {
+                                                if (prof == sourceProfile) {
+
+                                                    $scope.definitions.push(el)
+                                                    break
+                                                }
                                             }
+
+
                                         }
                                     }
                                 }
@@ -104,13 +118,18 @@ angular.module("pocApp")
 
             }
 
-            $scope.addRR = function (source,definition,target,name) {
-                let rr = {source:source.path,definition:definition,target:target.path,idName:name}
+            $scope.addRR = function (source,definition,target) {
+                $scope.input.resourceReferences = $scope.input.resourceReferences || []
+                //create the name that will be used in the allocateID extension
+
+                let ar = target.path.split('.')
+
+                let rr = {source:source.path,definition:definition.path,target:target.path}
                 $scope.input.resourceReferences.push(rr)
                 delete $scope.input.rrSource
                 delete $scope.input.rrDefinition
                 delete $scope.input.rrTarget
-                delete $scope.input.rrName
+
             }
 
             $scope.removeRR = function (inx) {

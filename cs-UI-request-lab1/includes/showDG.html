@@ -277,7 +277,7 @@
                   <td>
 
                     <div ng-repeat = "nq in dgNamedQueries">
-                      <div class="clickable" ng-click="testxquery(nq.name)">{{nq.name}}</div>
+                      <div class="clickable" ng-click="testxquery(nq.name)">{{nq.itemName}} </div>
 
 
                     </div>
@@ -937,10 +937,10 @@
 
         </uib-tab>
 
-        <!--
+
         <uib-tab heading="Graph" select="fitGraph()">
 
-          <em class="pull-right">DT inheritance hierarchy and referenced DTs</em>
+          <em>Directly referenced DataTypes</em>
           <br/>
           <div class="row">
             <div class="col-md-6">
@@ -956,11 +956,10 @@
                   <div class="row">
                     <div class="col-md-2">Name:</div>
                     <div class="col-md-10">
-                      {{selectedModelFromGraph.name}}
 
-                      <div class="clickable pull-right"
+                      <div class="clickable"
                            ng-if="selectedModelFromGraph.name !== selectedModel.name"
-                           ng-click="termSelectDG({DGName:selectedModelFromGraph.name},selectedModel.name)">Load
+                           ng-click="termSelectDG({DGName:selectedModelFromGraph.name},selectedModel.name)">{{selectedModelFromGraph.name}}
                       </div>
 
                     </div>
@@ -969,11 +968,71 @@
                     <div class="col-md-2">Title:</div>
                     <div class="col-md-10">{{selectedModelFromGraph.title}}</div>
                   </div>
+                  <div class="row">
+                    <div class="col-md-2">Description:</div>
+                    <div class="col-md-10">{{selectedModelFromGraph.description}}</div>
+                  </div>
+                  <div ng-if="selectedModelFromGraph.parent" class="row">
+                    <div class="col-md-2">Parent:</div>
+                    <div class="col-md-10">
+                      <div class="clickable"
+                              ng-click="termSelectDG({DGName:selectedModelFromGraph.parent},selectedModel.name)">
+                        {{selectedModelFromGraph.parent}}
+                      </div>
+
+                    </div>
+                  </div>
 
 
                   <br/>
 
                   <uib-tabset>
+
+                    <uib-tab heading="Full list">
+
+                      <table class="table-bordered table table-condensed">
+                        <tr><th>Path</th><th>Type</th><th>Card.</th></tr>
+                        <tr ng-repeat="item in selectedModelFromGraphFull">
+                          <td>
+                            <div class="clickableDotted" uib-popover="{{item.ed.description}}"
+                                 popover-placement="top"
+                                 popover-trigger="'mouseenter'">{{item.ed.path | dropFirstInPath}}</div>
+
+                          </td>
+                          <td>{{item.ed.type[0]}}
+                            <div class="clickable"><em ng-click="viewVS(item.ed.valueSet)">{{item.ed.valueSet}}</em></div>
+
+                            <div><em>{{item.ed.fixedCoding}}</em></div>
+                          </td>
+
+                          <td>{{item.ed.mult}}</td>
+                        </tr>
+                      </table>
+                      <em>These are all elements, including inherited</em>
+
+                    </uib-tab>
+
+                    <uib-tab heading="SDC">
+                      <table class="table-bordered table">
+                        <tr>
+                          <td>FHIR resource type</td>
+                          <td>{{snapshotSvc.getExtractResource(selectedModelFromGraph.name)}}</td>
+                        </tr>
+                      </table>
+
+                      <table class="table-bordered table">
+                        <tr ng-repeat="item in selectedModelFromGraphFull track by item.ed.path"
+                            ng-if="item.ed.definition || item.ed.prePop">
+                          <td>{{item.ed.path}}</td>
+                          <td>
+                            <div ng-show="item.ed.definition">Definition: {{item.ed.definition}}</div>
+                            <div ng-show="item.ed.prePop">Pre-pop: {{item.ed.prePop}}</div>
+                          </td>
+                        </tr>
+                      </table>
+
+                    </uib-tab>
+
                     <uib-tab heading="Directly defined">
                       <table class="table-bordered table table-condensed">
                         <tr><th>Path</th><th>Type</th><th>Card.</th></tr>
@@ -996,28 +1055,6 @@
                       <em>This is only elements directly defined in the DG, including overrides</em>
 
                     </uib-tab>
-                    <uib-tab heading="Full list">
-
-                      <table class="table-bordered table table-condensed">
-                        <tr><th>Path</th><th>Type</th><th>Card.</th></tr>
-                        <tr ng-repeat="item in selectedModelFromGraphFull">
-                          <td>
-                            <div class="clickableDotted" uib-popover="{{item.ed.description}}"
-                                 popover-placement="right"
-                                 popover-trigger="'mouseenter'">{{item.ed.path | dropFirstInPath}}</div>
-
-                          </td>
-                          <td>{{item.ed.type[0]}}
-                            <div class="clickable"><em>{{item.ed.valueSet}}</em></div>
-                            <div><em>{{item.ed.fixedCoding}}</em></div>
-                          </td>
-
-                          <td>{{item.ed.mult}}</td>
-                        </tr>
-                      </table>
-                      <em>These are all elements, including inherited</em>
-
-                    </uib-tab>
                   </uib-tabset>
 
 
@@ -1034,7 +1071,7 @@
 
         </uib-tab>
 
-        -->
+
 
         <uib-tab heading="Order element">
           <pre>{{selectedModel.ssOrder | json}}</pre>

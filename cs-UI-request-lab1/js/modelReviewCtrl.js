@@ -678,8 +678,6 @@ angular.module("pocApp")
                         })
 
 
-
-
                     })
                 }
             }

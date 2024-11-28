@@ -5,6 +5,39 @@ angular.module("pocApp")
 
         hashNQ = {}     //Nmaed Queries
 
+        var objColours ={};
+        objColours.Patient = '#93FF1A';
+        objColours.Composition = '#E89D0C';
+        objColours.Encounter = '#E89D0C';
+        objColours.List = '#ff8080';
+        objColours.Observation = '#FFFFCC';
+        objColours.ValueSet = '#FFFFCC';
+        objColours.Practitioner = '#FFBB99';
+        objColours.MedicationAdministration = '#ffb3ff';
+        objColours.MedicationRequest = "#f4d2b7" ;
+        objColours.CarePlan = '#FF9900';
+        objColours.Sequence = '#FF9900';
+        objColours.CareTeam = '#ffe6ff'
+        objColours.QuestionnaireResponse = '#ffe6ff'
+        // objColours.Condition = '#cc9900';
+        objColours.LogicalModel = '#ff8080';
+        objColours.Provenance = '#ff8080';
+        objColours.ServiceRequest = '#ff8080';
+        objColours.Composition = '#ff8080';
+        objColours.Organization = '#FF9900';
+        objColours.ProviderRole = '#FFFFCC';
+        objColours.Location = '#cc9900';
+        objColours.HealthcareService = '#FFFFCC';
+        objColours.MedicationDispense = '#FFFFCC';
+        //objColours.Composition =
+        objColours.Goal = '#FF9900';
+        objColours.Measure = '#FF9900';
+        objColours.Task = '#FF9900';
+        objColours.Immunization = '#aeb76c';
+        objColours.Procedure = '#aeb76c';
+
+
+
         $http.get("/model/namedquery").then(
             function (data) {
 
@@ -17,6 +50,9 @@ angular.module("pocApp")
         )
 
         return {
+            getNodeColor : function (type) {
+                let col = objColours[type] || "c9d1f2"
+            },
             getNQbyName : function (name) {
                 return hashNQ[name] || {}
             },
@@ -47,6 +83,8 @@ angular.module("pocApp")
             } else {
                 return ""
             }
+
+
 
         },
 

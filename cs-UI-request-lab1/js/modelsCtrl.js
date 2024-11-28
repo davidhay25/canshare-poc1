@@ -1774,10 +1774,15 @@ angular.module("pocApp")
                 $scope.dgFshLM = igSvc.makeFshForDG(dg,$scope.fullElementList)
                 $scope.dgFshProfile = igSvc.makeProfileFshDg(dg,$scope.fullElementList)
 
+              //  makeGraphOneDG :  function(dg,allElements,in_hashAllDG) {
 
+              //  }
+
+                let vo = modelDGSvc.makeGraphOneDG(dg,$scope.fullElementList,$scope.hashAllDG)
+                makeGraph(vo.graphData)     //todo - do we want the graph back?
 
                 /* - temp - 23 Nov 2024 see if it makes a difference
-                makeGraph()     //todo - do we want the graph back?
+
 
 
 
@@ -1836,9 +1841,9 @@ angular.module("pocApp")
 
 
             //this is the DG graph
-            function makeGraph() {
+            function makeGraph(graphData) {
 
-                return      //not currently used
+               // return      //not currently used
 
                 let container = document.getElementById('graph');
                 if (container) {
@@ -1854,7 +1859,7 @@ angular.module("pocApp")
                         $scope.graph.destroy()
                     }
 
-                    $scope.graph = new vis.Network(container, $scope.graphData, graphOptions);
+                    $scope.graph = new vis.Network(container, graphData, graphOptions);
 
                     //https://stackoverflow.com/questions/32403578/stop-vis-js-physics-after-nodes-load-but-allow-drag-able-nodes
                     $scope.graph.on("stabilizationIterationsDone", function () {
@@ -1868,21 +1873,19 @@ angular.module("pocApp")
                         delete $scope.selectedModelFromGraphFull
                         let nodeId = obj.nodes[0];  //get the first node
 
-                        let node = $scope.graphData.nodes.get(nodeId);
+                        let node = graphData.nodes.get(nodeId);
 
                         if (node.data && node.data.model) {
                             $scope.selectedModelFromGraph = node.data.model;
 
                             //now get the full list of elements for this DT. Used in the graph details view
                             let dg = $scope.hashAllDG[node.data.model.name]
-                            //<<<<< todo this function not used
                             let vo = modelsSvc.getFullListOfElements(dg,$scope.input.types,$scope.hashAllDG)
 
                             $scope.selectedModelFromGraphFull = vo.allElements
 
-
-                            $scope.$digest()
                         }
+                        $scope.$digest()
                     })
                 }
             }

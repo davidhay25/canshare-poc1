@@ -1,6 +1,6 @@
 angular.module("pocApp")
 
-    .service('modelDGSvc', function($http,$q,$localStorage,snapshotSvc) {
+    .service('modelDGSvc', function($http,$q,$localStorage,utilsSvc) {
 
         let config = {}
         let vsUrlPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/" //the url prefix
@@ -438,6 +438,63 @@ angular.module("pocApp")
                 }
 
             },
+
+
+            makeGraphOneDG :  function(dg,allElements,in_hashAllDG) {
+                //direct references only (for now)
+                let fhirDT = utilsSvc.fhirDataTypes()
+                let arNodes = []
+                let arEdges = []
+
+                let rootNode = {id: dg.name, label:dg.name ,shape: 'box'}
+                //node.data = {dg:DG}
+                arNodes.push(rootNode)
+
+
+
+                allElements.forEach(function (item,ctr) {
+                    let ed = item.ed
+                    if (ed.type) {
+                        let type = ed.type[0]
+                        if (fhirDT.indexOf(type) == -1) {
+                            let id = `${type}${ctr}`
+                            let node = {id: id, label:type,shape: 'box'}
+
+                            node.data = {model: in_hashAllDG[type]}
+                            //node.data = {dg:DG}
+                            arNodes.push(node)
+
+                            let edge = {id: 'e' + arEdges.length +1,
+                                from: rootNode.id,
+                                //to: model.parent,
+                                to: id,
+                                color: 'black',
+                                //width: 4,
+                                label: 'references',arrows : {to:true}}
+                            arEdges.push(edge)
+
+                            }
+
+
+
+                    }
+
+
+                })
+
+                let nodes = new vis.DataSet(arNodes)
+                let edges = new vis.DataSet(arEdges);
+
+                // provide the data in the vis format
+                let graphData = {
+                    nodes: nodes,
+                    edges: edges
+                };
+
+                return {graphData:graphData}
+
+            },
+
 
             makeFullGraph : function(in_hashAllDG,hideReferences) {
 

@@ -236,79 +236,88 @@
             <br/> <br/>
 
             <h4>Elements</h4>
-            <table class="table table-condensed table-bordered">
-                <tr><th>Text</th><th>Lvl</th><th>Type</th><th>Card.</th><th>Hidden</th><th>Fixed</th><th>SDC</th></tr>
-                <tr
-                        ng-class="{background:entry.linkId.split('.').length == 2}"
-                        ng-repeat="entry in qReport.entries" ng-if="showReportLine(input.SDCOnly,entry)">
-                    <td>
-                        <div ng-style="{ 'padding-left': (entry.linkId | pathindent) }">
-                            {{entry.text}}
-                        </div>
-                    </td>
-                    <td>{{entry.linkId.split('.').length -1}}</td>
-                    <td>{{entry.type}}</td>
-                    <td>{{entry.mult}}</td>
-                    <td>{{entry.isHidden}}</td>
-                    <td>{{entry.fixedValue}}</td>
-                    <td>
-                        <div ng-if="entry.initialExpression">
-                            <strong>Initial: </strong>{{entry.initialExpression}}
-                        </div>
-                        <div ng-if="entry.definition">
-                            <strong>Extraction: </strong>{{entry.definition}}
-                        </div>
-
-                        <div ng-if="entry.allocateId">
-                            <strong>Allocate Id: </strong>{{entry.allocateId}}
-                        </div>
-
-
-                        <div ng-if="entry.extractionContext">
-                            <strong>Extraction context: </strong>{{entry.extractionContext}}
-                        </div>
-
-                        <div ng-if="entry.populationContext">
-                            <strong>Population context:</strong>
-                            name=<strong>{{entry.populationContext.name}}</strong>
-                            expression={{entry.populationContext.expression}}
-                        </div>
-
-                        <span ng-if="entry.variable" class="pull-right clickable"
-                              style="cursor: pointer"
-                              ng-click="testxquery(entry)">Test</span>
-
-
-                        <div ng-if="entry.variable"><strong>Variable: </strong><em>{{entry.variable}}</em>: {{entry.expression}}</div>
-
-                        <div ng-repeat="ext in entry.itemControl">
-                            <strong>Item control: </strong> {{ext.coding[0].code}}
-
-                        </div>
-
-
-                        <div ng-repeat="sv in entry.setValue">
-                            <strong>Set value: </strong> {{sv.path}}
-                            <div>
-                                <div style="margin-left: 8px" ng-if="sv.value"><strong>Fixed: </strong>{{sv.value}}</div>
-                                <div style="margin-left: 8px" ng-if="sv.expression"><strong>Expression: </strong>{{sv.expression}}</div>
+            <div class="myScroll">
+                <table class="table table-condensed table-bordered">
+                    <tr><th>Text</th><th>Lvl</th><th>Type</th><th>Card.</th><th>Hidden</th><th>Fixed</th><th>SDC</th></tr>
+                    <tr
+                            ng-class="{background:entry.linkId.split('.').length == 2}"
+                            ng-repeat="entry in qReport.entries" ng-if="showReportLine(input.SDCOnly,entry)">
+                        <td>
+                            <div ng-style="{ 'padding-left': (entry.linkId | pathindent) }">
+                                {{entry.text}}
+                            </div>
+                        </td>
+                        <td>{{entry.linkId.split('.').length -1}}</td>
+                        <td>{{entry.type}}</td>
+                        <td>{{entry.mult}}</td>
+                        <td>{{entry.isHidden}}</td>
+                        <td>{{entry.fixedValue}}</td>
+                        <td>
+                            <div ng-if="entry.initialExpression">
+                                <strong>Initial: </strong>{{entry.initialExpression}}
+                            </div>
+                            <div ng-if="entry.definition">
+                                <strong>Extraction: </strong>{{entry.definition}}
                             </div>
 
-                        </div>
+                            <div ng-if="entry.allocateId">
+                                <strong>Allocate Id: </strong>{{entry.allocateId}}
+                            </div>
 
 
-                        <div ng-repeat="ext in entry.unknownExtension">
-                            <strong>Unknown: </strong> {{ext.url}}
+                            <div ng-if="entry.extractionContext">
+                                <strong>Extraction context: </strong>{{entry.extractionContext}}
+                            </div>
 
-                        </div>
+                            <div ng-if="entry.populationContext">
+                                <strong>Population context:</strong>
+                                name=<strong>{{entry.populationContext.name}}</strong>
+                                expression={{entry.populationContext.expression}}
+                            </div>
+
+                            <span ng-if="entry.variable" class="pull-right clickable"
+                                  style="cursor: pointer"
+                                  ng-click="testxquery(entry)">Test</span>
+
+
+                            <div ng-if="entry.variable">
+                                <strong>Variable: </strong>
+
+                                {{entry.itemName}} {{entry.contents}}
+
+
+                            </div>
+
+                            <div ng-repeat="ext in entry.itemControl">
+                                <strong>Item control: </strong> {{ext.coding[0].code}}
+
+                            </div>
+
+
+                            <div ng-repeat="sv in entry.setValue">
+                                <strong>Set value: </strong> {{sv.path}}
+                                <div>
+                                    <div style="margin-left: 8px" ng-if="sv.value"><strong>Fixed: </strong>{{sv.value}}</div>
+                                    <div style="margin-left: 8px" ng-if="sv.expression"><strong>Expression: </strong>{{sv.expression}}</div>
+                                </div>
+
+                            </div>
+
+
+                            <div ng-repeat="ext in entry.unknownExtension">
+                                <strong>Unknown: </strong> {{ext.url}}
+
+                            </div>
 
 
 
 
-                    </td>
+                        </td>
 
-                </tr>
-            </table>
+                    </tr>
+                </table>
+            </div>
+
 
             <h4>Set value (fixed string or expression)</h4>
 

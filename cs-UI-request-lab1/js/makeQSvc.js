@@ -16,14 +16,18 @@ angular.module("pocApp")
 
         extPlaceHolderUrl = "http://hl7.org/fhir/StructureDefinition/entryFormat"
 
-        extAllocateIdUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-allocateId"
+        //extensions for definition extraction
+        extAllocateIdUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-extractAllocateId"
+        extDefinitionExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract"
+        //Nov2 extExtractionValue = "http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue"
+        extDefinitionExtractValue = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtractValue"
 
 
-        extExtractionContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
+      //  extExtractionContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
         extHidden = "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
 
         //this specifies a specific value or an expression to set the value
-        extExtractionValue = "http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue"
+
 
         //defines a query that provides context data for pre-population of child elements
         extPopulationContext = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemPopulationContext"
@@ -117,8 +121,9 @@ angular.module("pocApp")
             //definition is the path in the resource (added to the 'item.definition' value
 
             //http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue
-            let ext = {url:extExtractionValue,extension:[]}
-            ext.extension.push({url:"definition",valueCanonical:definition})
+            let ext = {url:extDefinitionExtractValue,extension:[]}
+            //ext.extension.push({url:"definition",valueCanonical:definition})
+            ext.extension.push({url:"definition",valueUri:definition})
 
             if (value) {
                 console.log(value)
@@ -152,11 +157,24 @@ angular.module("pocApp")
 
         }
 
+
+        function setExtractionContext(item,context) {
+            //set the extraction context using the context (resource SD)
+
+            item.extension = item.extension || []
+
+            let ext = {url:extDefinitionExtract,extension:[]}
+            ext.extension.push({url:'definition',valueCanonical: context})
+
+            //item.extension.push({url:extExtractionContextUrl,valueCanonical:extractionContext})
+            item.extension.push(ext)
+        }
+
         function addReferenceDEP(item,definition,type,expression) {
             //add a fixed value extension. Can either be a value or an expression
 
             //http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue
-            let ext = {url:extExtractionValue,extension:[]}
+            let ext = {url:extDefinitionExtractValue,extension:[]}
             ext.extension.push({url:"definition",valueCanonical:definition})
 
 
@@ -688,11 +706,22 @@ angular.module("pocApp")
                 //errors discovered during the report creation
                // report.errors = []
 
-                //see if there is an extraction context on the Q (there may be some on child groups)
-                let ar1 = getExtension(Q,extExtractionContextUrl,'Canonical')
+                //see if there is an extraction context on the Q (there may also be some on child groups)
+                let ar1 = getExtension(Q,extDefinitionExtract,'Canonical')
+
+
                 if (ar1.length > 0) {
-                    thing.extractionContext = ar1[0]
-                    thing.isSDC = true
+                    //the whole extension is returned
+                    let ext = ar1[0]
+                    if (ext.extension > 0) {
+                        for (child of ext.extension) {
+                            if (child.url == 'definition')
+                                thing.extractionContext = child.valueCanonical
+                                thing.isSDC = true
+                            break
+                        }
+                    }
+
                 }
 
                 report.entries.push(thing)
@@ -704,7 +733,16 @@ angular.module("pocApp")
                     let thing = {text:Q.name}
                     thing.variable = ext.name
                     thing.contents = ext.expression  //varable type is x-query
-                    thing.itemName = ext.name       //the name the variable is referred to
+                    thing.itemName = ext.name
+                    /*
+                    let nq = utilsSvc.getNQbyName(ext.name)
+
+                    if (nq) {
+                        thing.itemName = nq.itemName       //the name the variable is referred to
+                        thing.contents = nq.contents  //varable type is x-query
+                    }
+                    */
+
                     report.entries.push(thing)
 
                     report.variableUsage[ext.name] = []
@@ -814,8 +852,12 @@ angular.module("pocApp")
                                         report.errors.push({msg:`variable ${variable} not found at ${item.linkId}`})
                                     }
                                     break
-                                case extExtractionContextUrl:
-                                    thing.extractionContext = ext.valueCanonical
+                                case extDefinitionExtract:
+
+                                    getExtension(ext,"definition","Canonical")
+
+                                    thing.extractionContext = getExtension(ext,"definition","Canonical") //ext.valueCanonical
+
                                     break
 
                                 case extPopulationContext:
@@ -823,7 +865,7 @@ angular.module("pocApp")
 
                                     break
 
-                                case extExtractionValue:
+                                case extDefinitionExtractValue:
                                     report.setValue = report.setValue || []
 
 
@@ -834,7 +876,7 @@ angular.module("pocApp")
                                         switch (child.url) {
                                             case 'definition' :
                                                 //the path in the extract where this element is to be inserted
-                                                v.path = child.valueCanonical
+                                                v.path = child.valueUri
                                                 break
                                             case 'fixed-value' :
                                                 //the actual value
@@ -1237,9 +1279,6 @@ angular.module("pocApp")
                     }
                 })
 
-
-
-
                 let Q = {resourceType:'Questionnaire'}
                 Q.id = `canshare-${firstElement.ed.path}`
                 Q.name = firstElement.ed.path
@@ -1269,35 +1308,51 @@ angular.module("pocApp")
                         idName:"specimenID"
                     }
                 ]
-                //markReferences()
 
 
-                for (const ref of testRef) {
-
-                    //add the reference target to the root
-                    let ext = {url:extAllocateIdUrl,valueString:ref.idName}
-                    Q.extension.push(ext)
-
-                    for (const item of lstQElements) {
-                        let ed = item.ed
-                        let path = ed.path
-                        if (path == ref.source) {
-                            console.log('source')
-                            ed.markReference = ref
+                if (dg.resourceReferences) {
+                    //we need to set consistent 'idname' properties - that will be used by allocateId
+                    let hashIdName = {}
+                    let ctr = 0
+                    for (const ref of dg.resourceReferences) {
+                        let target = ref.target
+                        if (hashIdName[target]) {
+                            //some other reference is targetting this resource - use the same idName
+                           ref.idName = hashIdName[target]
+                        } else {
+                            ctr ++
+                            let ar = target.split('.')
+                            let idName = `${ar[ar.length-1]}${ctr}`
+                            hashIdName[target] = idName
+                            ref.idName = idName
                         }
-                        if (path == ref.target) {
-                            ed.markTarget = ref
-                        }
+                    }
 
+                    //now for all of the unique id's add an allocateId extension
+                    Object.keys(hashIdName).forEach(function (key) {
+                        let ext = {url:extAllocateIdUrl,valueString:hashIdName[key]}
+                        Q.extension.push(ext)
+                    })
+
+                    //add the reference target to the root so an id will be created
+                    for (const ref of dg.resourceReferences) {
+
+                        for (const item of lstQElements) {
+                            let ed = item.ed
+                            let path = ed.path
+                            if (path == ref.source) {
+                                console.log('source')
+                                ed.markReference = ed.markReference || []
+                                ed.markReference.push(ref)      //note that the ref.idName has just bee updated
+                            }
+
+                            if (path == ref.target) {
+                                ed.markTarget = ref.idName
+                            }
+
+                        }
                     }
                 }
-
-
-
-
-
-                //targets will need to
-
 
 
 
@@ -1412,8 +1467,9 @@ angular.module("pocApp")
 
                         extractionContext = getExtractionContext(dgName,config.hashAllDG)
                         if (extractionContext) {
-                            currentItem.extension = currentItem.extension || []
-                            currentItem.extension.push({url:extExtractionContextUrl,valueCanonical:extractionContext})
+                            setExtractionContext(currentItem,extractionContext)
+                            //currentItem.extension = currentItem.extension || []
+                            //currentItem.extension.push({url:extExtractionContextUrl,valueCanonical:extractionContext})
                             //if there's an extraction context, then add any 'DG scope' fixed values.
                             //fixed values can also be defined on an item... todo TBD
                             addFixedValues(currentItem,dg)
@@ -1501,16 +1557,11 @@ angular.module("pocApp")
                 //extraction context is the url of the profile (could be a core type)
                 function decorateItem(item,ed,extractionContext,dg,config) {
 
-                   // let newItem = {}    //If a new item is needed - ie extension url
-
                     if (! ed.type) {
                         return
                     }
 
                     let edType = ed.type[0]     //actually be the name of the DG
-
-
-
 
                     //If this ed is a reference to another, it can have a different exraction context...
                     if (config.hashAllDG[edType]) {
@@ -1528,8 +1579,11 @@ angular.module("pocApp")
                         if (ed.markTarget) {
                             //this is a resource that is tha target of another. It needs the allocateId extension
                             item.extension = item.extension || []
-                            item.extension.push({url:extAllocateIdUrl,valueString: ed.markTarget.idName})
+                            item.extension.push({url:extAllocateIdUrl,valueString: ed.markTarget})
                         }
+
+
+
 
                         //this is an item that is extracted
                         if (extractType) {
@@ -1541,19 +1595,20 @@ angular.module("pocApp")
                                 addFixedValue(item,definition,null,null,expression)
                             }
 
-                            if (ed.markReference) {
+                            if (ed.markReference && ed.markReference.length > 0) {
                                 //This is a reference to a marked target
-                                //definition format: http://hl7.org/fhir/StructureDefinition/ServiceRequest#ServiceRequest.specimen.ref
-                                let ar = ed.markReference.definition.split('.')
-                                let definition = `http://hl7.org/fhir/StructureDefinition/${ar[0]}#${ed.markReference.definition}`
+                                //definition format: http://hl7.org/fhir/StructureDefinition/ServiceRequest#ServiceRequest.specimen.reference
 
-                                let expression = `%${ed.markReference.idName}`
-                                addFixedValue(item,definition,null,null,expression)
+                                ed.markReference.forEach(function (ref) {
+                                    let ar = ref.definition.split('.')
+                                    let definition = `http://hl7.org/fhir/StructureDefinition/${ar[0]}#${ref.definition}.reference`
+
+                                    let expression = `%${ref.idName}`
+                                    addFixedValue(item,definition,null,null,expression)
+                                })
 
 
                             }
-
-
 
                         }
 
@@ -1572,8 +1627,11 @@ angular.module("pocApp")
                         //let extractionContext = config.hashAllDG[edType].type
                         if (extractionContext) {
                             //The DG defines a new extraction context
-                            item.extension = item.extension || []
-                            item.extension.push({url:extExtractionContextUrl,valueCanonical:extractionContext})
+
+                            setExtractionContext(item,extractionContext)
+
+                            //item.extension = item.extension || []
+                            //item.extension.push({url:extExtractionContextUrl,valueCanonical:extractionContext})
 
                             //if there's an extraction context, then add any 'DG scope' fixed values.
                             //fixed values can also be defined on an item... todo TBD
@@ -1617,9 +1675,24 @@ angular.module("pocApp")
                         }
                     }
 
+
+                    //set the control type
+
                     let vo = getControlDetails(ed)
                     item.type = vo.controlType
 
+                    switch (vo.controlHint) {
+                        case "autocomplete" :
+                            addItemControl(item,'autocomplete')
+                            break
+                        case "radio" :
+                            addItemControl(item,'radio-button')
+                            break
+                        case "check-box" :
+                            addItemControl(item,'check-box')
+                            break
+                    }
+/*
                     //todo - refactor these
                     if (vo.controlHint == 'autocomplete') {
                         addItemControl(item,'autocomplete')
@@ -1635,7 +1708,7 @@ angular.module("pocApp")
                         addItemControl(item,'check-box')
 
                     }
-
+*/
                     //set the ValueSet or options from the ed to the item
                     //the fixed takes precedence, then ValueSet then options
                     //todo - need to look for other datatypes than can be fixed
@@ -1755,9 +1828,9 @@ angular.module("pocApp")
 
                     }
 
+                    /* - don't think this is used any more
                     if (ed.autoPop){
                         let foItem = {linkId:'xxx',text:ed.autoPop,type:'display'}
-
 
                         let ext1 = {url:extItemControlUrl}
                         ext1.valueCodeableConcept = {
@@ -1766,17 +1839,16 @@ angular.module("pocApp")
                                 system: systemItemControl
                             }]
                         }
-
-
                         foItem.extension = [ext1]
                         item.item=[foItem]
 
                     }
+                    */
 
 
-                    //There is a pre-pop extression
+                    //There is a pre-pop expression - set as initial value
                     if (ed.prePop) {
-                        //let ext = {url:extPrePopUrl}
+
                         let ext = {url:extInitialExpressionUrl}
 
                         //todo - not sure if 'Launch is needed
@@ -1801,6 +1873,7 @@ angular.module("pocApp")
                         item.extension.push(ext)
                     }
 
+                    //table layout for a group
                     if (ed.gtable) {
                         let ext = {url:extItemControlUrl}
                         ext.valueCodeableConcept = {
@@ -1828,6 +1901,13 @@ angular.module("pocApp")
                         let resourceType = ar[ar.length-1]      //todo - this assumes core types only...  need to think about profiles later
                         definition = definition.replace('%root%',resourceType)
                         item.definition = `${extractionContext}#${definition}`
+
+
+                        //Add the extension url as a definitionExtractValue
+                        if (ed.extractExtensionUrl) {
+                            let url = `${extractionContext}#${resourceType}.extension.url`
+                            addFixedValue(item,url,"String",ed.extractExtensionUrl)
+                        }
 
                         //todo - want to check this more...
                         if (false && ed.extractExtensionUrl) {
