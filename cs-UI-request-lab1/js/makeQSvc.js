@@ -116,6 +116,20 @@ angular.module("pocApp")
             }
         }
 
+
+
+        function addDefinitionExtract(item,vo) {
+            //add a definition extract resource. vo = {definition: fullUrl: } - might add others later
+            let ext = {url:extDefinitionExtractValue,extension:[]}
+            ext.extension.push({url:"definition",valueUri:vo.definition})       //the canonical url of the resource to extract - must be present
+            if (vo.fullUrl) {
+                ext.extension.push({url:"fullUrl",valueString:vo.fullUrl})
+            }
+            item.extension = item.extension || []
+            item.extension.push(ext)
+
+        }
+
         function addFixedValue(item,definition,type,value,expression) {
             //add a fixed value extension. Can either be a value or an expression
             //definition is the path in the resource (added to the 'item.definition' value
@@ -1328,7 +1342,7 @@ angular.module("pocApp")
                         }
                     }
 
-                    //now for all of the unique id's add an allocateId extension
+                    //now for all of the unique id's add an allocateId extension to the root
                     Object.keys(hashIdName).forEach(function (key) {
                         let ext = {url:extAllocateIdUrl,valueString:hashIdName[key]}
                         Q.extension.push(ext)
@@ -1576,13 +1590,14 @@ angular.module("pocApp")
                             item.extension.push({url:extAllocateIdUrl,valueString: 'patientID'})
                         }
 
+
+                        //addDefinitionExtract(item,vo)
+
                         if (ed.markTarget) {
                             //this is a resource that is tha target of another. It needs the allocateId extension
                             item.extension = item.extension || []
                             item.extension.push({url:extAllocateIdUrl,valueString: ed.markTarget})
                         }
-
-
 
 
                         //this is an item that is extracted
@@ -1630,16 +1645,13 @@ angular.module("pocApp")
 
                             setExtractionContext(item,extractionContext)
 
-                            //item.extension = item.extension || []
-                            //item.extension.push({url:extExtractionContextUrl,valueCanonical:extractionContext})
-
                             //if there's an extraction context, then add any 'DG scope' fixed values.
                             //fixed values can also be defined on an item... todo TBD
                             //this is for referenced DGs
                             addFixedValues(item,referencedDG)
 
 
-                           // item.extension.push({url:extExtractionContextUrl,valueExpression:{language:"text/fhirpath",expression:extractionContext}})
+
                         }
                     }
 
@@ -1907,69 +1919,6 @@ angular.module("pocApp")
                         if (ed.extractExtensionUrl) {
                             let url = `${extractionContext}#${resourceType}.extension.url`
                             addFixedValue(item,url,"String",ed.extractExtensionUrl)
-                        }
-
-                        //todo - want to check this more...
-                        if (false && ed.extractExtensionUrl) {
-                            //If there's an extension url on the item, then this item is an extension and
-                            //the definition will refer to the extension (eg Patient.extension). However,
-                            //we need to change the structure so that the element becomes a group
-                            //with child elements for url & value
-
-                            //Save attributes needed for the value child
-                            let copyItem = angular.copy(item)
-                            //let itemType = item.type  //need this for the value child
-
-
-
-
-                            item.type = "group"
-                            item.item = item.item || []
-
-                            // add an additional, hidden Q item for the extension url
-                            let urlItem = {linkId:`${item.linkId}.extUrl`,type:'string',text:"extension url"}
-
-                            //the defintion will be {resource type}.extension.url
-                            let ar = ed.definition.split('.')
-                            let extractResourceType = ar[0]
-
-                            urlItem.definition = `${extractionContext}#${extractResourceType}.extension.url`
-                            urlItem.initial = [{valueString:ed.extractExtensionUrl}]
-                            urlItem.extension = [{url:extHidden,valueBoolean:true}]
-                            item.item.push(urlItem)
-
-                            //now the value
-                            let valueItem = {linkId:`${item.linkId}.extValue`,type:copyItem.type,text:"extension value"}
-
-                            //There are attributes of the original model element that need to be copied to the value
-                            //currently only 1 identified
-                            let arCopy = ["answerOption"]
-
-                            for (const name of arCopy) {
-                                if (copyItem[name]) {
-                                    valueItem[name] = copyItem[name]
-                                    delete item[name]
-                                }
-                            }
-
-
-
-                            //Need to set the type of the valueItem according to the dt in the model. sometimes they
-                            //are the same (string) and sometimes not (codeableconcept)
-
-                            let dtInValue = edType
-                            switch (edType) {
-                                case "CodeableConcept" :
-                                    dtInValue = "Coding"
-                                    break
-                            }
-
-
-                            valueItem.definition = `${extractionContext}#${extractResourceType}.extension.value${capitalizeFirstLetter(dtInValue)}`
-
-                            //valueItem.definition = `${extractionContext}#${extractResourceType}.extension.value${dtInValue}`
-                            item.item.push(valueItem)
-
                         }
 
 
