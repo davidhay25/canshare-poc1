@@ -171,7 +171,7 @@ angular.module("pocApp")
                     //A report focussed on pre-popupation & extraction
                     let voReport =  makeQSvc.makeReport(testQ)
                     $scope.qReport =voReport.report
-                    $scope.fullQ = $scope.fullQ
+                    $scope.fullQ = testQ
                     $scope.input.mainTabActive = 1
                 } catch {
                     alert("This is a valid Json string, but there were errors parsing it.")

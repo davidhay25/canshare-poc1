@@ -120,10 +120,10 @@ angular.module("pocApp")
 
         function addDefinitionExtract(item,vo) {
             //add a definition extract resource. vo = {definition: fullUrl: } - might add others later
-            let ext = {url:extDefinitionExtractValue,extension:[]}
-            ext.extension.push({url:"definition",valueUri:vo.definition})       //the canonical url of the resource to extract - must be present
+            let ext = {url:extDefinitionExtract,extension:[]}
+            ext.extension.push({url:"definition",valueCanonical:vo.definition})       //the canonical url of the resource to extract - must be present
             if (vo.fullUrl) {
-                ext.extension.push({url:"fullUrl",valueString:vo.fullUrl})
+                ext.extension.push({url:"fullUrl",valueString:`%${vo.fullUrl}`})
             }
             item.extension = item.extension || []
             item.extension.push(ext)
@@ -350,9 +350,10 @@ angular.module("pocApp")
 
                         if (ed.controlHint ) {
                             controlHint = ed.controlHint
-                        } else {
-                           // controlHint = "drop-down"
-                           // controlType = "choice"
+                            //csiro only supports autocomplete on open-choice
+                            if (controlHint == 'autocomplete') {
+                                controlType = "open-choice"
+                            }
                         }
                         break
                     case 'Group' :
@@ -1323,13 +1324,13 @@ angular.module("pocApp")
                     }
                 ]
 
-
+                let hashIdName = {}     //associate an idname (from allocateId) with the path
                 if (dg.resourceReferences) {
                     //we need to set consistent 'idname' properties - that will be used by allocateId
-                    let hashIdName = {}
+
                     let ctr = 0
                     for (const ref of dg.resourceReferences) {
-                        let target = ref.target
+                        let target = ref.target     //
                         if (hashIdName[target]) {
                             //some other reference is targetting this resource - use the same idName
                            ref.idName = hashIdName[target]
@@ -1343,6 +1344,7 @@ angular.module("pocApp")
                     }
 
                     //now for all of the unique id's add an allocateId extension to the root
+                    //this will be the extracted resource id
                     Object.keys(hashIdName).forEach(function (key) {
                         let ext = {url:extAllocateIdUrl,valueString:hashIdName[key]}
                         Q.extension.push(ext)
@@ -1369,6 +1371,7 @@ angular.module("pocApp")
                 }
 
 
+                config.hashIdName = hashIdName  //when we create the Q item we need to add the id as a fullUrl property in edfinitionExtract
 
                 //add the named queries as variables in root of the Q
                 let namedQueries = snapshotSvc.getNamedQueries(dg.name)     //follows the DG hierarchy
@@ -1577,14 +1580,14 @@ angular.module("pocApp")
 
                     let edType = ed.type[0]     //actually be the name of the DG
 
-                    //If this ed is a reference to another, it can have a different exraction context...
+                    //If this ed is a reference to another, it can have a different extraction context...
                     if (config.hashAllDG[edType]) {
 
                         let referencedDG = config.hashAllDG[edType]
-                        let extractType = snapshotSvc.getExtractResource(edType)    //the FHIR type this DG extracts to, if any...
+                        let extractType = snapshotSvc.getExtractResource(edType)    //the FHIR type this DG extracts to, if any... Follows the parental hierarchy
 
                         //todo - could use markTarget (if that works out)
-                        if (extractType == 'Patient') {
+                        if (false && extractType == 'Patient') {
                             //For a patient, we also add the allocateId extension - in this context it sets the patient id
                             item.extension = item.extension || []
                             item.extension.push({url:extAllocateIdUrl,valueString: 'patientID'})
@@ -1593,15 +1596,32 @@ angular.module("pocApp")
 
                         //addDefinitionExtract(item,vo)
 
-                        if (ed.markTarget) {
-                            //this is a resource that is tha target of another. It needs the allocateId extension
-                            item.extension = item.extension || []
-                            item.extension.push({url:extAllocateIdUrl,valueString: ed.markTarget})
-                        }
 
 
                         //this is an item that is extracted
                         if (extractType) {
+                            let vo = {}     //this will have all the child extensions for definitionExtract
+                            vo.definition = `http://hl7.org/fhir/StructureDefinition/${extractType}`     //set the canonical for the extract
+                            if (extractType == 'Patient') {
+                                vo.fullUrl = 'patientID'            //sets the fullUrl to the variable created by allocateID and added to every Q
+                            } else {
+                                if (config.hashIdName[ed.path]) {
+                                    vo.fullUrl = config.hashIdName[ed.path]
+                                }
+                            }
+
+                            //now we can set the definitionExtract extension on this item
+                            addDefinitionExtract(item,vo)
+
+                            //note to me - don't think this is needed now
+                            if (false && ed.markTarget) {
+                                //this is a resource that is the target of another. It needs the canonical - not allocateId extension
+                                vo.fullUrl = ed.markTarget
+                                //item.extension = item.extension || []
+                               // item.extension.push({url:extAllocateIdUrl,valueString: ed.markTarget})
+                            }
+
+
                             //This is a resource that should have a patient reference
                             if (resourcesForPatientReference[extractType]) {
                                 let elementName = resourcesForPatientReference[extractType].path
@@ -1610,6 +1630,7 @@ angular.module("pocApp")
                                 addFixedValue(item,definition,null,null,expression)
                             }
 
+
                             if (ed.markReference && ed.markReference.length > 0) {
                                 //This is a reference to a marked target
                                 //definition format: http://hl7.org/fhir/StructureDefinition/ServiceRequest#ServiceRequest.specimen.reference
@@ -1617,12 +1638,9 @@ angular.module("pocApp")
                                 ed.markReference.forEach(function (ref) {
                                     let ar = ref.definition.split('.')
                                     let definition = `http://hl7.org/fhir/StructureDefinition/${ar[0]}#${ref.definition}.reference`
-
                                     let expression = `%${ref.idName}`
                                     addFixedValue(item,definition,null,null,expression)
                                 })
-
-
                             }
 
                         }
@@ -1643,7 +1661,7 @@ angular.module("pocApp")
                         if (extractionContext) {
                             //The DG defines a new extraction context
 
-                            setExtractionContext(item,extractionContext)
+                            //temp - not needed I thinksetExtractionContext(item,extractionContext)
 
                             //if there's an extraction context, then add any 'DG scope' fixed values.
                             //fixed values can also be defined on an item... todo TBD

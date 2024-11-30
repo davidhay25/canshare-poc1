@@ -182,7 +182,8 @@
             <td  style="width: 20%;">Hide in Q</td>
             <td><checkbox ng-model="input.hideInQ"></checkbox>
 
-              <a ng-if="linkToSpec" class='pull-right' target="_blank" ng-href="{{linkToSpec}}">View {{fhirResourceType}} in spec</a>
+              <a ng-if="linkToSpec"
+                 class='pull-right' target="_blank" ng-href="{{linkToSpec}}">View {{fhirResourceType}} in spec</a>
 
             </td>
           </tr>
@@ -376,12 +377,12 @@
                            class="form-control" ng-model="input.definition"/>
 
                   </div>
-
-                  <div ng-if="! dg.type">
+<!-- need to think about this...
+                  <div ng-if="! linkToSpec">
                     <em>You must set the resource context on this or a referencing DG to enable resource extraction. This is
-                      done from the main DG editor (the link at the top of the DG display page). </em>
+                      done from the main DG editor (the link at the top of the DG display page) for this DG or a parent. </em>
                   </div>
-
+-->
 
                 </div>
                 <!--

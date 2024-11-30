@@ -23,7 +23,9 @@ angular.module("pocApp")
             let dg = hashAllDG[dgName]
             $scope.dg = dg
 
-             if (dg.type) {
+            let extractType = snapshotSvc.getExtractResource(dg.name)
+
+             if (extractType) {
                  let baseFhirUrl = "http://hl7.org/fhir/R4B/"     //hard code to R4B. may need to become a parameter...
                  $scope.linkToSpec = `${baseFhirUrl}${dg.type}.html`
              }
