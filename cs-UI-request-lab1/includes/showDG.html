@@ -205,8 +205,9 @@
           <div class="background">
             <div class="pull-right">
               <div class="clickable myIcon" ng-click="expandDTTree()">Expand all ({{fullElementList.length -1}})</div>
+              <!--
               <div class="clickable myIcon" ng-click="showSSLog(selectedModel.name)">Snapshot log</div>
-
+-->
               <div class="clickable myIcon"
                    ng-hide="selectedModel.ssOrder"
                    ng-click="setOrder()">Set order</div>
@@ -371,20 +372,12 @@
 
                   <tr><td class="detailName" style="width : 20%">Title</td>
                     <td>
-                      <!--
-                    <i class="glyphicon glyphicon-edit pull-right clickable"
-                       ng-if="canEdit(selectedModel)"
-                       ng-click="editDGItem(selectedNode.data)"></i>
-                      -->
+
                    {{selectedNode.data.ed.title}}</td>
                   </tr>
 
                   <tr><td class="detailName">Description</td><td>
-                    <!--
-                    <i class="glyphicon glyphicon-edit pull-right clickable"
-                       ng-if="canEdit(selectedModel)"
-                       ng-click="editDGItem(selectedNode.data)"></i>
-                    -->
+
                     {{selectedNode.data.ed.description}}
                   </td></tr>
 
@@ -425,11 +418,7 @@
                     <td>
                       <div class="row">
                         <div class="col-md-12">
-<!--
-                          <i class="glyphicon glyphicon-edit pull-right clickable"
-                             ng-if="canEdit(selectedModel)"
-                             ng-click="editDGItem(selectedNode.data)"></i>
-                          -->
+
 
 
                           {{selectedNode.data.ed.controlHint}}
@@ -453,22 +442,14 @@
 
 
                   <tr><td class="detailName">Cardinality</td><td>
-                    <!--
-                    <i class="glyphicon glyphicon-edit pull-right clickable"
-                       ng-if="canEdit(selectedModel)"
-                       ng-click="editDGItem(selectedNode.data)"></i>
-                    -->
+
                     {{selectedNode.data.ed.mult}}
                   </td></tr>
 
                   <tr ng-if="selectedNode.data.ed.type[0] == 'CodeableConcept'">
                     <td class="detailName">ValueSet</td>
                     <td>
-<!--
-                      <i class="glyphicon glyphicon-edit pull-right clickable"
-                         ng-if="canEdit(selectedModel)"
-                         ng-click="editDGItem(selectedNode.data)"></i>
-                      -->
+
 
                       <div>
                         <span ng-if="selectedNode.data.ed.valueSet"
@@ -481,7 +462,7 @@
                     </td>
                   </tr>
 
-                  <tr>
+                  <tr ng-if="selectedNode.data.ed.notes">
                     <td class="detailName">Notes</td>
                     <td>
 
@@ -489,14 +470,14 @@
                     </td>
                   </tr>
 
-                  <tr>
+                  <tr ng-if="selectedNode.data.ed.rules">
                     <td class="detailName">Rules</td>
                     <td>
                       {{selectedNode.data.ed.rules}}
                     </td>
                   </tr>
 
-                  <tr>
+                  <tr ng-if="selectedNode.data.ed.placeHolder">
                     <td class="detailName">Placeholder</td>
                     <td>
                       {{selectedNode.data.ed.placeHolder}}
@@ -627,7 +608,7 @@
                     </td>
                   </tr>
 
-                  <tr>
+                  <tr ng-if="selectedNode.data.ed.sourceReference">
                     <td class="detailName">Source reference</td>
                     <td>
 
@@ -641,6 +622,13 @@
                     <td>
 
                       {{selectedNode.data.ed.definition}}
+                    </td>
+                  </tr>
+
+                  <tr ng-if="selectedNode.data.ed.identifierSystem">
+                    <td class="detailName">Identifier system</td>
+                    <td>
+                      {{selectedNode.data.ed.identifierSystem}}
                     </td>
                   </tr>
 
@@ -668,7 +656,14 @@
                     </td>
                   </tr>
 
-                  <tr>
+                  <tr ng-if="selectedNode.data.ed.sdcGrid">
+                    <td class="detailName">Grid layout</td>
+                    <td>
+                      Child nodes in columns
+                    </td>
+                  </tr>
+
+                  <tr ng-if="selectedNode.data.ed.selectedNQ">
                     <td  class="detailName">Selected Named query</td>
                     <td>
 

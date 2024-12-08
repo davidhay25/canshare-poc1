@@ -14,6 +14,7 @@ angular.module("pocApp")
                 switch (type) {
                     case 'code' :
                         $scope.input.code = current
+                        break
                     case 'Coding' :
                         $scope.input.code = current.code
                         $scope.input.display = current.display

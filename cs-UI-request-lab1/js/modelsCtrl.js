@@ -1071,11 +1071,14 @@ angular.module("pocApp")
                         },
                         parentEd : function () {
 
+
                             //$scope.selectedModel.diff.
                             if ($scope.selectedNode && $scope.selectedNode.data) {
                                 return $scope.selectedNode.data.ed
                             } else {
-                                return null
+                                //return the root
+                                return $scope.fullElementList[0].ed
+                                //return null
                             }
 
                         },
@@ -1195,8 +1198,17 @@ angular.module("pocApp")
                                 ed1.units = ed.units
                                 ed1.selectedNQ = ed.selectedNQ
                                 ed1.gTable = ed.gTable
+                                ed1.sdcGrid = ed.sdcGrid
+                                ed1.adHocExt = ed.adHocExt
 
-                                traceSvc.addAction({action:'edit-override',model:$scope.selectedModel,path:displayPath})
+                                if (ed.qFixedValues && ed.qFixedValues.length > 0) {
+                                    ed1.qFixedValues = ed.qFixedValues
+                                } else {
+                                    delete ed1.qFixedValues
+                                }
+
+
+                                //traceSvc.addAction({action:'edit-override',model:$scope.selectedModel,path:displayPath})
 
                                 break
                             }
@@ -1232,7 +1244,13 @@ angular.module("pocApp")
             }
 
 
+            function validateJson(json) {
+                try {
 
+                } catch (ex) {
+
+                }
+            }
 
             //when a specific DG is selected in the term summary
             //used by updates list as well = hence moved to main controller

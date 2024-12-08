@@ -573,14 +573,20 @@
         <uib-tab  ng-if="technicalview" heading="Model">
           <uib-tabset>
 
-            <uib-tab  ng-if="technicalview" heading="Item">
+            <uib-tab  heading="Item (no children)">
+              <pre>{{selectedItemNoChild | json}}</pre>
+            </uib-tab>
 
-              <strong>Todo: add SDC summary - incl. context from parent</strong>
+            <uib-tab  heading="Item">
+
+
+
               <div class="myScroll">
                 <pre>{{selectedItem | json}}</pre>
               </div>
 
             </uib-tab>
+
 
             <uib-tab  ng-if="technicalview && selectedEd" heading="ED">
               <pre>{{selectedEd | json}}</pre>

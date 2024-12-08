@@ -12,6 +12,8 @@ angular.module("pocApp")
             //construct a has of all types (DT + FHIR) for the full list of elements routine
             $scope.allTypes = angular.copy(hashTypes)
 
+
+
             //create a list of potential parent types for a new DG -
             $scope.input.possibleParents = []
             Object.keys(hashTypes).forEach(function (key) {

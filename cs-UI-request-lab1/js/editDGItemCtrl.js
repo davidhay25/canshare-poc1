@@ -7,6 +7,11 @@ angular.module("pocApp")
             $scope.input = {}
 
 
+            $scope.textareaStyles = {
+                'background-color': '#f9f9f9',
+                'color': '#333',
+                'border': '1px solid #ccc'
+            };
 
             $scope.input.collapsibleOptions = ['default-open','default-closed']
 
@@ -27,7 +32,7 @@ angular.module("pocApp")
 
              if (extractType) {
                  let baseFhirUrl = "http://hl7.org/fhir/R4B/"     //hard code to R4B. may need to become a parameter...
-                 $scope.linkToSpec = `${baseFhirUrl}${dg.type}.html`
+                 $scope.linkToSpec = `${baseFhirUrl}${extractType}.html`
              }
 
              //all the named queries used by any inherited or referenced DG
@@ -89,7 +94,6 @@ angular.module("pocApp")
              }
 
             //locate all the SDC variables at this
-
             $scope.getVariablesAtPath = function () {
                 let variables = []
                 //item.ed
@@ -141,37 +145,6 @@ angular.module("pocApp")
             console.log($scope.contextAtPath)
 
 
-             //execute the namedquery expression
-            $scope.testxqueryDEP = function (queryName) {
-                $http.get(`/model/namedquery/${queryName}`).then(
-                    function (data) {
-                        $uibModal.open({
-                            //backdrop: 'static',      //means can't close by clicking on the backdrop.
-                            //keyboard: false,       //same as above.
-                            size : 'lg',
-                            templateUrl: 'modalTemplates/xquery.html',
-                            controller: 'xqueryCtrl',
-                            resolve: {
-                                query: function () {
-                                    return data.data
-                                }
-                            }
-
-                        }).result.then(function (concept) {
-                            console.log(concept)
-
-
-                        })
-
-                    }, function (err) {
-                        alert("Named query not found")
-                    }
-                )
-
-
-
-            }
-
 
             $scope.options = []     //a list of options. Will be saved as ed.options
             $scope.units = [] //a list of units. Will be saved as ed.units
@@ -187,6 +160,7 @@ angular.module("pocApp")
                 let ar = parentEd.path.split('.')
                 posOfChildren = ar.length     //this is where all the direct children will sit - 0 based
             }
+
 
             //used to detect duplicate path names
             //Issue is that it won't include deleted items (mult = 0..0) as they are no linger in the list...
@@ -255,6 +229,7 @@ angular.module("pocApp")
                 $scope.input.collapsible =  item.ed.collapsible
 
                 $scope.input.gtable =  item.ed.gtable
+                $scope.input.sdcGrid =  item.ed.sdcGrid
                 $scope.input.prePop =  item.ed.prePop
                 $scope.input.definition =  item.ed.definition
                 $scope.input.extractExtensionUrl =  item.ed.extractExtensionUrl
@@ -304,7 +279,8 @@ angular.module("pocApp")
                 //displays for default
 
                 if (item.ed.defaultCode) {
-                    $scope.default = item.ed.defaultCode
+                    //$scope.default = item.ed.defaultCode
+                    $scope.default = {elName:'defaultCode',value:item.ed.defaultCode}
                     $scope.defaultDisplay = item.ed.defaultCode
                 }
                 if (item.ed.defaultCoding) {
@@ -347,8 +323,13 @@ angular.module("pocApp")
 
 
                 $scope.input.gTable = item.ed.gTable
+                $scope.input.sdcGrid = item.ed.sdcGrid
 
                 $scope.input.mult = item.ed.mult
+
+                $scope.input.adHocExt = item.ed.adHocExt
+
+                $scope.input.qFixedValues = item.ed.qFixedValues
 
             } else {
                 $scope.input.mult = "0..1"// $scope.mult[1]      //default to 0..1
@@ -395,6 +376,32 @@ angular.module("pocApp")
             }
 
             //---------
+
+
+            //functions for fixed values
+            $scope.addQFixedValue = function (path,type,value) {
+
+
+                let v = value
+                try {
+                    //try to convert to an object. If it isn't then the value remins simple
+                    v = angular.fromJson(value)
+                } catch (ex) {
+
+                }
+
+                let fv = {path:path,type:type}
+                fv.value = v
+                $scope.input.qFixedValues = $scope.input.qFixedValues || []
+                $scope.input.qFixedValues.push(fv)
+                delete $scope.input.fvPath
+                delete $scope.input.fvType
+                delete $scope.input.fvValue
+            }
+
+            $scope.removeFixedValue = function (inx) {
+                $scope.input.qFixedValues.splice(inx,1)
+            }
 
 
             function makeQuantityDisplay(quantity) {
@@ -551,13 +558,40 @@ angular.module("pocApp")
                 }
             }
 
-            function addOtherConditional() {
+            $scope.validateJson = function(value,displayErr) {
+                //let v = value
+                if (! value) {
+                    return
+                }
+                try {
+                    //try to convert to an object. If it isn't then the value remins simple
+                    let v = angular.fromJson(value)
+                    let ok = true
+                    let msg = "All good. The Json is valid"
+                    if (! Array.isArray(v)) {
+                        msg = "It's json, but must be an array"
+                        ok = false
+                    }
 
+                    if (displayErr) {
+                        alert(msg)
+                    }
+                    return ok
+                } catch (ex) {
+                    if (displayErr) {
+                        alert("There is a problem. The Json is invalid. Are you using double quotes?")
+                    }
+                    return false
+                }
             }
 
 
             //doesn't set the path - as that is different when being used to create a new DG element
             function editED (ed) {
+
+
+
+
                 ed.type = [$scope.input.selectedType]
                 //ed.path = `new.${$scope.input.path}`        //the 'new.' is stripped off, as the full path is passed in for editing existing
                 ed.description = $scope.input.description
@@ -567,11 +601,12 @@ angular.module("pocApp")
                 ed.units = $scope.units
                 ed.mult = $scope.input.mult
                 ed.gTable = $scope.input.gTable
+                ed.sdcGrid = $scope.input.sdcGrid
                 ed.valueSet = $scope.input.valueSet
                 ed.hideInQ = $scope.input.hideInQ
                 ed.autoPop = $scope.input.autoPop
                 ed.collapsible = $scope.input.collapsible
-                //ed.gTable = $scope.input.gTable
+
                 ed.prePop = $scope.input.prePop
                 ed.definition = $scope.input.definition
                 ed.extractExtensionUrl = $scope.input.extractExtensionUrl
@@ -636,6 +671,11 @@ angular.module("pocApp")
                     ed.selectedNQ = $scope.input.selectedNQ.name
                 }
 
+                ed.adHocExt = $scope.input.adHocExt
+
+                if ($scope.input.qFixedValues) {
+                    ed.qFixedValues = $scope.input.qFixedValues
+                }
 
                 return ed
             }
@@ -703,6 +743,15 @@ angular.module("pocApp")
 
             $scope.save = function() {
 
+
+                if ($scope.input.adHocExt) {
+                    if (! $scope.validateJson($scope.input.adHocExt)) {
+                        alert("The json in the Questionnaire ad-hoc Json extension is not valid. Please correct it before saving.")
+                        return
+                    }
+                }
+
+
                 if (allTypes.indexOf($scope.input.selectedType) == -1) {
                     alert("Invalid type")
                     return
@@ -715,7 +764,6 @@ angular.module("pocApp")
                        alert("This path has already been used at this level in this DG")
                        return
                    }
-
 
 
                     //check that there are no spaces in the path

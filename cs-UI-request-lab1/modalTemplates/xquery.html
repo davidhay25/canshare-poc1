@@ -117,7 +117,7 @@
                       </div>
 
                       <div>
-                          <div ng-repeat="item in fhirPathResultBundle">
+                          <div ng-repeat="item in fhirPathResultBundle track by $index">
                               <pre>{{item | json}}</pre>
                           </div>
                           {{fhirPathResultBundle}}

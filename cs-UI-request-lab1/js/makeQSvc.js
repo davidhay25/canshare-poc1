@@ -23,6 +23,7 @@ angular.module("pocApp")
         extDefinitionExtractValue = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtractValue"
 
 
+
       //  extExtractionContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
         extHidden = "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
 
@@ -116,6 +117,19 @@ angular.module("pocApp")
             }
         }
 
+
+        function addItemControl(item,code) {
+            let ext = {url:extItemControlUrl}
+            ext.valueCodeableConcept = {
+                coding: [{
+                    code: code,
+                    system: systemItemControl
+                }]
+            }
+
+            item.extension = item.extension || []
+            item.extension.push(ext)
+        }
 
 
         function addDefinitionExtract(item,vo) {
@@ -1790,16 +1804,19 @@ angular.module("pocApp")
 
                                     if (config.expandVS) {
                                         //if we're expanding the VS, then add all the contents as optoins...
-                                        item.answerOption = []
+                                        //item.answerOption = []
 
                                         let options = vsSvc.getOneVS(ed.valueSet)
-                                        if (options && options.length > 0) {
+                                        if (options && options.length > 0 && options[0].code !== 'notfound') {
+                                            item.answerOption = []
                                             for (const concept of options) {
                                                 concept.system = concept.system || unknownCodeSystem
                                                 item.answerOption.push({valueCoding : concept})
                                             }
                                         } else {
-                                            item.answerOption.push({valueCoding : {display:"The ValueSet is missing or empty"}})
+                                            //Dec 9 - leave the valueset there if couldn't be expanded
+                                            item.answerValueSet = ed.valueSet
+                                            //item.answerOption.push({valueCoding : {display:"The ValueSet is missing or empty"}})
                                         }
 
                                     } else {
@@ -1894,8 +1911,13 @@ angular.module("pocApp")
 
                     }
 
+                    if (ed.defaultCode) {
+                        item.initial = item.initial || []
+                        item.initial.push({valueString:ed.defaultCode})
+                    }
 
-                    //collapsibe sections
+
+                    //collapsible sections
                     if (ed.collapsible) {
                         let ext = {url:extCollapsibleUrl}
                         ext.valueCode = ed.collapsible
@@ -1905,6 +1927,8 @@ angular.module("pocApp")
 
                     //table layout for a group
                     if (ed.gtable) {
+                        addItemControl(item,'gtable')
+                        /*
                         let ext = {url:extItemControlUrl}
                         ext.valueCodeableConcept = {
                             coding: [{
@@ -1915,9 +1939,49 @@ angular.module("pocApp")
 
                         item.extension = item.extension || []
                         item.extension.push(ext)
+*/
+                    }
+
+                    //grid layout
+                    if (ed.sdcGrid) {
+                        addItemControl(item, 'grid')
+                    }
+
+                    if (ed.adHocExt) {
+                        try {
+                            let json = angular.fromJson(ed.adHocExt)
+                            item.extension = item.extension || []
+                            json.forEach(function (ext) {
+                                item.extension.push(ext)
+                            })
+                        } catch (ex) {
+                            console.error(ex)
+                        }
+
+
 
                     }
 
+                    if (ed.qFixedValues) {
+
+                        let ar = extractionContext.split('/')
+
+                      //  let canonical = `${extractionContext}#${ar[ar.length-1]}.identifier.system`
+                      //  console.log(canonical)
+                        ed.qFixedValues.forEach(function (fv) {
+                            let extractPath = `${extractionContext}#${fv.path}`
+                            if (fv.value.indexOf('%') > -1) {
+                                //this is assumed to be an expression
+                                addFixedValue(item,extractPath,fv.type,null,fv.value)
+                            } else {
+                                addFixedValue(item,extractPath,fv.type,fv.value)
+                            }
+
+
+                        })
+
+
+                    }
 
 
                     //important that this segment is the last as it can adjust items (eg the valueset stuff)

@@ -251,7 +251,6 @@ angular.module("pocApp")
                 let encodedQry = encodeURIComponent(url)
                 $http.get(`/proxy?qry=${encodedQry}`).then(
 
-                //$http.get(url).then(
                     function (data) {
                         $scope.libraryResultBundle = data.data
                        // console.log($scope.libraryResultBundle)
