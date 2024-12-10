@@ -1718,10 +1718,15 @@ angular.module("pocApp")
                 //actually - it is used when saving a version -
 
                 makeQSvc.getNamedQueries(function (hashNamedQueries) {
-                    let vo1 = makeQSvc.makeHierarchicalQFromComp(comp,$scope.hashAllDG,hashNamedQueries)
+                    delete $scope.compQErrors
+                    try {
+                        let vo1 = makeQSvc.makeHierarchicalQFromComp(comp,$scope.hashAllDG,hashNamedQueries)
+                        $scope.compQErrors = vo1.errorLog
+                        console.log(vo1)
+                    } catch(ex) {
+                        alert("There was an issue creating the Questionnaire, so that tab will be blank and you can't display the form. But you can still update the design. ")
+                    }
 
-                    $scope.compQErrors = vo1.errorLog
-                    console.log(vo1)
                 })
 
 
