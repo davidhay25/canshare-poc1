@@ -1802,7 +1802,7 @@ angular.module("pocApp")
                 /* - temp - 23 Nov 2024 see if it makes a difference
 
 
-
+*/
 
                 //always get all the valueset contents
                 var startTime = performance.now()
@@ -1810,7 +1810,7 @@ angular.module("pocApp")
                     var endTime = performance.now()
                     console.log(`Call to getAllVS took ${endTime - startTime} milliseconds`)
                 })
-                */
+
 
 
 

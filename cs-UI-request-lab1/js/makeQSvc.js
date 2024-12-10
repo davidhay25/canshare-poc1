@@ -96,11 +96,7 @@ angular.module("pocApp")
             item.extension.push(ext)
         }
 
-        function addReference(item,definition,variablename) {
-            //uses
-            //l//et definition =
-            alert('add ref')
-        }
+
 
 
         function addUnits(item,ed) {
@@ -139,6 +135,11 @@ angular.module("pocApp")
             if (vo.fullUrl) {
                 ext.extension.push({url:"fullUrl",valueString:`%${vo.fullUrl}`})
             }
+
+
+
+
+
             item.extension = item.extension || []
             item.extension.push(ext)
 
@@ -270,6 +271,22 @@ angular.module("pocApp")
             item.extension = item.extension || []
             item.extension.push(ext)
 
+        }
+
+        //If an adhoc extension has been added (to DG or ED) then add the extension to the item
+        function addAdHocExt(item,adHocExt) {
+            if (adHocExt) {
+                try {
+                    let json = angular.fromJson(adHocExt)
+                    item.extension = item.extension || []
+                    json.forEach(function (ext) {
+                        item.extension.push(ext)
+                    })
+                } catch (ex) {
+                    console.error(adHocExt)
+                    console.error(ex)
+                }
+            }
         }
 
         //add fixed values to the item
@@ -763,14 +780,7 @@ angular.module("pocApp")
                     thing.variable = ext.name
                     thing.contents = ext.expression  //varable type is x-query
                     thing.itemName = ext.name
-                    /*
-                    let nq = utilsSvc.getNQbyName(ext.name)
 
-                    if (nq) {
-                        thing.itemName = nq.itemName       //the name the variable is referred to
-                        thing.contents = nq.contents  //varable type is x-query
-                    }
-                    */
 
                     report.entries.push(thing)
 
@@ -847,8 +857,12 @@ angular.module("pocApp")
 
                             }
                         })
+
                     }
 
+                    if (item.answerValueSet) {
+                        thing.valueSet = item.answerValueSet
+                    }
 
                     //now process the extensions. Some we recognize here - others are added with the url
 
@@ -943,6 +957,8 @@ angular.module("pocApp")
                                     thing.itemControl = thing.itemControl || []
                                     thing.itemControl.push(ext.valueCodeableConcept)
                                     break
+
+
 
                                 default:
                                     thing.unknownExtension = thing.unknownExtension || []
@@ -1317,6 +1333,11 @@ angular.module("pocApp")
                 Q.url = `http://canshare.co.nz/questionnaire/${firstElement.ed.path}`
                 Q.description = dg.description
 
+                let adHocExt = snapshotSvc.getAdHocExt(dg.name)
+                if (adHocExt) {
+                    addAdHocExt(Q,adHocExt)
+                }
+
 
                 addPrePopExtensions(Q)      //launchPatient & LaunchPractitioner
                 addUseContext(Q)
@@ -1608,8 +1629,6 @@ angular.module("pocApp")
                         }
 
 
-                        //addDefinitionExtract(item,vo)
-
 
 
                         //this is an item that is extracted
@@ -1624,8 +1643,15 @@ angular.module("pocApp")
                                 }
                             }
 
+
                             //now we can set the definitionExtract extension on this item
                             addDefinitionExtract(item,vo)
+
+                            //Have any adhoc extensions been added to this DG (or any of its parents)
+                            let adHocExt = snapshotSvc.getAdHocExt(referencedDG.name)
+                            if (adHocExt) {
+                                addAdHocExt(item,adHocExt)
+                            }
 
                             //note to me - don't think this is needed now
                             if (false && ed.markTarget) {
@@ -1736,23 +1762,7 @@ angular.module("pocApp")
                             addItemControl(item,'check-box')
                             break
                     }
-/*
-                    //todo - refactor these
-                    if (vo.controlHint == 'autocomplete') {
-                        addItemControl(item,'autocomplete')
 
-                    }
-
-                    if (vo.controlHint == 'radio') {
-                        addItemControl(item,'radio-button')
-
-                    }
-
-                    if (vo.controlHint == 'check-box') {
-                        addItemControl(item,'check-box')
-
-                    }
-*/
                     //set the ValueSet or options from the ed to the item
                     //the fixed takes precedence, then ValueSet then options
                     //todo - need to look for other datatypes than can be fixed
@@ -1875,9 +1885,12 @@ angular.module("pocApp")
 
                     }
 
-                    /* - don't think this is used any more
+                    /* - don't think this is used any more - actually it is, it's used for help text*/
                     if (ed.autoPop){
-                        let foItem = {linkId:'xxx',text:ed.autoPop,type:'display'}
+
+                        const guid = createUUID()
+
+                        let foItem = {linkId:guid,text:ed.autoPop,type:'display'}
 
                         let ext1 = {url:extItemControlUrl}
                         ext1.valueCodeableConcept = {
@@ -1890,7 +1903,7 @@ angular.module("pocApp")
                         item.item=[foItem]
 
                     }
-                    */
+
 
 
                     //There is a pre-pop expression - set as initial value
@@ -1928,18 +1941,7 @@ angular.module("pocApp")
                     //table layout for a group
                     if (ed.gtable) {
                         addItemControl(item,'gtable')
-                        /*
-                        let ext = {url:extItemControlUrl}
-                        ext.valueCodeableConcept = {
-                            coding: [{
-                                code: "gtable",
-                                system: systemItemControl
-                            }]
-                        }
 
-                        item.extension = item.extension || []
-                        item.extension.push(ext)
-*/
                     }
 
                     //grid layout
@@ -1948,26 +1950,16 @@ angular.module("pocApp")
                     }
 
                     if (ed.adHocExt) {
-                        try {
-                            let json = angular.fromJson(ed.adHocExt)
-                            item.extension = item.extension || []
-                            json.forEach(function (ext) {
-                                item.extension.push(ext)
-                            })
-                        } catch (ex) {
-                            console.error(ex)
-                        }
 
-
+                        addAdHocExt(item,ed.adHocExt)
 
                     }
 
+                    //fixed values assigned to the ED
                     if (ed.qFixedValues) {
 
                         let ar = extractionContext.split('/')
 
-                      //  let canonical = `${extractionContext}#${ar[ar.length-1]}.identifier.system`
-                      //  console.log(canonical)
                         ed.qFixedValues.forEach(function (fv) {
                             let extractPath = `${extractionContext}#${fv.path}`
                             if (fv.value.indexOf('%') > -1) {

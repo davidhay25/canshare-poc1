@@ -28,8 +28,6 @@ angular.module("pocApp")
                         }
                     }
 
-
-
                 }
             })
             $scope.input.possibleParents.sort()
@@ -262,6 +260,9 @@ angular.module("pocApp")
                 $scope.input.resourceReferences = model.resourceReferences || []
 
                 $scope.extractedResources =  snapshotSvc.getExtractableDG(model.name)
+                $scope.input.adHocExt = model.adHocExt
+
+
 
                 getFullElementList()
 
@@ -461,12 +462,45 @@ angular.module("pocApp")
                 getFullElementList()
             }
 
+            $scope.validateJson = function(value,displayErr) {
+                //let v = value
+                if (! value) {
+                    return
+                }
+                try {
+                    //try to convert to an object. If it isn't then the value remins simple
+                    let v = angular.fromJson(value)
+                    let ok = true
+                    let msg = "All good. The Json is valid"
+                    if (! Array.isArray(v)) {
+                        msg = "It's json, but must be an array"
+                        ok = false
+                    }
+
+                    if (displayErr) {
+                        alert(msg)
+                    }
+                    return ok
+                } catch (ex) {
+                    if (displayErr) {
+                        alert("There is a problem. The Json is invalid. Are you using double quotes?")
+                    }
+                    return false
+                }
+            }
 
             $scope.save = function () {
                 $scope.model.type = $scope.input.type
 
+                //todo - should this be $scope - need to re-write so cancel works properly!!!
                 model.fixedValues = $scope.input.fixedValues
                 model.resourceReferences = $scope.input.resourceReferences
+
+
+                if ($scope.validateJson($scope.input.adHocExt)) {
+                    $scope.model.adHocExt = $scope.input.adHocExt
+                }
+
 
                 //update the named queries
                 delete $scope.model.namedQueries

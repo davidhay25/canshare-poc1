@@ -974,6 +974,34 @@ angular.module("pocApp")
 
                 }
             },
+            getAdHocExt : function (dgName) {
+                //retrieves any adhoc extensions defined to following the inheritance chain
+                let dg = allDgSnapshot[dgName]
+                if (dg) {
+                    if (dg.adHocExt) {
+                        return dg.adHocExt
+                    } else {
+                        if (dg.parent)  {      //only if there's no type set and there is a parent...
+                            let parentDG = allDgSnapshot[dg.parent]
+                            while (parentDG) {
+                                if (parentDG.adHocExt) {
+                                    return parentDG.adHocExt
+                                    break
+                                } else {
+                                    if (parentDG.parent) {
+                                        let parentName = parentDG.parent
+                                        parentDG = allDgSnapshot[parentName]
+                                    } else {
+
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            },
             getFixedValues : function (dgName) {
                 //retrieves the extract fixed values following the inheritance chain
                 let dg = allDgSnapshot[dgName]

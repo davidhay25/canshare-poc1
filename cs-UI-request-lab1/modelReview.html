@@ -238,7 +238,7 @@
             <h4>Elements</h4>
             <div class="myScroll">
                 <table class="table table-condensed table-bordered">
-                    <tr><th>Text</th><th>Lvl</th><th>Type</th><th>Card.</th><th>Hidden</th><th>Fixed</th><th>SDC</th></tr>
+                    <tr><th>Text</th><th>Lvl</th><th>Type</th><th>Card.</th><th>Hidden</th><th>Fixed / ValueSet</th><th>SDC</th></tr>
                     <tr
                             ng-class="{background:entry.linkId.split('.').length == 2}"
                             ng-repeat="entry in qReport.entries" ng-if="showReportLine(input.SDCOnly,entry)">
@@ -251,7 +251,10 @@
                         <td>{{entry.type}}</td>
                         <td>{{entry.mult}}</td>
                         <td>{{entry.isHidden}}</td>
-                        <td>{{entry.fixedValue}}</td>
+                        <td>{{entry.fixedValue}}
+
+                            {{entry.valueSet}}
+                        </td>
                         <td>
                             <div ng-if="entry.initialExpression">
                                 <strong>Initial: </strong>{{entry.initialExpression}}
@@ -304,7 +307,10 @@
                             </div>
 
 
-                            <div ng-repeat="ext in entry.unknownExtension">
+                            <div
+                                    style="background-color: #f2dede"
+                                    ng-repeat="ext in entry.unknownExtension">
+
                                 <strong>Unknown: </strong> {{ext.url}}
 
                             </div>

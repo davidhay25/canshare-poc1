@@ -97,6 +97,18 @@
 
 }
 
+.custom-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: vertical;
+}
+
 .tableFixHead {
     overflow-y: auto;
     height: 800px;

@@ -1,5 +1,5 @@
 <div>
-
+<!--
 <style>
   .custom-textarea {
     width: 100%;
@@ -14,6 +14,7 @@
   }
 
 </style>
+  -->
 
   <div class="modal-header">
     <div class="row">
@@ -214,10 +215,10 @@
           </tr>
 
 
-          <tr  ng-if="false">
-            <td>Auto populate note</td>
+          <tr>
+            <td>Help text</td>
             <td><input type="text" class="form-control" ng-model="input.autoPop"/>
-              <div><em>A note about any prepop. Will appear in the form.</em></div>
+              <div><em>A note about the item. Will appear as a help icon in the form.</em></div>
             </td>
           </tr>
 
@@ -319,7 +320,8 @@
             <td>PrePop expression</td>
             <td>
 
-              <div ng-if = "dg.namedQueries.length > 0">
+              <!--  <div ng-if = "dg.namedQueries.length > 0">-->
+              <div >
                 <div class="row">
                   <div class="col-md-8">
                   <textarea
@@ -355,8 +357,9 @@
                   {{testPPResult}}
                 </div>
               </div>
+
               <div ng-if = "! dg.namedQueries || dg.namedQueries.length < 1">
-                <em>To enable pre-population you need to select a named query for this DG. This is
+                <em>If not pre-popping from standard variable (%patient %user) or user defined variable, you need to select a named query for this DG. This is
                   done from the main DG editor (the link at the top of the DG display page).</em>
               </div>
 
@@ -449,7 +452,10 @@
 
           </uib-tab>
 
-          <uib-tab heading="Fixed values">
+          <uib-tab>
+
+            <uib-tab-heading>Fixed values <span class="badge" ng-if="input.qFixedValues.length > 0"> {{input.qFixedValues.length}}</span></uib-tab-heading>
+
             <em>Fixed values defined by this item </em>
             <table class="table table-bordered">
               <tr><th>Path</th><th>Type</th><th>Value</th></tr>

@@ -479,7 +479,15 @@
             </uib-tab>
 
 
+            <uib-tab heading="Ad hoc Q extensions">
 
+                <div class="pull-right clickable"><div ng-click="validateJson(input.adHocExt,true)">Validate</div></div>
+                <div class="clearfix"></div>
+                <textarea ng-model="input.adHocExt" class="custom-textarea" rows="15"></textarea>
+                <br/>
+                <em>Add any adhoc extensions to add to a derived questionnaire item. Must be an array with valid Json that
+                    will be copied into the Q Item. Use double quotes - not single quotes.</em>
+            </uib-tab>
 
             <uib-tab heading="Json">
                 <pre>{{model | json}}</pre>
