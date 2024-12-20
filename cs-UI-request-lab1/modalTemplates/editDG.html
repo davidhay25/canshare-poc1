@@ -131,7 +131,18 @@
                 </div>
                 <br/>
 
-
+                <div class="row">
+                    <div class="col-md-2">
+                        Terminology server
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" placeholder="Full url to sever fhir root" class="form-control" ng-model="input.termSvr">
+                    </div>
+                    <div class="col-md-6">
+                        The Terminology server to use for ValueSet expansion in this DG. Defaults to the National New Zealand Terminology Server.
+                    </div>
+                </div>
+                <br/>
                 <div class="row">
                     <div class="col-md-2">
                         Description
@@ -453,6 +464,8 @@
                                 <select class="form-control" ng-model="input.rrDefinition"
                                         ng-options = "v.path for v in definitions" />
 
+                                <input type="text" class="form-control" ng-model="input.adHocRrDefinition"/>
+
 
                             </td>
                             <td></td>
@@ -464,8 +477,8 @@
 
                 <div>
                     <div class="btn btn-primary pull-right"
-                            ng-show = "input.rrSource && input.rrDefinition && input.rrTarget"
-                            ng-click = "addRR(input.rrSource,input.rrDefinition,input.rrTarget)">
+                            ng-show = "input.rrSource && (input.rrDefinition || input.adHocRrDefinition) && input.rrTarget"
+                            ng-click = "addRR(input.rrSource,input.rrDefinition,input.rrTarget,input.adHocRrDefinition)">
                     Add Reference</div>
                 </div>
                 <br/>

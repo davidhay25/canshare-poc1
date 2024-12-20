@@ -20,7 +20,9 @@ angular.module('formsApp')
             templateUrl: 'directive/renderForm2/renderFormDir2.html',
             controller: function($scope,renderFormsSvc2,questionnaireSvc,vsSvc,$http,$uibModal,utilsSvc){
 
-                let localPatientId = $scope.patientId || "45086382"
+                //let localPatientId = $scope.patientid || "45086382"
+                let localPatientId = $scope.patientid || "dietrich-blake-louis"
+                let localPractitionerId = 'alderson-helene'     //connectathon
 
                 $scope.datePopup = {}
                 $scope.dataEntered = {}
@@ -107,6 +109,7 @@ angular.module('formsApp')
                     //add the patient context.
                     //todo - pass this into the directive...
                     $scope.redirectUrl += `&subject=Patient/${localPatientId}`
+                    $scope.redirectUrl += `&author=Practitioner/${localPractitionerId}`
 
                     //This was code to allow multiple of this directive in a single page. Didn't work. May no longer be needed.
 

@@ -43,6 +43,8 @@ angular.module("pocApp")
         //The actual reference is to a variable with the name 'PatientID'
         //todo - might want to externalize into a config file ot similar
 
+        //todo connectathon - this interferes when the patient is not in the bundle
+        //does seem to be overriten if the DG specified it though - is this OK?
         let resourcesForPatientReference = {}
         resourcesForPatientReference['AllergyIntolerance'] = {path:'patient'}
         resourcesForPatientReference['Observation'] = {path:'subject'}
@@ -130,6 +132,7 @@ angular.module("pocApp")
 
         function addDefinitionExtract(item,vo) {
             //add a definition extract resource. vo = {definition: fullUrl: } - might add others later
+            //
             let ext = {url:extDefinitionExtract,extension:[]}
             ext.extension.push({url:"definition",valueCanonical:vo.definition})       //the canonical url of the resource to extract - must be present
             if (vo.fullUrl) {
@@ -137,7 +140,9 @@ angular.module("pocApp")
             }
 
 
-
+            if (vo.ifNoneExist) {
+                ext.extension.push({url:"ifNoneMatch",valueString:vo.ifNoneExist})
+            }
 
 
             item.extension = item.extension || []
@@ -1348,7 +1353,7 @@ angular.module("pocApp")
                 let ext = {url:extAllocateIdUrl,valueString:'patientID'}
                 Q.extension.push(ext)
 
-
+/*
                 //need to mark items for inter-resource references
                 let testRef = [
                     {
@@ -1358,7 +1363,7 @@ angular.module("pocApp")
                         idName:"specimenID"
                     }
                 ]
-
+*/
                 let hashIdName = {}     //associate an idname (from allocateId) with the path
                 if (dg.resourceReferences) {
                     //we need to set consistent 'idname' properties - that will be used by allocateId
@@ -1637,6 +1642,12 @@ angular.module("pocApp")
                             vo.definition = `http://hl7.org/fhir/StructureDefinition/${extractType}`     //set the canonical for the extract
                             if (extractType == 'Patient') {
                                 vo.fullUrl = 'patientID'            //sets the fullUrl to the variable created by allocateID and added to every Q
+
+                                //todo connectathon
+
+                                vo.ifNoneExist = "'Patient?identifier=' + %resource.item.item.item.where(linkId='auPathRequest1.patient.identifier.system').answer.value"
+                                vo.ifNoneExist += "+ '|' + %resource.item.item.item.where(linkId='auPathRequest1.patient.identifier.value').answer.value"
+
                             } else {
                                 if (config.hashIdName[ed.path]) {
                                     vo.fullUrl = config.hashIdName[ed.path]
@@ -1962,7 +1973,8 @@ angular.module("pocApp")
 
                         ed.qFixedValues.forEach(function (fv) {
                             let extractPath = `${extractionContext}#${fv.path}`
-                            if (fv.value.indexOf('%') > -1) {
+
+                            if (typeof fv.value == 'string' && fv.value.indexOf('%') > -1) {
                                 //this is assumed to be an expression
                                 addFixedValue(item,extractPath,fv.type,null,fv.value)
                             } else {

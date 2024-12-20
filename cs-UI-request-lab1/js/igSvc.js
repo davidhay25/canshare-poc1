@@ -832,19 +832,14 @@ angular.module("pocApp")
                         let mult = ed.mult || '0..1'
                         lne += ` ${mult} ${type} `
 
-                        if (ed.description) {
-                            lne += `"${cleanString(ed.description)}"`
-                        } else {
-                            lne += `"${cleanString(ed.path)}"`  //description is required
-                        }
+                        let description = ed.description || ed.title || ed.path
+                        lne += `"${cleanString(description)}"`
+
                         arLne.push(lne)
                         if (ed.valueSet) {
                             let vs = ed.valueSet.replace(/\s/g, '') //remove any spaces
                             let lneVs =`* ${ar[ar.length-1]} from https://nzhts.digital.health.nz/fhir/ValueSet/${vs} (preferred)`
-                            //console.log(ed.valueSet,lneVs)
                             arLne.push(lneVs)
-                            //let lneVs = `item2 from http://hl7.org/fhir/ValueSet/contact-point-system (required)`
-
                         }
 
                         return arLne

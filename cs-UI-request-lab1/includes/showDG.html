@@ -103,7 +103,7 @@
 
 
 
-        <button class="btn btn-link" ng-click="loadReview()">New review</button>
+        <button class="btn btn-link" ng-click="loadReview()">Questionnaire</button>
 
       <button class="btn btn-link" ng-click="showLink('dg')">Link</button>
 
@@ -797,19 +797,10 @@
     <uib-tab heading="Views">
       <br/>
       <uib-tabset>
-        <uib-tab heading="Logical Model">
-          The FHIR shorthand that represents this DataGroup as a FHIR Logical Model.
-          <span class="pull-right">
-       <i class="glyphicon glyphicon-paperclip pull-right clickable"
-          ng-click="copyFshToClipboard(dgFshLM)"></i>
-      </span>
-          <br/>
-          <pre>{{dgFshLM}}</pre>
 
 
-        </uib-tab>
-
-        <uib-tab heading="Profile">
+<!--
+        <uib-tab  heading="Profile">
           The FHIR shorthand that represents this DataGroup as a FHIR Profile.
           Only includes elements marked as extractable
           <span class="pull-right">
@@ -821,6 +812,7 @@
 
 
         </uib-tab>
+        -->
 
         <uib-tab heading="Table">
           <br/>
@@ -1019,7 +1011,17 @@
 
         </uib-tab>
 
+        <uib-tab heading="Logical Model">
+          The FHIR shorthand that represents this DataGroup as a FHIR Logical Model.
+          <span class="pull-right">
+       <i class="glyphicon glyphicon-paperclip pull-right clickable"
+          ng-click="copyFshToClipboard(dgFshLM)"></i>
+      </span>
+          <br/>
+          <pre>{{dgFshLM}}</pre>
 
+
+        </uib-tab>
 
         <uib-tab heading="Order element">
           <pre>{{selectedModel.ssOrder | json}}</pre>
@@ -1232,11 +1234,12 @@
 
       <strong>DataGroups and Compositions that reference this one</strong>
       <table class="table table-bordered">
-        <tr><th>Name</th><th>Path</th><th>Kind</th><th>Card.</th><th>Mode</th></tr>
+        <tr><th>Title (name)</th><th>Path</th><th>Kind</th><th>Card.</th><th>Mode</th></tr>
+
         <tr ng-repeat="item in xref[selectedModel.name] track by $index">
           <td>
             <div class="clickable" ng-click="selectModelFromList(item.name,item.kind)">
-              {{item.name}} ({{item.title}})
+              {{item.title}} ({{item.name}})
             </div>
 
 

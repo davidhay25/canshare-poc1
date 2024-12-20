@@ -434,7 +434,6 @@ angular.module("pocApp")
 
                     }
                     return tmpDG
-
                 }
 
             },
@@ -450,14 +449,13 @@ angular.module("pocApp")
                 //node.data = {dg:DG}
                 arNodes.push(rootNode)
 
-
-
                 allElements.forEach(function (item,ctr) {
                     let ed = item.ed
                     if (ed.type) {
                         let type = ed.type[0]
                         if (fhirDT.indexOf(type) == -1) {
-                            let id = `${type}${ctr}`
+
+                            let id = `${type}${Math.floor(Math.random() * 1001)}`
                             let node = {id: id, label:type,shape: 'box'}
 
                             node.data = {model: in_hashAllDG[type]}
@@ -496,7 +494,7 @@ angular.module("pocApp")
             },
 
 
-            makeFullGraph : function(in_hashAllDG,hideReferences) {
+            makeFullGraph : function(in_hashAllDG,hideReferences,hideParents) {
 
                 //create a single graph with all DGs. hashierarchy and optionally references
                 //shows on the main page
@@ -529,12 +527,13 @@ angular.module("pocApp")
 
 
                     //add the default parent if needed
+                    //Dec16 - why did I do this?
                     if (! DG.parent) {
-                        DG.parent = "root"
+                     //   DG.parent = "root"
                     }
 
                     //check for parent
-                    if (DG.parent) {
+                    if (DG.parent && ! hideParents) {
                         //create the 'parent' link  todo - graph needs to add parent
                         let edge = {id: 'e' + arEdges.length +1,
                             from: DG.name,

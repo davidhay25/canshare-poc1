@@ -31,6 +31,9 @@
 
     <script src="js/libs/ngStorage.min.js"></script>
     <script src="js/eRequestCtrl.js"></script>
+    <script src="js/QutilitiesSvc.js"></script>
+
+
 
 
 </head>
@@ -338,14 +341,68 @@
                         </div>
                     </div>
 
+                    <pre>{{bundle | json}}</pre>
 
                     <textarea class="form-control" ng-model="input.pastedBundle" rows="20"></textarea>
                 </div>
                 <div class="col-md-6">
-                    <pre>{{bundle | json}}</pre>
+                    <uib-tabset>
+                        <uib-tab heading="Validation">
+                            <div class="myScroll">
+                                <table class="table table-bordered">
+                                    <tr ng-repeat="iss in newBundleOO.issue">
+                                        <td>{{iss.diagnostics}}
+                                            <br/>
+                                            <div ng-repeat="loc in iss.location">
+                                                <em>{{loc}}</em>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                </table>
+                            </div>
+                            <table class="table table-bordered">
+                                <tr ng-repeat="iss in newBundleOO.issue">
+                                    <td>{{iss.diagnostics}}
+                                        <br/>
+                                        <div ng-repeat="loc in iss.location">
+                                            <em>{{loc}}</em>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                            </table>
+                        </uib-tab>
+
+                        <uib-tab>
+                            <uib-tab-heading>Resources <span class="badge">{{bundle.entry.length}}</span> </uib-tab-heading>
+                            <ul>
+                                <li ng-repeat = 'entry in bundle.entry'>
+                                    {{entry.resource.resourceType}}
+                                </li>
+                            </ul>
+                        </uib-tab>
+                    </uib-tabset>
+
                 </div>
             </div>
 
+
+        </uib-tab>
+
+        <uib-tab heading="QR summary generation">
+            <div class="row">
+                <div class="col-md-6">
+                    <button class="btn btn-link pull-right"
+                            ng-click="generateSummary(input.pastedQR)"
+                            ng-if="input.pastedBundle">Parse bundle</button>
+
+                    <textarea class="form-control" ng-model="input.pastedQR" rows="20"></textarea>
+                </div>
+                <div class="col-md-6">
+                    {{input.qrSummary}}
+                </div>
+            </div>
 
         </uib-tab>
 

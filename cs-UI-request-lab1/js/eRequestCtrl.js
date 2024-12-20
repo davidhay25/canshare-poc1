@@ -40,28 +40,33 @@ angular.module("pocApp")
                 delete $scope.selectedHistoryItemContained
             }
 
+            $scope.generateSummary = function (str) {
+                let QR = JSON.parse(str)
+                $scope.input.qrSummar = QutilitiesSvc.makeQRSummary(QR)
+            }
+
             //paste in a Q
             $scope.pasteBundle = function (str) {
                 delete $scope.bundle
                 try {
                     $scope.bundle = JSON.parse(str)
+
+
+
                 } catch {
                     alert("This is not a valid Json string")
                     return
                 }
-/*
-                try {
-                    $scope.hashEd = {}
-                    //A report focussed on pre-popupation & extraction
-                    let voReport =  makeQSvc.makeReport(testQ)
-                    $scope.qReport =voReport.report
-                    $scope.fullQ = testQ
-                    $scope.input.mainTabActive = 1
-                } catch {
-                    alert("This is a valid Json string, but there were errors parsing it.")
 
-                }
-                */
+                $http.post(`${serverBase}Bundle/$validate`,$scope.bundle).then(
+                    function (data) {
+                        $scope.newBundleOO = data.data
+                        console.log(data.data)
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+
             }
 
 

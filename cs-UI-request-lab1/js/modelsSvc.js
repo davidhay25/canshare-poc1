@@ -214,7 +214,7 @@ angular.module("pocApp")
 
                         if (model) {
                             hashReferences[model.name] = hashReferences[model.name] || []
-                            hashReferences[model.name].push({name:DG.name,kind:model.kind,mode:'parent'})
+                            hashReferences[model.name].push({name:DG.name,title:DG.title,kind:model.kind,mode:'parent'})
                             currentModelParent = model.parent
                         } else {
                             console.log(`The DG ${key} has a parent or grandParent of ${currentModelParent} which is not a DG`)
@@ -229,7 +229,7 @@ angular.module("pocApp")
                                 ed.type.forEach(function (typ) {
                                    // console.log(typ)
                                     hashReferences[typ] = hashReferences[typ] || []
-                                    hashReferences[typ].push({name:DG.name,kind:DG.kind,path:ed.path,mode:'uses',mult:ed.mult,title:ed.title})
+                                    hashReferences[typ].push({name:DG.name,kind:DG.kind,path:ed.path,mode:'uses',mult:ed.mult,title:DG.title})
                                 })
                             }
                         })
@@ -255,6 +255,20 @@ angular.module("pocApp")
 
                         })
                     }
+                })
+
+                //sort contents of each
+                Object.keys(hashReferences).forEach(function (key) {
+                    let ar = hashReferences[key]
+                    ar.sort(function (a,b) {
+                        if (a.title > b.title) {
+                            return 1
+                        } else {
+                            return  -1
+                        }
+
+                    })
+
                 })
 
                 return hashReferences

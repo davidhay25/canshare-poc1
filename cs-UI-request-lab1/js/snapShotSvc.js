@@ -860,6 +860,42 @@ angular.module("pocApp")
 
 
         return {
+            getImpactedDGsDEP : function (dgName) {
+                //get all DG's that could be impacted by changes in this DG
+                //
+                let impactedDG = {}
+                let fhirTypes = utilsSvc.fhirDataTypes()    //the FHIR datatypes - can't be references
+
+                let arDGNames = [dgName]    //todo - add all children
+                //will be effected if a DG references one of these
+                //note that a specific change may not have an impact - if the DG has overitten an inherited path then it wont change
+
+                Object.keys(allDgSnapshot).forEach(function (key) {
+
+                    let dg = allDgSnapshot[key]
+                    if (dg.diff) {
+                        //examine the diff rather than the snapshot
+                        for (const ed of dg.diff) {
+                            let type = ed.type[0]
+                            if (fhirTypes.indexOf(type) == -1) {
+                                //not a FHIR datatype
+                                if (arDGNames.indexOf(type) > -1) {
+                                    //this ed refers to the input DG - or one of its children
+                                    impactedDG[dg.name] = true
+                                    break
+                                }
+                            }
+
+
+                        }
+                    }
+
+                })
+
+                console.log(impactedDG)
+                return impactedDG
+
+            },
             getNamedQueries : function (dgName) {
                 //get all the named queries used by any member of this DG
 

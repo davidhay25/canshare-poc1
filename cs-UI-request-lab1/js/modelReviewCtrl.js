@@ -7,6 +7,8 @@ angular.module("pocApp")
 
             $scope.input.SDCOnly = true
 
+            //dietrich-blake-louis
+
             // ----------- consume events emitted by the v2 Q renderer ----
             $scope.$on('viewVS',function (event,vs) {
                 $scope.viewVS(vs)

@@ -6,6 +6,7 @@ angular.module("pocApp")
                   snapshotSvc,vsSvc,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
+
             //change the background colour of the DG summary according to the environment
             $scope.modelInfoClass = 'modelInfo'
             let host = $location.absUrl()
@@ -414,7 +415,6 @@ angular.module("pocApp")
                 if ($scope.user && model && model.checkedOut == $scope.user.email) {
                     return true
                 }
-
             }
 
             //create an FSH with all DG
@@ -799,7 +799,8 @@ angular.module("pocApp")
 
                     let vo
                     try {
-                        vo = modelDGSvc.makeFullGraph($scope.hashAllDG,true)
+
+                        vo = modelDGSvc.makeFullGraph($scope.hashAllDG,false,false)
 
                         makeGraphAllDG(vo.graphData)
 
@@ -817,11 +818,13 @@ angular.module("pocApp")
                         }
 
 
+                        /* category no longer used
                         //--- make the category hash for the category tree display of DG
                         let hashCategories = modelDGSvc.analyseCategories($scope.hashAllDG)
                         let vo2 = modelDGSvc.makeTreeViewOfCategories(hashCategories)
                         showCategoryDGTree(vo2.treeData)
 
+                        */
                         //Jan15 - why is this here modelDGSvc.makeDgDownload($scope.hashAllDG)
 
 
@@ -897,7 +900,7 @@ angular.module("pocApp")
             }
 
             //display the tree with categories
-            function showCategoryDGTree(treeData) {
+            function showCategoryDGTreeDEP(treeData) {
                 $('#categoryDGTree').jstree('destroy');
 
                 $scope.categoryDGTree = $('#categoryDGTree').jstree(
@@ -1397,7 +1400,7 @@ angular.module("pocApp")
 
 
             $scope.refreshUpdates = function(){
-                //xref is cross references between models/types
+                //xref is cross references between models/types - used in the 'Relationships' tab
 
                // return //temp
                 $scope.xref = modelsSvc.getReferencedModels($scope.hashAllDG,$scope.hashAllCompositions)
@@ -1795,11 +1798,12 @@ angular.module("pocApp")
                 $scope.referencedDGOrdering = orderingSvc.createMoveFromReferences($scope.fullElementList,$scope.selectedModel,$scope.hashAllDG)
 
                 $scope.dgFshLM = igSvc.makeFshForDG(dg,$scope.fullElementList)
-                $scope.dgFshProfile = igSvc.makeProfileFshDg(dg,$scope.fullElementList)
+                // - temp - don't think this is used any more $scope.dgFshProfile = igSvc.makeProfileFshDg(dg,$scope.fullElementList)
 
               //  makeGraphOneDG :  function(dg,allElements,in_hashAllDG) {
 
               //  }
+
 
                 let vo = modelDGSvc.makeGraphOneDG(dg,$scope.fullElementList,$scope.hashAllDG)
                 makeGraph(vo.graphData)     //todo - do we want the graph back?
@@ -1826,7 +1830,34 @@ angular.module("pocApp")
                 //all the dependencies (enableWhen)
                 $scope.allDependencies = modelDGSvc.getAllEW($scope.fullElementList,$scope.selectedModel.name)
 
+             //   $scope.dgRefereningThisOne = snapshotSvc.getImpactedDGs($scope.selectedModel.name)
 
+/*
+                function findAllConnectedNodes(network, nodeId, visited = new Set()) {
+                    // If this node is already visited, skip it
+                    if (visited.has(nodeId)) {
+                        return visited;
+                    }
+
+                    // Mark the current node as visited
+                    visited.add(nodeId);
+
+                    // Get the direct neighbors of the current node
+                    let neighbors = network.getConnectedNodes(nodeId);
+
+                    // Recursively visit each neighbor
+                    for (let neighbor of neighbors) {
+                        findAllConnectedNodes(network, neighbor, visited);
+                    }
+
+                    return visited;
+                }
+
+
+
+                let set = findAllConnectedNodes($scope.graphAllDG,dg.name)
+                console.log(set)
+*/
             }
 
 
@@ -1965,6 +1996,11 @@ angular.module("pocApp")
 
                     $scope.$digest()
                 })
+
+
+
+
+
             }
 
             $scope.$on('redrawTree',function(){
@@ -2057,6 +2093,8 @@ angular.module("pocApp")
                 }
             }
 
+
+
             function makeGraphAllDG(graphData) {
                 $scope.allGraphData = graphData
 
@@ -2092,6 +2130,31 @@ angular.module("pocApp")
                         let nodeId = obj.nodes[0];  //get the first node
                         let node = $scope.allGraphData.nodes.get(nodeId);
                         $scope.selectedNodeFromFull = node.data
+
+
+                        //this is the one in the 'all DG' graph. It's not interactive
+                        if ($scope.selectedNodeFromFull && $scope.selectedNodeFromFull.dg) {
+                            let fullElementList = snapshotSvc.getFullListOfElements($scope.selectedNodeFromFull.dg.name)// vo.allElements
+                            let treeData = modelsSvc.makeTreeFromElementList(fullElementList)
+                            $('#dgFromAllGraph').jstree('destroy');
+                            $('#dgFromAllGraph').jstree(
+                                {'core':
+                                        {'multiple': false,
+                                            'data': treeData,
+                                            'themes': {name: 'proton', responsive: true}}
+                                }
+                            ).bind("loaded.jstree", function (event, data) {
+                                let id = treeData[0].id
+                                $(this).jstree("open_node", id);
+                                //let treeObject = $(this).jstree(true).get_json('#', { 'flat': false })
+
+
+                            })
+                        }
+
+
+
+
                         $scope.$digest()
 
                     })

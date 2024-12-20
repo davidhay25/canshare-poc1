@@ -11,6 +11,34 @@ angular.module("pocApp")
 
         return {
 
+            makeQRSummary : function (QR,Q) {
+                //generate an HTML summary of the QR
+
+                let lstSummary = []
+
+                function processItem(item) {
+                    //process a single item
+                    if (item.answer) {
+                        item.answer.forEach(function (ans) {
+                            let v = ans.valueString
+                            let lne = `<tr><td>${item.text}</td><td>${v}</td></tr>`
+                            lstSummary.push(lne)
+
+                        })
+
+                        if (item.item) {
+                            item.item.forEach(function (child) {
+                                processItem(child)
+                            })
+                        }
+                    }
+                }
+
+                QR.item.forEach(function (item) {
+                    processItem(item)
+                })
+
+            },
 
 
             getExtractableDGDEP : function (allDGItems) {

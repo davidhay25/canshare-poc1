@@ -118,13 +118,21 @@ angular.module("pocApp")
 
             }
 
-            $scope.addRR = function (source,definition,target) {
+            $scope.addRR = function (source,definition,target,adHocDefinition) {
+                //target could be a string or an object with a property of path
                 $scope.input.resourceReferences = $scope.input.resourceReferences || []
                 //create the name that will be used in the allocateID extension
 
-                let ar = target.path.split('.')
+                //let ar = target.path.split('.')
+                //connnectathon todo
+                let def = adHocDefinition
+                if (definition && definition.path) {
+                    def = definition.path
+                }
 
-                let rr = {source:source.path,definition:definition.path,target:target.path}
+                //let rr = {source:source.path,definition:definition.path,target:path}
+                let rr = {source:source.path,definition:def,target:target.path}
+                //let rr = {source:source.path,definition:definition.path,target:target.path}
                 $scope.input.resourceReferences.push(rr)
                 delete $scope.input.rrSource
                 delete $scope.input.rrDefinition

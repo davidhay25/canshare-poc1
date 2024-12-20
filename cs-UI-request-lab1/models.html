@@ -96,42 +96,39 @@
                 </form>
             </div>
 
-            <div class="col-md-1 col-sm-1">
-                <div class="navbar-text btn">
-                    <a href="https://docs.google.com/document/d/1InT4HDIudFl4gUAF5htUNeLJG2QT8rBnMjB_E1fe78s"
-                       target="_blank">Documentation</a>
-                </div>
-            </div>
 
-            <div class="col-md-1 col-sm-1">
-                <div class="navbar-text btn">
-                    <a href="query.html"
-                       target="_blank">Terminology</a>
-                </div>
-            </div>
+
+
 
 
             <div class="col-md-1">
-                <div class="navbar-text" >
+                <div class="navbar-text btn" >
                     <button class="btn btn-success pull-right" ng-click="library()">Library</button>
                 </div>
             </div>
 
-
+            <div class="col-md-1 col-sm-1">
+                <div class="navbar-text btn">
+                    <button class="btn btn-primary pull-right" ng-click="">Playground</button>
+                </div>
+            </div>
 
             <div class="col-md-1">
-                <div class="navbar-text" >
-                    <!--
-                    <div class="btn" ng-click = "toggleTrace()" class="clickable">
-                        <span ng-if="localStorage.trace.on"><span style="color: red">
-                            <strong>Trace on</strong></span> </span>
-                        <span ng-hide="localStorage.trace.on">Trace off</span>
-                        <span class="badge">{{localStorage.trace.contents.length}}</span>
+            </div>
+            <div class="col-md-1">
+
+                    <div class="navbar-text">
+                        <a href="query.html"
+                           target="_blank">Terminology</a>
+
+                        <div ng-if = "user.email">
+                            <a href="https://docs.google.com/document/d/1InT4HDIudFl4gUAF5htUNeLJG2QT8rBnMjB_E1fe78s"
+                               target="_blank">Documentation</a>
+                        </div>
                     </div>
-                    -->
 
 
-                </div>
+
 
             </div>
 
@@ -185,9 +182,7 @@
 
     <div>
 
-<!--
-        <button class="pull-right btn-link btn" ng-click="showTrace()">Trace</button>
--->
+
 
 
 
@@ -269,9 +264,6 @@
             <br/>
             <div class="row">
                 <div ng-class="leftPanel">
-
-
-
 
 
                     <uib-tabset>
@@ -471,7 +463,22 @@
                                         <div id="graphAllDG"></div>
                                     </div>
                                     <div class="col-md-4">
-                                        <pre>{{selectedNodeFromFull.dg | json}}</pre>
+
+                                        <button class="btn-link btn pull-right"
+                                                ng-click="selectModel(selectedNodeFromFull.dg )">Select</button>
+
+                                        <uib-tabset>
+                                            <uib-tab heading="Tree">
+                                                <div id="dgFromAllGraph"></div>
+                                            </uib-tab>
+                                            <uib-tab heading="Json">
+                                                <div class="myScroll">
+                                                    <pre>{{selectedNodeFromFull.dg | json}}</pre>
+                                                </div>
+
+                                            </uib-tab>
+                                        </uib-tabset>
+
                                     </div>
                                 </div>
 
@@ -741,12 +748,6 @@
 
 <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
 
-<!-- scripts the define the models-->
-<!--
-<script src="js/modelsDemoSvc.js"></script>
-<script src="js/models/ObservationModels.js"></script>
-<script src="js/models/StagingModels.js"></script>
--->
 
 
 <script src="js/compSectionsCtrl.js"></script>
