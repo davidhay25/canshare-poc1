@@ -15,15 +15,7 @@ angular.module("pocApp")
             }
 
 
-            $scope.fixGroupsDEP = function () {
-                //run the fixit routine to make sure group children immediately follow the group
-                //$scope.newDgDiff = orderingSvc.adjustGroupOrdering($scope.selectedModel)
-                $scope.selectedModel.diff = orderingSvc.adjustGroupOrdering($scope.selectedModel)
 
-                $scope.makeSnapshots()
-                $scope.refreshFullList($scope.selectedModel)
-
-            }
 
             $scope.testxquery = function (queryName) {
 
@@ -196,43 +188,6 @@ angular.module("pocApp")
             }
 
 
-            $scope.hideInQDEP = function (edIn) {
-
-                if (! $scope.user || $scope.selectedModel.checkedOut !== $scope.user.email) {
-                    alert("You must check out the DG to make changes")
-                    return
-                }
-
-                let path = $filter('dropFirstInPath')(edIn.path)
-
-                let found = false
-                for (const ed of $scope.selectedModel.diff) {
-                    if (ed.path == path) {
-                        ed.hideInQ = ! ed.hideInQ
-                        let action = ed.hideInQ ? 'set-hideinq' : 'reset-hideinq'
-                        $scope.selectedNode.data.ed.hideInQ = ed.hideInQ    //for the display
-
-                        traceSvc.addAction({action:action,model:$scope.selectedModel,description:`path: ${path} - update diff`})
-                        found = true
-
-                        break
-                    }
-                }
-
-                //create an override element
-                if (! found) {
-                    edIn.hideInQ = ! edIn.hideInQ
-                    let action = edIn.hideInQ ? 'set-hideinq' : 'reset-hideinq'
-                    edIn.path = path
-                    $scope.selectedModel.diff.push(edIn)
-                    traceSvc.addAction({action:action,model:$scope.selectedModel,description:`path: ${path} - add diff`})
-                }
-
-                $scope.refreshFullList($scope.selectedModel)
-                $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:path})
-
-
-            }
 
             //check out the current DG
             $scope.checkOut = function () {
@@ -382,8 +337,7 @@ angular.module("pocApp")
             }
 
             $scope.removeEnableWhen = function (inx,path) {
-              //  alert('remove disabled for now')
-            //    return
+
 
                 if (! confirm("Are you sure you wish to remove this Conditional show")) {
                     return
@@ -439,131 +393,7 @@ angular.module("pocApp")
 
             }
 
-            //When adding a new EW and the source has been selected. The possible values of that source need to be determined.
-            $scope.ewSourceSelectedDEP = function (source) {
-                //console.log(source)
-                delete $scope.ewSourceValues
-                $scope.input.ewSourceOp = "="       //default to =
 
-                if (source) {
-
-                    //need to get the list of options from the fullElement list
-                    for (const item of $scope.fullElementList) {
-                        console.log(item)
-                        if (item.ed && item.ed.path == source.ed.path) {
-                            modelDGSvc.expandEdValues(item.ed).then(
-                                function (ar) {
-                                    $scope.ewSourceValues = ar
-                                },
-                                function (err) {
-                                    console.log(err)
-                                }
-                            )
-                        }
-                    }
-
-
-
-
-                }
-
-            }
-
-            
-
-            $scope.getCategoryDEP = function (DG) {
-                if (!DG) {
-                    return {}
-                }
-                let categoryTag = {}
-                //first look in the DG itself
-                categoryTag = findCategoryTag(DG)
-
-                if (!categoryTag.code) {
-                    //if there isn't a category on the DG, is there one on any of their parents
-                    let clone = angular.copy(DG)
-                    while (clone.parent && ! categoryTag.code) {
-                        if ($scope.hashAllDG[clone.parent]) { //possible for the parent to not be downloaded from the library
-                            categoryTag = findCategoryTag($scope.hashAllDG[clone.parent])
-                            clone = angular.copy($scope.hashAllDG[clone.parent])
-                            if (! clone) {
-                                console.log('>>>', clone.parent)
-                            }
-                        }
-
-
-
-                    }
-                }
-
-                function findCategoryTag(DG) {
-                    let cTag = {}
-                    if (DG && DG.tags) {
-                        DG.tags.forEach(function (tag) {
-                            if (tag.system == "dgcategory") {
-                                cTag = tag
-                            }
-                        })
-                    }
-                    return cTag
-                }
-
-
-                return categoryTag
-            }
-
-            $scope.dglibraryInteractionDEP = function (DG) {
-
-                $uibModal.open({
-                    templateUrl: 'modalTemplates/libraryDG.html',
-                    backdrop: 'static',
-                    size : 'lg',
-                    controller: 'libraryDGCtrl',
-
-                    resolve: {
-                        DG: function () {
-                            return DG
-                        },
-                        user : function () {
-                            return $scope.user
-                        }
-                    }
-
-                }).result.then(function (ed) {
-                    //copy the units to the current item
-                    //need to update the .diff in the selected model
-/*
-                    //todo - what is this code doing???
-                    let p = $filter('lastInPath')(ed.path)
-                    for (const ed1 of $scope.selectedModel.diff) {
-                        if (ed1.path == p) {
-                            ed1.units = ed.units
-                            //ed.valueSet = vsUrl
-                            break
-                        }
-                    }
-
-                    */
-                })
-                
-            }
-
-
-
-            $scope.setOtherAllowedStatusDEP = function (ed,allowed) {
-                console.log(allowed)
-
-
-                //need to update the underlying model
-                let path = $filter("dropFirstInPath")(ed.path)
-                for (const ed1 of $scope.selectedModel.diff) {
-                    if (ed1.path == path) {
-                        ed1.otherAllowed = allowed
-                    }
-                }
-
-            }
-            
             //is this element able to be sliced
             $scope.canSlice = function (ed) {
                 if (ed && ed.mult) {
@@ -877,50 +707,11 @@ angular.module("pocApp")
                     return ed.sourceModelName
                 }
 
-/*
-                //why do this?
-                if (ed) {
-                    for (const element of $scope.fullElementList) {
-                        if (element.ed.path == ed.path) {
-                            return element.sourceModelName
-                            break
-                        }
-                    }
-                }
-                */
+
             }
 
             $scope.expandDTTree = function () {
                 $('#dgTree').jstree('open_all');
-            }
-
-            //set the possiblu units for a Quantity DT
-            $scope.setUnitsDEP = function (ed) {
-                $uibModal.open({
-                    templateUrl: 'modalTemplates/setUnits.html',
-                    backdrop: 'static',
-                    //size : 'lg',
-                    controller: 'setUnitsCtrl',
-
-                    resolve: {
-                        ED: function () {
-                            return ed
-                        }
-                    }
-
-                }).result.then(function (ed) {
-                    //copy the units to the current item
-                    //need to update the .diff in the selected model
-                    let p = $filter('lastInPath')(ed.path)
-                    for (const ed1 of $scope.selectedModel.diff) {
-                        if (ed1.path == p) {
-                            ed1.units = ed.units
-                            //ed.valueSet = vsUrl
-                            traceSvc.addAction({action:'edit-units',model:$scope.selectedModel,path:p})
-                            break
-                        }
-                    }
-                })
             }
 
             $scope.editDGOptionsList = function (ed,readOnly) {

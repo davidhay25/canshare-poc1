@@ -196,7 +196,7 @@ angular.module("pocApp")
 
 
             //Add or edit an override
-            $scope.editOverride = function (ed) {
+            $scope.editOverrideDEP = function (ed) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/editDGItem.html',
                     backdrop: 'static',
@@ -241,7 +241,7 @@ angular.module("pocApp")
             }
 
             //removing a Z element. It will be in the composition
-            $scope.removeZElement = function (ed) {
+            $scope.removeZElementDEP = function (ed) {
                 console.log(ed,$scope.selectedComposition.override)
 
                 if ($scope.selectedComposition.override) {
@@ -290,7 +290,7 @@ angular.module("pocApp")
                 }
 
             //Open the library interaction screen that is specific to compositions
-            $scope.libraryInteraction = function (comp) {
+            $scope.libraryInteractionDEP = function (comp) {
 
                 $uibModal.open({
                     templateUrl: 'modalTemplates/libraryComp.html',
@@ -331,18 +331,7 @@ angular.module("pocApp")
                 let newPath = ar.join('.')
                 $scope.termSelectDGItem({DHName:dgName,hiddenDGName:dgName,path:newPath})
 
-              /*
-                $timeout(function () {
 
-                    //let fullPath = `${item.hiddenDGName}.${item.path}`
-
-                    $("#compositionTree").jstree("select_node",  path);
-                    $("#compositionTree").jstree("open_node",  path);
-
-                    $scope.input.compTabActive = $scope.compUi.tree //make sure the tree is selected
-
-                },500)
-*/
 
             }
 
@@ -377,7 +366,7 @@ angular.module("pocApp")
                 return colour
             }
 
-            $scope.addZElement = function (parentEd) {
+            $scope.addZElementDEP = function (parentEd) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/addZElement.html',
                     backdrop: 'static',
@@ -432,34 +421,19 @@ angular.module("pocApp")
                 })
             }
         
-            $scope.getOverridesCount = function () {
+            $scope.getOverridesCountDEP = function () {
                 if ($scope.selectedComposition && $scope.selectedComposition.override) {
                     return Object.keys($scope.selectedComposition.override).length
                 }
 
             }
         
-            $scope.revertOverride = function (path) {
+            $scope.revertOverrideDEP = function (path) {
                 delete $scope.selectedComposition.override[path]
                 $scope.selectComposition($scope.selectedComposition)  //in parent
                 $scope.selectCompTreePath(path)
             }
 
-            $scope.changeValueSetDEP = function (ed) {
-                let vsUrl = prompt("Enter the ValueSet url")
-                if (vsUrl) {
-                    let newEd = angular.copy(ed)
-                    let oldVS = ed.valueSet
-
-                    newEd.valueSet = vsUrl
-                    newEd.oldValueSet = oldVS
-                    $scope.selectedComposition.override = $scope.selectedComposition.override || {}
-                    $scope.selectedComposition.override[newEd.path] = newEd
-                    //delete $scope.selectedCompositionNode
-                    $scope.selectComposition($scope.selectedComposition)  //in parent
-                    $scope.selectCompTreePath(ed.path)
-                }
-            }
 
             $scope.removeElement = function (ed) {
 

@@ -77,11 +77,58 @@
                     <span>
                         <a class="navbar-brand" href="#">
                             CanShare Logical Modeller workbench
+                            <div style="padding-top: 6px" ng-click="changeUserMode('library')"
+
+                                 ng-if="userMode == 'playground'">Playground</div>
                         </a>
                     </span>
 
+
             </div>
 
+            <div class="col-md-1">
+                <div class="navbar-text">
+                    <div>{{world.name}}</div>
+                </div>
+
+            </div>
+
+
+
+
+
+
+
+            <div class="col-md-1">
+                <div class="navbar-text btn" >
+                    <button ng-if="userMode == 'library'"
+                            class="btn btn-success pull-right" ng-click="library()">Library</button>
+                </div>
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <div class="navbar-text btn">
+                    <button ng-if="userMode == 'playground'" class="btn btn-primary pull-right"
+                            ng-click="openPlaygrounds()">Playgrounds</button>
+
+
+
+                </div>
+            </div>
+
+            <div class="col-md-1">
+
+                <div class="navbar-text" ng-if="userMode == 'library'">
+                    <a href="query.html"
+                       target="_blank">Terminology</a>
+
+                    <div ng-if = "user.email">
+                        <a href="https://docs.google.com/document/d/1InT4HDIudFl4gUAF5htUNeLJG2QT8rBnMjB_E1fe78s"
+                           target="_blank">Documentation</a>
+                    </div>
+                </div>
+
+            </div>
 
             <div class="col-md-1">
                 <div class="navbar-text">
@@ -94,42 +141,6 @@
                     <img ng-if="showWaiting" src="css/ajax_loader_blue_32.gif"/>
 
                 </form>
-            </div>
-
-
-
-
-
-
-            <div class="col-md-1">
-                <div class="navbar-text btn" >
-                    <button class="btn btn-success pull-right" ng-click="library()">Library</button>
-                </div>
-            </div>
-
-            <div class="col-md-1 col-sm-1">
-                <div class="navbar-text btn">
-                    <button class="btn btn-primary pull-right" ng-click="">Playground</button>
-                </div>
-            </div>
-
-            <div class="col-md-1">
-            </div>
-            <div class="col-md-1">
-
-                    <div class="navbar-text">
-                        <a href="query.html"
-                           target="_blank">Terminology</a>
-
-                        <div ng-if = "user.email">
-                            <a href="https://docs.google.com/document/d/1InT4HDIudFl4gUAF5htUNeLJG2QT8rBnMjB_E1fe78s"
-                               target="_blank">Documentation</a>
-                        </div>
-                    </div>
-
-
-
-
             </div>
 
             <div class="col-md-1">
@@ -182,27 +193,265 @@
 
     <div>
 
-
-
-
-
         <button class="pull-right btn-link btn" ng-click="clearLocal()">Clear local</button>
 
         <button class="pull-right btn-link btn" ng-click="export()">Import / Export</button>
-        <!--
-                <button ng-if = "user.email" class="pull-right btn-link btn" ng-click="updateTest()">Update Test</button>
 
+        <button ng-if = "selectedModel" class="pull-right btn-link btn" ng-click="showDGSummary()">Show Model summary</button>
 
-                <a style="padding-top: 8px; padding-right: 20px" class = 'pull-right' href="modelReview.html" target="_blank">Reviewer</a>
-        -->
-
-        <button ng-if = "selectedModel" class="pull-right btn-link btn" ng-click="showDGSummary()">Show DG image</button>
     </div>
 
 
     <uib-tabset active="input.mainTabActive">
 
-        <uib-tab heading="Compositions"  select="setInitialTab(0)">
+        <uib-tab heading="DataGroups" select="setInitialTab(0)">
+            <br/>
+            <div class="row">
+                <div ng-class="leftPanel">
+
+                    <uib-tabset>
+
+                        <uib-tab heading = "Inheritance" >
+                            <div>
+
+                                <div class="pull-right clickable spacer" ng-if = "user.email || userMode == 'playground'"
+                                     ng-click="newModel('dg')">New DG</div>
+
+                                <div class="pull-right clickable spacer"
+                                     ng-if = "(user.email || userMode == 'playground') && selectedModel"
+                                     ng-click="newModel('dg',selectedModel)">New child</div>
+
+
+                            </div>
+
+                            <div class="clearfix"></div>
+
+                            <div class="myScrollSmall background">
+                                <div id="allDGTree"></div>
+                            </div>
+
+                        </uib-tab>
+
+
+                        <uib-tab heading="All">
+
+                            <div style="padding: 8px">
+                                <div class="row ">
+                                    <div class="col-md-6">
+                                        <input type="text" placeholder="Filter" class="form-control"
+                                               ng-model="input.dgFilter"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button ng-if = "user.email" class="btn btn-link  pull-right" ng-click="newModel('dg')">New</button>
+                                        <button class="btn btn-link pull-right" ng-click="listAllDG()">List all</button>
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+                            <div class="clearfix"></div>
+
+                            <div class="myScroll background">
+                                <div class="list-group">
+                                    <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
+                                         ng-click="selectModel(v)"
+                                         ng-if="showDG(v,input.dgFilter)"
+                                         ng-repeat="v in sortedDGList">
+
+                                        <i ng-if="canEdit(v)"
+                                           class="glyphicon glyphicon-edit pull-right clickable"
+                                           ng-click="editModel(v)"></i>
+
+                                        {{v.title}}
+                                    </div>
+                                </div>
+                            </div>
+
+                        </uib-tab>
+
+                        <uib-tab heading="Tagged">
+                            <div class="row" style="padding: 8px">
+
+                                <div class="col-md-2">
+                                    <div style="padding-top: 8px">Tag</div>
+                                </div>
+                                <div class="col-md-7">
+                                    <select style="margin-top: 2px" class="form-control"
+                                            ng-options="k for k in tagNames"
+                                            ng-change = "rememberSelectedTag(input.selectedTag)"
+                                            ng-model = "input.selectedTag"></select>
+                                </div>
+                            </div>
+
+
+
+
+                            <div class="list-group background">
+                                <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
+                                     ng-click="selectModel(v)"
+                                     ng-if="true || showDG(v,input.dgFilter)"
+                                     ng-repeat="v in tags[input.selectedTag] track by $index">
+
+                                    <i class="glyphicon glyphicon-edit pull-right clickable"
+                                       ng-click="editModel(v)"></i>
+
+                                    {{v.title}}
+                                </div>
+
+                            </div>
+
+
+                        </uib-tab>
+
+
+                        <uib-tab heading = "Sections">
+                            <div>
+                                <div class="pull-right clickable spacer"
+                                     ng-if = "canEdit(selectedModel)"  ng-click="editModel(selectedModel)">Edit</div>
+                                <div class="pull-right clickable spacer" ng-if = "user.email"  ng-click="newModel('dg')">New dg</div>
+
+                                <div class="pull-right clickable spacer"
+                                     ng-if = "user.email && selectedModel"
+                                     ng-click="newModel('dg',selectedModel)">New child</div>
+
+                            </div>
+
+                            <div class="clearfix"></div>
+                            <div class="myScrollSmall background">
+                                <div id="sectionDGTree"></div>
+                            </div>
+                        </uib-tab>
+
+                        <uib-tab ng-if="false" heading = "Category">
+                            <em>Matching what's in the image</em>
+                            <div class="myScroll">
+                                <div id="categoryDGTree"></div>
+                            </div>
+
+                        </uib-tab>
+
+                    </uib-tabset>
+
+
+                </div>
+                <div ng-class="rightPanel">
+
+                    <div ng-show="!showDGList && selectedModel.kind == 'dg'">
+                        <ng-include src="'/includes/showDG.html'"></ng-include>
+                    </div>
+
+                    <div ng-hide = "selectedModel">
+                        <uib-tabset>
+
+                            <uib-tab heading="Model summary">
+                                <br/>
+
+                                <strong>Mode: </strong> {{userMode}}
+                                <div><strong>Name: </strong> {{world.name}}</div>
+                                <div><strong>Description: </strong>
+                                    <textarea class="form-control" ng-model="world.description"></textarea>
+
+
+                                </div>
+
+                                <div>
+                                    <div class="btn btn-link pull-right" ng-click="updatePlayground()">Update to Library</div>
+                                </div>
+
+
+                                <br/> <br/>
+
+                                <strong>List of DataGroups <span class="badge">{{sortedDGList.length}}</span> </strong>
+                                <br/>
+                                <div class="tableFixHead">
+                                    <table class="table table-condensed table-bordered">
+                                        <thead>
+                                        <tr><th>Title</th><th>Name</th><th>Description</th></tr>
+                                        </thead>
+                                        <tbody>
+
+
+                                        <tr ng-repeat="v in sortedDGList">
+                                            <td>{{v.title}}</td>
+                                            <td><div class="clickable"
+                                                     ng-click="selectModelFromList(v.name,v.kind)">{{v.name}}</div></td>
+
+                                            <td>{{v.description}}
+<!--
+                                                <div>
+                                                    <div ng-click="selectModelFromList(item.name,item.kind)"
+                                                            ng-repeat="item in xref[v.name] track by $index">
+                                                        {{item.kind}}:
+                                                        <span  class="clickable">{{item.name}}</span> (<em>{{item.path}}</em>)
+
+                                                        {{item}}
+
+                                                    </div>
+                                                </div>
+                                                -->
+
+                                            </td>
+<!--
+                                            <td>{{v.diff.length}} / {{v.snapshot.length}}</td>
+                                            -->
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+
+
+                            </uib-tab>
+
+
+
+<!-- There are serious perfromnce issues with large graphs...
+                            <uib-tab heading="Graph" select="fitAllDGGraph()">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div id="graphAllDG"></div>
+                                    </div>
+                                    <div class="col-md-4">
+
+                                        <button class="btn-link btn pull-right"
+                                                ng-click="selectModel(selectedNodeFromFull.dg )">Select</button>
+
+                                        <uib-tabset>
+                                            <uib-tab heading="Tree">
+                                                <div id="dgFromAllGraph"></div>
+                                            </uib-tab>
+                                            <uib-tab heading="Json">
+                                                <div class="myScroll">
+                                                    <pre>{{selectedNodeFromFull.dg | json}}</pre>
+                                                </div>
+
+                                            </uib-tab>
+                                        </uib-tabset>
+
+                                    </div>
+                                </div>
+
+
+
+                            </uib-tab>
+                            -->
+
+                            <uib-tab heading="CanShare Data Model">
+                                <div class="banner">CanShare Data Model</div>
+                                <img width="100%" src="images/LIM-org.png" usemap="#image_map"/>
+
+                            </uib-tab>
+
+                        </uib-tabset>
+                    </div>
+
+                </div>
+            </div>
+
+        </uib-tab>
+
+        <uib-tab heading="Compositions"  select="setInitialTab(1)">
             <br/>
 
             <div class="row">
@@ -260,269 +509,12 @@
 
         </uib-tab>
 
-        <uib-tab heading="DataGroups" select="setInitialTab(1)">
-            <br/>
-            <div class="row">
-                <div ng-class="leftPanel">
 
+          <uib-tab heading="Reports"  select="setInitialTab(2)">
 
-                    <uib-tabset>
+              <ng-include src="'/includes/terminology.html'"></ng-include>
 
-                        <uib-tab heading = "Inheritance" >
-                            <div>
-                                <!--
-                                <div class="pull-right clickable spacer"
-                                     ng-if = "canEdit(selectedModel)"  ng-click="editModel(selectedModel)">Edit</div>
-                                -->
-                                <div class="pull-right clickable spacer" ng-if = "user.email"
-                                     ng-click="newModel('dg')">New DG</div>
-
-                                <div class="pull-right clickable spacer"
-                                     ng-if = "user.email && selectedModel"
-                                     ng-click="newModel('dg',selectedModel)">New child</div>
-
-<!--
-                                <div class="pull-right clickable spacer" ng-if = "user.email && selectedModel"
-                                     ng-click="newModel('dg',selectedModel)">New child</div>
-                                -->
-
-                            </div>
-
-                            <div class="clearfix"></div>
-
-                            <div class="myScrollSmall background">
-                                <div id="allDGTree"></div>
-                            </div>
-
-                        </uib-tab>
-
-
-                        <uib-tab heading="All">
-
-                            <div style="padding: 8px">
-                                <div class="row ">
-                                    <div class="col-md-6">
-                                        <input type="text" placeholder="Filter" class="form-control"
-                                               ng-model="input.dgFilter"/>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <button ng-if = "user.email" class="btn btn-link  pull-right" ng-click="newModel('dg')">New</button>
-                                        <button class="btn btn-link pull-right" ng-click="listAllDG()">List all</button>
-                                    </div>
-                                </div>
-
-
-
-                            </div>
-                            <div class="clearfix"></div>
-
-                            <div class="myScroll background">
-                                <div class="list-group">
-                                    <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
-                                         ng-click="selectModel(v)"
-                                         ng-if="showDG(v,input.dgFilter)"
-                                         ng-repeat="v in sortedDGList">
-
-                                        <i ng-if="canEdit(v)"
-                                                class="glyphicon glyphicon-edit pull-right clickable"
-                                           ng-click="editModel(v)"></i>
-
-                                        {{v.title}}
-                                    </div>
-                                </div>
-                            </div>
-
-                        </uib-tab>
-
-                        <uib-tab heading="Tagged">
-                            <div class="row" style="padding: 8px">
-
-                                <div class="col-md-2">
-                                    <div style="padding-top: 8px">Tag</div>
-                                </div>
-                                <div class="col-md-7">
-                                    <select style="margin-top: 2px" class="form-control"
-                                            ng-options="k for k in tagNames"
-                                            ng-change = "rememberSelectedTag(input.selectedTag)"
-                                            ng-model = "input.selectedTag"></select>
-                                </div>
-                            </div>
-
-
-
-
-                            <div class="list-group background">
-                                <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
-                                     ng-click="selectModel(v)"
-                                        ng-if="true || showDG(v,input.dgFilter)"
-                                     ng-repeat="v in tags[input.selectedTag] track by $index">
-
-                                    <i class="glyphicon glyphicon-edit pull-right clickable"
-                                       ng-click="editModel(v)"></i>
-
-                                    {{v.title}}
-                                </div>
-
-                            </div>
-
-
-                        </uib-tab>
-
-
-                        <uib-tab heading = "Sections">
-                            <div>
-                                <div class="pull-right clickable spacer"
-                                     ng-if = "canEdit(selectedModel)"  ng-click="editModel(selectedModel)">Edit</div>
-                                <div class="pull-right clickable spacer" ng-if = "user.email"  ng-click="newModel('dg')">New dg</div>
-
-                                <div class="pull-right clickable spacer"
-                                     ng-if = "user.email && selectedModel"
-                                     ng-click="newModel('dg',selectedModel)">New child</div>
-
-                            </div>
-
-                            <div class="clearfix"></div>
-                            <div class="myScrollSmall background">
-                                <div id="sectionDGTree"></div>
-                            </div>
-                        </uib-tab>
-
-                        <uib-tab ng-if="false" heading = "Category">
-                            <em>Matching what's in the image</em>
-                            <div class="myScroll">
-                                <div id="categoryDGTree"></div>
-                            </div>
-
-                        </uib-tab>
-
-                    </uib-tabset>
-
-
-
-
-                </div>
-                <div ng-class="rightPanel">
-
-                    <div  ng-if="input.showDGList">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div style="margin-top: 7px" class="banner"> List of all DataGroups</div>
-                            </div>
-
-                        </div>
-
-
-                        <div class="tableFixHead">
-                            <table class="table table-condensed table-bordered">
-                                <thead>
-                            <tr><th>Title</th><th>Name</th><th>Description & Referenced by</th><th># elements</th></tr>
-                                </thead>
-                                <tbody>
-
-                         <!--   <tr ng-repeat="(k,v) in world.dataGroups"> -->
-                                <tr ng-repeat="v in sortedDGList">
-                                    <td>{{v.title}}</td>
-                                <td><div class="clickable" ng-click="selectModelFromList(v.name,v.kind)">{{v.name}}</div></td>
-
-                                <td>{{v.description}}
-
-                                    <div>
-                                        <div
-                                                ng-click="selectModelFromList(item.name,item.kind)"
-                                                ng-repeat="item in xref[v.name] track by $index">
-                                            {{item.kind}}: <span  class="clickable">{{item.name}}</span> (<em>{{item.path}}</em>)
-
-                                        </div>
-                                    </div>
-
-                                </td>
-
-                                <td>{{v.diff.length}}</td>
-                            </tr>
-                                </tbody>
-                        </table>
-                        </div>
-                    </div>
-
-
-                    <div  ng-show="!showDGList && selectedModel.kind == 'dg'">
-
-                        <ng-include src="'/includes/showDG.html'"></ng-include>
-                    </div>
-
-                    <div ng-hide = "selectedModel">
-                        <uib-tabset>
-                            <uib-tab heading="Data Model">
-
-                                <div class="banner">CanShare Data Model</div>
-                                <img width="100%" src="images/LIM-org.png" usemap="#image_map"/>
-                            </uib-tab>
-                            <uib-tab heading="Graph" select="fitAllDGGraph()">
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <div id="graphAllDG"></div>
-                                    </div>
-                                    <div class="col-md-4">
-
-                                        <button class="btn-link btn pull-right"
-                                                ng-click="selectModel(selectedNodeFromFull.dg )">Select</button>
-
-                                        <uib-tabset>
-                                            <uib-tab heading="Tree">
-                                                <div id="dgFromAllGraph"></div>
-                                            </uib-tab>
-                                            <uib-tab heading="Json">
-                                                <div class="myScroll">
-                                                    <pre>{{selectedNodeFromFull.dg | json}}</pre>
-                                                </div>
-
-                                            </uib-tab>
-                                        </uib-tabset>
-
-                                    </div>
-                                </div>
-
-
-
-                            </uib-tab>
-                        </uib-tabset>
-                    </div>
-
-                </div>
-            </div>
-
-        </uib-tab>
-
-        <!-- temp to see if increases watchers
-
-        <uib-tab heading="Snapshot generation log" select="setInitialTab(2)">
-            <br/>
-
-            <ng-include src="'/includes/snapshot.html'"></ng-include>
-
-
-        </uib-tab>
-
-        -->
-
-
-              <uib-tab heading="Reports"  select="setInitialTab(3)">
-                  <ng-include src="'/includes/terminology.html'"></ng-include>
-              </uib-tab>
-
-
-
-              <!--
-              <uib-tab heading="Profiling"  select="setInitialTab(4)">
-                  <div ng-controller="profilingSummaryCtrl">
-                      <ng-include src="'/includes/profilingSummary.html'"></ng-include>
-                  </div>
-
-              </uib-tab>
-              -->
-
-
-
+          </uib-tab>
 
 
         <uib-tab ng-if="errors.length > 0">
@@ -548,38 +540,6 @@
 
 
         </uib-tab>
-
-<!--
-        <uib-tab heading="IG artifacts">
-            <br/>
-
-            <uib-tabset>
-                <uib-tab heading="FSH All DG">
-                    <button class="btn-link btn pull-right" ng-click="makeAllFsh()">Make FSH</button>
-
-                    <span class="pull-right">
-                       <i class="glyphicon glyphicon-paperclip pull-right clickable"
-                          ng-click="copyFshToClipboard(allFsh)"></i>
-                      </span>
-                    <br/>
-                    <div class="myScroll">
-                        <pre ng-if="allFsh">{{allFsh}}</pre>
-                    </div>
-                </uib-tab>
-
-                <uib-tab heading="Index pages">
-                    Generate the index pages - DG & Composition
-                    download as a
-                    create from server API so can use from command line script
-
-                </uib-tab>
-            </uib-tabset>
-
-
-
-        </uib-tab>
-        -->
-
 
 
     </uib-tabset>
@@ -768,6 +728,7 @@
 
 <script src="js/snapShotSvc.js"></script>
 
+<script src="js/playgroundsCtrl.js"></script>
 
 <script src="js/questionnaireSvc.js"></script>
 <script src="js/compVersionsCtrl.js"></script>
@@ -776,19 +737,6 @@
 <script src="js/libs/fhirpath.r4.min.js"></script>
 
 
-
-<!--
-
-<script src="js/profilingDG.js"></script>
-<script src="js/profilingComp.js"></script>
-<script src="js/profilingSummaryCtrl.js"></script>
-
-
-<script src="directive/renderForm2/renderFormSvc2.js"></script>
-<script src="directive/renderForm2/renderFormDir2.js"></script>
-<script src="js/dgInflaterDEP.js"></script>
-<script src="js/makeCompQSvcDEP.js"></script>
--->
 
 <script>
     const firebaseConfig = {

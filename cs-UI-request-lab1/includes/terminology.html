@@ -26,7 +26,7 @@
           <tr><th>ValueSet Name</th><th>Where used</th></tr>
           </thead>
           <tbody>
-          <tr ng-repeat="v in ::arVsSummary" ng-class="{issue:v.issue}" ng-if="v[0].isValueSet">
+          <tr ng-repeat="v in arVsSummary" ng-class="{issue:v.issue}" ng-if="v[0].isValueSet">
             <td>
               <span class = 'clickable' ng-click="viewVS(v.url)">{{v.url}}</span>
             </td>
@@ -128,7 +128,7 @@
             <th>Element title</th><th>Element description</th><th>Element ValueSet</th><th># options</th></tr>
           </thead>
           <tbody>
-          <tr ng-repeat="item in ::termSummary">
+          <tr ng-repeat="item in termSummary">
             <td>
               <span class="clickable" ng-click="termSelectDG(item)">{{::item.DGName}}</span>
             </td>

@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('editDGCtrl',
-        function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc,snapshotSvc, parent,modelDGSvc,$http) {
+        function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc,snapshotSvc, parent,modelDGSvc,$http,userMode) {
 
             $scope.model=model
             $scope.input = {}
@@ -69,8 +69,6 @@ angular.module("pocApp")
             $scope.removeFixedValue = function (inx) {
                 $scope.input.fixedValues.splice(inx,1)
             }
-
-
 
 
             //----------- resource references
@@ -331,15 +329,25 @@ angular.module("pocApp")
 
                     $scope.model.name = name  //we can use the 'isUnique' to know if the model can be added
 
-                    modelsSvc.isUniqueNameOnLibrary(name,'dg').then(
-                        function () {
-                            //name is unique
-                            $scope.isUnique = true
-                        }, function (err) {
+                    if (userMode == 'library') {
+                        modelsSvc.isUniqueNameOnLibrary(name,'dg').then(
+                            function () {
+                                //name is unique
+                                $scope.isUnique = true
+                            }, function (err) {
+                                $scope.isUnique = false
+                            }
+                        )
+                    } else {
+                        //this is snapshot mode
+                        $scope.isUnique = true
+                        if (hashTypes[name]) {
                             $scope.isUnique = false
                         }
-                    )
-                    // }
+                    }
+
+
+
 
 
                 }

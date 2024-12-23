@@ -330,7 +330,8 @@ angular.module("pocApp")
                 ar.forEach(function (dg) {
                     let text = dg.title || dg.name
                     let parent = dg.parent || "root"
-                    let node = {id:dg.name,text:text,parent:parent,data:{dg:dg}}
+                    //temp let node = {id:dg.name,text:text,parent:parent,data:{dg:dg}}
+                    let node = {id:dg.name,text:text,parent:parent,data:{dgName: dg.name}}
                     treeData.push(node)
 
                 })
@@ -374,7 +375,8 @@ angular.module("pocApp")
 
                                 let sectionNode = {id:dg.name,
                                     text:dg.title,
-                                    parent:dg.parent,data:{dg:dg}}
+                                    parent:dg.parent,
+                                    data:{dgName:dg.name}}
                                 sectionTreeData.push(sectionNode)
                             }
                         }
@@ -455,7 +457,8 @@ angular.module("pocApp")
                         let type = ed.type[0]
                         if (fhirDT.indexOf(type) == -1) {
 
-                            let id = `${type}${Math.floor(Math.random() * 1001)}`
+                            //let id = `${type}${Math.floor(Math.random() * 1001)}`
+                            let id = `${type}-${ctr}`
                             let node = {id: id, label:type,shape: 'box'}
 
                             node.data = {model: in_hashAllDG[type]}
