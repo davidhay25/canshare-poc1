@@ -6,7 +6,6 @@ angular.module("pocApp")
                   snapshotSvc,vsSvc,makeQSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
-
             //change the background colour of the DG summary according to the environment
             $scope.modelInfoClass = 'modelInfo'
             let host = $location.absUrl()
@@ -16,13 +15,8 @@ angular.module("pocApp")
                 $scope.modelInfoClass = 'modelInfoTest'
             }
 
-            navigator.storage.estimate().then(estimate => {
-                console.log(`Quota: ${estimate.quota}`);
-                console.log(`Usage: ${estimate.usage}`);
-            });
 
-
-            $scope.userMode = "playground"      //possible modes are 'library' or 'playground'
+            $scope.userMode = $localStorage.userMode || "playground"      //possible modes are 'library' or 'playground'
             //$scope.userMode = "library"
 
             $scope.version = utilsSvc.getVersion()
@@ -190,8 +184,66 @@ angular.module("pocApp")
 
             }
 
-            $scope.changeUserMode = function (newMode) {
-                alert(newMode)
+
+            resetLocalEnvironment = function () {
+                $localStorage.world = {compositions:{},dataGroups: {}}
+                $scope.hashAllDG = $localStorage.world.dataGroups
+                $scope.hashAllCompositions = $localStorage.world.compositions
+            }
+
+            $scope.changeUserMode = function (evt,newMode) {
+                evt.preventDefault()
+
+                if (newMode == 'library') {
+                    //changing from playground. Can only do this if logged in.
+                    if ($scope.user.email) {
+                        let msg = "Are you sure you wish to enter Library mode? This will replace the current playground."
+                        if (confirm(msg)) {
+                            resetLocalEnvironment()
+
+                            alert("Reset complete. You'll need to use the Library to download the DG's")
+                            $scope.$emit('updateDGList',{})
+                            $scope.userMode = newMode
+                            $localStorage.userMode = newMode
+                        }
+                    } else {
+                        alert("You need to be logged in to use Library mode")
+                    }
+
+
+                } else if (newMode == 'playground') {
+                    //changing from Library mode to playground
+                    let cntDG = countCheckedOut($scope.hashAllDG)
+                    let cntComp = countCheckedOut($scope.hashAllCompositions)
+                    if ((cntDG + cntComp) > 0) {
+                        alert(`There are ${cntDG} DG's  and ${cntComp} Compositions still checked out. They need to be reverted or checked in.`)
+                        return
+                    }
+                    let msg = "Are you sure you wish to enter Playground mode? This will replace the current model."
+                    if (confirm(msg)) {
+                        resetLocalEnvironment()
+
+                        alert("Reset complete. You can create a new Playground - or download an existing one.")
+
+                        $scope.$emit('updateDGList',{})
+                        $scope.userMode = newMode
+                        $localStorage.userMode = newMode
+                    }
+
+                    function countCheckedOut(hash) {
+                        let cnt = 0
+                        Object.keys($scope.hashAllDG).forEach(function (dg) {
+                            if (dg.checkedOut) {
+                                cnt ++
+                            }
+                        })
+                        return cnt
+                    }
+
+                }
+
+
+
             }
 
             // -------------------------------------
@@ -225,98 +277,6 @@ angular.module("pocApp")
 
             //$scope.makeSnapshots()  //<<<<<<<<<,
 
-            function clearSsDetails() {
-                delete $scope.input.ssDiff
-                delete $scope.input.ssFullDiff
-                delete $scope.input.ssOverride
-                delete $scope.input.ssChangeItemEd
-            }
-
-            $scope.getLogDG = function (row) {
-
-
-                //$scope.input.ssFilter = row.dgName
-                $scope.selectedLogDg = snapshotSvc.getDG(row.dgName)
-                $scope.selectedLogRow = row
-                //$scope.ssRelationshipsSummary = snapshotSvc.getRelationshipsSummary(row.dgName)
-                clearSsDetails()
-            }
-
-            $scope.showSSLog = function (dgName) {
-                $scope.selectedLogDg = snapshotSvc.getDG(dgName)
-                $scope.input.ssFilter = $scope.selectedLogDg
-                $scope.input.mainTabActive = $scope.ui.tabSnapshot
-                clearSsDetails()
-            }
-
-            //when a parent or child is clicked
-            $scope.ssGetDG = function(dgName) {
-                $scope.ssHx.push(dgName)
-                clearSsDetails()
-                $scope.selectedLogDg = snapshotSvc.getDG(dgName)
-                $scope.selectedLogRow = {}
-
-
-                for (const dg of $scope.lstAllDGSS) {
-                    if (dg.name == dgName) {
-                        $scope.input.ssFilter = dg
-                    }
-                }
-            }
-
-            $scope.ssBack = function () {
-                $scope.ssHx.pop()  //the last one is the current dg
-                let dgName = $scope.ssHx.pop()
-                if (dgName) {
-                    $scope.ssGetDG(dgName)
-                }
-            }
-            
-            //get a single DG
-            $scope.setDGSS = function (dg) {
-                $scope.selectedLogDg = dg
-            }
-
-            $scope.showSSLogRow = function (row) {
-                if (! $scope.input.ssFilter) {return true}
-
-                if (row.dgName == $scope.input.ssFilter.name) {
-                    return true
-                }
-
-            }
-
-            $scope.ssLogPanel = 'col-md-6'
-            $scope.ssDisplayPanel = 'col-md-6'
-            let ssLogShown = true
-
-            $scope.toggleLog = function(){
-                if (ssLogShown) {
-                    $scope.ssLogPanel = 'hidden'
-                    $scope.ssDisplayPanel = 'col-md-12'
-                } else {
-                    $scope.ssLogPanel = 'col-md-6'
-                    $scope.ssDisplayPanel = 'col-md-6'
-                }
-                ssLogShown = ! ssLogShown
-
-            }
-
-
-            $scope.showSsErrorItem = function(log,type){
-                if (log.isError) {
-                    if (! type || type == 'All') {
-                        return true
-                    } else {
-                        if (log.isError == type) {
-                            return true
-                        }
-                    }
-                }
-
-
-            }
-
             //--------------------------
 
 
@@ -340,22 +300,6 @@ angular.module("pocApp")
 
             }
 
-            //>>>>>>>> this examines the entire model.
-            function validateModelDEP() {
-                // validate the model. This retruns a hash of all types defined in the model as well as errors
-                let vo1 = modelsSvc.validateModel($localStorage.world)
-                $scope.errors = vo1.errors
-                $scope.input.types = vo1.types      //a hash keyed by name
-                $scope.input.arTypes = Object.keys(vo1.types)       //list of types foe new element dropdown
-
-                //a hash by type of all elements that reference it
-                $scope.analysis = modelsSvc.analyseWorld($localStorage.world,$scope.input.types)
-
-            }
-            //temp validateModel()  //this will have an alert for all circular references - potentially a lot...
-            //todo need a better validation ?
-
-
 
             //allow filtering the code usage report
             $scope.canShowCodeReportLine = function (code) {
@@ -371,13 +315,11 @@ angular.module("pocApp")
             }
 
 
-
-
-
             //a handler that will re-draw the list and tree views of the DGs. nCalled when the set of DG's
             //has been updated
-
             $scope.$on('updateDGList',function(ev,vo) {
+
+
 
                 sortDG()    //update the sorted list of DG
 
@@ -391,12 +333,6 @@ angular.module("pocApp")
 
             })
 
-
-
-            //record access
-            //$http.post("model/access",{})
-
-            //$scope.igBase = "https://build.fhir.org/ig/davidhay25/canshare-LIM/branches/main/"
 
             $localStorage.selectedTag = $localStorage.selectedTag || 'main'
             $scope.input.selectedTag = $localStorage.selectedTag       //default tag for tag filtered list
@@ -568,47 +504,17 @@ angular.module("pocApp")
 
             $scope.clearLocal = function () {
                 if (confirm("This will remove all DGs and create an empty environment. Are you sure")) {
-                    $localStorage.world = {compositions:{},dataGroups: {}}
-                    $scope.hashAllDG = $localStorage.world.dataGroups
-                    $scope.hashAllCompositions = $localStorage.world.compositions
+                    resetLocalEnvironment()
+
+                    //$localStorage.world = {compositions:{},dataGroups: {}}
+                    //$scope.hashAllDG = $localStorage.world.dataGroups
+                    //$scope.hashAllCompositions = $localStorage.world.compositions
 
                     alert("Reset complete.")
                     $scope.$emit('updateDGList',{})
                 }
             }
 
-
-            //all the questionnaire objects (not actual Q)
-            //$scope.allQObject = $localStorage.allQObject
-
-            $scope.showTraceDEP = function () {
-                $uibModal.open({
-                    templateUrl: 'modalTemplates/trace.html',
-                    backdrop: 'static',
-                    size : 'xlg',
-                    controller: 'traceCtrl',
-                    resolve: {
-                        hashAllDG: function () {
-                            return $scope.hashAllDG
-                        },
-                        currentDG: function () {
-                            return $scope.selectedModel
-                        },
-                        user: function () {
-                            return $scope.user
-                        }
-                    }}).result.then(function (hashChanges) {
-
-                        if ($scope.selectedModel && hashChanges[$scope.selectedModel.name]) {
-                            //Has the current model been changed? If so, re-select
-                            $scope.selectModel($scope.selectedModel)
-
-                        }
-
-                })
-
-
-            }
 
             //The main library button
             $scope.library = function () {
@@ -653,13 +559,17 @@ angular.module("pocApp")
                         alert("DG has been downloaded. Please refresh the browser.")
                     }
 
+                    $scope.init()
+                    
+
+                    /*
                     //cause a refresh. May or may not be a model selected
                     if ($scope.selectedModel) {
                         $scope.$emit('updateDGList',{name:$scope.selectedModel.name})
                     } else {
                         $scope.$emit('updateDGList',{})
                     }
-
+*/
 
                 })
             }
@@ -983,31 +893,6 @@ angular.module("pocApp")
                 });
             }
 
-            //display the tree with categories
-            function showCategoryDGTreeDEP(treeData) {
-                $('#categoryDGTree').jstree('destroy');
-
-                $scope.categoryDGTree = $('#categoryDGTree').jstree(
-                    {'core': {'multiple': false, 'data': treeData,
-                            'themes': {name: 'proton', responsive: true}}}
-                ).on('changed.jstree', function (e, data) {
-
-                    if (data.node) {
-                        let dg = data.node.data.dg
-
-                        //use the dg out of $scope.hashAllDG - not the copy in the tree data
-                        $scope.selectModel($scope.hashAllDG[dg.name])
-                    }
-
-                    $scope.$digest();       //as the event occurred outside of angular...
-                }).bind("loaded.jstree", function (event, data) {
-                    let id = treeData[0].id
-                    $(this).jstree("open_node",id);
-
-                    $scope.$digest();
-                });
-            }
-
 
 
             //make a sorted list for the UI
@@ -1054,19 +939,13 @@ angular.module("pocApp")
             //make the term summary. These are the override elements in the models
 
             $scope.copyFshToClipboard = function (fsh) {
-
-
                 $scope.localCopyToClipboard (fsh)
                 alert("Fsh on clipboard")
-
-
             }
 
             $scope.copyToClipboard = function (json) {
                 let text = angular.toJson(json,true)
-
                 $scope.localCopyToClipboard (text)
-
             }
 
             //remove a DG from the local store
@@ -1239,7 +1118,9 @@ angular.module("pocApp")
                                 ed1.otherType = ed.otherType
                                 setValue(ed1,'hideInQ',ed.hideInQ,'bool')
                                 //ed1.hideInQ = ed.hideInQ
-                                ed1.autoPop = ed.autoPop
+
+                                setValue(ed1,'autoPop',ed.controlHint,'autoPop')
+                                //ed1.autoPop = ed.autoPop
                                 ed1.collapsible = ed.collapsible
 
                                 ed1.prePop = ed.prePop
@@ -1296,6 +1177,9 @@ angular.module("pocApp")
                                 }
 */
 
+
+
+
                                 //dec 24 - update json
                                 $scope.edForJsonDisplay = ed1
 
@@ -1327,6 +1211,18 @@ angular.module("pocApp")
                 })
 
                 function setValue(ed,prop,value,type) {
+
+                    //May not be safe to do this - could be an override - todo needs more thought
+                    ed[prop] = value
+
+                    return
+
+                    //to delete
+                    //hideLabel
+                    //gtable
+                    //otherAllowed
+
+
                     switch (type) {
                         case 'bool' :
                         case 'string':
@@ -1488,19 +1384,10 @@ angular.module("pocApp")
                 })
             }
 
-            //$scope.updateMetaValues()  //<<<<<<<<<<<
-          //  $scope.input.selectedTumourStream = $scope.tumourStreams[0]
-          //  $scope.input.selectedCompCategory = $scope.compCategories[0]
-
-
             $scope.refreshUpdates = function(){
                 //xref is cross references between models/types - used in the 'Relationships' tab
 
-               // return //temp
                 $scope.xref = modelsSvc.getReferencedModels($scope.hashAllDG,$scope.hashAllCompositions)
-
-                //updates to DG made over the ones in the code
-                // no longer used $scope.dgUpdates = modelDGSvc.makeUpdateList($scope.hashAllDG, $scope.xref )
 
             }
             //$scope.refreshUpdates() //<<<<<<<<<<<,
@@ -1531,11 +1418,8 @@ angular.module("pocApp")
 
             //---------- functions to edit a model from the tree
 
-
-
-
             //allow the user to set the VS for a given element
-            $scope.setValueSet = function (element) {
+            $scope.setValueSetDEP = function (element) {
 
                 let vs = prompt("ValueSet url")
                 if (vs) {

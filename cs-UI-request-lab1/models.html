@@ -77,9 +77,10 @@
                     <span>
                         <a class="navbar-brand" href="#">
                             CanShare Logical Modeller workbench
-                            <div style="padding-top: 6px" ng-click="changeUserMode('library')"
-
+                            <div style="padding-top: 6px" ng-click="changeUserMode($event,'library')"
                                  ng-if="userMode == 'playground'">Playground</div>
+                             <div style="padding-top: 6px" ng-click="changeUserMode($event,'playground')"
+                                  ng-if="userMode == 'library'">Library</div>
                         </a>
                     </span>
 

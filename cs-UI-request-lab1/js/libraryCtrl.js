@@ -16,6 +16,9 @@ angular.module("pocApp")
                 }
             }
 
+            $scope.close = function () {
+                $scope.$close()
+            }
             
             function loadNamedQueries() {
                 let qry = "/model/namedquery"
@@ -548,6 +551,7 @@ angular.module("pocApp")
                                 }
 
                             })
+
 
                         },
                         function (err) {
