@@ -224,7 +224,7 @@ angular.module("pocApp")
                 $scope.input.labelText =  item.ed.labelText
 
                 $scope.input.hideInQ =  item.ed.hideInQ
-                $scope.input.autoPop =  item.ed.autoPop
+                $scope.input.helpText =  item.ed.helpText
 
                 $scope.input.collapsible =  item.ed.collapsible
 
@@ -237,6 +237,9 @@ angular.module("pocApp")
 
                 $scope.input.identifierSystem = item.ed.identifierSystem
 
+                if (item.ed.itemCode) {
+                    $scope.input.itemCode = true
+                }
 
                 $scope.input.selectedType = item.ed.type[0]
 
@@ -604,7 +607,7 @@ angular.module("pocApp")
                 ed.sdcGrid = $scope.input.sdcGrid
                 ed.valueSet = $scope.input.valueSet
                 ed.hideInQ = $scope.input.hideInQ
-                ed.autoPop = $scope.input.autoPop
+                ed.helpText = $scope.input.helpText
                 ed.collapsible = $scope.input.collapsible
 
                 ed.prePop = $scope.input.prePop
@@ -676,6 +679,8 @@ angular.module("pocApp")
                 if ($scope.input.qFixedValues) {
                     ed.qFixedValues = $scope.input.qFixedValues
                 }
+
+                ed.itemCode = $scope.input.itemCode
 
                 return ed
             }

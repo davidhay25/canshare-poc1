@@ -2,7 +2,7 @@
 
 angular.module("pocApp")
 
-    .service('makeQSvc', function($http,codedOptionsSvc,QutilitiesSvc,snapshotSvc,$filter,vsSvc,orderingSvc,utilsSvc,qHelperSvc) {
+    .service('makeQSvc', function($http,codedOptionsSvc,QutilitiesSvc,snapshotSvc,$filter,vsSvc,orderingSvc,utilsSvc,makeQHelperSvc) {
 
         let unknownCodeSystem = "http://example.com/fhir/CodeSystem/example"
         let extLaunchContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
@@ -22,6 +22,9 @@ angular.module("pocApp")
         //Nov2 extExtractionValue = "http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue"
         extDefinitionExtractValue = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtractValue"
 
+        extObsExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
+
+        //extOb
 
 
       //  extExtractionContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
@@ -1107,7 +1110,6 @@ angular.module("pocApp")
                             //they would have been added by the DG routine, but the Q root is ignored here.
                             //add the named queries as variables in the Q.
                             if (dg.namedQueries) {
-                                //let item = Q.item[0]
                                 dg.namedQueries.forEach(function (nqName) {
                                     addNamedQuery(Q,nqName,config.namedQueries)
                                 })
@@ -1344,6 +1346,7 @@ angular.module("pocApp")
                 }
 
 
+
                 addPrePopExtensions(Q)      //launchPatient & LaunchPractitioner
                 addUseContext(Q)
                 addPublisher(Q)
@@ -1353,17 +1356,7 @@ angular.module("pocApp")
                 let ext = {url:extAllocateIdUrl,valueString:'patientID'}
                 Q.extension.push(ext)
 
-/*
-                //need to mark items for inter-resource references
-                let testRef = [
-                    {
-                        source:"BasicPathRequest.request",
-                        definition:"ServiceRequest.specimen.reference",
-                        target:"BasicPathRequest.specimen",
-                        idName:"specimenID"
-                    }
-                ]
-*/
+
                 let hashIdName = {}     //associate an idname (from allocateId) with the path
                 if (dg.resourceReferences) {
                     //we need to set consistent 'idname' properties - that will be used by allocateId
@@ -1437,6 +1430,13 @@ angular.module("pocApp")
                     let ed = item.ed
                     let path = ed.path
 
+                    //temp - testing the checker function
+                    let testHash = {}
+                    //testHash
+                    makeQHelperSvc.checkParentalHash(testHash,path)
+
+
+
                     //If this is being called from the composition then add the pathprefix to the path (linkId)
                     let newLink = path
                     if (pathPrefix) {
@@ -1446,10 +1446,10 @@ angular.module("pocApp")
 
                     if (currentItem) {
                         let parentItemPath = $filter('dropLastInPath')(path)
-                        //console.log(path,parentItemPath)
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
 
-                        extractionContext = decorateItem(currentItem,ed,extractionContext,dg,config)
+                        //we pass in hashItems so the decorate function can update other items - like setting a fixed value
+                        extractionContext = decorateItem(currentItem,ed,extractionContext,dg,config,hashItems)
 
                         if (config.enableWhen) {
                             let ar =  addEnableWhen(ed,currentItem,config.pathPrefix)
@@ -1525,8 +1525,6 @@ angular.module("pocApp")
                         extractionContext = getExtractionContext(dgName,config.hashAllDG)
                         if (extractionContext) {
                             setExtractionContext(currentItem,extractionContext)
-                            //currentItem.extension = currentItem.extension || []
-                            //currentItem.extension.push({url:extExtractionContextUrl,valueCanonical:extractionContext})
                             //if there's an extraction context, then add any 'DG scope' fixed values.
                             //fixed values can also be defined on an item... todo TBD
                             addFixedValues(currentItem,dg)
@@ -1534,22 +1532,7 @@ angular.module("pocApp")
                         }
 
                         //we'll also add a population context here. This is to support any pre-pop
-                        //todo - does it make sense for a DG to have multiple NQ? For now, we'll just grab the first one
-                        if (dg.namedQueries && dg.namedQueries.length > 0) {
 
-                            //todo - think this is not needed here
-
-                            //todo - there isn't aways a repeating group with a table. ?this is a configurable setting?
-
-                            //temp   addPopulationContext (dg.namedQueries[0],currentItem)
-                            //temp currentItem.repeats = true  //if pre-pop from a NQ then must be able to repeat
-
-                            //we'll also add the extension to render pre-pop as a table.
-                            //todo - this could be an option on the DG
-
-                            //temp addItemControl(currentItem,'gtable')
-
-                        }
 
                         //this sets the Q.item to the first entry (currentItem) - all the others are references off that
                         hashItems[path] = currentItem
@@ -1603,23 +1586,25 @@ angular.module("pocApp")
 
                 correctEW(Q,conditionalED)
 
-
-
-
                 return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog, allEW : newAllEW}
 
 
 
                 //add details to item
                 //extraction context is the url of the profile (could be a core type)
-                function decorateItem(item,ed,extractionContext,dg,config) {
+                function decorateItem(item,ed,extractionContext,dg,config,hashEd) {
 
                     if (! ed.type) {
                         return
                     }
 
                     let edType = ed.type[0]     //actually be the name of the DG
-
+/*
+                    //sets the 'code' value in the item. Needed for Observation based extract
+                    if (ed.itemCode && ed.fixedCoding) {
+                        item.code = ed.fixedCoding
+                    }
+*/
                     //If this ed is a reference to another, it can have a different extraction context...
                     if (config.hashAllDG[edType]) {
 
@@ -1632,8 +1617,6 @@ angular.module("pocApp")
                             item.extension = item.extension || []
                             item.extension.push({url:extAllocateIdUrl,valueString: 'patientID'})
                         }
-
-
 
 
                         //this is an item that is extracted
@@ -1757,7 +1740,7 @@ angular.module("pocApp")
                     }
 
 
-                    //set the control type
+                    //set the control type. Do this early on as other fnctions may change it (eg fixedCoding)
 
                     let vo = getControlDetails(ed)
                     item.type = vo.controlType
@@ -1804,10 +1787,30 @@ angular.module("pocApp")
                     if (edType == 'CodeableConcept') {
 
                         //check for fixedCoding. If there is, then set an answeroption with initialSelected
+                        //updated to use fixed value extension
                         if (ed.fixedCoding) {
+
                             let concept = ed.fixedCoding
                             delete concept.fsn
-                            item.answerOption = [{valueCoding:concept,initialSelected:true}]
+
+                            //the actual resource element to populate...
+                            let canonical = `${extractionContext}#${ed.definition}`
+
+                            //the fixedValueExtension needs to be added to the parent
+                            let ar1 = ed.path.split('.')
+                            ar1.pop()
+                            let p1 = ar1.join('.')
+                            let parentItem = hashEd[p1]
+                            if (parentItem) {
+                                addFixedValue(parentItem,canonical,'Coding',concept)
+                            } else {
+                                config.error(`Path ${p1} empty setting fixed value`)
+                            }
+
+                            //change the type to a string (the renderer may complain if still a choice with no values) and hide it in the Q
+                            item.type = 'string'
+                            makeQHelperSvc.addExtension(item,{url:extHidden,valueBoolean:true})
+
 
                         } else {
                             //no fixed value - check for valuesets & options
@@ -1897,11 +1900,11 @@ angular.module("pocApp")
                     }
 
                     /* - don't think this is used any more - actually it is, it's used for help text*/
-                    if (ed.autoPop){
+                    if (ed.helpText){
 
                         const guid = createUUID()
 
-                        let foItem = {linkId:guid,text:ed.autoPop,type:'display'}
+                        let foItem = {linkId:guid,text:ed.helpText,type:'display'}
 
                         let ext1 = {url:extItemControlUrl}
                         ext1.valueCodeableConcept = {
@@ -2000,15 +2003,11 @@ angular.module("pocApp")
                         definition = definition.replace('%root%',resourceType)
                         item.definition = `${extractionContext}#${definition}`
 
-
                         //Add the extension url as a definitionExtractValue
                         if (ed.extractExtensionUrl) {
                             let url = `${extractionContext}#${resourceType}.extension.url`
                             addFixedValue(item,url,"String",ed.extractExtensionUrl)
                         }
-
-
-
                     }
 
 

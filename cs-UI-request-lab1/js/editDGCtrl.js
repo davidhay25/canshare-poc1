@@ -269,6 +269,10 @@ angular.module("pocApp")
                 $scope.input.adHocExt = model.adHocExt
 
 
+                if (model.obsExtract) {
+                    $scope.input.obsExtract = true
+                }
+
 
                 getFullElementList()
 
@@ -517,6 +521,11 @@ angular.module("pocApp")
                     $scope.model.adHocExt = $scope.input.adHocExt
                 }
 
+                if ($scope.input.obsExtract) {
+                    $scope.model.obsExtract = true
+                } else {
+                    delete $scope.model.obsExtract
+                }
 
                 //update the named queries
                 delete $scope.model.namedQueries

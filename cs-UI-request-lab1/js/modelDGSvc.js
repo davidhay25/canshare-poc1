@@ -208,6 +208,7 @@ angular.module("pocApp")
                         }, function (err) {
 
                             console.error(`There was no ValueSet with the url:${ed.valueSet}`)
+                            //deferred.resolve(ar)
                         }
                     )
                 } else if (ed && ed.options) {

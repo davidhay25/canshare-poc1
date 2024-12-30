@@ -110,6 +110,24 @@
                     </div>
                 </div>
                 <br/>
+
+                <div ng-if="input.type == 'Observation'" class="row">
+                    <div class="col-md-2">
+                        Observation based extraction?
+                    </div>
+                    <div class="col-md-4">
+                        <checkbox ng-model="input.obsExtract"></checkbox>
+
+                    </div>
+                    <div class="col-md-6">
+                        Use Observation based extraction for simple Observations.
+
+                    </div>
+                    <br/> <br/>
+                </div>
+
+
+
                 <div class="row">
                     <div class="col-md-2">
                         Source reference
@@ -119,11 +137,7 @@
                                   class = "form-control" ng-model="input.sourceReference">
 
                         </textarea>
-                        <!--
-                        <input type="text"
-                               ng-change="setModelAttribute('sourceReference',input.sourceReference)"
-                               class = "form-control" ng-model="input.sourceReference"/>
-                        -->
+
                     </div>
                     <div class="col-md-6">
                         The source of the information that defined the contents of this Data Group.

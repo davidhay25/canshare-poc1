@@ -78,9 +78,9 @@
                         <a class="navbar-brand" href="#">
                             CanShare Logical Modeller workbench
                             <div style="padding-top: 6px" ng-click="changeUserMode($event,'library')"
-                                 ng-if="userMode == 'playground'">Playground</div>
+                                 ng-if="userMode == 'playground'">Playground mode</div>
                              <div style="padding-top: 6px" ng-click="changeUserMode($event,'playground')"
-                                  ng-if="userMode == 'library'">Library</div>
+                                  ng-if="userMode == 'library'">Library mode</div>
                         </a>
                     </span>
 
@@ -347,17 +347,14 @@
 
                             <uib-tab heading="Model summary">
                                 <br/>
-
-                                <strong>Mode: </strong> {{userMode}}
-                                <div><strong>Name: </strong> {{world.name}}</div>
-                                <div><strong>Description: </strong>
-                                    <textarea class="form-control" ng-model="world.description"></textarea>
-
-
-                                </div>
+                                <table class="table">
+                                    <tr><td style="width: 15%">Mode</td><td>{{userMode}}</td></tr>
+                                    <tr><td>Name</td><td>{{world.name}}</td></tr>
+                                    <tr><td>Description</td><td><textarea class="form-control" ng-model="world.description"></textarea></td></tr>
+                                </table>
 
                                 <div>
-                                    <div class="btn btn-link pull-right" ng-click="updatePlayground()">Update to Library</div>
+                                    <div class="btn btn-link pull-right" ng-click="updatePlayground()">Update to Model Repository</div>
                                 </div>
 
 
@@ -405,6 +402,20 @@
 
                             </uib-tab>
 
+                            <uib-tab heading="Import from Library">
+                                <br/>
+                                <table class="table table-bordered">
+                                    <tr><th>Title</th><th>Name</th><th>Description</th><th># diff</th><th></th></tr>
+                                    <tr ng-repeat="dg in importableDG">
+                                        <td>{{dg.title}}</td>
+                                        <td>{{dg.name}}</td>
+                                        <td>{{dg.description}}</td>
+                                        <td>{{dg.diff.length}}</td>
+                                        <td><div class="clickable" ng-click="importDG($index)">Import</div></td>
+                                    </tr>
+                                </table>
+
+                            </uib-tab>
 
 
 <!-- There are serious perfromnce issues with large graphs...
@@ -516,6 +527,24 @@
               <ng-include src="'/includes/terminology.html'"></ng-include>
 
           </uib-tab>
+
+        <uib-tab heading="Questionnaire defaults" select="setInitialTab(3)">
+
+            <table class="table">
+                <tr><td style="width: 15%">Default Terminology server</td>
+                    <td>
+                        <input type = "text" class="form-control" ng-model = "world.Q.termServer">
+                    </td>
+                    <td><em>Sets the default Terminology Server for the Questionnaire</em></td>
+                </tr>
+                <tr><td>Render VS as AnswerOption</td><td></td>
+                <td><em></em></td>
+            </tr>
+            </table>
+
+
+
+        </uib-tab>
 
 
         <uib-tab ng-if="errors.length > 0">
@@ -730,6 +759,9 @@
 <script src="js/snapShotSvc.js"></script>
 
 <script src="js/playgroundsCtrl.js"></script>
+<script src="js/playgroundsSvc.js"></script>
+
+<script src="js/makeQHelperSvc.js"></script>
 
 <script src="js/questionnaireSvc.js"></script>
 <script src="js/compVersionsCtrl.js"></script>

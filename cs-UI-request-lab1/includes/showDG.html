@@ -566,8 +566,15 @@
 
                       </span>
 
+                      <div ng-if="selectedNode.data.ed.itemCode">
+                        <em style="padding-left: 8px">item.code will be set to this value in the Questionnaire</em>
+                      </div>
+
                     </td>
                   </tr>
+
+
+
 
                   <tr ng-if="isFixedType(selectedNode.data.ed)">
                     <td class="detailName">Default value</td>

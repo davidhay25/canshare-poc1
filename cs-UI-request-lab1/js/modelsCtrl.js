@@ -3,7 +3,7 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,orderingSvc,
-                  snapshotSvc,vsSvc,makeQSvc,
+                  snapshotSvc,vsSvc,makeQSvc,playgroundsSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
             //change the background colour of the DG summary according to the environment
@@ -35,7 +35,9 @@ angular.module("pocApp")
             }
 
             //This is the browser cache object.
-            $localStorage.world = $localStorage.world || {dataGroups:{},compositions:{}}
+            $localStorage.world = $localStorage.world || {dataGroups:{},compositions:{},Q:{}}
+            $localStorage.world.Q =  $localStorage.world.Q || {}
+
             $scope.world = $localStorage.world
 
             $scope.localStorage = $localStorage
@@ -113,6 +115,8 @@ angular.module("pocApp")
                 //window.location.href = `modelReview.html?${$scope.selectedModel.name}`
             }
 
+            //----------------------
+
             $scope.openPlaygrounds = function () {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/playGrounds.html',
@@ -184,9 +188,22 @@ angular.module("pocApp")
 
             }
 
+            $scope.importDG = function (inx) {
+                let dg = $scope.importableDG[inx]
+                $scope.hashAllDG[dg.name] = dg
+
+              //  $scope.importableDG.splice(inx,1)
+
+                $scope.init()
+
+               // $scope.$emit('updateDGList',{})
+
+            }
+
 
             resetLocalEnvironment = function () {
                 $localStorage.world = {compositions:{},dataGroups: {}}
+                $scope.world = $localStorage.world
                 $scope.hashAllDG = $localStorage.world.dataGroups
                 $scope.hashAllCompositions = $localStorage.world.compositions
             }
@@ -202,7 +219,9 @@ angular.module("pocApp")
                             resetLocalEnvironment()
 
                             alert("Reset complete. You'll need to use the Library to download the DG's")
-                            $scope.$emit('updateDGList',{})
+                            //$scope.$emit('updateDGList',{})
+
+                            $scope.init()
                             $scope.userMode = newMode
                             $localStorage.userMode = newMode
                         }
@@ -225,9 +244,10 @@ angular.module("pocApp")
 
                         alert("Reset complete. You can create a new Playground - or download an existing one.")
 
-                        $scope.$emit('updateDGList',{})
+                       // $scope.$emit('updateDGList',{})
                         $scope.userMode = newMode
                         $localStorage.userMode = newMode
+                        $scope.init()
                     }
 
                     function countCheckedOut(hash) {
@@ -317,9 +337,8 @@ angular.module("pocApp")
 
             //a handler that will re-draw the list and tree views of the DGs. nCalled when the set of DG's
             //has been updated
+            //differs from init in that it just re-draws the DG list
             $scope.$on('updateDGList',function(ev,vo) {
-
-
 
                 sortDG()    //update the sorted list of DG
 
@@ -511,7 +530,8 @@ angular.module("pocApp")
                     //$scope.hashAllCompositions = $localStorage.world.compositions
 
                     alert("Reset complete.")
-                    $scope.$emit('updateDGList',{})
+                    //$scope.$emit('updateDGList',{})
+                    $scope.init()
                 }
             }
 
@@ -560,7 +580,7 @@ angular.module("pocApp")
                     }
 
                     $scope.init()
-                    
+
 
                     /*
                     //cause a refresh. May or may not be a model selected
@@ -620,8 +640,9 @@ angular.module("pocApp")
 
                     }
 
-                    alert("File has been imported. Please refresh the browser.")
-                    $scope.$emit('updateDGList',{})
+                    //alert("File has been imported. Please refresh the browser.")
+                    //$scope.$emit('updateDGList',{})
+                    $scope.init()
 
                 })
 
@@ -859,9 +880,6 @@ angular.module("pocApp")
                     if (data.node) {
 
                         let dgName = data.node.data.dgName
-                        //let
-
-                       // let dg = data.node.data.dg
 
                         //use the dg out of $scope.hashAllDG - not the copy in the tree data
                         if ($scope.hashAllDG[dgName]) {
@@ -1119,8 +1137,9 @@ angular.module("pocApp")
                                 setValue(ed1,'hideInQ',ed.hideInQ,'bool')
                                 //ed1.hideInQ = ed.hideInQ
 
-                                setValue(ed1,'autoPop',ed.controlHint,'autoPop')
+                                //setValue(ed1,'autoPop',ed.controlHint,'string')
                                 //ed1.autoPop = ed.autoPop
+                                ed1.helpText = ed.helpTest
                                 ed1.collapsible = ed.collapsible
 
                                 ed1.prePop = ed.prePop
@@ -1167,6 +1186,7 @@ angular.module("pocApp")
                                 setValue(ed1,'sdcGrid',ed.sdcGrid,'bool')
                                 //ed1.sdcGrid = ed.sdcGrid
                                 ed1.adHocExt = ed.adHocExt
+                                ed1.itemCode = ed.itemCode
 
                                 setValue(ed1,'qFixedValues',ed.qFixedValues,'array')
                                 /*
@@ -2036,7 +2056,7 @@ angular.module("pocApp")
             }
 
             //Initialization on first load or after playground select
-            //has to be at the bottom as other elements called
+            //has to be at the bottom as other functions called
             $scope.init = function () {
                 $scope.makeSnapshots()  //<<<<<<<<<,
                 $scope.makeAllDTList()
@@ -2049,6 +2069,17 @@ angular.module("pocApp")
 
                 $scope.input.selectedTumourStream = $scope.tumourStreams[0]
                 $scope.input.selectedCompCategory = $scope.compCategories[0]
+
+                delete $scope.selectedModel
+
+                //DGs that can be imported into this model from the library
+                playgroundsSvc.getImportableDG($scope.hashAllDG).then(
+                    function (data) {
+                        $scope.importableDG = data
+                        console.log(data)
+                    }
+                )
+
 
 
             }
