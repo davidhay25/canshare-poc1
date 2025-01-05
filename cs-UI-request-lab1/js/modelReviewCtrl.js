@@ -45,7 +45,9 @@ angular.module("pocApp")
                 let qry = `/Questionnaire/${qName}`
                 $http.get(qry).then(
                     function (data) {
-                        $scope.fullQ = data.data
+
+                        $scope.fullQ = data.data.Q
+                        $scope.errorLog = data.data.errorLog
                         $scope.hashEd = {}
 
                         //A report focussed on pre-popupation & extraction

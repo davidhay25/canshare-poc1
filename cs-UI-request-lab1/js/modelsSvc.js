@@ -364,6 +364,7 @@ angular.module("pocApp")
                 //theres also a list in snapShot Svc and utilsSvc todo: rationalize
                 return ['boolean','code','date','dateTime','decimal','integer','string','Address','Attachment','CodeableConcept','ContactPoint','Group','HumanName','Identifier','Period','Quantity','Ratio']
             },
+
             getAllTypes : function (hashAllDG) {
                 //return a list of all types
                 let types = angular.copy(hashAllDG)

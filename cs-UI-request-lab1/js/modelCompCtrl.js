@@ -1,7 +1,7 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('modelCompositionCtrl',
-        function ($scope,$uibModal,$timeout,librarySvc,modelsSvc,$localStorage,$http) {
+        function ($scope,$uibModal,$timeout,librarySvc,modelsSvc,$localStorage,$http,utilsSvc) {
 
 
             $localStorage.qStrategy = $localStorage.qStrategy || {}
@@ -383,7 +383,7 @@ angular.module("pocApp")
                             }
                         })
 
-                        $scope.input.types = modelsSvc.fhirDataTypes().concat(DGs)
+                        $scope.input.types = utilsSvc.fhirDataTypes().concat(DGs)
 
 
                         //$scope.input.types.sort()

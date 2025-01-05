@@ -1098,8 +1098,8 @@ async function setup(app,mongoDbName) {
 
 
 
-        const query = {name:name}
-        console.log(query)
+        const query = {"Q.name":name}
+        //console.log(query)
         try {
 
             const cursor = await database.collection("questionnaire").replaceOne(query,q,{upsert:true})
@@ -1136,7 +1136,7 @@ async function setup(app,mongoDbName) {
     //get a single Questionnaire by name
     app.get('/Questionnaire/:name', async function(req,res) {
         let name = req.params.name
-        const query = {name:name}
+        const query = {"Q.name":name}
         try {
             const cursor = await database.collection("questionnaire").find(query).toArray()
             if (cursor.length == 1) {

@@ -157,9 +157,10 @@ angular.module("pocApp")
             //add a fixed value extension. Can either be a value or an expression
             //definition is the path in the resource (added to the 'item.definition' value
 
+
+
             //http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue
             let ext = {url:extDefinitionExtractValue,extension:[]}
-            //ext.extension.push({url:"definition",valueCanonical:definition})
             ext.extension.push({url:"definition",valueUri:definition})
 
             if (value) {
@@ -167,14 +168,7 @@ angular.module("pocApp")
                 let child = {url:'fixed-value'}
                 child[`value${type}`] = value
 
-/*
-                try {
-                    child[`value${type}`] = angular.toJson(value)
-                } catch (ex) {
-                    child[`value${type}`] = value
-                }
 
-*/
 
 
 
@@ -828,9 +822,9 @@ angular.module("pocApp")
                 }
 
                 console.log(report.launchContext)
-                function processItem(report,item) {
+                function processItem(report,item,level) {
                     let thing = {linkId:item.linkId,text:item.text,type:item.type,definition:item.definition}
-
+                    thing.level = level
 
                     let mult = "0.."
                     if (item.required) {
@@ -982,14 +976,15 @@ angular.module("pocApp")
                     report.entries.push(thing)
 
                     if (item.item) {
+                        let newLevel = level + 1
                         item.item.forEach(function (child) {
-                            processItem(report,child)
+                            processItem(report,child,newLevel)
                         })
                     }
                 }
                 
                 Q.item.forEach(function (item) {
-                    processItem(report,item)
+                    processItem(report,item,0)
                 })
 
 
@@ -1449,7 +1444,8 @@ angular.module("pocApp")
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
 
                         //we pass in hashItems so the decorate function can update other items - like setting a fixed value
-                        extractionContext = decorateItem(currentItem,ed,extractionContext,dg,config,hashItems)
+                        let vo = decorateItem(currentItem,ed,extractionContext,dg,config,hashItems)
+                        extractionContext = vo.extractionContext
 
                         if (config.enableWhen) {
                             let ar =  addEnableWhen(ed,currentItem,config.pathPrefix)
@@ -1463,6 +1459,9 @@ angular.module("pocApp")
                         //here is where the new item is added to it's parent...
                         //We need to deal with 'out of order' elements - ie where we get to an item before its parent...
                         let canAdd = true
+                        if (vo.excludeFromQ) {
+                            canAdd = false
+                        }
                         //console.log(`Adding: ${path} to  ${parentItemPath}`)
                         if (! hashItems[parentItemPath]) {
                             console.error(`${parentItemPath} not present - adding...`)
@@ -1586,7 +1585,12 @@ angular.module("pocApp")
 
                 correctEW(Q,conditionalED)
 
-                return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog, allEW : newAllEW}
+                let lidHash = makeQHelperSvc.updateLinkIds(Q)
+
+                //don't think hashEd & hashVS & allEW are used by the caller...
+                return {Q:Q,errorLog:errorLog, lidHash:lidHash}
+
+                //return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog, allEW : newAllEW, lidHash:lidHash}
 
 
 
@@ -1597,6 +1601,7 @@ angular.module("pocApp")
                     if (! ed.type) {
                         return
                     }
+                    let excludeFromQ = false
 
                     let edType = ed.type[0]     //actually be the name of the DG
 /*
@@ -1795,6 +1800,13 @@ angular.module("pocApp")
 
                             //the actual resource element to populate...
                             let canonical = `${extractionContext}#${ed.definition}`
+                            if (! extractionContext) {
+                                errorLog.push({msg:`Resource type not set for fixed value in ${ed.path}`})
+                            }
+                            if (! ed.definition) {
+                                errorLog.push({msg:`Definition (extract path) not set for fixed value in ${ed.path}`})
+                            }
+
 
                             //the fixedValueExtension needs to be added to the parent
                             let ar1 = ed.path.split('.')
@@ -1807,9 +1819,13 @@ angular.module("pocApp")
                                 config.error(`Path ${p1} empty setting fixed value`)
                             }
 
+                            //Don't include this item in the Q.
+                            //There could be an issue if this is a parent - but a parent shouldn't have a fixed value...
+                            excludeFromQ = true
+
                             //change the type to a string (the renderer may complain if still a choice with no values) and hide it in the Q
-                            item.type = 'string'
-                            makeQHelperSvc.addExtension(item,{url:extHidden,valueBoolean:true})
+                           // item.type = 'string'
+                           // makeQHelperSvc.addExtension(item,{url:extHidden,valueBoolean:true})
 
 
                         } else {
@@ -2012,7 +2028,7 @@ angular.module("pocApp")
 
 
 
-                    return extractionContext
+                    return {excludeFromQ:excludeFromQ,extractionContext :extractionContext}
 
                 }
 

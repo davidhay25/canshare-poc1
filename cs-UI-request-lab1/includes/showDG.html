@@ -38,6 +38,9 @@
             <span class=" clickable spacer"
                  ng-click="newModel('dg',selectedModel)">New child</span>
 
+          <span class=" clickable spacer"
+                ng-click="makeFrozen('dg',selectedModel)">Freeze a copy</span>
+
         </div>
 
 
@@ -98,7 +101,7 @@
 
 
 
-        <button class="btn btn-link" ng-click="loadReview()">Questionnaire</button>
+        <button class="btn btn-link" ng-click="loadReview('dg')">Questionnaire</button>
 
       <button class="btn btn-link" ng-click="showLink('dg')">Link</button>
 

@@ -1,8 +1,55 @@
 angular.module("pocApp")
 
-    .service('makeQHelperSvc', function(orderingSvc,utilsSvc,qHelperSvc) {
+    .service('makeQHelperSvc', function() {
 
         return {
+            updateLinkIds : function (Q) {
+                //change all the linkIds from the path to a sequential number. For cosmetic reasons
+
+                let hash = {}
+                let ctr = 0
+
+                function processItem(item,updateLinkId) {
+                    //update the hash
+                    if (updateLinkId) {
+                        let key = `id-${ctr++}`
+                        hash[item.linkId] = key
+                        item.linkId = key
+                    }
+
+                    //now update any enableWhens that have been updated. 2 passes are needed to get all of them...
+                    if (item.enableWhen) {
+                        for (const ew of item.enableWhen) {
+                            let src = ew.question
+                            if (hash[src]) {
+                                ew.question = hash[src]
+                            }
+                        }
+                    }
+
+                    if (item.item) {
+                        for (const child of item.item) {
+                            processItem(child,updateLinkId)
+                        }
+                    }
+
+                }
+
+
+                //first pass, update the LinkIds and some enablewhens
+                Q.item.forEach(function (item) {
+                    processItem(item,true)
+                })
+
+                //second pass will be any unresolved enablewhen
+                Q.item.forEach(function (item) {
+                    processItem(item,false)
+                })
+
+
+                return hash     //we'll save the hash with the Q
+
+            },
             addExtension : function (item,ext) {
                 item.extension = item.extension || []
                 item.extension.push(ext)
@@ -20,18 +67,18 @@ angular.module("pocApp")
                 for (let i = 1;i < ar.length -1; i++) {
                     let path = makePath(ar,i)
                     if (! hash[path]) {
-                        hash[path] = {placeHolder:true,linkId:pathSoFar}
+                        hash[path] = {placeHolder:true,linkId:path}
                         let parentPath = makePath(ar,i-1)
 
                         hash[parentPath].item = hash[parentPath].item || []
                         let t = hash[parentPath]
-                        hash[arentPath].item.push(t)
+                        hash[parentPath].item.push(t)
 
-                        console.log(`added ${pathSoFar}`)
+                        console.log(`added ${path}`)
                     }
 
                 }
-
+/*
                 let pathSoFar = first[0]
                 for (const segment of ar) {
                     //will start with the second segment
@@ -41,13 +88,14 @@ angular.module("pocApp")
                     }
                     pathSoFar += '.' + segment
                 }
-
+*/
                 function makePath(ar,length) {
                     let path = ""
                     for (let i = 0;i < length; i++) {
                         path += `.${ar[i]}`
                     }
-                    return path.splice(1)   //split off the leading '.'
+
+                    return path.substring(1)   //split off the leading '.'
 
                 }
 

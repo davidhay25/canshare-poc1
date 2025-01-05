@@ -1,6 +1,7 @@
 angular.module("pocApp")
     .controller('editDGCtrl',
-        function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc,snapshotSvc, parent,modelDGSvc,$http,userMode) {
+        function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc,snapshotSvc, parent,
+                  utilsSvc, modelDGSvc,$http,userMode) {
 
             $scope.model=model
             $scope.input = {}
@@ -11,8 +12,6 @@ angular.module("pocApp")
 
             //construct a has of all types (DT + FHIR) for the full list of elements routine
             $scope.allTypes = angular.copy(hashTypes)
-
-
 
             //create a list of potential parent types for a new DG -
             $scope.input.possibleParents = []
@@ -228,7 +227,7 @@ angular.module("pocApp")
 
             $scope.input.types.sort()
             //now add the FHIR datatypes
-            $scope.input.types = modelsSvc.fhirDataTypes().concat($scope.input.types) //.concat(modelsSvc.fhirDataTypes())
+            $scope.input.types = utilsSvc.fhirDataTypes().concat($scope.input.types) //.concat(modelsSvc.fhirDataTypes())
 
 
             //get the full list of elements for a DG, following any inheritance chain..
@@ -343,20 +342,13 @@ angular.module("pocApp")
                             }
                         )
                     } else {
-                        //this is snapshot mode
+                        //this is playground mode
                         $scope.isUnique = true
                         if (hashTypes[name]) {
                             $scope.isUnique = false
                         }
                     }
-
-
-
-
-
                 }
-
-
             }
 
             $scope.isRequired = function (element) {

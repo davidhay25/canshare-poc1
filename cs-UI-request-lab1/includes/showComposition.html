@@ -58,6 +58,8 @@
 
       <a class="btn" ng-href="modelReview.html?{{selectedComposition.name}}" target="_blank">Review</a>
 
+        <button class="btn btn-link" ng-click="loadReview('comp')">Questionnaire</button>
+
       <span style="margin-left: 16px" class="clickable"
             ng-if="selectedComposition.checkedOut && selectedComposition.checkedOut == user.email"
             ng-click="publish(selectedComposition)">Publish</span>

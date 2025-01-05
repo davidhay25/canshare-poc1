@@ -3,10 +3,41 @@ angular.module("pocApp")
     .service('playgroundsSvc', function($http,utilsSvc,$q) {
 
         return {
+
             getImportableDG: function (hashAllDG) {
                 let deferred = $q.defer()
-                //get all the DG's that can be imported into a playground from the lubrary
+                //get all the DG's that can be imported into a playground from the library
                 //right now, it's those that have no parents and only FHIR datatype elements
+                let arImport = []
+                $http.get('/allfrozen').then(
+                    function (data) {
+
+                        for (const dg of data.data) {
+                            if (! hashAllDG[dg.name]) {
+                                arImport.push(dg)
+                            }
+                        }
+
+                        deferred.resolve(arImport)
+
+                    }, function (err) {
+                        //at least retun the simple ones
+                        deferred.reject(err)
+                    }
+                )
+
+                return deferred.promise
+
+
+            },
+
+                getImportableDGDEP: function (hashAllDG) {
+                let deferred = $q.defer()
+                //get all the DG's that can be imported into a playground from the library
+                //right now, it's those that have no parents and only FHIR datatype elements
+
+                let hash = {}
+
                 let fhirDT = utilsSvc.fhirDataTypes()
                 let arImport = []
 
@@ -26,14 +57,38 @@ angular.module("pocApp")
                                 }
                                 if (canImport) {
                                     //there are some values and this DG name not already in use
-                                    if (dg.diff.length > 0 && ! hashAllDG[dg.name])
-                                    arImport.push(dg)
+                                    if (dg.diff.length > 0 && ! hashAllDG[dg.name]) {
+                                        hash[dg.name] == true
+                                        arImport.push(dg)
+                                    }
+
                                 }
 
                             }
                         }
 
-                        deferred.resolve(arImport)
+
+                        //now get the frozen DGs
+                        $http.get('/allfrozen').then(
+                            function (data) {
+                                data.data.forEach(function (dg) {
+                                    //can import if not already marked for import & the name is not already used...
+                                    if (! hash[dg.name] && ! hashAllDG[dg.name]) {
+                                        arImport.push(dg)
+                                    }
+
+
+                                })
+                                deferred.resolve(arImport)
+
+                            }, function (err) {
+                                //at least retun the simple ones
+                                deferred.resolve(arImport)
+                            }
+                        )
+
+
+
 
                     }, function (err) {
                         console.error(angular.toJson(err.data))

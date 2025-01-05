@@ -3,7 +3,7 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,orderingSvc,
-                  snapshotSvc,vsSvc,makeQSvc,playgroundsSvc,
+                  snapshotSvc,vsSvc,makeQSvc,playgroundsSvc,$localForage,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
             //change the background colour of the DG summary according to the environment
@@ -84,24 +84,63 @@ angular.module("pocApp")
                 }
             }
 
+            $scope.makeFrozen = function (type,model) {
+                if (type == 'dg') {
+                    let msg = "Make a frozen copy of this DG, where the diff is the snapshot. Useful for Playgrounds"
+                    if (confirm(msg)) {
+                        let frozen = snapshotSvc.getFrozenDG(model.name)
+                        $http.put(`/frozen/${frozen.name}`,frozen).then(
+                            function (data) {
+                                alert("Frozen copy saved in Library")
+                            }, function (err) {
+                                alert(angular.toJson(err.data))
+                            }
+                        )
+
+                    }
+                }
+
+            }
+
+
             //todo - only works for DG at present...
-            $scope.loadReview = function () {
-                vsSvc.getAllVS($scope.fullElementList, function () {
+            $scope.loadReview = function (kind) {
+                //allCompElements
+                let ar = $scope.fullElementList
+                let model = $scope.selectedModel
+                if (kind == 'comp') {
+                    ar = $scope.allCompElements
+                    model = $scope.selectedComposition
+                }
+
+
+                vsSvc.getAllVS(ar, function () {
                     $scope.showWaiting = false
 
                     //the second option expands the valuesets as options into the Q - todo make this an option
-                    let config = {expandVS:true,enableWhen:true}
-                    config.hashAllDG = $scope.hashAllDG
-                    config.fhirType = $scope.selectedModel.type// Used for definition based extraction
-                    //need the named queries for Q variables
-                    makeQSvc.getNamedQueries(function (hash) {
-                        config.namedQueries = hash
-                        let voQ = makeQSvc.makeHierarchicalQFromDG($scope.selectedModel,$scope.fullElementList,config) //,$scope.hashAllDG)
 
-                        let qry = `/Questionnaire/${$scope.selectedModel.name}`
-                        $http.put(qry,voQ.Q).then(
+
+                    //need the named queries for Q variables
+                    makeQSvc.getNamedQueries(function (hashNamedQueries) {
+
+                        let voQ
+                        if (kind == 'dg') {
+                            let config = {expandVS:true,enableWhen:true}
+                            config.namedQueries = hashNamedQueries
+                            config.hashAllDG = $scope.hashAllDG
+                            config.fhirType = model.type// Used for definition based extraction
+                            voQ = makeQSvc.makeHierarchicalQFromDG(model,$scope.fullElementList,config) //,$scope.hashAllDG)
+                        } else {
+                            let compConfig = {hideEnableWhen : false}
+                            voQ = makeQSvc.makeHierarchicalQFromComp(model,$scope.hashAllDG,hashNamedQueries,compConfig)
+
+                        }
+
+                        let qry = `/Questionnaire/${model.name}`
+                        let t = {Q:voQ.Q,errorLog:voQ.errorLog, lidHash: voQ.lidHash}
+                        $http.put(qry,t).then(
                             function () {
-                                const url = `modelReview.html?q-${$scope.selectedModel.name}`
+                                const url = `modelReview.html?q-${model.name}`
                                 const features = 'noopener,noreferrer'
                                 window.open(url, '_blank', features)
                             }, function (ex) {
@@ -144,14 +183,29 @@ angular.module("pocApp")
                             $scope.init()
 
                         }
-
                 })
 
             }
 
             $scope.updatePlayground = function () {
                 //save the current playground to the library
+                $scope.world.id = $scope.world.id || utilsSvc.getUUID()
+                $localStorage.world.updated = new Date()
 
+                $http.put(`/playground/${$localStorage.world.id}`,$localStorage.world).then(
+                    function (data) {
+                        let msg = "The playground has been updated."
+                        if (! $localStorage.world.description) {
+                            msg += " You can edit the description in this page."
+                        }
+                        alert(msg)
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+
+/*
+                //?? why would name ever ne null???
                 if (! $localStorage.world.name) {
                     let name = prompt("What name do you want to use (it needs to be unique)")
                     if (name) {
@@ -186,20 +240,27 @@ angular.module("pocApp")
                     )
                 }
 
+                */
+            }
+
+            $scope.savePGtoLocal = function () {
+                let key = `pg-${$scope.world.id}`
+                $scope.world.id = $scope.world.id || utilsSvc.getUUID()
+                $localForage.setItem(key, $scope.world).then(function (value) {
+                    alert("Saved in Local Store")
+                }).catch(function(err) {
+                    alert(angular.toJson(err))
+                    console.log(err);
+                });
             }
 
             $scope.importDG = function (inx) {
                 let dg = $scope.importableDG[inx]
                 $scope.hashAllDG[dg.name] = dg
-
-              //  $scope.importableDG.splice(inx,1)
-
                 $scope.init()
-
-               // $scope.$emit('updateDGList',{})
-
             }
 
+            //--------------
 
             resetLocalEnvironment = function () {
                 $localStorage.world = {compositions:{},dataGroups: {}}
@@ -440,7 +501,7 @@ angular.module("pocApp")
             }
 
             //used in DG & Comp so when a type is a FHIR DT, we can create a link to the spec
-            $scope.fhirDataTypes = modelsSvc.fhirDataTypes()
+            $scope.fhirDataTypes = utilsSvc.fhirDataTypes()
 
             //allows a specific tab in the showCompositions to e selected. Used by term summary (only need tree ATM)
             $scope.compUi = {}
@@ -733,7 +794,7 @@ angular.module("pocApp")
                 $scope.tags = {} //a hash keyed on tag code containing an array of DG with that tag
 
                 $scope.tagNames = []        //use an array for the list filtered by tag. This is a string list of codes where system == bespoke
-                $scope.allTypes = modelsSvc.fhirDataTypes()
+                $scope.allTypes = utilsSvc.fhirDataTypes()
 
                 //This allows tags that survive re-setting. A hash, keyed by DG name with a collection of bespoke codings
                 let userTags1 = $localStorage.userTags1 || {}     //if the user has customized the tags - keyed by name
@@ -870,11 +931,26 @@ angular.module("pocApp")
 
                 //console.log(treeData,utilsSvc.getSizeOfObject(treeData))
 
+
+                /* - useful code from chatGPT for finding duplicates
+                const ids = treeData.map(node => node.id.toLowerCase());
+                const hasDuplicates = ids.some((id, idx) => ids.indexOf(id) !== idx);
+                console.log('Duplicates found:', hasDuplicates);
+*/
+
+
+
                 htmlElement = htmlElement || '#allDGTree'
                 $(htmlElement).jstree('destroy');
                 $scope.allDGTree = $(htmlElement).jstree(
-                    {'core': {'multiple': false, 'data': treeData,  worker: true, animation:0,
-                            'themes': {name: 'proton', responsive: true}}}
+                    {'core':
+                            {
+                                'multiple': false, 'data': treeData,
+                            worker: true,
+                            animation:0,
+                            'themes': {
+                                name: 'proton', responsive: true
+                            }}}
                 ).on('changed.jstree', function (e, data) {
 
                     if (data.node) {
@@ -885,7 +961,6 @@ angular.module("pocApp")
                         if ($scope.hashAllDG[dgName]) {
                             $scope.selectModel($scope.hashAllDG[dgName])
                         }
-
                     }
 
                     try {
@@ -894,11 +969,8 @@ angular.module("pocApp")
 
                     }
 
-
                 }).bind("loaded.jstree", function (event, data) {
                     let id = treeData[0].id
-
-
 
                     $(this).jstree("open_node",id);
 
@@ -1068,7 +1140,7 @@ angular.module("pocApp")
                     let displayPath = ""  //this will be the path in the changes display
                     if (isNew) {
                         //if it's new, then add it as a child of the currently selected element
-                      //  changes = "New element"
+
 
                         //need to determine the 'root' path.
                         let pathOfCurrentElement = ""  //$scope.selectedModel.name  //by default, add to the DG root
@@ -1096,6 +1168,8 @@ angular.module("pocApp")
                         //The path check in the dialog doesn't look for deleted elements, so we need to check here
                         let ar1 = $scope.selectedModel.diff.filter(localEd => localEd.path == ed.path)
                         if (ar1.length == 0) {
+
+
                             $scope.selectedModel.diff.push(ed)
                             displayPath = ed.path
                             traceSvc.addAction({action:'new-element',model:$scope.selectedModel,path:displayPath})

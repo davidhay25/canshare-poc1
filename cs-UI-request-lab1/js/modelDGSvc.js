@@ -289,8 +289,6 @@ angular.module("pocApp")
             },
 
 
-
-
             makeTreeViewOfDG : function(hashAllDG) {
                 if (! hashAllDG) {
                     //return an empty tree
@@ -298,6 +296,8 @@ angular.module("pocApp")
                     let treeData = [(root)]
                     return {treeData:treeData}
                 }
+
+
                 //create a treeview ordered by parent
                 //add the root
                 let treeData = []
@@ -315,8 +315,17 @@ angular.module("pocApp")
                 //make a list
                 let ar = []
                 Object.keys(hashAllDG).forEach(function (key) {
-                    let dg = hashAllDG[key]
-                    ar.push(dg)
+
+                    if (['root'].indexOf(key) > -1) {
+                        alert(`There is a DG with the name: ${key} which is not allowed. Removing it from the current Model.`)
+                        delete hashAllDG[key]
+                    } else {
+                        let dg = hashAllDG[key]
+                        ar.push(dg)
+                    }
+
+
+
                 })
 
                 //now sort by name for the full DG tree
@@ -331,7 +340,6 @@ angular.module("pocApp")
                 ar.forEach(function (dg) {
                     let text = dg.title || dg.name
                     let parent = dg.parent || "root"
-                    //temp let node = {id:dg.name,text:text,parent:parent,data:{dg:dg}}
                     let node = {id:dg.name,text:text,parent:parent,data:{dgName: dg.name}}
                     treeData.push(node)
 

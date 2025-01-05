@@ -43,7 +43,6 @@ angular.module("pocApp")
             $scope.canHavePopulationContext = function () {
 
 
-
                 if ($scope.input.selectedType == 'Group') {
                     return true
                 }

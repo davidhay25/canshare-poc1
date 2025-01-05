@@ -191,11 +191,11 @@
                 <div class="col-md-6">
                     <h5>Saved Questionnaires</h5>
                     <table class="table table-bordered">
-                        <tr ng-repeat="Q in lstQ">
+                        <tr ng-repeat="vo in lstQ">
                             <td>
-                                <div class="clickable" ng-click="selectQ(Q.name)">{{Q.name}}</div>
+                                <div class="clickable" ng-click="selectQ(vo.Q.name)">{{vo.Q.name}}</div>
                             </td>
-                            <td>{{Q.description}}</td>
+                            <td>{{vo.Q.description}}</td>
                         </tr>
                     </table>
                 </div>
@@ -240,14 +240,14 @@
                 <table class="table table-condensed table-bordered">
                     <tr><th>Text</th><th>Lvl</th><th>Type</th><th>Card.</th><th>Hidden</th><th>Fixed / ValueSet</th><th>SDC</th></tr>
                     <tr
-                            ng-class="{background:entry.linkId.split('.').length == 2}"
+                            ng-class="{background:entry.level == 2}"
                             ng-repeat="entry in qReport.entries" ng-if="showReportLine(input.SDCOnly,entry)">
                         <td>
                             <div ng-style="{ 'padding-left': (entry.linkId | pathindent) }">
                                 {{entry.text}}
                             </div>
                         </td>
-                        <td>{{entry.linkId.split('.').length -1}}</td>
+                        <td>{{entry.level}} </td>
                         <td>{{entry.type}}</td>
                         <td>{{entry.mult}}</td>
                         <td>{{entry.isHidden}}</td>

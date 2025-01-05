@@ -3,7 +3,9 @@ angular.module("pocApp")
     .service('snapshotSvc', function(utilsSvc) {
 
         //also a copy in modelsSvc
-        fhirDataTypes = ['boolean','code','date','dateTime','decimal','integer','string','Address','Attachment','CodeableConcept','ContactPoint','Group','HumanName','Identifier','Period','Quantity','Ratio']
+        //fhirDataTypes = ['boolean','code','date','dateTime','decimal','integer','string','Address','Attachment','CodeableConcept','ContactPoint','Group','HumanName','Identifier','Period','Quantity','Ratio']
+
+        fhirDataTypes = utilsSvc.fhirDataTypes()
 
         allDgSnapshot = {}      //a hash of all DGs with snapshots
         lstAllDG = []           //an alphabetical list of all DGs by name
@@ -652,16 +654,7 @@ angular.module("pocApp")
             }
         }
 
-        function adjustFhirResource(dg) {
-            //Set the 'extract FHIR resource' to any in the hierarchy
 
-
-
-        }
-
-        function adjustFixedValues(dg) {
-
-        }
 
         //Adjust the conditionals when they are either inherited or referenced from anoth DG
         function adjustEnableWhen(dg) {
@@ -858,8 +851,129 @@ angular.module("pocApp")
 
         }
 
+        //remove cruft (eg empty arrays) from snapshot
+        function cleanSnapshot(dg) {
+            let elementsToRemove = ['otherAllowed','sourceModelName','sourceReference','rules','slicedFrom','definedOnDG','slicedFrom','originalType','insertAfter']
+            let newSS = []
+
+            for (const ed of dg.snapshot) {
+                let newEd = {}
+                for (const key of Object.keys(ed)) {
+                    let canAdd = true
+                    let element = ed[key]
+
+                    if (elementsToRemove.indexOf(key) > -1) {
+                        canAdd = false
+                    }
+
+                    //empty strings
+                    if (typeof element === "string" && element === "") {
+                        canAdd = false
+                    }
+
+                    //boolean false values
+                    if (typeof element === "boolean" && element === false) {
+                        canAdd = false
+                    }
+
+                    //empty arrays
+                    if (Array.isArray(element) && element.length == 0) {
+                        canAdd = false
+                    }
+
+                    if (canAdd) {
+                        newEd[key] = ed[key]
+                    }
+
+                }
+                newSS.push(newEd)
+            }
+            dg.snapshot = newSS
+
+        }
+
 
         return {
+            getFrozenDG : function (dgName) {
+                //create a version of the dg where the diff is replaced by the snapshot.
+                //used for the playground ATM
+
+                let dg = angular.copy(allDgSnapshot[dgName])
+
+                cleanSnapshot(dg)
+                delete dg.parent
+                dg.diff = dg.snapshot
+
+                //now replace all the non-FHIR DTs with 'Group'
+                let fhirDT = utilsSvc.fhirDataTypes()
+                for (const ed of dg.diff) {
+                    let type = ed.type[0]
+                    if (fhirDT.indexOf(type) == -1) {
+                        ed.type = ['Group']
+                    }
+
+                }
+
+
+/*
+                //elements that are no longer used...
+                let elementsToRemove = ['otherAllowed','sourceModelName','sourceReference','rules','slicedFrom','definedOnDG','slicedFrom','originalType','insertAfter']
+
+
+
+                //remove all 'empty' eds
+                dg.diff = []
+                for (const ed of dg.snapshot) {
+                    let newEd = {}
+                    for (const key of Object.keys(ed)) {
+                        let canAdd = true
+                        let element = ed[key]
+
+                        if (elementsToRemove.indexOf(key) > -1) {
+                            canAdd = false
+                        }
+
+                        //empty strings
+                        if (typeof element === "string" && element === "") {
+                            canAdd = false
+                        }
+
+                        //boolean false values
+                        if (typeof element === "boolean" && element === false) {
+                            canAdd = false
+                        }
+
+                        //empty arrays
+                        if (Array.isArray(element) && element.length == 0) {
+                            canAdd = false
+                        }
+
+                        if (canAdd) {
+                            newEd[key] = ed[key]
+                        }
+
+                    }
+                    dg.diff.push(newEd)
+                }
+
+
+
+                */
+
+                delete dg.fullDiff
+                delete dg.snapshot
+
+
+
+
+
+
+
+                return dg
+
+
+
+            },
             getImpactedDGsDEP : function (dgName) {
                 //get all DG's that could be impacted by changes in this DG
                 //

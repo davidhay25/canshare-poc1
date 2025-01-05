@@ -50,15 +50,22 @@ angular.module("pocApp")
         )
 
         return {
+            getVersion : function(){
+                return "0.9.7"
+            },
+            getUUID : function () {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                })
+            },
             getNodeColor : function (type) {
                 let col = objColours[type] || "c9d1f2"
             },
             getNQbyName : function (name) {
                 return hashNQ[name] || {}
             },
-            getVersion : function(){
-                return "0.9.7"
-            },
+
             makeSafeString : function(s) {
             if (s) {
                 s = s.replace(/-/g, "");

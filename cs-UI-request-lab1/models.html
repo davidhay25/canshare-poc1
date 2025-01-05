@@ -8,10 +8,7 @@
     <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
     <link rel="stylesheet" type="text/css" href="css/jsTreeThemes/proton/style.css"/>
 
-
     <style>
-
-
 
         #graph {
             width: 100%;
@@ -26,7 +23,7 @@
         }
 
 
-
+/*
          .tableFixHead {
              overflow-y: auto;
              height: 800px;
@@ -39,6 +36,8 @@
             border-collapse: collapse;
             width: 100%;
         }
+
+        */
         th,
         td {
             padding: 8px 16px;
@@ -349,11 +348,15 @@
                                 <br/>
                                 <table class="table">
                                     <tr><td style="width: 15%">Mode</td><td>{{userMode}}</td></tr>
-                                    <tr><td>Name</td><td>{{world.name}}</td></tr>
+                                    <tr><td>Name</td><td>
+                                        <input class="form-control" type="text" ng-model="world.name"/>
+                                    </td></tr>
+                                    <tr><td>Id</td><td>{{world.id}}</td></tr>
                                     <tr><td>Description</td><td><textarea class="form-control" ng-model="world.description"></textarea></td></tr>
                                 </table>
 
                                 <div>
+                                    <div class="btn btn-link pull-right" ng-click="savePGtoLocal()">Update to Local Store</div>
                                     <div class="btn btn-link pull-right" ng-click="updatePlayground()">Update to Model Repository</div>
                                 </div>
 
@@ -402,7 +405,7 @@
 
                             </uib-tab>
 
-                            <uib-tab heading="Import from Library">
+                            <uib-tab ng-if="userMode == 'playground'" heading="Import from Library">
                                 <br/>
                                 <table class="table table-bordered">
                                     <tr><th>Title</th><th>Name</th><th>Description</th><th># diff</th><th></th></tr>
@@ -449,7 +452,7 @@
                             </uib-tab>
                             -->
 
-                            <uib-tab heading="CanShare Data Model">
+                            <uib-tab ng-if="userMode == 'library'" heading="CanShare Data Model">
                                 <div class="banner">CanShare Data Model</div>
                                 <img width="100%" src="images/LIM-org.png" usemap="#image_map"/>
 
@@ -605,7 +608,7 @@
 
 
 <script>
-    let app = angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage','ngSanitize',"firebase"]).config(function($locationProvider) {
+    let app = angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage','ngSanitize',"firebase","LocalForageModule"]).config(function($locationProvider) {
         $locationProvider.html5Mode(true);
         $locationProvider.hashPrefix('!');
     });
@@ -769,6 +772,10 @@
 <script src="js/libs/fhirpath.min.js"></script>
 <script src="js/libs/fhirpath.r4.min.js"></script>
 
+<!--https://github.com/scotttrinh/angular-localForage-->
+
+<script src="js/libs/localforage.min.js"></script>
+<script src="js/libs/angular-localForage.min.js"></script>
 
 
 <script>

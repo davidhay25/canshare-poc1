@@ -1,14 +1,12 @@
 //Utilities related to IG generation
 angular.module("pocApp")
 
-    .service('igSvc', function(modelsSvc,$filter) {
+    .service('igSvc', function(modelsSvc,utilsSvc,$filter) {
 
 
         function makeSafeString(s) {
             if (s) {
                 s = s.replace(/"/g, "'");
-
-
                 return s
             } else {
                 return ""
@@ -708,7 +706,7 @@ angular.module("pocApp")
 
                 initialSpacer = initialSpacer || ""     //when used by the comp.
 
-                let fhirDT = modelsSvc.fhirDataTypes()
+                let fhirDT = utilsSvc.fhirDataTypes()
                 let pathsToHide = []
 
                 //remove all elements that have a mult of 0..0 or a parent

@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('changeTypeCtrl',
-        function ($scope,ed,hashAllDG,modelsSvc,$uibModal) {
+        function ($scope,ed,hashAllDG,modelsSvc,utilsSvc, $uibModal,$timeout) {
 
             $scope.input = {}
             $scope.input.class = "dt"   //show the DataGroups as the default to select
@@ -13,7 +13,7 @@ angular.module("pocApp")
 
             let fhirBase = "http://hl7.org/fhir/R4B/datatypes.html"
 
-            $scope.fhirTypes = modelsSvc.fhirDataTypes()
+            $scope.fhirTypes = utilsSvc.fhirDataTypes()
 
             if (currentType && $scope.fhirTypes.indexOf(currentType) > -1) {
                 $scope.input.class = "dt"
@@ -42,8 +42,74 @@ angular.module("pocApp")
 
                 })
 
+                $timeout(function () {
+                    makeTree()
+                },1000)
+
+
             }
             sortDG()
+
+            function showAllDGTree(treeData) {
+                $('#ctDGTree').jstree('destroy');
+                $scope.allDGTree = $('#ctDGTree').jstree(
+                    {'core': {'multiple': false, 'data': treeData,  worker: true, animation:0,
+                            'themes': {name: 'proton', responsive: true}}}
+                ).on('changed.jstree', function (e, data) {
+
+                    if (data.node) {
+                        let dgName = data.node.data.dgName
+
+
+                        $scope.selectDG(hashAllDG[dgName])
+
+
+                        //use the dg out of $scope.hashAllDG - not the copy in the tree data
+                       // if ($scope.hashAllDG[dgName]) {
+                            //  $scope.selectModel($scope.hashAllDG[dgName])
+                      //  }
+                    }
+
+                    try {
+                        $scope.$digest();       //as the event occurred outside of angular...
+                    } catch (ex) {
+
+                    }
+
+                }).bind("loaded.jstree", function (event, data) {
+                    let id = treeData[0].id
+
+                    $(this).jstree("open_node",id);
+
+
+
+                    $scope.$digest();
+                });
+            }
+
+
+            function makeTree() {
+                let treeData = []
+                let root = {id:"root",text: "DataGroups tree",parent:'#',data:{}}
+                treeData.push(root)
+
+                $scope.sortedDGList1.forEach(function (dg) {
+                    let text = dg.title || dg.name
+                    let parent = dg.parent || "root"
+                    //temp let node = {id:dg.name,text:text,parent:parent,data:{dg:dg}}
+                    let node = {id:dg.name,text:text,parent:parent,data:{dgName: dg.name}}
+                    treeData.push(node)
+
+                })
+
+                showAllDGTree(treeData)
+
+            }
+
+
+
+
+
 
             if (hashAllDG[currentType]) {
                 //this is a DG - find the subtypes / supertypes

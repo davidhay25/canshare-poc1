@@ -24,9 +24,24 @@
     </div>
     <div class="modal-body">
 
-
         <uib-tabset>
-            <uib-tab heading="Saved Playgrounds">
+
+            <uib-tab heading="Local Store">
+                <table class="table table-bordered">
+                    <tr><th>Name</th><th>Description</th><th># DG</th><th>Updated</th></tr>
+                    <tr ng-repeat="row in localStore">
+                        <td>{{row.name}}</td>
+                        <td>{{row.description}}</td>
+                        <td>{{row.dgCount}}</td>
+                        <td>{{row.updated | date}}</td>
+                        <td><span class="clickable"  ng-click="load(row,'local')">Load</span>
+                            <span style="padding-left: 20px" class="clickable"  ng-click="copy(row)">Copy</span>
+                        </td>
+                    </tr>
+                </table>
+            </uib-tab>
+
+            <uib-tab heading="Models Repository">
                 <table class="table table-bordered">
                     <tr><th>Name</th><th>Description</th><th># DG</th><th>Updated</th></tr>
                     <tr ng-repeat="row in playgrounds">
@@ -34,12 +49,13 @@
                         <td>{{row.description}}</td>
                         <td>{{row.dgCount}}</td>
                         <td>{{row.updated | date}}</td>
-                        <td><span class="clickable"  ng-click="load(row)">Load</span>
-                            <span style="padding-left: 20px" class="clickable"  ng-click="copy(row)">Copy</span>
+                        <td><span class="clickable"  ng-click="load(row,'repo')">Load</span>
+                            <span style="padding-left: 20px" class="clickable"  ng-click="copy(row,'repo')">Copy</span>
                         </td>
                     </tr>
                 </table>
             </uib-tab>
+
             <uib-tab heading="New Playground">
                 <div><label>Name</label></div>
                 <input type="text" class="form-control" ng-model="input.name"/>
@@ -54,15 +70,6 @@
             </uib-tab>
         </uib-tabset>
 
-        <div class="row">
-            <div class="col-md-8">
-
-            </div>
-            <div class="col-md-4">
-                <h4></h4>
-
-            </div>
-        </div>
 
 
     </div>
