@@ -3,7 +3,7 @@ angular.module("pocApp")
         function ($scope,$filter,item,allTypes,hashAllDG,fullElementList,$uibModal,$http,parentEd,
                   igSvc,initialTab,vsSvc,utilsSvc,snapshotSvc) {
             $scope.item = item      //will be {ed:} if editing an existing item
-            $scope.allTypes = allTypes
+            $scope.allTypes = allTypes  //DGs only
             $scope.input = {}
 
 
@@ -333,6 +333,9 @@ angular.module("pocApp")
 
                 $scope.input.qFixedValues = item.ed.qFixedValues
 
+                $scope.input.displayAfter = item.ed.displayAfter
+                $scope.input.displayBefore = item.ed.displayBefore
+
             } else {
                 $scope.input.mult = "0..1"// $scope.mult[1]      //default to 0..1
 
@@ -637,6 +640,9 @@ angular.module("pocApp")
                 ed.sourceReference = $scope.input.sourceReference
 
                 ed.insertAfter = $scope.input.insertAfter
+
+                ed.displayAfter = $scope.input.displayAfter
+                ed.displayBefore = $scope.input.displayBefore
 
                 if ($scope.input.fsh || $scope.input.fhirPath || $scope.input.extUrl || $scope.input.isReference) {
                     ed.profile = {}

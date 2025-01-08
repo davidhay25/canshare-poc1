@@ -1,6 +1,6 @@
 angular.module("pocApp")
 
-    .service('makeQHelperSvc', function() {
+    .service('makeQHelperSvc', function(utilsSvc) {
 
         return {
             updateLinkIds : function (Q) {
@@ -97,6 +97,16 @@ angular.module("pocApp")
 
                     return path.substring(1)   //split off the leading '.'
 
+                }
+
+            },
+            makeDisplayItem : function (display,extHTMLRender) {
+                if (display) {
+                    let item = {type:'display',text:display}
+                    item.linkId = utilsSvc.getUUID()
+                    let disp = `<em style='padding-left:8px'>${display}</em>`
+                    item.extension = [{url:extHTMLRender,valueString:disp}]
+                    return item
                 }
 
             }

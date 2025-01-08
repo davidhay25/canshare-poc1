@@ -1,5 +1,22 @@
 angular.module("pocApp")
 
+    .filter('maxLength',function(){
+        //return a version of the path removing unneeded segments (for display)
+        return function(path,length,) {
+
+            if (path ) {
+               if (path.length > length-3) {
+                   return '...' + path.slice(-length-3)
+               } else {
+                   return path
+               }
+            }
+
+
+        }
+    })
+
+
     .filter('dtMetaData',function () {
         return function(ed) {
             if (ed) {

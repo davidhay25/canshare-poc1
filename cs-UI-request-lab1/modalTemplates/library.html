@@ -31,7 +31,7 @@
 
     <uib-tabset active="input.mainTabActive">
 
-      <uib-tab heading="DataGroups list" >
+      <uib-tab ng-if="user.email" heading="DataGroups list" >
         <br/>
         <div class="row">
           <div class="col-md-4">
@@ -191,7 +191,7 @@
 
       </uib-tab>
 
-      <uib-tab heading="DataGroups sync" >
+      <uib-tab ng-if="user.email" heading="DataGroups sync" >
 
         <div ng-if="syncOutcomeDownloadSummary">
           <br/>
@@ -272,7 +272,7 @@
 
       </uib-tab>
 
-      <uib-tab heading="Compositions">
+      <uib-tab ng-if="user.email" heading="Compositions">
 
 
 
@@ -389,7 +389,7 @@
             <tr><th>Variable name
 
               <i class="glyphicon glyphicon-info-sign clickable"
-                 uib-popover="The name used to identify this query"
+                 uib-popover="The name used to identify this query in the app"
                  popover-placement="top"
                  popover-trigger="'mouseenter'"></i>
 

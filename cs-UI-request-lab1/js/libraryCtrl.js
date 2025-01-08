@@ -92,7 +92,7 @@ angular.module("pocApp")
                         $http.put(qry,xqry).then(
                             function (data) {
                                 //$scope.namedQueries = data.data
-/*
+
                                 for (qry of $scope.namedQueries) {
                                     if (qry.name == xqry.name) {
                                         qry.contents = vo.expression
@@ -100,7 +100,9 @@ angular.module("pocApp")
                                     }
                                 }
 
-                               */
+
+
+
                                // loadNamedQueries()
                             }, function (err) {
                                 alert(angular.toJson(err.data))

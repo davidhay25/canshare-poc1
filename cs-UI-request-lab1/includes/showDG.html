@@ -38,7 +38,7 @@
             <span class=" clickable spacer"
                  ng-click="newModel('dg',selectedModel)">New child</span>
 
-          <span class=" clickable spacer"
+          <span ng-show="userMode == 'library'" class=" clickable spacer"
                 ng-click="makeFrozen('dg',selectedModel)">Freeze a copy</span>
 
         </div>

@@ -71,7 +71,6 @@ angular.module("pocApp")
 
 
             $scope.executeFhirPathOnBundle = function (fp) {
-
                 try {
                     let result = fhirpath.evaluate($scope.response, fp, null, fhirpath_r4_model)
                     $scope.fhirPathResultBundle = result
@@ -86,7 +85,6 @@ angular.module("pocApp")
                     try {
                         let result = fhirpath.evaluate(resource, fp, null, fhirpath_r4_model)
                         $scope.fhirPathResult = result
-
                     } catch (ex) {
                         alert(angular.toJson(ex))
                     }

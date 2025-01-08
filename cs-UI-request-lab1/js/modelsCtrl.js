@@ -274,7 +274,7 @@ angular.module("pocApp")
 
                 if (newMode == 'library') {
                     //changing from playground. Can only do this if logged in.
-                    if ($scope.user.email) {
+                    if ($scope.user && $scope.user.email) {
                         let msg = "Are you sure you wish to enter Library mode? This will replace the current playground."
                         if (confirm(msg)) {
                             resetLocalEnvironment()
@@ -868,9 +868,9 @@ angular.module("pocApp")
                     let vo
                     try {
 
-                        vo = modelDGSvc.makeFullGraph($scope.hashAllDG,false,false)
+                      //  vo = modelDGSvc.makeFullGraph($scope.hashAllDG,false,false)
 
-                        makeGraphAllDG(vo.graphData)
+                     //   makeGraphAllDG(vo.graphData)
 
                         //--------- build the tree with all DG
                         //todo - this call is duplicated...
@@ -1261,6 +1261,8 @@ angular.module("pocApp")
                                 //ed1.sdcGrid = ed.sdcGrid
                                 ed1.adHocExt = ed.adHocExt
                                 ed1.itemCode = ed.itemCode
+                                ed1.displayAfter = ed.displayAfter
+                                ed1.displayBefore = ed.displayBefore
 
                                 setValue(ed1,'qFixedValues',ed.qFixedValues,'array')
                                 /*
@@ -1907,6 +1909,8 @@ angular.module("pocApp")
             $scope.selectModel = function (dg) {
                 if (dg) {
 
+
+
                     clearB4Select()
                     $scope.selectedModel = dg
 
@@ -2129,11 +2133,27 @@ angular.module("pocApp")
                 }
             }
 
+            //is called by init()
+            $scope.createAllDGGraph = function () {
+                vo = modelDGSvc.makeFullGraph($scope.hashAllDG,false,false)
+                makeGraphAllDG(vo.graphData)
+            }
+
             //Initialization on first load or after playground select
             //has to be at the bottom as other functions called
             $scope.init = function () {
                 $scope.makeSnapshots()  //<<<<<<<<<,
                 $scope.makeAllDTList()
+
+                //the graph is slow to build in large sets...
+                if (Object.keys($scope.hashAllDG).length < 30) {
+                    $scope.createAllDGGraph()
+                } else {
+                    if ($scope.graphAllDG) {
+                        $scope.graphAllDG.destroy()
+
+                    }
+                }
 
                 /* temp */
                 sortDG()
@@ -2160,10 +2180,8 @@ angular.module("pocApp")
             $scope.init()
 
 
+
             function makeGraphAllDG(graphData) {
-                //This has significant performance on large models - like canshare.
-                //disabled for now as not that useful any way
-                return
 
                 $scope.allGraphData = graphData
 
@@ -2185,6 +2203,7 @@ angular.module("pocApp")
                             hierarchical : false
                         }
                     };
+
                     if ($scope.graphAllDG) {
                         $scope.graphAllDG.destroy()
                     }
@@ -2193,7 +2212,7 @@ angular.module("pocApp")
 
                     //https://stackoverflow.com/questions/32403578/stop-vis-js-physics-after-nodes-load-but-allow-drag-able-nodes
                     $scope.graphAllDG.on("stabilizationIterationsDone", function () {
-                        $scope.graphAllDG.setOptions({physics: true});
+                        $scope.graphAllDG.setOptions({physics: false});
 
 
                     });

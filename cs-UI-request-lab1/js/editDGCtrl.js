@@ -1,7 +1,7 @@
 angular.module("pocApp")
     .controller('editDGCtrl',
         function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc,snapshotSvc, parent,
-                  utilsSvc, modelDGSvc,$http,userMode) {
+                  utilsSvc, modelDGSvc,$http,userMode,$uibModal) {
 
             $scope.model=model
             $scope.input = {}
@@ -30,6 +30,40 @@ angular.module("pocApp")
                 }
             })
             $scope.input.possibleParents.sort()
+
+
+
+            //set the type for an ed. Only for a new one
+            $scope.setType = function (){
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/changeType.html',
+                    //backdrop: 'static',
+                    size : 'xlg',
+                    controller: 'changeTypeCtrl',
+
+                    resolve: {
+                        ed: function () {
+                                return {}
+
+
+                        },
+                        hashAllDG: function () {
+                            return $scope.allTypes
+                        }
+                    }
+
+                }).result.then(function (vo) {
+                    if (vo.class == 'dg') {
+                        $scope.input.type = vo.value.name
+                    } else {
+                        $scope.input.type = vo.value
+                    }
+
+
+
+                })
+            }
+
 
             $scope.deleteParent = function () {
                 if (confirm("Are you sure you wish to remove the parent?")) {
@@ -93,7 +127,8 @@ angular.module("pocApp")
                                     for (const typ of el.types) {
                                         if (typ.code == 'Reference' && typ.targetProfile) {
                                             for (const prof of typ.targetProfile) {
-                                                if (prof == sourceProfile) {
+
+                                                if (prof == sourceProfile || (prof == 'http://hl7.org/fhir/StructureDefinition/Resource')) {
 
                                                     $scope.definitions.push(el)
                                                     break
@@ -239,13 +274,7 @@ angular.module("pocApp")
             }
 
 
-            function getExtractedResourcesDEP() {
-                //returns all 'referenced' DGs that are defined as extractable. They are candidates for references
-                if ($scope.model.name) {
-                    $scope.extractedResources =  snapshotSvc.getExtractableDG($scope.model.name)
-                }
 
-            }
             //if not new, set the UI names & parent
             //the editing is directly on the $scope.model (there's an onchange handler that updates it as these values are changed
             if (! isNew) {
@@ -297,9 +326,6 @@ angular.module("pocApp")
             $scope.input.card = $scope.input.cards[0]
 
 
-            $scope.tabSelectedDEP = function (tab) {
-                $scope.selectedTab = tab
-            }
 
 
             $scope.canEdit = function (element) {
@@ -329,6 +355,12 @@ angular.module("pocApp")
                         $scope.input.newModelName = $scope.input.newModelName.replace(/\s/g, "");
                         return
                     }
+
+                    if (['root'].indexOf(name) > -1) {
+                        alert(`The name: ${name}  is not allowed.`)
+                        return
+                    }
+
 
                     $scope.model.name = name  //we can use the 'isUnique' to know if the model can be added
 
@@ -408,6 +440,12 @@ angular.module("pocApp")
 
             //check if this path has been used in the DG
             $scope.checkDuplicatePath = function(path) {
+
+                if (path.includes(" ")) {
+                    alert("Path cannot contain spaces")
+                    return
+                }
+
                 $scope.isDuplicatePath = false
                 if ($scope.allElements) {
                     $scope.allElements.forEach(function (element) {
@@ -423,7 +461,7 @@ angular.module("pocApp")
 
             //called when a new element is being added. This is linked to the element name
             $scope.setTitle = function (name) {
-                if (name) {
+                if (name && ! $scope.input.title) {
                     $scope.input.title = name.charAt(0).toUpperCase() + name.slice(1)
                 }
 

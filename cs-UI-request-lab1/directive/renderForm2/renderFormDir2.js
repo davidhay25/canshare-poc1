@@ -20,8 +20,8 @@ angular.module('formsApp')
             templateUrl: 'directive/renderForm2/renderFormDir2.html',
             controller: function($scope,renderFormsSvc2,questionnaireSvc,vsSvc,$http,$uibModal,utilsSvc){
 
-                //let localPatientId = $scope.patientid || "45086382"
-                let localPatientId = $scope.patientid || "dietrich-blake-louis"
+                let localPatientId = $scope.patientid || "45086382"
+                //let localPatientId = $scope.patientid || "dietrich-blake-louis"
                 let localPractitionerId = 'alderson-helene'     //connectathon
 
                 $scope.datePopup = {}

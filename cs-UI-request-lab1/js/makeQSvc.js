@@ -24,6 +24,8 @@ angular.module("pocApp")
 
         extObsExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract"
 
+        extHTMLRender = "http://hl7.org/fhir/StructureDefinition/rendering-xhtml"
+
         //extOb
 
 
@@ -157,8 +159,7 @@ angular.module("pocApp")
             //add a fixed value extension. Can either be a value or an expression
             //definition is the path in the resource (added to the 'item.definition' value
 
-
-
+            
             //http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue
             let ext = {url:extDefinitionExtractValue,extension:[]}
             ext.extension.push({url:"definition",valueUri:definition})
@@ -167,10 +168,6 @@ angular.module("pocApp")
                 console.log(value)
                 let child = {url:'fixed-value'}
                 child[`value${type}`] = value
-
-
-
-
 
                 ext.extension.push(child)
             } else if (expression){
@@ -245,7 +242,9 @@ angular.module("pocApp")
             }
 
             let ext = {url:extVariable}
-            ext.valueExpression = {language:"application/x-fhir-query",expression:nq.contents,name:nq.name}
+
+            //ext.valueExpression = {language:"application/x-fhir-query",expression:nq.contents,name:nq.name}
+            ext.valueExpression = {language:"application/x-fhir-query",expression:nq.contents,name:nq.itemName}
 
             item.extension = item.extension || []
             item.extension.push(ext)
@@ -1447,6 +1446,8 @@ angular.module("pocApp")
                         let vo = decorateItem(currentItem,ed,extractionContext,dg,config,hashItems)
                         extractionContext = vo.extractionContext
 
+                        console.log(path,extractionContext)
+
                         if (config.enableWhen) {
                             let ar =  addEnableWhen(ed,currentItem,config.pathPrefix)
                             allEW.push(...ar)
@@ -1501,6 +1502,23 @@ angular.module("pocApp")
                             if (newItem) {
                                 hashItems[parentItemPath].item.push(newItem)
                             }
+
+                            let displayBeforeItem = makeQHelperSvc.makeDisplayItem(ed.displayBefore,extHTMLRender)
+                            if (displayBeforeItem) {
+
+                                let l = hashItems[parentItemPath].item.length
+
+                                hashItems[parentItemPath].item.splice(l-1,0,displayBeforeItem)
+                            }
+
+                            //And for display items that are added after the actual item
+                            let displayAfterItem = makeQHelperSvc.makeDisplayItem(ed.displayAfter,extHTMLRender)
+                            if (displayAfterItem) {
+                                hashItems[parentItemPath].item.push(displayAfterItem)
+                            }
+
+
+
                         }
 
 
@@ -1915,9 +1933,8 @@ angular.module("pocApp")
 
                     }
 
-                    /* - don't think this is used any more - actually it is, it's used for help text*/
-                    if (ed.helpText){
 
+                    if (ed.helpText){
                         const guid = createUUID()
 
                         let foItem = {linkId:guid,text:ed.helpText,type:'display'}

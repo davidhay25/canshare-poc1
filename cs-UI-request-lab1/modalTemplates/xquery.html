@@ -12,6 +12,11 @@
         <div class="col-md-4">
         <div>
             <a ng-href="{{linkToSpec}}" target="_blank">{{resourceType}} resource in spec</a>
+
+            <a href="https://hl7.org/fhir/R4B/search.html" target="_blank">Query in spec</a>
+
+
+
         </div>
         </div>
 
@@ -33,7 +38,7 @@
           </div>
           <div class="col-md-9">
               <textarea class="form-control" ng-model="input.expression"
-                ng-change=""
+                ng-change="input.dirty = true"
               ></textarea>
           </div>
           <div class="col-md-2">
@@ -45,7 +50,7 @@
 
       <div class="row">
           <div class="col-md-1">
-              Name
+              Item name
           </div>
           <div class="col-md-9">
               {{query.itemName}}
@@ -59,17 +64,63 @@
       <hr/>
 
       <uib-tabset ng-show="response">
-          <uib-tab heading="Single resource">
+
+          <uib-tab heading="Json response">
               <div class="row">
-                  <div class="col-md-3">
-                      <div class="list-group">
-                          <div ng-class="{'list-group-item':true, listItemSelected:selectedResource.id == entry.resource.id}"
-                               ng-click="selectResource(entry.resource)"
-                               style="cursor: pointer"
-                               ng-repeat="entry in response.entry">
-                              {{entry.resource.id}}
+                  <div class="col-md-6">
+                      <div class="myScroll">
+                          <pre>{{response | json}}</pre>
+                      </div>
+
+                  </div>
+                  <div class="col-md-6">
+
+                      <div class="row">
+
+                          <div class="col-md-10">
+                              <textarea class="form-control"
+                                        placeholder="FhirPath"
+                                        ng-model="input.fhirPathBundle"></textarea>
+
+                          </div>
+                          <div class="col-md-2">
+                              <button class="btn btn-link"
+                                      ng-click="executeFhirPathOnBundle(input.fhirPathBundle)">Execute</button>
                           </div>
                       </div>
+
+                      <div>
+                          <div ng-repeat="item in fhirPathResultBundle track by $index">
+                              <pre>{{item | json}}</pre>
+                          </div>
+                          <!--
+                          {{fhirPathResultBundle}}
+                          -->
+                      </div>
+
+
+
+
+                  </div>
+              </div>
+
+
+          </uib-tab>
+
+          <uib-tab ng-if="response.entry.length > 0" heading="Bundle contents">
+              <div class="row">
+                  <div class="col-md-3">
+                      <div class="myScroll">
+                          <div class="list-group">
+                              <div ng-class="{'list-group-item':true, listItemSelected:selectedResource.id == entry.resource.id}"
+                                   ng-click="selectResource(entry.resource)"
+                                   style="cursor: pointer"
+                                   ng-repeat="entry in response.entry">
+                                  {{entry.resource.id}}
+                              </div>
+                          </div>
+                      </div>
+
                   </div>
                   <div class="col-md-9">
 
@@ -94,42 +145,6 @@
 
                   </div>
               </div>
-          </uib-tab>
-          <uib-tab heading="Bundle">
-              <div class="row">
-                  <div class="col-md-6">
-                      <pre>{{response | json}}</pre>
-                  </div>
-                  <div class="col-md-6">
-
-                      <div class="row">
-
-                          <div class="col-md-10">
-                              <textarea class="form-control"
-                                        placeholder="FhirPath"
-                                        ng-model="input.fhirPathBundle"></textarea>
-
-                          </div>
-                          <div class="col-md-2">
-                              <button class="btn btn-link"
-                                      ng-click="executeFhirPathOnBundle(input.fhirPathBundle)">Execute</button>
-                          </div>
-                      </div>
-
-                      <div>
-                          <div ng-repeat="item in fhirPathResultBundle track by $index">
-                              <pre>{{item | json}}</pre>
-                          </div>
-                          {{fhirPathResultBundle}}
-                      </div>
-
-
-
-
-                  </div>
-              </div>
-
-
           </uib-tab>
       </uib-tabset>
 

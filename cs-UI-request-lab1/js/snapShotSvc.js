@@ -267,7 +267,7 @@ angular.module("pocApp")
 
                 tmpDG = allDg[tmpDG.parent]
                 if (! tmpDG) {
-                    throw new Error(`DG ${parent} was not found. Referenced in ${dgTitle}`)
+                    throw new Error(`DG ${parent} was not found. Defined as a parent for ${dgTitle}`)
                     return
                 }
 
@@ -900,7 +900,7 @@ angular.module("pocApp")
 
                 let dg = angular.copy(allDgSnapshot[dgName])
 
-                cleanSnapshot(dg)
+                cleanSnapshot(dg)   //remove 'empty' attributes
                 delete dg.parent
                 dg.diff = dg.snapshot
 
