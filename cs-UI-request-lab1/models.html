@@ -616,12 +616,19 @@
     let app = angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage','ngSanitize',"firebase","LocalForageModule"]).config(function($locationProvider) {
         $locationProvider.html5Mode(true);
         $locationProvider.hashPrefix('!');
+
     });
     angular.module("pocApp").constant("moment", moment);
 
     angular.module("pocApp").config(['$compileProvider', function ($compileProvider) {
         $compileProvider.aHrefSanitizationWhitelist(/^\s*(http|https?|ftp|mailto|blob):/);
     }]);
+
+    angular.module('pocApp').config(['$localForageProvider', function($localForageProvider){
+            $localForageProvider.config({
+                name        : 'lf' // name of the database and prefix for your data, it is "lf" by default
+            });
+        }]);
 
     angular.module("formsApp",[])
     angular.module('topApp', ['pocApp', 'formsApp'])
@@ -773,6 +780,9 @@
 
 <script src="js/questionnaireSvc.js"></script>
 <script src="js/compVersionsCtrl.js"></script>
+
+<script src="js/makeSDCExtensionCtrl.js"></script>
+
 
 <script src="js/libs/fhirpath.min.js"></script>
 <script src="js/libs/fhirpath.r4.min.js"></script>

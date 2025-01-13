@@ -508,7 +508,7 @@ angular.module("pocApp")
                                         specificLogger(dg.name,`--> ${msg}`,arElements)
 
                                         if (dg.name == "ColorectalHistoTumour") {
-                                           // console.log(ed.path,dgToInsert.name,arElements)
+                                          //  console.log(ed.path,dgToInsert.name,arElements)
                                         }
 
 
@@ -778,6 +778,9 @@ angular.module("pocApp")
         }
 
 
+
+
+
         //loook for non-error issues with a DG
         function auditDG(dg) {
             let hashEd = {}     //has by path
@@ -897,8 +900,11 @@ angular.module("pocApp")
             getFrozenDG : function (dgName) {
                 //create a version of the dg where the diff is replaced by the snapshot.
                 //used for the playground ATM
+                let that = this
+
 
                 let dg = angular.copy(allDgSnapshot[dgName])
+                dg.type = that.getExtractResource(dgName)       //the resource this DG extracts to, if any
 
                 cleanSnapshot(dg)   //remove 'empty' attributes
                 delete dg.parent
@@ -911,67 +917,11 @@ angular.module("pocApp")
                     if (fhirDT.indexOf(type) == -1) {
                         ed.type = ['Group']
                     }
-
                 }
-
-
-/*
-                //elements that are no longer used...
-                let elementsToRemove = ['otherAllowed','sourceModelName','sourceReference','rules','slicedFrom','definedOnDG','slicedFrom','originalType','insertAfter']
-
-
-
-                //remove all 'empty' eds
-                dg.diff = []
-                for (const ed of dg.snapshot) {
-                    let newEd = {}
-                    for (const key of Object.keys(ed)) {
-                        let canAdd = true
-                        let element = ed[key]
-
-                        if (elementsToRemove.indexOf(key) > -1) {
-                            canAdd = false
-                        }
-
-                        //empty strings
-                        if (typeof element === "string" && element === "") {
-                            canAdd = false
-                        }
-
-                        //boolean false values
-                        if (typeof element === "boolean" && element === false) {
-                            canAdd = false
-                        }
-
-                        //empty arrays
-                        if (Array.isArray(element) && element.length == 0) {
-                            canAdd = false
-                        }
-
-                        if (canAdd) {
-                            newEd[key] = ed[key]
-                        }
-
-                    }
-                    dg.diff.push(newEd)
-                }
-
-
-
-                */
 
                 delete dg.fullDiff
                 delete dg.snapshot
-
-
-
-
-
-
-
                 return dg
-
-
 
             },
             getImpactedDGsDEP : function (dgName) {
@@ -1329,8 +1279,16 @@ angular.module("pocApp")
                     //alert(`No DG called ${dgName} found`)
                 }
 
+                let lst1 = utilsSvc.reorder(lst)
 
-                return lst
+                console.log(lst1.length,lst.length)
+
+             //   lst1.splice(0,1)
+                    return lst1
+
+               // console.log(utilsSvc.reorder(lst))
+
+               // return lst
             }
         }
 

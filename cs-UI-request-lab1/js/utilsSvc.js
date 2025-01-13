@@ -59,6 +59,101 @@ angular.module("pocApp")
                     return v.toString(16);
                 })
             },
+
+
+            reorder : function (lstElements) {
+                //ensures that
+
+                let data = []
+                lstElements.forEach(function (item) {
+                    //data.push({path:item.ed.path,value:{title:item.ed.title,path:item.ed.path}})
+                    data.push({path:item.ed.path,value:item.ed})
+                })
+
+                function buildHierarchicalHash(data) {
+                    const root = { name: 'root', children: [] }; // Root object to hold the hierarchical structure
+
+                    // Helper function to find or create a node in the hierarchy
+                    function findOrCreateNode(path, value = null) {
+                        const parts = path.split('.');
+                        let current = root;
+
+                        for (const part of parts) {
+                            // Ensure `children` exists before accessing it
+                            current.children = current.children || [];
+
+                            // Find or create the current part in the children array
+                            let child = current.children.find(node => node.name === part);
+                            if (!child) {
+                                child = { name: part, value: null }; // Initialize with a default value
+                                current.children.push(child);
+                            }
+                            current = child;
+                        }
+
+                        // Set or override the value if explicitly provided
+                        if (value !== null) {
+                            current.value = value;
+                        }
+
+                        return current;
+                    }
+
+                    // Build the hierarchy
+                    data.forEach(({ path, value }) => {
+                        findOrCreateNode(path, value);
+                    });
+
+                    // Clean up empty children arrays
+                    function cleanUp(node) {
+                        if (node.children) {
+                            node.children.forEach(cleanUp);
+                            if (node.children.length === 0) {
+                                delete node.children;
+                            }
+                        }
+                    }
+                    root.children.forEach(cleanUp);
+
+                    return root; // Return the full root object with children
+                }
+
+                function printHierarchy(node, indent = '') {
+                    // Print the current node's name and value
+                    if (node.value) {
+                        console.log(`${indent}Node: ${node.name}, Value: ${node.value.path}`);
+                    }
+
+
+                    // If the node has children, recursively print each child
+                    if (node.children) {
+                        node.children.forEach(child => printHierarchy(child, indent + '  '));
+                    }
+                }
+
+                function collectNodes(node, result = []) {
+                    // Add the current node to the result array
+                    //result.push({ name: node.name, value: node.value });
+                    result.push({ed: node.value });
+                    // If the node has children, recursively collect each child's node
+                    if (node.children) {
+                        node.children.forEach(child => collectNodes(child, result));
+                    }
+
+
+                    return result; // Return the accumulated result array
+                }
+
+
+                // Build the hierarchical hash
+                const hierarchicalHash = buildHierarchicalHash(data);
+                let ar = collectNodes(hierarchicalHash)
+                ar.splice(0,1)  //the first entry is null
+                return ar
+
+            },
+
+
             getNodeColor : function (type) {
                 let col = objColours[type] || "c9d1f2"
             },

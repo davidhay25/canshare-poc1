@@ -10,6 +10,14 @@
     background-color: lightsalmon;
 }
 
+
+.custom-popover {
+    max-width: 600px; /* Adjust this value as needed */
+    width: auto; /* Optional: Allow the content to determine the width */
+}
+
+
+
 .draftVS {
     background-color: lightgoldenrodyellow;
 }

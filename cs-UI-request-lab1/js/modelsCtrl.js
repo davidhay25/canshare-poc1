@@ -160,7 +160,7 @@ angular.module("pocApp")
                 $uibModal.open({
                     templateUrl: 'modalTemplates/playGrounds.html',
                     backdrop: 'static',
-                    size : 'lg',
+                    size : 'xlg',
                     controller: 'playgroundsCtrl',
                     resolve : {
                         userMode : function() {
@@ -172,7 +172,7 @@ angular.module("pocApp")
                     }
                     }).result.then(function (playground) {
                         if (playground) {
-                            //a new playground has been created.
+                            //a new playground has been created or loaded.
                             //todo - why do both 'worlds need to be set?
 
                             $localStorage.world = playground
@@ -246,6 +246,7 @@ angular.module("pocApp")
             $scope.savePGtoLocal = function () {
                 let key = `pg-${$scope.world.id}`
                 $scope.world.id = $scope.world.id || utilsSvc.getUUID()
+                $scope.world.updated = new Date()
                 $localForage.setItem(key, $scope.world).then(function (value) {
                     alert("Saved in Local Store")
                 }).catch(function(err) {
@@ -279,12 +280,32 @@ angular.module("pocApp")
                         if (confirm(msg)) {
                             resetLocalEnvironment()
 
-                            alert("Reset complete. You'll need to use the Library to download the DG's")
-                            //$scope.$emit('updateDGList',{})
+                            let qry = '/model/allDG'
+                            $http.get(qry).then(
+                                function (data) {
+                                    //console.log(data)
+                                    $scope.hashAllDG = {}
+                                    let arDG = data.data
+                                    for (const dg of arDG) {
+                                        $localStorage.world.dataGroups[dg.name] = dg
+                                        $scope.hashAllDG[dg.name] = dg
+                                    }
 
-                            $scope.init()
-                            $scope.userMode = newMode
-                            $localStorage.userMode = newMode
+                                    //alert("Reset complete. You'll need to use the Library to download the DG's")
+                                    alert("Reset complete. It may take a few seconds for the UI to update.")
+                                    //$scope.$emit('updateDGList',{})
+
+                                    $scope.init()
+                                    $scope.userMode = newMode
+                                    $localStorage.userMode = newMode
+
+                                }, function (err) {
+                                    alert(angular.toJson(err))
+                                }
+                            )
+
+
+
                         }
                     } else {
                         alert("You need to be logged in to use Library mode")
@@ -313,8 +334,8 @@ angular.module("pocApp")
 
                     function countCheckedOut(hash) {
                         let cnt = 0
-                        Object.keys($scope.hashAllDG).forEach(function (dg) {
-                            if (dg.checkedOut) {
+                        Object.keys(hash).forEach(function (name) {
+                            if (hash[name].checkedOut) {
                                 cnt ++
                             }
                         })
@@ -618,6 +639,9 @@ angular.module("pocApp")
                         },
                         user : function () {
                             return $scope.user
+                        },
+                        userMode : function () {
+                            return $scope.userMode
                         }
                     }
 
@@ -868,9 +892,6 @@ angular.module("pocApp")
                     let vo
                     try {
 
-                      //  vo = modelDGSvc.makeFullGraph($scope.hashAllDG,false,false)
-
-                     //   makeGraphAllDG(vo.graphData)
 
                         //--------- build the tree with all DG
                         //todo - this call is duplicated...
@@ -903,12 +924,7 @@ angular.module("pocApp")
 
 
                 },500)
-
-
             }
-
-          //  $scope.makeAllDTList()         //initial invokation on load  <<<<<<<
-
 
 
             //when a tag is update in the UI - save a copy in the browser cache
@@ -1804,7 +1820,8 @@ angular.module("pocApp")
                         $scope.compQErrors = vo1.errorLog
                         console.log(vo1)
                     } catch(ex) {
-                        alert("There was an issue creating the Questionnaire, so that tab will be blank and you can't display the form. But you can still update the design. ")
+                        console.log(ex)
+                        alert("There was an issue creating the Questionnaire")
                     }
 
                 })
@@ -1851,6 +1868,8 @@ angular.module("pocApp")
 
                 //temp $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name,dg)// vo.allElements
                 $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)// vo.allElements
+
+
 
                 $scope.fullElementHash = {}         //I seem to need this quite a lot. Though memory usage is getting high...
                 //create the list of all paths in the DG. Used by the 'ordering'
@@ -2128,7 +2147,7 @@ angular.module("pocApp")
             }
 
             $scope.fitAllDGGraph = function () {
-                if ($scope.graphAllDG) {
+                if ($scope.graphAllDG && $scope.graphAllDG.view) {
                     $timeout(function(){$scope.graphAllDG.fit()},500)
                 }
             }
@@ -2145,6 +2164,10 @@ angular.module("pocApp")
                 $scope.makeSnapshots()  //<<<<<<<<<,
                 $scope.makeAllDTList()
 
+
+                $('#dgFromAllGraph').jstree('destroy');
+
+
                 //the graph is slow to build in large sets...
                 if (Object.keys($scope.hashAllDG).length < 30) {
                     $scope.createAllDGGraph()
@@ -2153,6 +2176,9 @@ angular.module("pocApp")
                         $scope.graphAllDG.destroy()
 
                     }
+
+
+
                 }
 
                 /* temp */
@@ -2225,7 +2251,7 @@ angular.module("pocApp")
                         $scope.selectedNodeFromFull = node.data
 
 
-                        //this is the one in the 'all DG' graph. It's not interactive
+                        //this is the tree in the 'all DG' graph. It's not interactive
                         if ($scope.selectedNodeFromFull && $scope.selectedNodeFromFull.dg) {
                             let fullElementList = snapshotSvc.getFullListOfElements($scope.selectedNodeFromFull.dg.name)// vo.allElements
                             let treeData = modelsSvc.makeTreeFromElementList(fullElementList)

@@ -6,31 +6,47 @@ angular.module("pocApp")
             //$scope.playground = playground
 
             if (userMode == 'library') {
-                if (! confirm("Make sure you have saved any updated before switching to Playground mode! Do you wish to continue?")){
+                if (! confirm("Make sure you have saved any updates before switching to Playground mode! Do you wish to continue?")){
                         return
                 }
-
             }
 
-            $scope.localStore = []
-            $localForage.iterate(function(value, key, iterationNumber) {
+            function makeLocalStoreSummary() {
+                $scope.localStore = []
+
+                $localForage.iterate(function(value, key, iterationNumber) {
 
 
-                let item = {id:value.id,name:value.name,description:value.description,updated:value.updated}
-                if (value.dataGroups) {
-                    item.dgCount = Object.keys(value.dataGroups).length
-                }
+                    let item = {id:value.id,name:value.name,description:value.description,updated:value.updated}
+                    if (value.dataGroups) {
+                        item.dgCount = Object.keys(value.dataGroups).length
+                    }
+                    if (value.compositions) {
+                        item.compCount = Object.keys(value.compositions).length
+                    }
 
-                $scope.localStore.push(item)
+                    $scope.localStore.push(item)
 
-                console.log(key,value)
+                    console.log(key,value)
 
-            }).then(function(data) {
-                // data is the key of the value > 10
-            });
+                }).then(function(data) {
+                    // data is the key of the value > 10
+                    $scope.localStore.sort(function (a,b) {
+                        if (a.name > b.name) {
+                            return 1
+                        } else {
+                            return -1
+                        }
 
-           // $scope.
+                    })
+                });
 
+            }
+            makeLocalStoreSummary()
+
+
+
+            //Models repository playgrounds
             $http.get('playgroundSummary').then(
                 function (data) {
                         $scope.playgrounds = data.data
@@ -146,17 +162,32 @@ angular.module("pocApp")
 
             }
 
+            $scope.delete = function (playground,source) {
+                if (confirm(`Are you sure you wish to delete the ${playground.name} playground?`)) {
+                    if (source == 'local') {
+                        let key = `pg-${playground.id}`
+                        $localForage.removeItem(key).then(
+                            function (data) {
+                                alert("Playground has been removed from the localstore.")
+                                makeLocalStoreSummary()
+                            }
+                        )
+                    }
+                }
+
+            }
+
             $scope.createNew = function () {
 
                 //create new just creates the playground locally (with a UUID)
                 //the name no longer needs to be unique
-                let world = {name:$scope.input.name,description:$scope.input.description}
-                world.id = utilsSvc.getUUID()
-                world.dataGroups = {}
-                world.compositions = {}
+                let pg = {name:$scope.input.name,description:$scope.input.description}
+                pg.id = utilsSvc.getUUID()
+                pg.dataGroups = {}
+                pg.compositions = {}
 
-                alert("The playground has been created.")
-                $scope.$close(world)
+                alert("The playground has been created in the working model. It won't be created in the Local store until you update it.")
+                $scope.$close(pg)
 
 
 

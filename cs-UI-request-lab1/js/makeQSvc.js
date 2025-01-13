@@ -61,11 +61,11 @@ angular.module("pocApp")
         resourcesForPatientReference['Task'] = {path:'for'}
         //resourcesForPatientReference['Patient'] = {}   //treated as a special case
 
-        function capitalizeFirstLetter(string) {
+        function capitalizeFirstLetterDEP(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
 
-        function createUUID () {
+        function createUUIDDEP () {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                 var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
@@ -115,7 +115,6 @@ angular.module("pocApp")
 
                 })
 
-               // extQuantityUnit = "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption"
 
             }
         }
@@ -159,13 +158,13 @@ angular.module("pocApp")
             //add a fixed value extension. Can either be a value or an expression
             //definition is the path in the resource (added to the 'item.definition' value
 
-            
+
             //http://hl7.org/fhir/StructureDefinition/sdc-questionnaire-itemExtractionValue
             let ext = {url:extDefinitionExtractValue,extension:[]}
             ext.extension.push({url:"definition",valueUri:definition})
 
             if (value) {
-                console.log(value)
+               // console.log(value)
                 let child = {url:'fixed-value'}
                 child[`value${type}`] = value
 
@@ -340,7 +339,6 @@ angular.module("pocApp")
                 controlHint = "drop-down"
                 controlType = "choice"
             }
-
 
             if (ed.type) {
                 switch (ed.type[0]) {
@@ -560,7 +558,7 @@ angular.module("pocApp")
         //strategy has options for populating choice elements
         //  - expandVS - if true, generate answerOption elements
         //ed has controlType and controlHint
-         function setControlType(ed,item,strategy) {
+         function setControlTypeDEP(ed,item,strategy) {
                  strategy = strategy || {}
 
                  //config = config || {maxFromValueSet : 500}
@@ -724,7 +722,6 @@ angular.module("pocApp")
 
         let services =  {
 
-
             getNamedQueries : function (cb) {
                 let qry = "/model/namedquery"
                 $http.get(qry).then(
@@ -824,6 +821,10 @@ angular.module("pocApp")
                 function processItem(report,item,level) {
                     let thing = {linkId:item.linkId,text:item.text,type:item.type,definition:item.definition}
                     thing.level = level
+
+                    if (item.definition) {
+                        thing.isSDC = true
+                    }
 
                     let mult = "0.."
                     if (item.required) {
@@ -1048,12 +1049,12 @@ angular.module("pocApp")
 
                 Q.item.push(containerSection)
 
-
                 let hashEd = {}         //has of ED by path (=linkId)
                 let hashVS = {}         //all valueSets
 
+                let linkIdCtrStart = 0      //the start counter for re-numbering linkids
 
-                let patientId = createUUID() // crypto.randomUUID();
+                let patientId = utilsSvc.getUUID()// createUUID() // crypto.randomUUID();
 
                 for (const section of comp.sections) {
                     if (section.items && section.items.length > 0) {
@@ -1088,13 +1089,15 @@ angular.module("pocApp")
                             if (compConfig.hideEnableWhen) {
                                 config.enableWhen = false
                             }
+                            config.startInx = linkIdCtrStart
 
-                           // const guid = createUUID() // crypto.randomUUID();
 
                             config.patientId = patientId //'testPatient'    //will be a uuid
 
 
                             let vo = that.makeHierarchicalQFromDG(dg,dgElementList,config)
+
+                            linkIdCtrStart = vo.maxInx
 
                             allEW.push(...vo.allEW)
 
@@ -1230,7 +1233,7 @@ angular.module("pocApp")
                 //Used in the new Q renderer
                 //config.enableWhen (boolean) will cause the enableWhens to be set. It's a debugging flag...
                 //config.patientId is the patient id to use for the fixed value extension  //TODO NOT USED ANYMORE
-                config.patientId = config.patientId || createUUID()
+                config.patientId = config.patientId || utilsSvc.getUUID() //createUUID()
                 //config.pathPrefix is used for enable when targets. Only used from composition. It may be null
                 //config.namedQueries allows the NQ to be passed in
                 let pathPrefix = ""
@@ -1238,6 +1241,7 @@ angular.module("pocApp")
                     pathPrefix = config.pathPrefix + "."
                 }
 
+                let startInx = config.startInx || 0     //the start index for re-numbering the linkIds
 
 
                 if (! lstElements || lstElements.length == 0) {
@@ -1338,8 +1342,6 @@ angular.module("pocApp")
                 if (adHocExt) {
                     addAdHocExt(Q,adHocExt)
                 }
-
-
 
                 addPrePopExtensions(Q)      //launchPatient & LaunchPractitioner
                 addUseContext(Q)
@@ -1446,7 +1448,7 @@ angular.module("pocApp")
                         let vo = decorateItem(currentItem,ed,extractionContext,dg,config,hashItems)
                         extractionContext = vo.extractionContext
 
-                        console.log(path,extractionContext)
+                        //console.log(path,extractionContext)
 
                         if (config.enableWhen) {
                             let ar =  addEnableWhen(ed,currentItem,config.pathPrefix)
@@ -1589,7 +1591,6 @@ angular.module("pocApp")
                         }
 
 
-
                     } else {
                         //the question / control element was found so add to the updated 'allEW' list
                         newAllEW.push(ew)
@@ -1603,12 +1604,15 @@ angular.module("pocApp")
 
                 correctEW(Q,conditionalED)
 
-                let lidHash = makeQHelperSvc.updateLinkIds(Q)
+                let vo = makeQHelperSvc.updateLinkIds(Q,startInx)
 
-                //don't think hashEd & hashVS & allEW are used by the caller...
-                return {Q:Q,errorLog:errorLog, lidHash:lidHash}
+                makeQHelperSvc.updateEnableWhen(Q,vo.hash)
 
-                //return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog, allEW : newAllEW, lidHash:lidHash}
+                makeQHelperSvc.updateExpressions(Q,vo.hash)
+
+
+
+                return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog, allEW : newAllEW, lidHash:vo.lidHash,maxInx:vo.maxInx}
 
 
 
@@ -1834,7 +1838,7 @@ angular.module("pocApp")
                             if (parentItem) {
                                 addFixedValue(parentItem,canonical,'Coding',concept)
                             } else {
-                                config.error(`Path ${p1} empty setting fixed value`)
+                                errorLog.push(`Path ${p1} empty setting fixed value`)
                             }
 
                             //Don't include this item in the Q.
@@ -1935,7 +1939,7 @@ angular.module("pocApp")
 
 
                     if (ed.helpText){
-                        const guid = createUUID()
+                        const guid = utilsSvc.getUUID() //createUUID()
 
                         let foItem = {linkId:guid,text:ed.helpText,type:'display'}
 

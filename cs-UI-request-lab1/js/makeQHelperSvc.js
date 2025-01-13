@@ -3,11 +3,92 @@ angular.module("pocApp")
     .service('makeQHelperSvc', function(utilsSvc) {
 
         return {
-            updateLinkIds : function (Q) {
+
+            updateExpressions: function (Q,hashLinkId) {
+                //update any expressions based on the replacements in hashLinkId
+                let logIssues = []
+
+                function processItem(item) {
+                    if (item.extension) {
+                        for (let ext of item.extension) {
+                            if (ext.valueExpression) {
+                                let exp = ext.valueExpression.expression
+
+                                let newExp = exp.replace(/{{(.*?)}}/g, (_, key) => {
+                                    const trimmedKey = key.trim();
+                                    if (hashLinkId.hasOwnProperty(trimmedKey)) {
+                                        return hashLinkId[trimmedKey];
+                                    } else {
+                                        logIssues.push(trimmedKey); // Log missing key
+                                        return `{{${trimmedKey}}}`; // Keep placeholder
+                                    }
+                                })
+
+                                ext.valueExpression.expression = newExp
+
+                            }
+                        }
+                    }
+
+                    if (item.item) {
+                        for (let child of item.item) {
+                            processItem(child)
+                        }
+                    }
+                }
+
+
+                processItem(Q)  //extensions on the Q
+
+                for (let item of Q.item) {
+                    processItem(item)
+                }
+
+                return logIssues
+
+
+            },
+
+            updateEnableWhen : function (Q,hashLinkId) {
+                //update the enableWhens based on the replacements in hashLinkId
+
+                let logIssues = []
+
+                function processItem(item) {
+                    if (item.enableWhen) {
+                        for (const ew of item.enableWhen) {
+                            let question = ew.question
+                            if (hashLinkId[question]) {
+                                ew.question = hashLinkId[question]
+                            } else {
+                                logIssues.push({msg:`${question} not found at ${item.linkId}`})
+                            }
+                        }
+                    }
+                    if (item.item) {
+                        for (const child of item.item) {
+                            processItem(child)
+                        }
+                    }
+                }
+
+
+
+                for (let item of Q.item) {
+                    processItem(item)
+                }
+
+                return logIssues
+
+            },
+
+
+            updateLinkIds : function (Q,startInx) {
                 //change all the linkIds from the path to a sequential number. For cosmetic reasons
 
+                let that = this
                 let hash = {}
-                let ctr = 0
+                let ctr = startInx || 0
 
                 function processItem(item,updateLinkId) {
                     //update the hash
@@ -16,7 +97,7 @@ angular.module("pocApp")
                         hash[item.linkId] = key
                         item.linkId = key
                     }
-
+/* temp
                     //now update any enableWhens that have been updated. 2 passes are needed to get all of them...
                     if (item.enableWhen) {
                         for (const ew of item.enableWhen) {
@@ -26,7 +107,7 @@ angular.module("pocApp")
                             }
                         }
                     }
-
+*/
                     if (item.item) {
                         for (const child of item.item) {
                             processItem(child,updateLinkId)
@@ -40,14 +121,18 @@ angular.module("pocApp")
                 Q.item.forEach(function (item) {
                     processItem(item,true)
                 })
-
+/* temp
                 //second pass will be any unresolved enablewhen
                 Q.item.forEach(function (item) {
                     processItem(item,false)
                 })
+*/
 
+                //let vo = that.updateEnableWhen(Q,hash)
 
-                return hash     //we'll save the hash with the Q
+               // console.log(vo)
+
+                return {hash:hash,maxInx:ctr}     //we'll save the hash with the Q
 
             },
             addExtension : function (item,ext) {
@@ -74,7 +159,7 @@ angular.module("pocApp")
                         let t = hash[parentPath]
                         hash[parentPath].item.push(t)
 
-                        console.log(`added ${path}`)
+                        //console.log(`added ${path}`)
                     }
 
                 }

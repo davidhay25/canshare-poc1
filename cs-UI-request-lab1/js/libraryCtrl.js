@@ -1,10 +1,12 @@
 //seversync is actually the main library interface
 angular.module("pocApp")
     .controller('libraryCtrl',
-        function ($scope,$rootScope,$http,allDG,allComp,$sce,allQObject,user,librarySvc,$timeout,traceSvc,$uibModal,$window) {
+        function ($scope,$rootScope,$http,allDG,allComp,$sce,allQObject,user,userMode,
+                  utilsSvc,librarySvc,$timeout,traceSvc,$uibModal,$window) {
 
             $scope.input = {}
             $scope.user = user
+            $scope.userMode = userMode
             //$scope.input.mainTabActive = 1
 
             $scope.canBulkUpdateDGLibrary = function () {
@@ -132,6 +134,55 @@ angular.module("pocApp")
                 $scope.input.filter = {}
             }
 
+            //create a playground in the Models repository
+            $scope.createPlayground = function (name,description) {
+                if (confirm(`Are you sure you wish to create a playground in the Models Repository named ${name}`)) {
+                    $http.get(`/playgroundByName/${name}`).then(
+                        function (data) {
+                            alert("Sorry, there is already a playground with this name")
+                        }, function (err) {
+                            if (err.status == 404) {
+
+                                let pg = {name:name,description:description}
+                                pg.id = utilsSvc.getUUID()
+                                pg.dataGroups = {}
+                                pg.compositions = {}
+                                pg.updated = new Date()
+
+                                for (const dg of $scope.libraryDG) {
+                                    pg.dataGroups[dg.name] = dg
+                                }
+                                for (const comp of $scope.libraryComp) {
+                                    pg.compositions[comp.name] = comp
+                                }
+
+                                if (user) {
+                                    pg.email = user.email
+                                }
+
+
+                                console.log(pg)
+
+                                $http.put(`/playground/${pg.id}`,pg).then(
+                                    function (data) {
+                                        let msg = "The playground has been created."
+                                        alert(msg)
+                                    }, function (err) {
+                                        alert(angular.toJson(err.data))
+                                    }
+                                )
+
+
+
+                            } else {
+                                alert(angular.toJson(err))
+                            }
+
+                        })
+                }
+
+
+            }
 
 
             //whether a composition is shown.

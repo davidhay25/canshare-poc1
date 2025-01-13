@@ -70,16 +70,42 @@ async function setup(app,mongoDbName) {
         }
     })
 
+    app.get('/playgroundByName/:name', async function(req,res) {
+        let name = req.params.name
+        const query = {name:name}
+        try {
+            const cursor = await database.collection("playground").find(query).toArray()
+            if (cursor.length == 1) {
+                let playground = cursor[0]
+                delete playground['_id']
+                res.json(playground)
+            } else {
+                if (cursor.length == 0) {
+                    res.status(404).json({msg:'Playground not found'})
+                } else {
+                    res.status(500).json({msg:`There were ${cursor.length} Playgrounds with this name. This shouldn't happen.`})
+                }
+
+            }
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+        }
+    })
+
 
     //get a summary of playgrounds
     app.get('/playgroundSummary', async function(req,res) {
         try {
-            const cursor = await database.collection("playground").find().toArray()
+            const cursor = await database.collection("playground").find().sort({name:1}).toArray()
             let ar = []
             for (const entry of cursor) {
                 let item = {id:entry.id,name:entry.name,description:entry.description,updated:entry.updated}
                 if (entry.dataGroups) {
                     item.dgCount = Object.keys(entry.dataGroups).length
+                }
+                if (entry.compositions) {
+                    item.compCount = Object.keys(entry.compositions).length
                 }
                 ar.push(item)
             }

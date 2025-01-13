@@ -3,8 +3,6 @@ angular.module("pocApp")
     .controller('modelDGCtrl',
         function ($scope,$uibModal,$filter,modelsSvc,modelDGSvc,$timeout,librarySvc,traceSvc,orderingSvc,$http) {
 
-
-
             $timeout(function () {
                 console.log('watchers:' + $scope.$$watchers.length);
             },5000)
@@ -14,11 +12,13 @@ angular.module("pocApp")
                 $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:displayPath})
             }
 
-
-
+            $scope.popoverText = function (text) {
+                //let json = angular.toJson(text)
+                //let t = angular.fromJson(json)
+                return text.replace(/\n/g, '<br>')
+            }
 
             $scope.testxquery = function (queryName) {
-
 
                 $http.get(`/model/namedquery/${queryName}`).then(
 

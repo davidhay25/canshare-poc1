@@ -28,26 +28,27 @@
 
             <uib-tab heading="Local Store">
                 <table class="table table-bordered">
-                    <tr><th>Name</th><th>Description</th><th># DG</th><th>Updated</th></tr>
+                    <tr><th>Name</th><th>Description</th><th># DG / Comp</th><th>Updated</th></tr>
                     <tr ng-repeat="row in localStore">
                         <td>{{row.name}}</td>
                         <td>{{row.description}}</td>
-                        <td>{{row.dgCount}}</td>
+                        <td>{{row.dgCount}} / {{row.compCount}}</td>
                         <td>{{row.updated | date}}</td>
                         <td><span class="clickable"  ng-click="load(row,'local')">Load</span>
-                            <span style="padding-left: 20px" class="clickable"  ng-click="copy(row)">Copy</span>
                         </td>
+                        <td><span style="padding-left: 20px" class="clickable"  ng-click="copy(row,'local')">Copy</span></td>
+                        <td><span style="padding-left: 20px" class="clickable"  ng-click="delete(row,'local')">Delete</span></td>
                     </tr>
                 </table>
             </uib-tab>
 
             <uib-tab heading="Models Repository">
                 <table class="table table-bordered">
-                    <tr><th>Name</th><th>Description</th><th># DG</th><th>Updated</th></tr>
+                    <tr><th>Name</th><th>Description</th><th># DG / Comp</th><th>Updated</th></tr>
                     <tr ng-repeat="row in playgrounds">
                         <td>{{row.name}}</td>
                         <td>{{row.description}}</td>
-                        <td>{{row.dgCount}}</td>
+                        <td>{{row.dgCount}} / {{row.compCount}}</td>
                         <td>{{row.updated | date}}</td>
                         <td><span class="clickable"  ng-click="load(row,'repo')">Load</span>
                             <span style="padding-left: 20px" class="clickable"  ng-click="copy(row,'repo')">Copy</span>

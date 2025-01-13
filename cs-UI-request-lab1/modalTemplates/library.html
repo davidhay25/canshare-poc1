@@ -31,7 +31,7 @@
 
     <uib-tabset active="input.mainTabActive">
 
-      <uib-tab ng-if="user.email" heading="DataGroups list" >
+      <uib-tab ng-if="userMode == 'library'" heading="DataGroups list" >
         <br/>
         <div class="row">
           <div class="col-md-4">
@@ -191,7 +191,7 @@
 
       </uib-tab>
 
-      <uib-tab ng-if="user.email" heading="DataGroups sync" >
+      <uib-tab ng-if="userMode == 'library'" heading="DataGroups sync" >
 
         <div ng-if="syncOutcomeDownloadSummary">
           <br/>
@@ -272,7 +272,7 @@
 
       </uib-tab>
 
-      <uib-tab ng-if="user.email" heading="Compositions">
+      <uib-tab ng-if="userMode == 'library'" heading="Compositions">
 
 
 
@@ -379,6 +379,37 @@
             </td>
           </tr>
         </table>
+
+      </uib-tab>
+
+      <uib-tab ng-if="userMode == 'library'" heading="Copy to playground">
+        <em>Create a playground from the Library. Useful as a version.</em>
+
+        <br/><br/>
+        <div class="row">
+          <div class="col-md-6">
+            <div>{{libraryComp.length}} Compositions</div>
+            <div>{{libraryDG.length}} DataGroups</div>
+          </div>
+          <div class="col-md-6">
+            <div><strong>Options</strong></div>
+            <!--
+                    <checkbox ng-model="input.freezeDG"></checkbox> Freeze all
+                    <br/><br/>
+                    -->
+          </div>
+        </div>
+
+
+        <br/><br/>
+
+        <input type="text" class="form-control"
+               placeholder="Playground name (must be unique)" ng-model="input.pgName"/>
+        <br/>
+        <textarea class="form-control" placeholder="Description" ng-model="input.pgDescription"/>
+
+        <button class="btn btn-primary"
+                ng-click="createPlayground(input.pgName,input.pgDescription)">Create playground</button>
 
       </uib-tab>
 

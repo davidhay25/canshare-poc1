@@ -1,0 +1,185 @@
+<div>
+  <!--<div ng-controller="newResourceCtrl">-->
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-8 col-sm-8">
+        <h3 class="modal-title">
+          Make SDC extension
+        </h3>
+      </div>
+
+
+      <div class="col-md-4 col-sm-4">
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+
+          <!--
+        <button ng-show = "input.name"
+                class="btn btn-primary pull-right" ng-click="save()">Close</button>
+          -->
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-body">
+
+      <uib-tabset>
+          <uib-tab heading="Variable">
+                <br/>
+              <div class="row">
+
+                  <div class="col-md-3">
+                      Type
+                  </div>
+                  <div class="col-md-9">
+                      <input type = 'radio' value="fhirpath" ng-model="input.vType"/> fhirPath &nbsp;&nbsp;&nbsp;
+                      <input type = 'radio' value="query" ng-model="input.vType"/> x-query
+                  </div>
+              </div>
+                <br/>
+              <div class="row">
+
+                  <div class="col-md-3">
+                      Name
+                  </div>
+                  <div class="col-md-7">
+                      <input class="form-control" ng-model="input.vName"/>
+                  </div>
+                  <div class="col-md-2">
+                      <div ng-click="insertPath()">Insert</div>
+                  </div>
+              </div>
+              <br/>
+              <div class="row">
+
+                  <div class="col-md-3">
+                      Expression
+                  </div>
+                  <div class="col-md-9">
+                      <textarea class="form-control" rows = 4  ng-model="input.vExpression"></textarea>
+                  </div>
+              </div>
+
+              <br/>
+              <em>A general purpose variable</em>
+
+              <button class="btn btn-primary pull-right"
+                      ng-if="input.vName && input.vExpression"
+                      ng-click="save('variable')">Save</button>
+
+
+
+          </uib-tab>
+
+          <uib-tab heading="allocateId">
+              <br/>
+              <div class="row">
+
+                  <div class="col-md-3">
+                      Name
+                  </div>
+                  <div class="col-md-9">
+                      <input class="form-control" ng-model="input.alName"/>
+                  </div>
+              </div>
+              <br/>
+              <em>Allocate an Id</em>
+
+              <button class="btn btn-primary pull-right"
+                      ng-if="input.alName"
+                      ng-click="save('allocateId')">Save</button>
+          </uib-tab>
+
+          <uib-tab heading="Definition extract">
+              <br/>
+              <div class="row">
+
+                  <div class="col-md-2">
+                      Canonical Url
+                  </div>
+                  <div class="col-md-10">
+                      <input class="form-control" ng-model="input.anCanonical"/>
+                      <div><em>
+                          The full url of the profile that the extract will conform to. eg http://hl7.org/fhir/StructureDefinition/Patient
+                      </em></div>
+                  </div>
+                  <div class="col-md-2">
+
+                  </div>
+              </div>
+
+              <div class="row">
+
+                  <div class="col-md-2">
+                      Id variable
+                  </div>
+                  <div class="col-md-10">
+                      <input class="form-control" ng-model="input.anVariable"/>
+                      <div><em>
+                          The variable created by the allocateId extension that will be the fullUrl value of the extracted resource in the output bundle.
+                      </em></div>
+
+                  </div>
+                  <div class="col-md-2">
+
+                  </div>
+              </div>
+
+              <br/>
+
+              <em>Marks where a resource is extracted. Child items are elements in the extracted resource.</em>
+
+              <button class="btn btn-primary pull-right"
+                      ng-if="input.anCanonical"
+                      ng-click="save('defextract')">Save</button>
+
+          </uib-tab>
+          <uib-tab heading="Calculated Expression">
+
+
+
+          </uib-tab>
+
+          <uib-tab heading="Elements">
+              <table class="table-bordered table">
+                  <tr ng-repeat = "element in elements">
+                      <td>
+
+                          <div ng-repeat = "segment in element.ed.path.split('.') track by $index">
+                              {{segment}}
+                          </div>
+
+
+
+                      </td>
+                      <td>{{element.ed.title}}</td>
+                      <td>{{element.ed.description}}</td>
+                      <td>{{element.ed.type[0]}}
+                        <em>expand if cc or options</em>
+                      </td>
+                      <td><span class="clickable" ng-click="copyPath(element.ed.path)">Copy</span> </td>
+                  </tr>
+              </table>
+
+
+          </uib-tab>
+
+          <uib-tab heading="dev demplate">
+              <br/>
+              <div class="row">
+
+                  <div class="col-md-3">
+
+                  </div>
+                  <div class="col-md-9">
+                  </div>
+              </div>
+          </uib-tab>
+      </uib-tabset>
+
+
+  </div>
+  <div class="modal-header">
+
+  </div>
+</div>

@@ -295,6 +295,7 @@ angular.module('formsApp')
                 }
 
                 $scope.selectByLinkId = function (linkId) {
+
                     //linkId is currently text - eg "linkId='myMedication.drugName'"
                     //scruffy code to get rid of the offending text
                     linkId = linkId.replace("linkId='","")
