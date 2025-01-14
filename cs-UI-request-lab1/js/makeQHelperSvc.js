@@ -115,7 +115,6 @@ angular.module("pocApp")
 
             },
 
-
             updateLinkIds : function (Q,startInx) {
                 //change all the linkIds from the path to a sequential number. For cosmetic reasons
 
@@ -227,7 +226,109 @@ angular.module("pocApp")
                     return item
                 }
 
+            },
+            getPathToItem : function (Q,item) {
+                //h=given an
+
+            },
+            makeVariableUsage : function(Q) {
+                //generate a has summary of variable expression use
+                let hashVariable = {}    //defined variables (expressions have a name)
+                let hashUsed = {}       //where a variable has been used
+                let lstUseExpression = []   //items that use an expression
+                function processItem(item) {
+                    if (item.extension) {
+                        let clone = angular.copy(item)
+                        if (clone.item) {
+                            clone.item = []
+                        }
+                        for (const ext of item.extension) {
+
+                            let url = ext.url
+
+                            if (url == "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-extractAllocateId") {
+                                let aName = ext.valueString
+                                hashVariable[aName] = hashVariable[aName] || []
+
+                                let thing = {kind:'allocateId',item:clone}
+                                hashVariable[aName].push(thing)      //should only be 1...
+                            } else if (ext.valueExpression) {
+                                let name = ext.valueExpression.name
+                                let expression = ext.valueExpression.expression
+                                //if there's a name, then this extension is defining the variable
+
+                                if (name) {
+                                    hashVariable[name] = hashVariable[name] || []
+
+                                    let thing = {kind:'variable',url:url,expression:ext.valueExpression.expression,item:clone}
+                                    hashVariable[name].push(thing)      //should only be 1...
+                                } else {
+                                    //if there's no name, then it may be using a variable
+
+                                    //look for a variable - prefixed by %
+                                    const matches = expression.match(/%\w+/g)
+                                    if (matches) {
+                                        for (const v of matches) {
+                                            hashUsed[v] = hashUsed[v] || []
+                                            let thing = {url:url,expression:ext.valueExpression.expression,item:clone}
+                                            hashUsed[v].push(thing)
+                                        }
+                                    } else {
+                                        //if there are no variables found then it's just an item with an expression of some sort
+                                        let thing = {url:url,expression:ext.valueExpression.expression,item:clone}
+                                        lstUseExpression.push(thing)
+                                    }
+                                }
+                            } else if (ext.extension) {
+                                //this is a complex extension
+                                for (const extChild of ext.extension) {
+                                    if (extChild.valueExpression) {
+                                        //we'll ignore any name - don't think they're useful
+                                        let childExpression = extChild.valueExpression.expression
+                                        if (childExpression) {
+                                            //look for a variable - prefixed by %
+                                            const childMatches = childExpression.match(/%\w+/g)
+                                            if (childMatches) {
+                                                for (const v of childMatches) {
+                                                    hashUsed[v] = hashUsed[v] || []
+                                                    let thing = {url:url,expression:childExpression,item:clone}
+                                                    hashUsed[v].push(thing)
+                                                }
+                                            } else {
+                                                //if there are no variables found then it's just an item with an expression of some sort
+                                                let thing = {url:url,expression:ext.valueExpression.expression,item:clone}
+                                                lstUseExpression.push(thing)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (item.item) {
+                        for (const child of item.item) {
+                            processItem(child)
+                        }
+                    }
+
+                }
+
+
+                processItem(Q)      //extensions defined on the root
+/*
+                for (const item of Q.item) {
+                    processItem(item)   //item based extensions
+                }
+                */
+
+                console.log(hashVariable,hashUsed,lstUseExpression)
+
+                return {variables:hashVariable,used:hashUsed,lstUseExpression:lstUseExpression}
+
+
             }
+
 
         }
 

@@ -1,5 +1,23 @@
 angular.module("pocApp")
 
+
+
+
+
+    .filter('sdcExtensionName',function(){
+        //return a version of the path removing unneeded segments (for display)
+        return function(url) {
+
+            if (url ) {
+                let ar = url.split('/')
+                let name = ar[ar.length-1]
+                return name.replace('sdc-questionnaire-','')
+            }
+
+
+        }
+    })
+
     .filter('maxLength',function(){
         //return a version of the path removing unneeded segments (for display)
         return function(path,length,) {

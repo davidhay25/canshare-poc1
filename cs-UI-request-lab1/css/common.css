@@ -16,6 +16,10 @@
     width: auto; /* Optional: Allow the content to determine the width */
 }
 
+.custom-popover-big {
+    max-width: 900px; /* Adjust this value as needed */
+    width: auto; /* Optional: Allow the content to determine the width */
+}
 
 
 .draftVS {

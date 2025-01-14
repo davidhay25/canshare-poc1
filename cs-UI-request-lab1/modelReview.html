@@ -43,7 +43,7 @@
 -->
 
     <script>
-        let app = angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngStorage']).config(function($locationProvider) {
+        let app = angular.module("pocApp",['ui.bootstrap','ui.checkbox','ngSanitize','ngStorage']).config(function($locationProvider) {
 
             // enable html5Mode for pushstate ('#'-less URLs)
             $locationProvider.html5Mode(true);
@@ -107,11 +107,14 @@
     <script src="js/qHelperSvc.js"></script>
     <script src="js/makeQHelperSvc.js"></script>
 
+    <script src="js/libs/angular-sanitize.js"></script>
 
     <!-- While developing new directive -->
     <script src="directive/renderForm2/renderFormSvc2.js"></script>
     <script src="directive/renderForm2/renderFormDir2.js"></script>
     <script src="js/questionnaireSvc.js"></script>
+
+    <script src="js/viewItemCtrl.js"></script>
 
 
 </head>
@@ -230,135 +233,264 @@
         </uib-tab>
 
         <uib-tab  heading="SDC elements">
-            <div class="pull-right">
-                <checkbox ng-model="input.SDCOnly"></checkbox> Show only with SDC instructions
-            </div>
-            <br/> <br/>
+            <br>
+            <uib-tabset>
+                <uib-tab heading="Elements">
+                    <div class="pull-right">
+                        <checkbox ng-model="input.SDCOnly"></checkbox> Show only with SDC instructions
+                    </div>
+                    <br/> <br/>
 
-            <h4>Elements</h4>
-            <div class="myScroll">
-                <table class="table table-condensed table-bordered">
-                    <tr><th>Text</th><th>Lvl</th><th>LinkId</th><th>Type</th><th>Card.</th><th>Hidden</th><th>Fixed / ValueSet</th><th>SDC</th></tr>
-                    <tr
-                            ng-class="{background:entry.level == 2}"
-                            ng-repeat="entry in qReport.entries track by $index" ng-if="showReportLine(input.SDCOnly,entry)" >
-                        <td>
-                            <div ng-style="{ 'padding-left': (entry.level * 6) }">
-                                {{entry.text}}
-                            </div>
-                        </td>
-                        <td>{{entry.level}} </td>
-                        <td>{{entry.linkId}} </td>
-                        <td>{{entry.type}}</td>
-                        <td>{{entry.mult}}</td>
-                        <td>{{entry.isHidden}}</td>
-                        <td>{{entry.fixedValue}}
+                    <h4>Elements</h4>
+                    <div class="myScroll">
+                        <table class="table table-condensed table-bordered">
+                            <tr><th>Text</th><th>Lvl</th><th>LinkId</th><th>Type</th><th>Card.</th><th>Hidden</th><th>Fixed / ValueSet</th><th>SDC</th></tr>
+                            <tr
+                                    ng-class="{background:entry.level == 2}"
+                                    ng-repeat="entry in qReport.entries track by $index"
+                                    ng-if="showReportLine(input.SDCOnly,entry)" >
+                                <td>
+                                    <div ng-style="{ 'padding-left': (entry.level * 6) }">
 
-                            {{entry.valueSet}}
-                        </td>
-                        <td>
-                            <div ng-if="entry.initialExpression">
-                                <strong>Initial: </strong>{{entry.initialExpression}}
-                            </div>
-                            <div ng-if="entry.definition">
-                                <strong>Extraction: </strong>{{entry.definition}}
-                            </div>
+                                        {{entry.text}}
+                                    </div>
+                                </td>
+                                <td>{{entry.level}} </td>
+                                <td class="clickable"
+                                    ng-click="viewItem(entry.item)">
+                                    {{entry.linkId}}
+                                </td>
+                                <td>{{entry.type}}</td>
+                                <td>{{entry.mult}}</td>
+                                <td>{{entry.isHidden}}</td>
+                                <td>{{entry.fixedValue}}
 
-                            <div ng-if="entry.allocateId">
-                                <strong>Allocate Id: </strong>{{entry.allocateId}}
-                            </div>
+                                    {{entry.valueSet}}
+                                </td>
+                                <td>
+                                    <div ng-if="entry.initialExpression">
+                                        <strong>Initial: </strong>{{entry.initialExpression}}
+                                    </div>
+                                    <div ng-if="entry.definition">
+                                        <strong>Extraction: </strong>{{entry.definition}}
+                                    </div>
 
-
-                            <div ng-if="entry.extractionContext">
-                                <strong>Extraction context: </strong>{{entry.extractionContext}}
-                            </div>
-
-                            <div ng-if="entry.populationContext">
-                                <strong>Population context:</strong>
-                                name=<strong>{{entry.populationContext.name}}</strong>
-                                expression={{entry.populationContext.expression}}
-                            </div>
-
-                            <span ng-if="entry.variable" class="pull-right clickable"
-                                  style="cursor: pointer"
-                                  ng-click="testxquery(entry)">Details</span>
+                                    <div ng-if="entry.allocateId">
+                                        <strong>Allocate Id: </strong>{{entry.allocateId}}
+                                    </div>
 
 
-                            <div ng-if="entry.variable">
-                                <strong>Variable: </strong>
+                                    <div ng-if="entry.extractionContext">
+                                        <strong>Extraction context: </strong>{{entry.extractionContext}}
+                                    </div>
 
-                                {{entry.itemName}} {{entry.contents}}
+                                    <div ng-if="entry.populationContext">
+                                        <strong>Population context:</strong>
+                                        name=<strong>{{entry.populationContext.name}}</strong>
+                                        expression={{entry.populationContext.expression}}
+                                    </div>
+
+                                    <span ng-if="entry.variable" class="pull-right clickable"
+                                          style="cursor: pointer"
+                                          ng-click="testxquery(entry)">Details</span>
 
 
-                            </div>
+                                    <div ng-if="entry.variable">
+                                        <strong>Variable: </strong>
 
-                            <div ng-repeat="ext in entry.itemControl">
-                                <strong>Item control: </strong> {{ext.coding[0].code}}
-
-                            </div>
+                                        {{entry.itemName}}
+                                        <div><em>{{entry.contents}}</em></div>
 
 
-                            <div ng-repeat="sv in entry.setValue">
-                                <strong>Set value: </strong> {{sv.path}}
-                                <div>
-                                    <div style="margin-left: 8px" ng-if="sv.value"><strong>Fixed: </strong>{{sv.value}}</div>
-                                    <div style="margin-left: 8px" ng-if="sv.expression"><strong>Expression: </strong>{{sv.expression}}</div>
+                                    </div>
+
+                                    <div ng-repeat="ext in entry.itemControl">
+                                        <strong>Item control: </strong> {{ext.coding[0].code}}
+
+                                    </div>
+
+
+                                    <div ng-repeat="sv in entry.setValue">
+                                        <strong>Set value: </strong> {{sv.path}}
+                                        <div>
+                                            <div style="margin-left: 8px" ng-if="sv.value"><strong>Fixed: </strong>{{sv.value}}</div>
+                                            <div style="margin-left: 8px" ng-if="sv.expression"><strong>Expression: </strong>{{sv.expression}}</div>
+                                        </div>
+
+                                    </div>
+
+                                    <div ng-if="entry.calculated">
+                                        <strong>Calculated expression: </strong>
+                                        <div><em>{{entry.calculated}}</em></div>
+                                    </div>
+
+
+                                    <div
+                                            style="background-color: #f2dede"
+                                            ng-repeat="ext in entry.unknownExtension">
+
+                                        <strong>Unknown: </strong> {{ext.url}}
+
+                                    </div>
+
+
+
+
+                                </td>
+
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h4>Set value (fixed string or expression)</h4>
+
+                    <table class="table table-condensed table-bordered">
+                        <tr><th>Path</th><th>Fixed value / Expression</th></tr>
+                        <tr ng-repeat="sv in qReport.setValue">
+                            <td>
+                                {{sv.linkId}}
+                                <div>{{sv.path}}</div>
+                            </td>
+                            <td>
+                                <div ng-if="sv.value"><strong>FV: </strong>{{sv.value}}</div>
+                                <div ng-if="sv.expression"><strong>Exp: </strong>{{sv.expression}}</div>
+                            </td>
+
+                        </tr>
+                    </table>
+
+                    <h4>Launch Contexts</h4>
+                    <table class="table table-condensed table-bordered">
+                        <tr><th>Name</th><th>Type</th><th>Description</th><th>Used</th></tr>
+                        <tr ng-repeat="lc in qReport.launchContext">
+                            <td>{{lc.name}}</td>
+                            <td>{{lc.type}}</td>
+                            <td>{{lc.description}}</td>
+                            <td>
+
+                                <div ng-repeat="item in qReport.variableUsage[lc.name]">
+                                    {{item}}
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                </uib-tab>
+                <uib-tab heading="Expression usage">
+
+                    <h4>Variable definition</h4>
+
+                    <table class="table-bordered table">
+                            <tr><th style="width:15%">Name</th>
+                            <th>
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        Kind of variable
+                                    </div>
+                                    <div class="col-md-2">
+                                        Where defined
+                                    </div>
+                                    <div class="col-md-8">
+                                        Expression
+                                    </div>
+                                </div>
+                            </th></tr>
+
+                            <tr ng-repeat="(k,v) in qReport.expressionUsage.variables">
+                                <td>{{k}}</td>
+                                <td>
+                                    <div class="row" ng-repeat="v1 in v">
+                                        <div class="col-md-2">
+                                            {{v1.kind}}
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="clickable"
+                                                 ng-click="viewItem(v1.item)">
+                                                {{v1.item.linkId || "Q Root"}}
+                                            </div>
+
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{v1.expression}}
+                                        </div>
+                                    </div>
+
+                                </td>
+                            </tr>
+                        </table>
+
+                    <h4>Variable usage</h4>
+
+
+
+                    <table class="table-bordered table">
+                        <tr><th style="width:15%">Name</th>
+                            <th>
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        Kind of expression
+                                    </div>
+                                    <div class="col-md-2">
+                                        Where used
+                                    </div>
+                                    <div class="col-md-8">
+                                        Full expression
+                                    </div>
+                                </div>
+                            </th></tr>
+                        <tr ng-repeat="(k,v) in qReport.expressionUsage.used">
+                            <td>{{k}}</td>
+                            <td>
+                                <div class="row" ng-repeat="v1 in v">
+                                    <div class="col-md-2">
+                                        {{v1.url | sdcExtensionName}}
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="clickable"
+                                             ng-click="viewItem(v1.item)">
+                                            {{v1.item.linkId || "Q Root"}}
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-8">
+                                        {{v1.expression}}
+                                    </div>
+
+                                </div>
+                            </td>
+                        </tr>
+
+                    </table>
+
+                    <h4>Other uses of expression</h4>
+
+                    <table class="table-bordered table">
+                        <tr><th style="width:15%">Where used</th><th style="width:15%">Kind of expression</th><th>Expression</th></tr>
+                        <tr ng-repeat="used in qReport.expressionUsage.lstUseExpression">
+                            <td>
+
+                                <div class="clickable"
+                                     ng-click="viewItem(used.item)">
+                                    {{used.item.linkId || "Q Root"}}
                                 </div>
 
-                            </div>
-
-
-                            <div
-                                    style="background-color: #f2dede"
-                                    ng-repeat="ext in entry.unknownExtension">
-
-                                <strong>Unknown: </strong> {{ext.url}}
-
-                            </div>
+                               </td>
+                            <td>{{used.url | sdcExtensionName}}</td>
+                            <td>{{used.expression}}</td>
+                        </tr>
+                    </table>
 
 
 
 
-                        </td>
-
-                    </tr>
-                </table>
-            </div>
 
 
-            <h4>Set value (fixed string or expression)</h4>
-
-            <table class="table table-condensed table-bordered">
-                <tr><th>Path</th><th>Fixed value / Expression</th></tr>
-                <tr ng-repeat="sv in qReport.setValue">
-                    <td>
-                        {{sv.linkId}}
-                        <div>{{sv.path}}</div>
-                    </td>
-                    <td>
-                        <div ng-if="sv.value"><strong>FV: </strong>{{sv.value}}</div>
-                        <div ng-if="sv.expression"><strong>Exp: </strong>{{sv.expression}}</div>
-                    </td>
-
-                </tr>
-            </table>
 
 
-            <h4>Launch Contexts</h4>
-            <table class="table table-condensed table-bordered">
-                <tr><th>Name</th><th>Type</th><th>Description</th><th>Used</th></tr>
-                <tr ng-repeat="lc in qReport.launchContext">
-                    <td>{{lc.name}}</td>
-                    <td>{{lc.type}}</td>
-                    <td>{{lc.description}}</td>
-                    <td>
+                </uib-tab>
+            </uib-tabset>
 
-                        <div ng-repeat="item in qReport.variableUsage[lc.name]">
-                            {{item}}
-                        </div>
-                    </td>
-                </tr>
-            </table>
+
 
         </uib-tab>
 

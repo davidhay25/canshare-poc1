@@ -43,6 +43,8 @@ angular.module("pocApp")
        // let extSourceQuery = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-sourceQueries"
         systemItemControl = "http://hl7.org/fhir/questionnaire-item-control"
 
+        extCalculatedExpression = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression"
+
 
         //resources that have the patient reference attached.
         //The actual reference is to a variable with the name 'PatientID'
@@ -770,7 +772,7 @@ angular.module("pocApp")
 
                 report.entries.push(thing)
                 
-                //get the variables - can now be defined on an item
+                //get the variables - can now be defined on an item as well
                 //todo - not going to work for compositions I think
                 let ar2 = getExtension(Q,extVariable,'Expression')
                 ar2.forEach(function (ext) {
@@ -821,6 +823,13 @@ angular.module("pocApp")
                 function processItem(report,item,level) {
                     let thing = {linkId:item.linkId,text:item.text,type:item.type,definition:item.definition}
                     thing.level = level
+
+                    let clone = angular.copy(item)
+                    if (clone.item) {
+                        clone.item = []
+                    }
+                    thing.item = clone
+
 
                     if (item.definition) {
                         thing.isSDC = true
@@ -970,14 +979,10 @@ angular.module("pocApp")
                                         alert(`Invalid expression at ${item.text}. ignoring`)
                                     }
 
+                                    break
 
-
-                                    //report.entries.push(thing)
-
-                                    //report.variableUsage[ext.name] = []
-
-
-
+                                case extCalculatedExpression :
+                                    thing.calculated = ext.valueExpression.expression
 
                                     break
 
@@ -1022,6 +1027,7 @@ angular.module("pocApp")
 
                 })
 
+                report.expressionUsage = makeQHelperSvc.makeVariableUsage(Q)
 
                 console.log(report)
                 return {report:report}

@@ -14,6 +14,19 @@ angular.module("pocApp")
                 $scope.viewVS(vs)
             })
 
+            $scope.popoverItem = function (item) {
+                if (item) {
+
+                    let text = angular.toJson(item,true)
+                    //text = text.replace(/ /g, '%nbsp;')
+                    text = text.replace(/\n/g, '<br>')
+                    return `<pre>${text}</pre>`
+
+                    //return text.replace(/\n/g, '<br>')
+                }
+
+            }
+
             //display the technical items
             $scope.input.technical = true
 
@@ -41,6 +54,32 @@ angular.module("pocApp")
                 $scope.loadQ(qName)
             }
 
+            $scope.viewItem = function (item) {
+
+                let config = {}
+
+
+
+                $uibModal.open({
+
+                    size : 'xlg',
+                    templateUrl: 'modalTemplates/viewItem.html',
+
+                    controller: 'viewItemCtrl',
+
+                    resolve: {
+                        item: function () {
+                            return item
+                        }, Q: function () {
+                            return $scope.fullQ
+                        }
+                    }
+
+                })
+
+
+            }
+
             $scope.loadQ = function (qName) {
                 let qry = `/Questionnaire/${qName}`
                 $http.get(qry).then(
@@ -60,6 +99,8 @@ angular.module("pocApp")
                     }
                 )
             }
+
+
 
             if (modelName) {
                 if (modelName.startsWith('q-')) {
