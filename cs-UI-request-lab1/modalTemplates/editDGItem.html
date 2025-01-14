@@ -211,7 +211,7 @@
             </td>
           </tr>
 
-          <tr>
+          <tr ng-if="false">
             <td>Is item code</td>
             <td><checkbox ng-model="input.itemCode"></checkbox>
               Item.code will be set to this value in the Questionnaire
@@ -497,7 +497,12 @@
 
           <uib-tab heading="Ad hoc Q extensions">
 
-            <div class="pull-right clickable"><div ng-click="validateJson(input.adHocExt,true)">Validate</div></div>
+
+            <div style="margin: 8px" class="pull-right clickable"><div ng-click="validateJson(input.adHocExt,true)">Validate</div></div>
+            <div  style="margin: 8px" class="pull-right clickable"><div ng-click="extBuilder()">Builder</div></div>
+
+
+
             <div class="clearfix"></div>
             <textarea ng-model="input.adHocExt" class="custom-textarea" rows="15">
 
@@ -505,6 +510,9 @@
             <br/>
             <em>Add any adhoc extensions to add to a derived questionnaire item. Must be an array with valid Json that
             will be copied into the Q Item. Use double quotes - not single quotes.</em>
+
+
+
           </uib-tab>
 
         </uib-tabset>

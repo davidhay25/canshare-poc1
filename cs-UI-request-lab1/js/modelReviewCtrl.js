@@ -5,7 +5,7 @@ angular.module("pocApp")
 
             $scope.input = {}
 
-            $scope.input.SDCOnly = true
+            $scope.input.SDCOnly = false
 
             //dietrich-blake-louis
 

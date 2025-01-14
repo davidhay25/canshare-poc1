@@ -18,6 +18,7 @@ angular.module("pocApp")
 
 
                     let item = {id:value.id,name:value.name,description:value.description,updated:value.updated}
+                    item.version = value.version
                     if (value.dataGroups) {
                         item.dgCount = Object.keys(value.dataGroups).length
                     }

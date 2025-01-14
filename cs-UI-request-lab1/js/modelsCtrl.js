@@ -190,7 +190,11 @@ angular.module("pocApp")
             $scope.updatePlayground = function () {
                 //save the current playground to the library
                 $scope.world.id = $scope.world.id || utilsSvc.getUUID()
+
                 $localStorage.world.updated = new Date()
+                if ($localStorage.world.version) {
+                    $localStorage.world.version ++
+                } else {$localStorage.world.version = 1}
 
                 $http.put(`/playground/${$localStorage.world.id}`,$localStorage.world).then(
                     function (data) {
@@ -247,6 +251,12 @@ angular.module("pocApp")
                 let key = `pg-${$scope.world.id}`
                 $scope.world.id = $scope.world.id || utilsSvc.getUUID()
                 $scope.world.updated = new Date()
+
+                if ($scope.world.version) {
+                    $scope.world.version ++
+
+                } else {$scope.world.version = 1}
+
                 $localForage.setItem(key, $scope.world).then(function (value) {
                     alert("Saved in Local Store")
                 }).catch(function(err) {

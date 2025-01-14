@@ -395,11 +395,9 @@ angular.module('formsApp')
                 $scope.saveToServer = function (openLab) {
                     //saves the Q to the fhirpath lab server so that we can invoke the fhirpath lab
                     //Once the POC is ssl then we can save there instead
-                    if (confirm("This will save the Q to a FHIR server, then display it using the CSIRO renderer. This can take a few seconds, so please be patient.")) {
+                 //   if (confirm("This will save the Q to a FHIR server, then display it using the CSIRO renderer. This can take a few seconds, so please be patient.")) {
 
                         let qry = `${$scope.serverbase}Questionnaire/${$scope.q.id}`
-
-
                         let config = {headers:{'content-type':'application/fhir+json'}}
 
                         $scope.savingQ = true
@@ -407,16 +405,11 @@ angular.module('formsApp')
                             function (data) {
                                 $scope.savingQ = false
 
-
-                                let msg = `Q has been saved on the server. I'll try to load the renderer with the url ${$scope.redirectUrl}`
+                                let msg = `Q has been saved in the Lab. I'll try to load the renderer with the url ${$scope.redirectUrl}`
                                 msg += " If that fails, then try the direct link that has appeared."
                                 alert(msg)
                                 if (openLab) {
-
-
-
                                     copyToClipboard($scope.redirectUrl)
-
                                     window.open($scope.redirectUrl)
                                 }
                                 $scope.pathToQ = qry
@@ -426,7 +419,7 @@ angular.module('formsApp')
                                 alert(angular.toJson(err))
                             }
                         )
-                    }
+                 //   }
 
 
                 }

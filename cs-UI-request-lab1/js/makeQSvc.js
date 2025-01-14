@@ -758,7 +758,7 @@ angular.module("pocApp")
                     //the whole extension is returned
                     let ext = ar1[0]
                     if (ext.extension > 0) {
-                        for (child of ext.extension) {
+                        for (const child of ext.extension) {
                             if (child.url == 'definition')
                                 thing.extractionContext = child.valueCanonical
                                 thing.isSDC = true
@@ -770,7 +770,7 @@ angular.module("pocApp")
 
                 report.entries.push(thing)
                 
-                //get the variables - assume they are defined on the Q root for now...
+                //get the variables - can now be defined on an item
                 //todo - not going to work for compositions I think
                 let ar2 = getExtension(Q,extVariable,'Expression')
                 ar2.forEach(function (ext) {
@@ -883,7 +883,7 @@ angular.module("pocApp")
                                 case extHidden:
                                     thing.isHidden = ext.valueBoolean
                                     break
-                                case  extInitialExpressionUrl:
+                                case extInitialExpressionUrl:
 
                                     thing.initialExpression = ext.valueExpression.expression
 
@@ -960,6 +960,26 @@ angular.module("pocApp")
                                     thing.itemControl.push(ext.valueCodeableConcept)
                                     break
 
+                                case extVariable :
+
+                                    try {
+                                        thing.variable = ext.valueExpression.name
+                                        thing.contents = ext.valueExpression.expression
+                                        thing.itemName = ext.valueExpression.name
+                                    } catch (ex) {
+                                        alert(`Invalid expression at ${item.text}. ignoring`)
+                                    }
+
+
+
+                                    //report.entries.push(thing)
+
+                                    //report.variableUsage[ext.name] = []
+
+
+
+
+                                    break
 
 
                                 default:

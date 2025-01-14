@@ -241,7 +241,7 @@
                     <tr><th>Text</th><th>Lvl</th><th>LinkId</th><th>Type</th><th>Card.</th><th>Hidden</th><th>Fixed / ValueSet</th><th>SDC</th></tr>
                     <tr
                             ng-class="{background:entry.level == 2}"
-                            ng-repeat="entry in qReport.entries" ng-if="showReportLine(input.SDCOnly,entry)">
+                            ng-repeat="entry in qReport.entries track by $index" ng-if="showReportLine(input.SDCOnly,entry)" >
                         <td>
                             <div ng-style="{ 'padding-left': (entry.level * 6) }">
                                 {{entry.text}}
@@ -281,7 +281,7 @@
 
                             <span ng-if="entry.variable" class="pull-right clickable"
                                   style="cursor: pointer"
-                                  ng-click="testxquery(entry)">Test</span>
+                                  ng-click="testxquery(entry)">Details</span>
 
 
                             <div ng-if="entry.variable">

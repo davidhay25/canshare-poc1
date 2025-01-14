@@ -42,11 +42,11 @@
                   <div class="col-md-3">
                       Name
                   </div>
-                  <div class="col-md-7">
-                      <input class="form-control" ng-model="input.vName"/>
+                  <div class="col-md-4">
+                      <input class="form-control" ng-model="input.vName" placeholder="Spaces will be removed"/>
                   </div>
-                  <div class="col-md-2">
-                      <div ng-click="insertPath()">Insert</div>
+                  <div class="col-md-5">
+                    <em>To insert a linkId, use the elements tab to copy it to the clipboard then paste in here</em>
                   </div>
               </div>
               <br/>
@@ -79,11 +79,15 @@
                       Name
                   </div>
                   <div class="col-md-9">
-                      <input class="form-control" ng-model="input.alName"/>
+                      <input class="form-control" ng-model="input.alName" placeholder="Spaces will be removed"/>
                   </div>
               </div>
               <br/>
-              <em>Allocate an Id</em>
+
+              <div class="pull-right">
+                  <a href="https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-extractAllocateId.html" target="_blank">Spec</a>
+              </div>
+              <em>Allocate an Id for use later in a definitionExtract extension</em>
 
               <button class="btn btn-primary pull-right"
                       ng-if="input.alName"
@@ -98,7 +102,7 @@
                       Canonical Url
                   </div>
                   <div class="col-md-10">
-                      <input class="form-control" ng-model="input.anCanonical"/>
+                      <input class="form-control" ng-model="input.anCanonical" placeholder="Spaces will be removed"/>
                       <div><em>
                           The full url of the profile that the extract will conform to. eg http://hl7.org/fhir/StructureDefinition/Patient
                       </em></div>
@@ -114,7 +118,7 @@
                       Id variable
                   </div>
                   <div class="col-md-10">
-                      <input class="form-control" ng-model="input.anVariable"/>
+                      <input class="form-control" ng-model="input.anVariable" placeholder="Spaces will be removed"/>
                       <div><em>
                           The variable created by the allocateId extension that will be the fullUrl value of the extracted resource in the output bundle.
                       </em></div>
@@ -136,11 +140,60 @@
           </uib-tab>
           <uib-tab heading="Calculated Expression">
 
+              <br/>
+              <em>An expression that is dynamically calculated from the answers to other questions.
+              <a href="https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-calculatedExpression.html" target="_blank">Spec</a> </em>
+              <br>
+              <div class="row">
+
+                  <div class="col-md-3">
+                      Type
+                  </div>
+                  <div class="col-md-9">
+                      <input type = 'radio' value="fhirpath" ng-model="input.calcType"/> fhirPath &nbsp;&nbsp;&nbsp;
+                      <input type = 'radio' value="query" ng-model="input.calcType"/> x-query
+                  </div>
+              </div>
+              <br/>
+
+              <div class="row">
+
+                  <div class="col-md-3">
+                      Expression
+                  </div>
+                  <div class="col-md-9">
+                      <textarea class="form-control" rows = 4  ng-model="input.calcExpression"></textarea>
+                  </div>
+              </div>
+
+              <br/>
+              <em>An expression that returns a value based on the value of other elements in the form</em>
+
+              <button class="btn btn-primary pull-right"
+                      ng-if="input.calcExpression"
+                      ng-click="save('calc')">Save</button>
+
+
 
 
           </uib-tab>
 
+          <uib-tab heading="Context variables">
+              <br><em>Variables that are in scope at this element</em>
+              <table class="table table-bordered">
+                  <tr><th>Variable name</th><th>Kind</th><th>Path where defined</th><th>Expression</th></tr>
+                  <tr ng-repeat="v in variables">
+                      <td>{{v.name}}</td>
+                      <td>{{v.kind}}</td>
+                      <td>{{v.path}}</td>
+                      <td>{{v.expression}}</td>
+                  </tr>
+              </table>
+          </uib-tab>
+
           <uib-tab heading="Elements">
+              <br>
+              <em>All the elements in the DG. Use to paste a linkID into an expression</em>
               <table class="table-bordered table">
                   <tr ng-repeat = "element in elements">
                       <td>
@@ -155,7 +208,7 @@
                       <td>{{element.ed.title}}</td>
                       <td>{{element.ed.description}}</td>
                       <td>{{element.ed.type[0]}}
-                        <em>expand if cc or options</em>
+                       <!-- <em>expand if cc or options</em>-->
                       </td>
                       <td><span class="clickable" ng-click="copyPath(element.ed.path)">Copy</span> </td>
                   </tr>
@@ -180,6 +233,22 @@
 
   </div>
   <div class="modal-header">
+      <div class="row">
+
+          <div class="col-md-4">
+              Current path: {{currentPath}}
+          </div>
+          <div class="col-md-4">
+              <div><a href="https://dev.fhirpath-lab.com/FhirPath" target="_blank">FHIRPath tester</a> </div>
+          </div>
+          <div class="col-md-4">
+              <div><a href="https://docs.google.com/document/d/1dBY8U8mWaiTH6wxu_vrQqrLWv_qZfq_PnTXmcRtxH7Y/edit?tab=t.0" target="_blank">Documentation</a> </div>
+
+
+          </div>
+      </div>
+
+
 
   </div>
 </div>

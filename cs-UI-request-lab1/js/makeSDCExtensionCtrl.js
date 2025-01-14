@@ -1,17 +1,82 @@
 angular.module("pocApp")
     .controller('makeSDCExtensionCtrl',
-        function ($scope,elements) {
+        function ($scope,elements,currentPath,snapshotSvc) {
             $scope.input = {}
-            $scope.elements = elements
-console.log(elements)
+            $scope.elements = elements      //all the elements in this DG
+            //currentPath is the path to the current element in the DG (includes the top)
+            $scope.currentPath = currentPath
+console.log(elements,currentPath)
             $scope.input.vType = "fhirpath"
+            $scope.input.calcType = "fhirpath"
+
+            function findVariablesInContext (lstAllElements,path) {
+                //find all the variables in scope for a given item.
+                //Assumes that passed in a DG and the path is the dotted segment format
+
+                $scope.variables = []
+
+                let hashEd = {}
+                for (const item of elements) {
+                    hashEd[item.ed.path] = item.ed
+                }
+
+                //get any variables defined on the root
+                let dgname = lstAllElements[0].ed.path
+                let dg = snapshotSvc.getDG(dgname)
+                if (dg.adHocExt) {
+                    hashEd[dgname] = {adHocExt : dg.adHocExt,path:dgname}
+                }
+
+                let ar = path.split('.')
+                let pth = ""
+                ar.forEach(function (segment,inx) {
+
+                    if (inx > 0) {
+                        pth += '.' + segment
+                    } else {
+                        //this is the root. Need to get the
+                        pth = segment
+
+                    }
+
+                    let ed = hashEd[pth]
+                    if (ed && ed.adHocExt) {
+                        try {
+                            let arJson = angular.fromJson(ed.adHocExt)
+
+                            arJson.forEach(function (ext) {
+                                switch (ext.url) {
+                                    case "http://hl7.org/fhir/StructureDefinition/variable" :
+                                        let thing = {kind:"variable",name:ext.valueExpression.name,path:ed.path,expression:ext.valueExpression.expression}
+                                        $scope.variables.push(thing)
+                                        break
+                                    case "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-extractAllocateId" :
+                                        let thing1 = {kind:"allocateId",name:ext.valueString,path:ed.path}
+                                        $scope.variables.push(thing1)
+                                        break
+                                }
+
+                            })
+                        } catch (ex) {
+                            alert(angular.toJson(ex))
+                        }
+
+                    }
+
+                    console.log(segment,ed)
+
+                })
+
+
+            }
+            findVariablesInContext($scope.elements,currentPath)
 
             function makeExtension(type) {
                 let ext = {}
                 switch (type) {
                     case "variable" :
                         ext.url= "http://hl7.org/fhir/StructureDefinition/variable"
-                        ext.valueExpression = {name: $scope.input.vName}
+                        ext.valueExpression = {name: $scope.input.vName.replace(/\s+/g, "")}
                         ext.valueExpression.expression = $scope.input.vExpression
                         ext.valueExpression.language = "text/fhirpath"
                         if ($scope.input.vType == 'query') {
@@ -20,13 +85,21 @@ console.log(elements)
                         break
                     case "allocateId":
                         ext.url= "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-extractAllocateId"
-                        ext.valueString = $scope.input.alName
+                        ext.valueString = $scope.input.alName.replace(/\s+/g, "")
                         break
                     case "definitionExtract":
                         ext.url = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract"
                         ext.extension = []
-                        ext.extension.push({url:'definition',valueCanonical:$scope.input.deCanonical})
+                        ext.extension.push({url:'definition',valueCanonical:$scope.input.deCanonical.replace(/\s+/g, "")})
                         break
+                    case "calc" :
+                        ext.url= "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression"
+                        ext.valueExpression =  {} //{name: $scope.input.calcName.replace(/\s+/g, "")}
+                        ext.valueExpression.expression = $scope.input.calcExpression
+                        ext.valueExpression.language = "text/fhirpath"
+                        if ($scope.input.calcType == 'query') {
+                            ext.valueExpression.language = "application/x-fhir-query"
+                        }
 
                     }
 
@@ -42,7 +115,9 @@ console.log(elements)
 
             $scope.copyPath = function (path) {
                 localCopyToClipboard(`{{${path}}}`)
+                alert(`{{${path}}} copied`)
             }
+
 
             localCopyToClipboard = function(text) {
                 let textArea = document.createElement("textarea");

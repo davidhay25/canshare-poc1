@@ -101,6 +101,7 @@ async function setup(app,mongoDbName) {
             let ar = []
             for (const entry of cursor) {
                 let item = {id:entry.id,name:entry.name,description:entry.description,updated:entry.updated}
+                item.version = entry.version
                 if (entry.dataGroups) {
                     item.dgCount = Object.keys(entry.dataGroups).length
                 }

@@ -32,69 +32,34 @@ angular.module("pocApp")
             $scope.input.possibleParents.sort()
 
 
+
+
+
             $scope.extBuilder = function () {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/makeSDCExtension.html',
                     backdrop: 'static',
                     size : 'lg',
                     controller: 'makeSDCExtensionCtrl',
-
                     resolve: {
-
                         elements: function () {
                             return $scope.allElements
+                        }, currentPath : function () {
+                            return model.name
                         }
                     }
-
                 }).result.then(function (ext) {
 
                     let json = angular.toJson(ext,true)
 
                     if ($scope.input.adHocExt) {
                         let l = $scope.input.adHocExt.length
-
-
                         $scope.input.adHocExt = $scope.input.adHocExt.substring(0,l-1) + "," + json + '\n]'
 
                     } else {
                         $scope.input.adHocExt = `[${json}]`
                     }
 
-
-/*
-
-                    //$scope.input.adHocExt += "test"
-
-                    return
-
-                    let json = angular.toJson(ext,2)
-
-                    //model.adHocExt.slice(model.adHocExt -2,0,json)
-
-                    const textarea = document.getElementById("adHocExtension");
-                   // const insertText = " Beautiful";
-
-                    // Get the current text
-                    const originalText = textarea.value;
-
-                    // Calculate the position before the last character
-                    const position = originalText.length - 1;
-
-                    // Insert the text
-
-
-
-
-                    $timeout(function() {
-                        // Optionally, set the cursor after the inserted text
-                        textarea.value = originalText.slice(0, position) + json + ' ' + originalText.slice(position);
-                    }, 0);
-
-
-
-                    console.log(ext)
-
-*/
 
                 })
 

@@ -39,6 +39,32 @@ angular.module("pocApp")
              $scope.allNamedQueries = snapshotSvc.getNamedQueries(dg.name)      //an Array of named queries
 
 
+            $scope.extBuilder = function () {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/makeSDCExtension.html',
+                    backdrop: 'static',
+                    size : 'lg',
+                    controller: 'makeSDCExtensionCtrl',
+                    resolve: {
+                        elements: function () {
+                            return fullElementList
+                        },currentPath : function () {
+
+                            return item.ed.path
+                        }
+                    }
+                }).result.then(function (ext) {
+                    let json = angular.toJson(ext,true)
+                    if ($scope.input.adHocExt) {
+                        let l = $scope.input.adHocExt.length
+                        $scope.input.adHocExt = $scope.input.adHocExt.substring(0,l-1) + "," + json + '\n]'
+                    } else {
+                        $scope.input.adHocExt = `[${json}]`
+                    }
+                })
+
+            }
+
             //todo - similar to collapsible - ? can combine
             $scope.canHavePopulationContext = function () {
 

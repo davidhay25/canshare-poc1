@@ -16,8 +16,11 @@ angular.module("pocApp")
 
                                 let newExp = exp.replace(/{{(.*?)}}/g, (_, key) => {
                                     const trimmedKey = key.trim();
-                                    if (hashLinkId.hasOwnProperty(trimmedKey)) {
-                                        return hashLinkId[trimmedKey];
+                                    let newLinkId = getReplacementLinkId(trimmedKey)
+                                    if (newLinkId){
+                                    //if (hashLinkId.hasOwnProperty(trimmedKey)) {
+                                        return newLinkId
+                                        //return hashLinkId[trimmedKey];
                                     } else {
                                         logIssues.push(trimmedKey); // Log missing key
                                         return `{{${trimmedKey}}}`; // Keep placeholder
@@ -45,6 +48,36 @@ angular.module("pocApp")
                 }
 
                 return logIssues
+
+                function getReplacementLinkId(key) {
+
+                    if (hashLinkId[key]) {
+                        return hashLinkId[key]
+                    } else {
+                        //if there's not a direct map in the hash, then look for any entries that end with this key
+                        //I *think* that will safely support circumstances where a DG is embedded in another
+                        //todo - check this, and also use for enableWhen
+                        //todo - this assumes that the path segment is the same as the DG name
+
+                        let ar = []
+                        for (const hashKey of Object.keys(hashLinkId)) {
+                            let oldId = hashLinkId[hashKey]
+                            let t1 = hashKey.toLowerCase()
+                            let t2 = key.toLowerCase()
+                            if (t1.endsWith(t2)) {
+                            //if (hashKey.endsWith(key)) {
+                                ar.push(oldId)
+                            }
+                        }
+
+                        if (ar.length == 1) {
+                            return ar[0]
+                        } else {
+                            console.error(`Unable to map ${key} to the updated value`)
+                        }
+
+                    }
+                }
 
 
             },
