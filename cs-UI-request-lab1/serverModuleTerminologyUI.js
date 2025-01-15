@@ -51,6 +51,46 @@ async function getNZHTSAccessToken() {
 
 function setup(app) {
 
+
+
+
+    app.get('/proxy/*',async function(req,res){
+
+        //let tsInstance = nzhtsconfig.serverBaseAuthor
+        
+        let qry = `${nzhtsconfig.serverBaseAuthor}${req.originalUrl.replace("/proxy/","")}`
+
+        let token = await getNZHTSAccessToken()
+        //console.log(`nzhts query: ${req.query.qry}`)
+        if (token) {
+
+            let config = {headers:{authorization:'Bearer ' + token}}
+            config['content-type'] = "application/fhir+json"
+
+            axios.get(qry,config).then(function(data) {
+
+                res.json(data.data)
+
+            }).catch(function(ex) {
+                if (ex.response) {
+                    //console.log("----- NOT found -----")
+                    res.status(ex.response.status).json(ex.response.data)
+                } else {
+                    res.status(500).json(ex)
+                }
+
+            })
+        } else {
+
+            res.status(500).json({msg:"Unable to get Access Token."})
+        }
+
+
+
+    })
+
+
+
     app.get('/cmConfig',function (req,res) {
         res.json(cmconfig)
 

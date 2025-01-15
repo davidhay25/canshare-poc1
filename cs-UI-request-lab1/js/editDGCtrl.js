@@ -32,9 +32,6 @@ angular.module("pocApp")
             $scope.input.possibleParents.sort()
 
 
-
-
-
             $scope.extBuilder = function () {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/makeSDCExtension.html',
@@ -580,9 +577,14 @@ angular.module("pocApp")
                 model.resourceReferences = $scope.input.resourceReferences
 
 
-                if ($scope.validateJson($scope.input.adHocExt)) {
-                    $scope.model.adHocExt = $scope.input.adHocExt
+                if ($scope.input.adHocExt) {
+                    if ($scope.validateJson($scope.input.adHocExt)) {
+                        $scope.model.adHocExt = $scope.input.adHocExt
+                    }
+                } else {
+                    delete $scope.model.adHocExt
                 }
+
 
                 if ($scope.input.obsExtract) {
                     $scope.model.obsExtract = true

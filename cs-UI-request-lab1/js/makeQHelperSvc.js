@@ -4,6 +4,12 @@ angular.module("pocApp")
 
         return {
 
+            cloneItem : function (item) {
+                //create a copy of an item, removing the item node
+                let clone = angular.copy(item)
+                delete clone.item
+                return clone
+            },
             updateExpressions: function (Q,hashLinkId) {
                 //update any expressions based on the replacements in hashLinkId
                 let logIssues = []
@@ -252,6 +258,11 @@ angular.module("pocApp")
 
                                 let thing = {kind:'allocateId',item:clone}
                                 hashVariable[aName].push(thing)      //should only be 1...
+                            } else if (url == "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtractValue") {
+                                //not sure if this belongs in here anyway (although it can be an expression...
+
+
+
                             } else if (ext.valueExpression) {
                                 let name = ext.valueExpression.name
                                 let expression = ext.valueExpression.expression

@@ -22,7 +22,7 @@ angular.module('formsApp')
 
                 let localPatientId = $scope.patientid || "45086382"
                 //let localPatientId = $scope.patientid || "dietrich-blake-louis"
-                let localPractitionerId = 'alderson-helene'     //connectathon
+                let localPractitionerId = '10652933'//'alderson-helene'     //connectathon
 
                 $scope.datePopup = {}
                 $scope.dataEntered = {}

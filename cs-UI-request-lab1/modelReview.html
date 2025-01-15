@@ -243,9 +243,13 @@
 
                     <h4>Elements</h4>
                     <div class="myScroll">
+                        <div class="tableFixHead">
                         <table class="table table-condensed table-bordered">
-                            <tr><th>Text</th><th>Lvl</th><th>LinkId</th><th>Type</th><th>Card.</th><th>Hidden</th><th>Fixed / ValueSet</th><th>SDC</th></tr>
-                            <tr
+                            <thead>
+                                <tr><th>Text</th><th>Lvl</th><th>LinkId</th><th>Type</th><th>Card.</th><th>Hidden</th><th>SDC</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr
                                     ng-class="{background:entry.level == 2}"
                                     ng-repeat="entry in qReport.entries track by $index"
                                     ng-if="showReportLine(input.SDCOnly,entry)" >
@@ -263,10 +267,7 @@
                                 <td>{{entry.type}}</td>
                                 <td>{{entry.mult}}</td>
                                 <td>{{entry.isHidden}}</td>
-                                <td>{{entry.fixedValue}}
 
-                                    {{entry.valueSet}}
-                                </td>
                                 <td>
                                     <div ng-if="entry.initialExpression">
                                         <strong>Initial: </strong>{{entry.initialExpression}}
@@ -276,7 +277,9 @@
                                     </div>
 
                                     <div ng-if="entry.allocateId">
-                                        <strong>Allocate Id: </strong>{{entry.allocateId}}
+                                        <div ng-repeat="ai in entry.allocateId">
+                                            <strong>Allocate Id: </strong>{{ai}}
+                                        </div>
                                     </div>
 
 
@@ -339,16 +342,33 @@
                                 </td>
 
                             </tr>
+                            </tbody>
                         </table>
+                        </div>
                     </div>
 
-                    <h4>Set value (fixed string or expression)</h4>
+
+
+
+
+                </uib-tab>
+
+                <uib-tab heading="Set values">
+
+
+                    <em>Elements that use the definitionExtractValue extension. Used to fix values
+                    to a constant, variable or expression. Also used to define references.</em>
 
                     <table class="table table-condensed table-bordered">
-                        <tr><th>Path</th><th>Fixed value / Expression</th></tr>
+                        <tr><th>Where defined</th><th>Path</th><th>Fixed value / Expression</th></tr>
                         <tr ng-repeat="sv in qReport.setValue">
                             <td>
-                                {{sv.linkId}}
+                                {{sv.item.text}}
+                                <span class="clickable pull-right"
+                                     ng-click="viewItem(sv.item)">{{sv.item.linkId}}</span>
+                            </td>
+                            <td>
+
                                 <div>{{sv.path}}</div>
                             </td>
                             <td>
@@ -358,24 +378,30 @@
 
                         </tr>
                     </table>
+                </uib-tab>
 
-                    <h4>Launch Contexts</h4>
+                <uib-tab heading="Context variables">
+                    <br>
+                    <em>Launch Context variables that are passed in when the form is created.
+                    Also lists the items that use those variables</em>
+
                     <table class="table table-condensed table-bordered">
-                        <tr><th>Name</th><th>Type</th><th>Description</th><th>Used</th></tr>
+                        <tr><th>Name</th><th>Type</th><th>Description</th><th>Used by</th></tr>
                         <tr ng-repeat="lc in qReport.launchContext">
                             <td>{{lc.name}}</td>
                             <td>{{lc.type}}</td>
                             <td>{{lc.description}}</td>
                             <td>
-
-                                <div ng-repeat="item in qReport.variableUsage[lc.name]">
-                                    {{item}}
+                                <div ng-repeat="item in qReport.variableUsage[lc.name]"
+                                      ng-click="viewItem(item)">
+                                    {{item.text}}
+                                    <span class="clickable pull-right">{{item.linkId}}</span>
                                 </div>
                             </td>
                         </tr>
                     </table>
-
                 </uib-tab>
+
                 <uib-tab heading="Expression usage">
 
                     <h4>Variable definition</h4>
@@ -404,12 +430,16 @@
                                             {{v1.kind}}
                                         </div>
                                         <div class="col-md-2">
-                                            <div class="clickable"
+                                            {{v1.item.text}}
+                                            <span class="clickable pull-right"
                                                  ng-click="viewItem(v1.item)">
+
                                                 {{v1.item.linkId || "Q Root"}}
-                                            </div>
+                                            </span>
 
                                         </div>
+
+
                                         <div class="col-md-8">
                                             {{v1.expression}}
                                         </div>
@@ -446,10 +476,11 @@
                                         {{v1.url | sdcExtensionName}}
                                     </div>
                                     <div class="col-md-2">
-                                        <div class="clickable"
+                                        {{v1.item.text}}
+                                        <span class="clickable pull-right"
                                              ng-click="viewItem(v1.item)">
                                             {{v1.item.linkId || "Q Root"}}
-                                        </div>
+                                        </span>
 
                                     </div>
                                     <div class="col-md-8">
@@ -468,11 +499,11 @@
                         <tr><th style="width:15%">Where used</th><th style="width:15%">Kind of expression</th><th>Expression</th></tr>
                         <tr ng-repeat="used in qReport.expressionUsage.lstUseExpression">
                             <td>
-
-                                <div class="clickable"
+                                {{used.item.text}}
+                                <span class="clickable pull-right"
                                      ng-click="viewItem(used.item)">
                                     {{used.item.linkId || "Q Root"}}
-                                </div>
+                                </span>
 
                                </td>
                             <td>{{used.url | sdcExtensionName}}</td>
@@ -493,6 +524,8 @@
 
 
         </uib-tab>
+
+
 
         <uib-tab  heading="All comments">
             <table class="table-condensed table-bordered table">

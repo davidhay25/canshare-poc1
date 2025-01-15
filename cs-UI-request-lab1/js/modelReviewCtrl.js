@@ -58,8 +58,6 @@ angular.module("pocApp")
 
                 let config = {}
 
-
-
                 $uibModal.open({
 
                     size : 'xlg',

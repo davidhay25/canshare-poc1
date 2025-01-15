@@ -66,7 +66,7 @@
              ng-hide="savingQ || ! technicalview" ng-click="saveToServer(true)">Save and open in Lab</div>
         <div style="padding: 8px" ng-if="savingQ">Saving Q to Lab. Please wait...</div>
         <div ng-if="redirectUrl">
-          <a class = "btn" ng-href="{{redirectUrl}}" target="_blank">Load Lab</a>
+          <a class = "btn" ng-hide="savingQ" ng-href="{{redirectUrl}}" target="_blank">Load Lab</a>
         </div>
 
         <div class="clearfix"/>

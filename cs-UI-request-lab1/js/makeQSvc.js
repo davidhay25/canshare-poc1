@@ -743,14 +743,13 @@ angular.module("pocApp")
                 //generate a report object for the SDC table view (that displays key extraction / population details)
 
 
-
                 let report = {entries:[],variableUsage:{},errors:[]}
                 let thing = {text:Q.name}
-                //A hash showing for each variable where it is used...
-                //report.variableUsage = {}
 
-                //errors discovered during the report creation
-               // report.errors = []
+                //todo - right now I'm looking for specific extensions on the root
+                //todo but really need to iterate over all exts as do for items
+                //todo - need to refactor extension processing and extension url definitions into an object
+
 
                 //see if there is an extraction context on the Q (there may also be some on child groups)
                 let ar1 = getExtension(Q,extDefinitionExtract,'Canonical')
@@ -781,7 +780,6 @@ angular.module("pocApp")
                     thing.contents = ext.expression  //varable type is x-query
                     thing.itemName = ext.name
 
-
                     report.entries.push(thing)
 
                     report.variableUsage[ext.name] = []
@@ -789,6 +787,28 @@ angular.module("pocApp")
                     thing.isSDC = true
 
                 })
+
+                let ar3 = getExtension(Q,extAllocateIdUrl)
+                ar3.forEach(function (ext) {
+
+                    let thing = {text:Q.name}
+                    thing.level = 0
+
+
+                    thing.allocateId = thing.allocateId ||  []
+                    thing.allocateId.push(ext.valueString)
+
+
+
+
+                    report.entries.push(thing)
+
+
+
+                    thing.isSDC = true
+
+                })
+
 
 
                 //get the launch contexts. These are fixed ATM but worth displaying
@@ -820,15 +840,14 @@ angular.module("pocApp")
                 }
 
                 console.log(report.launchContext)
+
+
                 function processItem(report,item,level) {
                     let thing = {linkId:item.linkId,text:item.text,type:item.type,definition:item.definition}
                     thing.level = level
 
-                    let clone = angular.copy(item)
-                    if (clone.item) {
-                        clone.item = []
-                    }
-                    thing.item = clone
+
+                    thing.item = makeQHelperSvc.cloneItem(item)
 
 
                     if (item.definition) {
@@ -883,7 +902,8 @@ angular.module("pocApp")
 
                             switch (ext.url) {
                                 case extAllocateIdUrl:
-                                    thing.allocateId = ext.valueString
+                                    thing.allocateId = thing.allocateId ||  []
+                                    thing.allocateId.push(ext.valueString)
                                     break
 
                                 case extQuantityUnit :
@@ -901,7 +921,9 @@ angular.module("pocApp")
                                     let variable = ar1[0].substr(1)
                                     if (report.variableUsage[variable]) {
                                         report.variableUsage[variable] = report.variableUsage[variable] || []
-                                        report.variableUsage[variable].push(item.linkId)
+
+                                        //report.variableUsage[variable].push(item.linkId)
+                                        report.variableUsage[variable].push(makeQHelperSvc.cloneItem(item))
                                     } else {
                                         report.errors.push({msg:`variable ${variable} not found at ${item.linkId}`})
                                     }
@@ -924,7 +946,8 @@ angular.module("pocApp")
 
 
                                     let v = {}
-                                    v.linkId = item.linkId    //where the extension was located
+                                    //v.linkId = item.linkId    //where the extension was located
+                                    v.item = makeQHelperSvc.cloneItem(item)
                                     //console.log(ext)
                                     ext.extension.forEach(function (child) {
                                         switch (child.url) {
@@ -934,7 +957,24 @@ angular.module("pocApp")
                                                 break
                                             case 'fixed-value' :
                                                 //the actual value
-                                                v.value = child.valueString || child.valueId
+                                                const keysStartingWithValue = Object.keys(child).filter(key => key.startsWith('value'));
+                                                const values = keysStartingWithValue.map(key => child[key]);
+                                                if (values) {
+                                                    //will only be 1
+                                                    let value = values[0]
+                                                    if (typeof value === 'object') {
+                                                        v.value = angular.toJson(value)
+                                                    } else {
+                                                        v.value = value
+                                                    }
+                                                }
+
+
+                                               // v.value = child.valueString || child.valueId
+
+
+
+
                                                 break
                                             case 'dynamic-value': //todo - is this used
                                                 //an expression
@@ -1017,7 +1057,7 @@ angular.module("pocApp")
                 report.entries.forEach(function (entry) {
                     if (report.setValue) {
                         report.setValue.forEach(function (value) {
-                            if (value.linkId == entry.linkId) {
+                            if (value.item.linkId == entry.linkId) {
                                 entry.setValue = entry.setValue || []
                                 entry.setValue.push(value)
                             }
@@ -1027,6 +1067,7 @@ angular.module("pocApp")
 
                 })
 
+                //reports on where expressions are defined and used
                 report.expressionUsage = makeQHelperSvc.makeVariableUsage(Q)
 
                 console.log(report)
