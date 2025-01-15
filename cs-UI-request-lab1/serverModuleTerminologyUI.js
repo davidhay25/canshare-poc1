@@ -57,7 +57,7 @@ function setup(app) {
     app.get('/proxy/*',async function(req,res){
 
         //let tsInstance = nzhtsconfig.serverBaseAuthor
-        
+
         let qry = `${nzhtsconfig.serverBaseAuthor}${req.originalUrl.replace("/proxy/","")}`
 
         let token = await getNZHTSAccessToken()

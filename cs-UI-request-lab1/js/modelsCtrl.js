@@ -129,6 +129,8 @@ angular.module("pocApp")
                             config.namedQueries = hashNamedQueries
                             config.hashAllDG = $scope.hashAllDG
                             config.fhirType = model.type// Used for definition based extraction
+
+                            config.expandVS = false     //testing proxy
                             voQ = makeQSvc.makeHierarchicalQFromDG(model,$scope.fullElementList,config) //,$scope.hashAllDG)
                         } else {
                             let compConfig = {hideEnableWhen : false}

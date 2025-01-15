@@ -18,6 +18,7 @@ const clients = new Map();
 
 
 
+
 //the Mongo database used by the models (and associated) apps
 const mongoDbName = process.env.MONGODB || "canShare"
 
@@ -55,6 +56,16 @@ let express = require('express');
 let app = express();
 app.use(bodyParser.json({limit:'50mb',type:['application/json+fhir','application/fhir+json','application/json']}))
 app.use('/', express.static(__dirname,{index:'/poc.html'}));
+
+
+//from chatGPT to allow call from elsewhere
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*'); // Allow all origins
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE'); // Allowed methods
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allowed headers
+    next();
+});
+
 
 /*
 //disable any cache - https://stackoverflow.com/questions/22632593/how-to-disable-webpage-caching-in-expressjs-nodejs
