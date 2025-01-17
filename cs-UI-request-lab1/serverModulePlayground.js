@@ -111,6 +111,21 @@ async function setup(app,mongoDbName) {
                 ar.push(item)
             }
 
+            try {
+                ar.sort(function (a,b) {
+                    if (a.name.toLowerCase() > b.name.toLowerCase()) {
+                        return 1
+                    } else {
+                        return -1
+                    }
+
+                })
+            } catch (e) {
+                console.error(e)
+                res.json(ar)
+            }
+
+
             res.json(ar)
 
         } catch(ex) {

@@ -127,7 +127,12 @@
         </div>
       </div>
 
-     <div> <strong>FHIR resource:</strong>{{snapshotSvc.getExtractResource(selectedModel.name) }}</div>
+     <div> <strong>FHIR resource:</strong>
+       <a ng-href="{{fhirRoot}}{{snapshotSvc.getExtractResource(selectedModel.name)}}.html" target="_blank">
+       {{snapshotSvc.getExtractResource(selectedModel.name) }}
+       </a>
+
+     </div>
 
       <table class="table table-condensed" style="margin-top: 8px">
 
@@ -846,7 +851,12 @@
                   <div ng-repeat="type in element.ed.type">
                     {{type}}
                   </div>
-                  <div><em class="clickable" ng-click="viewVS(element.ed.valueSet)">{{element.ed.valueSet}}</em></div>
+                  <div>
+                    <em class="clickable" ng-if = "element.ed.valueSet" ng-click="viewVS(element.ed.valueSet)">
+                      View VS
+                   <!--   {{element.ed.valueSet}}-->
+                    </em>
+                  </div>
 
                   <div ng-if="element.ed.options.length > 0" >
                     <em class="clickable"
@@ -968,7 +978,11 @@
                       <table class="table-bordered table">
                         <tr>
                           <td>FHIR resource type</td>
-                          <td>{{snapshotSvc.getExtractResource(selectedModelFromGraph.name)}}</td>
+                          <td>
+                            {{snapshotSvc.getExtractResource(selectedModelFromGraph.name)}}
+                          </a>
+
+                          </td>
                         </tr>
                       </table>
 
@@ -1023,6 +1037,46 @@
 
         </uib-tab>
 
+        <uib-tab heading="Extensions">
+          <br/>
+          <em>User specified extensions defined in extract items (not SDC ones)</em>
+          <table class="table-bordered table">
+            <tr><th>Path</th><th>Title</th><th>Description</th><th>Url</th></tr>
+
+            <tr ng-repeat="element in fullElementList"
+                ng-if="element.ed.definition.indexOf('extension') > -1">
+              <td>
+
+                <div ng-repeat = "segment in element.ed.path.split('.') track by $index">
+                  {{segment}}
+                </div>
+                <!--
+                <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
+
+
+
+
+                    {{element.ed.path | lastInPath}}
+
+
+                </div>
+                -->
+              </td>
+              <td>{{element.ed.title}}</td>
+              <td>
+
+                {{element.ed.description}}
+              </td>
+
+              <td>{{element.ed.extractExtensionUrl}}</td>
+            </tr>
+
+            </tr>
+
+          </table>
+
+        </uib-tab>
+
         <uib-tab heading="Logical Model">
           The FHIR shorthand that represents this DataGroup as a FHIR Logical Model.
           <span class="pull-right">
@@ -1035,7 +1089,7 @@
 
         </uib-tab>
 
-        <uib-tab heading="Order element">
+        <uib-tab ng-if = "false" heading="Order element">
           <pre>{{selectedModel.ssOrder | json}}</pre>
 
         </uib-tab>
@@ -1343,7 +1397,7 @@
     </uib-tab>
 
 
-    <uib-tab>
+    <uib-tab ng-if="false">
       <uib-tab-heading>
         Ordering <span class="badge"> {{selectedModel.ordering.length}}</span>
       </uib-tab-heading>
@@ -1396,7 +1450,7 @@
 
     <uib-tab>
       <uib-tab-heading>Diff <span class="badge">{{selectedModel.diff.length}}</span> </uib-tab-heading>
-      <em>The element definitions in the .diff element. ie directly defined in the DG. The Json has the complete model.
+      <em>The element definitions in the .diff element. ie directly defined in the DG. The Json has the expanded DG.
       Clicking on an element in the table, selects it in the list (to see details)</em>
       <br/><br/>
 

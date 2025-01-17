@@ -54,7 +54,7 @@ angular.module('formsApp')
                     let concepts = []
                     if (item.answerValueSet) {
                         let options = vsSvc.getOneVS(item.answerValueSet)
-
+console.log(item.answerValueSet,options)
                         return options
                     } else {
                         if (item.answerOption) {
@@ -407,7 +407,8 @@ angular.module('formsApp')
 
                                 let msg = `Q has been saved in the Lab. I'll try to load the renderer with the url ${$scope.redirectUrl}`
                                 msg += " If that fails, then try the direct link that has appeared."
-                                alert(msg)
+                                //alert(msg)
+
                                 if (openLab) {
                                     copyToClipboard($scope.redirectUrl)
                                     window.open($scope.redirectUrl)

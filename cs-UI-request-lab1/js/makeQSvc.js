@@ -1944,13 +1944,21 @@ angular.module("pocApp")
                                             }
                                         } else {
                                             //Dec 9 - leave the valueset there if couldn't be expanded
+
                                             item.answerValueSet = ed.valueSet
                                             //item.answerOption.push({valueCoding : {display:"The ValueSet is missing or empty"}})
                                         }
 
                                     } else {
                                         //otherwise, add the answervalueSet property and let the renderer retrieve the contents
-                                        item.answerValueSet = ed.valueSet
+
+                                        let vs = ed.valueSet
+                                        if (vs.indexOf('http') == -1) {
+                                            vs = `https://nzhts.digital.health.nz/fhir/ValueSet/${vs}`
+                                        }
+
+
+                                        item.answerValueSet = vs //ed.valueSet
                                     }
                                 }
                             } else if (ed.options && ed.options.length > 0) {
@@ -2045,6 +2053,11 @@ angular.module("pocApp")
                     if (ed.defaultCode) {
                         item.initial = item.initial || []
                         item.initial.push({valueString:ed.defaultCode})
+                    }
+
+                    if (ed.defaultCoding) {
+                        item.initial = item.initial || []
+                        item.initial.push({valueCoding:ed.defaultCoding})
                     }
 
 

@@ -32,14 +32,19 @@ angular.module("pocApp")
 
                 }).then(function(data) {
                     // data is the key of the value > 10
-                    $scope.localStore.sort(function (a,b) {
-                        if (a.name > b.name) {
-                            return 1
-                        } else {
-                            return -1
-                        }
+                    try {
+                        $scope.localStore.sort(function (a,b) {
+                            if (a.name.toLowerCase() > b.name.toLowerCase()) {
+                                return 1
+                            } else {
+                                return -1
+                            }
 
-                    })
+                        })
+                    } catch (e) {
+                        console.error(e)
+                    }
+
                 });
 
             }
@@ -51,6 +56,7 @@ angular.module("pocApp")
             $http.get('playgroundSummary').then(
                 function (data) {
                         $scope.playgrounds = data.data
+
                 }, function (err) {
                         alert(angular.toJson(err.data))
                 }

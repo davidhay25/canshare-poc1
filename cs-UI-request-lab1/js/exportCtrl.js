@@ -1,13 +1,17 @@
 angular.module("pocApp")
     .controller('exportCtrl',
-        function ($scope,hashAllDG,hashAllCompositions) {
+        function ($scope,hashAllDG,hashAllCompositions,name) {
 
             //create the json & TSV download
 
             let obj = {dg:hashAllDG,comp:hashAllCompositions}
 
             $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([angular.toJson(obj,true) ],{type:"application/json"}))
+
             $scope.downloadLinkJsonName = `allDataGroups.json`
+            if (name) {
+                $scope.downloadLinkJsonName = `${name}.json`
+            }
 
             $scope.import = function () {
                 $scope.$close({dg:$scope.uploadedDG,comp: $scope.uploadedComp})

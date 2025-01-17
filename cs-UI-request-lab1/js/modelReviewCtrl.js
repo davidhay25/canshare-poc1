@@ -1,7 +1,7 @@
 angular.module("pocApp")
     .controller('modelReviewCtrl',
         function ($scope,$http,modelsSvc,modelCompSvc,$timeout, $uibModal,makeQSvc,utilsSvc,$window,
-                  orderingSvc,snapshotSvc,vsSvc) {
+                  orderingSvc,snapshotSvc,vsSvc,qHelperSvc) {
 
             $scope.input = {}
 
@@ -78,19 +78,39 @@ angular.module("pocApp")
 
             }
 
+            //Load the Q from the database
             $scope.loadQ = function (qName) {
                 let qry = `/Questionnaire/${qName}`
                 $http.get(qry).then(
                     function (data) {
-
+                        $scope.input.mainTabActive = 1
                         $scope.fullQ = data.data.Q
                         $scope.errorLog = data.data.errorLog
                         $scope.hashEd = {}
 
-                        //A report focussed on pre-popupation & extraction
-                        let voReport =  makeQSvc.makeReport($scope.fullQ)
-                        $scope.qReport =voReport.report
-                        $scope.input.mainTabActive = 1
+                        //get all the VS in the Q - returne
+                        let ar = qHelperSvc.getAllVS($scope.fullQ)
+
+                        for (const thing of ar) {
+
+                            $scope.hashEd[thing.ed.path] = thing.ed
+                        }
+
+
+
+                        vsSvc.getAllVS(ar, function () {
+
+                            //A report focussed on pre-popupation & extraction
+                            let voReport =  makeQSvc.makeReport($scope.fullQ)
+                            $scope.qReport =voReport.report
+                        })
+
+
+
+
+
+
+
 
                     }, function (err) {
                         alert(angular.toJson(err.data))

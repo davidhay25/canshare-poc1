@@ -75,7 +75,7 @@
             <div class="col-md-3">
                     <span>
                         <a class="navbar-brand" href="#">
-                            CanShare Logical Modeller workbench
+                            CanShare Logical Modeller
                             <div style="padding-top: 6px" ng-click="changeUserMode($event,'library')"
                                  ng-if="userMode == 'playground'">Playground mode</div>
                              <div style="padding-top: 6px" ng-click="changeUserMode($event,'playground')"
@@ -233,7 +233,7 @@
                         </uib-tab>
 
 
-                        <uib-tab heading="All">
+                        <uib-tab heading="List">
 
                             <div style="padding: 8px">
                                 <div class="row ">
@@ -270,7 +270,7 @@
 
                         </uib-tab>
 
-                        <uib-tab heading="Tagged">
+                        <uib-tab ng-if="userMode !== 'playground'" heading="Tagged">
                             <div class="row" style="padding: 8px">
 
                                 <div class="col-md-2">
@@ -305,7 +305,7 @@
                         </uib-tab>
 
 
-                        <uib-tab heading = "Sections">
+                        <uib-tab  ng-if="userMode !== 'playground'" heading = "Sections">
                             <div>
                                 <div class="pull-right clickable spacer"
                                      ng-if = "canEdit(selectedModel)"  ng-click="editModel(selectedModel)">Edit</div>
@@ -356,8 +356,10 @@
                                 </table>
 
                                 <div>
+                                    <div class="btn btn-link pull-right" ng-click="updatePlayground(true)">Update both Model Repository and Local Store</div>
                                     <div class="btn btn-link pull-right" ng-click="savePGtoLocal()">Update to Local Store</div>
                                     <div class="btn btn-link pull-right" ng-click="updatePlayground()">Update to Model Repository</div>
+
                                 </div>
 
 

@@ -10,7 +10,66 @@ angular.module("pocApp")
 
         return {
 
-            addFixedValue : function(item,definition,type,value,expression) {
+            getAllVS : function (Q) {
+                //create a list of all the VS in a Q. The format matches the element list
+                //so it can be to vsSvc.getAllVS(). It creates 'ED' elements (as much as it can from Q item data)
+                let lst = []
+
+                function processItem(item) {
+                    let ed = {title:item.text,path:item.linkId}
+                    ed.mult = '0..1'
+                    //required repeats
+
+                    ed.mult = '0'
+                    if (item.required) {
+                        ed.mult = '1'
+                    }
+
+                    if (item.repeats) {
+                        ed.mult += '..*'
+                    } else {
+                        ed.mult += '..1'
+                    }
+
+
+                    //set the ed type from the Q type.
+                    switch (item.type) {
+                        case 'choice' :
+                            ed.type = ['CodeableConcept']
+                            break
+                        case 'date' :
+                            ed.type = ['date']
+                            break
+                        case 'quantity' :
+                            ed.type = ['Quantity']
+                            break
+                        case 'string' :
+                            //deliberate fall through
+                        case 'text' :
+                            ed.type = ['string']
+                            break
+                    }
+
+                    if (item.answerValueSet) {
+                        ed.valueSet = item.answerValueSet
+                    }
+
+                    lst.push({ed:ed})
+
+                    if (item.item) {
+                        for (const child of item.item) {
+                            processItem(child)
+                        }
+                    }
+                }
+
+                processItem(Q)
+
+                return lst
+
+            },
+
+            addFixedValueDEP : function(item,definition,type,value,expression) {
             //add a fixed value extension. Can either be a value or an expression
             //definition is the path in the resource (added to the 'item.definition' value
 

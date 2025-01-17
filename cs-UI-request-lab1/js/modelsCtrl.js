@@ -16,6 +16,10 @@ angular.module("pocApp")
             }
 
 
+
+           // $scope.fhirBase = "http://hl7.org/fhir/R4B/"
+
+
             $scope.userMode = $localStorage.userMode || "playground"      //possible modes are 'library' or 'playground'
             //$scope.userMode = "library"
 
@@ -189,7 +193,7 @@ angular.module("pocApp")
 
             }
 
-            $scope.updatePlayground = function () {
+            $scope.updatePlayground = function (both) {
                 //save the current playground to the library
                 $scope.world.id = $scope.world.id || utilsSvc.getUUID()
 
@@ -200,67 +204,47 @@ angular.module("pocApp")
 
                 $http.put(`/playground/${$localStorage.world.id}`,$localStorage.world).then(
                     function (data) {
-                        let msg = "The playground has been updated."
-                        if (! $localStorage.world.description) {
-                            msg += " You can edit the description in this page."
-                        }
-                        alert(msg)
-                    }, function (err) {
-                        alert(angular.toJson(err.data))
-                    }
-                )
 
-/*
-                //?? why would name ever ne null???
-                if (! $localStorage.world.name) {
-                    let name = prompt("What name do you want to use (it needs to be unique)")
-                    if (name) {
-                        $http.get(`/playground/${name}`).then(
-                            function (data) {
-                                alert("Sorry, this name has been used before.")
-                            },function (err) {
-                                if (err.status == 404) {
-                                    $localStorage.world.name = name
-                                    savePG()
-                                }
-                            }
-                        )
-                    }
-                } else {
-                    savePG()
-                }
+                        if (both) {
+                            //update repo and local
+                            $scope.savePGtoLocal(true,true,function () {
+                                alert("Both repository and local copies of the playground have been updated.")
+                            })
 
-
-                function savePG() {
-                    $localStorage.world.updated = new Date()
-                    $http.put(`/playground/${$localStorage.world.name}`,$localStorage.world).then(
-                        function (data) {
+                        } else {
                             let msg = "The playground has been updated."
                             if (! $localStorage.world.description) {
                                 msg += " You can edit the description in this page."
                             }
                             alert(msg)
-                        }, function (err) {
-                            alert(angular.toJson(err.data))
                         }
-                    )
-                }
 
-                */
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
             }
 
-            $scope.savePGtoLocal = function () {
+            $scope.savePGtoLocal = function (hideAlert,noversionupdate,cb) {
                 let key = `pg-${$scope.world.id}`
                 $scope.world.id = $scope.world.id || utilsSvc.getUUID()
                 $scope.world.updated = new Date()
 
-                if ($scope.world.version) {
-                    $scope.world.version ++
+                if (!noversionupdate) {
+                    if ($scope.world.version) {
+                        $scope.world.version ++
 
-                } else {$scope.world.version = 1}
+                    } else {$scope.world.version = 1}
+                }
+
 
                 $localForage.setItem(key, $scope.world).then(function (value) {
-                    alert("Saved in Local Store")
+                    if (!hideAlert) {
+                        alert("Saved in Local Store")
+                    }
+                    if (cb) {
+                        cb()
+                    }
                 }).catch(function(err) {
                     alert(angular.toJson(err))
                     console.log(err);
@@ -716,6 +700,8 @@ angular.module("pocApp")
                         },
                         hashAllCompositions: function () {
                             return $scope.hashAllCompositions
+                        },name :function () {
+                            return $scope.world.name
                         }
                     }
 
@@ -1241,7 +1227,7 @@ angular.module("pocApp")
 
                                 //setValue(ed1,'autoPop',ed.controlHint,'string')
                                 //ed1.autoPop = ed.autoPop
-                                ed1.helpText = ed.helpTest
+                                ed1.helpText = ed.helpText
                                 ed1.collapsible = ed.collapsible
 
                                 ed1.prePop = ed.prePop

@@ -165,7 +165,7 @@
                 </td>
               </tr>
 
-              <tr  ng-if="selectedEd.type[0] == 'CodeableConcept' ">
+              <tr ng-if="selectedEd.type[0] == 'CodeableConcept' ">
                 <td class="detailName">ValueSet</td>
                 <td>
                   <div><em>{{selectedEd.valueSet}}</em>
@@ -586,7 +586,6 @@
               </div>
 
             </uib-tab>
-
 
             <uib-tab  ng-if="technicalview && selectedEd" heading="ED">
               <pre>{{selectedEd | json}}</pre>
