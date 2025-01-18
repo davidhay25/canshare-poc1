@@ -121,7 +121,7 @@
 
 
               <tr>
-                <td ng-if="technicalview" class="detailName">  Q type</td>
+                <td ng-if="technicalview" class="detailName">Q type</td>
                 <td>
                   {{selectedItem.type}}
                 </td>
@@ -133,7 +133,30 @@
                   {{selectedEd.mult}}
                 </td>
               </tr>
-              <tr>
+
+              <tr ng-if="helpElements.instructions">
+                <td class="detailName">Instructions</td>
+                <td>
+                  {{helpElements.instructions}}
+                </td>
+              </tr>
+
+              <tr ng-if="helpElements.helpText">
+                <td class="detailName">Help text</td>
+                <td>
+                  {{helpElements.helpText}}
+                </td>
+              </tr>
+
+              <tr ng-if="helpElements.placeHolder">
+                <td class="detailName">Placeholder</td>
+                <td>
+                  {{helpElements.placeHolder}}
+                </td>
+              </tr>
+
+
+              <tr ng-if = 'false'>
                 <td class="detailName">Obligation</td>
                 <td>
                   <!-- If this is a section, then the cardinality is in the sectionItem element. Otherwise, the ed-->

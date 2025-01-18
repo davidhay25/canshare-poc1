@@ -238,6 +238,13 @@
             </td>
           </tr>
 
+          <tr>
+            <td>PlaceHolder text</td>
+            <td><input type="text" class="form-control"  ng-model="input.placeHolder"/>
+              <em>Placeholder text. Really only makes sense for string or text</em>
+            </td>
+          </tr>
+
           <tr ng-if="false">
             <td>Set auto gTable flag</td>
             <td><checkbox ng-model="input.gtable"/>
@@ -287,12 +294,7 @@
             </td>
           </tr>
 
-          <tr>
-            <td>PlaceHolder text</td>
-            <td><input type="text" class="form-control"  ng-model="input.placeHolder"/>
-            <em>Placeholder text. Really only makes sense for string or text</em>
-            </td>
-          </tr>
+
 
           <tr ng-if="canHavePopulationContext()">
             <td>Population context</td>
@@ -375,7 +377,7 @@
               </div>
 
               <div ng-if = "! dg.namedQueries || dg.namedQueries.length < 1">
-                <em>If not pre-popping from standard variable (%patient %user) or user defined variable, you need to select a named query for this DG. This is
+                <em>If not pre-popping from standard variable (%patient %user) or a user defined variable, you need to select a named query for this DG. This is
                   done from the main DG editor (the link at the top of the DG display page).</em>
               </div>
 

@@ -21,8 +21,7 @@
             height: 400px;
             border: 1px solid lightgray;
         }
-
-
+        /* jan19
         th,
         td {
             padding: 8px 16px;
@@ -31,12 +30,8 @@
         th {
             background: #eee;
         }
-
-
-/*        modal-xlg {
-            width : 1200px
-        }
 */
+
         /* change the selected colour as the text is hard to read*/
         .jstree-proton .jstree-clicked {
             background: #dedede;
@@ -61,10 +56,9 @@
                     <span>
                         <a class="navbar-brand" href="#">
                             CanShare Logical Modeller
-                            <div style="padding-top: 6px" ng-click="changeUserMode($event,'library')"
-                                 ng-if="userMode == 'playground'">Playground mode</div>
-                             <div style="padding-top: 6px" ng-click="changeUserMode($event,'playground')"
-                                  ng-if="userMode == 'library'">Library mode</div>
+
+                             <div>{{world.name}}</div>
+
                         </a>
                     </span>
 
@@ -73,16 +67,14 @@
 
             <div class="col-md-1">
                 <div class="navbar-text">
-                    <div>{{world.name}}</div>
+                    <div style="padding-top: 6px" ng-click="changeUserMode($event,'library')"
+                         ng-if="userMode == 'playground'">Playground mode</div>
+                    <div style="padding-top: 6px" ng-click="changeUserMode($event,'playground')"
+                         ng-if="userMode == 'library'">Library mode</div>
+
                 </div>
 
             </div>
-
-
-
-
-
-
 
             <div class="col-md-1">
                 <div class="navbar-text btn" >
@@ -338,6 +330,32 @@
                                     </td></tr>
                                     <tr><td>Id</td><td>{{world.id}}</td></tr>
                                     <tr><td>Description</td><td><textarea class="form-control" ng-model="world.description"></textarea></td></tr>
+                                    <tr>
+                                        <td>Container DGs</td>
+                                        <td>
+                                            <div ng-repeat="(k,v) in hashAllDG">
+
+
+                                                <div ng-if="v.isContainer">
+                                                    {{k}}
+
+                                                    <div class="btn btn-link"
+                                                         ng-click="selectModel(hashAllDG[k])">
+                                                        Select
+                                                    </div>
+
+                                                     <div class="btn btn-link"
+                                                         ng-click="showContainerQ(k)">
+                                                        Questionnaire
+                                                     </div>
+                                                </div>
+
+
+                                            </div>
+                                        </td>
+                                    </tr>
+
+
                                 </table>
 
                                 <div>

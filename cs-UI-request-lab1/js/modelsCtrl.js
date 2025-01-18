@@ -117,18 +117,18 @@ angular.module("pocApp")
 
             $scope.loadReview = function (kind,model) {
                 //allCompElements
-                let ar = $scope.fullElementList
-                model = model || $scope.selectedModel //default to the current model
 
+                model = model || $scope.selectedModel //default to the current model
+                let allElements = snapshotSvc.getFullListOfElements(model.name) //$scope.fullElementList
 
 
                 if (kind == 'comp') {
-                    ar = $scope.allCompElements
+                    allElements = $scope.allCompElements
                     model = $scope.selectedComposition
                 }
 
 
-                vsSvc.getAllVS(ar, function () {
+                vsSvc.getAllVS(allElements, function () {
                     $scope.showWaiting = false
 
                     //the second option expands the valuesets as options into the Q - todo make this an option
@@ -143,7 +143,7 @@ angular.module("pocApp")
                             config.hashAllDG = $scope.hashAllDG
                             config.fhirType = model.type// Used for definition based extraction
                             config.expandVS = false     //use proxy to expand vs
-                            let allElements = snapshotSvc.getFullListOfElements(model.name)
+                           // let allElements = snapshotSvc.getFullListOfElements(model.name)
                             voQ = makeQSvc.makeHierarchicalQFromDG(model,allElements,config) //,$scope.hashAllDG)
                         } else {
                             let compConfig = {hideEnableWhen : false}

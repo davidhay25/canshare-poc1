@@ -18,8 +18,8 @@ angular.module('formsApp')
 
 
             templateUrl: 'directive/renderForm2/renderFormDir2.html',
-            controller: function($scope,renderFormsSvc2,questionnaireSvc,vsSvc,$http,$uibModal,utilsSvc){
-
+            controller: function($scope,renderFormsSvc2,vsSvc,$http,$uibModal,utilsSvc,makeQHelperSvc){
+//,questionnaireSvc
                 let localPatientId = $scope.patientid || "45086382"
                 //let localPatientId = $scope.patientid || "dietrich-blake-louis"
                 let localPractitionerId = '10652933'//'alderson-helene'     //connectathon
@@ -93,8 +93,6 @@ console.log(item.answerValueSet,options)
 
                 function setupQ () {
 
-
-
                     let obj = $scope.q
                     $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([angular.toJson(obj,true) ],{type:"application/json"}))
                     $scope.downloadLinkJsonName = `${$scope.q.name}.json`
@@ -113,26 +111,24 @@ console.log(item.answerValueSet,options)
 
                     //This was code to allow multiple of this directive in a single page. Didn't work. May no longer be needed.
 
-                    $scope.treenode = "designTree"//   $scope.treenode || "designTreeX"
-                    //add the node
-                   // let html = `<div id="${$scope.treenode}"></div>`
-               //     $( "#designTree" ).after( ( html ) );
+                    $scope.treenode = "designTree"
 
                     //$scope.q is set from the directive attributes. setupQ() is only called when it is not null
                     let vo = renderFormsSvc2.makeTreeFromQ($scope.q)
 
                     $scope.treeData = vo.treeData
-                    console.log(vo.treeData)
+                   // console.log(vo.treeData)
 
                     $scope.prepopExpression = vo.prepopExpression   //for evaluating pre-pop
                     $scope.hashItem = vo.hashItem   //also for pre-pop - eg date
 
-
+                    //get specific items for the display
+                    //let extInstruction = makeQHelperSvc.getExtension('displayCategory')
 
 
                     drawTree(vo.treeData)       //for drawing the tree
 
-                    getNotes($scope.q.name)
+                    getNotes($scope.q.name)   //reviewer Notes
 
                 }
 
@@ -281,6 +277,8 @@ console.log(item.answerValueSet,options)
 
 
                             $scope.selectedEd = $scope.hashEd[$scope.selectedItem.linkId]
+
+                            $scope.helpElements = makeQHelperSvc.getHelpElements($scope.selectedItem)
 
 
 

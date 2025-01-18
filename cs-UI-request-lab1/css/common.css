@@ -136,6 +136,8 @@ table {
     border-collapse: collapse;
     width: 100%;
 }
+
+/*
 th,
 td {
     padding: 8px 16px;
@@ -144,7 +146,7 @@ td {
 th {
     background: #eee;
 }
-
+*/
 .banner {
 
     border: 1px solid #b8b9b5;

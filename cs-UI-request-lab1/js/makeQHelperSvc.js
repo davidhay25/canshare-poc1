@@ -1,11 +1,66 @@
 angular.module("pocApp")
 
+
+
+
+    //try not to add depencies to this service
     .service('makeQHelperSvc', function(utilsSvc) {
 
+        extensionUrls = {}
+        extensionUrls.displayCategory = "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory"
+        extensionUrls.itemControl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
+        extensionUrls.entryFormat = "http://hl7.org/fhir/StructureDefinition/entryFormat"
+
         return {
+            getExtensionUrls : function () {
+                return extensionUrls
+            },
+
+            getHelpElements(item) {
+                //get all the help text elements associated with an item
+                //let instructionExt = extensionUrls.displayCategory      //instructions are
+
+                let vo = {}
+
+                //placeholder
+                //if (item.extension) {
+                    for (const ext of item.extension || []) {
+                        if (ext.url = extensionUrls.entryFormat) {
+                            vo.placeHolder = ext.valueString
+                        }
+                    }
+                //}
+
+                //Instructions & helptext
+                if (item.item) {
+                    for (const child of item.item) {
+                        if (child.extension) {
+                            for (const ext of child.extension) {
+                                if (ext.url == extensionUrls.displayCategory) {
+                                    //this extension marks the item as the categry. Currently only 'instruction' supported so no need to check cc
+                                    vo.instructions = child.text
+                                }
+                                if (ext.url == extensionUrls.itemControl) {
+                                    if (ext.valueCodeableConcept &&
+                                        ext.valueCodeableConcept.coding &&
+                                            ext.valueCodeableConcept.coding[0].code == 'flyover') {
+                                        vo.helpText = child.text
+                                    }
+
+                                }
+
+                            }
+                        }
+                    }
+                }
+
+                return vo
+
+
+            },
 
             cleanCC : function (cc) {
-                //remove the fsn attribuet from a CC
+                //remove the fsn attribute from a CC
                 if (cc) {
                     delete  cc.fsn
                     return cc

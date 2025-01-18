@@ -2,13 +2,17 @@
 
 angular.module("pocApp")
 
-    .service('makeQSvc', function($http,codedOptionsSvc,QutilitiesSvc,snapshotSvc,$filter,vsSvc,orderingSvc,utilsSvc,makeQHelperSvc) {
+    .service('makeQSvc', function($http,codedOptionsSvc,QutilitiesSvc,snapshotSvc,$filter,vsSvc,
+                                  orderingSvc,utilsSvc,makeQHelperSvc) {
 
         let unknownCodeSystem = "http://example.com/fhir/CodeSystem/example"
         let extLaunchContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
 
-        extensionUrls = {}
-        extensionUrls.displayCategory = "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory"
+
+
+        extensionUrls = makeQHelperSvc.getExtensionUrls()  //{}
+
+       // extensionUrls.displayCategory = "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory"
 
         extInitialExpressionUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
         extItemControlUrl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
@@ -17,7 +21,7 @@ angular.module("pocApp")
         //extQuantityUnit = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
         extQuantityUnit = "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption"
 
-        extPlaceHolderUrl = "http://hl7.org/fhir/StructureDefinition/entryFormat"
+        //extPlaceHolderUrl = "http://hl7.org/fhir/StructureDefinition/entryFormat"
 
         //extensions for definition extraction
         extAllocateIdUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-extractAllocateId"
@@ -2018,7 +2022,8 @@ angular.module("pocApp")
 
                     //placeholder
                     if (ed.placeHolder) {
-                        let ext = {url:extPlaceHolderUrl,valueString:ed.placeHolder}
+                        let ext = {url:extensionUrls.entryFormat,valueString:ed.placeHolder}
+                        //let ext = {url:extPlaceHolderUrl,valueString:ed.placeHolder}
                         item.extension = item.extension || []
                         item.extension.push(ext)
 
@@ -2047,7 +2052,8 @@ angular.module("pocApp")
                             }]
                         }
                         foItem.extension = [ext1]
-                        item.item=[foItem]
+                        item.item = item.item || []
+                        item.item.push(foItem)
 
                     }
 
