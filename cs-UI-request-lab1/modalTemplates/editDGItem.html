@@ -196,6 +196,8 @@
       <uib-tab heading="Questionnaire">
         <br/>
 
+        <a ng-if="linkToSpec"
+           class='pull-right' target="_blank" ng-href="{{linkToSpec}}">View {{fhirResourceType}} in spec</a>
 
         <uib-tabset>
           <uib-tab heading="Standard options">
@@ -204,10 +206,14 @@
           <tr>
             <td  style="width: 20%;">Hide in Q</td>
             <td><checkbox ng-model="input.hideInQ"></checkbox>
+              <em>The item is not copied into the Q at all</em>
+            </td>
+          </tr>
 
-              <a ng-if="linkToSpec"
-                 class='pull-right' target="_blank" ng-href="{{linkToSpec}}">View {{fhirResourceType}} in spec</a>
-
+          <tr>
+            <td  style="width: 20%;">Hidden in Q</td>
+            <td><checkbox ng-model="input.hiddenInQ"></checkbox>
+              <em>The item is in the Q, but not shown</em>
             </td>
           </tr>
 
@@ -222,6 +228,13 @@
             <td>Help text</td>
             <td><input type="text" class="form-control" ng-model="input.helpText"/>
               <div><em>A note about the item. Will appear as a help icon in the form.</em></div>
+            </td>
+          </tr>
+
+          <tr>
+            <td>Instructions</td>
+            <td><input type="text" class="form-control" ng-model="input.instructions"/>
+              <div><em>Instructions for the user. Appear below the control</em></div>
             </td>
           </tr>
 

@@ -10,6 +10,9 @@
     background-color: lightsalmon;
 }
 
+.isContainer {
+    font-weight: bold;
+}
 
 .custom-popover {
     max-width: 600px; /* Adjust this value as needed */

@@ -125,6 +125,19 @@
             <strong>Checked out to {{selectedModel.checkedOut}}</strong>
           </div>
         </div>
+
+        <div ng-if="userMode == 'playground'">
+          <div ng-repeat="(k,v) in hashAllDG">
+            <div ng-if="v.isContainer"
+                 class="btn btn-link"
+                ng-click="showContainerQ(k)">
+
+              {{k}} Questionnaire
+            </div>
+
+          </div>
+
+        </div>
       </div>
 
      <div> <strong>FHIR resource:</strong>
@@ -244,7 +257,7 @@
           <div><strong style="margin-left: 8px">Bold</strong> elements are required</div>
           <div><span style="color: blue; margin-left: 8px">Blue</span>  elements have a fixed value</div>
           <div style=" margin-left: 8px">A trailing <strong>*</strong> indicates element can repeat.</div>
-          <div style=" margin-left: 8px"><span style="text-decoration: line-through">Strike-through</span> indicates the element does not appear in a Q</div>
+          <div style=" margin-left: 8px"><span style="text-decoration: line-through">Strike-through</span> indicates the element does not appear in a Q or is hidden</div>
           <div style=" margin-left: 8px">
             <span style="text-decoration-line: underline;text-decoration-style: dotted">
               Dotted underline</span> indicates the element is subject to conditional show in the Q</div>
@@ -333,8 +346,9 @@
 
                       <!--  <span class="pull-right clickable" ng-click="hideInQ(selectedNode.data.ed)"> -->
                       <span class="pull-right" >
-                        <span ng-if="selectedNode.data.ed.hideInQ">Not shown in Q</span>
-                        <span ng-hide="selectedNode.data.ed.hideInQ">Appears in Q</span>
+                        <span ng-if="selectedNode.data.ed.hideInQ">Not copied into Q</span>
+                         <span ng-if="selectedNode.data.ed.hiddenInQ">Present but hidden in Q</span>
+                        <span ng-hide="selectedNode.data.ed.hideInQ || selectedNode.data.ed.hiddenInQ">Appears in Q</span>
                       </span>
 
                     </td>
@@ -631,6 +645,15 @@
                     <td>
 
                       {{selectedNode.data.ed.sourceReference}}
+                    </td>
+                  </tr>
+
+
+                  <tr ng-if="selectedNode.data.ed.definition">
+                    <td class="detailName">Instructions</td>
+                    <td>
+
+                      {{selectedNode.data.ed.instructions}}
                     </td>
                   </tr>
 

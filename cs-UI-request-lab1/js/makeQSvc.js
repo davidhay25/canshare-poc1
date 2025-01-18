@@ -7,6 +7,9 @@ angular.module("pocApp")
         let unknownCodeSystem = "http://example.com/fhir/CodeSystem/example"
         let extLaunchContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
 
+        extensionUrls = {}
+        extensionUrls.displayCategory = "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory"
+
         extInitialExpressionUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
         extItemControlUrl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
         extCollapsibleUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-collapsible"
@@ -1332,6 +1335,7 @@ angular.module("pocApp")
 
                 //construct a list of paths to hide (not include in the Q)
                 let basePathsToHide = []    //a list of all paths where hideInQ is set. Any elements starting with this path are also set
+                //note that hideInQ actually means don't copy to Q
                 lstElements.forEach(function (thing) {
                     //Actually, there shouldn't be anything with the mult 0..0 any more - but hideInQ is certainly there
                     if (thing.ed.mult == '0..0') {
@@ -1812,13 +1816,16 @@ angular.module("pocApp")
                         addItemControl(item,'gtable')
                     }
 
+
                     //add any units
                     addUnits(item,ed)
 
                     //The only way an element here will have hideInQ set but still be included is for fixed values.
                     //they get added to the Q - but with the hidden extension
 
-                    if (ed.hideInQ) {
+                    //hiddenInQ is an item that does appear but not shown
+                    //not the same as hideInQ which means they dont appear in Q at all (poor naming choice there)
+                    if (ed.hideInQ || ed.hiddenInQ) {
                         item.extension = item.extension || []
                         item.extension.push({url:extHidden,valueBoolean:true})
                     }
@@ -1881,7 +1888,11 @@ angular.module("pocApp")
                     if (edType == 'CodeableConcept') {
 
                         //check for fixedCoding. If there is, then set an answeroption with initialSelected
+
                         //updated to use fixed value extension
+                        //need to use hidden answeOption approach as for extensions, the element needs to be
+                        //there to attach the value[x] part of the extension...
+
                         if (ed.fixedCoding) {
 
                             let concept = ed.fixedCoding
@@ -1896,7 +1907,6 @@ angular.module("pocApp")
                                 errorLog.push({msg:`Definition (extract path) not set for fixed value in ${ed.path}`})
                             }
 
-
                             //the fixedValueExtension needs to be added to the parent
                             let ar1 = ed.path.split('.')
                             ar1.pop()
@@ -1910,7 +1920,8 @@ angular.module("pocApp")
 
                             //Don't include this item in the Q.
                             //There could be an issue if this is a parent - but a parent shouldn't have a fixed value...
-                            excludeFromQ = true
+
+                            // temp - why did I exclude??? excludeFromQ = true
 
                             //change the type to a string (the renderer may complain if still a choice with no values) and hide it in the Q
                            // item.type = 'string'
@@ -1970,7 +1981,8 @@ angular.module("pocApp")
                                     item.answerOption.push({valueCoding : concept})
                                 }
                             } else {
-                                item.answerOption = [{valueCoding : {display:"There is neither a ValueSet nor options"}}]
+                                //just leave out the message - fix it in the autooring side
+                              //  item.answerOption = [{valueCoding : {display:"There is neither a ValueSet nor options"}}]
                             }
 
                         }
@@ -2012,6 +2024,15 @@ angular.module("pocApp")
 
                     }
 
+                    if (ed.instructions) {
+
+                        let child = {type:'display',linkId:`${ed.linkId}-instructions`,text:ed.instructions}
+                        let cc = {coding:[{code:"instructions",system:"http://hl7.org/fhir/questionnaire-display-category"}]}
+                        let ext = {url:extensionUrls.displayCategory,valueCodeableConcept:cc}
+                        child.extension =  [ext]
+                        item.item = item.item || []
+                        item.item.push(child)
+                    }
 
                     if (ed.helpText){
                         const guid = utilsSvc.getUUID() //createUUID()
@@ -2029,7 +2050,6 @@ angular.module("pocApp")
                         item.item=[foItem]
 
                     }
-
 
 
                     //There is a pre-pop expression - set as initial value
@@ -2057,7 +2077,8 @@ angular.module("pocApp")
 
                     if (ed.defaultCoding) {
                         item.initial = item.initial || []
-                        item.initial.push({valueCoding:ed.defaultCoding})
+
+                        item.initial.push({valueCoding: makeQHelperSvc.cleanCC(ed.defaultCoding)})
                     }
 
 

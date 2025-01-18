@@ -465,7 +465,7 @@ angular.module("pocApp")
                         }
                     }
 
-                    if (ed.hideInQ) {
+                    if (ed.hideInQ || ed.hiddenInQ) {
                         arStyle.push("text-decoration: line-through")
                     } else {
                         //if there is hideInQ then it has precedence over showing enablewhen

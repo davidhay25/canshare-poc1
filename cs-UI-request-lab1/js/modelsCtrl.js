@@ -107,11 +107,21 @@ angular.module("pocApp")
             }
 
 
-            //todo - only works for DG at present...
-            $scope.loadReview = function (kind) {
+
+            $scope.showContainerQ = function (name) {
+                //alert(name)
+                let model = $scope.hashAllDG[name]
+                $scope.loadReview('dg',model)
+            }
+
+
+            $scope.loadReview = function (kind,model) {
                 //allCompElements
                 let ar = $scope.fullElementList
-                let model = $scope.selectedModel
+                model = model || $scope.selectedModel //default to the current model
+
+
+
                 if (kind == 'comp') {
                     ar = $scope.allCompElements
                     model = $scope.selectedComposition
@@ -123,7 +133,6 @@ angular.module("pocApp")
 
                     //the second option expands the valuesets as options into the Q - todo make this an option
 
-
                     //need the named queries for Q variables
                     makeQSvc.getNamedQueries(function (hashNamedQueries) {
 
@@ -133,13 +142,12 @@ angular.module("pocApp")
                             config.namedQueries = hashNamedQueries
                             config.hashAllDG = $scope.hashAllDG
                             config.fhirType = model.type// Used for definition based extraction
-
-                            config.expandVS = false     //testing proxy
-                            voQ = makeQSvc.makeHierarchicalQFromDG(model,$scope.fullElementList,config) //,$scope.hashAllDG)
+                            config.expandVS = false     //use proxy to expand vs
+                            let allElements = snapshotSvc.getFullListOfElements(model.name)
+                            voQ = makeQSvc.makeHierarchicalQFromDG(model,allElements,config) //,$scope.hashAllDG)
                         } else {
                             let compConfig = {hideEnableWhen : false}
                             voQ = makeQSvc.makeHierarchicalQFromComp(model,$scope.hashAllDG,hashNamedQueries,compConfig)
-
                         }
 
                         let qry = `/Questionnaire/${model.name}`
@@ -513,9 +521,18 @@ angular.module("pocApp")
                 $scope.input.mainTabActive = $localStorage.initialModelTab
             }
 
+            if ($localStorage.selectModelTab !== undefined ) {
+                $scope.input.selectTabActive = $localStorage.selectModelTab
+            }
+
             $scope.setInitialTab = function (inx) {
                 $localStorage.initialModelTab = inx
             }
+
+            $scope.setSelectTab = function (inx) {
+                $localStorage.selectModelTab = inx
+            }
+
 
             //used in DG & Comp so when a type is a FHIR DT, we can create a link to the spec
             $scope.fhirDataTypes = utilsSvc.fhirDataTypes()
@@ -1224,6 +1241,7 @@ angular.module("pocApp")
                                 ed1.otherType = ed.otherType
                                 setValue(ed1,'hideInQ',ed.hideInQ,'bool')
                                 //ed1.hideInQ = ed.hideInQ
+                                setValue(ed1,'hiddenInQ',ed.hiddenInQ,'bool')
 
                                 //setValue(ed1,'autoPop',ed.controlHint,'string')
                                 //ed1.autoPop = ed.autoPop
@@ -1274,6 +1292,7 @@ angular.module("pocApp")
                                 setValue(ed1,'sdcGrid',ed.sdcGrid,'bool')
                                 //ed1.sdcGrid = ed.sdcGrid
                                 ed1.adHocExt = ed.adHocExt
+                                ed1.instructions = ed.instructions
                                 ed1.itemCode = ed.itemCode
                                 ed1.displayAfter = ed.displayAfter
                                 ed1.displayBefore = ed.displayBefore
@@ -1893,10 +1912,8 @@ angular.module("pocApp")
 
                 $scope.dgFshLM = igSvc.makeFshForDG(dg,$scope.fullElementList)
 
-
-
                 let vo = modelDGSvc.makeGraphOneDG(dg,$scope.fullElementList,$scope.hashAllDG)
-                makeGraph(vo.graphData)     //todo - do we want the graph back?
+                makeGraph(vo.graphData)
 
 
 
@@ -2026,7 +2043,7 @@ angular.module("pocApp")
                         'data': treeData,
                         'themes': {name: 'proton', responsive: true}},
                         'check_callback' : true,
-                        plugins:['dnd'],
+                        plugins:['dnd','state'],
                         dnd: {
                             'is_draggable' : function(nodes,e) {
                                 return $scope.canEdit($scope.selectedModel)

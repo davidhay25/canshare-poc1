@@ -249,6 +249,9 @@ angular.module("pocApp")
                 $scope.input.labelText =  item.ed.labelText
 
                 $scope.input.hideInQ =  item.ed.hideInQ
+                $scope.input.hiddenInQ =  item.ed.hiddenInQ
+                $scope.input.instructions =  item.ed.instructions
+
                 $scope.input.helpText =  item.ed.helpText
 
                 $scope.input.collapsible =  item.ed.collapsible
@@ -635,6 +638,8 @@ angular.module("pocApp")
                 ed.sdcGrid = $scope.input.sdcGrid
                 ed.valueSet = $scope.input.valueSet
                 ed.hideInQ = $scope.input.hideInQ
+                ed.hiddenInQ = $scope.input.hiddenInQ
+                ed.instructions = $scope.input.instructions
                 ed.helpText = $scope.input.helpText
                 ed.collapsible = $scope.input.collapsible
 

@@ -313,6 +313,7 @@ angular.module("pocApp")
                 $scope.input.newModelTitle = model.title
                 $scope.input.sourceReference = model.sourceReference
                 $scope.input.newModelDescription = model.description
+                $scope.input.isContainer = model.isContainer
 
                 $scope.input.namedQueries = model.namedQueries          //the array of named queries this DG requires...
                 $scope.input.type = model.type
@@ -575,6 +576,8 @@ angular.module("pocApp")
                 //todo - should this be $scope - need to re-write so cancel works properly!!!
                 model.fixedValues = $scope.input.fixedValues
                 model.resourceReferences = $scope.input.resourceReferences
+                model.isContainer = $scope.input.isContainer
+
 
 
                 if ($scope.input.adHocExt) {

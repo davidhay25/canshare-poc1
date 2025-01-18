@@ -4,6 +4,13 @@ angular.module("pocApp")
 
         return {
 
+            cleanCC : function (cc) {
+                //remove the fsn attribuet from a CC
+                if (cc) {
+                    delete  cc.fsn
+                    return cc
+                }
+            },
             cloneItem : function (item) {
                 //create a copy of an item, removing the item node
                 let clone = angular.copy(item)

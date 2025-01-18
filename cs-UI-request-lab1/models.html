@@ -23,21 +23,6 @@
         }
 
 
-/*
-         .tableFixHead {
-             overflow-y: auto;
-             height: 800px;
-         }
-        .tableFixHead thead th {
-            position: sticky;
-            top: 0;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        */
         th,
         td {
             padding: 8px 16px;
@@ -48,10 +33,10 @@
         }
 
 
-        modal-xlg {
+/*        modal-xlg {
             width : 1200px
         }
-
+*/
         /* change the selected colour as the text is hard to read*/
         .jstree-proton .jstree-clicked {
             background: #dedede;
@@ -209,9 +194,9 @@
             <div class="row">
                 <div ng-class="leftPanel">
 
-                    <uib-tabset>
+                    <uib-tabset  active="input.selectTabActive">
 
-                        <uib-tab heading = "Inheritance" >
+                        <uib-tab heading = "Inheritance"  select="setSelectTab(0)">
                             <div>
 
                                 <div class="pull-right clickable spacer" ng-if = "user.email || userMode == 'playground'"
@@ -233,10 +218,10 @@
                         </uib-tab>
 
 
-                        <uib-tab heading="List">
+                        <uib-tab heading="List" select="setSelectTab(1)">
 
                             <div style="padding: 8px">
-                                <div class="row ">
+                                <div class="row">
                                     <div class="col-md-6">
                                         <input type="text" placeholder="Filter" class="form-control"
                                                ng-model="input.dgFilter"/>
@@ -263,14 +248,14 @@
                                            class="glyphicon glyphicon-edit pull-right clickable"
                                            ng-click="editModel(v)"></i>
 
-                                        {{v.title}}
+                                        <div ng-class="{isContainer:v.isContainer}">{{v.title}}</div>
                                     </div>
                                 </div>
                             </div>
 
                         </uib-tab>
 
-                        <uib-tab ng-if="userMode !== 'playground'" heading="Tagged">
+                        <uib-tab ng-if="userMode !== 'playground'" select="setSelectTab(2)" heading="Tagged">
                             <div class="row" style="padding: 8px">
 
                                 <div class="col-md-2">
@@ -305,7 +290,7 @@
                         </uib-tab>
 
 
-                        <uib-tab  ng-if="userMode !== 'playground'" heading = "Sections">
+                        <uib-tab  ng-if="userMode !== 'playground'" select="setSelectTab(3)" heading = "Sections">
                             <div>
                                 <div class="pull-right clickable spacer"
                                      ng-if = "canEdit(selectedModel)"  ng-click="editModel(selectedModel)">Edit</div>
@@ -356,7 +341,7 @@
                                 </table>
 
                                 <div>
-                                    <div class="btn btn-link pull-right" ng-click="updatePlayground(true)">Update both Model Repository and Local Store</div>
+                                    <div class="btn btn-primary pull-right" ng-click="updatePlayground(true)">Update both Model Repository and Local Store</div>
                                     <div class="btn btn-link pull-right" ng-click="savePGtoLocal()">Update to Local Store</div>
                                     <div class="btn btn-link pull-right" ng-click="updatePlayground()">Update to Model Repository</div>
 
@@ -365,12 +350,18 @@
 
                                 <br/> <br/>
 
-                                <strong>List of DataGroups <span class="badge">{{sortedDGList.length}}</span> </strong>
+
+
+                            </uib-tab>
+
+                            <uib-tab heading="Resource types">
+                                <br/>
+                                <em>List of DataGroups with resource types </em>
                                 <br/>
                                 <div class="tableFixHead">
                                     <table class="table table-condensed table-bordered">
                                         <thead>
-                                        <tr><th>Title</th><th>Name</th><th>Description</th></tr>
+                                        <tr><th>Title</th><th>Resource type</th><th>Description</th></tr>
                                         </thead>
                                         <tbody>
 
@@ -381,28 +372,27 @@
                                                      ng-click="selectModelFromList(v.name,v.kind)">{{v.name}}</div></td>
 
                                             <td>{{v.description}}
-<!--
-                                                <div>
-                                                    <div ng-click="selectModelFromList(item.name,item.kind)"
-                                                            ng-repeat="item in xref[v.name] track by $index">
-                                                        {{item.kind}}:
-                                                        <span  class="clickable">{{item.name}}</span> (<em>{{item.path}}</em>)
+                                                <!--
+                                                                                                <div>
+                                                                                                    <div ng-click="selectModelFromList(item.name,item.kind)"
+                                                                                                            ng-repeat="item in xref[v.name] track by $index">
+                                                                                                        {{item.kind}}:
+                                                                                                        <span  class="clickable">{{item.name}}</span> (<em>{{item.path}}</em>)
 
-                                                        {{item}}
+                                                                                                        {{item}}
 
-                                                    </div>
-                                                </div>
-                                                -->
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                -->
 
                                             </td>
-<!--
-                                            <td>{{v.diff.length}} / {{v.snapshot.length}}</td>
-                                            -->
+                                            <!--
+                                                                                        <td>{{v.diff.length}} / {{v.snapshot.length}}</td>
+                                                                                        -->
                                         </tr>
                                         </tbody>
                                     </table>
                                 </div>
-
 
 
                             </uib-tab>
@@ -424,6 +414,7 @@
 
 
                             <uib-tab heading="Graph" select="fitAllDGGraph()">
+                                <br>
                                 <div>
                                     <div class="clickable pull-right" ng-click="createAllDGGraph()">
                                         Create graph
