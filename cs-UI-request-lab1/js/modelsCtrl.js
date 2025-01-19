@@ -287,7 +287,6 @@ angular.module("pocApp")
                             let qry = '/model/allDG'
                             $http.get(qry).then(
                                 function (data) {
-                                    //console.log(data)
                                     $scope.hashAllDG = {}
                                     let arDG = data.data
                                     for (const dg of arDG) {
@@ -359,7 +358,7 @@ angular.module("pocApp")
             $scope.ssHx = []
 
             $scope.makeSnapshots = function() {
-                console.log('-------->   building snapshots...')
+
                 let voSs = snapshotSvc.makeSnapshots($scope.hashAllDG)
                 $scope.snapshotLog = voSs.log
                 $scope.ssErrorTypes = ['All']
@@ -960,7 +959,6 @@ angular.module("pocApp")
             function showAllDGTree(treeData,htmlElement) {
 
 
-                //console.log(treeData,utilsSvc.getSizeOfObject(treeData))
 
 
                 /* - useful code from chatGPT for finding duplicates
@@ -1441,7 +1439,7 @@ angular.module("pocApp")
 
                 //selct the element in the DG tree. Need to wait for the tree to be built...
                 $timeout(function () {
-                    console.log(path)
+
 
                     //from chatgpt
                     var tree = $('#dgTree').jstree(true);
@@ -1835,7 +1833,7 @@ angular.module("pocApp")
                     try {
                         let vo1 = makeQSvc.makeHierarchicalQFromComp(comp,$scope.hashAllDG,hashNamedQueries)
                         $scope.compQErrors = vo1.errorLog
-                        console.log(vo1)
+
                     } catch(ex) {
                         console.log(ex)
                         alert("There was an issue creating the Questionnaire")
@@ -2033,7 +2031,7 @@ angular.module("pocApp")
             function drawDGTree(treeData) {
                 //enable drag / drop for re-ordering
 
-                console.log("about to draw DG tree")
+
                 $('#dgTree').jstree('destroy');
 
                 let x = $('#dgTree').jstree(
@@ -2057,7 +2055,7 @@ angular.module("pocApp")
                 //).on('changed.jstree', function (e, data) {
                     // the node selection event...
 
-                    console.log('select')
+
 
                     if (data.node) {
                         $scope.selectedNode = data.node;
@@ -2211,7 +2209,7 @@ angular.module("pocApp")
                 playgroundsSvc.getImportableDG($scope.hashAllDG).then(
                     function (data) {
                         $scope.importableDG = data
-                        console.log(data)
+
                     }
                 )
 

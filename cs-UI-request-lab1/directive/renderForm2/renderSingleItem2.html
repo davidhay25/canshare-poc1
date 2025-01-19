@@ -182,8 +182,9 @@
     <!-- ?what is disabled doing
     <div ng-repeat="ew in entry.ed.enableWhen" ng-show="entry.isDisabled">
       -->
+
       <div ng-repeat="ew in entry.ed.enableWhen" ng-show="entry.isDisabled">
-      <em>{{ew.source | dropFirstInPath}} {{ew.operator}} {{ew.value.display}}</em>
+      <em>{{ew.source}} ({{hashEd[ew.source].title}}) {{ew.operator}} {{ew.value.display}}</em>
     </div>
 
 

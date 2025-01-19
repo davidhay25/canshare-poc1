@@ -106,14 +106,34 @@ angular.module("pocApp")
 
                             //adjusts the source (controller) path for contained DG's with conditionals
                             //also called when rendering a Q...
-                            let source = ew.source
+                            let source = ew.source      //corresponds to 'question' in the Q
                             let sourceEd = hashElements[source]
 
-                            let entry = {path:item.ed.path,ew:ew,ed:sourceEd}
                             if (! sourceEd) {
-                                entry.error = `Warning! source ed not found at path ${ew.source}`
-                            }
+                                //could be a contained
+                                let ar = source.split('.')
+                                //todo - if we make the path in the container the same as the DG name then we don't need to remove it and it will be more robust
+                                ar.splice(0,1)      //remove the first in the path - the dg where the ew is defined
+                                let matchingPath = ar.join('.')     //we're looking for an element whose path ends with this
+                                let matches = []        //matching elements - there should only be 1
 
+                                for (const key of Object.keys(hashElements)) {
+                                    if (key.endsWith(matchingPath)) {
+                                        matches.push(hashElements[key])
+                                    }
+                                }
+
+                                if (matches.length == 1) {
+                                    sourceEd = matches[0]
+                                } else {
+                                    entry.error = `Warning! source ed not found at path ${ew.source}`
+                                }
+
+
+
+
+                            }
+                            let entry = {path:item.ed.path,ew:ew,ed:sourceEd}
                             allDependencies.push(entry)
                         })
                     }

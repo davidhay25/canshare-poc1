@@ -170,7 +170,10 @@
                         <input type="text" placeholder="Full url to sever fhir root" class="form-control" ng-model="input.termSvr">
                     </div>
                     <div class="col-md-6">
-                        The Terminology server to use for ValueSet expansion in this DG. Defaults to the National New Zealand Terminology Server.
+                        The Terminology server to use for ValueSet expansion in this DG.
+
+                        <span class="clickable" ng-click="input.termSvr = 'https://backup.canshare.co.nz/proxy'">
+                            Set to the National New Zealand Terminology Server.</span>
                     </div>
                 </div>
                 <br/>

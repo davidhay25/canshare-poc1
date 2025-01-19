@@ -659,6 +659,8 @@ angular.module("pocApp")
         //Adjust the conditionals when they are either inherited or referenced from anoth DG
         function adjustEnableWhen(dg) {
 
+            return //Jan20 - debugging
+
             let printLog = false
             if (dg.name == 'BreastHistoClinicalInformationXX') {printLog = true}
 
@@ -699,15 +701,46 @@ angular.module("pocApp")
                                     console.log(`NOT found in DG`)
                                 }
 
-                                //no, this must be a referenced DG
-                                let arThisPath = ed.path.split('.')      // this ed - the one that is dependent
 
+
+                                //no, this must be a referenced DG
+                                //so we need to adjust the ew.source path.
+                                //We've already removed the original DG name from arController (above)
+                                //so we need to prefix that with the path to this element to give the adjusted path
+                                //eg {path.to.here}.{path.in.source
+
+                                //new code 20Jan
+
+                                let arThisPath = ed.path.split('.')      // this ed - the one that is dependent
+                                arThisPath.pop()        //remove the last element (as it specifies this element)
+                                arThisPath.splice(0,0,dg.name)      //add the DG name at the front
+
+
+
+                                let newPath = arThisPath.concat(arControllerPath) //stick the source path on the end
+                                ew.source = newPath.join('.')   //and assign to the source
+
+
+
+
+
+
+
+/* old code
                                // let ar = arThisPath // arControllerPath.slice(1) //removes the dgname from the source
                                 let ar = arControllerPath.slice(1) //removes the dgname from the source
-                                arThisPath.splice(0,0,dg.name)
+
+
+                                arThisPath.splice(0,0,dg.name)  //This is the source with the DG name removed
+
+
+
+
+
 
                                 let arFullPath = arThisPath.concat(ar) //start from the insert point
                                 ew.source = arFullPath.join('.')
+                                */
 
                             }
 
@@ -956,7 +989,7 @@ angular.module("pocApp")
 
                 })
 
-                console.log(impactedDG)
+               // console.log(impactedDG)
                 return impactedDG
 
             },
@@ -1014,7 +1047,7 @@ angular.module("pocApp")
 
                     lst.push(tmp)
                 }
-                console.log(lst)
+                //console.log(lst)
                 return lst
 
             },
@@ -1281,7 +1314,7 @@ angular.module("pocApp")
 
                 let lst1 = utilsSvc.reorder(lst)
 
-                console.log(lst1.length,lst.length)
+              //  console.log(lst1.length,lst.length)
 
              //   lst1.splice(0,1)
                     return lst1

@@ -846,7 +846,7 @@ angular.module("pocApp")
 
                 }
 
-                console.log(report.launchContext)
+               // console.log(report.launchContext)
 
 
                 function processItem(report,item,level) {
@@ -1077,7 +1077,7 @@ angular.module("pocApp")
                 //reports on where expressions are defined and used
                 report.expressionUsage = makeQHelperSvc.makeVariableUsage(Q)
 
-                console.log(report)
+                //console.log(report)
                 return {report:report}
 
             },
@@ -1281,7 +1281,6 @@ angular.module("pocApp")
                                     }
                                 }
 
-
                                 sectionItem.item.push(dgItem)
 
                             }
@@ -1405,12 +1404,14 @@ angular.module("pocApp")
                 })
 
                 let Q = {resourceType:'Questionnaire'}
-                Q.id = `canshare-${firstElement.ed.path}`
-                Q.name = firstElement.ed.path
-                Q.title = firstElement.title
+                //Q.id = `canshare-${firstElement.ed.path}`
+                Q.id = `canshare-${dg.name}`
+                Q.name = dg.name //firstElement.ed.path
+                Q.title = dg.title //firstElement.title
                 Q.status = 'active'
                 Q.title = dg.title
-                Q.url = `http://canshare.co.nz/questionnaire/${firstElement.ed.path}`
+               // Q.url = `http://canshare.co.nz/questionnaire/${firstElement.ed.path}`
+                Q.url = `http://canshare.co.nz/questionnaire/${dg.name}`
                 Q.description = dg.description
 
                 let adHocExt = snapshotSvc.getAdHocExt(dg.name)
@@ -1421,6 +1422,13 @@ angular.module("pocApp")
                 addPrePopExtensions(Q)      //launchPatient & LaunchPractitioner
                 addUseContext(Q)
                 addPublisher(Q)
+
+                //set any default terminology server
+                if (dg.termSvr) {
+                    Q.extension = Q.extension || []
+                    let ext = {url:extensionUrls.peferredTerminologyServer,valueUrl:dg.termSvr}
+                    Q.extension.push(ext)
+                }
 
                 //we always add the patientID variable extension. If there's no references needed, it's just ignored...
                 Q.extension = Q.extension || []
@@ -1461,7 +1469,7 @@ angular.module("pocApp")
                             let ed = item.ed
                             let path = ed.path
                             if (path == ref.source) {
-                                console.log('source')
+                                //console.log('source')
                                 ed.markReference = ed.markReference || []
                                 ed.markReference.push(ref)      //note that the ref.idName has just bee updated
                             }
@@ -1603,7 +1611,7 @@ angular.module("pocApp")
                     } else {
                         //this is the first item in the DG Q.
 
-                        console.log(`>>>>>>>>>. ${pathPrefix}${path}` )
+                     //   console.log(`>>>>>>>>>. ${pathPrefix}${path}` )
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
                         decorateItem(currentItem,ed,extractionContext,dg,config)
 
@@ -1636,7 +1644,7 @@ angular.module("pocApp")
 
                 }
 
-                console.log(hashItems)
+               // console.log(hashItems)
 
 
                 //validate the enablewhens - but not if the generation is called from the composition
@@ -1880,7 +1888,7 @@ angular.module("pocApp")
                             if ( extractionContext)  {
                                 let ar = extractionContext.split('/')
                                 let canonical = `${extractionContext}#${ar[ar.length-1]}.identifier.system`
-                                console.log(canonical)
+                               // console.log(canonical)
                                 addFixedValue(item,canonical,"String",ed.identifierSystem)
                             } else {
                                 alert(`Processing ${dgName} which has an identifier extraction set but there's no extraction context on the DG`)

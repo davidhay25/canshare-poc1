@@ -10,6 +10,7 @@ angular.module("pocApp")
         extensionUrls.displayCategory = "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory"
         extensionUrls.itemControl = "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
         extensionUrls.entryFormat = "http://hl7.org/fhir/StructureDefinition/entryFormat"
+        extensionUrls.peferredTerminologyServer = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-preferredTerminologyServer"
 
         return {
             getExtensionUrls : function () {
@@ -162,6 +163,24 @@ angular.module("pocApp")
                             if (hashLinkId[question]) {
                                 ew.question = hashLinkId[question]
                             } else {
+                                //The ew.source is set to the full path within the DG that it is defined
+                                let ar = ew.question.split('.')
+                                //todo - if we make the path in the container the same as the DG name then we don't need to remove it and it will be more robust
+                                ar.splice(0,1)      //remove the first in the path - the dg where the ew is defined
+                                let matchingPath = ar.join('.')     //we're looking for an element whose path ends with this
+                                let matches = []        //matching elements - there should only be 1
+                                for (const key of Object.keys(hashLinkId)) {
+                                    if (key.endsWith(matchingPath)) {
+                                        matches.push(hashLinkId[key])
+                                    }
+                                }
+                                if (matches.length == 1) {
+                                    ew.question = matches[0]
+                                } else {
+                                    alert(`Error fining match for EW path ${ew.source}. ${matches.length} matchs found`)
+                                }
+
+
                                 logIssues.push({msg:`${question} not found at ${item.linkId}`})
                             }
                         }

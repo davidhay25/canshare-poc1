@@ -327,6 +327,8 @@ angular.module("pocApp")
                 $scope.extractedResources =  snapshotSvc.getExtractableDG(model.name)
                 $scope.input.adHocExt = model.adHocExt
 
+                $scope.input.termSvr = model.termSvr
+
 
                 if (model.obsExtract) {
                     $scope.input.obsExtract = true
@@ -577,6 +579,7 @@ angular.module("pocApp")
                 model.fixedValues = $scope.input.fixedValues
                 model.resourceReferences = $scope.input.resourceReferences
                 model.isContainer = $scope.input.isContainer
+                model.termSvr = $scope.input.termSvr
 
 
 

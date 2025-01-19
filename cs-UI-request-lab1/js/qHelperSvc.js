@@ -31,6 +31,17 @@ angular.module("pocApp")
                         ed.mult += '..1'
                     }
 
+                    for (const ew of item.enableWhen || []) {
+                        ed.enableWhen = ed.enableWhen || []
+                        let newEW = {source: ew.question, operator : ew.operator}
+                        if (ew.answerCoding) {
+                            newEW.value = ew.answerCoding
+                            newEW.value.display = ew.answerCoding.display || ew.answerCoding.code
+                        }
+
+                        ed.enableWhen.push(newEW)
+                    }
+
 
                     //set the ed type from the Q type.
                     switch (item.type) {

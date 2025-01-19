@@ -31,7 +31,7 @@ angular.module("pocApp")
                 cmSvc.getVSContentsHash(lst).then(
                     function (vo) {
                         let hash = vo.hashExpanded
-                        console.log(hash)
+
                         that.setVSContents(hash)
                         //hashVS = hash
 
@@ -68,7 +68,7 @@ angular.module("pocApp")
                     vs = that.fixUrl(vs)            //adds the NXHTS prefix if missing
 
                     if (lst.indexOf(vs) == -1 && ! cache[vs]) {    //only add once!
-                       // console.log(`cache miss: ${vs}`)
+
                         lst.push(vs)
                     }
                 }
@@ -80,7 +80,7 @@ angular.module("pocApp")
                             vs = that.fixUrl(vs)            //adds the NXHTS prefix if missing
 
                             if (lst.indexOf(vs) == -1 && ! cache[vs]) {    //only add once!
-                                console.log(`cache miss: ${vs}`)
+
                                 lst.push(vs)
                             }
                         }
@@ -94,37 +94,6 @@ angular.module("pocApp")
 
 
                 that.updateCacheFromList(lst, cb)
-
-/*
-                cmSvc.getVSContentsHash(lst).then(
-                function (hash) {
-                    //console.log(hash)
-                    that.setVSContents(hash)
-                    //hashVS = hash
-
-
-                    let size1 = utilsSvc.getSizeOfObject(hash)
-                    console.log(`Size of retrieved VS: ${size1/1024} K`)
-                    lst.forEach(function (vs) {
-                       // console.log(" " + vs)
-                    })
-
-                    let size2 = utilsSvc.getSizeOfObject(cache)
-                    console.log(`Size of full VS cache: ${size2/1024} K`)
-
-                    cb()
-                }, function () {
-                    //If a VS is not
-                    cb()
-                }
-
-
-            )
-
-*/
-
-
-            console.log('getting VS')
 
         },
 
