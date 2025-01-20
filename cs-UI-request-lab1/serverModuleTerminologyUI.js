@@ -65,7 +65,7 @@ function setup(app) {
         }
 
 
-        console.log(req.originalUrl,qry)
+        //console.log(req.originalUrl,qry)
 
 
 
