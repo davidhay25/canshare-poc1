@@ -60,7 +60,16 @@ function setup(app) {
 
         let qry = `${nzhtsconfig.serverBaseAuthor}${req.originalUrl.replace("/proxy/","")}`
 
+        if (req.originalUrl.indexOf('$expand') > -1) {
+            qry += "&displayLanguage=en-x-sctlang-23162100-0210105"
+        }
+
+
         console.log(req.originalUrl,qry)
+
+
+
+
         let token = await getNZHTSAccessToken()
         //console.log(`nzhts query: ${req.query.qry}`)
         if (token) {
