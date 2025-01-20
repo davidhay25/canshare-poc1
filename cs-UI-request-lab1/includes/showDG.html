@@ -38,7 +38,7 @@
             <span class=" clickable spacer"
                  ng-click="newModel('dg',selectedModel)">New child</span>
 
-          <span ng-show="userMode == 'library'" class=" clickable spacer"
+          <span class="clickable spacer"
                 ng-click="makeFrozen('dg',selectedModel)">Freeze a copy</span>
 
         </div>
@@ -66,19 +66,26 @@
             </div>
 
             <div class="col-md-6">
-              <strong>Direct children</strong> ({{relationshipsSummary.children.length}})
-              <span ng-if="relationshipsSummary.children.length > 0"
+
+              <div ng-if="">
+                <strong>Direct children</strong> ({{relationshipsSummary.children.length}})
+
+                <span ng-if="relationshipsSummary.children.length > 0"
                       class="clickable" ng-click="input.showDGChildren = ! input.showDGChildren">
                 <span ng-if="input.showDGChildren">Hide</span>
                  <span ng-hide="input.showDGChildren">Show</span>
               </span>
-              <div ng-if="input.showDGChildren"
-                      ng-repeat = "child in relationshipsSummary.children">
+                <div ng-if="input.showDGChildren"
+                     ng-repeat = "child in relationshipsSummary.children">
                   <span class="clickable" style="margin-left: 8px"
                         ng-click="termSelectDG({DGName:child},selectedModel.name)">
                     {{hashAllDG[child].title}}  <!--  ({{parent}}) -->
                   </span>
+                </div>
               </div>
+
+
+
             </div>
 
 
@@ -86,7 +93,7 @@
 
         </div>
 
-        <br/>
+
 
 
       </div>
@@ -94,12 +101,13 @@
 
       <button class="btn btn-link" ng-click="deleteDG(selectedModel.name)">Delete</button>
 
+        <!--
       <a class="btn btn-link"
          ng-if="! canEdit(selectedModel)"
          ng-href="modelReview.html?{{selectedModel.name}}" target="_blank">Review</a>
 
 
-
+-->
 
         <button class="btn btn-link" ng-click="loadReview('dg')">Questionnaire</button>
 
@@ -139,15 +147,16 @@
 
         </div>
       </div>
-
-     <div> <strong>FHIR resource:</strong>
+<br/>
+     <div ng-if="snapshotSvc.getExtractResource(selectedModel.name)">
+       <strong style="padding-left: 12px">FHIR resource:</strong>
        <a ng-href="{{fhirRoot}}{{snapshotSvc.getExtractResource(selectedModel.name)}}.html" target="_blank">
        {{snapshotSvc.getExtractResource(selectedModel.name) }}
        </a>
 
      </div>
 
-      <table class="table table-condensed" style="margin-top: 8px">
+      <table ng-if="false" class="table table-condensed" style="margin-top: 8px">
 
         <tr><td>Tags</td>
           <td>

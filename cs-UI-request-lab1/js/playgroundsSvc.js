@@ -7,16 +7,26 @@ angular.module("pocApp")
             getImportableDG: function (hashAllDG) {
                 let deferred = $q.defer()
                 //get all the DG's that can be imported into a playground from the library
-                //right now, it's those that have no parents and only FHIR datatype elements
+                //These are DG's that have been exported as 'frozen'
                 let arImport = []
                 $http.get('/allfrozen').then(
                     function (data) {
 
                         for (const dg of data.data) {
-                            if (! hashAllDG[dg.name]) {
-                                arImport.push(dg)
+                            if (hashAllDG[dg.name]) {
+                                dg.nameExists = true
                             }
+
+                            arImport.push(dg)
                         }
+
+                        arImport.sort(function (a,b) {
+                            if (a.title > b.title) {
+                                return 1
+                            } else {
+                                return -1
+                            }
+                        })
 
                         deferred.resolve(arImport)
 

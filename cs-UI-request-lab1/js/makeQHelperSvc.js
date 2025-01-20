@@ -83,6 +83,7 @@ angular.module("pocApp")
                             if (ext.valueExpression) {
                                 let exp = ext.valueExpression.expression
 
+                                //looking for {{?}} placeholders
                                 let newExp = exp.replace(/{{(.*?)}}/g, (_, key) => {
                                     const trimmedKey = key.trim();
                                     let newLinkId = getReplacementLinkId(trimmedKey)
@@ -177,7 +178,7 @@ angular.module("pocApp")
                                 if (matches.length == 1) {
                                     ew.question = matches[0]
                                 } else {
-                                    alert(`Error fining match for EW path ${ew.source}. ${matches.length} matchs found`)
+                                    console.log(`Error fining match for EW path ${ew.source}. ${matches.length} matchs found`)
                                 }
 
 

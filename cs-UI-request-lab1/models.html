@@ -21,7 +21,7 @@
             height: 400px;
             border: 1px solid lightgray;
         }
-        /* jan19
+
         th,
         td {
             padding: 8px 16px;
@@ -30,7 +30,7 @@
         th {
             background: #eee;
         }
-*/
+
 
         /* change the selected colour as the text is hard to read*/
         .jstree-proton .jstree-clicked {
@@ -385,28 +385,12 @@
 
 
                                         <tr ng-repeat="v in sortedDGList">
-                                            <td>{{v.title}}</td>
-                                            <td><div class="clickable"
-                                                     ng-click="selectModelFromList(v.name,v.kind)">{{v.name}}</div></td>
-
-                                            <td>{{v.description}}
-                                                <!--
-                                                                                                <div>
-                                                                                                    <div ng-click="selectModelFromList(item.name,item.kind)"
-                                                                                                            ng-repeat="item in xref[v.name] track by $index">
-                                                                                                        {{item.kind}}:
-                                                                                                        <span  class="clickable">{{item.name}}</span> (<em>{{item.path}}</em>)
-
-                                                                                                        {{item}}
-
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                                -->
-
+                                            <td>
+                                                <div class="clickable" ng-click="selectModelFromList(v.name,v.kind)">{{v.title}}</div>
                                             </td>
-                                            <!--
-                                                                                        <td>{{v.diff.length}} / {{v.snapshot.length}}</td>
-                                                                                        -->
+                                            <td><div >{{v.type}}</div></td>
+                                            <td>{{v.description}}</td>
+
                                         </tr>
                                         </tbody>
                                     </table>
@@ -415,16 +399,22 @@
 
                             </uib-tab>
 
-                            <uib-tab ng-if="userMode == 'playground'" heading="Import from Library">
+                            <uib-tab ng-if="userMode == 'playground'" heading="Import from Frozen">
                                 <br/>
                                 <table class="table table-bordered">
-                                    <tr><th>Title</th><th>Name</th><th>Description</th><th># diff</th><th></th></tr>
+                                    <tr><th>Title</th><th>Name</th><th>Type</th><th>Description</th><th># diff</th><th></th></tr>
                                     <tr ng-repeat="dg in importableDG">
                                         <td>{{dg.title}}</td>
                                         <td>{{dg.name}}</td>
+                                        <td>{{dg.type}}</td>
                                         <td>{{dg.description}}</td>
+
                                         <td>{{dg.diff.length}}</td>
-                                        <td><div class="clickable" ng-click="importDG($index)">Import</div></td>
+
+                                        <td>
+                                            <div ng-if="dg.nameExists" class="clickable" ng-click="updateDG($index)">Update</div>
+                                            <div ng-if="!dg.nameExists"class="clickable" ng-click="importDG($index)">Import</div>
+                                        </td>
                                     </tr>
                                 </table>
 

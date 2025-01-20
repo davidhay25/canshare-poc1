@@ -89,20 +89,36 @@ angular.module("pocApp")
             }
 
             $scope.makeFrozen = function (type,model) {
+
                 if (type == 'dg') {
                     let msg = "Make a frozen copy of this DG, where the diff is the snapshot. Useful for Playgrounds"
                     if (confirm(msg)) {
                         let frozen = snapshotSvc.getFrozenDG(model.name)
-                        $http.put(`/frozen/${frozen.name}`,frozen).then(
-                            function (data) {
-                                alert("Frozen copy saved in Library")
-                            }, function (err) {
-                                alert(angular.toJson(err.data))
-                            }
-                        )
-
+                        frozen.source = $scope.userMode
+                        frozen.sourceId = $scope.world.id
+                        saveModel(frozen)
                     }
                 }
+
+                if (type == 'comp') {
+
+                    //make the DG replica of a composition
+                    let frozen = snapshotSvc.getFrozenComp($scope.selectedComposition,$scope.allCompElements)
+                    console.log(frozen)
+                    saveModel(frozen)
+
+                }
+
+                function saveModel(frozen) {
+                    $http.put(`/frozen/${frozen.name}`,frozen).then(
+                        function (data) {
+                            alert("Frozen copy saved in Library")
+                        }, function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+                }
+
 
             }
 
@@ -114,17 +130,17 @@ angular.module("pocApp")
                 $scope.loadReview('dg',model)
             }
 
-
             $scope.loadReview = function (kind,model) {
                 //allCompElements
 
-                model = model || $scope.selectedModel //default to the current model
-                let allElements = snapshotSvc.getFullListOfElements(model.name) //$scope.fullElementList
-
+                let allElements
 
                 if (kind == 'comp') {
                     allElements = $scope.allCompElements
-                    model = $scope.selectedComposition
+                    model = model || $scope.selectedComposition
+                } else {
+                    model = model || $scope.selectedModel //default to the current model
+                    allElements = snapshotSvc.getFullListOfElements(model.name) //$scope.fullElementList
                 }
 
 
@@ -263,6 +279,9 @@ angular.module("pocApp")
                 let dg = $scope.importableDG[inx]
                 $scope.hashAllDG[dg.name] = dg
                 $scope.init()
+            }
+            $scope.updateDG = function (inx) {
+                alert("Will update the DG from the frozen list (need better name). Need a diff of some sort")
             }
 
             //--------------
@@ -2209,7 +2228,6 @@ angular.module("pocApp")
                 playgroundsSvc.getImportableDG($scope.hashAllDG).then(
                     function (data) {
                         $scope.importableDG = data
-
                     }
                 )
 

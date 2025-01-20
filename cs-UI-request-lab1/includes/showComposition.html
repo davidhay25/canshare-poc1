@@ -56,7 +56,11 @@
 
       <button class="btn btn-link" ng-click="showLink('comp')">Link</button>
 
+        <span class="clickable spacer"
+              ng-click="makeFrozen('comp',selectedComposition)">Freeze a copy</span>
+<!--
       <a class="btn" ng-href="modelReview.html?{{selectedComposition.name}}" target="_blank">Review</a>
+-->
 
         <button class="btn btn-link" ng-click="loadReview('comp')">Questionnaire</button>
 

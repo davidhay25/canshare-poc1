@@ -60,6 +60,7 @@ function setup(app) {
 
         let qry = `${nzhtsconfig.serverBaseAuthor}${req.originalUrl.replace("/proxy/","")}`
 
+        console.log(req.originalUrl,qry)
         let token = await getNZHTSAccessToken()
         //console.log(`nzhts query: ${req.query.qry}`)
         if (token) {

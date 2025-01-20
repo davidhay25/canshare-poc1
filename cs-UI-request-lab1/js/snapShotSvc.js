@@ -917,6 +917,8 @@ angular.module("pocApp")
                         canAdd = false
                     }
 
+
+
                     if (canAdd) {
                         newEd[key] = ed[key]
                     }
@@ -929,7 +931,44 @@ angular.module("pocApp")
         }
 
 
+        function updateTypes(dg) {
+            let fhirDT = utilsSvc.fhirDataTypes()
+            for (const ed of dg.diff) {
+                if (ed.type && ed.type.length > 0) {
+                    let type = ed.type[0]
+                    if (fhirDT.indexOf(type) == -1) {
+                        ed.type = ['Group']
+                    }
+                }
+
+            }
+        }
+
         return {
+            getFrozenComp : function (comp,allElements) {
+                //construct a model that represents a composition - but similar to a DG
+                //effecively an expanded DG
+                let dg = {kind:'comp',name:comp.name,title:comp.title,diff:[],snapshot:[]}
+
+
+                for (const thing of allElements) {
+                    if (thing.ed.type) {
+                        dg.snapshot.push(thing.ed)
+                    }
+
+
+                }
+
+                cleanSnapshot(dg)   //remove 'empty' attributes
+                dg.diff = dg.snapshot
+
+                //now replace all the non-FHIR DTs with 'Group'
+                updateTypes(dg)
+                delete dg.snapshot
+                return dg
+
+
+            },
             getFrozenDG : function (dgName) {
                 //create a version of the dg where the diff is replaced by the snapshot.
                 //used for the playground ATM
@@ -944,6 +983,8 @@ angular.module("pocApp")
                 dg.diff = dg.snapshot
 
                 //now replace all the non-FHIR DTs with 'Group'
+                updateTypes(dg)
+                /*
                 let fhirDT = utilsSvc.fhirDataTypes()
                 for (const ed of dg.diff) {
                     let type = ed.type[0]
@@ -951,7 +992,7 @@ angular.module("pocApp")
                         ed.type = ['Group']
                     }
                 }
-
+*/
                 delete dg.fullDiff
                 delete dg.snapshot
                 return dg

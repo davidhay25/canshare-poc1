@@ -1414,6 +1414,8 @@ angular.module("pocApp")
                 Q.url = `http://canshare.co.nz/questionnaire/${dg.name}`
                 Q.description = dg.description
 
+                Q.meta = {tag: [{code:'debug'}]} //invokes debug in the lab
+
                 let adHocExt = snapshotSvc.getAdHocExt(dg.name)
                 if (adHocExt) {
                     addAdHocExt(Q,adHocExt)

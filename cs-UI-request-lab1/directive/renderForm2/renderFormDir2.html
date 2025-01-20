@@ -262,7 +262,9 @@
                   <table class="table">
                     <tr><th>Source</th><th>Op.</th><th>Value</th></tr>
                     <tr ng-repeat="ew in selectedEd.enableWhen">
-                      <td>{{ew.source | dropFirstInPath}}</td>
+                      <td>{{ew.source}}
+                        ({{hashEd[ew.source].title}})
+                      </td>
                       <td>{{ew.operator}}</td>
                       <td>
 

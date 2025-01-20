@@ -337,7 +337,7 @@ angular.module("pocApp")
                 Object.keys(hashAllDG).forEach(function (key) {
 
                     if (['root'].indexOf(key) > -1) {
-                        alert(`There is a DG with the name: ${key} which is not allowed. Removing it from the current Model.`)
+                        alert(`There is a DG with the name: ${key} which is not allowed. Remove it from the current Model.`)
                         delete hashAllDG[key]
                     } else {
                         let dg = hashAllDG[key]
@@ -360,7 +360,7 @@ angular.module("pocApp")
                 ar.forEach(function (dg) {
                     let text = dg.title || dg.name
                     let parent = dg.parent || "root"
-                    let node = {id:dg.name,text:text,parent:parent,data:{dgName: dg.name}}
+                    let node = {id:dg.name,text:text,parent:parent,data:{dgName: dg.name,dg:dg}}
                     treeData.push(node)
 
                 })
@@ -405,7 +405,7 @@ angular.module("pocApp")
                                 let sectionNode = {id:dg.name,
                                     text:dg.title,
                                     parent:dg.parent,
-                                    data:{dgName:dg.name}}
+                                    data:{dgName:dg.name,dg:dg}}
                                 sectionTreeData.push(sectionNode)
                             }
                         }
