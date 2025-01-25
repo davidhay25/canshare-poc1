@@ -328,6 +328,7 @@ angular.module("pocApp")
                 $scope.input.adHocExt = model.adHocExt
 
                 $scope.input.termSvr = model.termSvr
+                $scope.input.linkedDG = model.linkedDG
 
 
                 if (model.obsExtract) {
@@ -580,6 +581,7 @@ angular.module("pocApp")
                 model.resourceReferences = $scope.input.resourceReferences
                 model.isContainer = $scope.input.isContainer
                 model.termSvr = $scope.input.termSvr
+                model.linkedDG = $scope.input.linkedDG
 
 
 

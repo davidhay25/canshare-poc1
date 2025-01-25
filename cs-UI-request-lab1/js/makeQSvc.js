@@ -160,7 +160,6 @@ angular.module("pocApp")
 
             item.extension = item.extension || []
             item.extension.push(ext)
-
         }
 
         function addFixedValue(item,definition,type,value,expression) {
@@ -1414,7 +1413,7 @@ angular.module("pocApp")
                 Q.url = `http://canshare.co.nz/questionnaire/${dg.name}`
                 Q.description = dg.description
 
-                Q.meta = {tag: [{code:'debug'}]} //invokes debug in the lab
+                //temp Q.meta = {tag: [{code:'debug'}]} //invokes debug in the lab
 
                 let adHocExt = snapshotSvc.getAdHocExt(dg.name)
                 if (adHocExt) {
@@ -1628,6 +1627,9 @@ angular.module("pocApp")
 
                         extractionContext = getExtractionContext(dgName,config.hashAllDG)
                         if (extractionContext) {
+
+
+
                             setExtractionContext(currentItem,extractionContext)
                             //if there's an extraction context, then add any 'DG scope' fixed values.
                             //fixed values can also be defined on an item... todo TBD
@@ -1731,10 +1733,36 @@ angular.module("pocApp")
                         }
 
 
+
                         //this is an item that is extracted
                         if (extractType) {
+
+                            //Jan22
+                            if (false && extractType !== 'Patient') {
+                                //Each resource set the allocateId extension - and uses it
+                                item.extension = item.extension || []
+                                item.extension.push({url:extAllocateIdUrl,valueString: `${extractType}-id`})    //todo will duplaicate if >1 resource of this type
+/*
+                                if (resourcesForPatientReference[extractType]) {
+                                    let elementName = resourcesForPatientReference[extractType].path
+                                    let definition = `http://hl7.org/fhir/StructureDefinition/${extractType}#${extractType}.${elementName}.reference`
+                                    let expression = `%${extractType}-id`
+                                    addFixedValue(item,definition,null,null,expression)
+                                }
+*/
+
+
+                            }
+
+
                             let vo = {}     //this will have all the child extensions for definitionExtract
                             vo.definition = `http://hl7.org/fhir/StructureDefinition/${extractType}`     //set the canonical for the extract
+
+
+
+
+
+
                             if (extractType == 'Patient') {
                                 vo.fullUrl = 'patientID'            //sets the fullUrl to the variable created by allocateID and added to every Q
 
@@ -1744,6 +1772,7 @@ angular.module("pocApp")
                                 vo.ifNoneExist += "+ '|' + %resource.item.item.item.where(linkId='auPathRequest1.patient.identifier.value').answer.value"
 
                             } else {
+                                //if this resource was the target of another in the resourceReferences array, it will have had a fullUrl defined...
                                 if (config.hashIdName[ed.path]) {
                                     vo.fullUrl = config.hashIdName[ed.path]
                                 }

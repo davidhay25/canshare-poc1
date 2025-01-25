@@ -170,7 +170,7 @@ angular.module("pocApp")
                     }
                 }
 
-                if (confirm("Are you sure you wish to remove this Override? It will be removed from all children (unless they have overriden it)")) {
+                if (confirm("Are you sure you wish to remove this element? It will effectively be removed from all children (unless they have overriden it)")) {
                     //traceSvc.addAction({action:'delete element',model:$scope.selectedModel,description:"From diff display"})
 
                     let pathToDelete = $scope.selectedModel.diff[inx].path

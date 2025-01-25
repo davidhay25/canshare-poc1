@@ -109,6 +109,7 @@ angular.module("pocApp")
                             let source = ew.source      //corresponds to 'question' in the Q
                             let sourceEd = hashElements[source]
 
+                            let entry = {}
                             if (! sourceEd) {
                                 //could be a contained
                                 let ar = source.split('.')
@@ -133,7 +134,10 @@ angular.module("pocApp")
 
 
                             }
-                            let entry = {path:item.ed.path,ew:ew,ed:sourceEd}
+
+                            entry = {...entry, path:item.ed.path,ew:ew,ed:sourceEd}
+
+
                             allDependencies.push(entry)
                         })
                     }

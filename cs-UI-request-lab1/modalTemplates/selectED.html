@@ -1,0 +1,87 @@
+<div>
+
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-8 col-sm-8">
+        <h3 class="modal-title">
+          Select ED
+        </h3>
+      </div>
+
+
+      <div class="col-md-4 col-sm-4">
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+
+        <button class="btn btn-primary pull-right" ng-click="select()">Select</button>
+
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-body">
+
+
+    <div class="tableFixHead">
+      <table class="table-bordered table">
+        <thead>
+        <tr><th>Select</th><th>Path</thth></th><th>Title</th>
+          <th>Description</th><th>Type</th><th>Mult.</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <!---     <tr ng-repeat="element in fullElementList">-->
+        <tr ng-repeat="ed in linkedDG.diff">
+
+
+          <td>
+            <checkbox ng-model="input.selected[ed.path]"></checkbox>
+          </td>
+
+          <td>
+            <div ng-repeat = "segment in ed.path.split('.') track by $index">
+              {{segment}}
+            </div>
+
+            <div ng-repeat="issue in ed.issue track by $index">
+              <em>{{issue}}</em>
+            </div>
+
+
+
+          </td>
+
+
+          <td>{{ed.title}}</td>
+          <td>
+
+            {{ed.description}}
+          </td>
+          <td>
+            <div ng-repeat="type in ed.type">
+              {{type}}
+            </div>
+            <div><em class="clickable" ng-click="viewVS(ed.valueSet)">{{ed.valueSet}}</em></div>
+          </td>
+          <td>{{ed.mult}}</td>
+
+
+
+
+
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre>{{linkedDG | json}}</pre>
+
+  </div>
+  <div class="modal-header">
+
+    Name:{{linkedDG}}
+
+
+  </div>
+</div>

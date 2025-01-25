@@ -138,6 +138,20 @@
                       ng-click="save('defextract')">Save</button>
 
           </uib-tab>
+
+          <uib-tab heading="Definition extract value">
+              <br/>
+              <div class="row">
+
+                  <div class="col-md-3">
+
+                  </div>
+                  <div class="col-md-9">
+                  </div>
+              </div>
+          </uib-tab>
+
+
           <uib-tab heading="Calculated Expression">
 
               <br/>
@@ -178,56 +192,55 @@
 
           </uib-tab>
 
-          <uib-tab heading="Context variables">
-              <br><em>Variables that are in scope at this element</em>
-              <table class="table table-bordered">
-                  <tr><th>Variable name</th><th>Kind</th><th>Path where defined</th><th>Expression</th></tr>
-                  <tr ng-repeat="v in variables">
-                      <td>{{v.name}}</td>
-                      <td>{{v.kind}}</td>
-                      <td>{{v.path}}</td>
-                      <td>{{v.expression}}</td>
-                  </tr>
-              </table>
-          </uib-tab>
-
-          <uib-tab heading="Elements">
-              <br>
-              <em>All the elements in the DG. Use to paste a linkID into an expression</em>
-              <table class="table-bordered table">
-                  <tr ng-repeat = "element in elements">
-                      <td>
-
-                          <div ng-repeat = "segment in element.ed.path.split('.') track by $index">
-                              {{segment}}
-                          </div>
-
-
-
-                      </td>
-                      <td>{{element.ed.title}}</td>
-                      <td>{{element.ed.description}}</td>
-                      <td>{{element.ed.type[0]}}
-                       <!-- <em>expand if cc or options</em>-->
-                      </td>
-                      <td><span class="clickable" ng-click="copyPath(element.ed.path)">Copy</span> </td>
-                  </tr>
-              </table>
-
-
-          </uib-tab>
-
-          <uib-tab heading="dev demplate">
+          <uib-tab heading="Context">
               <br/>
-              <div class="row">
+              <uib-tabset>
+                  <uib-tab heading="Context variables">
+                      <br><em>Variables that are in scope at this element</em>
+                      <table class="table table-bordered">
+                          <tr><th>Variable name</th><th>Kind</th><th>Path where defined</th><th>Expression</th></tr>
+                          <tr ng-repeat="v in variables">
+                              <td>{{v.name}}</td>
+                              <td>{{v.kind}}</td>
+                              <td>{{v.path}}</td>
+                              <td>{{v.expression}}</td>
+                          </tr>
+                      </table>
+                  </uib-tab>
 
-                  <div class="col-md-3">
+                  <uib-tab heading="Elements">
+                      <br>
+                      <em>All the elements in the DG. Use to paste a linkID into an expression</em>
+                      <table class="table-bordered table">
+                          <tr ng-repeat = "element in elements">
+                              <td>
 
-                  </div>
-                  <div class="col-md-9">
-                  </div>
-              </div>
+                                  <div ng-repeat = "segment in element.ed.path.split('.') track by $index">
+                                      {{segment}}
+                                  </div>
+
+
+
+                              </td>
+                              <td>{{element.ed.title}}</td>
+                              <td>{{element.ed.description}}</td>
+                              <td>{{element.ed.type[0]}}
+                                  <!-- <em>expand if cc or options</em>-->
+                              </td>
+                              <td><span class="clickable" ng-click="copyPath(element.ed.path)">Copy</span> </td>
+                          </tr>
+                      </table>
+
+
+                  </uib-tab>
+
+              </uib-tabset>
+
           </uib-tab>
+
+
+
+
       </uib-tabset>
 
 

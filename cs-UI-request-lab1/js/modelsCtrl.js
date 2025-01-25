@@ -1134,7 +1134,57 @@ angular.module("pocApp")
                 $scope.input.mainTabActive = $scope.ui.tabDG;
             }
 
-            //edits some of the attributes of a single ED.
+            //insert an element from another Comp / DG.
+            $scope.insertDGItem = function (currentPath) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/selectED.html',
+                    backdrop: 'static',
+                    size: 'lg',
+                    controller: 'selectEDCtrl',
+
+                    resolve: {
+                        DG: function () {
+                            return $scope.selectedModel
+                        }
+                    }
+                }).result.then(
+                    function(lst) {
+                        //return list of EDs to add
+                        let rootPath = ""       //where to insert the DG if on a group
+                        let insertPoint = $scope.selectedModel.diff.length       //where to insert the EDs - by default at the end...
+                        if ($scope.selectedNode) {
+                            let path = $scope.selectedNode.data.ed.path      //this is the full path with the DG name as a prefix
+                            let ar = path.split('.')
+                            if (ar.length > 1) {
+                                //if the path is 1 then the new eds are added to the root - no change needed
+                                //otherwise we remove the first segment to get the root path and locate the position of the insert point in the diff
+                                ar.splice(0,1)
+                                rootPath = ar.join('.') + '.'
+                                insertPoint = $scope.selectedModel.diff.findIndex(item => item.path === rootPath) +1
+                            }
+
+                        }
+
+                        //update the path (if needed) and set the attribute that indicates where the ed came from
+                        for (let ed of lst) {
+                            ed.path = `${rootPath}${ed.path}`
+                            ed.linkedFrom = $scope.selectedModel.linkedDG
+                        }
+
+                        $scope.selectedModel.diff.splice(insertPoint,0, ...lst)     //insert the Eds
+                        $scope.updateTermSummary()
+                        $scope.makeSnapshots()
+
+                        //rebuild fullList and re-draw the tree
+                        $scope.refreshFullList($scope.selectedModel)
+
+                    }
+                )
+
+
+            }
+
+            //edits some attributes of a single ED.
             $scope.editDGItem = function (item,initialTab) {
                 let originalED = {}
                 let isNew = true
@@ -1406,8 +1456,11 @@ angular.module("pocApp")
                 $("#allDGTree").jstree().deselect_all(true);
                 $('#allDGTree').jstree('select_node', item.DGName);
 
-                $("#sectionDGTree").jstree().deselect_all(true);
-                $('#sectionDGTree').jstree('select_node', item.DGName);
+                if ($("#sectionDGTree").jstree().deselect_all) {
+                    $("#sectionDGTree").jstree().deselect_all(true);
+                    $('#sectionDGTree').jstree('select_node', item.DGName);
+                }
+
 
 
                 //$scope.selectModel

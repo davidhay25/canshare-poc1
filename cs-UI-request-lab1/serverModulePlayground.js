@@ -18,6 +18,26 @@ async function setup(app,mongoDbName) {
     await client.connect()
     console.log("model connected in serverModulePlayground")
 
+    app.get('/frozen/:name', async function(req,res) {
+        let name = req.params.name
+
+        const query = {name:name}
+        try {
+            const ar =  await database.collection("frozenDG").find(query).toArray()
+            if (ar.length == 1) {
+                res.json(ar[0])
+            } else {
+                res.status(400).json({msg:`There were ${ar.length} matches`})
+            }
+
+
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+
+        }
+    })
+
     app.put('/frozen/:name', async function(req,res) {
         let name = req.params.name
         let frozen = req.body
