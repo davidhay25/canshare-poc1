@@ -241,7 +241,7 @@
                     <div class="pull-right">
                         <checkbox ng-model="input.SDCOnly"></checkbox> Show only with SDC instructions
                     </div>
-                    <br/> <br/>
+
 
                     <h4>Elements</h4>
                     <div class="myScroll">
@@ -286,7 +286,10 @@
 
 
                                     <div ng-if="entry.extractionContext">
-                                        <strong>Extraction context: </strong>{{entry.extractionContext}}
+                                        <strong>Extraction context: </strong>{{entry.extractionContext.type}}
+                                        <div style="margin-left: 8px" ng-if="entry.extractionContext.fullUrl">
+                                            <strong>Id variable: (fullurl) </strong>{{entry.extractionContext.fullUrl}}
+                                        </div>
                                     </div>
 
                                     <div ng-if="entry.populationContext">

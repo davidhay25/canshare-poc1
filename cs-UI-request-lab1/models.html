@@ -53,11 +53,21 @@
 
         <div class="container-fluid">
             <div class="col-md-3">
-                    <span>
+                    <span ng-if="userMode == 'playground'"
+                          ng-click="changeUserMode($event,'library')">
                         <a class="navbar-brand" href="#">
-                            CanShare Logical Modeller
+                            CanShare Form Builder
 
-                             <div>{{world.name}}</div>
+                             <div style="padding-top: 8px">{{world.name}}</div>
+
+                        </a>
+                    </span>
+                    <span ng-if="userMode == 'library'"
+                          ng-click="changeUserMode($event,'playground')">
+                        <a class="navbar-brand" href="#">
+                            CanShare LIM Maintenance
+
+                             <div style="padding-top: 8px">{{world.name}}</div>
 
                         </a>
                     </span>
@@ -65,15 +75,18 @@
 
             </div>
 
-            <div class="col-md-1">
-                <div class="navbar-text">
-                    <div style="padding-top: 6px" ng-click="changeUserMode($event,'library')"
-                         ng-if="userMode == 'playground'">Playground mode</div>
-                    <div style="padding-top: 6px" ng-click="changeUserMode($event,'playground')"
-                         ng-if="userMode == 'library'">Library mode</div>
+
+
+
+
+            <div class="col-md-1 col-sm-1">
+                <div class="navbar-text btn">
+                    <button ng-if="userMode == 'playground'" class="btn btn-primary pull-right"
+                            ng-click="openPlaygrounds()">Projects</button>
+
+
 
                 </div>
-
             </div>
 
             <div class="col-md-1">
@@ -83,17 +96,19 @@
                 </div>
             </div>
 
-            <div class="col-md-1 col-sm-1">
-                <div class="navbar-text btn">
-                    <button ng-if="userMode == 'playground'" class="btn btn-primary pull-right"
-                            ng-click="openPlaygrounds()">Playgrounds</button>
 
-
+            <div ng-if="false" class="col-md-1">
+                <div class="navbar-text">
+                    <div style="padding-top: 6px" ng-click="changeUserMode($event,'library')"
+                         ng-if="userMode == 'playground'">Builder mode</div>
+                    <div style="padding-top: 6px" ng-click="changeUserMode($event,'playground')"
+                         ng-if="userMode == 'library'">Library mode</div>
 
                 </div>
+
             </div>
 
-            <div class="col-md-1">
+            <div class="col-md-2">
 
                 <div class="navbar-text" ng-if="userMode == 'library'">
                     <a href="query.html"
@@ -535,6 +550,7 @@
         </uib-tab>
 
         <uib-tab heading="Model info">
+            <br/>
             <uib-tabset>
 
                 <uib-tab heading="Model summary">
@@ -577,7 +593,9 @@
                     <div>
                         <div class="btn btn-primary pull-right" ng-click="updatePlayground(true)">Update both Model Repository and Local Store</div>
                         <div class="btn btn-link pull-right" ng-click="savePGtoLocal()">Update to Local Store</div>
+                        <!--
                         <div class="btn btn-link pull-right" ng-click="updatePlayground()">Update to Model Repository</div>
+                        -->
 
                     </div>
 
@@ -937,6 +955,8 @@
 
 <script src="js/makeSDCExtensionCtrl.js"></script>
 <script src="js/selectEDCtrl.js"></script>
+
+<script src="js/diff.js"></script>
 
 <script src="js/libs/fhirpath.min.js"></script>
 <script src="js/libs/fhirpath.r4.min.js"></script>

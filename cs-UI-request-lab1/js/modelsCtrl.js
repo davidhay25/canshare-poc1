@@ -88,10 +88,40 @@ angular.module("pocApp")
                 }
             }
 
+            $scope.createDiff = function () {
+                let leftDiffDG = $scope.selectedModel
+                let key = `pg-${$scope.selectedModel.id}`
+
+                $localForage.getItem(key).then(
+                    function (data) {
+                        let rightDiffDG = data
+
+
+                        $uibModal.open({
+                            templateUrl: 'modalTemplates/dgDiff.html',
+                            backdrop: 'static',
+                            size : 'xlg',
+                            controller: 'dgDiffCtrl',
+                            resolve : {
+                                leftDiffDG : function() {
+                                    return leftDiffDG
+                                },
+                                rightDiffDG: function () {
+                                    return rightDiffDG
+                                }
+                            }
+                        })
+
+
+                    }
+                )
+
+            }
+
             $scope.makeFrozen = function (type,model) {
 
                 if (type == 'dg') {
-                    let msg = "Make a frozen copy of this DG, where the diff is the snapshot. Useful for Playgrounds"
+                    let msg = "Make a frozen copy of this DG, where the diff is the snapshot. Useful for Projects"
                     if (confirm(msg)) {
                         let frozen = snapshotSvc.getFrozenDG(model.name)
                         frozen.source = $scope.userMode
@@ -170,9 +200,12 @@ angular.module("pocApp")
                         let t = {Q:voQ.Q,errorLog:voQ.errorLog, lidHash: voQ.lidHash}
                         $http.put(qry,t).then(
                             function () {
-                                const url = `modelReview.html?q-${model.name}`
-                                const features = 'noopener,noreferrer'
-                                window.open(url, '_blank', features)
+                                if (confirm("load review?")) {
+                                    const url = `modelReview.html?q-${model.name}`
+                                    const features = 'noopener,noreferrer'
+                                    window.open(url, '_blank', features)
+                                }
+
                             }, function (ex) {
                                 alert(angular.toJson(ex.data))
                             }
@@ -226,17 +259,23 @@ angular.module("pocApp")
                     $localStorage.world.version ++
                 } else {$localStorage.world.version = 1}
 
+                //reset the dirty flag of all DGs
+                for (const key of Object.keys($localStorage.world.dataGroups)) {
+                    let DG = $localStorage.world.dataGroups[key]
+                    DG.dirty = false
+                }
+
                 $http.put(`/playground/${$localStorage.world.id}`,$localStorage.world).then(
                     function (data) {
 
                         if (both) {
                             //update repo and local
                             $scope.savePGtoLocal(true,true,function () {
-                                alert("Both repository and local copies of the playground have been updated.")
+                                alert("Both repository and local copies of the Project have been updated.")
                             })
 
                         } else {
-                            let msg = "The playground has been updated."
+                            let msg = "The Project has been updated."
                             if (! $localStorage.world.description) {
                                 msg += " You can edit the description in this page."
                             }
@@ -299,7 +338,7 @@ angular.module("pocApp")
                 if (newMode == 'library') {
                     //changing from playground. Can only do this if logged in.
                     if ($scope.user && $scope.user.email) {
-                        let msg = "Are you sure you wish to enter Library mode? This will replace the current playground."
+                        let msg = "Are you sure you wish to enter Library mode? This will replace the current Project."
                         if (confirm(msg)) {
                             resetLocalEnvironment()
 
@@ -342,11 +381,11 @@ angular.module("pocApp")
                         alert(`There are ${cntDG} DG's  and ${cntComp} Compositions still checked out. They need to be reverted or checked in.`)
                         return
                     }
-                    let msg = "Are you sure you wish to enter Playground mode? This will replace the current model."
+                    let msg = "Are you sure you wish to enter Project mode? This will replace the current model."
                     if (confirm(msg)) {
                         resetLocalEnvironment()
 
-                        alert("Reset complete. You can create a new Playground - or download an existing one.")
+                        alert("Reset complete. You can create a new Project - or download an existing one.")
 
                        // $scope.$emit('updateDGList',{})
                         $scope.userMode = newMode
@@ -1232,6 +1271,7 @@ angular.module("pocApp")
                     }
 
                 }).result.then(function (ed) {
+                    $scope.selectedModel.dirty = true
                     //update specific items. Not the whole ED
                     //what changed
                     //let changes = ""
@@ -1755,6 +1795,7 @@ angular.module("pocApp")
                     }
 
                 }).result.then(function (newModel) {
+                    $scope.selectedModel.dirty = true
                     if (newModel) {
                         //if a model is returned, then it is a new one and needs to be added to the world
                         //traceSvc.addAction({action:'new-model',model:newModel})
@@ -2015,26 +2056,31 @@ angular.module("pocApp")
 
 
 
+
                     clearB4Select()
                     $scope.selectedModel = dg
 
+
                     $scope.fhirResourceType = igSvc.findResourceType(dg,$scope.hashAllDG)   //not sure if this is used wo fsh stuff
 
-                    //check the current checkedout state on the library.
+                    //in library mode check the current checkedout state on the library.
                     //Always update the local version checkedout (not data) with the one from the library
-                    let name = dg.name
-                    let qry = `/model/DG/${name}`
-                    $http.get(qry).then(
-                        function (data) {
-                            let libraryDG = data.data
-                            $scope.selectedModel.checkedOut = libraryDG.checkedOut
-                            if ($scope.hashAllDG[name]) {
-                                $scope.hashAllDG[name].checkedOut = libraryDG.checkedOut
-                            } else {
-                                alert(`DG ${name} not found in the local storage`)
+                    if ($scope.userMode == 'library') {
+                        let name = dg.name
+                        let qry = `/model/DG/${name}`
+                        $http.get(qry).then(
+                            function (data) {
+                                let libraryDG = data.data
+                                $scope.selectedModel.checkedOut = libraryDG.checkedOut
+                                if ($scope.hashAllDG[name]) {
+                                    $scope.hashAllDG[name].checkedOut = libraryDG.checkedOut
+                                } else {
+                                    alert(`DG ${name} not found in the local storage`)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
+
 
                  //   $scope.refreshUpdates()     //update the xref
                     $scope.refreshFullList(dg)      //the complete list of elements for this DG + graph & Q

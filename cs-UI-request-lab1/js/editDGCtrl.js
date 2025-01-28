@@ -1,7 +1,7 @@
 angular.module("pocApp")
     .controller('editDGCtrl',
         function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc,snapshotSvc, parent,
-                  utilsSvc, modelDGSvc,$http,userMode,$uibModal,$timeout) {
+                  utilsSvc, modelDGSvc,$http,userMode,$uibModal,$timeout,$filter) {
 
             $scope.model=model
             $scope.input = {}
@@ -30,6 +30,32 @@ angular.module("pocApp")
                 }
             })
             $scope.input.possibleParents.sort()
+
+            $scope.moveAfter = function (pos,element) {
+                let path = $filter('lastInPath')(element.path)
+                let msg = `This is row ${pos} (${path}). Enter the row number to move this row to.`
+                const input = prompt(msg);
+
+                if (input !== null) {
+                    let newPos = Number(input);
+                    if (!isNaN(newPos)) {
+                        alert(`You entered: ${newPos}`);
+                        if (newPos > 0 && newPos < model.diff.length) {
+                            const [row] = model.diff.splice(pos,1)
+                            if (newPos > pos) (
+                                newPos--
+                            )
+                            model.diff.splice(newPos,0,row)
+                        }
+
+
+                    } else {
+                        alert("That's not a valid number!");
+                    }
+                }
+
+
+            }
 
 
             $scope.extBuilder = function () {
@@ -314,6 +340,7 @@ angular.module("pocApp")
                 $scope.input.sourceReference = model.sourceReference
                 $scope.input.newModelDescription = model.description
                 $scope.input.isContainer = model.isContainer
+                $scope.input.idVariable = model.idVariable
 
                 $scope.input.namedQueries = model.namedQueries          //the array of named queries this DG requires...
                 $scope.input.type = model.type
@@ -580,6 +607,7 @@ angular.module("pocApp")
                 model.fixedValues = $scope.input.fixedValues
                 model.resourceReferences = $scope.input.resourceReferences
                 model.isContainer = $scope.input.isContainer
+                model.idVariable = $scope.input.idVariable
                 model.termSvr = $scope.input.termSvr
                 model.linkedDG = $scope.input.linkedDG
 

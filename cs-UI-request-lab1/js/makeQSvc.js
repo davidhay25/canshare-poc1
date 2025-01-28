@@ -193,7 +193,7 @@ angular.module("pocApp")
         }
 
 
-        function setExtractionContext(item,context) {
+        function setExtractionContextDEP(item,context) {
             //set the extraction context using the context (resource SD)
 
             item.extension = item.extension || []
@@ -718,7 +718,6 @@ angular.module("pocApp")
                 }
             }
             return result
-
         }
 
         //return true if has a fixed value
@@ -767,7 +766,9 @@ angular.module("pocApp")
                     if (ext.extension > 0) {
                         for (const child of ext.extension) {
                             if (child.url == 'definition')
+
                                 thing.extractionContext = child.valueCanonical
+
                                 thing.isSDC = true
                             break
                         }
@@ -936,9 +937,17 @@ angular.module("pocApp")
                                     break
                                 case extDefinitionExtract:
 
-                                    getExtension(ext,"definition","Canonical")
 
-                                    thing.extractionContext = getExtension(ext,"definition","Canonical") //ext.valueCanonical
+                                    const firstOrNull = (arr) => arr.length > 0 ? arr[0] : null
+
+                                    //looks at the sub extension
+                                    let resourceType = getExtension(ext,"definition","Canonical")
+                                    let fullUrl = getExtension(ext,"fullUrl","String")
+
+                                    let vo = {type: firstOrNull(resourceType),fullUrl:firstOrNull(fullUrl)}
+
+
+                                    thing.extractionContext = vo //getExtension(ext,"definition","Canonical") //ext.valueCanonical
 
                                     break
 
@@ -1612,7 +1621,6 @@ angular.module("pocApp")
                     } else {
                         //this is the first item in the DG Q.
 
-                     //   console.log(`>>>>>>>>>. ${pathPrefix}${path}` )
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
                         decorateItem(currentItem,ed,extractionContext,dg,config)
 
@@ -1629,8 +1637,27 @@ angular.module("pocApp")
                         if (extractionContext) {
 
 
+                            let vo = {definition:extractionContext}
+                            if (dg.idVariable) {
+                                vo.fullUrl = dg.idVariable
+                            }
 
-                            setExtractionContext(currentItem,extractionContext)
+                            addDefinitionExtract(currentItem,vo)        //ie the extractDefinition that sets the resource to extract to...
+
+                            //does this resource need a reference to patient?
+
+                            //This is a resource that should have a patient reference
+                            if (resourcesForPatientReference[dg.type]) {
+                                let elementName = resourcesForPatientReference[dg.type].path
+                                let definition = `http://hl7.org/fhir/StructureDefinition/${dg.type}#${dg.type}.${elementName}.reference`
+                                let expression = "%patientID"
+                                addFixedValue(currentItem,definition,null,null,expression)
+                            }
+
+
+
+
+                            // - same functionity as addDefinitionExtract setExtractionContext(currentItem,extractionContext)
                             //if there's an extraction context, then add any 'DG scope' fixed values.
                             //fixed values can also be defined on an item... todo TBD
                             addFixedValues(currentItem,dg)
@@ -1713,12 +1740,7 @@ angular.module("pocApp")
                     let excludeFromQ = false
 
                     let edType = ed.type[0]     //actually be the name of the DG
-/*
-                    //sets the 'code' value in the item. Needed for Observation based extract
-                    if (ed.itemCode && ed.fixedCoding) {
-                        item.code = ed.fixedCoding
-                    }
-*/
+
                     //If this ed is a reference to another, it can have a different extraction context...
                     if (config.hashAllDG[edType]) {
 
@@ -1758,11 +1780,6 @@ angular.module("pocApp")
                             let vo = {}     //this will have all the child extensions for definitionExtract
                             vo.definition = `http://hl7.org/fhir/StructureDefinition/${extractType}`     //set the canonical for the extract
 
-
-
-
-
-
                             if (extractType == 'Patient') {
                                 vo.fullUrl = 'patientID'            //sets the fullUrl to the variable created by allocateID and added to every Q
 
@@ -1773,8 +1790,18 @@ angular.module("pocApp")
 
                             } else {
                                 //if this resource was the target of another in the resourceReferences array, it will have had a fullUrl defined...
+                                //todo - may deprecate this...
+
                                 if (config.hashIdName[ed.path]) {
                                     vo.fullUrl = config.hashIdName[ed.path]
+                                }
+
+                                //does the DG that is being referenced here have ns idVariable set?
+                                //If so, then we need to set the fullUrl to that value
+                                //todo - need a snapshot function to follow the parental path
+
+                                if (referencedDG.idVariable) {
+                                    vo.fullUrl = referencedDG.idVariable
                                 }
                             }
 

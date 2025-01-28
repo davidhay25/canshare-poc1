@@ -23,13 +23,21 @@
     <div class="row">
       <div class="col-md-6">
         <strong>{{selectedModel.title}} </strong> ({{selectedModel.name}}) <em>{{selectedModel.description}}</em>
+
+        <div>
+          <div ng-if="selectedModel.dirty">
+            <strong ng-click="createDiff()" class="pull-right clickable">DG has been updated</strong>
+          </div>
+        </div>
+
         <div>
           <div ng-if="selectedModel.sourceReference">
             <strong>Source reference</strong>: {{selectedModel.sourceReference}}
           </div>
         </div>
 
-        <div ng-if = "canEdit(selectedModel)">
+        <br/>
+        <span ng-if = "canEdit(selectedModel)">
           <span class="clickable" ng-click="cloneDG(selectedModel)">Make a copy</span>
 
             <span class=" clickable spacer"
@@ -38,11 +46,10 @@
             <span class=" clickable spacer"
                  ng-click="newModel('dg',selectedModel)">New child</span>
 
-          <span class="clickable spacer"
-                ng-click="makeFrozen('dg',selectedModel)">Update component</span>
+        </span>
 
-        </div>
-
+        <span class="clickable spacer"
+              ng-click="makeFrozen('dg',selectedModel)">Update component</span>
 
 
         <br/>
@@ -150,7 +157,7 @@
 <br/>
      <div ng-if="snapshotSvc.getExtractResource(selectedModel.name)">
        <strong style="padding-left: 12px">FHIR resource:</strong>
-       <a ng-href="{{fhirRoot}}{{snapshotSvc.getExtractResource(selectedModel.name)}}.html" target="_blank">
+       <a ng-href="{{fhirRoot}}{{snapshotSvc.getExtractResource(selectedModel.name) | lowercase}}.html" target="_blank">
        {{snapshotSvc.getExtractResource(selectedModel.name) }}
        </a>
 
@@ -275,9 +282,6 @@
 
                 Copy new element
                 <span ng-if="selectedNode">to {{selectedNode.data.ed.path}}</span>
-
-
-
 
 
               </div>
@@ -691,6 +695,14 @@
                     </td>
                   </tr>
 
+                  <tr ng-if="getExtractType(selectedNode.data.ed)">
+                    <td class="detailName">Extraction Type</td>
+                    <td>
+
+                      {{getExtractType(selectedNode.data.ed) }}
+                    </td>
+                  </tr>
+
 
                   <tr ng-if="selectedNode.data.ed.definition">
                     <td class="detailName">Extraction</td>
@@ -837,9 +849,12 @@
               </uib-tab>
 
               <uib-tab heading="Json">
+                <!--
                 New
                 <pre>{{edForJsonDisplay | json}}</pre>
                 Old
+
+                -->
                 <pre ng-if="selectedNode">{{selectedNode.data.ed | json}}</pre>
 
               </uib-tab>
@@ -930,6 +945,8 @@
 
                   <div ng-if="element.ed.definition">Extract: {{element.ed.definition}}</div>
                   <div ng-if="element.ed.prePop">PrePop: {{element.ed.prePop}}</div>
+                  {{getExtractType(element.ed)}}
+
 
                   <div ng-if="element.ed.adHocExt"
                        class="clickableDotted"
@@ -1159,129 +1176,6 @@
 
     </uib-tab>
 
-<!--
-    <uib-tab ng-if="false" heading="Graph" select="fitGraph()">
-
-      <em class="pull-right">DT inheritance hierarchy and referenced DTs</em>
-      <br/>
-      <div class="row">
-        <div class="col-md-6">
-          <div id="graphXXX"></div>
-        </div>
-        <div class="col-md-6">
-
-
-          <uib-tabset ng-if="selectedModelFromGraph">
-
-            <uib-tab heading="Table">
-
-              <div class="row">
-                <div class="col-md-2">Name:</div>
-                <div class="col-md-10">
-                  {{selectedModelFromGraph.name}}
-
-                  <div class="clickable pull-right"
-                       ng-if="selectedModelFromGraph.name !== selectedModel.name"
-                       ng-click="termSelectDG({DGName:selectedModelFromGraph.name},selectedModel.name)">Load
-                  </div>
-
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-2">Title:</div>
-                <div class="col-md-10">{{selectedModelFromGraph.title}}</div>
-              </div>
-
-
-              <br/>
-
-              <uib-tabset>
-                <uib-tab heading="Directly defined">
-                  <table class="table-bordered table table-condensed">
-                    <tr><th>Path</th><th>Type</th><th>Card.</th></tr>
-                    <tr ng-repeat="ed in selectedModelFromGraph.diff">
-                      <td>
-                        <div class="clickableDotted" uib-popover="{{ed.description}}"
-                             popover-placement="right"
-                             popover-trigger="'mouseenter'">{{ed.path}}</div>
-
-
-                      </td>
-                      <td>{{ed.type[0]}}
-                        <div class="clickable"><em>{{ed.valueSet}}</em></div>
-                        <div><em>{{ed.fixedCoding}}</em></div>
-                      </td>
-
-                      <td>{{ed.mult}}</td>
-                    </tr>
-                  </table>
-                  <em>This is only elements directly defined in the DG, including overrides</em>
-
-                </uib-tab>
-                <uib-tab heading="Full list">
-
-                  <table class="table-bordered table table-condensed">
-                    <tr><th>Path</th><th>Type</th><th>Card.</th></tr>
-                    <tr ng-repeat="item in selectedModelFromGraphFull">
-                      <td>
-                        <div class="clickableDotted" uib-popover="{{item.ed.description}}"
-                             popover-placement="right"
-                             popover-trigger="'mouseenter'">{{item.ed.path | dropFirstInPath}}</div>
-
-                      </td>
-                      <td>{{item.ed.type[0]}}
-                        <div class="clickable"><em>{{item.ed.valueSet}}</em></div>
-                        <div><em>{{item.ed.fixedCoding}}</em></div>
-                      </td>
-
-                      <td>{{item.ed.mult}}</td>
-                    </tr>
-                  </table>
-                  <em>These are all elements, including inherited</em>
-
-                </uib-tab>
-              </uib-tabset>
-
-
-            </uib-tab>
-            <uib-tab heading="DG Json">
-              <pre>{{selectedModelFromGraph | json}}</pre>
-            </uib-tab>
-          </uib-tabset>
-
-
-        </div>
-      </div>
-
-
-    </uib-tab>
-    -->
-
-
-
-   <!--
-<uib-tab ng-if="false" heading="Fixed values">
-      todo: add other fixed types
-
-      <br/>
-      <div class="tableFixHead">
-        <table class="table-bordered table">
-          <thead>
-          <tr><th>Path</th><th><th>Fixed value</th></tr>
-          </thead>
-          <tbody>
-          <tr ng-repeat="ed in selectedModel.diff" ng-if="ed.fixedCoding">
-
-            <td>{{ed.path}}</td>
-            <td>{{ed.fixedCoding}}</td>
-
-          </tr>
-          </tbody>
-        </table>
-      </div>
-
-    </uib-tab>
-    -->
 
     <uib-tab heading="Relationships">
 
@@ -1467,27 +1361,20 @@
       <hr/>
     </uib-tab>
 
-
-    <uib-tab ng-if = "false" heading="Form">
-
-
-     <!-- <div id="dgformlocation"></div> -->
-
-
-
 <!--
-     <renderform2 q="dgQ" hash-ed="hashAllDG" technicalview="true" treenode="dgformlocation"></renderform2>
-      <pre>{{dgQ | json}}</pre>
+    <uib-tab heading="Changes">
 
-      <button class="btn-link btn pull-right" ng-click="previewQ(dgQ)">Examine Q</button>
--->
+      <div ng-controller="diffCtrl">
+        <button class="btn btn-link pull-right" ng-click="createDiff()">Create diff</button>
+        <ng-include src="'/includes/diff.html'"></ng-include>
+      </div>
 
-<!-- - not working for some Q (procedure)
 
-      <renderform q="dgQ" qr="{}" form="{}"></renderform>
--->
+
+
 
     </uib-tab>
+    -->
 
 
 <!--

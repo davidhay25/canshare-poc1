@@ -18,6 +18,21 @@ angular.module("pocApp")
                 return text.replace(/\n/g, '<br>')
             }
 
+            //return the extract type if the type of this ed is a DG
+            $scope.getExtractType = function (ed) {
+                if (ed.type) {
+                    let type = ed.type[0]
+                    let dg = $scope.hashAllDG[type]
+                    if (dg && dg.type) {
+                        return dg.type
+                    }
+                }
+
+
+
+            }
+
+
             $scope.testxquery = function (queryName) {
 
                 $http.get(`/model/namedquery/${queryName}`).then(
@@ -259,6 +274,7 @@ angular.module("pocApp")
 
             $scope.addEWNew = function () {
                 //create a new function to add an EW is now a separate modal
+
                 $uibModal.open({
                     templateUrl: 'modalTemplates/addEW.html',
                     backdrop: 'static',
@@ -279,6 +295,7 @@ angular.module("pocApp")
                     }
 
                 }).result.then(function (vo) {
+                    $scope.selectedModel.dirty = true
                     $scope.addEnableWhen({ed:vo.ed},vo.value,vo.op)
 
                     //need to re-build the key elements

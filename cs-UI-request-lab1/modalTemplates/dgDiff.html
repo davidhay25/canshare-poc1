@@ -1,0 +1,37 @@
+
+<div>
+
+  <div class="modal-header">
+
+    <div class="row">
+      <div class="col-md-8 col-sm-8">
+        <h3 class="modal-title">DG Diff</h3>
+      </div>
+
+
+      <div class="col-md-4 col-sm-4">
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
+      </div>
+
+
+    </div>
+
+  </div>
+  <div class="modal-body">
+
+    <uib-tabset>
+      <uib-tab heading="Json">
+        <div class="row">
+          <div class="col-md-6">
+            <pre>{{leftDiffDG | json}}</pre>
+          </div>
+          <div class="col-md-6">
+            <pre>{{rightDiffDG | json}}</pre>
+          </div>
+        </div>
+      </uib-tab>
+    </uib-tabset>
+
+  </div>
+
+</div>

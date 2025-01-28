@@ -113,6 +113,21 @@
 
                 <div class="row">
                     <div class="col-md-2">
+                        Id variable
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" placeholder="eg Observation" class="form-control" ng-model="input.idVariable">
+                    </div>
+                    <div class="col-md-6">
+                        When the DG is extracted as a resource, this value (if set) will be set to a fhirpath variable
+                        that will set the resource id. <strong>If this variable is set, then there must be an SDC allocateId extension that
+                        defines it at the same level or higher in the Questionnaire.</strong>
+                    </div>
+                </div>
+                <br/>
+
+                <div class="row">
+                    <div class="col-md-2">
                         Is container resource
                     </div>
                     <div class="col-md-4">
@@ -214,8 +229,9 @@
                 <em class="pull-right">Content directly defined by this model</em>
 
                 <table class="table table-bordered">
-                    <tr><th>Path</th><th>Title</th><th>Type</th><th>Description</th><th>Card.</th><th>Move</th><th>Edit</th></tr>
+                    <tr><th>Inx</th><th>Path</th><th>Title</th><th>Type</th><th>Description</th><th>Card.</th><th>Move</th><th>Edit</th></tr>
                     <tr ng-repeat="element in model.diff">
+                        <td>{{$index}}</td>
                         <td>
                             <div ng-style="{ 'padding-left': (element.path | pathindent) }">{{element.path | lastInPath}}</div>
                         </td>
@@ -233,11 +249,6 @@
                         </td>
                         <td>
                             {{element.description}}
-                            <!--
-                                                                <div ng-repeat="code in element.code">
-                                                                    {{code.code}}
-                                                                </div>
-                                                                -->
 
                         </td>
                         <td>{{element.mult}}</td>
@@ -245,6 +256,10 @@
                             <span ng-show="$index > 0">
                                 <i class="glyphicon glyphicon-arrow-up pull-right clickable"
                                    ng-click="moveUp($index)"></i>
+                            </span>
+                            <span ng-show="$index > 0">
+                                <i class="glyphicon glyphicon-move pull-right clickable"
+                                   ng-click="moveAfter($index,element)"></i>
                             </span>
                             <span ng-show="$index < model.diff.length -1">
                                 <i class="glyphicon glyphicon-arrow-down clickable"
@@ -258,7 +273,7 @@
                         </td>
                     </tr>
                     <tr>
-
+                        <td></td>
                         <td><input class="form-control" type="text"
                                    ng-change="checkDuplicatePath(input.path)"
                                    ng-model="input.path" ng-blur="setTitle(input.path)"/>
