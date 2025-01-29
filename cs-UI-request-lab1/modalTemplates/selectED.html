@@ -1,5 +1,11 @@
 <div>
 
+  <style>
+    .isDup  {
+      background-color: #ef8fbe;
+
+    }
+  </style>
 
   <div class="modal-header">
     <div class="row">
@@ -13,7 +19,7 @@
       <div class="col-md-4 col-sm-4">
         <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
 
-        <button class="btn btn-primary pull-right" ng-click="select()">Select</button>
+        <button class="btn btn-primary pull-right" ng-click="save()">Select</button>
 
       </div>
     </div>
@@ -44,11 +50,23 @@
               <uib-tab heading="Selected List">
 
                 <table class="table-bordered table">
-                  <tr><th>Title</th><th>Datatype</th><th>Card.</th></tr>
-                  <tr ng-repeat="ed in selectedED">
+                  <tr><th>Path</th><th>Title</th><th>Datatype</th><th>Card.</th></tr>
+                  <tr ng-class="{isDup: ed.isDupPath}" ng-repeat="ed in selectedED">
+                    <td>
+                      <input class="form-control"
+                             ng-change="changePathHandler(ed)"
+                             ng-model="input.newPath[ed.path]"/>
+                    </td>
                     <td>{{ed.title}}</td>
-                    <td>{{ed.type[0]}}</td>
+                    <td>{{ed.type[0]}}
+
+                      <div ng-show="ed.valueSet">
+                        <div class="clickable" ng-click="viewVS(ed.valueSet)">{{ed.valueSet}}</div>
+
+                      </div>
+                    </td>
                     <td>{{ed.mult}}</td>
+
                   </tr>
                 </table>
 
@@ -61,7 +79,7 @@
                 <uib-tab-heading>Issues <span class="badge">{{issues.length}}</span> </uib-tab-heading>
                 <br/>
 
-                <div class="list-group" ng-repeat="iss in issues">
+                <div class="list-group" ng-repeat="iss in issues track by $index">
                   <div class="list-group-item" >{{iss}}</div>
 
                 </div>

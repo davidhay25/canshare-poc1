@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('selectEDCtrl',
-        function ($scope,DG,$http,modelsSvc,insertNode,$filter) {
+        function ($scope,DG,$http,modelsSvc,insertNode,$filter,viewVS) {
 
             $scope.linkedDGName = DG.linkedDG
 
@@ -12,19 +12,17 @@ angular.module("pocApp")
             for (let ed of DG.diff) {
                 let path = ed.path  //no DG prefix
                 if (path.startsWith(currentPath + '.') ) {
-                    console.log(path)
+                    //console.log(path)
                     let newPath = path.replace(currentPath + '.',"")
-                    console.log(newPath)
+                    //console.log(newPath)
                     let ar = newPath.split('.')
                     currentChildren.push(ar[0])
                 }
 
             }
 
-            console.log(currentChildren)
 
-
-            $scope.input = {selected:{}};
+            $scope.input = {selected:{},newPath:{}};
 
 
             $http.get(`/frozen/${$scope.linkedDGName}`).then(
@@ -46,7 +44,11 @@ angular.module("pocApp")
                 }
             )
 
-            $scope.select = function () {
+            $scope.viewVS = function (url) {
+                viewVS(url)
+            }
+
+            $scope.save = function () {
 
 
                 let arSelected = []
@@ -55,16 +57,36 @@ angular.module("pocApp")
                 let hashPath = {}
                 let dups = []
                 if ($scope.selectedED) {
+
                     for (const ed of $scope.selectedED) {
                         if (ed.type) {  //'real' eds have a type
+                            if (! ed.isDupPath) {
+                                ed.pathInSource = ed.path
+                                ed.path = ed.newPath
+                                arSelected.push(ed)
+                            }
+/*
+                            if (hashPath[ed.newPath]) {
+                                dups.push(ed)
+                            } else {
+                                ed.pathInSource = ed.path
+                                ed.path = ed.newPath
+
+                                hashPath[ed.newPath] = ed
+                            }
+                            */
+
+                            /*
                             let ar = ed.path.split('.')
                             let newPath = ar[ar.length-1]
+
                             if (hashPath[newPath]) {
                                 dups.push(ed)
                             } else {
                                 ed.path = newPath
                                 hashPath[newPath] = ed
                             }
+                            */
                         }
 
                     }
@@ -72,11 +94,14 @@ angular.module("pocApp")
 
                 // ??? todo - what to do with dups - ?rename ?reject
 
-
+/*
                 for (const key of Object.keys(hashPath)) {
                     arSelected.push(hashPath[key])
 
                 }
+*/
+                //check the ed - eg remove enableWhen, conditionalVS
+                checkForIssues(arSelected,true)
 
                 $scope.$close(arSelected)
             }
@@ -87,15 +112,17 @@ angular.module("pocApp")
 
                 $('#selectTree').jstree('destroy');
 
-                let x = $('#selectTree').jstree(
-                    {'core':
-                            {'multiple': true,
-                                'animation' : 0,
-                                'data': treeData,
-                                'themes': {name: 'proton', responsive: true}},
-                        'check_callback' : true,
-                        plugins:['checkbox']
 
+
+                let x = $('#selectTree').jstree(
+                    {
+                        'core': {
+                                'multiple': true,
+                                'animation': 1,
+                                'data': treeData,
+                                'themes': {name: 'proton', responsive: true}
+                            },
+                        plugins:['checkbox']
                     }
 
 
@@ -136,15 +163,24 @@ angular.module("pocApp")
                 selectedIds.forEach(function (id) {
                     let node = $('#selectTree').jstree('get_node', id)
                     let ed = node.data.ed
+                    //newPath will be the path in the inserted elements
+                    if (! ed.newPath) {
+                        let ar = ed.path.split('.')
+                        ed.newPath = ar[ar.length-1]
+                        $scope.input.newPath[ed.path] = ed.newPath
+                    }
 
+                    let canAdd = true
+
+/* todo - do this when saving
                     //if the last element of the path is in the 'current' list then don't add...
                     let segment = $filter('lastInPath')(ed.path)
-                    let canAdd = true
+
                     if (currentChildren.indexOf(segment) > -1) {
                         $scope.issues.push(`${ed.path} already in DG`)
                         canAdd = false
                     }
-
+*/
                     if (! ed.type) {
                         $scope.issues.push(`${ed.path} has no type`)
                         canAdd = false
@@ -161,27 +197,79 @@ angular.module("pocApp")
                     }
 
 
+                })
 
-
-
-
-                });
-
+                checkForDups($scope.selectedED)
                 checkForIssues($scope.selectedED)
                 //console.log($scope.selectedED)
+            }
+
+            $scope.changePathHandler = function (ed) {
+                //ed.newPath = input.newPath[ed.path]
+                ed.newPath = $scope.input.newPath[ed.path]
+                checkForDups($scope.selectedED)
+            }
+
+            function checkForDups(lst) {
+                let hash = {}
+
+                //create a hash of the number of times a newPath is used
+                for (const ed of lst) {
+                    if (hash[ed.newPath]) {
+                        hash[ed.newPath] ++
+                    } else {
+                        hash[ed.newPath] = 1
+                    }
+                }
+
+
+
+
+                //set the
+                for (let ed of lst) {
+                    ed.isDupPath = false
+                    //duplicates in this selection
+                    if (hash[ed.newPath] > 1) {
+                        ed.isDupPath = true
+                    }
+
+                    //dup from parent
+                    if (currentChildren.indexOf(ed.newPath) > -1) {
+                        ed.isDupPath = true
+                    }
+
+                }
+
+
+
             }
 
             function checkForIssues(lst,clean) {
 
                 for (let ed of lst) {
                     if (ed.enableWhen) {
-                        let iss = `${ed.path} has conditionals (EnableWhen) set.`
+                        let iss = `${ed.path} has conditionals (EnableWhen) set which will be disabled.`
                         $scope.issues.push(iss)
+
                         if (clean) {
-                            addIssue(ed,iss)
+                            addIssue(ed,ed.enableWhen)
                             delete ed.enableWhen
                         }
+
+
                     }
+
+                    if (ed.conditionalVS) {
+                        let iss = `${ed.path} has conditional ValueSets which will be disabled.`
+                        $scope.issues.push(iss)
+                        if (clean) {
+                            addIssue(ed,ed.conditionalVS)
+                            delete ed.conditionalVS
+                        }
+                    }
+
+
+
                     //conditional vs
                 }
 

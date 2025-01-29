@@ -276,6 +276,7 @@
 
             <div>
               <div class="clickable pull-right"
+
                    ng-if="userMode == 'playground' && selectedModel.linkedDG &&
                       (! selectedNode || selectedNode.data.ed.type[0] == 'Group' || selectedNode.data.ed.kind == 'root')"
                    style="padding-top: 8px" ng-click="insertDGItem()">
@@ -864,16 +865,11 @@
             <br/><br/>
             <div ng-hide="selectedNode.data.ed.kind == 'root' || ! canEdit(selectedModel)">
               {{selectedNode.data.ed.title}}
-              <!--
-              <button class="btn-link btn" ng-click="hideInQ(selectedNode.data.ed)">
-                Hide in Q
-              </button>
--->
-              <button class="btn-link btn" ng-click="deleteDGItem(selectedNode.data.ed)">
+              <button class="btn-link btn"
+                      ng-if="userMode == 'library'"
+                      ng-click="deleteDGItem(selectedNode.data.ed)">
                 Delete this item
               </button>
-
-
 
             </div>
 

@@ -131,7 +131,7 @@ angular.module("pocApp")
             $scope.makeFrozen = function (type,model) {
 
                 if (type == 'dg') {
-                    let msg = "Make a frozen copy of this DG, where the diff is the snapshot. Useful for Projects"
+                    let msg = "Make a frozen copy of this DG, where the diff is the snapshot. Useful for Forms"
                     if (confirm(msg)) {
                         let frozen = snapshotSvc.getFrozenDG(model.name)
                         frozen.source = $scope.userMode
@@ -283,11 +283,11 @@ angular.module("pocApp")
                         if (both) {
                             //update repo and local
                             $scope.savePGtoLocal(true,true,function () {
-                                alert("Both repository and local copies of the Project have been updated.")
+                                alert("Both repository and local copies of the Form have been updated.")
                             })
 
                         } else {
-                            let msg = "The Project has been updated."
+                            let msg = "The Form has been updated."
                             if (! $localStorage.world.description) {
                                 msg += " You can edit the description in this page."
                             }
@@ -350,7 +350,7 @@ angular.module("pocApp")
                 if (newMode == 'library') {
                     //changing from playground. Can only do this if logged in.
                     if ($scope.user && $scope.user.email) {
-                        let msg = "Are you sure you wish to enter Library mode? This will replace the current Project."
+                        let msg = "Are you sure you wish to enter Library mode? This will replace the current Form."
                         if (confirm(msg)) {
                             resetLocalEnvironment()
 
@@ -391,13 +391,13 @@ angular.module("pocApp")
                     let cntDG = countCheckedOut($scope.hashAllDG)
                     let cntComp = countCheckedOut($scope.hashAllCompositions)
                     if ((cntDG + cntComp) > 0) {
-                        let msg = `There are ${cntDG} DG's  and ${cntComp} Compositions still checked out. Are you sure you wish to enter Prohject mode`
+                        let msg = `There are ${cntDG} DG's  and ${cntComp} Compositions still checked out. Are you sure you wish to enter Forms mode`
                         if (! confirm(msg)) {
                             return
                         }
 
                     } else {
-                        let msg = "Are you sure you wish to enter Project mode? This will replace the current model."
+                        let msg = "Are you sure you wish to enter Forms mode? This will replace the current model."
                         if (! confirm(msg)) {
                             return
                         }
@@ -406,7 +406,7 @@ angular.module("pocApp")
 
                     resetLocalEnvironment()
 
-                    alert("Reset complete. You can create a new Project - or download an existing one.")
+                    alert("Reset complete. You can create a new Form - or download an existing one.")
 
                    // $scope.$emit('updateDGList',{})
                     $scope.userMode = newMode
@@ -1208,6 +1208,8 @@ angular.module("pocApp")
                         },
                         insertNode : function () {
                             return $scope.selectedNode
+                        }, viewVS : function () {
+                            return $scope.viewVS    //this is a function
                         }
                     }
                 }).result.then(
@@ -1607,7 +1609,7 @@ angular.module("pocApp")
             }
             //$scope.updateTermSummary()  //<<<<<<<<<<<<,
 
-            $scope.viewVS = function (item,refsetId) {
+            $scope.viewVS = function (url,refsetId) {
 
                 $uibModal.open({
                     templateUrl: 'modalTemplates/viewVS.html',
@@ -1617,7 +1619,7 @@ angular.module("pocApp")
 
                     resolve: {
                         url: function () {
-                            return item
+                            return url
                         }, refsetId : function () {
                             return refsetId
                         }
@@ -1817,6 +1819,9 @@ angular.module("pocApp")
                         },
                         userMode : function () {
                             return $scope.userMode
+                        },
+                        viewVS : function () {
+                            return $scope.viewVS    //this is a function
                         }
 
                     }

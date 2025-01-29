@@ -76,6 +76,7 @@
                     </div>
                 </div>
                 <br/>
+
                 <div class="row">
                     <div class="col-md-2">
                         Parent
@@ -96,6 +97,8 @@
                     </div>
                 </div>
                 <br/>
+
+
                 <div class="row">
                     <div class="col-md-2">
                         Extraction context
@@ -234,8 +237,13 @@
                         <tr><th>Inx</th><th>Path</th><th>Title</th><th>Type</th><th>Description</th><th>Card.</th><th>Move</th><th>Remove</th></tr>
                         <tr ng-repeat="element in model.diff">
                             <td>{{$index}}</td>
+
                             <td>
-                                <div class="clickableDotted" ng-style="{ 'padding-left': (element.path | pathindent) }"
+                                <div class="clickableDotted"
+                                     uib-popover="{{element.path}}"
+                                     popover-placement="top"
+                                     popover-trigger="'mouseenter'"
+                                     ng-style="{ 'padding-left': (element.path | pathindent) }"
                                      ng-click="editPath(element)">
 
                                     {{element.path | lastInPath}}
@@ -249,7 +257,8 @@
                                 </div>
 
                                 <div ng-show="element.valueSet">
-                                    {{element.valueSet}}
+                                    <div class="clickable" ng-click="viewVS(element.valueSet)">{{element.valueSet}}</div>
+
                                 </div>
 
                             </td>
@@ -282,8 +291,10 @@
 
                             </td>
                         </tr>
+
                         <tr>
                             <td></td>
+
                             <td><input class="form-control" type="text"
                                        ng-change="checkDuplicatePath(input.path)"
                                        ng-model="input.path" ng-blur="setTitle(input.path)"/>

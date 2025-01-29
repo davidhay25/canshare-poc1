@@ -227,7 +227,10 @@
           <tr>
             <td>Help text</td>
             <td><input type="text" class="form-control" ng-model="input.helpText"/>
-              <div><em>A note about the item. Will appear as a help icon in the form.</em></div>
+              <div><em>A note about the item. Will appear as a help icon in the form.</em>
+              <span ng-if="input.description" class="clickable" ng-click="input.helpText = input.description">
+                Paste description</span>
+              </div>
             </td>
           </tr>
 

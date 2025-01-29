@@ -1,7 +1,7 @@
 angular.module("pocApp")
     .controller('editDGCtrl',
         function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc,snapshotSvc, parent,
-                  utilsSvc, modelDGSvc,$http,userMode,$uibModal,$timeout,$filter) {
+                  utilsSvc, modelDGSvc,$http,userMode,$uibModal,$timeout,$filter,viewVS) {
 
             $scope.model=model
             $scope.input = {}
@@ -39,6 +39,9 @@ angular.module("pocApp")
                // alert(ed.path + " " + newPath)
             }
 
+            $scope.viewVS = function (url) {
+                viewVS(url)
+            }
 
             $scope.moveAfter = function (pos,element) {
                 let path = $filter('lastInPath')(element.path)

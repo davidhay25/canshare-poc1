@@ -5,7 +5,7 @@
 
         <div class="row">
             <div class="col-md-8 col-sm-8">
-                <h3 class="modal-title">Projects</h3>
+                <h3 class="modal-title">Forms</h3>
             </div>
 
             <div class="col-md-2">
@@ -44,7 +44,7 @@
                 </table>
             </uib-tab>
 
-            <uib-tab heading="Models Repository">
+            <uib-tab heading="Forms Repository">
                 <table class="table table-bordered">
                     <tr><th>Name</th><th>Description</th><th># DG / Comp</th><th>Updated</th><th>Version</th></tr>
                     <tr ng-repeat="row in playgrounds">
@@ -61,7 +61,7 @@
                 </table>
             </uib-tab>
 
-            <uib-tab heading="New Project">
+            <uib-tab heading="New Form">
                 <div><label>Name</label></div>
                 <input type="text" class="form-control" ng-model="input.name"/>
                 <br/>
@@ -69,7 +69,7 @@
                 <textarea class="form-control" ng-model="input.description"></textarea>
                 <br/>
                 <div>
-                    <button ng-if="input.name" class="btn btn-link" ng-click="createNew()">Create new Project</button>
+                    <button ng-if="input.name" class="btn btn-link" ng-click="createNew()">Create new Form</button>
                 </div>
 
             </uib-tab>

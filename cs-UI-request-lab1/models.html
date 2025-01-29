@@ -82,7 +82,7 @@
             <div class="col-md-1 col-sm-1">
                 <div class="navbar-text btn">
                     <button ng-if="userMode == 'playground'" class="btn btn-primary pull-right"
-                            ng-click="openPlaygrounds()">Projects</button>
+                            ng-click="openPlaygrounds()">Forms</button>
 
 
 
@@ -211,7 +211,7 @@
                                      ng-click="newModel('dg')">New DG</div>
 
                                 <div class="pull-right clickable spacer"
-                                     ng-if = "(user.email || userMode == 'playground') && selectedModel"
+                                     ng-if = "user.email && userMode == 'library' && selectedModel"
                                      ng-click="newModel('dg',selectedModel)">New child</div>
 
 
@@ -558,7 +558,7 @@
                     <table class="table table-bordered">
                         <tr><td style="width: 15%">Mode</td>
                             <td>
-                                <div ng-if="userMode == 'playground'">Project</div>
+                                <div ng-if="userMode == 'playground'">Forms</div>
                                 <div ng-if="userMode == 'library'">Library</div>
 
                             </td>
