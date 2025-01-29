@@ -47,6 +47,8 @@ angular.module("pocApp")
             $scope.localStorage = $localStorage
             $scope.input.types = $localStorage.world.dataGroups  //<<<< temp
 
+
+
             //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
             $scope.hashAllDG = $localStorage.world.dataGroups
 
@@ -60,6 +62,14 @@ angular.module("pocApp")
                 //this at least prevents the app from crashing, so remedial action can be taken
                 Object.keys($scope.hashAllDG).forEach(function (key) {
                     $scope.hashAllDG[key].diff = $scope.hashAllDG[key].diff || []
+
+                    for (let ed of $scope.hashAllDG[key].diff) {
+                        if (! ed.type) {
+                            ed.type = ['Group']
+                            alert(`Warning! Element ${ed.path} of DG ${key} had no type. Setting to Group`)
+                        }
+                    }
+
                 })
 
             } else {
@@ -216,6 +226,8 @@ angular.module("pocApp")
 
                 //window.location.href = `modelReview.html?${$scope.selectedModel.name}`
             }
+
+
 
             //----------------------
 
@@ -375,23 +387,32 @@ angular.module("pocApp")
 
                 } else if (newMode == 'playground') {
                     //changing from Library mode to playground
+
                     let cntDG = countCheckedOut($scope.hashAllDG)
                     let cntComp = countCheckedOut($scope.hashAllCompositions)
                     if ((cntDG + cntComp) > 0) {
-                        alert(`There are ${cntDG} DG's  and ${cntComp} Compositions still checked out. They need to be reverted or checked in.`)
-                        return
-                    }
-                    let msg = "Are you sure you wish to enter Project mode? This will replace the current model."
-                    if (confirm(msg)) {
-                        resetLocalEnvironment()
+                        let msg = `There are ${cntDG} DG's  and ${cntComp} Compositions still checked out. Are you sure you wish to enter Prohject mode`
+                        if (! confirm(msg)) {
+                            return
+                        }
 
-                        alert("Reset complete. You can create a new Project - or download an existing one.")
-
-                       // $scope.$emit('updateDGList',{})
-                        $scope.userMode = newMode
-                        $localStorage.userMode = newMode
-                        $scope.init()
+                    } else {
+                        let msg = "Are you sure you wish to enter Project mode? This will replace the current model."
+                        if (! confirm(msg)) {
+                            return
+                        }
                     }
+
+
+                    resetLocalEnvironment()
+
+                    alert("Reset complete. You can create a new Project - or download an existing one.")
+
+                   // $scope.$emit('updateDGList',{})
+                    $scope.userMode = newMode
+                    $localStorage.userMode = newMode
+                    $scope.init()
+
 
                     function countCheckedOut(hash) {
                         let cnt = 0
@@ -1178,12 +1199,15 @@ angular.module("pocApp")
                 $uibModal.open({
                     templateUrl: 'modalTemplates/selectED.html',
                     backdrop: 'static',
-                    size: 'lg',
+                    size: 'xlg',
                     controller: 'selectEDCtrl',
 
                     resolve: {
                         DG: function () {
                             return $scope.selectedModel
+                        },
+                        insertNode : function () {
+                            return $scope.selectedNode
                         }
                     }
                 }).result.then(
@@ -1198,8 +1222,11 @@ angular.module("pocApp")
                                 //if the path is 1 then the new eds are added to the root - no change needed
                                 //otherwise we remove the first segment to get the root path and locate the position of the insert point in the diff
                                 ar.splice(0,1)
-                                rootPath = ar.join('.') + '.'
-                                insertPoint = $scope.selectedModel.diff.findIndex(item => item.path === rootPath) +1
+                                rootPath = ar.join('.')  // + '.'
+                                insertPoint = $scope.selectedModel.diff.findIndex(item => item.path === rootPath) +1  //to ensure it is after
+                                if (rootPath) {
+                                    rootPath += '.'
+                                }
                             }
 
                         }
@@ -1795,7 +1822,7 @@ angular.module("pocApp")
                     }
 
                 }).result.then(function (newModel) {
-                    $scope.selectedModel.dirty = true
+                   // $scope.selectedModel.dirty = true
                     if (newModel) {
                         //if a model is returned, then it is a new one and needs to be added to the world
                         //traceSvc.addAction({action:'new-model',model:newModel})
@@ -2055,11 +2082,8 @@ angular.module("pocApp")
                 if (dg) {
 
 
-
-
                     clearB4Select()
                     $scope.selectedModel = dg
-
 
                     $scope.fhirResourceType = igSvc.findResourceType(dg,$scope.hashAllDG)   //not sure if this is used wo fsh stuff
 

@@ -952,9 +952,9 @@ angular.module("pocApp")
 
 
                 for (const thing of allElements) {
-                    if (thing.ed.type) {
+                  // if (thing.ed.type) {
                         dg.snapshot.push(thing.ed)
-                    }
+                  //  }
 
 
                 }
@@ -1249,7 +1249,6 @@ angular.module("pocApp")
                             return -1
                         }
                     })
-
 
 
                 } catch (ex) {

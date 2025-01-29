@@ -116,10 +116,10 @@
                         Id variable
                     </div>
                     <div class="col-md-4">
-                        <input type="text" placeholder="eg Observation" class="form-control" ng-model="input.idVariable">
+                        <input type="text" placeholder="eg id-obs" class="form-control" ng-model="input.idVariable">
                     </div>
                     <div class="col-md-6">
-                        When the DG is extracted as a resource, this value (if set) will be set to a fhirpath variable
+                        When the DG is extracted as a resource, this value (if set) will be set to a unique fhirpath variable
                         that will set the resource id. <strong>If this variable is set, then there must be an SDC allocateId extension that
                         defines it at the same level or higher in the Questionnaire.</strong>
                     </div>
@@ -203,7 +203,7 @@
 
                     </div>
                     <div class="col-md-6">
-                        The Library DG that this DG represents in the form
+                        The Library DG or Composition that this DG represents in the form
 
                     </div>
                     <br/> <br/>
@@ -227,168 +227,116 @@
 
             <uib-tab heading="Base model content">
                 <em class="pull-right">Content directly defined by this model</em>
+                <br/>
 
-                <table class="table table-bordered">
-                    <tr><th>Inx</th><th>Path</th><th>Title</th><th>Type</th><th>Description</th><th>Card.</th><th>Move</th><th>Edit</th></tr>
-                    <tr ng-repeat="element in model.diff">
-                        <td>{{$index}}</td>
-                        <td>
-                            <div ng-style="{ 'padding-left': (element.path | pathindent) }">{{element.path | lastInPath}}</div>
-                        </td>
-                        <td>{{element.title}}</td>
-                        <td>
-                            <div ng-repeat="type in element.type">
-                                {{type}}
+                <div class="myScroll">
+                    <table class="table table-bordered">
+                        <tr><th>Inx</th><th>Path</th><th>Title</th><th>Type</th><th>Description</th><th>Card.</th><th>Move</th><th>Remove</th></tr>
+                        <tr ng-repeat="element in model.diff">
+                            <td>{{$index}}</td>
+                            <td>
+                                <div class="clickableDotted" ng-style="{ 'padding-left': (element.path | pathindent) }"
+                                     ng-click="editPath(element)">
 
-                            </div>
+                                    {{element.path | lastInPath}}
+                                </div>
+                            </td>
+                            <td>{{element.title}}</td>
+                            <td>
+                                <div ng-repeat="type in element.type">
+                                    {{type}}
 
-                            <div ng-show="element.valueSet">
-                                {{element.valueSet}}
-                            </div>
+                                </div>
 
-                        </td>
-                        <td>
-                            {{element.description}}
+                                <div ng-show="element.valueSet">
+                                    {{element.valueSet}}
+                                </div>
 
-                        </td>
-                        <td>{{element.mult}}</td>
-                        <td>
-                            <span ng-show="$index > 0">
+                            </td>
+                            <td>
+                                {{element.description}}
+
+                            </td>
+                            <td>{{element.mult}}</td>
+                            <td style="width: 7%">
+                             <span ng-show="$index < model.diff.length -1">
+                                <i class="glyphicon glyphicon-arrow-down pull-right  clickable "
+                                   ng-click="moveDn($index)"></i>
+                            </span>
+
+
+                                <span ng-show="$index > 0">
+                                <i class="glyphicon glyphicon-move  pull-right  clickable"
+                                   ng-click="moveAfter($index,element)"></i>
+                            </span>
+
+                                <span ng-show="$index > 0">
                                 <i class="glyphicon glyphicon-arrow-up pull-right clickable"
                                    ng-click="moveUp($index)"></i>
                             </span>
-                            <span ng-show="$index > 0">
-                                <i class="glyphicon glyphicon-move pull-right clickable"
-                                   ng-click="moveAfter($index,element)"></i>
-                            </span>
-                            <span ng-show="$index < model.diff.length -1">
-                                <i class="glyphicon glyphicon-arrow-down clickable"
-                                   ng-click="moveDn($index)"></i>
-                            </span>
-                        </td>
-                        <td>
-                            <i style="color: red" class="glyphicon glyphicon-remove clickable"
-                               ng-click="remove($index)"></i>
 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td><input class="form-control" type="text"
-                                   ng-change="checkDuplicatePath(input.path)"
-                                   ng-model="input.path" ng-blur="setTitle(input.path)"/>
+                            </td>
+                            <td>
+                                <i style="color: red" class="glyphicon glyphicon-remove clickable"
+                                   ng-click="remove($index)"></i>
 
-                            <div ng-show="isDuplicatePath" style="color: red;text-decoration-style: dotted"
-                                 uib-popover="This name has already been used in this DG, or inherited from a parent."
-                                 popover-placement="top"
-                                 popover-trigger="'mouseenter'">Duplicate path name</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><input class="form-control" type="text"
+                                       ng-change="checkDuplicatePath(input.path)"
+                                       ng-model="input.path" ng-blur="setTitle(input.path)"/>
+
+                                <div ng-show="isDuplicatePath" style="color: red;text-decoration-style: dotted"
+                                     uib-popover="This name has already been used in this DG, or inherited from a parent."
+                                     popover-placement="top"
+                                     popover-trigger="'mouseenter'">Duplicate path name</div>
 
 
-                        </td>
-                        <td><input class="form-control" type="text" ng-model="input.title"/></td>
-                        <td>
-                            <div class="row">
-                                <div class="col-md-10">
-                                    <select class="form-control" ng-model="input.type"
-                                            ng-options = "type for type in input.types">
+                            </td>
+                            <td><input class="form-control" type="text" ng-model="input.title"/></td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <select class="form-control" ng-model="input.type"
+                                                ng-options = "type for type in input.types">
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <i style="color: green" class="glyphicon glyphicon-edit clickable"
+                                           ng-click="setType()"></i>
+
+                                    </div>
+                                </div>
+
+
+                                <!--
+                                <div ng-show ="input.type == 'CodeableConcept'">
+                                    <select class="form-control" ng-model="input.valueSet"
+                                            ng-options = "type for type in input.valueSets">
                                     </select>
                                 </div>
-                                <div class="col-md-2">
-                                    <i style="color: green" class="glyphicon glyphicon-edit clickable"
-                                       ng-click="setType()"></i>
+                                -->
 
-                                </div>
-                            </div>
+                            </td>
+                            <td><textarea class="form-control" type="text" ng-model="input.description"></textarea></td>
+                            <!--  <td><input class="form-control" type="text" ng-model="input.code"/></td> -->
+                            <td><select class="form-control" ng-model="input.card"
+                                        ng-options = "card for card in input.cards"></select></td>
+                            <td></td>
+                            <td>
+                                <i style="color: green" class="glyphicon glyphicon-ok clickable"
+                                   ng-show="input.path && input.title && input.type"
+                                   ng-click="add()"></i>
+                            </td>
 
-
-                            <!--
-                            <div ng-show ="input.type == 'CodeableConcept'">
-                                <select class="form-control" ng-model="input.valueSet"
-                                        ng-options = "type for type in input.valueSets">
-                                </select>
-                            </div>
-                            -->
-
-                        </td>
-                        <td><textarea class="form-control" type="text" ng-model="input.description"></textarea></td>
-                        <!--  <td><input class="form-control" type="text" ng-model="input.code"/></td> -->
-                        <td><select class="form-control" ng-model="input.card"
-                                    ng-options = "card for card in input.cards"></select></td>
-                        <td></td>
-                        <td>
-                            <i style="color: green" class="glyphicon glyphicon-ok clickable"
-                               ng-show="input.path && input.title && input.type"
-                               ng-click="add()"></i>
-                        </td>
-
-                    </tr>
+                        </tr>
 
 
-                </table>
-                <!--
+                    </table>
+                </div>
 
-                <uib-tabset>
-                    <uib-tab heading="Table view (for adding / moving / deleting)">
-
-                    </uib-tab>
-
-                    <uib-tab ng-show="false" heading="List view (for editing)">
-
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="list-group">
-                                    <div ng-class={"list-group-item":true,listItemSelected:selectedElementFromList==element}
-                                         style="cursor: pointer"
-                                         ng-click = "selectElementFromList(element)"
-                                         ng-repeat="element in model.diff">
-                                        {{element.path}}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-9" ng-show="selectedElementFromList.path">
-                                <div class="pull-right">
-                                    <button class="btn btn-link" ng-click="updateElementFromList()">Update</button>
-                                </div>
-                                <div class="clearfix"></div>
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        Title
-                                    </div>
-                                    <div class="col-md-9">
-                                        <input type="text" class = "form-control"
-                                               ng-model="edit.title"/>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        Cardinality
-                                    </div>
-                                    <div class="col-md-9">
-                                        <input type="text" class = "form-control"
-                                               ng-model="edit.mult"/>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        Code
-                                    </div>
-                                    <div class="col-md-9">
-                                        <input type="text" class = "form-control"
-                                               ng-model="edit.code"/>
-                                    </div>
-                                </div>
-
-                                <pre>{{selectedElementFromList | json}}</pre>
-
-                            </div>
-                        </div>
-
-                    </uib-tab>
-                </uib-tabset>
-
--->
 
             </uib-tab>
 

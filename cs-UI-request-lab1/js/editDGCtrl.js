@@ -31,6 +31,15 @@ angular.module("pocApp")
             })
             $scope.input.possibleParents.sort()
 
+            $scope.editPath = function (ed) {
+                let newPath = prompt("Enter new path",ed.path)
+                if (newPath) {
+                    ed.path = newPath
+                }
+               // alert(ed.path + " " + newPath)
+            }
+
+
             $scope.moveAfter = function (pos,element) {
                 let path = $filter('lastInPath')(element.path)
                 let msg = `This is row ${pos} (${path}). Enter the row number to move this row to.`
@@ -554,11 +563,11 @@ angular.module("pocApp")
 
 
             $scope.remove = function (inx) {
-                if (confirm("Are you sure you wish to remove this element")) {
+              //  if (confirm("Are you sure you wish to remove this element")) {
 
                     $scope.model.diff.splice(inx,1)
                     getFullElementList()
-                }
+             //   }
             }
 
             $scope.moveUp = function (inx) {

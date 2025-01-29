@@ -32,11 +32,13 @@ angular.module("pocApp")
 
              if (extractType) {
                  let baseFhirUrl = "http://hl7.org/fhir/R4B/"     //hard code to R4B. may need to become a parameter...
-                 $scope.linkToSpec = `${baseFhirUrl}${extractType}.html`
+                 $scope.linkToSpec = `${baseFhirUrl}${extractType.toLowerCase()}.html`
              }
 
              //all the named queries used by any inherited or referenced DG
              $scope.allNamedQueries = snapshotSvc.getNamedQueries(dg.name)      //an Array of named queries
+
+
 
 
             $scope.extBuilder = function () {

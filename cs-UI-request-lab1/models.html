@@ -556,7 +556,14 @@
                 <uib-tab heading="Model summary">
                     <br/>
                     <table class="table table-bordered">
-                        <tr><td style="width: 15%">Mode</td><td>{{userMode}}</td></tr>
+                        <tr><td style="width: 15%">Mode</td>
+                            <td>
+                                <div ng-if="userMode == 'playground'">Project</div>
+                                <div ng-if="userMode == 'library'">Library</div>
+
+                            </td>
+
+                        </tr>
                         <tr><td>Name</td><td>
                             <input class="form-control" type="text" ng-model="world.name"/>
                         </td></tr>

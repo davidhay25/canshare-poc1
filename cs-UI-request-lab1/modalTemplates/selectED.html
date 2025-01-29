@@ -21,66 +21,82 @@
   </div>
   <div class="modal-body">
 
+    <uib-tabset>
 
-    <div class="tableFixHead">
-      <table class="table-bordered table">
-        <thead>
-        <tr><th>Select</th><th>Path</thth></th><th>Title</th>
-          <th>Description</th><th>Type</th><th>Mult.</th>
-        </tr>
-        </thead>
-        <tbody>
+      <uib-tab heading="Tree">
 
-        <!---     <tr ng-repeat="element in fullElementList">-->
-        <tr ng-repeat="ed in linkedDG.diff">
-
-
-          <td>
-            <checkbox ng-model="input.selected[ed.path]"></checkbox>
-          </td>
-
-          <td>
-            <div ng-repeat = "segment in ed.path.split('.') track by $index">
-              {{segment}}
-            </div>
-
-            <div ng-repeat="issue in ed.issue track by $index">
-              <em>{{issue}}</em>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="myScroll">
+              <div id="selectTree"></div>
             </div>
 
 
+          </div>
+          <div class="col-md-8">
+            <em>Selected elements will be inserted at the same level in the DG. If you want different levels,
+            then create the group element in the DG and insert separately. Group elements or items without dataTypes
+              will not be inserted.
+            </em>
+            <br/><br/>
+            <uib-tabset>
 
-          </td>
+              <uib-tab heading="Selected List">
+
+                <table class="table-bordered table">
+                  <tr><th>Title</th><th>Datatype</th><th>Card.</th></tr>
+                  <tr ng-repeat="ed in selectedED">
+                    <td>{{ed.title}}</td>
+                    <td>{{ed.type[0]}}</td>
+                    <td>{{ed.mult}}</td>
+                  </tr>
+                </table>
+
+              </uib-tab>
+              <uib-tab heading="Single ED">
+                <pre>{{edForJsonDisplay | json}}</pre>
+              </uib-tab>
+
+              <uib-tab ng-show="issues.length > 0">
+                <uib-tab-heading>Issues <span class="badge">{{issues.length}}</span> </uib-tab-heading>
+                <br/>
+
+                <div class="list-group" ng-repeat="iss in issues">
+                  <div class="list-group-item" >{{iss}}</div>
+
+                </div>
+              </uib-tab>
+              <uib-tab heading="Selected Json">
+                <pre>{{selectedED | json}}</pre>
+              </uib-tab>
 
 
-          <td>{{ed.title}}</td>
-          <td>
+            </uib-tabset>
 
-            {{ed.description}}
-          </td>
-          <td>
-            <div ng-repeat="type in ed.type">
-              {{type}}
-            </div>
-            <div><em class="clickable" ng-click="viewVS(ed.valueSet)">{{ed.valueSet}}</em></div>
-          </td>
-          <td>{{ed.mult}}</td>
+          </div>
+        </div>
 
 
 
 
 
-        </tr>
-        </tbody>
-      </table>
-    </div>
+      </uib-tab>
 
-    <pre>{{linkedDG | json}}</pre>
+      <uib-tab heading="Json">
+
+
+
+        <pre>{{linkedDG | json}}</pre>
+      </uib-tab>
+    </uib-tabset>
+
+
+
 
   </div>
   <div class="modal-header">
 
-    Name:{{linkedDG}}
+    Name:{{linkedDG.name}}
 
 
   </div>
