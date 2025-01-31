@@ -391,6 +391,8 @@
                       </span>
 
                     </td>
+
+
                   </tr>
 
                   <tr>
@@ -412,6 +414,13 @@
                         <em>{{selectedNode.data.ed.sourceModelName}}</em></div>
 
 
+                    </td>
+                  </tr>
+
+                  <tr ng-if="selectedNode.data.ed.itemCode">
+                    <td class="detailName" style="width : 20%">Item code</td>
+                    <td>
+                      {{selectedNode.data.ed.itemCode.code}} | {{selectedNode.data.ed.itemCode.display}} | {{selectedNode.data.ed.itemCode.system}}
                     </td>
                   </tr>
 
@@ -1346,7 +1355,7 @@
     </uib-tab>
 
 
-    <uib-tab ng-if="true">
+    <uib-tab ng-if="userMode == 'library'">
       <uib-tab-heading>
         Ordering <span class="badge"> {{selectedModel.ordering.length}}</span>
       </uib-tab-heading>

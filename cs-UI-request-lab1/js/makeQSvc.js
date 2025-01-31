@@ -337,7 +337,8 @@ angular.module("pocApp")
         }
 
         //given an ed, return the control type and hint
-        function getControlDetails(ed) {
+        //function is a property of the service return object - can be removed when I'm sure all is working OK
+        function getControlDetailsDEP(ed) {
             //return the control type & hint based on the ed
 
             let controlHint = "string"            //this can be any value - it will be an extension in the Q - https://hl7.org/fhir/R4B/extension-questionnaire-itemcontrol.html
@@ -363,6 +364,10 @@ angular.module("pocApp")
                     case 'decimal' :
                         controlHint = "decimal"
                         controlType = "decimal"
+                        break
+                    case 'integer' :
+                        controlHint = "integer"
+                        controlType = "integer"
                         break
                     case 'Quantity' :
                         controlHint = "quantity"
@@ -561,145 +566,6 @@ angular.module("pocApp")
             return allEW
         }
 
-        //set the control type (and hint extension) for the item
-        //updates the item object directly
-        //strategy has options for populating choice elements
-        //  - expandVS - if true, generate answerOption elements
-        //ed has controlType and controlHint
-         function setControlTypeDEP(ed,item,strategy) {
-                 strategy = strategy || {}
-
-                 //config = config || {maxFromValueSet : 500}
-
-             //sets the Q control type from the ed.type
-                 let vo = getControlDetails(ed) //get the control details from the ed
-
-                 item.type = vo.controlType    //the 'official' type for the item (from the spec)
-
-                 //Add the hint instruction
-                 if (vo.controlType !== vo.controlHint) {
-                     //console.log(item.text,data.controlType,data.controlHint)
-                     //the hint is the extension that gives more options to the renderer
-                     item.extension = item.extension || []
-                     let ext = {url: extItemControlUrl}
-                     ext.valueCodeableConcept = {
-                         coding: [{
-                             code: vo.controlHint,
-                             system: "http://hl7.org/fhir/questionnaire-item-control"
-                         }]
-                     }
-                     item.extension.push(ext)
-                 }
-
-                 //we need to do this before the async function codedOptionsSvc.getOptionsForEd() otherwise the form is rendered
-                //before it is returned and won't appear.
-                 if (ed.valueSet) {
-                     let vs = ed.valueSet
-                     if (vs.indexOf('http:') == -1) {
-                         vs = `https://nzhts.digital.health.nz/fhir/ValueSet/${vs}`
-                     }
-
-                     //todo seems to be an issue where despite the VS, the answeroptions are being added...
-                     //todo - need to think through the strategy for answeOption population
-                     // todo temp - just while debugging
-                     item.answerValueSet = vs
-                     //delete item.answerOption   //if there's a valueset, then no options - mar 21
-                 }
-
-                 switch (vo.controlHint) {
-                     case 'drop-down' :
-                         //will be 'drop-down' if the type is CodeableConcept...
-                         //use the options service to get the list of options. could come from the options element of expanded vs
-                         //let timerLabel = `sct${ed.path}`
-                        // console.time(timerLabel)
-                         codedOptionsSvc.getOptionsForEd(ed).then(
-
-                             function (vo1) {
-                                 //console.log(vo1)
-                                 //console.timeEnd(timerLabel)
-                                 if (!vo1.options || (vo1.options && vo1.options.length == 0)) {
-                                     vo1.options = vo1.options || []
-                                     vo1.options.push({
-                                         code: 'nocode',
-                                         system: 'http://example.com/CodeSystem/unknown',
-                                         display: "No codes supplied"
-                                     })
-                                 }
-
-                                 switch (vo1.status) {
-                                     case 'options' :
-                                         //the list of options came from an options element in the ED. They must be answerOption
-
-                                         for (const Coding of vo1.options) {
-                                             item.answerOption = item.answerOption || []
-                                             item.answerOption.push({valueCoding: Coding})
-                                         }
-                                         break
-                                     case 'vs' :
-                                         //the list of options came from an expanded valueset
-                                         if (strategy.expandVS) {
-                                             //if (config && config.maxFromValueSet && vo.options.length <= config.maxFromValueSet) {
-                                             //item.answerOption = []
-                                             for (const Coding of vo1.options) {
-                                                 item.answerOption = item.answerOption || []
-                                                 item.answerOption.push({valueCoding: Coding})
-                                             }
-                                             //delete item.answerValueSet //mar 21
-                                         } else {
-                                             let vs = ed.valueSet
-                                             if (vs.indexOf('http') == -1) {
-                                                 //the vs in the model might not have the full url
-                                                 vs = `https://nzhts.digital.health.nz/fhir/ValueSet/${vs}`
-                                             }
-                                             //item.answerValueSet = vs
-                                         }
-                                         break
-                                     case 'not-found' :
-                                         //there was a ValueSet, but it wasn't found on the terminology server
-                                         item.answerOption = [{
-                                             valueCoding: {
-                                                 code: 'not-found',
-                                                 system: 'http://example.com/CodeSystem/unknown',
-                                                 display: `VS ${ed.valueSet} not found`
-                                             }
-                                         }]
-                                         console.log(`The element ${ed.title} had the ValueSet ${ed.valueSet} which was not on the terminology server`)
-                                         break
-                                     case 'no-options-or-vs':
-
-                                         if (item.type == 'choice') {
-                                             item.answerOption = [{
-                                                 valueCoding: {
-                                                     code: 'no-options',
-                                                     system: 'http://example.com/CodeSystem/unknown',
-                                                     display: `Neither options nor ValueSet`
-                                                 }
-                                             }]
-
-                                         }
-
-                                        // console.log(`The element ${ed.title} had neither ValueSet not options defined`)
-                                         break
-
-                                 }
-                                 //resolve(item)
-
-                             }, function (err) {
-                                 console.log(err)
-                                 //resolve(item)
-
-                             }
-                         )
-
-
-                         break
-
-                     case 'typeahead' :
-                         //resolve(item)
-                         break
-                 }
-
-        }
 
         //find a specific extension
         function getExtension(item,url,type) {
@@ -1311,6 +1177,7 @@ angular.module("pocApp")
             },
 
             makeHierarchicalQFromDG : function  (dg,lstElements,config) {
+                config.getControlDetails = this.getControlDetails //need to use the function defined in the service object which is called externally...
                 //Used in the new Q renderer
                 //config.enableWhen (boolean) will cause the enableWhens to be set. It's a debugging flag...
                 //config.patientId is the patient id to use for the fixed value extension  //TODO NOT USED ANYMORE
@@ -1886,6 +1753,9 @@ angular.module("pocApp")
                         addItemControl(item,'gtable')
                     }
 
+                    if (ed.itemCode) {
+                        item.code = [ed.itemCode]
+                    }
 
                     //add any units
                     addUnits(item,ed)
@@ -1912,8 +1782,8 @@ angular.module("pocApp")
 
 
                     //set the control type. Do this early on as other fnctions may change it (eg fixedCoding)
-
-                    let vo = getControlDetails(ed)
+                    //note that the function is defined on config as the scope is a little clumsy...
+                    let vo = config.getControlDetails(ed)
                     item.type = vo.controlType
 
                     switch (vo.controlHint) {
@@ -2340,8 +2210,9 @@ angular.module("pocApp")
             },
 
             getControlDetails : function(ed) {
+
                 //return the control type & hint based on the ed
-                //used by modelsSvc
+
                 let controlHint = "string"            //this can be any value - it will be an extension in the Q - https://hl7.org/fhir/R4B/extension-questionnaire-itemcontrol.html
                 let controlType = "string"          //this has to be one of the defined type values
 
@@ -2349,7 +2220,6 @@ angular.module("pocApp")
                     controlHint = "drop-down"
                     controlType = "choice"
                 }
-
 
                 if (ed.type) {
                     switch (ed.type[0]) {
@@ -2359,25 +2229,72 @@ angular.module("pocApp")
                                 controlType = "text"
                             }
                             break
+                        case 'boolean' :
+                            controlHint = "boolean"
+                            controlType = "boolean"
+                            break
+                        case 'decimal' :
+                            controlHint = "decimal"
+                            controlType = "decimal"
+                            break
+                        case 'integer' :
+                            controlHint = "integer"
+                            controlType = "integer"
+                            break
+                        case 'Quantity' :
+                            controlHint = "quantity"
+                            controlType = "quantity"
+                            if (ed.units) {
+                                //p
+                                //console.log(ed.units)
+                            }
+                            break
                         case 'dateTime' :
                             controlHint = "dateTime"
                             controlType = "dateTime"
                             break
+                        case 'date' :
+                            controlHint = "date"
+                            controlType = "date"
+                            break
                         case 'CodeableConcept' :
-                          //  if (ed.valueSet) {
-                                controlHint = "drop-down"
-                                controlType = "choice"
-                         //   }
-                    }
-                }
+                            //  controltype is always choice. May want typeahead later
 
-                if (ed.controlHint) {
-                    controlHint = ed.controlHint
+                            controlHint = "drop-down"
+                            controlType = "choice"
+
+                            if (ed.controlHint ) {
+                                controlHint = ed.controlHint
+                                //csiro only supports autocomplete on open-choice
+                                if (controlHint == 'autocomplete') {
+                                    controlType = "open-choice"
+                                }
+                            }
+                            break
+                        case 'Group' :
+                            controlHint = "display"
+                            controlType = "display"
+                            break
+                        /*
+                        case 'Identifier' :
+                            controlHint = "Identifier"
+                            controlType = "Identifier"
+    */
+
+                    }
+
+                    //determine if this is a referece to another DG
+                    //make a display if so as we're not nesting in the Q in the same way as in th emodel
+                    let type = ed.type[0]
+                    if (snapshotSvc.getDG(ed.type[0])) {
+                        controlHint = "display"
+                        controlType = "display"
+                    }
+
                 }
 
 
                 return {controlType:controlType,controlHint:controlHint}
-
             },
 
 

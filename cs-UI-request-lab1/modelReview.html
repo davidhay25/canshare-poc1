@@ -530,7 +530,54 @@
 
         </uib-tab>
 
+        <uib-tab  heading="QR Analysis">
 
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="btn-link btn pull-right" ng-click="parseQR(input.QR)">Parse QR</div>
+                    <textarea rows = "20" class="form-control" ng-model="input.QR">
+
+                    </textarea>
+
+                    <em>This can be any QR - the Q will be retrieved from the Lab server</em>
+                </div>
+                <div class="col-md-8">
+                    <uib-tabset>
+
+                        <uib-tab heading="Report">
+
+                            <table class="table table-bordered">
+                                <tr><th>LinkId</th><th>Text</th><th>Code</th><th>DataType</th><th>Value</th></tr>
+                                <tr ng-repeat="entry in lstQRItem"
+                                    ng-class="{background:entry.dt == 'Group'}"
+                                    >
+                                    <td>{{entry.item.linkId}}</td>
+                                    <td>{{entry.item.text}}</td>
+                                    <td>
+                                        <div ng-repeat="code in entry.item.code">
+                                            {{code.code}}
+                                        </div>
+
+                                    </td>
+                                    <td>{{entry.dt}}</td>
+                                    <td>
+                                        <div ng-repeat="ans in entry.answerDisplay">
+                                            {{ans}}
+                                        </div>
+
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </uib-tab>
+                    </uib-tabset>
+
+                </div>
+            </div>
+
+
+        </uib-tab>
 
         <uib-tab  heading="All comments">
             <table class="table-condensed table-bordered table">

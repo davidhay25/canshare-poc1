@@ -953,7 +953,9 @@ angular.module("pocApp")
 
                 for (const thing of allElements) {
                   // if (thing.ed.type) {
-                        dg.snapshot.push(thing.ed)
+                    //The snapshot generator barfs if there isn't a type...
+                    thing.ed.type = thing.ed.type || 'Group'
+                    dg.snapshot.push(thing.ed)
                   //  }
 
 

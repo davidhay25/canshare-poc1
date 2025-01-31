@@ -63,6 +63,7 @@ angular.module("pocApp")
                             if (! ed.isDupPath) {
                                 ed.pathInSource = ed.path
                                 ed.path = ed.newPath
+                                delete ed.dupPath
                                 arSelected.push(ed)
                             }
 /*

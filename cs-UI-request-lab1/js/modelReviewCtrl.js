@@ -1,7 +1,7 @@
 angular.module("pocApp")
     .controller('modelReviewCtrl',
         function ($scope,$http,modelsSvc,modelCompSvc,$timeout, $uibModal,makeQSvc,utilsSvc,$window,
-                  orderingSvc,snapshotSvc,vsSvc,qHelperSvc) {
+                  orderingSvc,snapshotSvc,vsSvc,qHelperSvc,$localStorage) {
 
             $scope.input = {}
 
@@ -9,10 +9,132 @@ angular.module("pocApp")
 
             //dietrich-blake-louis
 
+            $scope.serverbase = "https://fhir.forms-lab.com/"
+
             // ----------- consume events emitted by the v2 Q renderer ----
             $scope.$on('viewVS',function (event,vs) {
                 $scope.viewVS(vs)
             })
+
+            $scope.input.QR =  $localStorage.QR //dev
+            $scope.parseQR = function (text) {
+                let QR
+
+                $scope.hashLinkId = {}
+                $scope.lstQRItem = []
+
+                try {
+                    QR = angular.fromJson(text)
+                    $localStorage.QR = text //dev
+                } catch (e) {
+                    alert("Invalid Json")
+                    return
+                }
+
+                let qUrl = QR.questionnaire
+
+                let qry = `${$scope.serverbase}Questionnaire?url=${qUrl}`
+                let config = {headers:{'content-type':'application/fhir+json'}}
+
+                $http.get(qry,config).then(
+                    function (data) {
+                        console.log(data.data)
+                        if (data.data.entry && data.data.entry.length > 0) {
+
+                            //get the definition of the items from the Q
+                            let Q = data.data.entry[0].resource
+                            for (const item of Q.item) {
+                                processQItem(item)
+                            }
+
+                            //get the answers from the QR
+                            for (const item of QR.item) {
+                                processQRItem(item)
+                            }
+
+                        } else {
+                            alert(`The Q with the url ${qUrl} was not found`)
+                        }
+
+
+
+                    },function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+
+
+                function processQItem(item) {
+                    $scope.hashLinkId[item.linkId] = item
+                    if (item.item) {
+                        for (const child of item.item) {
+                            processQItem(child)
+                        }
+                    }
+                }
+
+
+                function processQRItem(item) {
+                    console.log(item.linkId)
+
+                    let def = angular.copy($scope.hashLinkId[item.linkId])
+                    delete def.item
+                    if (item.answer) {
+                       // let def = angular.copy($scope.hashLinkId[item.linkId])
+                      //  delete def.item
+                        //answer[] is the answer from the QR (an array), answerDisplay[] is a display form
+                        let thing = {item:def,answer:item.answer,answerDisplay:[]}
+
+                        //a simplified answer for display
+                        for (let ans of item.answer) {
+                            //ans will have a single property - valueCoding, valueString etc
+                            let keys = Object.keys(ans)
+                            for (const key of keys ) {
+                                let value = ans[key]
+                                thing.dt = key.replace("value","")
+
+                                //should only be 1
+                                switch (key) {
+                                    case "valueCoding":
+                                        thing.answerDisplay.push(`${value.code} | ${value.display} | ${value.system}`)
+                                        break
+                                    case "valueQuantity":
+                                        thing.answerDisplay.push(`${value.value} ${value.code}`)
+                                        break
+                               /*     case "valueString" :
+                                        thing.dt = 'String'
+                                        thing.answerDisplay.push(value)
+                                        break
+                                    */
+                                    default :
+                                        thing.answerDisplay.push(value)
+                                }
+
+                            }
+                            $scope.lstQRItem.push(thing)
+
+
+
+                        }
+
+
+
+                    } else {
+                        //there is no answer, but add as a 'section'
+                        let thing = {item:def,answer:item.answer,answerDisplay:[]}
+                        thing.dt = "Group"
+                        $scope.lstQRItem.push(thing)
+                    }
+                    if (item.item) {
+                        for (const child of item.item) {
+                            processQRItem(child)
+                        }
+                    }
+                }
+
+
+
+            }
 
             $scope.popoverItem = function (item) {
                 if (item) {

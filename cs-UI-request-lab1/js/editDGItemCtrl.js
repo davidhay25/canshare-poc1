@@ -267,10 +267,12 @@ angular.module("pocApp")
 
                 $scope.input.identifierSystem = item.ed.identifierSystem
 
+                $scope.input.itemCode = item.ed.itemCode
+                /*
                 if (item.ed.itemCode) {
                     $scope.input.itemCode = true
                 }
-
+*/
                 $scope.input.selectedType = item.ed.type[0]
 
                 setControlOptions($scope.input.selectedType)
@@ -719,6 +721,8 @@ angular.module("pocApp")
                 }
 
                 ed.itemCode = $scope.input.itemCode
+
+
 
                 return ed
             }

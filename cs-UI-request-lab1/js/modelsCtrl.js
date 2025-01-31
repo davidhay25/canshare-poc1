@@ -255,6 +255,16 @@ angular.module("pocApp")
 
                             $scope.input.types = $localStorage.world.dataGroups  //<<<< temp
                             $scope.hashAllDG = $localStorage.world.dataGroups
+
+                            //retrieve the history (if any)
+                            delete $scope.playGroundHistory
+                            $http.get(`/playground/history/${playground.id}`).then(
+                                function (data) {
+                                    $scope.playGroundHistory = data.data
+                                  //  console.log($scope.playGroundHistory)
+                                }
+                            )
+
                             $scope.init()
 
                         }
@@ -795,8 +805,11 @@ angular.module("pocApp")
                         },
                         hashAllCompositions: function () {
                             return $scope.hashAllCompositions
-                        },name :function () {
-                            return $scope.world.name
+                        },meta :function () {
+                            let meta = {name:$scope.world.name,id:$scope.world.id}
+                            meta.description = $scope.world.description
+                            meta.version = $scope.world.version
+                            return meta
                         }
                     }
 
@@ -817,9 +830,15 @@ angular.module("pocApp")
                         })
 
                     }
+                    if (vo.meta) {
+                        $scope.world.name = vo.meta.name
+                        $scope.world.id = vo.meta.id
+                        $scope.world.description = vo.meta.description
+                        $scope.world.version = vo.meta.version || 0
 
-                    //alert("File has been imported. Please refresh the browser.")
-                    //$scope.$emit('updateDGList',{})
+                    }
+
+
                     $scope.init()
 
                 })
@@ -1308,6 +1327,7 @@ angular.module("pocApp")
                     if (isNew) {
                         //if it's new, then add it as a child of the currently selected element
 
+                        ed.id = utilsSvc.getUUID()  //the unique identifier. used for dependencies.
 
                         //need to determine the 'root' path.
                         let pathOfCurrentElement = ""  //$scope.selectedModel.name  //by default, add to the DG root
@@ -2086,6 +2106,8 @@ angular.module("pocApp")
             $scope.selectModel = function (dg) {
                 if (dg) {
 
+                    //ensure DG view selected
+                    $scope.input.mainTabActive = $scope.ui.tabDG
 
                     clearB4Select()
                     $scope.selectedModel = dg

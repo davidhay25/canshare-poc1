@@ -66,7 +66,7 @@ async function setup(app,mongoDbName) {
         }
     })
 
-    //get a single playground
+    //get a single playground by id
     app.get('/playground/:id', async function(req,res) {
         let id = req.params.id
         const query = {id:id}
@@ -90,6 +90,7 @@ async function setup(app,mongoDbName) {
         }
     })
 
+    //get a single playground by name
     app.get('/playgroundByName/:name', async function(req,res) {
         let name = req.params.name
         const query = {name:name}
@@ -113,6 +114,20 @@ async function setup(app,mongoDbName) {
         }
     })
 
+
+    //get the history of a playground
+    app.get('/playground/history/:id', async function(req,res) {
+        let id = req.params.id
+        const query = {id:id}
+        try {
+            const cursor = await database.collection("playgroundBackup").find(query).toArray()
+            res.json(cursor)
+
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+        }
+    })
 
     //get a summary of playgrounds
     app.get('/playgroundSummary', async function(req,res) {
@@ -160,9 +175,14 @@ async function setup(app,mongoDbName) {
     app.put('/playground/:id', async function(req,res) {
         let id = req.params.id
         let playground = req.body
+        let playgroundBackup = JSON.parse(JSON.stringify(playground))
+        delete playgroundBackup['_id']
 
         const query = {id:id}
         try {
+
+            await database.collection("playgroundBackup").insertOne(playgroundBackup)     //insert into the backup collection
+
             const cursor = await database.collection("playground").replaceOne(query,playground,{upsert:true})
 
             res.json(playground)
