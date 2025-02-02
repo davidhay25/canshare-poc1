@@ -54,7 +54,7 @@ angular.module('formsApp')
                     let concepts = []
                     if (item.answerValueSet) {
                         let options = vsSvc.getOneVS(item.answerValueSet)
-console.log(item.answerValueSet,options)
+//console.log(item.answerValueSet,options)
                         return options
                     } else {
                         if (item.answerOption) {
@@ -341,6 +341,10 @@ console.log(item.answerValueSet,options)
                         },function (err) {
                             $scope.validating = false
                             $scope.oo = err.data
+
+                            if (! $scope.oo) {
+                                $scope.oo = {issue:[{severity:'error',diagnostics:"There was an error in the Validator"}]}
+                            }
 
                         }
                     )

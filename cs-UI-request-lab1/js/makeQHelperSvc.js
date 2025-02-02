@@ -152,7 +152,44 @@ angular.module("pocApp")
 
             },
 
-            updateEnableWhen : function (Q,hashLinkId) {
+            updateEnableWhen : function (Q,hashId) {
+                //update the enableWhens based on the replacements in hashId which used the ED id
+
+                let logIssues = []
+
+                function processItem(item) {
+                    if (item.enableWhen) {
+
+                        item.enableWhen.forEach(function (ew) {
+                            //note that this is the id of the controlling element
+                            let questionId = ew.question //ew.sourcePathId    //the ED id of the source (controlling) elemeny
+
+                            if (hashId[questionId]) {
+                                ew.question = hashId[questionId]
+                            } else {
+                                logIssues.push({msg:`${questionId} not found at ${item.linkId}`})
+                            }
+                        })
+
+                    }
+                    if (item.item) {
+                        for (const child of item.item) {
+                            processItem(child)
+                        }
+                    }
+                }
+
+
+
+                for (let item of Q.item) {
+                    processItem(item)
+                }
+
+                return logIssues
+
+            },
+
+            updateEnableWhenDEP : function (Q,hashLinkId) {
                 //update the enableWhens based on the replacements in hashLinkId
 
                 let logIssues = []
@@ -205,29 +242,25 @@ angular.module("pocApp")
 
             updateLinkIds : function (Q,startInx) {
                 //change all the linkIds from the path to a sequential number. For cosmetic reasons
-
+                //does mean that EW and expressoins will need to be separately updated
                 let that = this
-                let hash = {}
+                let hashByLinkId = {}
+                let hashById = {}
                 let ctr = startInx || 0
 
                 function processItem(item,updateLinkId) {
                     //update the hash
                     if (updateLinkId) {
                         let key = `id-${ctr++}`
-                        hash[item.linkId] = key
+                        hashByLinkId[item.linkId] = key
+                        //some items won't have a prefix as they were inserted by the Q builder - eg help text
+                        if (item.prefix) {
+                            hashById[item.prefix] = key     //using prefix to store the ED id
+                        }
+
                         item.linkId = key
                     }
-/* temp
-                    //now update any enableWhens that have been updated. 2 passes are needed to get all of them...
-                    if (item.enableWhen) {
-                        for (const ew of item.enableWhen) {
-                            let src = ew.question
-                            if (hash[src]) {
-                                ew.question = hash[src]
-                            }
-                        }
-                    }
-*/
+
                     if (item.item) {
                         for (const child of item.item) {
                             processItem(child,updateLinkId)
@@ -237,22 +270,13 @@ angular.module("pocApp")
                 }
 
 
-                //first pass, update the LinkIds and some enablewhens
+                //Update the LinkIds
                 Q.item.forEach(function (item) {
                     processItem(item,true)
                 })
-/* temp
-                //second pass will be any unresolved enablewhen
-                Q.item.forEach(function (item) {
-                    processItem(item,false)
-                })
-*/
 
-                //let vo = that.updateEnableWhen(Q,hash)
 
-               // console.log(vo)
-
-                return {hash:hash,maxInx:ctr}     //we'll save the hash with the Q
+                return {hashByLinkId:hashByLinkId,hashById:hashById,maxInx:ctr}     //we'll save the hash with the Q
 
             },
             addExtension : function (item,ext) {

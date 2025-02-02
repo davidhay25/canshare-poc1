@@ -514,10 +514,17 @@ angular.module("pocApp")
                     //When an EW is in a contained DG, then the paths of the source (in the EW) need to be updated
                  //temp   let source = QutilitiesSvc.updateEWSourcePath(ed.path,ew.source)
                     let source = ew.source
-                    qEW.question = `${pathPrefix}${source}` //linkId of source is relative to the parent (DG)
+
+                    //--------------
+                    //qEW.question = `${pathPrefix}${source}` //linkId of source is relative to the parent (DG)
+
+                    //2Feb - make the question the sourceId. Then, adjust to the path after the Q has been generated
+                    qEW.question = ew.sourceId || "MissingSourceId"
+                    //---------------
 
                     //qEW.question = `${pathPrefix}${ew.source}` //linkId of source is relative to the parent (DG)
                     qEW.operator = ew.operator
+                   // qEW.
                     //if the ew.value is an object then assume a Coding. Otherwise a boolean (we only support these 2)
 
                     let canAdd = false
@@ -967,7 +974,7 @@ angular.module("pocApp")
 
                 let that = this
                 let errorLog = []
-                let allEW = []      //all EnableWhens - for validation
+            //    let allEW = []      //all EnableWhens - for validation
 
                 let Q = {resourceType:'Questionnaire'}
                 Q.title = comp.title
@@ -1020,7 +1027,6 @@ angular.module("pocApp")
                         for (const contentDG of section.items) {     //a section can have multiple DGs within it.
                             let dgType = contentDG.type[0]        //the dg type. Generally a 'section' dg
 
-
                             //todo - should this ordering be done in the snapshot service???
                             let dgElementList = snapshotSvc.getFullListOfElements(dgType)
 
@@ -1039,15 +1045,13 @@ angular.module("pocApp")
                             }
                             config.startInx = linkIdCtrStart
 
-
                             config.patientId = patientId //'testPatient'    //will be a uuid
-
 
                             let vo = that.makeHierarchicalQFromDG(dg,dgElementList,config)
 
                             linkIdCtrStart = vo.maxInx
 
-                            allEW.push(...vo.allEW)
+                          //  allEW.push(...vo.allEW)
 
                             let dgQ = vo.Q
 
@@ -1101,9 +1105,6 @@ angular.module("pocApp")
 
 
                             if (dgQ && dgQ.item[0]) {
-
-
-
 
                                 //todo - added this level of nesting as CSIRO renderer doesn't support pre-pop in tabs
                                 //makes the tree bad though...
@@ -1165,6 +1166,7 @@ angular.module("pocApp")
 
                 //console.log(allEW)
 
+                /*
                 //validate the enablewhens
                 for (const ew of allEW) {
                     if (! hashEd[ew.question]) {
@@ -1172,7 +1174,12 @@ angular.module("pocApp")
                     }
                 }
 
-                return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog,allEW:allEW}
+                */
+
+                //return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog,allEW:allEW}
+
+                //need to ensure callers of this don't do anything with allEW
+                return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog,allEW:[]}
 
             },
 
@@ -1201,7 +1208,8 @@ angular.module("pocApp")
                 //if config.expandVS is true, then the contents of the VS will be expanded as options into the item. May need to limit the length...
                 let errorLog = []
                 let firstElement = lstElements[0]
-                let allEW = []      //all EnableWhen. Used for validation
+
+              //  let allEW = []      //all EnableWhen. Used for validation
 
 
                 //all EDs where the valueSet is conditional. Anything that has a dependency of one of these
@@ -1391,8 +1399,6 @@ angular.module("pocApp")
                     //testHash
                     makeQHelperSvc.checkParentalHash(testHash,path)
 
-
-
                     //If this is being called from the composition then add the pathprefix to the path (linkId)
                     let newLink = path
                     if (pathPrefix) {
@@ -1412,7 +1418,7 @@ angular.module("pocApp")
 
                         if (config.enableWhen) {
                             let ar =  addEnableWhen(ed,currentItem,config.pathPrefix)
-                            allEW.push(...ar)
+                         //   allEW.push(...ar)
                         }
 
                         if (ed.mult.indexOf('..*')> -1) {
@@ -1469,7 +1475,6 @@ angular.module("pocApp")
                             if (displayBeforeItem) {
 
                                 let l = hashItems[parentItemPath].item.length
-
                                 hashItems[parentItemPath].item.splice(l-1,0,displayBeforeItem)
                             }
 
@@ -1479,11 +1484,7 @@ angular.module("pocApp")
                                 hashItems[parentItemPath].item.push(displayAfterItem)
                             }
 
-
-
                         }
-
-
 
                     } else {
                         //this is the first item in the DG Q.
@@ -1493,7 +1494,7 @@ angular.module("pocApp")
 
                         if (config.enableWhen) {
                             let ar = addEnableWhen(ed,currentItem,config.pathPrefix)
-                            allEW.push(...ar)
+                        //    allEW.push(...ar)
                         }
 
                         //this is the first item in the Q. We place any extraction context defined on the DG
@@ -1544,6 +1545,7 @@ angular.module("pocApp")
 
                // console.log(hashItems)
 
+                /* this is redundant after the move to using Ids...
 
                 //validate the enablewhens - but not if the generation is called from the composition
                 //if the error is to an element that has conditional ValueSets, then it isn't really an error
@@ -1579,23 +1581,31 @@ angular.module("pocApp")
                 }
 
 
+                */
+
+
                 //at this point the Q has been built, but if there were any elements with conditionalVS
                 //then that element will not have been added to the Q (conditional items for each possible VS will have been)
                 //and any other items that have a dependency on that one will need to be corrected...
 
-                correctEW(Q,conditionalED)
+                //NOTE: This does need to be here to support conditional VS - just commenting it out while I check EW creation
+                //to avoid confusing things
+                //temp correctEW(Q,conditionalED)
 
                 let vo = makeQHelperSvc.updateLinkIds(Q,startInx)
 
-                makeQHelperSvc.updateEnableWhen(Q,vo.hash)
+                //console.log(vo)
 
-                makeQHelperSvc.updateExpressions(Q,vo.hash)
+                //the 'question' entry in the EW will be to the sourceId id. This replaces with linkId
+                makeQHelperSvc.updateEnableWhen(Q,vo.hashById)
+
+                makeQHelperSvc.updateExpressions(Q,vo.hashByLinkId)
 
 
 
-                return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog, allEW : newAllEW, lidHash:vo.lidHash,maxInx:vo.maxInx}
+               //return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog, allEW : newAllEW, lidHash:vo.lidHash,maxInx:vo.maxInx}
 
-
+                return {Q:Q,hashEd:hashEd,hashVS:hashVS,errorLog:errorLog, lidHash:vo.lidHash,maxInx:vo.maxInx}
 
                 //add details to item
                 //extraction context is the url of the profile (could be a core type)
@@ -1756,6 +1766,8 @@ angular.module("pocApp")
                     if (ed.itemCode) {
                         item.code = [ed.itemCode]
                     }
+
+                    item.prefix = ed.id     //save the Id in the prefix. We'll need it for adjusting the EnableWhens
 
                     //add any units
                     addUnits(item,ed)
@@ -1967,12 +1979,22 @@ angular.module("pocApp")
 
                     if (ed.instructions) {
 
+
+
+/* - I think I'm using this incorrectly... disable for now
                         let child = {type:'display',linkId:`${ed.linkId}-instructions`,text:ed.instructions}
                         let cc = {coding:[{code:"instructions",system:"http://hl7.org/fhir/questionnaire-display-category"}]}
                         let ext = {url:extensionUrls.displayCategory,valueCodeableConcept:cc}
                         child.extension =  [ext]
-                        item.item = item.item || []
-                        item.item.push(child)
+
+                        item.extension = item.extension || []
+                        item.extension.push(ext)
+
+                       // item.item = item.item || []
+                       // item.item.push(child)
+                        */
+
+
                     }
 
                     if (ed.helpText){

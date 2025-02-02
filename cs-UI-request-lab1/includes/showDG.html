@@ -371,7 +371,7 @@
             <uib-tabset ng-hide="selectedNode.data.ed.kind == 'root'">
 
               <button class="btn-link btn pull-right"
-                      ng-if="selectedNode && canEdit(selectedModel)"
+                      ng-if="selectedNode && canEditED(selectedModel,selectedNode)"
                       ng-click="editDGItem(selectedNode.data)">Edit </button>
 
               <uib-tab heading="Details">
@@ -398,21 +398,26 @@
                   <tr>
                     <td class="detailName" style="width : 20%">Source model</td>
                     <td>
-
+<!--
                       <div ng-hide="selectedNode.data.ed.sourceModelName == selectedModel.name"
                            class="pull-right clickable"
                            style="padding-right: 12px"
                            ng-click="termSelectDG({DGName:selectedNode.data.ed.sourceModelName},selectedModel.name)">
                         Load
                       </div>
+-->
 
 
-                      {{hashAllDG[selectedNode.data.ed.sourceModelName].title}}
 
                       <div class = 'clickable'
                             ng-click="termSelectDG({DGName:selectedNode.data.ed.sourceModelName},selectedModel.name)">
-                        <em>{{selectedNode.data.ed.sourceModelName}}</em></div>
+                        <em>{{selectedNode.data.ed.sourceModelName}}</em>
 
+
+                      </div>
+                      <!--
+                      <span>{{hashAllDG[selectedNode.data.ed.sourceModelName].title}}</span>
+-->
 
                     </td>
                   </tr>
@@ -859,13 +864,13 @@
               </uib-tab>
 
               <uib-tab heading="Json">
-                <!--
+
                 New
                 <pre>{{edForJsonDisplay | json}}</pre>
                 Old
 
-                -->
-                <pre ng-if="selectedNode">{{selectedNode.data.ed | json}}</pre>
+
+                <pre ng-show="selectedNode">{{selectedNode.data.ed | json}}</pre>
 
               </uib-tab>
             </uib-tabset>
@@ -950,6 +955,8 @@
                   {{element.ed.fixedDecimal}}{{element.ed.fixedString}}
                   {{element.ed.fixedQuantity.value}} {{element.ed.fixedQuantity.unit}}
 
+
+                  <div ng-if="element.ed.itemCode">Code: {{element.ed.itemCode.code}}</div>
                   <div ng-if="element.ed.definition">Extract: {{element.ed.definition}}</div>
                   <div ng-if="element.ed.prePop">PrePop: {{element.ed.prePop}}</div>
                   {{getExtractType(element.ed)}}

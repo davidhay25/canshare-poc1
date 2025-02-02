@@ -551,6 +551,7 @@
                                 <div ng-if="userMode == 'playground'">Forms</div>
                                 <div ng-if="userMode == 'library'">Library</div>
 
+
                             </td>
 
                         </tr>
@@ -561,6 +562,11 @@
                                 </div>
                                 <div class="col-md-3">
                                     Version: {{world.version}}
+                                    <div ng-if="world.lockedTo"
+                                         style="color: red">
+                                        Locked to: {{world.lockedTo}}
+
+                                    </div>
                                 </div>
                             </div>
 
@@ -713,6 +719,10 @@
 
 
 
+                </uib-tab>
+
+                <uib-tab ng-if="userMode == 'playground'"  heading="Form history">
+                    <pre>{{playGroundHistory | json}}</pre>
                 </uib-tab>
 
 

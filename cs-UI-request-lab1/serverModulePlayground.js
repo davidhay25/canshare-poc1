@@ -66,6 +66,52 @@ async function setup(app,mongoDbName) {
         }
     })
 
+
+    app.post('/playground/unlock',async function(req,res) {
+        let vo = req.body
+        const command = {'$unset':{lockedTo:""}}
+        const query = {id:vo.id}
+        try {
+            const cursor1 = await database.collection("playground").updateOne(query,command)
+            res.json(cursor1[0])
+        } catch (ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+        }
+
+
+
+    })
+
+    //lock a playground
+    app.post('/playground/lock', async function(req,res) {
+        let vo = req.body
+        const query = {id:vo.id}
+        try {
+            const cursor = await database.collection("playground").find(query).toArray()
+            if (cursor.length == 1) {
+
+                let playground = cursor[0]
+                playground.lockedTo = vo.email
+
+                const cursor1 = await database.collection("playground").replaceOne(query,playground,{upsert:true})
+
+                res.json(cursor1[0])
+            } else {
+                if (cursor.length == 0) {
+                    res.status(404).json({msg:'Form not found'})
+                } else {
+                    res.status(500).json({msg:`There were ${cursor.length} Forms with this id. This shouldn't happen.`})
+                }
+
+            }
+        } catch (ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+        }
+
+    })
+
     //get a single playground by id
     app.get('/playground/:id', async function(req,res) {
         let id = req.params.id
@@ -137,6 +183,7 @@ async function setup(app,mongoDbName) {
             for (const entry of cursor) {
                 let item = {id:entry.id,name:entry.name,description:entry.description,updated:entry.updated}
                 item.version = entry.version
+                item.lockedTo = entry.lockedTo
                 if (entry.dataGroups) {
                     item.dgCount = Object.keys(entry.dataGroups).length
                 }

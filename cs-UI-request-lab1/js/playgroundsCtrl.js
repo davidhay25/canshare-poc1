@@ -1,15 +1,48 @@
 angular.module("pocApp")
     .controller('playgroundsCtrl',
-        function ($scope,$http,userMode,playground,utilsSvc,$localForage) {
+        function ($scope,$http,userMode,playground,utilsSvc,$localForage,currentDirty,user) {
 
             $scope.input = {}
-            //$scope.playground = playground
+
+            $scope.user = user
 
             if (userMode == 'library') {
                 if (! confirm("Make sure you have saved any updates before switching to Playground mode! Do you wish to continue?")){
                         return
                 }
             }
+
+            $scope.currentDirty = currentDirty
+
+
+            //Lock a from so no-one else can update
+            $scope.lock = function (row) {
+                let vo = {email:user.email,id:row.id}
+
+                $http.post(`/playground/lock`,vo).then(
+                    function (data) {
+                        alert("This form can now only be updated by you!")
+                        row.lockedTo = user.email   //just to update the UI
+                    }, function (err) {
+                        alert(angular.toJson(err.data) )
+                    })
+
+            }
+
+            //unlock to allow others to update
+            $scope.unlock = function (row) {
+                let vo = {id:row.id}
+
+                $http.post(`/playground/unlock`,vo).then(
+                    function (data) {
+                        alert("This form can now be updated by anyone")
+                        delete row.lockedTo  //just to update the UI
+                    }, function (err) {
+                        alert(angular.toJson(err.data) )
+                    })
+
+            }
+
 
             function makeLocalStoreSummary() {
                 $scope.localStore = []
@@ -28,7 +61,7 @@ angular.module("pocApp")
 
                     $scope.localStore.push(item)
 
-                    console.log(key,value)
+
 
                 }).then(function(data) {
                     // data is the key of the value > 10
@@ -63,7 +96,7 @@ angular.module("pocApp")
             )
 
             $scope.load = function (playground,source) {
-                let msg = "This action will replace the current model. Are you sure you wish to load a new one?"
+                let msg = "This action will replace the current form. Are you sure you wish to load a new one?"
                 if (confirm(msg)) {
                     if (source == 'repo') {
                         //from the library repository
@@ -111,77 +144,20 @@ angular.module("pocApp")
                         )
                     }
                 }
-
-                return
-
-                $http.get(`/playground/${playgroundSummary.id}`).then(
-                    function (data) {
-                        let playground = data.data      //the playground being copied
-
-                        let name = prompt("What name do you want to use for the copy")
-                        if (name) {
-
-                            playground.name = name
-                            playground.id = utilsSvc.getUUID()
-                            $scope.$close(playground)
-
-                            /*
-                            $http.put(`/playground/${name}`,playground).then(
-                                function (data) {
-                                    alert("The playground has been copied.")
-                                    $scope.$close(playground)
-                                }, function (err) {
-                                    alert("Error saving copy" + angular.toJson(err.data))
-                                }
-                            )
-                            */
-
-
-
-                            /*
-                            $http.get(`/playground/${name}`).then(
-                                function (data) {
-                                    alert("Sorry, this name has been used before.")
-                                },function (err) {
-                                    if (err.status == 404) {
-                                        playground.name = name
-                                        $http.put(`/playground/${name}`,playground).then(
-                                            function (data) {
-                                                alert("The playground has been copied.")
-                                                $scope.$close(playground)
-                                            }, function (err) {
-                                                alert("Error saving copy" + angular.toJson(err.data))
-                                            }
-                                        )
-                                    } else {
-                                        alert("Error accessing library")
-                                    }
-                                }
-                            )
-                            */
-                        }
-                    }, function (err) {
-                        alert("Error getting original playground")
-
-                    })
-
-
-
             }
 
             $scope.delete = function (playground,source) {
-                if (confirm(`Are you sure you wish to delete the ${playground.name} playground?`)) {
+                if (confirm(`Are you sure you wish to delete the ${playground.name} form?`)) {
                     if (source == 'local') {
                         let key = `pg-${playground.id}`
                         $localForage.removeItem(key).then(
                             function (data) {
-                                alert("Playground has been removed from the localstore.")
+                                alert("The form has been removed from the localstore.")
                                 makeLocalStoreSummary()
                             }
                         )
                     }
                 }
-
             }
 
             $scope.createNew = function () {
@@ -193,47 +169,10 @@ angular.module("pocApp")
                 pg.dataGroups = {}
                 pg.compositions = {}
 
-                alert("The playground has been created in the working model. It won't be created in the Local store until you update it.")
+                alert("The form has been created in the working model. It won't be created in the Local store until you update it.")
                 $scope.$close(pg)
 
 
-
-/*
-
-                //check that name doesn't exist already
-                let name = $scope.input.name
-                $http.get(`/playground/${name}`).then(
-                    function (data) {
-                            
-                    },function (err) {
-                            if (err.status == '404') {
-
-                                let world = {name:name,description:$scope.input.description}
-                                world.dataGroups = {}
-                                world.compositions = {}
-
-                                $http.put(`/playground/${name}`,world).then(
-                                    function (data) {
-                                        alert("The playground has been created.")
-                                        $scope.$close(world)
-                                    }, function (err) {
-                                        alert(angular.toJson(err.data))
-                                    }
-                                )
-
-                            } else {
-                                    alert("This name has already been used - try another")
-                            }
-
-                    }
-                )
-
-                */
-                    
-
-                
-                //return new wold - note than may be a clone of another. Caller updates browser cache    
-                    
             }
         }
 )

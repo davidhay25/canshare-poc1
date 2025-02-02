@@ -32,6 +32,25 @@ angular.module("pocApp")
 
             }
 
+            //can a selected node be edited? Depends on userMode and checkedOut status
+            $scope.canEditED = function (selectedModel,node) {
+
+                let canEdit = $scope.canEdit(selectedModel) // true if playground mode or library mode and checked out to user
+
+                if ($scope.userMode == 'playground') { //additional check in playground / forms mode
+
+                    if (node && node.data && node.data.ed) {
+                        let path = $filter('dropFirstInPath')(node.data.ed.path) //path has leading DG name
+                        let ar = selectedModel.diff.filter(ed => ed.path == path)
+                        if (ar.length == 0) {
+                            canEdit = false
+                        }
+                    }
+
+                }
+                return canEdit
+            }
+
 
             $scope.testxquery = function (queryName) {
 
@@ -315,6 +334,7 @@ angular.module("pocApp")
 
                 //let sourcePath = item.shortPath       //this is the path of the source
                 let sourcePath = item.ed.path       //the controlling ED path. THIS MUST BE THE FULL PATH includeing DG name
+                let sourcePathId = item.ed.id       //the id of the ed
                 //let targetPath =$scope.selectedNode.data.ed.path
                 let targetPath = $filter('dropFirstInPath')($scope.selectedNode.data.ed.path)  //the currently selected ED - the one that will be controlled
                 let targetED = $scope.selectedNode.data.ed  //this ED - the one that will be shown / hidden
@@ -326,7 +346,7 @@ angular.module("pocApp")
                     if (ed.path == targetPath) {
                         found = true
                         ed.enableWhen = ed.enableWhen || []
-                        let ew = {source:sourcePath,operator:op,value:value}
+                        let ew = {source:sourcePath,sourcePathId: sourcePathId,operator:op,value:value}
                         ed.enableWhen.push(ew)
 
                         //traceSvc.addAction({action:'add-enablewhen',model:$scope.selectedModel,path:targetPath,description:'edit diff'})
@@ -338,7 +358,7 @@ angular.module("pocApp")
                     let diffEd = angular.copy(targetED)     //this is a copy of the 'source' - which will be hidden
                     diffEd.path = targetPath
                     diffEd.enableWhen = item.ed.enableWhen || []
-                    let ew = {source:sourcePath,operator:"=",value:value}
+                    let ew = {source:sourcePath,sourcePathId: sourcePathId,operator:"=",value:value}
                     diffEd.enableWhen.push(ew)
                     $scope.selectedModel.diff.push(diffEd)
                     traceSvc.addAction({action:'add-enablewhen',model:$scope.selectedModel,path:targetPath,description:'add diff'})

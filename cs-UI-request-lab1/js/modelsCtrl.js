@@ -144,7 +144,7 @@ angular.module("pocApp")
 
                     //make the DG replica of a composition
                     let frozen = snapshotSvc.getFrozenComp($scope.selectedComposition,$scope.allCompElements)
-                    console.log(frozen)
+
                     saveModel(frozen)
 
                 }
@@ -243,6 +243,20 @@ angular.module("pocApp")
                         },
                         playground: function () {
                             return $localStorage.world
+                        },
+                        currentDirty: function () {
+                            //have any of the DG's been changed
+                            let dirty = false
+                            for (const key of Object.keys($scope.hashAllDG)) {
+                                if ($scope.hashAllDG[key].dirty) {
+                                    dirty = true
+                                    break
+                                }
+                            }
+                            return dirty
+                        },
+                        user : function () {
+                            return $scope.user
                         }
                     }
                     }).result.then(function (playground) {
@@ -253,18 +267,24 @@ angular.module("pocApp")
                             $localStorage.world = playground
                             $scope.world = playground
 
-                            $scope.input.types = $localStorage.world.dataGroups  //<<<< temp
+                            //reset the dirty flag of all DGs
+                            for (const key of Object.keys($localStorage.world.dataGroups)) {
+                                let DG = $localStorage.world.dataGroups[key]
+                                DG.dirty = false
+                            }
+
+                            $scope.input.types = $localStorage.world.dataGroups  //todo - fix this<<<< temp
                             $scope.hashAllDG = $localStorage.world.dataGroups
 
+                            /* - don't delete, just not sure of the best approach
                             //retrieve the history (if any)
                             delete $scope.playGroundHistory
                             $http.get(`/playground/history/${playground.id}`).then(
                                 function (data) {
                                     $scope.playGroundHistory = data.data
-                                  //  console.log($scope.playGroundHistory)
                                 }
                             )
-
+*/
                             $scope.init()
 
                         }
@@ -287,27 +307,33 @@ angular.module("pocApp")
                     DG.dirty = false
                 }
 
-                $http.put(`/playground/${$localStorage.world.id}`,$localStorage.world).then(
-                    function (data) {
+                if ($localStorage.world.lockedTo && $localStorage.world.lockedTo !== $scope.user.email) {
+                    alert (`Form is locked by ${$localStorage.world.lockedTo}. Only they can make changes. You can still make a copy or save to your local store.`)
+                } else {
+                    $http.put(`/playground/${$localStorage.world.id}`,$localStorage.world).then(
+                        function (data) {
 
-                        if (both) {
-                            //update repo and local
-                            $scope.savePGtoLocal(true,true,function () {
-                                alert("Both repository and local copies of the Form have been updated.")
-                            })
+                            if (both) {
+                                //update repo and local
+                                $scope.savePGtoLocal(true,true,function () {
+                                    alert("Both repository and local copies of the Form have been updated.")
+                                })
 
-                        } else {
-                            let msg = "The Form has been updated."
-                            if (! $localStorage.world.description) {
-                                msg += " You can edit the description in this page."
+                            } else {
+                                let msg = "The Form has been updated."
+                                if (! $localStorage.world.description) {
+                                    msg += " You can edit the description in this page."
+                                }
+                                alert(msg)
                             }
-                            alert(msg)
-                        }
 
-                    }, function (err) {
-                        alert(angular.toJson(err.data))
-                    }
-                )
+                        }, function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+                }
+
+
             }
 
             $scope.savePGtoLocal = function (hideAlert,noversionupdate,cb) {
@@ -1852,6 +1878,8 @@ angular.module("pocApp")
                         //if a model is returned, then it is a new one and needs to be added to the world
                         //traceSvc.addAction({action:'new-model',model:newModel})
 
+                        newModel.id = utilsSvc.getUUID()
+
                         if ($scope.user) {
                             newModel.author = $scope.user.email
                             librarySvc.checkOut(newModel,$scope.user)
@@ -2106,11 +2134,21 @@ angular.module("pocApp")
             $scope.selectModel = function (dg) {
                 if (dg) {
 
+
+
                     //ensure DG view selected
                     $scope.input.mainTabActive = $scope.ui.tabDG
 
                     clearB4Select()
                     $scope.selectedModel = dg
+
+                    //ensure that every ed has an id. If the DG does, then the EDs will as well...
+                    if (! $scope.selectedModel.id) {
+
+                        modelDGSvc.updateDGId($scope.selectedModel)    //add id's to DG & ED plus update conditionals
+                        $scope.hashAllDG[dg.name] = $scope.selectedModel //needed to update the local storage
+                    }
+
 
                     $scope.fhirResourceType = igSvc.findResourceType(dg,$scope.hashAllDG)   //not sure if this is used wo fsh stuff
 

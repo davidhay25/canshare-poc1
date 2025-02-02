@@ -8,6 +8,38 @@ angular.module("pocApp")
 
         return {
 
+            updateDGId : function (dg) {
+                //add id's to the dg and all the ed. Update any conditionals
+//return //just for now
+                dg.id = utilsSvc.getUUID()
+
+                let hashByPath = {}
+
+                //assign the ids
+                dg.diff.forEach(function (ed) {
+                    let id = ed.id || utilsSvc.getUUID()
+                    ed.id = id
+                    let fullPath = `${dg.name}.${ed.path}`    //the diff doesn't have the dg name prefix
+                    hashByPath[fullPath] = id
+                })
+
+                //update the conditionals
+                dg.diff.forEach(function (ed) {
+                    if (ed.enableWhen) {
+                        ed.enableWhen.forEach(function (ew) {
+
+                            let sourceId = hashByPath[ew.source]
+                            if (sourceId) {
+                                ew.sourceId = sourceId
+                            } else {
+                                console.error(`EW source path ${ew.source} not found in DG`)
+                            }
+
+                        })
+                    }
+                })
+
+            },
 
 
             auditDGDiff : function (dg,hashAllDG) {
