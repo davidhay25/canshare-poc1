@@ -111,7 +111,12 @@ angular.module("pocApp")
                         let key = `pg-${playground.id}`
                         $localForage.getItem(key).then(
                             function (data) {
+                                if (! data) {
+                                    alert("The form wasn't in the local store!")
+                                }
                                 $scope.$close(data)
+                            }, function (err) {
+                                alert(angular.toJson(err))
                             }
                         )
                     }

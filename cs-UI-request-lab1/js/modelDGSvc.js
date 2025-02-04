@@ -27,8 +27,9 @@ angular.module("pocApp")
                 dg.diff.forEach(function (ed) {
                     if (ed.enableWhen) {
                         ed.enableWhen.forEach(function (ew) {
-
-                            let sourceId = hashByPath[ew.source]
+                            //note that ew.source has the dgName as a prefix. hashByPath does not.
+                            let key = `${dg.name}.${ew.source}`
+                            let sourceId = hashByPath[key]
                             if (sourceId) {
                                 ew.sourceId = sourceId
                             } else {

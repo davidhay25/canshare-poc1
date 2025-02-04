@@ -1,12 +1,13 @@
 angular.module("pocApp")
     .controller('selectEDCtrl',
-        function ($scope,DG,$http,modelsSvc,insertNode,$filter,viewVS) {
+        function ($scope,DG,$http,modelsSvc,insertNode,$filter,viewVS,utilsSvc) {
 
             $scope.linkedDGName = DG.linkedDG
 
             //create a list of all current children of the node where these items are to be inserted.
             //Don't insert anything with the same name
             let currentChildren = []
+
             let currentPath = $filter('dropFirstInPath')(insertNode.data.ed.path)  //this is the full path with the DG name as a prefix, so drop the DF name
 
             for (let ed of DG.diff) {
@@ -29,13 +30,16 @@ angular.module("pocApp")
                 function (data) {
                     $scope.linkedDG = data.data
 
-                    let ar = []
+                    let arElements = []
+                    let rootEd = {name:$scope.linkedDG.name,title:$scope.linkedDG.title, path:$scope.linkedDG.name}
+                    arElements.push({ed:rootEd})  //the root
+
                     for (const ed of $scope.linkedDG.diff) {
-                        ar.push({ed:ed})
+                        ed.path = `${$scope.linkedDG.name}.${ed.path}`
+                        arElements.push({ed:ed})
                     }
 
-                    let treeData = modelsSvc.makeTreeFromElementList(ar)
-
+                    let treeData = modelsSvc.makeTreeFromElementList(arElements)
                     drawDGTree(treeData)
 
 
@@ -54,8 +58,8 @@ angular.module("pocApp")
                 let arSelected = []
 
                 //set the path to the last segment, checking for dups
-                let hashPath = {}
-                let dups = []
+                //let hashPath = {}
+               // let dups = []
                 if ($scope.selectedED) {
 
                     for (const ed of $scope.selectedED) {
@@ -63,44 +67,18 @@ angular.module("pocApp")
                             if (! ed.isDupPath) {
                                 ed.pathInSource = ed.path
                                 ed.path = ed.newPath
+                                ed.id = ed.id || utilsSvc.getUUID()
                                 delete ed.dupPath
                                 arSelected.push(ed)
                             }
-/*
-                            if (hashPath[ed.newPath]) {
-                                dups.push(ed)
-                            } else {
-                                ed.pathInSource = ed.path
-                                ed.path = ed.newPath
 
-                                hashPath[ed.newPath] = ed
-                            }
-                            */
-
-                            /*
-                            let ar = ed.path.split('.')
-                            let newPath = ar[ar.length-1]
-
-                            if (hashPath[newPath]) {
-                                dups.push(ed)
-                            } else {
-                                ed.path = newPath
-                                hashPath[newPath] = ed
-                            }
-                            */
                         }
 
                     }
                 }
 
-                // ??? todo - what to do with dups - ?rename ?reject
 
-/*
-                for (const key of Object.keys(hashPath)) {
-                    arSelected.push(hashPath[key])
 
-                }
-*/
                 //check the ed - eg remove enableWhen, conditionalVS
                 checkForIssues(arSelected,true)
 
@@ -197,7 +175,6 @@ angular.module("pocApp")
                         $scope.selectedED.push(ed)
                     }
 
-
                 })
 
                 checkForDups($scope.selectedED)
@@ -250,6 +227,9 @@ angular.module("pocApp")
                 for (let ed of lst) {
                     if (ed.enableWhen) {
                         let iss = `${ed.path} has conditionals (EnableWhen) set which will be disabled.`
+                        for (const ew of ed.enableWhen) {
+                            iss += `Conditional on ${ew.source}`
+                        }
                         $scope.issues.push(iss)
 
                         if (clean) {

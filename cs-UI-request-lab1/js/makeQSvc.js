@@ -440,10 +440,11 @@ angular.module("pocApp")
                     break
                 case "sometimes" :
                     //add the additional item, plus a conditional on the sourceItem
-                    newItem = {text:`Other ${ed.title}`,linkId:`${ed.path}-other`,type:'string'}
+                    let id =  utilsSvc.getUUID()
+                    newItem = {text:`Other ${ed.title}`,linkId:`${ed.path}-other`,type:'string',prefix: id}
 
                     let qEW = {}
-                    qEW.question = sourceItem.linkId
+                    qEW.question = sourceItem.prefix //  id //sourceItem.linkId
                     qEW.operator = '='
                     qEW.answerCoding = {code:"74964007",system:'http://snomed.info/sct'}
 
@@ -1597,9 +1598,9 @@ angular.module("pocApp")
                 //console.log(vo)
 
                 //the 'question' entry in the EW will be to the sourceId id. This replaces with linkId
-                makeQHelperSvc.updateEnableWhen(Q,vo.hashById)
+                errorLog.push(...  makeQHelperSvc.updateEnableWhen(Q,vo.hashById))
 
-                makeQHelperSvc.updateExpressions(Q,vo.hashByLinkId)
+                errorLog.push(...makeQHelperSvc.updateExpressions(Q,vo.hashByLinkId))
 
 
 

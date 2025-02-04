@@ -168,6 +168,7 @@ angular.module("pocApp")
                                 ew.question = hashId[questionId]
                             } else {
                                 logIssues.push({msg:`${questionId} not found at ${item.linkId}`})
+                                console.warn(`${questionId} not found at ${item.linkId}`)
                             }
                         })
 

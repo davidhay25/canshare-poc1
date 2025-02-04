@@ -282,6 +282,7 @@
                    style="padding-top: 8px" ng-click="insertDGItem()">
 
                 Copy new element
+
                 <span ng-if="selectedNode">to {{selectedNode.data.ed.path}}</span>
 
 
@@ -328,6 +329,9 @@
               <table class="table table-bordered table-condensed">
                 <tr><td>Name</td><td>{{selectedModel.name}}</td></tr>
                 <tr><td>Description</td><td>{{selectedModel.description}}</td></tr>
+
+                <tr ng-if="selectedModel.linkedDG"><td>Linked DG</td><td>{{selectedModel.linkedDG}}</td></tr>
+
                 <tr ng-if="selectedModel.type"><td>Resource type</td><td>{{selectedModel.type}}</td></tr>
                 <tr ng-if="selectedModel.sourceReference"><td>Source reference</td><td>{{selectedModel.sourceReference}}</td></tr>
                 <tr ng-if="selectedModel.checkedOut"><td>Checked out</td>
@@ -346,7 +350,7 @@
                   </td>
                 </tr>
 
-                <tr ng-if="selectedModel.fixedValues"><td>Fixed values</td>
+                <tr ng-if="selectedModel.fixedValues.length > 0"><td>Fixed values</td>
                   <td>
                     <div ng-repeat = "fv in selectedModel.fixedValues">
 

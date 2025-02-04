@@ -34,20 +34,25 @@ angular.module("pocApp")
 
             //can a selected node be edited? Depends on userMode and checkedOut status
             $scope.canEditED = function (selectedModel,node) {
+                let canEdit = false
+                if (selectedModel) {
+                    canEdit = $scope.canEdit(selectedModel) // true if playground mode or library mode and checked out to user
 
-                let canEdit = $scope.canEdit(selectedModel) // true if playground mode or library mode and checked out to user
+                    if ($scope.userMode == 'playground') { //additional check in playground / forms mode
 
-                if ($scope.userMode == 'playground') { //additional check in playground / forms mode
-
-                    if (node && node.data && node.data.ed) {
-                        let path = $filter('dropFirstInPath')(node.data.ed.path) //path has leading DG name
-                        let ar = selectedModel.diff.filter(ed => ed.path == path)
-                        if (ar.length == 0) {
-                            canEdit = false
+                        if (node && node.data && node.data.ed) {
+                            let path = $filter('dropFirstInPath')(node.data.ed.path) //path has leading DG name
+                            let ar = selectedModel.diff.filter(ed => ed.path == path)
+                            if (ar.length == 0) {
+                                canEdit = false
+                            }
                         }
-                    }
 
+                    }
                 }
+
+
+
                 return canEdit
             }
 

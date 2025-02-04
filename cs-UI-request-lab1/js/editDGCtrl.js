@@ -13,7 +13,22 @@ angular.module("pocApp")
             //construct a has of all types (DT + FHIR) for the full list of elements routine
             $scope.allTypes = angular.copy(hashTypes)
 
-            //create a list of potential parent types for a new DG -
+            //frozen DG - ie components
+            $http.get('/allfrozen').then(
+                function (data) {
+                    $scope.allFrozen = data.data
+                    populateControls()
+
+                },function (err) {
+                    alert(angular.toJson(err))
+                    $scope.allFrozen = []
+                    populateControls()      //even in error
+                }
+            )
+
+
+
+                    //create a list of potential parent types for a new DG -
             $scope.input.possibleParents = []
             Object.keys(hashTypes).forEach(function (key) {
                 if (hashTypes[key].kind == 'dg') {      //should only be DG
@@ -316,6 +331,10 @@ angular.module("pocApp")
             //create the list of DG's that can be added as child elements. Don't include this one...
             if (isNew) {
                 $scope.input.types = Object.keys(hashTypes) //an array for the new type dropdown
+
+                $scope.input.termSvr = 'https://backup.canshare.co.nz/proxy'
+
+
             } else {
                 $scope.input.types = []
                 let ar = Object.keys(hashTypes)
@@ -343,55 +362,72 @@ angular.module("pocApp")
 
 
 
+
             //if not new, set the UI names & parent
             //the editing is directly on the $scope.model (there's an onchange handler that updates it as these values are changed
-            if (! isNew) {
-
-                $scope.input.newModelName = model.name
-                $scope.input.newModelTitle = model.title
-                $scope.input.sourceReference = model.sourceReference
-                $scope.input.newModelDescription = model.description
-                $scope.input.isContainer = model.isContainer
-                $scope.input.idVariable = model.idVariable
-
-                $scope.input.namedQueries = model.namedQueries          //the array of named queries this DG requires...
-                $scope.input.type = model.type
-                if (model.parent) {
-                    $scope.input.newModelParent = model.parent
-                }
-
-                $scope.input.fixedValues = model.fixedValues || []
-                $scope.input.resourceReferences = model.resourceReferences || []
-
-                $scope.extractedResources =  snapshotSvc.getExtractableDG(model.name)
-                $scope.input.adHocExt = model.adHocExt
-
-                $scope.input.termSvr = model.termSvr
-                $scope.input.linkedDG = model.linkedDG
 
 
-                if (model.obsExtract) {
-                    $scope.input.obsExtract = true
-                }
+            function populateControls() {
+                if (! isNew) {
+
+                    $scope.input.newModelName = model.name
+                    $scope.input.newModelTitle = model.title
+                    $scope.input.sourceReference = model.sourceReference
+                    $scope.input.newModelDescription = model.description
+                    $scope.input.isContainer = model.isContainer
+                    $scope.input.idVariable = model.idVariable
+
+                    $scope.input.namedQueries = model.namedQueries          //the array of named queries this DG requires...
+                    $scope.input.type = model.type
+                    if (model.parent) {
+                        $scope.input.newModelParent = model.parent
+                    }
+
+                    $scope.input.fixedValues = model.fixedValues || []
+                    $scope.input.resourceReferences = model.resourceReferences || []
+
+                    $scope.extractedResources =  snapshotSvc.getExtractableDG(model.name)
+                    $scope.input.adHocExt = model.adHocExt
+
+                    $scope.input.termSvr = model.termSvr
 
 
-                getFullElementList()
-
-              
-            } else {
-                if (parent) {
-                    //if there's a parent passed in for a new DG, then set the parent dropdown
-
-                    for (name of $scope.input.possibleParents) {
-                        if (name == parent.name) {
-                            $scope.input.newModelParent = name
-                            $scope.setModelAttribute('parent',name)
-                            break
+                    if (model.linkedDG) {
+                        let ar = $scope.allFrozen.filter(dg => dg.name == model.linkedDG)
+                        if (ar.length == 1) {
+                            $scope.input.linkedDG = ar[0]
                         }
                     }
 
+                    //input.linkedDG
+                    //$scope.input.linkedDG = model.linkedDG
+
+
+                    if (model.obsExtract) {
+                        $scope.input.obsExtract = true
+                    }
+
+
+                    getFullElementList()
+
+
+                } else {
+                    if (parent) {
+                        //if there's a parent passed in for a new DG, then set the parent dropdown
+
+                        for (name of $scope.input.possibleParents) {
+                            if (name == parent.name) {
+                                $scope.input.newModelParent = name
+                                $scope.setModelAttribute('parent',name)
+                                break
+                            }
+                        }
+
+                    }
                 }
             }
+
+
 
 
 
@@ -621,7 +657,12 @@ angular.module("pocApp")
                 model.isContainer = $scope.input.isContainer
                 model.idVariable = $scope.input.idVariable
                 model.termSvr = $scope.input.termSvr
-                model.linkedDG = $scope.input.linkedDG
+                if ($scope.input.linkedDG) {
+                    model.linkedDG = $scope.input.linkedDG.name
+                } else {
+                    delete model.linkedDG
+                }
+
 
 
 
@@ -649,6 +690,13 @@ angular.module("pocApp")
                         $scope.model.namedQueries = $scope.model.namedQueries || []
                         $scope.model.namedQueries.push(key)
                     }
+                }
+
+                //make sure all eds have an id
+                if ($scope.model.diff) {
+                    $scope.model.diff.forEach(function (ed) {
+                        ed.id = ed.id || utilsSvc.getUUID()
+                    })
                 }
 
                 if (isNew) {

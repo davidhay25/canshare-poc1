@@ -320,6 +320,7 @@ angular.module("pocApp")
                                 })
 
                             } else {
+
                                 let msg = "The Form has been updated."
                                 if (! $localStorage.world.description) {
                                     msg += " You can edit the description in this page."
@@ -401,7 +402,7 @@ angular.module("pocApp")
                                     }
 
                                     //alert("Reset complete. You'll need to use the Library to download the DG's")
-                                    alert("Reset complete. It may take a few seconds for the UI to update.")
+                                    alert("Reset complete. It may take a few seconds for the UI to update. Updating the browser is a good idea too.")
                                     //$scope.$emit('updateDGList',{})
 
                                     $scope.init()
@@ -1241,6 +1242,10 @@ angular.module("pocApp")
 
             //insert an element from another Comp / DG.
             $scope.insertDGItem = function (currentPath) {
+                if (! $scope.selectedNode) {
+                    alert("Please select a node to insert into")
+                    return
+                }
                 $uibModal.open({
                     templateUrl: 'modalTemplates/selectED.html',
                     backdrop: 'static',
@@ -1404,6 +1409,7 @@ angular.module("pocApp")
                             if (ed1.path == displayPath) {
                                 found = true
                                 //can't just replace from ed as not all elements can be altered
+                                //note that attributes not explicitely replaced (like id) remain
                                 ed1.type = ed.type
                                 ed1.title = ed.title
                                 ed1.notes = ed.notes
@@ -1501,7 +1507,19 @@ angular.module("pocApp")
                         if (! found) {
                             //The attribute that was edited (eg edscription) is inherited
                             //Need to create an 'override' element and add to the DG
-                            ed.path = $filter('dropFirstInPath')(ed.path)
+
+                            //now see if this is element is in the snapshot. If it is, then need to use the same Id.
+                            //otherwise, create a new one
+                            let ar = $scope.fullElementList.filter(item => item.ed.path == ed.path)
+                            if (ar.length > 0) {
+                                //should only be one... todo ?raise an error
+                                ed.id = ar[0].ed.id    //re-use the id
+                            } else {
+                                ed.id = utilsSvc.getUUID()  //this is a new ed
+                            }
+
+
+                            ed.path = $filter('dropFirstInPath')(ed.path)   //eds in the diff don't have the leading dgname
 
                             $scope.selectedModel.diff.push(ed)
                             //traceSvc.addAction({action:'add-override',model:$scope.selectedModel,path:ed.path})
@@ -1837,7 +1855,7 @@ angular.module("pocApp")
             }
 
 
-            //edit an existing model (DG)
+            //edit an existing model (DG) or add a new one
             $scope.editModel = function (model,isNew, parent) {
 
                 $uibModal.open({

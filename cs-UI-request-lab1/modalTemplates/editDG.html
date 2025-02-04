@@ -202,7 +202,10 @@
                     </div>
                     <div class="col-md-4">
 
-                        <input type="text" class="form-control" ng-model="input.linkedDG"/>
+                        <select ng-model="input.linkedDG" class="form-control"
+                                ng-options = "fDG.name for fDG in allFrozen"></select>
+
+
 
                     </div>
                     <div class="col-md-6">
@@ -234,7 +237,7 @@
 
                 <div class="myScroll">
                     <table class="table table-bordered">
-                        <tr><th>Inx</th><th>Path</th><th>Title</th><th>Type</th><th>Description</th><th>Card.</th><th>Move</th><th>Remove</th></tr>
+                        <tr><th>Inx</th><th>Path</th><th>Title</th><th>Type</th><th>Description</th><th>Card.</th><th>Move</th><th>Edit</th></tr>
                         <tr ng-repeat="element in model.diff">
                             <td>{{$index}}</td>
 

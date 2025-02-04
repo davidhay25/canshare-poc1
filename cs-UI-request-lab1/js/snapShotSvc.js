@@ -1,6 +1,6 @@
 angular.module("pocApp")
 
-    .service('snapshotSvc', function(utilsSvc) {
+    .service('snapshotSvc', function(utilsSvc,$filter) {
 
         //also a copy in modelsSvc
         //fhirDataTypes = ['boolean','code','date','dateTime','decimal','integer','string','Address','Attachment','CodeableConcept','ContactPoint','Group','HumanName','Identifier','Period','Quantity','Ratio']
@@ -948,7 +948,8 @@ angular.module("pocApp")
             getFrozenComp : function (comp,allElements) {
                 //construct a model that represents a composition - but similar to a DG
                 //effecively an expanded DG
-                let dg = {kind:'comp',name:comp.name,title:comp.title,diff:[],snapshot:[]}
+
+                let dg = {kind:'dg',name:comp.name,title:comp.title,diff:[],snapshot:[]}
 
 
                 for (const thing of allElements) {
@@ -982,19 +983,21 @@ angular.module("pocApp")
 
                 cleanSnapshot(dg)   //remove 'empty' attributes
                 delete dg.parent
-                dg.diff = dg.snapshot
+
+                //the path in a diff doesn't have the leading dg name.
+                dg.diff = []
+                for (let i=1;i < dg.snapshot.length; i++) {
+                    let ed = dg.snapshot[i]
+                    ed.path = $filter('dropFirstInPath')(ed.path)
+                    dg.diff.push(ed)
+                }
+
+
+                //dg.diff = dg.snapshot
 
                 //now replace all the non-FHIR DTs with 'Group'
                 updateTypes(dg)
-                /*
-                let fhirDT = utilsSvc.fhirDataTypes()
-                for (const ed of dg.diff) {
-                    let type = ed.type[0]
-                    if (fhirDT.indexOf(type) == -1) {
-                        ed.type = ['Group']
-                    }
-                }
-*/
+
                 delete dg.fullDiff
                 delete dg.snapshot
                 return dg
