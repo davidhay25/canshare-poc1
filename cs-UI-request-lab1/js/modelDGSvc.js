@@ -31,7 +31,7 @@ angular.module("pocApp")
                             let key = `${dg.name}.${ew.source}`
                             let sourceId = hashByPath[key]
                             if (sourceId) {
-                                ew.sourceId = sourceId
+                                ew.sourcePathId = sourceId
                             } else {
                                 console.error(`EW source path ${ew.source} not found in DG`)
                             }
@@ -124,9 +124,19 @@ angular.module("pocApp")
 
                 //construct a hash of all elements in this DG
                 let hashElements = {}
+                let hashElementsById = {}       //ew now use id's as the lookup
                 lstElements.forEach(function (item) {
                     if (item.ed.mult !== '0..0') {
                         hashElements[item.ed.path] = item.ed
+                        if (item.ed.id) {
+                            hashElementsById[item.ed.id] = item.ed
+                        } else {
+                            if (item.ed.path !==dgName) {   //the first element is the DG and won't have an id (or a path)
+                                console.error(`path ${item.ed.path} has no Id`)
+                            }
+
+                        }
+
                     }
                 })
 
@@ -136,36 +146,44 @@ angular.module("pocApp")
                         //note that the ew here is not the same as in the Q - for example it has 'source' rather than 'question'
                         item.ed.enableWhen.forEach(function (ew) {
 
-
                             //adjusts the source (controller) path for contained DG's with conditionals
                             //also called when rendering a Q...
                             let source = ew.source      //corresponds to 'question' in the Q
-                            let sourceEd = hashElements[source]
-
                             let entry = {}
-                            if (! sourceEd) {
-                                //could be a contained
-                                let ar = source.split('.')
-                                //todo - if we make the path in the container the same as the DG name then we don't need to remove it and it will be more robust
-                                ar.splice(0,1)      //remove the first in the path - the dg where the ew is defined
-                                let matchingPath = ar.join('.')     //we're looking for an element whose path ends with this
-                                let matches = []        //matching elements - there should only be 1
+                            let sourceEd
 
-                                for (const key of Object.keys(hashElements)) {
-                                    if (key.endsWith(matchingPath)) {
-                                        matches.push(hashElements[key])
-                                    }
-                                }
+                            let findStrategy = 'path'        //so I can test different strategies
 
-                                if (matches.length == 1) {
-                                    sourceEd = matches[0]
-                                } else {
+                            if (findStrategy == 'id') {
+                                sourceEd = hashElementsById[source]
+
+                                if (! sourceEd) {
                                     entry.error = `Warning! source ed not found at path ${ew.source}`
                                 }
+                            }
+                            if (findStrategy == 'path') {
+                                    sourceEd = hashElements[source]
+                                  if (! sourceEd) {
+                                      //could be a contained
+                                      let ar = source.split('.')
+                                      //todo - if we make the path in the container the same as the DG name then we don't need to remove it and it will be more robust
+                                      ar.splice(0,1)      //remove the first in the path - the dg where the ew is defined
+                                      let matchingPath = ar.join('.')     //we're looking for an element whose path ends with this
+                                      let matches = []        //matching elements - there should only be 1
 
+                                      for (const key of Object.keys(hashElements)) {
+                                          if (key.endsWith(matchingPath)) {
+                                              matches.push(hashElements[key])
+                                          }
+                                      }
 
+                                      if (matches.length == 1) {
+                                          sourceEd = matches[0]
+                                      } else {
+                                          entry.error = `Warning! source ed not found at path ${ew.source}`
+                                      }
 
-
+                                  }
                             }
 
                             entry = {...entry, path:item.ed.path,ew:ew,ed:sourceEd}

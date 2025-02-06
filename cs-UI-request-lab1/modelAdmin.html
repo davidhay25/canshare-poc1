@@ -18,6 +18,10 @@
         .retired {
             background-color: lightsalmon;
         }
+
+        .error {
+            background-color: mistyrose;
+        }
     </style>
 
     <script>
@@ -44,6 +48,9 @@
     <script src="js/querySvc.js"></script>
     <script src="js/showParameters.js"></script>
     <script src="js/loginCtrl.js"></script>
+    <script src="js/snapShotSvc.js"></script>
+    <script src="js/utilsSvc.js"></script>
+    <script src="js/filters.js"></script>
 
     <script src="js/libs/firebase.js"></script>
     <script src="js/libs/angularfire.min.js"></script>
@@ -62,6 +69,23 @@
             firebase.initializeApp(firebaseConfig);
 
         }
+    </script>
+
+    <script>
+        //add a function to determine if a given path is a child of another. Used when excluding paths
+        //eg seg1.seg2 is a child of seg1.  seg1path is not.
+        //Add here to ensure it is available before any functions that use it are loaded...
+        String.prototype.isChildPath = function (parent) {
+
+            let test = parent + "."
+            if (this.startsWith(test) ) {
+                return true
+            } else {
+                return false
+            }
+
+        };
+
     </script>
 
 </head>
@@ -128,14 +152,17 @@
 
 
     <uib-tabset>
-        <uib-tab heading="LocalStorage: Datagroups">
+        <uib-tab heading=" Datagroups">
             <div class="row">
                 <div class="col-md-3">
+
+
+
                     <div class="myScroll">
                         <div class="list-group">
                             <div class="list-group-item"
                                  ng-click="selectDG(dg)"
-                                 ng-repeat="dg in arDG">
+                                 ng-repeat="dg in arDG track by $index">
                                 {{dg.name}}
                             </div>
                         </div>
@@ -146,18 +173,25 @@
                 </div>
                 <div class="col-md-9">
                     <div ng-show="selectedDG">
-                        <button class="btn btn-danger pull-right" ng-click="deleteDG()">Remove this DG from localStorage</button>
+                        <button class="btn btn-link pull-right" ng-click="deleteDG()">Remove this DG from localStorage</button>
+                    </div>
+                    <div class="clearfix"></div>
+
+
+
+
+                    <div class="myScroll">
+                        <pre>{{selectedDG | json}}</pre>
                     </div>
 
-
-                    <pre>{{selectedDG | json}}</pre>
 
                 </div>
             </div>
 
 
         </uib-tab>
-        <uib-tab heading="Log">
+        <!--
+        <uib-tab ng-if="false" heading="Log">
 
             <div class="row">
                 <div class="col-md-7">
@@ -265,6 +299,76 @@
 
 
         </uib-tab>
+        -->
+
+        <uib-tab heading="Conditionals">
+
+            <br/>
+            <div>
+                <button class="btn btn-link pull-right" ng-click="fixErrors()">Fix issues</button>
+            </div>
+            <div class="clearfix"></div>
+
+
+
+
+
+            <div class="row">
+                <div class="col-md-4">
+                    <select class="form-control" ng-model="input.dgname"
+                            ng-options="name for name in dgWithEw">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+
+
+            <br/>
+
+            <table class="table-bordered table">
+                <tr ng-show="showCondForDG(ew)" ng-repeat="ew in allEW"
+                    ng-class="{error:ew.issues.length > 0}"
+                    >
+                    <td>{{ew.name}}</td>
+                    <td>
+                        <div ng-repeat="iss in ew.issues">
+                            {{iss}}
+                        </div>
+
+                    </td>
+                    <td>{{ew.sourcePathId}}</td>
+                    <td
+                            uib-popover="{{ew.source}}"
+                            popover-placement="top"
+                            popover-append-to-body = "true"
+                            popover-trigger="'mouseenter'"
+                    >
+
+                        {{ew.source}}
+
+                    </td>
+
+                    <!--
+                    <td>{{ew.operator}}</td>
+                    <td>{{ew.value}}</td>
+
+
+                    BreastHistoAncillaryStudies.AncillaryStudies.AncillaryStudiesPerformed.slice:PRStatus.TestStatus.slice:PRStatus.TestStatus
+                    -->
+                </tr>
+            </table>
+        </uib-tab>
+
+        <uib-tab heading="Diff analysis">
+            <table class="table table-bordered">
+                <tr ng-repeat="lne in arDiffReport">
+                    <td>{{lne.name}}</td>
+                    <td>{{lne.source}}</td>
+                    <td>{{lne.msg}}</td>
+                </tr>
+            </table>
+        </uib-tab>
+
         <uib-tab heading="Local storage Json">
 
             <a class="btn btn-link" download="{{downloadLinkJsonName}}"
@@ -273,7 +377,10 @@
             </a>
 
 
-            <pre>{{world | json}}</pre>
+            <div class="myScroll">
+                <pre>{{world | json}}</pre>
+            </div>
+
 
         </uib-tab>
 

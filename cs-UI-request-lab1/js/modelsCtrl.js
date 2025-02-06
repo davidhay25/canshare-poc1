@@ -1508,7 +1508,7 @@ angular.module("pocApp")
                             //The attribute that was edited (eg edscription) is inherited
                             //Need to create an 'override' element and add to the DG
 
-                            //now see if this is element is in the snapshot. If it is, then need to use the same Id.
+                            //now see if this is element is in the snapshot. If it is, then need to use the same Id - conditionals use it
                             //otherwise, create a new one
                             let ar = $scope.fullElementList.filter(item => item.ed.path == ed.path)
                             if (ar.length > 0) {

@@ -11,6 +11,10 @@
       background-color: mistyrose;
     }
 
+    .error {
+      background-color: mistyrose;
+    }
+
     .edIssue {
       background-color: mistyrose;
     }
@@ -912,7 +916,7 @@
           <div class="tableFixHead">
             <table class="table-bordered table">
               <thead>
-              <tr><th>Path</th><th>Title</th><th>Description</th><th>DG Type</th><th>Mult.</th><th>SDC attributes</th><th>Source</th></tr>
+              <tr><th>Path</th><th>Title</th><th>Description</th><th>DG Type</th><th>Card.</th><th>SDC attributes</th><th>Source</th></tr>
               </thead>
               <tbody>
               <!---     <tr ng-repeat="element in fullElementList">-->
@@ -940,7 +944,11 @@
                     {{type}}
                   </div>
                   <div>
-                    <em class="clickable" ng-if = "element.ed.valueSet" ng-click="viewVS(element.ed.valueSet)">
+                    <em class="clickable" ng-if = "element.ed.valueSet"
+                        uib-popover="{{element.ed.valueSet}}"
+                        popover-placement="top"
+                        popover-trigger="'mouseenter'"
+                        ng-click="viewVS(element.ed.valueSet)">
                       View VS
                    <!--   {{element.ed.valueSet}}-->
                     </em>
@@ -1336,7 +1344,9 @@
 
 
         </tr>
-        <tr ng-repeat="dep in allDependencies">
+        <tr ng-repeat="dep in allDependencies"
+          ng-class="{error:dep.error}"
+          >
           <td>
             <div class="clickable" ng-click="selectCondElement(dep.path)">
               {{dep.path | dropFirstInPath}}

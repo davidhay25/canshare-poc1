@@ -315,6 +315,64 @@
             </td>
           </tr>
 
+          <tr>
+            <td>Extract expression</td>
+            <td>
+              <div class="row">
+                <div class="col-md-10">
+
+
+                  <div>
+                    <input type="text"
+                           placeholder="FHIRPath extraction expression - eg Specimen.bodySite"
+                           class="form-control" ng-model="input.definition"/>
+
+                  </div>
+                  <!-- need to think about this...
+                                    <div ng-if="! linkToSpec">
+                                      <em>You must set the resource context on this or a referencing DG to enable resource extraction. This is
+                                        done from the main DG editor (the link at the top of the DG display page) for this DG or a parent. </em>
+                                    </div>
+                  -->
+
+                </div>
+                <!--
+                <div class="col-md-1">
+
+                  <span class="btn btn-link" ng-click="testPrePop(input.definition,'testExtract')">Test</span>
+
+                </div>
+                <div class="col-md-1">
+
+                  <a style="display:block ; margin-top: 8px" href="https://hl7.org/fhir/fhirpath.html" target="_blank">Spec</a>
+                </div>
+                -->
+
+              </div>
+
+              <div><pre ng-if="testExtract">{{testExtract | json}}</pre></div>
+            </td>
+          </tr>
+
+          <tr ng-show="input.definition.indexOf('extension') > -1">
+            <td>Extract Extension Url</td>
+            <td>
+              <input type="text"
+                     placeholder="Url for extension"
+                     class="form-control" ng-model="input.extractExtensionUrl"/>
+              <div><em>If extracting to an extension, need to set the extension url</em></div>
+            </td>
+          </tr>
+
+          <tr ng-show="input.selectedType == 'Identifier'">
+            <td>System</td>
+            <td>
+              <input type="text"
+                     placeholder="System for this identifier"
+                     class="form-control" ng-model="input.identifierSystem"/>
+              <div><em>If extracting to an identifier, this is the system to use</em></div>
+            </td>
+          </tr>
 
 
           <tr ng-if="canHavePopulationContext()">
@@ -405,64 +463,6 @@
             </td>
           </tr>
 
-          <tr>
-            <td>Extract expression</td>
-            <td>
-              <div class="row">
-                <div class="col-md-10">
-
-
-                  <div>
-                    <input type="text"
-                           placeholder="FHIRPath extraction expression - eg Specimen.bodySite"
-                           class="form-control" ng-model="input.definition"/>
-
-                  </div>
-<!-- need to think about this...
-                  <div ng-if="! linkToSpec">
-                    <em>You must set the resource context on this or a referencing DG to enable resource extraction. This is
-                      done from the main DG editor (the link at the top of the DG display page) for this DG or a parent. </em>
-                  </div>
--->
-
-                </div>
-                <!--
-                <div class="col-md-1">
-
-                  <span class="btn btn-link" ng-click="testPrePop(input.definition,'testExtract')">Test</span>
-
-                </div>
-                <div class="col-md-1">
-
-                  <a style="display:block ; margin-top: 8px" href="https://hl7.org/fhir/fhirpath.html" target="_blank">Spec</a>
-                </div>
-                -->
-
-              </div>
-
-              <div><pre ng-if="testExtract">{{testExtract | json}}</pre></div>
-            </td>
-          </tr>
-
-          <tr ng-show="input.definition.indexOf('extension') > -1">
-            <td>Extract Extension Url</td>
-            <td>
-              <input type="text"
-                     placeholder="Url for extension"
-                     class="form-control" ng-model="input.extractExtensionUrl"/>
-              <div><em>If extracting to an extension, need to set the extension url</em></div>
-            </td>
-          </tr>
-
-          <tr ng-show="input.selectedType == 'Identifier'">
-            <td>System</td>
-            <td>
-              <input type="text"
-                     placeholder="System for this identifier"
-                     class="form-control" ng-model="input.identifierSystem"/>
-              <div><em>If extracting to an identifier, this is the system to use</em></div>
-            </td>
-          </tr>
 
 
           <!--

@@ -659,7 +659,7 @@ angular.module("pocApp")
         //Adjust the conditionals when they are either inherited or referenced from anoth DG
         function adjustEnableWhen(dg) {
 
-            return //Jan20 - debugging
+            return //Feb5- debugging
 
             let printLog = false
             if (dg.name == 'BreastHistoClinicalInformationXX') {printLog = true}
@@ -703,6 +703,10 @@ angular.module("pocApp")
 
 
 
+
+
+
+
                                 //no, this must be a referenced DG
                                 //so we need to adjust the ew.source path.
                                 //We've already removed the original DG name from arController (above)
@@ -712,22 +716,13 @@ angular.module("pocApp")
                                 //new code 20Jan
 
                                 let arThisPath = ed.path.split('.')      // this ed - the one that is dependent
-                                arThisPath.pop()        //remove the last element (as it specifies this element)
-                                arThisPath.splice(0,0,dg.name)      //add the DG name at the front
 
 
+                             //   arThisPath.pop()        //remove the last element (as it specifies this element)
+                             //   arThisPath.splice(0,0,dg.name)      //add the DG name at the front
+                              //  let newPath = arThisPath.concat(arControllerPath) //stick the source path on the end
+                               // ew.source = newPath.join('.')   //and assign to the source
 
-                                let newPath = arThisPath.concat(arControllerPath) //stick the source path on the end
-                                ew.source = newPath.join('.')   //and assign to the source
-
-
-
-
-
-
-
-/* old code
-                               // let ar = arThisPath // arControllerPath.slice(1) //removes the dgname from the source
                                 let ar = arControllerPath.slice(1) //removes the dgname from the source
 
 
@@ -740,7 +735,7 @@ angular.module("pocApp")
 
                                 let arFullPath = arThisPath.concat(ar) //start from the insert point
                                 ew.source = arFullPath.join('.')
-                                */
+
 
                             }
 

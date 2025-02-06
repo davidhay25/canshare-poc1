@@ -337,6 +337,7 @@ angular.module("pocApp")
             $scope.addEnableWhen = function(item,value,op) {
                 //item is the controlling ed - the one whose value will hide/show the currently selected element
 
+                op = op || '='
                 //let sourcePath = item.shortPath       //this is the path of the source
                 let sourcePath = item.ed.path       //the controlling ED path. THIS MUST BE THE FULL PATH includeing DG name
                 let sourcePathId = item.ed.id       //the id of the ed
@@ -363,10 +364,11 @@ angular.module("pocApp")
                     let diffEd = angular.copy(targetED)     //this is a copy of the 'source' - which will be hidden
                     diffEd.path = targetPath
                     diffEd.enableWhen = item.ed.enableWhen || []
-                    let ew = {source:sourcePath,sourcePathId: sourcePathId,operator:"=",value:value}
+                    let ew = {source:sourcePath,sourcePathId: sourcePathId,operator:op.value,value:value}
+                    //let ew = {source:sourcePath,sourcePathId: sourcePathId,operator:"=",value:value}
                     diffEd.enableWhen.push(ew)
                     $scope.selectedModel.diff.push(diffEd)
-                    traceSvc.addAction({action:'add-enablewhen',model:$scope.selectedModel,path:targetPath,description:'add diff'})
+                   // traceSvc.addAction({action:'add-enablewhen',model:$scope.selectedModel,path:targetPath,description:'add diff'})
                 }
 
                 //delete $scope.input.ewSourceValue

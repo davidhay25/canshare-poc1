@@ -520,7 +520,7 @@ angular.module("pocApp")
                     //qEW.question = `${pathPrefix}${source}` //linkId of source is relative to the parent (DG)
 
                     //2Feb - make the question the sourceId. Then, adjust to the path after the Q has been generated
-                    qEW.question = ew.sourceId || "MissingSourceId"
+                    qEW.question = ew.sourcePathId || "MissingSourceId"
                     //---------------
 
                     //qEW.question = `${pathPrefix}${ew.source}` //linkId of source is relative to the parent (DG)
@@ -1765,7 +1765,16 @@ angular.module("pocApp")
                     }
 
                     if (ed.itemCode) {
+
                         item.code = [ed.itemCode]
+
+                        if (extractionContext == 'http://hl7.org/fhir/StructureDefinition/Observation') {
+                            //add an definitionExtractValue extension if this is an observatiob
+                            let canonicalUrl = `http://hl7.org/fhir/StructureDefinition/Observation#Observation.code`
+                            let value = {coding:[ed.itemCode]}
+                            addFixedValue(item,canonicalUrl,"CodeableConcept",value)
+                        }
+                        
                     }
 
                     item.prefix = ed.id     //save the Id in the prefix. We'll need it for adjusting the EnableWhens
