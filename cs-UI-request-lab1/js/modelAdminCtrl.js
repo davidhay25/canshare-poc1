@@ -1,14 +1,11 @@
 angular.module("pocApp")
     .controller('modelAdminCtrl',
-        function ($scope,$http,$uibModal,$localStorage,$q,snapshotSvc,$filter) {
+        function ($scope,$http,$uibModal,$localStorage,$q,snapshotSvc,$filter,modelDGSvc) {
 
             let dgFilter
             let emailFilter
             $scope.input = {}
 
-            $scope.restoreDG = function () {
-                alert("Not yet enabled")
-            }
 
             $scope.showCondForDG = function(ew) {
                 if ($scope.input.dgname) {
@@ -29,6 +26,14 @@ angular.module("pocApp")
                 analyse()
             }
 
+
+            $scope.applyIdFix = function () {
+                Object.keys($scope.world.dataGroups).forEach(function (key) {
+                    let dg = $scope.world.dataGroups[key]
+                    modelDGSvc.updateDGId(dg)
+                })
+
+            }
 
             function lookForDups(path,fix) {
                 let ar = path.split('.')
@@ -119,16 +124,36 @@ angular.module("pocApp")
             function analyse(fix) {
                 $scope.allEW = []
                 $scope.dgWithEw = []
+
+                //create the hashes
+                let hash = {}
+                let hashSourceId = {}
+
+                Object.keys($scope.world.dataGroups).forEach(function (key) {
+                    let dg = $scope.world.dataGroups[key]
+                    let allElements = snapshotSvc.getFullListOfElements(dg.name)
+
+
+                    allElements.forEach(function (item) {
+                        hash[item.ed.path] = item.ed
+                        hashSourceId[item.ed.id] = item.ed
+                    })
+
+                })
+
+
                 Object.keys($scope.world.dataGroups).forEach(function (key) {
                     let dg = $scope.world.dataGroups[key]
 
                     //perform the ew analysis on the expanded DG
                     let allElements = snapshotSvc.getFullListOfElements(dg.name)
 
-                    let hash = {}
+                 /*
                     allElements.forEach(function (item) {
                         hash[item.ed.path] = item.ed
+                        hashSourceId[item.ed.id] = item.ed
                     })
+                    */
 
 
                     allElements.forEach(function (item) {
@@ -140,9 +165,10 @@ angular.module("pocApp")
                             }
 
                             ed.enableWhen.forEach(function (ew) {
-                                let item = {name: dg.name}
-                                item.source = ew.source
-                                item.sourcePathId = ew.sourcePathId
+                                let item = {name: dg.name} //the dg where the ew is located
+                                item.target = ed.path   //the path of the target (where the ew is located)
+                                item.source = ew.source //the controlling ed path
+                                item.sourceId = ew.sourceId  //the controlling element id
                                 item.operator = ew.operator
                                 item.value = ew.value
                                 item.issues = []
@@ -156,75 +182,19 @@ angular.module("pocApp")
                                 if (! sourceEd) {
                                     let msg = lookForDups(ew.source)
                                     if (msg) {
-                                        item.issues.push(msg)
+                                        item.issues.push(`path search: ${msg}`)
                                     } else {
-                                        item.issues.push('Unknown issue')
+                                        item.issues.push('path search: Unknown issue')
                                     }
-
-                                    /*
-
-                                    //see if the last and second to last are the same
-                                    let l = ar.length
-
-                                    if (l > 3) {
-                                        let a =  ar[l-1]
-                                        let b = ar[l-2]
-
-                                        if (a==b) {
-                                            if (fix) {
-                                                ar.splice(-1)
-
-                                                item.source = ar.join('.')
-                                            } else {
-                                                item.issues.push('dup at end (1)')
-                                            }
-
-
-                                        }
-                                    }
-
-                                    if (l > 5) {
-                                        let a = ar[l-2] + ar[l-1]
-                                        let b = ar[l-4] + ar[l-3]
-                                        if (a==b) {
-                                            if (fix) {
-                                                //
-
-
-                                                ar.splice(-2)
-                                                item.source = ar.join('.')
-                                            } else {
-                                                item.issues.push('dup at end (2)')
-                                            }
-
-                                        }
-                                    }
-
-
-                                    if (l > 7) {
-                                        let a = ar[l-3] + ar[l-2] + ar[l-1]
-                                        let b = ar[l-6] + ar[l-5] + ar[l-4]
-                                        if (a==b) {
-                                            if (fix) {
-                                                ar.splice(-3)
-                                                item.source = ar.join('.')
-                                            } else {
-                                                item.issues.push('dup at end (3)')
-                                            }
-
-                                        }
-                                    }
-
-
-
-                                    if (item.issues.length ==0) {
-                                        item.issues.push('Unknown issue')
-                                    }
- */
                                 }
 
-                                //let ar = allElements.filter(item => item.ed.path == $filter('dropFirstInPath')(item.source))
-                                //item.matchCount = ar.length
+                                let sourceEd1 = hashSourceId[item.sourceId]
+                                if (! sourceEd1) {
+
+                                    item.issues.push('id search: ed not found')
+                                }
+
+
 
                                 $scope.allEW.push(item)
                             })
@@ -291,9 +261,22 @@ angular.module("pocApp")
 
             $scope.selectDG = function (dg) {
                 $scope.selectedDG = dg
+                $scope.allElements = snapshotSvc.getFullListOfElements(dg.name)
+                $scope.hashOfId = {}
+                for (const item of $scope.allElements) {
+                    $scope.hashOfId[item.ed.id] = item.ed
+                }
+            }
+
+            $scope.isIdPresent = function (id) {
+                if ($scope.hashOfId[id]) {
+                    return true
+                }
             }
 
             $scope.deleteDG = function () {
+                alert('disabled')
+                return
                 if (confirm("Are you sure you wish to remove this DG from local storage? (Any version on the Library is untouched")){
                     delete $localStorage.world.dataGroups[$scope.selectedDG.name]
                     delete $scope.selectedDG

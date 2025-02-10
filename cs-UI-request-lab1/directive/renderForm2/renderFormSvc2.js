@@ -11,6 +11,37 @@ angular.module("formsApp")
         extHidden = "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
 
         return {
+            parseErrorExpression : function (expression,Q) {
+                ///\ //Questionnaire.item[0].item[2].extension[1].extension[1]
+                console.log(expression)
+                let ar = expression.split('.')
+                let arPath = []
+                for (let i=0; i<ar.length;i++) {
+                    let seg = ar[i]
+                    if (seg.startsWith('item')) {
+                        const match = seg.match(/\[(\d+)\]/); // Extracts number inside brackets
+                        if (match) {
+                            const index = parseInt(match[1], 10); // Convert to a number
+                            console.log(index);
+                            arPath.push(index)
+                        }
+                    }
+                }
+
+                let item = Q
+                for (let i=0; i<arPath.length;i++) {
+                    let seg = arPath[i]
+                    item = item.item[seg]
+
+
+                }
+
+                console.log(item)
+                return item
+
+
+
+            },
 
             getExtension : function (element,url,type) {
                 //return the value of an extensiop

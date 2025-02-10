@@ -18,10 +18,18 @@
 
   </div>
   <div class="modal-body">
-    <h3>Questionnaire Item</h3>
-      <pre>{{item | json}}</pre>
-    <h3>Element definition</h3>
-      <pre>{{ed | json}}</pre>
+    <div class="row">
+      <div class="col-md-6">
+        <h3>Error</h3>
+        <pre>{{iss | json}}</pre>
+      </div>
+      <div class="col-md-6">
+        <h3>Questionnaire Item</h3>
+        <pre>{{item | json}}</pre>
+      </div>
+    </div>
+
+
 
   </div>
   <div class="modal-header">

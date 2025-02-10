@@ -139,16 +139,97 @@
 
           </uib-tab>
 
+          <uib-tab heading="Initial expression">
+              <br/>
+              <div class="row">
+
+                  <div class="col-md-2">
+                      Path in resource
+                  </div>
+                  <div class="col-md-10">
+                      <input class="form-control" ng-model="input.ieCanonical" placeholder="Spaces will be removed"/>
+                      <div><em>
+                          The full url of the path that will be populated by the value. eg http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate
+                      </em></div>
+                  </div>
+
+              </div>
+
+
+              <div class="row">
+                  <div class="col-md-2">
+                      Expression
+                  </div>
+                  <div class="col-md-10">
+                      <input class="form-control" ng-model="input.ieExpression" />
+                      <div><em>The expression to use to set the initial value. If a json object then use double quotes</em></div>
+                  </div>
+              </div>
+
+
+              <button class="btn btn-primary pull-right"
+                      ng-if="input.ieCanonical && input.ieExpression"
+                      ng-click="save('initialexp')">Save</button>
+
+
+          </uib-tab>
+
+
           <uib-tab heading="Definition extract value">
               <br/>
               <div class="row">
 
-                  <div class="col-md-3">
-
+                  <div class="col-md-2">
+                      Path in resource
                   </div>
-                  <div class="col-md-9">
+                  <div class="col-md-10">
+                      <input class="form-control" ng-model="input.devCanonical" placeholder="Spaces will be removed"/>
+                      <div><em>
+                          The full url of the path that will be populated by the value. eg http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate
+                      </em></div>
+                  </div>
+
+              </div>
+
+              <div class="row">
+                  <div class="col-md-2">
+                      DataType
+                  </div>
+                  <div class="col-md-4">
+                      <select class="form-control" ng-model="input.devFhirDT"
+                              ng-options="dt for dt in fhirDataTypes"></select>
+                      <div><em>The element dataType</em></div>
                   </div>
               </div>
+
+              <div class="row">
+                  <div class="col-md-2">
+                      Fixed value
+                  </div>
+                  <div class="col-md-10">
+                      <input class="form-control" ng-model="input.devFixed" />
+                      <div><em>If the value to insert is fixed. If a json object then use double quotes</em></div>
+                  </div>
+              </div>
+
+              <div class="row">
+                  <div class="col-md-2">
+                      Expression
+                  </div>
+                  <div class="col-md-10">
+                      <input class="form-control" ng-model="input.devExpression" />
+                      <div><em>If an expression is used to calculate the value to insert</em></div>
+                  </div>
+              </div>
+
+              <div><em>The value can either be a fixed value or an expression - but not both</em></div>
+
+
+              <button class="btn btn-primary pull-right"
+                      ng-if="input.devCanonical && (input.devFixed || input.devExpression)"
+                      ng-click="save('defextractvalue')">Save</button>
+
+
           </uib-tab>
 
 

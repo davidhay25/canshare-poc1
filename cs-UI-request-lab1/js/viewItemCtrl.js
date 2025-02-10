@@ -1,7 +1,7 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('viewItemCtrl',
-        function ($scope,item,Q) {
+        function ($scope,item,Q,makeQHelperSvc) {
 
             $scope.item = item
             
@@ -21,6 +21,8 @@ angular.module("pocApp")
                 }
 
                 clone.children = itemDisplay
+                clone.summary = makeQHelperSvc.getExtensionSummary(clone)
+
                 const newChain = [...chain, clone];
 
                 // Check if the current node is the target
@@ -44,13 +46,23 @@ angular.module("pocApp")
 
 
             let tree = {linkId:'root',item:Q.item}
+            tree.extension = Q.extension
 
             $scope.chain = getChainToNode(tree,item.linkId)
             if ($scope.chain) {
-                $scope.chain.splice(0,1)
+               //tmp $scope.chain.splice(0,1)
                 $scope.selectedItem = $scope.chain[$scope.chain.length -1]
+
+                //$scope.selectedItemNoSummary =
             }
 
+            $scope.getDisplay = function (item) {
+                $scope.selectedSummary = item.summary
+                let vo = angular.copy(item)
+
+                delete vo.summary
+                return vo
+            }
 
             $scope.selectItem = function (item) {
                 $scope.selectedItem = item

@@ -1,7 +1,7 @@
 angular.module("pocApp")
     .controller('modelReviewCtrl',
         function ($scope,$http,modelsSvc,modelCompSvc,$timeout, $uibModal,makeQSvc,utilsSvc,$window,
-                  orderingSvc,snapshotSvc,vsSvc,qHelperSvc,$localStorage) {
+                  orderingSvc,snapshotSvc,vsSvc,qHelperSvc,$localStorage,makeQHelperSvc) {
 
             $scope.input = {}
 
@@ -178,6 +178,8 @@ angular.module("pocApp")
 
             $scope.viewItem = function (item) {
 
+                makeQHelperSvc.showItemDetailsDlg(item,$scope.fullQ)
+/*
                 let config = {}
 
                 $uibModal.open({
@@ -196,7 +198,7 @@ angular.module("pocApp")
                     }
 
                 })
-
+*/
 
             }
 
@@ -218,20 +220,20 @@ angular.module("pocApp")
                             $scope.hashEd[thing.ed.path] = thing.ed
                         }
 
-
-
                         vsSvc.getAllVS(ar, function () {
 
                             //A report focussed on pre-popupation & extraction
                             let voReport =  makeQSvc.makeReport($scope.fullQ)
                             $scope.qReport =voReport.report
+
+                            console.log(voReport)
+
+                            //a graph of items
+                            let vo = makeQHelperSvc.getItemGraph($scope.fullQ)
+                            makeItemsGraph(vo.graphData)
+
+
                         })
-
-
-
-
-
-
 
 
                     }, function (err) {
@@ -760,15 +762,14 @@ angular.module("pocApp")
                         //A report focussed on pre-popupation & extraction
                         let voReport =  makeQSvc.makeReport($scope.fullQ)
                         $scope.qReport =voReport.report
+
+
                     })
 
                 })
-
-
-
-
-
             }
+
+
 
             $scope.getRowColour = function (ed) {
                 let colour
@@ -873,6 +874,60 @@ angular.module("pocApp")
                 if (entry.isSDC) {return true}
 
                 return false
+            }
+
+            function makeItemsGraph(graphData) {
+
+                $scope.allGraphData = graphData
+
+                let container = document.getElementById('itemGraph');
+                if (container) {
+                    let graphOptions = {
+                        physics: {
+                            enabled: true,
+                            solver: 'barnesHut',
+                            barnesHut: {
+                                gravitationalConstant: -2000,
+                                centralGravity: 0.3,
+                                springLength: 95,
+                                springConstant: 0.04,
+                                damping: 0.09
+                            }
+                        },
+                        layout : {
+                            hierarchical : false
+                        }
+                    };
+
+                    if ($scope.itemGraph) {
+                        $scope.itemGraph.destroy()
+                    }
+
+                    $scope.itemGraph = new vis.Network(container, graphData, graphOptions);
+
+                    //https://stackoverflow.com/questions/32403578/stop-vis-js-physics-after-nodes-load-but-allow-drag-able-nodes
+                    $scope.itemGraph.on("stabilizationIterationsDone", function () {
+                     //   $scope.itemGraph.setOptions({physics: false});
+
+
+                    });
+
+                    $scope.itemGraph.on("click", function (obj)
+                    {
+
+                        let nodeId = obj.nodes[0];  //get the first node
+                        let node = $scope.allGraphData.nodes.get(nodeId);
+                        $scope.selectedNodeFromItemGraph = node.data
+
+
+
+
+                        $scope.$digest()
+
+                    })
+                }
+
+
             }
 
 

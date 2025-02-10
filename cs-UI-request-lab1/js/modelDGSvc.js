@@ -11,7 +11,7 @@ angular.module("pocApp")
             updateDGId : function (dg) {
                 //add id's to the dg and all the ed. Update any conditionals
 //return //just for now
-                dg.id = utilsSvc.getUUID()
+                dg.id = dg.id || utilsSvc.getUUID()
 
                 let hashByPath = {}
 
@@ -23,7 +23,7 @@ angular.module("pocApp")
                     hashByPath[fullPath] = id
                 })
 
-                //update the conditionals
+                //update the conditionals that are directly defined in this DG
                 dg.diff.forEach(function (ed) {
                     if (ed.enableWhen) {
                         ed.enableWhen.forEach(function (ew) {
@@ -31,7 +31,10 @@ angular.module("pocApp")
                             let key = `${dg.name}.${ew.source}`
                             let sourceId = hashByPath[key]
                             if (sourceId) {
-                                ew.sourcePathId = sourceId
+                                //ew.sourcePathId = sourceId
+                                ew.sourceId = sourceId
+                                ew.issue =  ew.issue || []
+                                ew.issue.push(`Unable to locate the key ${key} in this DG. It may be inherited or contained.`)
                             } else {
                                 console.error(`EW source path ${ew.source} not found in DG`)
                             }

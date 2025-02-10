@@ -31,6 +31,14 @@
             -moz-border-radius: 5px;
             border-radius: 5px;
         }
+
+        #itemGraph {
+            width: 100%;
+            height: 800px;
+            border: 1px solid lightgray;
+        }
+
+
     </style>
 
 <!--
@@ -233,6 +241,8 @@
         <uib-tab  heading="Form">
             <renderform2 q="fullQ" hash-ed="hashEd" technicalview="input.technical" errors="errorLog"></renderform2>
         </uib-tab>
+
+
 
         <uib-tab  heading="SDC view">
             <br>
@@ -524,6 +534,11 @@
 
 
                 </uib-tab>
+
+                <uib-tab heading="Report Json">
+                    <pre>{{qReport | json}}</pre>
+                </uib-tab>
+
             </uib-tabset>
 
 
@@ -604,6 +619,58 @@
                 </tr>
             </table>
 
+        </uib-tab>
+
+        <uib-tab heading="Questionnaire Graph">
+            <br>
+            <div class="row">
+                <div class="col-md-7">
+                    <div id="itemGraph"></div>
+                </div>
+                <div class="col-md-5">
+
+                    <div class="rounded-box">
+                        <checkbox ng-model="input.graph.hideDisplay"></checkbox> Hide display items
+                    </div>
+
+                    <uib-tabset>
+                        <uib-tab heading="Details">
+                            <table class="table-bordered table">
+                                <tr>
+                                    <td>Text</td><td>{{selectedNodeFromItemGraph.item.text}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Type</td><td>{{selectedNodeFromItemGraph.item.type}}</td>
+                                </tr>
+                                <tr ng-click="viewItem(selectedNodeFromItemGraph.item)">
+                                    <td>LinkId</td>
+                                    <td>
+                                        <div class="clickable" ng-click="viewItem(selectedNodeFromItemGraph.item)">
+                                            {{selectedNodeFromItemGraph.item.linkId}}
+                                        </div>
+
+                                    </td></tr>
+
+                                <tr ng-if="selectedNodeFromItemGraph.meta.extractType">
+                                    <td>Extract type</td><td>{{selectedNodeFromItemGraph.meta.extractType}}</td>
+                                </tr>
+
+                                <tr ng-if="selectedNodeFromItemGraph.item.definition">
+                                    <td>Extract path</td><td>{{selectedNodeFromItemGraph.item.definition}}</td>
+                                </tr>
+
+                            </table>
+
+
+
+                        </uib-tab>
+                        <uib-tab heading="Json">
+                            <pre>{{selectedNodeFromItemGraph | json}}</pre>
+                        </uib-tab>
+                    </uib-tabset>
+
+                </div>
+            </div>
         </uib-tab>
 
         <uib-tab  heading="Questionnaire Json">

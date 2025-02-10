@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('makeSDCExtensionCtrl',
-        function ($scope,elements,currentPath,snapshotSvc) {
+        function ($scope,elements,currentPath,snapshotSvc,utilsSvc) {
             $scope.input = {}
             $scope.elements = elements      //all the elements in this DG
             //currentPath is the path to the current element in the DG (includes the top)
@@ -8,6 +8,10 @@ angular.module("pocApp")
 console.log(elements,currentPath)
             $scope.input.vType = "fhirpath"
             $scope.input.calcType = "fhirpath"
+
+
+            $scope.fhirDataTypes = utilsSvc.fhirDataTypes()
+
 
             function findVariablesInContext (lstAllElements,path) {
                 //find all the variables in scope for a given item.
@@ -87,7 +91,7 @@ console.log(elements,currentPath)
                         ext.url= "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-extractAllocateId"
                         ext.valueString = $scope.input.alName.replace(/\s+/g, "")
                         break
-                    case "definitionExtract":
+                    case "defextract":
                         ext.url = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract"
                         ext.extension = []
                         ext.extension.push({url:'definition',valueCanonical:$scope.input.deCanonical.replace(/\s+/g, "")})
@@ -100,7 +104,42 @@ console.log(elements,currentPath)
                         if ($scope.input.calcType == 'query') {
                             ext.valueExpression.language = "application/x-fhir-query"
                         }
+                        break
+                    case "initialexp" :
+                        ext.url= "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+                        ext.extension = []
+                        ext.extension.push({url:'definition',valueUri:$scope.input.devCanonical})
 
+                        let child = {url:'valueExpression'}
+
+                        let exp = {}
+
+                        exp.expression = $scope.input.ieExpression
+                        exp.language = "text/fhirpath"
+                        child.valueExpression = exp
+                        
+                        ext.extension.push(child)
+                        break
+                    case "defextractvalue" :
+                        if ($scope.input.devFixed && $scope.input.devExpression) {
+                            alert("You can have a fixed value OR an expression - not both!")
+                        }
+                        ext.url = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtractValue"
+                        ext.extension = []
+                        ext.extension.push({url:'definition',valueUri:$scope.input.devCanonical})
+                        if ($scope.input.devFixed) {
+                            let dt = $scope.input.devFhirDT
+                            let v = `value${dt.charAt(0).toUpperCase() + dt.slice(1)}`
+                            let child = {url:'fixed-value'}
+                            child[v] = $scope.input.devFixed
+                            ext.extension.push(child)
+
+
+
+                        }
+                        break
+
+                      //  ng-if="input.devCanonical && input.devfhirDT && (input.devFixed || input.devExpression)"
                     }
 
                 return ext

@@ -339,8 +339,9 @@ angular.module("pocApp")
 
                 op = op || '='
                 //let sourcePath = item.shortPath       //this is the path of the source
+
                 let sourcePath = item.ed.path       //the controlling ED path. THIS MUST BE THE FULL PATH includeing DG name
-                let sourcePathId = item.ed.id       //the id of the ed
+                let sourceId = item.ed.id       //the id of the ed
                 //let targetPath =$scope.selectedNode.data.ed.path
                 let targetPath = $filter('dropFirstInPath')($scope.selectedNode.data.ed.path)  //the currently selected ED - the one that will be controlled
                 let targetED = $scope.selectedNode.data.ed  //this ED - the one that will be shown / hidden
@@ -352,7 +353,8 @@ angular.module("pocApp")
                     if (ed.path == targetPath) {
                         found = true
                         ed.enableWhen = ed.enableWhen || []
-                        let ew = {source:sourcePath,sourcePathId: sourcePathId,operator:op,value:value}
+                        let ew = {source:sourcePath,sourceId: sourceId,operator:op,value:value}
+                        //let ew = {source:sourcePath,sourcePathId: sourcePathId,operator:op,value:value}
                         ed.enableWhen.push(ew)
 
                         //traceSvc.addAction({action:'add-enablewhen',model:$scope.selectedModel,path:targetPath,description:'edit diff'})
@@ -364,7 +366,7 @@ angular.module("pocApp")
                     let diffEd = angular.copy(targetED)     //this is a copy of the 'source' - which will be hidden
                     diffEd.path = targetPath
                     diffEd.enableWhen = item.ed.enableWhen || []
-                    let ew = {source:sourcePath,sourcePathId: sourcePathId,operator:op.value,value:value}
+                    let ew = {source:sourcePath,sourceId: sourceId,operator:op.value,value:value}
                     //let ew = {source:sourcePath,sourcePathId: sourcePathId,operator:"=",value:value}
                     diffEd.enableWhen.push(ew)
                     $scope.selectedModel.diff.push(diffEd)
@@ -474,6 +476,7 @@ angular.module("pocApp")
                     }
 
                     let clone = angular.copy(ed)  //copy to insert
+                    clone.id = utilsSvc.getUUID()   //replace the id with a new one. But ids within the clone remain (eg for EW's in the ed)
                     let basePath = $filter('dropFirstInPath')(ed.path)
                     let newPath = `${basePath}.slice:${sliceName}`
 
@@ -485,7 +488,6 @@ angular.module("pocApp")
                             break
                         }
                     }
-
 
                     clone.path = newPath
                     clone.title = sliceName //`Slice ${sliceName} from ${basePath}`
@@ -500,7 +502,7 @@ angular.module("pocApp")
 
                     $scope.selectedModel.diff.push(clone)
 
-                    traceSvc.addAction({action:'add-slice',path:newPath,model:$scope.selectedModel})
+                    //traceSvc.addAction({action:'add-slice',path:newPath,model:$scope.selectedModel})
 
                     //also need to change the type of the element that was sliced. hmmm.
                     //what happens if sliced twice - original dt lost? ?store original??

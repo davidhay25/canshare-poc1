@@ -89,6 +89,10 @@ angular.module('formsApp')
                     }
                 );
 
+                $scope.viewItem = function (item) {
+                    makeQHelperSvc.showItemDetailsDlg(item,$scope.q)
+                }
+
 
 
                 function setupQ () {
@@ -350,28 +354,34 @@ angular.module('formsApp')
                     )
                 }
 
-                $scope.getItemFromOO = function (expression) {
+                $scope.getItemFromOO = function (expression,iss) {
 
-                    let result = fhirpath.evaluate($scope.q, expression, null, fhirpath_r4_model)
-                    if (result && result.length > 0) {
-                        let item = result[0]
+                    //Questionnaire.item[0].item[2].extension[1].extension[1]
+                    let item = renderFormsSvc2.parseErrorExpression(expression,$scope.q)
+
+
+
+                    //let result = fhirpath.evaluate($scope.q, expression, null, fhirpath_r4_model)
+                 //   if (result && result.length > 0) {
+                        if (item) {
+                     //   let item = result[0]
 
                         $uibModal.open({
                             //backdrop: 'static',      //means can't close by clicking on the backdrop.
                             //keyboard: false,       //same as above.
-                            //size : 'lg',
+                            size : 'xlg',
                             templateUrl: 'modalTemplates/showItem.html',
 
-                            controller: function($scope,item,ed){
+                            controller: function($scope,item,iss){
                                 $scope.item = item
-                                $scope.ed = ed
+                                $scope.iss = iss
                             },
 
                             resolve: {
                                 item: function () {
                                     return item
-                                }, ed: function () {
-                                    return $scope.hashEd[item.linkId]
+                                }, iss: function () {
+                                    return iss
                                 }
                             }
                         })

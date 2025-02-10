@@ -52,6 +52,9 @@
     <script src="js/utilsSvc.js"></script>
     <script src="js/filters.js"></script>
 
+    <script src="js/modelDGSvc.js"></script>
+
+
     <script src="js/libs/firebase.js"></script>
     <script src="js/libs/angularfire.min.js"></script>
 
@@ -161,6 +164,8 @@
                     <div class="myScroll">
                         <div class="list-group">
                             <div class="list-group-item"
+                                 ng-class="{listItemSelected:dg.name == selectedDG.name}"
+                                 style="cursor: pointer"
                                  ng-click="selectDG(dg)"
                                  ng-repeat="dg in arDG track by $index">
                                 {{dg.name}}
@@ -180,9 +185,81 @@
 
 
 
-                    <div class="myScroll">
-                        <pre>{{selectedDG | json}}</pre>
-                    </div>
+                    <uib-tabset>
+                        <uib-tab heading="Tree">
+
+                            <div class="myScroll">
+                                <pre>{{selectedDG | json}}</pre>
+                            </div>
+                        </uib-tab>
+
+                        <uib-tab heading="Expanded elements">
+                            <div class="myScroll">
+                                <pre>{{allElements | json}}</pre>
+                            </div>
+                        </uib-tab>
+
+
+
+                        <uib-tab heading="Table">
+                            <table class="table table-bordered">
+                                <tr ng-repeat="item in allElements">
+                                    <td>{{item.ed.path}}</td>
+                                    <td>{{item.ed.sourceModelName}}</td>
+
+                                </tr>
+                            </table>
+                        </uib-tab>
+                        <uib-tab heading="Graph">
+
+                            <div class="myScroll">
+
+                            </div>
+                        </uib-tab>
+                        <uib-tab heading="Enable Whens">
+                            <div class="myScroll">
+                                <div ng-repeat="item in allElements">
+                                    <div ng-if = "item.ed.enableWhen.length > 0">
+                                        <pre>{{item.ed | json}}</pre>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </uib-tab>
+
+                        <uib-tab heading="Diff">
+
+                            <div class="myScroll">
+                                <pre>{{selectedDG | json}}</pre>
+                            </div>
+                        </uib-tab>
+
+                        <uib-tab heading="Ids">
+                            <table class="table table-bordered">
+                                <tr ng-repeat="item in allElements">
+                                    <td>{{item.ed.id | shortId}}</td>
+                                    <td
+                                            uib-popover="{{item.ed.path}}"
+                                            popover-append-to-body = true
+                                            popover-placement="top"
+                                            popover-trigger="'mouseenter'"
+
+                                    >{{item.ed.path | maxLengthDisplay : 50}}</td>
+                                    <td>
+                                        <div ng-repeat="ew in item.ed.enableWhen">
+                                            <i ng-show= "isIdPresent(ew.sourceId)" class="glyphicon glyphicon-ok"></i>
+                                            {{ew.sourceId | shortId}} {{ew.source}}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </uib-tab>
+                    </uib-tabset>
+
+
+
+
+
 
 
                 </div>
@@ -301,6 +378,12 @@
         </uib-tab>
         -->
 
+        <uib-tab heading="Graph">
+
+            <br/>
+        </uib-tab>
+
+
         <uib-tab heading="Conditionals">
 
             <br/>
@@ -309,10 +392,6 @@
             </div>
             <div class="clearfix"></div>
 
-
-
-
-
             <div class="row">
                 <div class="col-md-4">
                     <select class="form-control" ng-model="input.dgname"
@@ -320,12 +399,19 @@
                         <option></option>
                     </select>
                 </div>
+                <div class="col-md-8">
+                    <div ng-click="applyIdFix()">Update all Ids</div>
+                </div>
+
+
+
             </div>
 
 
             <br/>
 
             <table class="table-bordered table">
+                <tr><th>DG</th><th style="width: 10%">Issues</th><th>Target / Source</th></tr>
                 <tr ng-show="showCondForDG(ew)" ng-repeat="ew in allEW"
                     ng-class="{error:ew.issues.length > 0}"
                     >
@@ -336,17 +422,13 @@
                         </div>
 
                     </td>
-                    <td>{{ew.sourcePathId}}</td>
-                    <td
-                            uib-popover="{{ew.source}}"
-                            popover-placement="top"
-                            popover-append-to-body = "true"
-                            popover-trigger="'mouseenter'"
-                    >
-
-                        {{ew.source}}
-
+                    <td>
+                        <div>Targ: {{ew.target}}</div>
+                        <div>Srce: {{ew.source}}</div>
                     </td>
+
+
+
 
                     <!--
                     <td>{{ew.operator}}</td>

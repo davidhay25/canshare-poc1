@@ -30,21 +30,94 @@
                ng-click="selectItem(item)"
                ng-class="{'list-group-item':true,listItemSelected:item == selectedItem}"}>
             {{item.text || 'Q'}} <span class="pull-right">{{item.linkId}}</span>
-          </div>
+          </div><br/>
+<!--
+          <strong>Children</strong>
+
+-->
+
+          <br/>
+
         </div>
       </div>
       <div class="col-md-9">
-        <pre>{{selectedItem | json}}</pre>
-        <em>Note that the element 'children' was added by this routine - it isn't in the actual item</em>
+        <uib-tabset>
+          <uib-tab heading="Json">
+            <pre>{{getDisplay(selectedItem) | json}}</pre>
+            <em>Note that the element 'children' was added by this routine - it isn't in the actual item</em>
 
-      </div>
-    </div>
+          </uib-tab>
+          <uib-tab heading="SDC stuff">
+            <br/>
+
+
+              <div ng-if="selectedSummary.lc.length > 0">
+                  <strong>Launch contexts</strong>
+                  <table class="table table-bordered">
+                      <tr><th>Name</th><th>Type</th></tr>
+                      <tr ng-repeat="entry in selectedSummary.lc">
+                          <td>{{entry.name.code}}</td>
+                          <td>{{entry.type}}
+
+                          </td>
+                      </tr>
+                  </table>
+
+              </div>
+
+             <div ng-repeat="ai in selectedSummary.allocateId">
+                 <strong>AllocateId:</strong> {{ai}}
+             </div>
+
+              <br/>
+
+              <div ng-repeat="ie in selectedSummary.ie track by $index">
+                  <strong>initialExpression :</strong>  {{ie}}
+              </div>
+
+              <br/>
+
+              <div ng-repeat="defExt in selectedSummary.defExt track by $index">
+                  <strong>definitionExtract:</strong>  type <span ng-bind="defExt.type"></span>
+              </div>
+
+              <br/>
+
+              <div ng-if="selectedSummary.defExtValue.length > 0">
+                  <strong>definitionExtractValue</strong>
+                  <table class="table table-bordered">
+                      <tr><th>Path</th><th>Value / expression</th></tr>
+                      <tr ng-repeat="entry in selectedSummary.defExtValue">
+                          <td>{{entry.path}}</td>
+                          <td>{{entry.value}}
+                            {{entry.expression.expression}}
+                          </td>
+                      </tr>
+                  </table>
+
+              </div>
+
+              <div ng-if="selectedItem.definition"><strong>Extraction expression</strong> {{selectedItem.definition}}</div>
+
+
+              <div ng-if="selectedSummary.unknownExt.length > 0">
+                  <strong>Unparsed extensions</strong>
+                  <pre>{{selectedSummary.unknownExt | json}}</pre>
+              </div>
+
+
+
+                     </uib-tab>
+                   </uib-tabset>
+
+                 </div>
+               </div>
 
 
 
 
-  </div>
-  <div class="modal-header">
+             </div>
+             <div class="modal-header">
 
-  </div>
-</div>
+             </div>
+           </div>

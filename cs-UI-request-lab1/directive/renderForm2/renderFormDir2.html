@@ -120,8 +120,8 @@
               </tr>
 
 
-              <tr>
-                <td ng-if="technicalview" class="detailName">Q type</td>
+              <tr ng-if="technicalview">
+                <td class="detailName">Q type</td>
                 <td>
                   {{selectedItem.type}}
                 </td>
@@ -304,7 +304,10 @@
               <tr>
                 <td ng-if="technicalview" class="detailName">LinkId</td>
                 <td>
-                  {{selectedItem.linkId}}
+                  <div class="clickable" ng-click="viewItem(selectedItem)">
+                    {{selectedItem.linkId}}
+                  </div>
+
                 </td>
               </tr>
 
@@ -658,13 +661,16 @@
                 <td>{{iss.severity}}</td>
                 <td>{{iss.diagnostics}}
                   <div>
+                    {{iss.location[0]}}
+                    <!--
                     <em class="clickable" ng-click="selectByLinkId(iss.location[0])">
                       {{iss.location[0]}}
                     </em>
+                    -->
                   </div>
                   <div>{{iss.details.text}}</div>
                   <div ng-repeat = "exp in iss.expression">
-                    <em><span class="clickable" ng-click="getItemFromOO(exp)">{{exp}}</span></em>
+                    <em><span class="clickable" ng-click="getItemFromOO(exp,iss)">{{exp}}</span></em>
                   </div>
                 </td>
 

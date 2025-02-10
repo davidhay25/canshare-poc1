@@ -4,7 +4,7 @@ angular.module("pocApp")
 
 
     //try not to add depencies to this service
-    .service('makeQHelperSvc', function(utilsSvc) {
+    .service('makeQHelperSvc', function(utilsSvc,$uibModal) {
 
         extensionUrls = {}
         extensionUrls.displayCategory = "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory"
@@ -12,7 +12,199 @@ angular.module("pocApp")
         extensionUrls.entryFormat = "http://hl7.org/fhir/StructureDefinition/entryFormat"
         extensionUrls.peferredTerminologyServer = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-preferredTerminologyServer"
 
+        extensionUrls.extDefinitionExtract = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract"
+        extensionUrls.extDefinitionExtractValue = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtractValue"
+
+        extensionUrls.extAllocateIdUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-extractAllocateId"
+        extensionUrls.extLaunchContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+
+        extensionUrls.initialExpression = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+
+        objColours = {
+            "resource" : "tomato",
+            "group" : "moccasin",
+            "info" : "palegreen"
+        }
+
+
         return {
+            showItemDetailsDlg : function (item,Q) {
+                $uibModal.open({
+
+                    size : 'xlg',
+                    templateUrl: 'modalTemplates/viewItem.html',
+
+                    controller: 'viewItemCtrl',
+
+                    resolve: {
+                        item: function () {
+                            return item
+                        }, Q: function () {
+                            return Q
+                        }
+                    }
+                })
+            },
+
+            getExtensionSummary : function (item) {
+                //generate a summary of extensions on a Q item
+                let summary = {unknownExt:[],allocateId:[],defExt : [],defExtValue:[], lc:[],ie:[]}
+                if (item.extension) {
+                    //summary.extensions = item.extension    //in case the caller needs access to raw data
+                    for (const ext of item.extension) {
+                        //pull out the specific extensions we are interested in
+                        switch (ext.url) {
+                            case extensionUrls.initialExpression :
+                                //should only be 1
+                                summary.ie.push(ext.valueExpression.expression)
+                                break
+                            case extensionUrls.extLaunchContextUrl :
+                                let voLC = {}
+                                ext.extension.forEach(function (child) {
+                                    switch (child.url) {
+                                        case 'name' :
+                                            voLC.name = child.valueCoding
+                                            break
+                                        case 'type' :
+                                            voLC.type = child.valueCode
+                                            break
+                                    }
+                                })
+                                summary.lc.push(voLC)
+                                break
+                            case extensionUrls.extAllocateIdUrl :
+                                summary.allocateId.push(ext.valueString)
+                                break
+                            case extensionUrls.extDefinitionExtract:
+                                let vo = {}
+                                ext.extension.forEach(function (child) {
+                                    switch (child.url) {
+                                        case 'definition' :
+                                            vo.type = child.valueCanonical
+                                            break
+                                    }
+                                })
+                                summary.defExt.push(vo)
+                                break
+
+                            case extensionUrls.extDefinitionExtractValue:
+                                let vo1 = {}
+                                ext.extension.forEach(function (child) {
+                                    switch (child.url) {
+                                        case 'definition' :
+                                            vo1.path = child.valueUri.replace('http://hl7.org/fhir/StructureDefinition/',"")
+                                            break
+                                        case 'fixed-value' :
+                                            vo1.value = child.valueCoding || child.valueString
+                                            break
+                                        case 'expression' :
+                                            vo1.expression = child.valueExpression
+                                            break
+
+                                    }
+                                })
+                                summary.defExtValue.push(vo1)
+
+                                break
+                            default:
+                                summary.unknownExt.push(ext)
+
+                        }
+
+                    }
+
+
+
+                }
+                return summary
+
+            },
+
+            getItemGraph : function (Q) {
+                //generate graph of Q items
+
+                let arNodes = []
+                let hashHodes = {}  //hash by linkId
+                let arEdges = []
+
+
+                function processItem(parentNode,item) {
+                    let node = {id: item.linkId, label: item.text,shape: 'box'}
+                    node.data = {item:item,meta:{}}
+
+                    if (item.type == 'group') {
+                        node.color = objColours.group
+                    }
+
+                    if (item.type == 'display') {
+                        node.color = objColours.info
+                    }
+
+                    if (item.extension) {
+                        for (const ext of item.extension) {
+                            if (ext.url == extensionUrls.extDefinitionExtract) {
+                                node.color = objColours.resource
+                                for (const child of ext.extension) {
+                                    if (child.url == 'definition') {
+                                        node.data.meta.extractType = child.valueCanonical
+                                    }
+
+                                }
+
+                            }
+                        }
+                    }
+
+
+
+                    arNodes.push(node)
+                    hashHodes[item.linkId] = node
+
+                    let edge = {id: 'e' + arEdges.length +1,
+                        to: item.linkId,
+                        from: parentNode.id,
+                        color: 'black',
+                        label: '',
+                        arrows : {to:true}}
+                    arEdges.push(edge)
+
+                    if (item.item) {
+                        for (const child of item.item) {
+                            let parentNode = hashHodes[item.linkId]
+
+                            processItem(parentNode,child)
+                        }
+                    }
+
+                }
+
+                //create root node as parent
+                let rootNode = {id: "root", label: "Questionnaire",shape: 'box',color:'red'}
+                rootNode.data = {item:{}}
+                arNodes.push(rootNode)
+                hashHodes[rootNode.id] = rootNode
+
+                //call all items of Q
+                for (const item of Q.item) {
+                    processItem(rootNode,item)
+                }
+
+                //generate graph
+                let nodes = new vis.DataSet(arNodes)
+                let edges = new vis.DataSet(arEdges);
+
+                // provide the data in the vis format
+                let graphData = {
+                    nodes: nodes,
+                    edges: edges
+                };
+
+                return {graphData:graphData}
+
+
+
+
+            },
             getExtensionUrls : function () {
                 return extensionUrls
             },
@@ -162,7 +354,7 @@ angular.module("pocApp")
 
                         item.enableWhen.forEach(function (ew) {
                             //note that this is the id of the controlling element
-                            let questionId = ew.question //ew.sourcePathId    //the ED id of the source (controlling) elemeny
+                            let questionId = ew.question //ew.sourceId    //the ED id of the source (controlling) elemeny
 
                             if (hashId[questionId]) {
                                 ew.question = hashId[questionId]

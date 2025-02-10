@@ -520,7 +520,8 @@ angular.module("pocApp")
                     //qEW.question = `${pathPrefix}${source}` //linkId of source is relative to the parent (DG)
 
                     //2Feb - make the question the sourceId. Then, adjust to the path after the Q has been generated
-                    qEW.question = ew.sourcePathId || "MissingSourceId"
+                    //qEW.question = ew.sourcePathId || "MissingSourceId"
+                    qEW.question = ew.sourceId || "MissingSourceId"
                     //---------------
 
                     //qEW.question = `${pathPrefix}${ew.source}` //linkId of source is relative to the parent (DG)
@@ -674,17 +675,10 @@ angular.module("pocApp")
 
                     let thing = {text:Q.name}
                     thing.level = 0
-
-
                     thing.allocateId = thing.allocateId ||  []
                     thing.allocateId.push(ext.valueString)
 
-
-
-
                     report.entries.push(thing)
-
-
 
                     thing.isSDC = true
 
@@ -1774,7 +1768,7 @@ angular.module("pocApp")
                             let value = {coding:[ed.itemCode]}
                             addFixedValue(item,canonicalUrl,"CodeableConcept",value)
                         }
-                        
+
                     }
 
                     item.prefix = ed.id     //save the Id in the prefix. We'll need it for adjusting the EnableWhens
