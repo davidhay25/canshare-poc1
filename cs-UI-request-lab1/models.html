@@ -649,17 +649,20 @@
                 <uib-tab ng-if="userMode == 'playground'" heading="Import Component">
                     <br/>
                     <table class="table table-bordered">
-                        <tr><th>Title</th><th>Name</th><th>Type</th><th>Description</th><th># diff</th><th></th></tr>
+                        <tr><th>Title</th><th>Name</th><th>Source</th><th>Type</th><th>Description</th><th>Cnt</th><th></th></tr>
                         <tr ng-repeat="dg in importableDG">
                             <td>{{dg.title}}</td>
                             <td>{{dg.name}}</td>
+                            <td>
+                                {{ { playground: "Form", library: "Library" }[dg.source] || dg.source}}
+                            </td>
                             <td>{{dg.type}}</td>
                             <td>{{dg.description}}</td>
 
                             <td>{{dg.diff.length}}</td>
 
                             <td>
-                                <div ng-if="dg.nameExists" class="clickable" ng-click="updateDG($index)">Update</div>
+                                <div ng-if="dg.nameExists" class="clickable" ng-click="updateDG($index)">Replace</div>
                                 <div ng-if="!dg.nameExists"class="clickable" ng-click="importDG($index)">Import</div>
                             </td>
                         </tr>

@@ -572,9 +572,6 @@ angular.module("pocApp")
                                 let canInclude = true
                                 for (const key of Object.keys(hashHidden)) {
 
-
-
-
                                     if (ed.path == key || ed.path.isChildPath(key)) {
                                         //this is an excluded or child-of excluded element so don't include it
                                         canInclude = false

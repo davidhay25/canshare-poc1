@@ -53,7 +53,7 @@
         </span>
 
         <span class="clickable spacer"
-              ng-click="makeFrozen('dg',selectedModel)">Update component</span>
+              ng-click="updateComponent('dg',selectedModel)">Update component</span>
 
 
         <br/>
@@ -363,6 +363,22 @@
 
                     </div>
 
+                  </td>
+                </tr>
+
+                <tr ng-if="selectedModel.adHocExt">
+                  <td class="detailName">Ad hoc ext</td>
+                  <td>
+                    <div
+                            class="clickableDotted"
+                            uib-popover-html="popoverText(selectedModel.adHocExt)"
+                            popover-placement="left"
+                            popover-class="custom-popover"
+                            popover-trigger="'mouseenter'">
+
+                      Extension
+
+                    </div>
                   </td>
                 </tr>
 
@@ -710,7 +726,7 @@
                   </tr>
 
 
-                  <tr ng-if="selectedNode.data.ed.definition">
+                  <tr ng-if="selectedNode.data.ed.instructions">
                     <td class="detailName">Instructions</td>
                     <td>
 
@@ -721,7 +737,6 @@
                   <tr ng-if="getExtractType(selectedNode.data.ed)">
                     <td class="detailName">Extraction Type</td>
                     <td>
-
                       {{getExtractType(selectedNode.data.ed) }}
                     </td>
                   </tr>
@@ -730,10 +745,26 @@
                   <tr ng-if="selectedNode.data.ed.definition">
                     <td class="detailName">Extraction</td>
                     <td>
-
                       {{selectedNode.data.ed.definition}}
                     </td>
                   </tr>
+
+                  <tr ng-if="selectedNode.data.ed.adHocExt">
+                    <td class="detailName">Ad hoc ext</td>
+                    <td>
+                      <div
+                           class="clickableDotted"
+                           uib-popover-html="popoverText(selectedNode.data.ed.adHocExt)"
+                           popover-placement="left"
+                           popover-class="custom-popover"
+                           popover-trigger="'mouseenter'">
+
+                        Extension
+
+                      </div>
+                    </td>
+                  </tr>
+
 
                   <tr ng-if="selectedNode.data.ed.identifierSystem">
                     <td class="detailName">Identifier system</td>
@@ -757,6 +788,9 @@
                       {{selectedNode.data.ed.prePop}}
                     </td>
                   </tr>
+
+
+
 
                   <tr ng-if="selectedNode.data.ed.collapsible">
                     <td class="detailName">Collapsible</td>
@@ -919,7 +953,9 @@
               <tr><th>Path</th><th>Title</th><th>Description</th><th>DG Type</th><th>Card.</th><th>SDC attributes</th><th>Source</th></tr>
               </thead>
               <tbody>
-              <!---     <tr ng-repeat="element in fullElementList">-->
+              <!---     <tr ng-repeat="element in fullElementList">
+
+              -->
               <tr ng-repeat="element in fullElementList"
                   ng-hide="$index==0 || (element.ed.mult.indexOf('..0') > -1)">
                 <td>
@@ -971,6 +1007,7 @@
                   <div ng-if="element.ed.itemCode">Code: {{element.ed.itemCode.code}}</div>
                   <div ng-if="element.ed.definition">Extract: {{element.ed.definition}}</div>
                   <div ng-if="element.ed.prePop">PrePop: {{element.ed.prePop}}</div>
+
                   {{getExtractType(element.ed)}}
 
 
@@ -984,6 +1021,8 @@
                     Extension
 
                   </div>
+
+
 
 
                 </td>

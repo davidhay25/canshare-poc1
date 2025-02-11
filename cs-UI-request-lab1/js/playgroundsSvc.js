@@ -4,10 +4,22 @@ angular.module("pocApp")
 
         return {
 
+            savePlayground : function (pg,email) {
+                let deferred = $q.defer()
+                $http.get(`/playground/${$localStorage.world.id}`).then(
+
+
+                )
+
+                return deferred.promise
+
+            },
+
             getImportableDG: function (hashAllDG) {
                 let deferred = $q.defer()
                 //get all the DG's that can be imported into a playground from the library
                 //These are DG's that have been exported as 'frozen'
+                //re-named as 'componnets
                 let arImport = []
                 $http.get('/allfrozen').then(
                     function (data) {

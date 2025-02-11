@@ -24,8 +24,9 @@
     </div>
     <div class="modal-body">
 
-        <div style="text-align: center" class="alert alert-warning" ng-if="currentDirty">
-            There are unsaved changes in the current Form. If you load one or create a new one those changes will be lost.
+        <div style="text-align: center" class="alert alert-warning" ng-if="currentDirty.length > 0">
+            There are unsaved changes in the dataGroups <span ng-repeat="dg in currentDirty"><strong>{{dg}}</strong>, </span>.
+            If you load a Form or create a new one those changes will be lost.
 
         </div>
 

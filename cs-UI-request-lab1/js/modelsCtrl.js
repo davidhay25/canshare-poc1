@@ -128,7 +128,7 @@ angular.module("pocApp")
 
             }
 
-            $scope.makeFrozen = function (type,model) {
+            $scope.updateComponent = function (type,model) {
 
                 if (type == 'dg') {
                     let msg = "Make a frozen copy of this DG, where the diff is the snapshot. Useful for Forms"
@@ -150,6 +150,7 @@ angular.module("pocApp")
                 }
 
                 function saveModel(frozen) {
+
                     $http.put(`/frozen/${frozen.name}`,frozen).then(
                         function (data) {
                             alert("Frozen copy saved in Library")
@@ -210,7 +211,7 @@ angular.module("pocApp")
                         let t = {Q:voQ.Q,errorLog:voQ.errorLog, lidHash: voQ.lidHash}
                         $http.put(qry,t).then(
                             function () {
-                                if (confirm("load review?")) {
+                                if (confirm("Load questionnaire viewer?")) {
                                     const url = `modelReview.html?q-${model.name}`
                                     const features = 'noopener,noreferrer'
                                     window.open(url, '_blank', features)
@@ -246,11 +247,10 @@ angular.module("pocApp")
                         },
                         currentDirty: function () {
                             //have any of the DG's been changed
-                            let dirty = false
+                            let dirty = []
                             for (const key of Object.keys($scope.hashAllDG)) {
                                 if ($scope.hashAllDG[key].dirty) {
-                                    dirty = true
-                                    break
+                                    dirty.push(key)
                                 }
                             }
                             return dirty
@@ -293,23 +293,48 @@ angular.module("pocApp")
             }
 
             $scope.updatePlayground = function (both) {
+
                 //save the current playground to the library
                 $scope.world.id = $scope.world.id || utilsSvc.getUUID()
 
-                $localStorage.world.updated = new Date()
-                if ($localStorage.world.version) {
-                    $localStorage.world.version ++
-                } else {$localStorage.world.version = 1}
+                $http.get(`/playground/${$localStorage.world.id}`).then(
+                    function (data) {
+                        let pgFromServer = data.data
+                        if (pgFromServer.lockedTo) {
+                            if (!  $scope.user || pgFromServer.lockedTo !== $scope.user.email) {
+                                alert (`Form is locked by ${$localStorage.world.lockedTo}. Only they can make changes. You can still make a copy or save to your local store.`)
+                                return
+                            }
+                        }
+                        //safe to update
+                        updatePlayground()
 
-                //reset the dirty flag of all DGs
-                for (const key of Object.keys($localStorage.world.dataGroups)) {
-                    let DG = $localStorage.world.dataGroups[key]
-                    DG.dirty = false
-                }
+                    },function (err) {
+                        if (err.status == 404) {
+                            updatePlayground()
+                        } else {
+                            alert(angular.toJson(err.data))
+                        }
 
-                if ($localStorage.world.lockedTo && $localStorage.world.lockedTo !== $scope.user.email) {
-                    alert (`Form is locked by ${$localStorage.world.lockedTo}. Only they can make changes. You can still make a copy or save to your local store.`)
-                } else {
+                    }
+
+                )
+
+
+
+
+                function updatePlayground() {
+                    $localStorage.world.updated = new Date()
+                    if ($localStorage.world.version) {
+                        $localStorage.world.version ++
+                    } else {$localStorage.world.version = 1}
+
+                    //reset the dirty flag of all DGs
+                    for (const key of Object.keys($localStorage.world.dataGroups)) {
+                        let DG = $localStorage.world.dataGroups[key]
+                        DG.dirty = false
+                    }
+
                     $http.put(`/playground/${$localStorage.world.id}`,$localStorage.world).then(
                         function (data) {
 
@@ -333,6 +358,10 @@ angular.module("pocApp")
                         }
                     )
                 }
+
+
+
+
 
 
             }
@@ -2095,7 +2124,9 @@ angular.module("pocApp")
                 //temp $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name,dg)// vo.allElements
                 $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)// vo.allElements
 
+                $scope.allAdHocExt = modelDGSvc.makeSDCSummary($scope.fullElementList,$scope.hashAllDG)
 
+console.log($scope.allAdHocExt)
 
                 $scope.fullElementHash = {}         //I seem to need this quite a lot. Though memory usage is getting high...
                 //create the list of all paths in the DG. Used by the 'ordering'

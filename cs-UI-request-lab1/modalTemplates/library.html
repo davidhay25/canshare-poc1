@@ -382,8 +382,8 @@
 
       </uib-tab>
 
-      <uib-tab ng-if="userMode == 'library'" heading="Copy to playground">
-        <em>Create a playground from the Library. Useful as a version.</em>
+      <uib-tab ng-if="userMode == 'library'" heading="Copy to form">
+        <em>Create a form from the Library. Useful as a version.</em>
 
         <br/><br/>
         <div class="row">
@@ -409,7 +409,7 @@
         <textarea class="form-control" placeholder="Description" ng-model="input.pgDescription"/>
 
         <button class="btn btn-primary"
-                ng-click="createPlayground(input.pgName,input.pgDescription)">Create playground</button>
+                ng-click="createPlayground(input.pgName,input.pgDescription)">Create form</button>
 
       </uib-tab>
 

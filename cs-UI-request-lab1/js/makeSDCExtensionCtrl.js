@@ -95,6 +95,8 @@ console.log(elements,currentPath)
                         ext.url = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract"
                         ext.extension = []
                         ext.extension.push({url:'definition',valueCanonical:$scope.input.deCanonical.replace(/\s+/g, "")})
+                        ext.extension.push({url:'fullUrl',valueString:$scope.input.deVariable})
+
                         break
                     case "calc" :
                         ext.url= "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression"
@@ -107,6 +109,16 @@ console.log(elements,currentPath)
                         break
                     case "initialexp" :
                         ext.url= "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+
+                        ext.valueExpression =  {} //{name: $scope.input.calcName.replace(/\s+/g, "")}
+                        ext.valueExpression.expression = $scope.input.ieExpression
+                        ext.valueExpression.language = "text/fhirpath"
+
+                        /*
+
+                        ext.expression = $scope.input.ieExpression
+                        exp.language = "text/fhirpath"
+
                         ext.extension = []
                         ext.extension.push({url:'definition',valueUri:$scope.input.devCanonical})
 
@@ -117,8 +129,9 @@ console.log(elements,currentPath)
                         exp.expression = $scope.input.ieExpression
                         exp.language = "text/fhirpath"
                         child.valueExpression = exp
-                        
+
                         ext.extension.push(child)
+                        */
                         break
                     case "defextractvalue" :
                         if ($scope.input.devFixed && $scope.input.devExpression) {
@@ -126,8 +139,23 @@ console.log(elements,currentPath)
                         }
                         ext.url = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtractValue"
                         ext.extension = []
-                        ext.extension.push({url:'definition',valueUri:$scope.input.devCanonical})
-                        if ($scope.input.devFixed) {
+
+                        //format should be {type}.Path - eg Patient.birthDate
+                        let canonical = $scope.input.devCanonical
+
+                        let ar = canonical.split('.')
+                        let type = ar[0]
+
+                        canonical = `http://hl7.org/fhir/StructureDefinition/${type}#${canonical}`
+                        ext.extension.push({url:'definition',valueUri:canonical})
+
+                        if ($scope.input.devExpression) {
+                            let child = {}
+
+                            child.expression = $scope.input.devExpression
+                            child.language = "text/fhirpath"
+                            ext.extension.push({url:"expression",valueExpression:child})
+                        } else if ($scope.input.devFixed) {
                             let dt = $scope.input.devFhirDT
                             let v = `value${dt.charAt(0).toUpperCase() + dt.slice(1)}`
                             let child = {url:'fixed-value'}

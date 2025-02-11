@@ -157,7 +157,7 @@ angular.module("pocApp")
                 ext.extension.push({url:"ifNoneMatch",valueString:vo.ifNoneExist})
             }
 
-
+            file:///Users/davidhay/clinFHIR/canshare-poc1/cs-UI-request-lab1/js/makeQCtrlDEP.js
             item.extension = item.extension || []
             item.extension.push(ext)
         }
@@ -789,7 +789,7 @@ angular.module("pocApp")
                                     break
                                 case extInitialExpressionUrl:
 
-                                    thing.initialExpression = ext.valueExpression.expression
+                                    thing.initialExpression = utilsSvc.getExpression(ext.valueExpression)
 
                                     //add to the variable usage hash
                                     let ar1 = thing.initialExpression.split('.')
@@ -896,7 +896,7 @@ angular.module("pocApp")
 
                                     try {
                                         thing.variable = ext.valueExpression.name
-                                        thing.contents = ext.valueExpression.expression
+                                        thing.contents = utilsSvc.getExpression(ext.valueExpression)
                                         thing.itemName = ext.valueExpression.name
                                     } catch (ex) {
                                         alert(`Invalid expression at ${item.text}. ignoring`)
@@ -905,7 +905,7 @@ angular.module("pocApp")
                                     break
 
                                 case extCalculatedExpression :
-                                    thing.calculated = ext.valueExpression.expression
+                                    thing.calculated = utilsSvc.getExpression(ext.valueExpression)
 
                                     break
 
@@ -955,6 +955,15 @@ angular.module("pocApp")
 
                 //console.log(report)
                 return {report:report}
+
+                function getExpressionDEP(exp) {
+                    if (exp && exp.expression) {
+                        return exp.expression
+                    } else {
+                        return ""
+                    }
+
+                }
 
             },
 
@@ -1336,7 +1345,8 @@ angular.module("pocApp")
                     }
 
                     //now for all of the unique id's add an allocateId extension to the root
-                    //this will be the extracted resource id
+                    //this will be the extracted resource id todo - may deprecate this function in favour of adhoc exts - still thinking
+
                     Object.keys(hashIdName).forEach(function (key) {
                         let ext = {url:extAllocateIdUrl,valueString:hashIdName[key]}
                         Q.extension.push(ext)
@@ -1496,14 +1506,18 @@ angular.module("pocApp")
                         // here so it is in the right place for repeated elements...
                         //note that it is already defined - don't use 'let'
 
-                        extractionContext = getExtractionContext(dgName,config.hashAllDG)
+                        extractionContext = getExtractionContext(dgName,config.hashAllDG) //the FHIR resource type defined on the DG
                         if (extractionContext) {
 
 
                             let vo = {definition:extractionContext}
-                            if (dg.idVariable) {
+
+                            //currently disabled Feb2025- should this be set only in the extensions
+                            if (false && dg.idVariable) {
                                 vo.fullUrl = dg.idVariable
                             }
+
+
 
                             addDefinitionExtract(currentItem,vo)        //ie the extractDefinition that sets the resource to extract to...
 
@@ -1605,7 +1619,6 @@ angular.module("pocApp")
                 //add details to item
                 //extraction context is the url of the profile (could be a core type)
                 function decorateItem(item,ed,extractionContext,dg,config,hashEd) {
-
                     if (! ed.type) {
                         return
                     }
@@ -1619,35 +1632,8 @@ angular.module("pocApp")
                         let referencedDG = config.hashAllDG[edType]
                         let extractType = snapshotSvc.getExtractResource(edType)    //the FHIR type this DG extracts to, if any... Follows the parental hierarchy
 
-                        //todo - could use markTarget (if that works out)
-                        if (false && extractType == 'Patient') {
-                            //For a patient, we also add the allocateId extension - in this context it sets the patient id
-                            item.extension = item.extension || []
-                            item.extension.push({url:extAllocateIdUrl,valueString: 'patientID'})
-                        }
-
-
-
                         //this is an item that is extracted
                         if (extractType) {
-
-                            //Jan22
-                            if (false && extractType !== 'Patient') {
-                                //Each resource set the allocateId extension - and uses it
-                                item.extension = item.extension || []
-                                item.extension.push({url:extAllocateIdUrl,valueString: `${extractType}-id`})    //todo will duplaicate if >1 resource of this type
-/*
-                                if (resourcesForPatientReference[extractType]) {
-                                    let elementName = resourcesForPatientReference[extractType].path
-                                    let definition = `http://hl7.org/fhir/StructureDefinition/${extractType}#${extractType}.${elementName}.reference`
-                                    let expression = `%${extractType}-id`
-                                    addFixedValue(item,definition,null,null,expression)
-                                }
-*/
-
-
-                            }
-
 
                             let vo = {}     //this will have all the child extensions for definitionExtract
                             vo.definition = `http://hl7.org/fhir/StructureDefinition/${extractType}`     //set the canonical for the extract
@@ -1672,14 +1658,34 @@ angular.module("pocApp")
                                 //If so, then we need to set the fullUrl to that value
                                 //todo - need a snapshot function to follow the parental path
 
-                                if (referencedDG.idVariable) {
+                                if (false && referencedDG.idVariable) {
                                     vo.fullUrl = referencedDG.idVariable
                                 }
                             }
 
+                            //we only want to do this if there isn't already a definitionExtract set in ad hoc extensions.
+                            //we need to retrieve the DG that corresponds to the extract type to see if it has been defined there
+                            //note if we wanted to support DG inheritance we'd need to walk up the chain - but that does bring in complexities!
+                            let canAddDE = true
+                            if (referencedDG.adHocExt) {
+                                let json = angular.fromJson(referencedDG.adHocExt)
+                                for (let ext of json) {
+                                    if (ext.url == extDefinitionExtract) {
+                                        canAddDE = false
+                                        break
+                                    }
+                                }
+                            }
+
+
+                            if (canAddDE) {
+                                addDefinitionExtract(currentItem,vo)        //ie the extractDefinition that sets the resource to extract to...
+
+                            }
+
 
                             //now we can set the definitionExtract extension on this item
-                            addDefinitionExtract(item,vo)
+                        //    addDefinitionExtract(item,vo)
 
                             //Have any adhoc extensions been added to this DG (or any of its parents)
                             let adHocExt = snapshotSvc.getAdHocExt(referencedDG.name)
@@ -2111,8 +2117,19 @@ angular.module("pocApp")
 
                         //Add the extension url as a definitionExtractValue
                         if (ed.extractExtensionUrl) {
-                            let url = `${extractionContext}#${resourceType}.extension.url`
-                            addFixedValue(item,url,"String",ed.extractExtensionUrl)
+                            //the definition will be something like Specimen.collection.extension.value
+                            let ar1 = definition.split('.')
+                            if (ar1.length > 2) {
+                                ar1.splice(-2,2)    //remove the 2 on the end
+
+                                let url = `${extractionContext}#${ar1.join('.')}.extension.url`
+                                //let url = `${extractionContext}#${resourceType}.extension.url`
+
+                                addFixedValue(item,url,"String",ed.extractExtensionUrl)
+                            } else {
+                                errorLog.push({msg:`${ed.path} has an incorrect definition`})
+                            }
+
                         }
                     }
 

@@ -60,6 +60,14 @@ angular.module("pocApp")
                 })
             },
 
+            getExpression : function(exp) {
+                if (exp && exp.expression) {
+                    return exp.expression
+                } else {
+                    return ""
+                }
+
+            },
 
             reorder : function (lstElements) {
                 //ensures that

@@ -564,7 +564,7 @@ angular.module("pocApp")
 
                             } else if (ext.valueExpression) {
                                 let name = ext.valueExpression.name
-                                let expression = ext.valueExpression.expression
+                                let expression = utilsSvc.getExpression(ext.valueExpression)
                                 //if there's a name, then this extension is defining the variable
 
                                 if (name) {
@@ -594,7 +594,7 @@ angular.module("pocApp")
                                 for (const extChild of ext.extension) {
                                     if (extChild.valueExpression) {
                                         //we'll ignore any name - don't think they're useful
-                                        let childExpression = extChild.valueExpression.expression
+                                        let childExpression = utilsSvc.getExpression(extChild.valueExpression)
                                         if (childExpression) {
                                             //look for a variable - prefixed by %
                                             const childMatches = childExpression.match(/%\w+/g)
@@ -606,7 +606,7 @@ angular.module("pocApp")
                                                 }
                                             } else {
                                                 //if there are no variables found then it's just an item with an expression of some sort
-                                                let thing = {url:url,expression:ext.valueExpression.expression,item:clone}
+                                                let thing = {url:url,expression:utilsSvc.getExpression(ext.valueExpression),item:clone}
                                                 lstUseExpression.push(thing)
                                             }
                                         }
