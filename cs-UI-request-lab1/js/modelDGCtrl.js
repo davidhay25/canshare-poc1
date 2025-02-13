@@ -442,6 +442,10 @@ angular.module("pocApp")
 
             //is this element able to be sliced
             $scope.canSlice = function (ed) {
+                if ($scope.userMode == 'playground') {
+                    return false
+                }
+
                 if (ed && ed.mult) {
                     //must be multiple
                     if (ed.mult.indexOf('..*')  == -1 ) {

@@ -1145,8 +1145,45 @@ angular.module("pocApp")
 
                 }
             },
+            getAllAdHocExt : function () {
+                //create an object containing all adHoc extensions on all DGs
+                let arAdHoc = []
+                for (const key of Object.keys(allDgSnapshot)) {
+                    const dg = allDgSnapshot[key]
+                    if (dg.adHocExt) {
+                        arAdHoc.push({dg:key,path:key,adHocExt: adHocObj(dg.adHocExt)})
+                    }
+                    for (const ed of dg.snapshot) {
+                        if (ed.adHocExt) {
+                            arAdHoc.push({dg:key,path:ed.path,adHocExt: adHocObj(ed.adHocExt)})
+                        }
+                    }
+                }
+
+                arAdHoc.sort(function (a,b) {
+                    if (a.dg > b.dg) {
+                        return 1
+                    } else {
+                        return -1
+                    }
+                })
+
+                return arAdHoc
+
+                function adHocObj(json) {
+                    let obj = {msg:"Invalid Json",json:json}
+                    try {
+                        obj = angular.fromJson(json)
+                    } catch (ex) {
+
+                    }
+                    return obj
+                }
+
+            },
             getAdHocExt : function (dgName) {
                 //retrieves any adhoc extensions defined to following the inheritance chain
+                //note - only gets adHoc defined on DG - not elements
                 let dg = allDgSnapshot[dgName]
                 if (dg) {
                     if (dg.adHocExt) {

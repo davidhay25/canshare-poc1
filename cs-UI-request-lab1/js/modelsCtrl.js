@@ -522,6 +522,9 @@ angular.module("pocApp")
                 //assign the snapshot svc to the modelSvc so that it can read the snapshots of DGs
                 modelCompSvc.setSnapshotSvc(snapshotSvc)
 
+                //all adhoc extensions in the model
+                $scope.allAdHocExt = snapshotSvc.getAllAdHocExt()
+
 
             }
 
@@ -2124,9 +2127,9 @@ angular.module("pocApp")
                 //temp $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name,dg)// vo.allElements
                 $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)// vo.allElements
 
-                $scope.allAdHocExt = modelDGSvc.makeSDCSummary($scope.fullElementList,$scope.hashAllDG)
+               // $scope.allAdHocExt = modelDGSvc.makeSDCSummary($scope.fullElementList,$scope.hashAllDG)
 
-console.log($scope.allAdHocExt)
+//console.log($scope.allAdHocExt)
 
                 $scope.fullElementHash = {}         //I seem to need this quite a lot. Though memory usage is getting high...
                 //create the list of all paths in the DG. Used by the 'ordering'

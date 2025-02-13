@@ -558,7 +558,21 @@ angular.module("pocApp")
                                 let thing = {kind:'allocateId',item:clone}
                                 hashVariable[aName].push(thing)      //should only be 1...
                             } else if (url == "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtractValue") {
-                                //not sure if this belongs in here anyway (although it can be an expression...
+                                //find the expression
+                                if (ext.extension) {
+                                   for (const child of ext.extension) {
+                                       if (child.url == 'expression') {
+                                           if (child.valueExpression) {
+                                               let aName = child.valueExpression.expression
+
+                                               hashUsed[aName] = hashUsed[aName] || []
+
+                                               let thing = {kind:'definitionExtractValue',item:clone}
+                                               hashUsed[aName].push(thing)
+                                           }
+                                       }
+                                   }
+                                }
 
 
 

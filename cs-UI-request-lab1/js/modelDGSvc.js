@@ -8,7 +8,7 @@ angular.module("pocApp")
 
         return {
 
-            makeSDCSummary : function (fullElementList,hashAllDG) {
+            makeSDCSummaryDEP : function (fullElementList,hashAllDG) {
                 //Make a summary of all the SDC extensions
 
 

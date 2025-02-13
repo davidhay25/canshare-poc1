@@ -221,6 +221,38 @@
 
     </uib-tab>
 
+    <uib-tab heading="Adhoc extensions">
+      <div class="pull-right">Adhoc extensions defined across all DGs
+      </div>
+
+      <div class="clearfix"/>
+
+      <div class="tableFixHead">
+        <table class="table table-bordered">
+          <thead>
+          <tr><th>DG</th><th>Path</th><th>Extensions</th></tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="item in ::allAdHocExt">
+            <td>
+              <span class="clickable" ng-click="termSelectDG({DGName:item.dg})" >{{::item.dg}}</span>
+            </td>
+            <td>
+
+              <span class="clickable" ng-click="termSelectDGItem({hiddenDGName:item.dg,path:item.path})">{{::item.path}}</span>
+
+
+
+            </td>
+            <td><pre>{{item.adHocExt | json}}</pre></td>
+
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </uib-tab>
+
     <uib-tab heading="Notes">
       <div class="pull-right">Notes across all resources
       </div>

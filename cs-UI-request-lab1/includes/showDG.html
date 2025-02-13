@@ -1189,17 +1189,6 @@
                 <div ng-repeat = "segment in element.ed.path.split('.') track by $index">
                   {{segment}}
                 </div>
-                <!--
-                <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
-
-
-
-
-                    {{element.ed.path | lastInPath}}
-
-
-                </div>
-                -->
               </td>
               <td>{{element.ed.title}}</td>
               <td>
@@ -1215,6 +1204,28 @@
           </table>
 
         </uib-tab>
+
+        <uib-tab heading="AdHoc Extensions">
+          <br/>
+
+          <em class="pull-right">AdHoc extensions - generally for SDC</em>
+          <table class="table-bordered table">
+            <tr><th>Path</th><th>Extensions</th></tr>
+
+            <tr ng-repeat="item in allAdHocExt"
+                ng-show="item.dg == selectedModel.name">
+              <td>
+                <span class="clickable"
+                      ng-click="termSelectDGItem({hiddenDGName:item.dg,path:item.path})">{{::item.path}}</span>
+
+              </td>
+              <td><pre>{{item.adHocExt | json}}</pre></td>
+            </tr>
+          </table>
+        </uib-tab>
+
+
+
 
         <uib-tab heading="Logical Model">
           The FHIR shorthand that represents this DataGroup as a FHIR Logical Model.

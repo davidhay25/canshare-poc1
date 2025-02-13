@@ -1303,6 +1303,7 @@ angular.module("pocApp")
 
                 //temp Q.meta = {tag: [{code:'debug'}]} //invokes debug in the lab
 
+                //adhoc defined on the DG
                 let adHocExt = snapshotSvc.getAdHocExt(dg.name)
                 if (adHocExt) {
                     addAdHocExt(Q,adHocExt)
@@ -1517,11 +1518,31 @@ angular.module("pocApp")
                                 vo.fullUrl = dg.idVariable
                             }
 
+                            //we need to see if the DG has any adHox extensions defined on the root
+                            if (dg.adHocExt) {
 
+                               // addAdHocExt(item,ed.adHocExt)
+
+                                //now see if there is an allocateId. if there is, then it needs to be added to the extractDefinition vo and the extension removed from ad hoc
+                                let json = angular.fromJson(dg.adHocExt)
+                                let newAdHoc = []
+                                for (const ext of json) {
+                                    if (ext.url == extAllocateIdUrl) {
+                                        vo.fullUrl = ext.valueString
+                                    } else {
+                                        newAdHoc.push(ext)
+                                    }
+                                }
+                                addAdHocExt(currentItem,angular.toJson(newAdHoc))
+
+                            }
 
                             addDefinitionExtract(currentItem,vo)        //ie the extractDefinition that sets the resource to extract to...
 
+
+
                             //does this resource need a reference to patient?
+
 
                             //This is a resource that should have a patient reference
                             if (resourcesForPatientReference[dg.type]) {
@@ -1687,7 +1708,7 @@ angular.module("pocApp")
                             //now we can set the definitionExtract extension on this item
                         //    addDefinitionExtract(item,vo)
 
-                            //Have any adhoc extensions been added to this DG (or any of its parents)
+                            //Have any adhoc extensions been added to this DG (or any of its parents) - but not elements
                             let adHocExt = snapshotSvc.getAdHocExt(referencedDG.name)
                             if (adHocExt) {
                                 addAdHocExt(item,adHocExt)
