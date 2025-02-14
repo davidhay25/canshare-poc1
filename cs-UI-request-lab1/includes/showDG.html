@@ -366,14 +366,19 @@
                   </td>
                 </tr>
 
-                <tr ng-if="selectedModel.adHocExt">
+                <tr ng-if="selectedModel.adHocExtension">
                   <td class="detailName">Ad hoc ext</td>
                   <td>
+                    <div class="pull-right">
+                      <div class="btn btn-link" ng-click="editAdHocExtension(null,selectedModel)">Edit</div>
+                    </div>
+
                     <div
                             class="clickableDotted"
-                            uib-popover-html="popoverText(selectedModel.adHocExt)"
+                            popover-append-to-body="true"
+                            uib-popover-html="popoverText(selectedModel.adHocExtension)"
                             popover-placement="left"
-                            popover-class="custom-popover"
+                            popover-class="custom-popover-big"
                             popover-trigger="'mouseenter'">
 
                       Extension
@@ -749,19 +754,23 @@
                     </td>
                   </tr>
 
-                  <tr ng-if="selectedNode.data.ed.adHocExt">
+                  <tr>
                     <td class="detailName">Ad hoc ext</td>
                     <td>
-                      <div
-                           class="clickableDotted"
-                           uib-popover-html="popoverText(selectedNode.data.ed.adHocExt)"
-                           popover-placement="left"
-                           popover-class="custom-popover"
-                           popover-trigger="'mouseenter'">
 
-                        Extension
-
+                      <div class="pull-right">
+                        <div class="btn btn-link" ng-click="editAdHocExtension(selectedNode.data.ed)">Edit</div>
                       </div>
+
+                      <span ng-if="selectedNode.data.ed.adHocExtension.length > 0"
+                           class="clickableDotted"
+                           uib-popover-html="popoverText(selectedNode.data.ed.adHocExtension)"
+                           popover-placement="left"
+                           popover-class="custom-popover-big"
+                           popover-trigger="'mouseenter'"> Extension </span>
+
+
+
                     </td>
                   </tr>
 
@@ -1011,11 +1020,11 @@
                   {{getExtractType(element.ed)}}
 
 
-                  <div ng-if="element.ed.adHocExt"
+                  <div ng-if="element.ed.adHocExtension"
                        class="clickableDotted"
-                       uib-popover-html="popoverText(element.ed.adHocExt)"
+                       uib-popover-html="popoverText(element.ed.adHocExtension)"
                        popover-placement="left"
-                       popover-class="custom-popover"
+                       popover-class="custom-popover-big"
                        popover-trigger="'mouseenter'">
 
                     Extension

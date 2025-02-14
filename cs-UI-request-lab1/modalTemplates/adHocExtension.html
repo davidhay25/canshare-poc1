@@ -1,0 +1,49 @@
+<div class="modal-header">
+  <div class="row">
+    <div class="col-md-8 col-sm-8">
+      <h3 class="modal-title">
+        Ad hoc extensions
+      </h3>
+    </div>
+
+
+    <div class="col-md-4 col-sm-4">
+      <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+      <button class="btn btn-primary pull-right" ng-click="save()">Close</button>
+
+    </div>
+  </div>
+
+</div>
+<div class="modal-body">
+
+
+  <div class="row">
+    <div class="col-md-3">
+      <div class="list-group">
+        <div ng-class="{'list-group-item':true,listItemSelected:ext == selectedExt}"
+             ng-click="selectExt(ext)"
+             ng-repeat="ext in currentExt">
+          <span class="pull-right" ng-click="deleteExt($index)">Del</span>
+          {{ext.url | sdcExtensionName}}
+        </div>
+      </div>
+
+      <button class="btn-link btn" ng-click="addExt()">Add new extension</button>
+    </div>
+    <div class="col-md-9">
+      <pre>{{selectedExt | json}}</pre>
+
+    </div>
+  </div>
+
+
+<!--
+  <pre>{{currentExt | json}}</pre>
+  -->
+</div>
+
+
+<div class="modal-header">
+
+</div>

@@ -233,6 +233,24 @@
               <em>The item is in the Q, but not shown</em>
             </td>
           </tr>
+
+          <tr>
+            <td>AdHoc extensions</td>
+            <td>
+
+
+
+              <div class="pull-right">
+                <div class="btn btn-link" ng-click="editAdHocExtension()">Edit</div>
+              </div>
+
+              <div ng-repeat="ext in item.ed.adHocExtension">
+                {{ext.url | sdcExtensionName}}
+              </div>
+
+
+            </td>
+          </tr>
 <!--
           <tr ng-if="false">
             <td>Is item code</td>
@@ -417,7 +435,6 @@
             <td>PrePop expression</td>
             <td>
 
-              <!--  <div ng-if = "dg.namedQueries.length > 0">-->
               <div >
                 <div class="row">
                   <div class="col-md-8">
@@ -426,13 +443,6 @@
                           class="form-control" ng-model="input.prePop"></textarea>
 
                   </div>
-
-                  <!--
-                  <div class="col-md-1">
-                    <span class="btn btn-link" ng-click="testPrePop(input.prePop,'testPPResult')">Test</span>
-
-                  </div>
-                  -->
 
                   <div class="col-md-4">
                     <strong>Contexts in scope</strong>
@@ -491,7 +501,7 @@
 
           </uib-tab>
 
-          <uib-tab>
+          <uib-tab ng-if="false">
 
             <uib-tab-heading>Fixed values <span class="badge" ng-if="input.qFixedValues.length > 0"> {{input.qFixedValues.length}}</span></uib-tab-heading>
 
@@ -531,11 +541,13 @@
           </uib-tab>
 
 
-          <uib-tab heading="Ad hoc Q extensions">
+          <uib-tab ng-if="false" heading="Ad hoc Q extensions">
 
 
             <div style="margin: 8px" class="pull-right clickable"><div ng-click="validateJson(input.adHocExt,true)">Validate</div></div>
             <div  style="margin: 8px" class="pull-right clickable"><div ng-click="extBuilder()">Builder</div></div>
+
+            <div  style="margin: 8px" class="pull-right clickable"><div ng-click="editAdHocExtension()">edit</div></div>
 
 
 

@@ -95,6 +95,27 @@ angular.module("pocApp")
                 }
             )
 
+
+            function convertAdHoc(world) {
+
+
+
+
+               for (let key of  Object.keys(world.dataGroups)) {
+                   let dg = world.dataGroups[key]
+                   if (dg.adHocExt) {
+                       dg.adHocExtension = angular.fromJson(dg.adHocExt)
+                   }
+                   for (let ed of dg.diff) {
+                       if (ed.adHocExt) {
+                           ed.adHocExtension = angular.fromJson(ed.adHocExt)
+                          // console.log()
+                       }
+                   }
+               }
+
+            }
+
             $scope.load = function (playground,source) {
                 let msg = "This action will replace the current form. Are you sure you wish to load a new one?"
                 if (confirm(msg)) {
@@ -102,6 +123,7 @@ angular.module("pocApp")
                         //from the library repository
                         $http.get(`/playground/${playground.id}`).then(
                             function (data) {
+                                convertAdHoc(data.data)
                                 $scope.$close(data.data)
                             }, function (err) {
                                 alert(angular.toJson(err.data) )
@@ -114,6 +136,7 @@ angular.module("pocApp")
                                 if (! data) {
                                     alert("The form wasn't in the local store!")
                                 }
+                                convertAdHoc(data)
                                 $scope.$close(data)
                             }, function (err) {
                                 alert(angular.toJson(err))

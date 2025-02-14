@@ -20,6 +20,7 @@ angular.module("pocApp")
 
         extensionUrls.initialExpression = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
 
+        //colours for the questionnaire graph
         objColours = {
             "resource" : "tomato",
             "group" : "moccasin",
@@ -28,6 +29,25 @@ angular.module("pocApp")
 
 
         return {
+
+            removePrefix : function (Q) {
+                //we use the prefix to store the ED id's so they can be adjusted in for EW. This removed them when the Q is complete
+
+                function processItem(item) {
+                    delete item.prefix
+                    if (item.item) {
+                        for (const child of item.item) {
+                            processItem(child)
+                        }
+                    }
+
+                }
+
+                processItem(Q)
+
+
+            },
+
             showItemDetailsDlg : function (item,Q) {
                 $uibModal.open({
 
@@ -280,9 +300,7 @@ angular.module("pocApp")
                                     const trimmedKey = key.trim();
                                     let newLinkId = getReplacementLinkId(trimmedKey)
                                     if (newLinkId){
-                                    //if (hashLinkId.hasOwnProperty(trimmedKey)) {
                                         return newLinkId
-                                        //return hashLinkId[trimmedKey];
                                     } else {
                                         logIssues.push(trimmedKey); // Log missing key
                                         return `{{${trimmedKey}}}`; // Keep placeholder

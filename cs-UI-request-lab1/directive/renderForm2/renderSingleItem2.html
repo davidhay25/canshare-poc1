@@ -15,6 +15,10 @@
 
     <div style="padding-left: 15px; padding-right: 15px" ng-switch="entry.item.type">
 
+      <div ng-switch-when = "display" >
+        <!-- Don't need anything as the text was displayed above-->
+      </div>
+
       <div ng-switch-when = "choice" >
 
         <div ng-show="entry.ed.fixedCoding">

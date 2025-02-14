@@ -281,6 +281,17 @@ angular.module("pocApp")
 
         }
 
+
+        function addAdHocExtension(item,adHocExtension) {
+            if (adHocExtension) {
+                item.extension = item.extension || []
+                adHocExtension.forEach(function (ext) {
+                    item.extension.push(ext)
+                })
+            }
+
+        }
+
         //If an adhoc extension has been added (to DG or ED) then add the extension to the item
         function addAdHocExt(item,adHocExt) {
             if (adHocExt) {
@@ -1304,11 +1315,13 @@ angular.module("pocApp")
                 //temp Q.meta = {tag: [{code:'debug'}]} //invokes debug in the lab
 
                 //adhoc defined on the DG
+               // addAdHocExtension(Q,dg)
+                /*
                 let adHocExt = snapshotSvc.getAdHocExt(dg.name)
                 if (adHocExt) {
                     addAdHocExt(Q,adHocExt)
                 }
-
+*/
                 addPrePopExtensions(Q)      //launchPatient & LaunchPractitioner
                 addUseContext(Q)
                 addPublisher(Q)
@@ -1519,6 +1532,22 @@ angular.module("pocApp")
                             }
 
                             //we need to see if the DG has any adHox extensions defined on the root
+                            if (dg.adHocExtension) {
+
+                                //now see if there is an allocateId. if there is, then it needs to be added to the extractDefinition vo and the extension removed from ad hoc
+                                let newAdHoc = []
+                                for (const ext of dg.adHocExtension) {
+                                    if (ext.url == extAllocateIdUrl) {
+                                        vo.fullUrl = ext.valueString
+                                    } else {
+                                        newAdHoc.push(ext)
+                                    }
+                                }
+                                addAdHocExt(currentItem,newAdHoc)
+
+                            }
+
+                            /*
                             if (dg.adHocExt) {
 
                                // addAdHocExt(item,ed.adHocExt)
@@ -1536,6 +1565,7 @@ angular.module("pocApp")
                                 addAdHocExt(currentItem,angular.toJson(newAdHoc))
 
                             }
+                            */
 
                             addDefinitionExtract(currentItem,vo)        //ie the extractDefinition that sets the resource to extract to...
 
@@ -1629,7 +1659,15 @@ angular.module("pocApp")
                 //the 'question' entry in the EW will be to the sourceId id. This replaces with linkId
                 errorLog.push(...  makeQHelperSvc.updateEnableWhen(Q,vo.hashById))
 
+                //in the expression definition in an ED , refer to other ED's putting the path in {{}}
+                //this is needed as the linkIds are no longer the path - todo example
                 errorLog.push(...makeQHelperSvc.updateExpressions(Q,vo.hashByLinkId))
+
+                //clear all the item.prefix entres
+                makeQHelperSvc.removePrefix(Q)
+
+
+
 
 
 
@@ -1707,12 +1745,16 @@ angular.module("pocApp")
 
                             //now we can set the definitionExtract extension on this item
                         //    addDefinitionExtract(item,vo)
-
+/*
                             //Have any adhoc extensions been added to this DG (or any of its parents) - but not elements
                             let adHocExt = snapshotSvc.getAdHocExt(referencedDG.name)
                             if (adHocExt) {
                                 addAdHocExt(item,adHocExt)
                             }
+*/
+                            addAdHocExtension(item,referencedDG.adHocExtension)
+
+
 
                             //note to me - don't think this is needed now
                             if (false && ed.markTarget) {
@@ -2096,14 +2138,17 @@ angular.module("pocApp")
                         addItemControl(item, 'grid')
                     }
 
+                    addAdHocExtension(item,ed.adHocExtension)
+                    /*
                     if (ed.adHocExt) {
 
                         addAdHocExt(item,ed.adHocExt)
 
                     }
-
+*/
                     //fixed values assigned to the ED
-                    if (ed.qFixedValues) {
+                    //todo - use of these has been deprecated - to be removed DEP
+                    if (false && ed.qFixedValues) {
 
                         let ar = extractionContext.split('/')
 

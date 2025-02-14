@@ -67,12 +67,14 @@ console.log(elements,currentPath)
 
                     }
 
-                    console.log(segment,ed)
+                    //console.log(segment,ed)
 
                 })
 
 
             }
+
+
             findVariablesInContext($scope.elements,currentPath)
 
             function makeExtension(type) {
@@ -114,24 +116,6 @@ console.log(elements,currentPath)
                         ext.valueExpression.expression = $scope.input.ieExpression
                         ext.valueExpression.language = "text/fhirpath"
 
-                        /*
-
-                        ext.expression = $scope.input.ieExpression
-                        exp.language = "text/fhirpath"
-
-                        ext.extension = []
-                        ext.extension.push({url:'definition',valueUri:$scope.input.devCanonical})
-
-                        let child = {url:'valueExpression'}
-
-                        let exp = {}
-
-                        exp.expression = $scope.input.ieExpression
-                        exp.language = "text/fhirpath"
-                        child.valueExpression = exp
-
-                        ext.extension.push(child)
-                        */
                         break
                     case "defextractvalue" :
                         if ($scope.input.devFixed && $scope.input.devExpression) {

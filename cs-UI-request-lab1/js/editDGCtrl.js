@@ -25,10 +25,29 @@ angular.module("pocApp")
                     populateControls()      //even in error
                 }
             )
+/*
+            $scope.editAdHocExtension = function (ed) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/adHocExtension.html',
+                    backdrop: 'static',
+                    size : 'lg',
+                    controller: 'adHocExtensionCtrl',
+                    resolve: {
+                        currentExt: function () {
+                            return ed.adHocExtension
+                        }
+                    }
+                }).result.then(function (ext) {
 
+                    if (ext) {
 
+                    }
+                })
+            }
 
-                    //create a list of potential parent types for a new DG -
+*/
+
+            //create a list of potential parent types for a new DG -
             $scope.input.possibleParents = []
             Object.keys(hashTypes).forEach(function (key) {
                 if (hashTypes[key].kind == 'dg') {      //should only be DG

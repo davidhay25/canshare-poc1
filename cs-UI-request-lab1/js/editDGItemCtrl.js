@@ -40,8 +40,39 @@ angular.module("pocApp")
 
 
 
+            $scope.editAdHocExtension = function () {
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/adHocExtension.html',
+                    backdrop: 'static',
+                    size : 'lg',
+                    controller: 'adHocExtensionCtrl',
+                    resolve: {
+                        currentExt: function () {
+                            return $scope.item.ed.adHocExtension
+                        },
+                        currentPath : function () {
+                            return $scope.item.ed.path
+
+                        },fullElementList : function () {
+                            return $scope.fullElementList
+
+                        }
+                    }
+                }).result.then(function (ext) {
+
+                    if (ext) {
+
+                    }
+                })
+            }
+
 
             $scope.extBuilder = function () {
+                 if (!$scope.item) {
+                     alert("You need to save the element first, then edit to add an addHoc extension. Sorry about that.")
+                     return
+                 }
                 $uibModal.open({
                     templateUrl: 'modalTemplates/makeSDCExtension.html',
                     backdrop: 'static',
@@ -56,13 +87,32 @@ angular.module("pocApp")
                         }
                     }
                 }).result.then(function (ext) {
+
+                    if (ext) {
+                        $scope.item.adHocExtension = $scope.item.adHocExtension || []
+                        $scope.item.adHocExtension.push(ext)
+                        $scope.input.adHocExt = angular.toJson(ext,true)
+                    }
+/*
+
                     let json = angular.toJson(ext,true)
+
+
+
+                    //$scope.input.adHocExt = "[" + json + ']'
+
+
+
+
                     if ($scope.input.adHocExt) {
                         let l = $scope.input.adHocExt.length
                         $scope.input.adHocExt = $scope.input.adHocExt.substring(0,l-1) + "," + json + '\n]'
                     } else {
                         $scope.input.adHocExt = `[${json}]`
                     }
+
+                    */
+
                 })
 
             }
@@ -714,7 +764,9 @@ angular.module("pocApp")
                     ed.selectedNQ = $scope.input.selectedNQ.name
                 }
 
+                //note that adHocExtension is set directly when edited...
                 ed.adHocExt = $scope.input.adHocExt
+              //  ed.adHocExtension =
 
                 if ($scope.input.qFixedValues) {
                     ed.qFixedValues = $scope.input.qFixedValues

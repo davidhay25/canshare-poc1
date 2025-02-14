@@ -1150,12 +1150,14 @@ angular.module("pocApp")
                 let arAdHoc = []
                 for (const key of Object.keys(allDgSnapshot)) {
                     const dg = allDgSnapshot[key]
-                    if (dg.adHocExt) {
-                        arAdHoc.push({dg:key,path:key,adHocExt: adHocObj(dg.adHocExt)})
+                    if (dg.adHocExtension) {
+                        //arAdHoc.push(...dg.adHocExtension)
+                        arAdHoc.push({dg:key,path:key,adHocExt: dg.adHocExtension})
                     }
                     for (const ed of dg.snapshot) {
-                        if (ed.adHocExt) {
-                            arAdHoc.push({dg:key,path:ed.path,adHocExt: adHocObj(ed.adHocExt)})
+                        if (ed.adHocExtension) {
+                            //arAdHoc.push(...ed.adHocExtension)
+                            arAdHoc.push({dg:key,path:ed.path,adHocExt: ed.adHocExtension})
                         }
                     }
                 }
@@ -1170,7 +1172,7 @@ angular.module("pocApp")
 
                 return arAdHoc
 
-                function adHocObj(json) {
+                function adHocObjDEP(json) {
                     let obj = {msg:"Invalid Json",json:json}
                     try {
                         obj = angular.fromJson(json)

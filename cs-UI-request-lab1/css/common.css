@@ -15,7 +15,7 @@
 }
 
 .custom-popover {
-    max-width: 600px; /* Adjust this value as needed */
+    max-width: 800px; /* Adjust this value as needed */
     width: auto; /* Optional: Allow the content to determine the width */
 }
 

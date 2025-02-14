@@ -98,6 +98,62 @@ angular.module("pocApp")
                 }
             }
 
+
+            $scope.editAdHocExtensionDEP = function (ed,dg) {
+                //element can be ed or  DG. Both have adHocExtension
+                // let adHocExten
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/adHocExtension.html',
+                    backdrop: 'static',
+                    size : 'xlg',
+                    controller: 'adHocExtensionCtrl',
+                    resolve: {
+                        currentExt: function () {
+                            if (ed) {
+                                return ed.adHocExtension
+                            } else {
+                                return dg.adHocExtension
+                            }
+
+                        },
+                        currentPath : function () {
+                            if (ed) {
+                                return ed.path
+                            } else {
+                                return dg.name
+                            }
+
+                        },fullElementList : function () {
+                            return $scope.fullElementList
+
+                        }
+                    }
+                }).result.then(function (ext) {
+
+                    if (ext) {
+                        if (ed) {
+                            let displayPath = $filter('dropFirstInPath')(ed.path)
+                            for (let ed1 of $scope.selectedModel.diff) {
+                                if (ed1.path == displayPath) {
+                                    ed1.adHocExtension = ext
+                                    break
+                                }
+                            }
+
+
+                        } else {
+                            $scope.selectedModel.adHocExtension = ext
+                        }
+                        // $scope.makeSnapshots()
+
+                        //rebuild fullList and re-draw the tree
+                       ///  $scope.refreshFullList($scope.selectedModel)
+                    }
+                })
+            }
+
+
+
             $scope.createDiff = function () {
                 let leftDiffDG = $scope.selectedModel
                 let key = `pg-${$scope.selectedModel.id}`
@@ -2288,28 +2344,31 @@ angular.module("pocApp")
             }
 
             function drawDGTree(treeData) {
-                //enable drag / drop for re-ordering
-
-
+                //enable drag / drop for re-ordering in library mode
                 $('#dgTree').jstree('destroy');
 
-                let x = $('#dgTree').jstree(
-                    {'core':
+                let config = {'core':
                         {'multiple': false,
                             'animation' : 0,
-                        'data': treeData,
-                        'themes': {name: 'proton', responsive: true}},
-                        'check_callback' : true,
-                        plugins:['dnd','state'],
-                        dnd: {
-                            'is_draggable' : function(nodes,e) {
+                            'data': treeData,
+                            'themes': {name: 'proton', responsive: true}},
+                    'check_callback' : true,
+                    plugins:['dnd','state'],
+                    dnd: {
+                        'is_draggable' : function(nodes,e) {
+                            if ($scope.userMode == 'playground') {
+                                return false
+                            } else {
                                 return $scope.canEdit($scope.selectedModel)
-
                             }
+
+
                         }
                     }
+                }
 
-
+                let x = $('#dgTree').jstree(
+                    config
                 ).on('select_node.jstree', function (e, data) {
                 //).on('changed.jstree', function (e, data) {
                     // the node selection event...

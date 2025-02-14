@@ -12,10 +12,14 @@ angular.module("pocApp")
                 $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:displayPath})
             }
 
-            $scope.popoverText = function (text) {
-                //let json = angular.toJson(text)
+            $scope.popoverText = function (adHoc) {
+
+                let json = angular.toJson(adHoc,true)
+
+
+                return `<pre>${json}</pre>`
                 //let t = angular.fromJson(json)
-                return text.replace(/\n/g, '<br>')
+               // return text.replace(/\n/g, '<br>')
             }
 
             //return the extract type if the type of this ed is a DG
@@ -27,9 +31,58 @@ angular.module("pocApp")
                         return dg.type
                     }
                 }
+            }
+            $scope.editAdHocExtension = function (ed,dg) {
+                //element can be ed or  DG. Both have adHocExtension
+                // let adHocExten
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/adHocExtension.html',
+                    backdrop: 'static',
+                    size : 'xlg',
+                    controller: 'adHocExtensionCtrl',
+                    resolve: {
+                        currentExt: function () {
+                            if (ed) {
+                                return ed.adHocExtension
+                            } else {
+                                return dg.adHocExtension
+                            }
+
+                        },
+                        currentPath : function () {
+                            if (ed) {
+                                return ed.path
+                            } else {
+                                return dg.name
+                            }
+
+                        },fullElementList : function () {
+                            return $scope.fullElementList
+
+                        }
+                    }
+                }).result.then(function (ext) {
+
+                    if (ext) {
+                        if (ed) {
+                            let displayPath = $filter('dropFirstInPath')(ed.path)
+                            for (let ed1 of $scope.selectedModel.diff) {
+                                if (ed1.path == displayPath) {
+                                    ed1.adHocExtension = ext
+                                    break
+                                }
+                            }
 
 
+                        } else {
+                            $scope.selectedModel.adHocExtension = ext
+                        }
+                        $scope.makeSnapshots()
 
+                        //rebuild fullList and re-draw the tree
+                        $scope.refreshFullList($scope.selectedModel)
+                    }
+                })
             }
 
             //can a selected node be edited? Depends on userMode and checkedOut status
