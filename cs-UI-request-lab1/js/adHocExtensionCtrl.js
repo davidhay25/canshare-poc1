@@ -2,15 +2,16 @@ angular.module("pocApp")
     .controller('adHocExtensionCtrl',
         function ($scope,currentExt,$uibModal,fullElementList,currentPath) {
 
-
             $scope.currentExt = angular.copy(currentExt)
+            $scope.currentPath = currentPath
 
             $scope.selectExt = function (ext) {
                 $scope.selectedExt = ext
             }
 
-            if (currentExt && currentExt.length > 0) {
-                $scope.selectExt(currentExt[0])
+            //select the first one
+            if ($scope.currentExt && $scope.currentExt.length > 0) {
+                $scope.selectExt($scope.currentExt[0])
             }
 
             $scope.save = function () {
@@ -43,6 +44,8 @@ angular.module("pocApp")
 
             $scope.deleteExt = function (inx) {
                 $scope.currentExt.splice(inx)
+                delete $scope.selectedExt
+
             }
 
 

@@ -524,6 +524,31 @@
 
       </uib-tab>
 
+      <uib-tab heading="Components">
+        <br/>
+        <table class="table table-bordered">
+          <tr><th>Title</th><th>Name</th><th>Source</th><th>Type</th><th>Description</th><th>Cnt</th><th></th></tr>
+          <tr ng-repeat="dg in components">
+            <td>{{dg.title}}</td>
+            <td>{{dg.name}}</td>
+            <td>
+              {{ { playground: "Form", library: "Library" }[dg.source] || dg.source}}
+            </td>
+            <td>{{dg.type}}</td>
+            <td>{{dg.description}}</td>
+
+            <td>{{dg.diff.length}}</td>
+
+            <td>
+              <div ng-if="dg.nameExists" class="clickable">In form</div>
+              
+            </td>
+          </tr>
+        </table>
+
+        <pre>{{components | json}}</pre>
+      </uib-tab>
+
     </uib-tabset>
 
 

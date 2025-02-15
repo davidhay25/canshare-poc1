@@ -145,6 +145,7 @@
           </div>
         </div>
 
+        <!--
         <div ng-if="userMode == 'playground'">
           <div ng-repeat="(k,v) in hashAllDG">
             <div ng-if="v.isContainer"
@@ -157,6 +158,8 @@
           </div>
 
         </div>
+        -->
+
       </div>
 <br/>
      <div ng-if="snapshotSvc.getExtractResource(selectedModel.name)">
@@ -249,7 +252,7 @@
               <div class="clickable myIcon" ng-click="showSSLog(selectedModel.name)">Snapshot log</div>
 -->
               <div class="clickable myIcon"
-                   ng-hide="selectedModel.ssOrder"
+                   ng-hide="selectedModel.ssOrder || userMode == 'playground'"
                    ng-click="setOrder()">Set order</div>
 
               <div class="clickable myIcon"
@@ -262,9 +265,6 @@
                    ng-click="removeOrder()">Remove order</div>
 
             </div>
-
-
-
 
             <div id="dgTree"></div>
 
@@ -1398,7 +1398,7 @@
       <h4>Dependencies</h4>
 
       <table class="table-bordered table">
-        <tr><th>Target (what to hide)</th><th>Controlling element</th><th>Controller description</th><th>Op</th>
+        <tr><th>Target (what to show/hide)</th><th>Controlling element</th><th>Controller description</th><th>Op</th>
           <th>Value (that will show target)</th>
 
 

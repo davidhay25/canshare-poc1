@@ -181,6 +181,19 @@
 
         <button class="pull-right btn-link btn" ng-click="export()">Import / Export</button>
 
+        <div ng-if="userMode == 'playground'">
+            <div ng-repeat="(k,v) in hashAllDG">
+                <div ng-if="v.isContainer"
+                     class="btn btn-link pull-right"
+                     ng-click="showContainerQ(k)">
+
+                    {{k}} Questionnaire
+                </div>
+
+            </div>
+
+        </div>
+
 
     </div>
 

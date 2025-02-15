@@ -2,7 +2,7 @@
 angular.module("pocApp")
     .controller('libraryCtrl',
         function ($scope,$rootScope,$http,allDG,allComp,$sce,allQObject,user,userMode,
-                  utilsSvc,librarySvc,$timeout,traceSvc,$uibModal,$window) {
+                  utilsSvc,librarySvc,$timeout,traceSvc,$uibModal,$window,playgroundsSvc) {
 
             $scope.input = {}
             $scope.user = user
@@ -21,7 +21,13 @@ angular.module("pocApp")
             $scope.close = function () {
                 $scope.$close()
             }
-            
+
+            playgroundsSvc.getImportableDG(allDG).then(
+                function (data) {
+                    $scope.components = data
+                }
+            )
+
             function loadNamedQueries() {
                 let qry = "/model/namedquery"
                 $http.get(qry).then(

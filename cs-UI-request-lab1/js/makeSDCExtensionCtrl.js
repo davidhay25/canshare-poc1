@@ -5,9 +5,22 @@ angular.module("pocApp")
             $scope.elements = elements      //all the elements in this DG
             //currentPath is the path to the current element in the DG (includes the top)
             $scope.currentPath = currentPath
-console.log(elements,currentPath)
+//console.log(elements,currentPath)
             $scope.input.vType = "fhirpath"
             $scope.input.calcType = "fhirpath"
+
+
+            $scope.extTypes = []
+            $scope.extTypes.push({name:'variable',display:"Variable"})
+            $scope.extTypes.push({name:'allocateId',display:"AllocateId"})
+            $scope.extTypes.push({name:'initialexp',display:"Initial expression"})
+            $scope.extTypes.push({name:'defextract',display:"Definition extract"})
+            $scope.extTypes.push({name:'defextractvalue',display:"Definition extract value"})
+            $scope.extTypes.push({name:'calc',display:"Calculated expression"})
+
+            $scope.selectType = function (type) {
+                $scope.selectedType = type
+            }
 
 
             $scope.fhirDataTypes = utilsSvc.fhirDataTypes()
@@ -151,7 +164,7 @@ console.log(elements,currentPath)
                         }
                         break
 
-                      //  ng-if="input.devCanonical && input.devfhirDT && (input.devFixed || input.devExpression)"
+
                     }
 
                 return ext

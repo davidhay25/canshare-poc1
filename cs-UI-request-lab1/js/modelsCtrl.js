@@ -2524,6 +2524,7 @@ angular.module("pocApp")
                 delete $scope.selectedModel
 
                 //DGs that can be imported into this model from the library
+
                 playgroundsSvc.getImportableDG($scope.hashAllDG).then(
                     function (data) {
                         $scope.importableDG = data
