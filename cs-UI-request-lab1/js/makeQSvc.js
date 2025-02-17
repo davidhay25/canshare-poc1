@@ -1844,7 +1844,7 @@ angular.module("pocApp")
                         addItemControl(item,'gtable')
                     }
 
-                    if (ed.itemCode) {
+                    if (ed.itemCode && ed.itemCode.code) {
 
                         item.code = [ed.itemCode]
 

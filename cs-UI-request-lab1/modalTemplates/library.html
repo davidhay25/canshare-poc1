@@ -530,8 +530,6 @@
         <div class="row">
           <div class="col-md-9">
 
-
-
             <span style="margin-right: 20px">Source:</span> <checkbox ng-model="input.showLibrary"></checkbox> LIM
             <span style="margin-left: 20px">
                <checkbox ng-model="input.showForm"></checkbox> Form
@@ -544,7 +542,7 @@
               <tr ng-repeat="dg in components"
                 ng-if="canShowComponent(dg)" >
                 <td>
-                  <div ng-click="selectFromComponent(dg)">
+                  <div class="clickable" ng-click="selectFromComponent(dg)">
                     {{dg.title}}
                   </div>
 
@@ -554,7 +552,11 @@
                   {{ { playground: "Form", library: "LIM" }[dg.source] || dg.source}}
                 </td>
                 <td>{{dg.type}}</td>
-                <td>{{dg.description}}</td>
+                <td>{{dg.description}}
+                  <div style="color: red" ng-if = "dg.lockedTo" >Locked to: {{dg.lockedTo}}</div>
+
+
+                </td>
 
                 <td>{{dg.diff.length}}</td>
 
