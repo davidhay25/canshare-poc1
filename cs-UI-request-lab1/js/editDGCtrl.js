@@ -119,6 +119,14 @@ angular.module("pocApp")
                     }
                 }).result.then(function (ext) {
 
+                    if (ext) {
+                        $scope.model.adHocExtension = $scope.model.adHocExtension || []
+                        $scope.model.adHocExtension.push(ext)
+                       // $scope.input.adHocExt = angular.toJson(ext,true)
+                    }
+
+                    /*
+
                     let json = angular.toJson(ext,true)
 
                     if ($scope.input.adHocExt) {
@@ -128,7 +136,7 @@ angular.module("pocApp")
                     } else {
                         $scope.input.adHocExt = `[${json}]`
                     }
-
+*/
 
                 })
 
@@ -406,6 +414,8 @@ angular.module("pocApp")
                     $scope.input.resourceReferences = model.resourceReferences || []
 
                     $scope.extractedResources =  snapshotSvc.getExtractableDG(model.name)
+
+
                     $scope.input.adHocExt = model.adHocExt
 
                     $scope.input.termSvr = model.termSvr
@@ -684,6 +694,8 @@ angular.module("pocApp")
 
 
 
+                /*
+
 
                 if ($scope.input.adHocExt) {
                     if ($scope.validateJson($scope.input.adHocExt)) {
@@ -692,6 +704,8 @@ angular.module("pocApp")
                 } else {
                     delete $scope.model.adHocExt
                 }
+
+                */
 
 
                 if ($scope.input.obsExtract) {

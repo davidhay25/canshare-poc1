@@ -43,7 +43,7 @@ angular.module("pocApp")
             }
 
             $scope.deleteExt = function (inx) {
-                $scope.currentExt.splice(inx)
+                $scope.currentExt.splice(inx,1)
                 delete $scope.selectedExt
 
             }

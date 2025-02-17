@@ -282,11 +282,22 @@ angular.module("pocApp")
         }
 
 
-        function addAdHocExtension(item,adHocExtension) {
+        function addAdHocExtension(Q,item,adHocExtension) {
             if (adHocExtension) {
                 item.extension = item.extension || []
                 adHocExtension.forEach(function (ext) {
-                    item.extension.push(ext)
+                    if (ext.url == extVariable && ext.valueExpression
+                        && ext.valueExpression.language && ext.valueExpression.language.indexOf('-query') > -1)  {
+                            //if something is an x-qurey variable, it goes on the Q
+                        Q.extension = Q.extension || []
+                        Q.extension.push(ext)
+
+                    } else {
+                        item.extension.push(ext)
+                    }
+
+
+
                 })
             }
 
@@ -1539,6 +1550,10 @@ angular.module("pocApp")
                                 for (const ext of dg.adHocExtension) {
                                     if (ext.url == extAllocateIdUrl) {
                                         vo.fullUrl = ext.valueString
+                                    } else if (ext.url == extVariable) {
+
+                                        Q.extension = Q.extension || []
+                                        Q.extension.push(ext)
                                     } else {
                                         newAdHoc.push(ext)
                                     }
@@ -1752,7 +1767,9 @@ angular.module("pocApp")
                                 addAdHocExt(item,adHocExt)
                             }
 */
-                            addAdHocExtension(item,referencedDG.adHocExtension)
+
+
+                            addAdHocExtension(Q,item,referencedDG.adHocExtension)
 
 
 
@@ -2138,7 +2155,7 @@ angular.module("pocApp")
                         addItemControl(item, 'grid')
                     }
 
-                    addAdHocExtension(item,ed.adHocExtension)
+                    addAdHocExtension(Q,item,ed.adHocExtension)
                     /*
                     if (ed.adHocExt) {
 

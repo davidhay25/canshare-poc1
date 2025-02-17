@@ -432,7 +432,7 @@
 
             </uib-tab>
 
-            <uib-tab heading="Fixed values">
+            <uib-tab ng-if="false" heading="Fixed values">
                 <br/>
 
                 <em>Fixed values defined by this DG </em>
@@ -460,7 +460,7 @@
 
             </uib-tab>
 
-            <uib-tab heading="Resource references">
+            <uib-tab ng-if = "false" heading="Resource references">
 
                 <h4>Current References</h4>
                 <table class="table-bordered table">
@@ -540,19 +540,22 @@
             </uib-tab>
 
 
-            <uib-tab heading="Ad hoc Q extensions">
+            <uib-tab ng-if="false" heading="Ad hoc Q extensions">
 
                 <div style="margin: 8px" class="pull-right clickable"><div ng-click="validateJson(input.adHocExt,true)">Validate</div></div>
 
                 <div  style="margin: 8px" class="pull-right clickable"><div ng-click="extBuilder()">Builder</div></div>
 
                 <div class="clearfix"></div>
-                <textarea id="adHocExtension" ng-model="input.adHocExt" class="custom-textarea" rows="15"></textarea>
-                <br/>
-                <em>Add any adhoc extensions to add to a derived questionnaire item. Must be an array with valid Json that
-                    will be copied into the Q Item. Use double quotes - not single quotes.</em>
 
+                <pre>{{model.adHocExtension | json}}</pre>
+                <!--
+                              <textarea id="adHocExtension" ng-model="model." class="custom-textarea" rows="15"></textarea>
+                          <br/>
+                              <em>Add any adhoc extensions to add to a derived questionnaire item. Must be an array with valid Json that
+                                  will be copied into the Q Item. Use double quotes - not single quotes.</em>
 
+              -->
             </uib-tab>
 
             <uib-tab heading="Json">

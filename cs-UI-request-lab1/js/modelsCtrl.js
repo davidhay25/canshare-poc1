@@ -187,7 +187,7 @@ angular.module("pocApp")
             $scope.updateComponent = function (type,model) {
 
                 if (type == 'dg') {
-                    let msg = "Make a frozen copy of this DG, where the diff is the snapshot. Useful for Forms"
+                    let msg = "Copy the expanded version of this DG to the Component store. Can subsequently be imported into Forms."
                     if (confirm(msg)) {
                         let frozen = snapshotSvc.getFrozenDG(model.name)
                         frozen.source = $scope.userMode
@@ -209,7 +209,7 @@ angular.module("pocApp")
 
                     $http.put(`/frozen/${frozen.name}`,frozen).then(
                         function (data) {
-                            alert("Frozen copy saved in Library")
+                            alert("Component updated")
                         }, function (err) {
                             alert(angular.toJson(err.data))
                         }
@@ -281,7 +281,6 @@ angular.module("pocApp")
 
                 })
 
-                //window.location.href = `modelReview.html?${$scope.selectedModel.name}`
             }
 
 
@@ -373,11 +372,7 @@ angular.module("pocApp")
                         }
 
                     }
-
                 )
-
-
-
 
                 function updatePlayground() {
                     $localStorage.world.updated = new Date()
@@ -415,11 +410,6 @@ angular.module("pocApp")
                     )
                 }
 
-
-
-
-
-
             }
 
             $scope.savePGtoLocal = function (hideAlert,noversionupdate,cb) {
@@ -452,9 +442,10 @@ angular.module("pocApp")
                 let dg = $scope.importableDG[inx]
                 $scope.hashAllDG[dg.name] = dg
                 $scope.init()
+                alert("DG has been imported")
             }
             $scope.updateDG = function (inx) {
-                alert("Will update the DG from the frozen list (need better name). Need a diff of some sort")
+                alert("Not yet implemented. Will update the DG from the component. Need a diff of some sort")
             }
 
             //--------------

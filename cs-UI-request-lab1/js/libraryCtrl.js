@@ -1,10 +1,11 @@
 //seversync is actually the main library interface
 angular.module("pocApp")
     .controller('libraryCtrl',
-        function ($scope,$rootScope,$http,allDG,allComp,$sce,allQObject,user,userMode,
-                  utilsSvc,librarySvc,$timeout,traceSvc,$uibModal,$window,playgroundsSvc) {
+        function ($scope,$rootScope,$http,allDG,allComp,$sce,allQObject,user,userMode,snapshotSvc,
+                  utilsSvc,librarySvc,$timeout,traceSvc,$uibModal,$window,playgroundsSvc,modelsSvc) {
 
             $scope.input = {}
+            $scope.input.showForm = true
             $scope.user = user
             $scope.userMode = userMode
             //$scope.input.mainTabActive = 1
@@ -17,6 +18,44 @@ angular.module("pocApp")
                     return true
                 }
             }
+
+            $scope.canShowComponent = function (dg) {
+                if (dg.source == 'playground' && $scope.input.showForm) {
+                    return true
+                }
+                if (dg.source == 'library' && $scope.input.showLibrary) {
+                    return true
+                }
+
+            }
+
+            $scope.selectFromComponent = function (dg) {
+                let clone = angular.copy(dg)
+                let fullElementList = snapshotSvc.getFullListOfElements(clone.name)// vo.allElements
+                let elementList = [{ed:{path:clone.name,title:clone.name}}]
+
+                for (const ed of clone.diff) {
+                    ed.path = `${dg.name}.${ed.path}`
+                    elementList.push({ed:ed})
+                }
+
+                let treeData = modelsSvc.makeTreeFromElementList(elementList)
+                $('#componentGraph').jstree('destroy');
+                $('#componentGraph').jstree(
+                    {'core':
+                            {'multiple': false,
+                                'data': treeData,
+                                'themes': {name: 'proton', responsive: true}}
+                    }
+                ).bind("loaded.jstree", function (event, data) {
+                    let id = treeData[0].id
+                    $(this).jstree("open_node", id);
+                    //let treeObject = $(this).jstree(true).get_json('#', { 'flat': false })
+
+
+                })
+            }
+
 
             $scope.close = function () {
                 $scope.$close()

@@ -980,7 +980,7 @@ angular.module("pocApp")
                 dg.diff = []
                 for (let i=1;i < dg.snapshot.length; i++) {
                     let ed = dg.snapshot[i]
-                    ed.path = $filter('dropFirstInPath')(ed.path)
+                    //ed.path = $filter('dropFirstInPath')(ed.path)
                     dg.diff.push(ed)
                 }
 
