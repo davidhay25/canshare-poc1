@@ -253,6 +253,43 @@
 
     </uib-tab>
 
+    <uib-tab heading = "DG usage summary">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="banner">DGs and the number of other DGs that contain them</div>
+          <div class="myScroll">
+            <table class="table-bordered table">
+              <tr><th>Name</th><th>Title</th><th>Count</th></tr>
+              <tr ng-repeat="row in usageSummary"
+                  style="cursor: pointer"
+                  ng-click="input.selectedDGUsage = row"
+                ng-class="{listItemSelected:row == input.selectedDGUsage}">
+                <td class="clickable" ng-click="termSelectDG({DGName:row.name})">
+                  {{row.name}}
+                </td>
+                <td>{{row.title}}</td>
+                <td>{{row.cnt}}</td>
+              </tr>
+
+            </table>
+          </div>
+
+        </div>
+        <div class="col-md-6" ng-if="input.selectedDGUsage">
+          <div class="banner">DGs that contain {{input.selectedDGUsage.title}}</div>
+          <div class="myScroll">
+            <div ng-repeat="(k,v) in input.selectedDGUsage.names">
+              <span class="clickable" ng-click="termSelectDG({DGName:k})">{{k}} </span>  ({{v}})
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+    </uib-tab>
+
+
     <uib-tab heading="Notes">
       <div class="pull-right">Notes across all resources
       </div>

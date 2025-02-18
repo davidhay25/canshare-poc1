@@ -144,10 +144,7 @@ angular.module("pocApp")
                         } else {
                             $scope.selectedModel.adHocExtension = ext
                         }
-                        // $scope.makeSnapshots()
 
-                        //rebuild fullList and re-draw the tree
-                       ///  $scope.refreshFullList($scope.selectedModel)
                     }
                 })
             }
@@ -571,6 +568,8 @@ angular.module("pocApp")
 
                 //all adhoc extensions in the model
                 $scope.allAdHocExt = snapshotSvc.getAllAdHocExt()
+
+                $scope.usageSummary = snapshotSvc.dgUseSummary()
 
 
             }

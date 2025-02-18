@@ -937,6 +937,54 @@ angular.module("pocApp")
         }
 
         return {
+            dgUseSummary : function () {
+                let hashUsage = {}
+                let hashName = {}
+                let fhirDT = utilsSvc.fhirDataTypes()
+                for (const key of Object.keys(allDgSnapshot)) {
+                    let dg = allDgSnapshot[key]
+                    hashName[key] = {title:dg.title}
+                    for (ed of dg.snapshot) {
+                        let type = ed.type[0]
+                        if (fhirDT.indexOf(type) == -1) {
+                            hashUsage[type] = hashUsage[type] || {cnt:0,names:{}}
+                            hashUsage[type].cnt++
+
+                            hashUsage[type].names[key] = hashUsage[type].names[key] || 0
+                            hashUsage[type].names[key] ++
+                           // hashUsage[type].names.push(key)
+                        }
+                    }
+                }
+
+
+
+                let arUsage = []
+                for (const key of Object.keys(hashUsage)) {
+
+
+
+
+                    arUsage.push({name:key,title:hashName[key].title,cnt:hashUsage[key].cnt,names:hashUsage[key].names})
+                }
+
+                arUsage.sort(function (a,b) {
+                    if (a.cnt > b.cnt) {
+                        return -1
+                    } else {
+                        return 1
+                    }
+
+                })
+
+
+                console.log(hashUsage,hashName,arUsage)
+
+
+
+                return arUsage
+
+            },
             getFrozenComp : function (comp,allElements) {
                 //construct a model that represents a composition - but similar to a DG
                 //effecively an expanded DG
