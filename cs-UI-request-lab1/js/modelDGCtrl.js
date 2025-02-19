@@ -24,7 +24,7 @@ angular.module("pocApp")
 
             //return the extract type if the type of this ed is a DG
             $scope.getExtractType = function (ed) {
-                if (ed.type) {
+                if (ed && ed.type) {
                     let type = ed.type[0]
                     let dg = $scope.hashAllDG[type]
                     if (dg && dg.type) {

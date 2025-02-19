@@ -277,8 +277,9 @@ angular.module("pocApp")
                 let arMove = []     //will be a list of move instructions extracted from referenced DGs
                 for (const item of lst) {
                     let ed = item.ed
-                    let path = ed.path
-                    if (ed.type) {
+
+                    if (ed && ed.type) {
+                        let path = ed.path
                         let type = ed.type[0]
                         let referencedEd = hashAllDG[type]  //is this a reference to a DG?
                         if (referencedEd) {                 //yes, it is

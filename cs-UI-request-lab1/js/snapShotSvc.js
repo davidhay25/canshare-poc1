@@ -1026,7 +1026,8 @@ angular.module("pocApp")
 
                 //the path in a diff doesn't have the leading dg name.
                 dg.diff = []
-                for (let i=1;i < dg.snapshot.length; i++) {
+                for (let i=0;i < dg.snapshot.length; i++) {
+                    //for (let i=1;i < dg.snapshot.length; i++) {
                     let ed = dg.snapshot[i]
                     //ed.path = $filter('dropFirstInPath')(ed.path)
                     dg.diff.push(ed)

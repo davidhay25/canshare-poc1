@@ -1,6 +1,6 @@
 angular.module("pocApp")
 
-    .service('vsSvc', function(cmSvc,utilsSvc,$q) {
+    .service('vsSvc', function(cmSvc,utilsSvc,$q,$http) {
 
         //cache of all vs. rebuilt each time the app runs. todo: could load into persistent browser cache like conceptmap stuff
         let cache = {}
@@ -50,6 +50,37 @@ angular.module("pocApp")
                         cb()
                     }
                 )
+            },
+
+            getSingleVS : function(url) {
+                let deferred = $q.defer()
+                let that = this
+
+                let qry = `ValueSet/$expand?url=${that.fixUrl(url)}&_summary=false&displayLanguage=en-x-sctlang-23162100-0210105`
+                let encodedQry = encodeURIComponent(qry)
+                let call = `nzhts?qry=${encodedQry}`
+
+                $http.get(call).then(
+                    function (response) {
+                        //console.log(`${url} success`)
+                        if (response.data && response.data.expansion && response.data.expansion.contains) {
+
+                            let ar = []
+                            response.data.expansion.contains.forEach(function (concept) {
+                                ar.push(concept)
+                            })
+
+                            deferred.resolve(ar)
+
+                        } else {
+                            deferred.reject()
+                        }
+                    }, function (err) {
+                        deferred.reject()
+
+                    })
+
+                return deferred.promise
             },
 
 

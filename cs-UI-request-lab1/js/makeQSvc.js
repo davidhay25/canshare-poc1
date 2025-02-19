@@ -1235,6 +1235,8 @@ angular.module("pocApp")
                 let errorLog = []
                 let firstElement = lstElements[0]
 
+
+
               //  let allEW = []      //all EnableWhen. Used for validation
 
 
@@ -1312,6 +1314,16 @@ angular.module("pocApp")
                     }
                 })
 
+
+                if (dg.adHocExtension) {
+                    //We need to be able to put extensions on the first element - which is the DG.
+                    //this entry in allItems is missing a lot of the ed stuff (naturally) so we need to add it here
+                    //we have to set a type so the decorateRoutine won't reject it. todo - can this restriction be removed?
+                    lstQElements[0].ed.adHocExtension = dg.adHocExtension
+                    lstQElements[0].ed.type=['string']      //todo - not sure about this...
+                }
+
+
                 let Q = {resourceType:'Questionnaire'}
                 //Q.id = `canshare-${firstElement.ed.path}`
                 Q.id = `canshare-${dg.name}`
@@ -1319,7 +1331,6 @@ angular.module("pocApp")
                 Q.title = dg.title //firstElement.title
                 Q.status = 'active'
                 Q.title = dg.title
-               // Q.url = `http://canshare.co.nz/questionnaire/${firstElement.ed.path}`
                 Q.url = `http://canshare.co.nz/questionnaire/${dg.name}`
                 Q.description = dg.description
 
@@ -1398,7 +1409,7 @@ angular.module("pocApp")
                 }
 
 
-                config.hashIdName = hashIdName  //when we create the Q item we need to add the id as a fullUrl property in edfinitionExtract
+                config.hashIdName = hashIdName  //when we create the Q item we need to add the id as a fullUrl property in definitionExtract
 
                 //add the named queries as variables in root of the Q
                 let namedQueries = snapshotSvc.getNamedQueries(dg.name)     //follows the DG hierarchy

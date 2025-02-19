@@ -35,6 +35,26 @@
             </div>
           </div>
           <div class="col-md-9">
+
+              <div ng-if="selectedType.name == 'item-control'">
+                  <em>Sets the control code extension for the item.
+                      See <a href="https://hl7.org/fhir/extensions/CodeSystem-questionnaire-item-control.html" target="_blank">details</a>. Not all codes included here.</em>
+                  <br/><br/>
+
+                  <div class="row">
+
+                      <div class="col-md-3">
+                         <select ng-model="input.itemControl" class="form-control"
+                                 ng-options="concept.code for concept in itemControlCodes"></select>
+                      </div>
+                  </div>
+
+                  <button class="btn btn-primary pull-right"
+                          ng-if="input.itemControl"
+                          ng-click="save('item-control')">Save</button>
+
+              </div>
+
               <div ng-if="selectedType.name == 'variable'">
                   <em>A general purpose variable</em>
                   <br/><br/>

@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('makeSDCExtensionCtrl',
-        function ($scope,elements,currentPath,snapshotSvc,utilsSvc) {
+        function ($scope,elements,currentPath,snapshotSvc,utilsSvc,vsSvc) {
             $scope.input = {}
             $scope.elements = elements      //all the elements in this DG
             //currentPath is the path to the current element in the DG (includes the top)
@@ -10,6 +10,8 @@ angular.module("pocApp")
             $scope.input.calcType = "fhirpath"
 
 
+
+
             $scope.extTypes = []
             $scope.extTypes.push({name:'variable',display:"Variable"})
             $scope.extTypes.push({name:'allocateId',display:"AllocateId"})
@@ -17,10 +19,30 @@ angular.module("pocApp")
             $scope.extTypes.push({name:'defextract',display:"Definition extract"})
             $scope.extTypes.push({name:'defextractvalue',display:"Definition extract value"})
             $scope.extTypes.push({name:'calc',display:"Calculated expression"})
+            $scope.extTypes.push({name:'item-control',display:"Item control codes"})
 
             $scope.selectType = function (type) {
                 $scope.selectedType = type
             }
+
+            vsSvc.getSingleVS("http://hl7.org/fhir/ValueSet/questionnaire-item-control").then(
+                function (data) {
+                    $scope.itemControlCodes = data
+
+                    //additional codes
+                    $scope.itemControlCodes.push({system:"http://hl7.org/fhir/questionnaire-item-control",code:"tab-container",display:"Tab Container"})
+
+                    $scope.itemControlCodes.sort(function (a,b) {
+                        if (a.code  > b.code) {
+                            return 1
+                        } else {
+                            return  -1
+                        }
+                    })
+
+                    console.log(data)
+                }
+            )
 
 
             $scope.fhirDataTypes = utilsSvc.fhirDataTypes()
@@ -93,6 +115,13 @@ angular.module("pocApp")
             function makeExtension(type) {
                 let ext = {}
                 switch (type) {
+                    case "item-control" :
+
+                       let concept = $scope.input.itemControl
+                        ext.url= "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
+
+                        ext.valueCodeableConcept = {coding:[concept]}
+                        break
                     case "variable" :
                         ext.url= "http://hl7.org/fhir/StructureDefinition/variable"
                         ext.valueExpression = {name: $scope.input.vName.replace(/\s+/g, "")}

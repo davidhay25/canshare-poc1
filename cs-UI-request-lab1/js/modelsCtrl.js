@@ -2182,10 +2182,13 @@ angular.module("pocApp")
                 $scope.allPaths = []  //used for the manual re-ordering
 
                 $scope.fullElementList.forEach(function (item) {
-                    $scope.fullElementHash[item.ed.path] = item.ed
-                    if (item.ed.mult !== '0..0') {
-                        $scope.allPaths.push(item.ed.path)
+                    if (item && item.ed) {
+                        $scope.fullElementHash[item.ed.path] = item.ed
+                        if (item.ed.mult !== '0..0') {
+                            $scope.allPaths.push(item.ed.path)
+                        }
                     }
+
                 })
 
 

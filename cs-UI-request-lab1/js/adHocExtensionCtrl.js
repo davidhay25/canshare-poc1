@@ -38,6 +38,7 @@ angular.module("pocApp")
                     if (ext) {
                         $scope.currentExt = currentExt || []
                         $scope.currentExt.push(ext)
+                        $scope.selectExt($scope.currentExt[$scope.currentExt.length -1])
                     }
                 })
             }

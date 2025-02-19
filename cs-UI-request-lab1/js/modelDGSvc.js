@@ -567,7 +567,7 @@ angular.module("pocApp")
 
                 allElements.forEach(function (item,ctr) {
                     let ed = item.ed
-                    if (ed.type) {
+                    if (ed && ed.type) {
                         let type = ed.type[0]
                         if (fhirDT.indexOf(type) == -1) {
 

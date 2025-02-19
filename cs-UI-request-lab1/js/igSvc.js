@@ -713,24 +713,27 @@ angular.module("pocApp")
                 let cleanedElements = []
                 elements.forEach(function (item,inx) {
                     let ed = item.ed
-                    let canAdd = true
-                    if (ed.mult == '0..0') {
-                        pathsToHide.push(ed.path)
-                        canAdd = false
-                    } else {
-                        //is this a descendent of a hidden element
-                        let path = ed.path
-                        for (const p of pathsToHide) {
-                            if (path.isChildPath(p)) {
-                            //if (path.startsWith(p)) {
-                                canAdd = false
-                                break
+                    if (ed) {
+                        let canAdd = true
+                        if (ed.mult == '0..0') {
+                            pathsToHide.push(ed.path)
+                            canAdd = false
+                        } else {
+                            //is this a descendent of a hidden element
+                            let path = ed.path
+                            for (const p of pathsToHide) {
+                                if (path.isChildPath(p)) {
+                                    //if (path.startsWith(p)) {
+                                    canAdd = false
+                                    break
+                                }
                             }
                         }
+                        if (canAdd) {
+                            cleanedElements.push(item)
+                        }
                     }
-                    if (canAdd) {
-                        cleanedElements.push(item)
-                    }
+
 
                 })
 

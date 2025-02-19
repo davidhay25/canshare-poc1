@@ -367,13 +367,13 @@
                 </tr>
 
                 <tr>
-                  <td class="detailName">Ad hoc ext</td>
+                  <td class="detailName">Ad hoc extension</td>
                   <td>
                     <div class="pull-right">
                       <div class="btn btn-link" ng-click="editAdHocExtension(null,selectedModel)">Edit</div>
                     </div>
 
-                    <div ng-if="selectedModel.adHocExtension"
+                    <div ng-if="selectedModel.adHocExtension.length > 0"
                             class="clickableDotted"
                             popover-append-to-body="true"
                             uib-popover-html="popoverText(selectedModel.adHocExtension)"
@@ -755,7 +755,7 @@
                   </tr>
 
                   <tr>
-                    <td class="detailName">Ad hoc ext</td>
+                    <td class="detailName">Ad hoc extension</td>
                     <td>
 
                       <div class="pull-right">
