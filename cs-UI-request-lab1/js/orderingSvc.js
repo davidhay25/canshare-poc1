@@ -102,7 +102,13 @@ angular.module("pocApp")
 
                     //remove the first segment in the path - this is the DG name
                     let toMove = $filter('dropFirstInPath')(item.toMove)
-                    let insertAfter = $filter('dropFirstInPath')(item.insertAfter)
+
+                    //if this is the root, then don't strip the 'first' segment
+                    let insertAfter = item.insertAfter
+                    if (item.insertAfter.indexOf('.') > -1) {
+                        insertAfter = $filter('dropFirstInPath')(item.insertAfter)
+                    }
+
 
                     //find the number of elements that start with the item to moves path
                     //todo - can't use 'startswith' - has to be segment aware (BodySite.bodypart)
@@ -117,7 +123,7 @@ angular.module("pocApp")
 
                     console.log(`${toMove} has ${cnt} elements to move`)
 
-                    let currentPos = findCurrentPositionInList(toMove)
+                    let currentPos = findCurrentPositionInList(toMove)  //current position of the element to move
 
                     if (currentPos > -1) {
                         //cnt++   //the cnt does not include the element to move.
@@ -126,50 +132,45 @@ angular.module("pocApp")
 
                         //now find the insertion point
                         let foundIt = false
-                        for (let i=0; i< lst.length; i++) {
-                            let tItem = lst[i]
-                            if ($filter('dropFirstInPath')(tItem.ed.path) == insertAfter) {
 
-                                //sep 3 - need to move past any child elements of this path
-                                foundIt = true
-                                console.log(`found at ${i}`)
 
-                            } else if (foundIt) {
-                                let pth = $filter('dropFirstInPath')(tItem.ed.path)
+                        //Feb26 - if the insertAfter is the DG name, then it's being moved to the top
 
-                                if (! pth.isChildPath(insertAfter)) {
-                                    console.log(`Inserting at ${i}`)
-                                    Array.prototype.splice.apply(lst, [i, 0].concat(itemsToMove));
-                                    //Array.prototype.splice.apply(lst, [i+1, 0].concat(itemsToMove));
-                                    insertPointFound = true
-                                    break
+                        if (insertAfter == dg.name) {
+
+                            Array.prototype.splice.apply(lst, [1, 0].concat(itemsToMove));
+                            insertPointFound = true
+
+                        } else {
+                            //otherwise we need to find the insert point...
+                            for (let i=0; i< lst.length; i++) {
+                                let tItem = lst[i]
+                                if ($filter('dropFirstInPath')(tItem.ed.path) == insertAfter) {
+
+                                    //sep 3 - need to move past any child elements of this path
+                                    foundIt = true
+                                    console.log(`found at ${i}`)
+
+                                } else if (foundIt) {
+                                    let pth = $filter('dropFirstInPath')(tItem.ed.path)
+
+                                    if (! pth.isChildPath(insertAfter)) {
+                                        console.log(`Inserting at ${i}`)
+                                        Array.prototype.splice.apply(lst, [i, 0].concat(itemsToMove));
+                                        insertPointFound = true
+                                        break
+                                    }
                                 }
-
-
-                            }
-
-
-
-
-                        }
-
-                        /*
-                        * for (let i=0; i< lst.length; i++) {
-                            let tItem = lst[i]
-                            if ($filter('dropFirstInPath')(tItem.ed.path) == insertAfter) {
-
-
-
-                                Array.prototype.splice.apply(lst, [i+1, 0].concat(itemsToMove));
-                                insertPointFound = true
-                                break
                             }
                         }
-                        * */
+
+
+
+
 
 
                         if (! insertPointFound) {
-                            console.log(`Insert point ${item.insertAfter} not found, no re-ordering occurred`)
+                            alert(`Insert point ${item.insertAfter} not found, no re-ordering occurred`)
                             //we need to put them back
                             for (let i = itemsToMove.length-1; i > -1; i--) {
                                 lst.splice(currentPos,0,itemsToMove[i])

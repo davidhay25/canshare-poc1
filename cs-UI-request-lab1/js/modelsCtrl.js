@@ -460,7 +460,7 @@ angular.module("pocApp")
                 if (newMode == 'library') {
                     //changing from playground. Can only do this if logged in.
                     if ($scope.user && $scope.user.email) {
-                        let msg = "Are you sure you wish to enter Library mode? This will replace the current Form."
+                        let msg = "Are you sure you wish to enter LIM mode? This will replace the current Form."
                         if (confirm(msg)) {
                             resetLocalEnvironment()
 
