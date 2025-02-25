@@ -991,11 +991,22 @@ angular.module("pocApp")
 
                 let dg = {kind:'dg',name:comp.name,title:comp.title,diff:[],snapshot:[]}
 
+                //add a
+
+              //  comp.sections.forEach(function (sect) {
+
+
+
+             //   })
+
+               // return dg
+
 
                 for (const thing of allElements) {
                   // if (thing.ed.type) {
                     //The snapshot generator barfs if there isn't a type...
                     thing.ed.type = thing.ed.type || 'Group'
+                    thing.ed.mult = thing.ed.mult || '0..1'
                     dg.snapshot.push(thing.ed)
                   //  }
 

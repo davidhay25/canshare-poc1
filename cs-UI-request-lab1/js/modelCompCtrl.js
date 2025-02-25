@@ -1,13 +1,17 @@
 //controller for the 'showComposition' include
 angular.module("pocApp")
     .controller('modelCompositionCtrl',
-        function ($scope,$uibModal,$timeout,librarySvc,modelsSvc,$localStorage,$http,utilsSvc) {
+        function ($scope,$uibModal,$timeout,librarySvc,modelsSvc,$localStorage,$http,utilsSvc,documentSvc) {
 
 
             $localStorage.qStrategy = $localStorage.qStrategy || {}
             $scope.qStrategy = $localStorage.qStrategy
 
             $scope.compositionKind = ['request','report','general']
+
+
+
+
 
             $scope.qGenerationOptions = function () {
                 $uibModal.open({

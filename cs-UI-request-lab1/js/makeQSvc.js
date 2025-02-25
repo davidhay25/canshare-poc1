@@ -157,7 +157,7 @@ angular.module("pocApp")
                 ext.extension.push({url:"ifNoneMatch",valueString:vo.ifNoneExist})
             }
 
-            file:///Users/davidhay/clinFHIR/canshare-poc1/cs-UI-request-lab1/js/makeQCtrlDEP.js
+        //    file:///Users/davidhay/clinFHIR/canshare-poc1/cs-UI-request-lab1/js/makeQCtrlDEP.js
             item.extension = item.extension || []
             item.extension.push(ext)
         }
@@ -452,6 +452,10 @@ angular.module("pocApp")
         //If the ed has the 'otherType set, then an additional item mutst be created - possibl with an enableWhen
         //The function returns the items to insert (including the source) - possibly not needed, but I'll leave it like this for now
         function addOtherItem(ed,sourceItem) {
+            
+           // return //temp feb 25
+            
+
             let newItem       //the function returns the list of items
             switch (ed.otherType) {
                 case "never" :
@@ -522,6 +526,9 @@ angular.module("pocApp")
         //updates the item object directly
         //When used by the Composition, we add a prefix which is {compname}.{section name}. (note the trailing dot)
         function addEnableWhen(ed,item,inPathPrefix) {
+
+
+           // return //temp 25 feb
 
             let allEW = []  //track all EW created as the Q is created. Used to check the links once the Q is finished
             let pathPrefix = ""

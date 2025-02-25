@@ -7,6 +7,7 @@ angular.module("pocApp")
             $scope.input = {}
             $scope.edit = {}
             $scope.isNew = isNew        //if new, then allow the model metadata to be set
+            $scope.userMode = userMode
 
             $scope.input.fixedValues = []   //all the fixed values defined by this DG (not shared like Named Queries)
 

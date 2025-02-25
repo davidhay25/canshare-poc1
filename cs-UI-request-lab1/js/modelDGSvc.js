@@ -1,6 +1,6 @@
 angular.module("pocApp")
 
-    .service('modelDGSvc', function($http,$q,$localStorage,utilsSvc) {
+    .service('modelDGSvc', function($http,$q,$localStorage,utilsSvc,$filter) {
 
         let config = {}
         let vsUrlPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/" //the url prefix
@@ -562,7 +562,6 @@ angular.module("pocApp")
                 let arEdges = []
 
                 let rootNode = {id: dg.name, label:dg.name ,shape: 'box'}
-                //node.data = {dg:DG}
                 arNodes.push(rootNode)
 
                 allElements.forEach(function (item,ctr) {
@@ -571,21 +570,21 @@ angular.module("pocApp")
                         let type = ed.type[0]
                         if (fhirDT.indexOf(type) == -1) {
 
-                            //let id = `${type}${Math.floor(Math.random() * 1001)}`
                             let id = `${type}-${ctr}`
                             let node = {id: id, label:type,shape: 'box'}
 
                             node.data = {model: in_hashAllDG[type]}
-                            //node.data = {dg:DG}
                             arNodes.push(node)
+
+                            let label = $filter('lastInPath')(ed.path)
 
                             let edge = {id: 'e' + arEdges.length +1,
                                 from: rootNode.id,
-                                //to: model.parent,
                                 to: id,
                                 color: 'black',
                                 //width: 4,
-                                label: 'references',arrows : {to:true}}
+                                //label: 'references',arrows : {to:true}},
+                                label:label,arrows : {to:true}}
                             arEdges.push(edge)
 
                             }

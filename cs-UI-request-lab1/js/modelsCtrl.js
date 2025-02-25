@@ -3,7 +3,7 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,orderingSvc,
-                  snapshotSvc,vsSvc,makeQSvc,playgroundsSvc,$localForage,
+                  snapshotSvc,vsSvc,makeQSvc,playgroundsSvc,$localForage,documentSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
             //change the background colour of the DG summary according to the environment
@@ -2075,6 +2075,22 @@ angular.module("pocApp")
 
 
 
+            $scope.updateHISODoc = function () {
+                //generate the HISO document
+
+                let htmlContent = documentSvc.makeHISODocument( $scope.allCompElements)
+
+                $('#htmlHISO').contents().find('html').html(htmlContent)
+
+                $scope.downloadLinkDoc = window.URL.createObjectURL(new Blob([htmlContent],
+                    {type: "text/html"}));
+
+                //$scope.downloadLinkJsonName = "downloaded"
+                var now = moment().format();
+                $scope.downloadLinkDocName =  'myDoc-' + now + '.html';
+            }
+
+
             $scope.selectComposition = function(comp){
                 clearB4Select()
                 $scope.selectedComposition = comp
@@ -2112,6 +2128,24 @@ angular.module("pocApp")
                 let vo = modelCompSvc.makeFullList(comp,$scope.input.types,$scope.hashAllDG)      //overites the previou slist
 
                 $scope.allCompElements = vo.allElements     //list of all elements. used by the Table and Q generation (at least)
+
+                /* - Feb25 - nor working*/
+
+
+
+
+
+                /*
+                                const blob = new Blob(['\ufeff', htmlContent], {
+                                    type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                });
+
+
+                                $scope.downloadLinkHISO = window.URL.createObjectURL(blob)
+                                $scope.downloadLinkHISOName = `myDoc.docx`
+
+
+                */
 
 
                 //build the Q. This is to find any errors - we don't otherwise use the Q in this app anymore
