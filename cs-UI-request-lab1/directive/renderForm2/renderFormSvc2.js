@@ -162,6 +162,11 @@ angular.module("formsApp")
                         arStyle.push("color : blue")
                     }
 
+                    //fixed values can be set in multiple ways
+                    if (item.answerOption && item.answerOption.length > 0 && item.answerOption[0].initialSelected) {
+                        arStyle.push("color : blue")
+                    }
+
                     //process extensions
                     if (item.extension) {
                         for (const ext of item.extension) {

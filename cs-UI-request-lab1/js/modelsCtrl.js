@@ -2078,7 +2078,7 @@ angular.module("pocApp")
             $scope.updateHISODoc = function () {
                 //generate the HISO document
 
-                let htmlContent = documentSvc.makeHISODocument( $scope.allCompElements)
+                let htmlContent = documentSvc.makeHISODocument($scope.selectedComposition, $scope.allCompElements,$scope.hashAllDG)
 
                 $('#htmlHISO').contents().find('html').html(htmlContent)
 
@@ -2087,7 +2087,9 @@ angular.module("pocApp")
 
                 //$scope.downloadLinkJsonName = "downloaded"
                 var now = moment().format();
-                $scope.downloadLinkDocName =  'myDoc-' + now + '.html';
+                $scope.downloadLinkDocName =  `${$scope.selectedComposition.name}-${now}.html`
+
+                //$scope.downloadLinkDocName =  'myDoc-' + now + '.html';
             }
 
 
@@ -2203,13 +2205,8 @@ angular.module("pocApp")
 
 
                 //by supplying the dg in the call, the eds will be annotatded with 'definedOnDG' for those in the diff
-
-                //temp $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name,dg)// vo.allElements
                 $scope.fullElementList = snapshotSvc.getFullListOfElements(dg.name)// vo.allElements
 
-               // $scope.allAdHocExt = modelDGSvc.makeSDCSummary($scope.fullElementList,$scope.hashAllDG)
-
-//console.log($scope.allAdHocExt)
 
                 $scope.fullElementHash = {}         //I seem to need this quite a lot. Though memory usage is getting high...
                 //create the list of all paths in the DG. Used by the 'ordering'
@@ -2226,7 +2223,7 @@ angular.module("pocApp")
                 })
 
 
-                //adjust according to 'insertAfter' values
+                //adjust according to 'insertAfter' values. Note that if the user updates the order, the updateList will be empty
                 orderingSvc.sortFullListByInsertAfter($scope.fullElementList,dg,$scope.hashAllDG)
 
                 //this is intended to allow a DG to apply the ordering to referenced DGs - but it's confusing. working on a better solution
@@ -2238,6 +2235,7 @@ angular.module("pocApp")
 
                 $scope.dgFshLM = igSvc.makeFshForDG(dg,$scope.fullElementList)
 
+                //the DG's referenced by / contained this DG
                 let vo = modelDGSvc.makeGraphOneDG(dg,$scope.fullElementList,$scope.hashAllDG)
                 makeGraph(vo.graphData)
 

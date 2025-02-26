@@ -528,7 +528,6 @@ angular.module("pocApp")
         function addEnableWhen(ed,item,inPathPrefix) {
 
 
-           // return //temp 25 feb
 
             let allEW = []  //track all EW created as the Q is created. Used to check the links once the Q is finished
             let pathPrefix = ""
@@ -1947,9 +1946,10 @@ angular.module("pocApp")
 
                     if (edType == 'CodeableConcept') {
 
-                        //check for fixedCoding. If there is, then set an answeroption with initialSelected
+                        //check for fixedCoding. Handles in 2 ways.
+                        // If there's an extractionContext and a definition, then use the definitionExtractValue extension (as it's set up for extarction)
+                        //If not, then set an answeroption with initialSelected and hide it
 
-                        //updated to use fixed value extension
                         //need to use hidden answeOption approach as for extensions, the element needs to be
                         //there to attach the value[x] part of the extension...
 
@@ -1958,25 +1958,42 @@ angular.module("pocApp")
                             let concept = ed.fixedCoding
                             delete concept.fsn
 
+
+                            let canUseExtension = true
                             //the actual resource element to populate...
                             let canonical = `${extractionContext}#${ed.definition}`
                             if (! extractionContext) {
-                                errorLog.push({msg:`Resource type not set for fixed value in ${ed.path}`})
+                                //errorLog.push({msg:`Resource type not set for fixed value in ${ed.path}`})
+                                canUseExtension = false
                             }
                             if (! ed.definition) {
-                                errorLog.push({msg:`Definition (extract path) not set for fixed value in ${ed.path}`})
+                                canUseExtension = false
+                               // errorLog.push({msg:`Definition (extract path) not set for fixed value in ${ed.path}`})
                             }
 
-                            //the fixedValueExtension needs to be added to the parent
-                            let ar1 = ed.path.split('.')
-                            ar1.pop()
-                            let p1 = ar1.join('.')
-                            let parentItem = hashEd[p1]
-                            if (parentItem) {
-                                addFixedValue(parentItem,canonical,'Coding',concept)
+                            if (! canUseExtension ) {
+                                //need an answeroption with initial selected
+                                item.answerOption = item.answerOption || []
+                                let ao = {valueCoding:concept,initialSelected:true}
+                                item.answerOption.push(ao)
+                                makeQHelperSvc.addExtension(item,{url:extHidden,valueBoolean:true})
+
+
                             } else {
-                                errorLog.push(`Path ${p1} empty setting fixed value`)
+                                //the fixedValueExtension needs to be added to the parent
+                                let ar1 = ed.path.split('.')
+                                ar1.pop()
+                                let p1 = ar1.join('.')
+                                let parentItem = hashEd[p1]
+                                if (parentItem) {
+                                    addFixedValue(parentItem,canonical,'Coding',concept)
+                                } else {
+                                    errorLog.push(`Path ${p1} empty setting fixed value`)
+                                }
                             }
+
+
+
 
                             //Don't include this item in the Q.
                             //There could be an issue if this is a parent - but a parent shouldn't have a fixed value...

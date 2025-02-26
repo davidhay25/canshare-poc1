@@ -938,6 +938,7 @@ angular.module("pocApp")
 
         return {
             dgUseSummary : function () {
+                //an analysis of where dgs are container by another
                 let hashUsage = {}
                 let hashName = {}
                 let fhirDT = utilsSvc.fhirDataTypes()
@@ -978,7 +979,7 @@ angular.module("pocApp")
                 })
 
 
-                console.log(hashUsage,hashName,arUsage)
+                //console.log(hashUsage,hashName,arUsage)
 
 
 

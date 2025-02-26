@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('modelAdminCtrl',
-        function ($scope,$http,$uibModal,$localStorage,$q,snapshotSvc,$filter,modelDGSvc) {
+        function ($scope,$http,$uibModal,$localStorage,$q,snapshotSvc,$filter,modelDGSvc,utilsSvc) {
 
             let dgFilter
             let emailFilter
@@ -27,7 +27,7 @@ angular.module("pocApp")
             }
 
 
-            $scope.applyIdFix = function () {
+            $scope.applyIdFixDEP = function () {
                 Object.keys($scope.world.dataGroups).forEach(function (key) {
                     let dg = $scope.world.dataGroups[key]
                     modelDGSvc.updateDGId(dg)
@@ -224,17 +224,104 @@ angular.module("pocApp")
             }
 
             $scope.hashAllDG = {}
+
+
+            //ensure that all the dg's and ed's have a unique id
+            $scope.updateIds = function (dg) {
+                if (! dg.id) {
+                    console.log(`Setting dg ID : ${dg.name}`)
+                    dg.id =  utilsSvc.getUUID()
+                }
+
+                if (dg.diff) {
+                    dg.diff.forEach(function (ed) {
+                        if (! ed.id) {
+                            console.log(`Setting ed ID : ${ed.path}`)
+                            ed.id =  utilsSvc.getUUID()
+                        }
+                    })
+                }
+
+            }
+
+            //udate the conditionsls to set sourceId (assuming it can be found)
+            $scope.updateEnableWhen = function (dg,summary) {
+
+                let cnt = 0
+                let fullDG = snapshotSvc.getDG(dg.name)
+                let hash = {}
+                fullDG.snapshot.forEach(function (ed) {
+                    hash[`${dg.name}.${ed.path}`] = ed.id
+                })
+
+
+
+                fullDG.snapshot.forEach(function (ed) {
+                    if (ed.enableWhen && ed.mult !== '0..0') {
+
+                        //console.log(hash)
+
+                        ed.enableWhen.forEach(function (ew) {
+                           // console.log(ew)
+                            let lne = {dg:dg.name,source:ew.source}
+
+                            if (hash[ew.source]) {
+                               // console.log('ok')
+                                lne.outcome = 'ok'
+                            } else {
+                                cnt ++
+                                let msg = lookForDups(ew.source)
+
+                                console.log(`${dg.name}: ${ed.path} ${ew.source} not found...`,msg)
+
+                                lne.outcome = 'not found'
+                               //
+                            }
+
+                            summary.push(lne)
+
+                        })
+
+                    }
+                })
+
+                if (cnt > 0) {
+                    console.log(`${dg.name} ${cnt} missing soruces`)
+                }
+
+                return cnt
+
+
+
+            }
+
+
             function loadWorld() {
                 //the localstorage objects
                 $scope.world = $localStorage.world
                 $scope.arDG = []
+
                 Object.keys($scope.world.dataGroups).forEach(function (key) {
                     let dg = $scope.world.dataGroups[key]
+                    $scope.updateIds(dg)
                     $scope.arDG.push(dg)
                     $scope.hashAllDG[key] = dg
                 })
 
+
+
+
                 snapshotSvc.makeSnapshots($scope.hashAllDG)
+
+                $scope.ewSummary = []
+                let tot = 0
+                Object.keys($scope.hashAllDG).forEach(function (key) {
+                    let dg = $scope.world.dataGroups[key]
+                    tot += $scope.updateEnableWhen(dg,$scope.ewSummary)
+                })
+
+                console.log($scope.ewSummary)
+                console.log(`${tot} not found`)
 
                 analyse()
                 analyseDiff()

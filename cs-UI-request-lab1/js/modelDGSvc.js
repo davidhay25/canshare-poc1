@@ -38,6 +38,8 @@ angular.module("pocApp")
             updateDGId : function (dg) {
                 //add id's to the dg and all the ed. Update any conditionals
 //return //just for now
+
+                return
                 dg.id = dg.id || utilsSvc.getUUID()
 
                 let hashByPath = {}

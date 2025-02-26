@@ -7,25 +7,129 @@ angular.module("pocApp")
 
         return {
 
-            makeHISODocument: function (lst) {
-
-                let arDoc = []
-                arDoc.push("This is a test")
+            makeHISODocument: function (comp,lst,hashAllDG) {
 
                 let fhirDT = utilsSvc.fhirDataTypes()
+                let arDoc = []
 
+
+                let hashLink = {}       //to create simple links from paths
+
+                //----------- metadata
+                arDoc.push(addTaggedLine("h1", comp.title))
+                arDoc.push(addTaggedLine("p", comp.description))
+
+                arDoc.push("<table class='dTable'>")
+                addRowIfNotEmpty(arDoc, 'HISO number', comp.meta.hisoNumber)
+                addRowIfNotEmpty(arDoc, 'version', comp.version)
+                addRowIfNotEmpty(arDoc, 'Category', comp.meta.category)
+                addRowIfNotEmpty(arDoc, 'Tumour stream', comp.meta.tumourStream)
+                addRowIfNotEmpty(arDoc, 'Procedure', comp.meta.procedure)
+                addRowIfNotEmpty(arDoc, 'Organ', comp.meta.organ)
+
+                arDoc.push("</table>")
+
+                //--------- list of sections
+                arDoc.push(addTaggedLine("h1", "Sections"))
+
+                arDoc.push("<table class='dTable'>")
+
+                arDoc.push("<tr><th>Title</th><th>Cardinality</th><th>Description (rules)</th></tr>")
+                comp.sections.forEach(function (sect) {
+                    arDoc.push("<tr>")
+                    arDoc.push(`<td>${sect.title}</td>`)
+
+                    let occurence = "Optional"
+                    if (sect.mult) {
+                        if (sect.mult.indexOf('1.') > -1) {
+                            occurence = "Required"
+                        }
+                        if (sect.mult.indexOf('*') > -1) {
+                            occurence += ", can repeat"
+                        } else {
+                           // occurence += "single occurrence"
+                        }
+                        arDoc.push(`<td>${occurence}</td>`)
+                    }
+
+                    let rules = sect.rules || ""
+
+                    arDoc.push(`<td>${rules}</td>`)
+                    arDoc.push("</tr>")
+
+                })
+
+                arDoc.push("</table>")
+
+                //-------- Table of contents
+
+                arDoc.push(addTaggedLine("h1", "Table Of Contents"))
+                arDoc.push("<table class='dTable' style='width:100%;'>")
+
+                let cntLink = 0
+
+                lst.forEach(function (item,inx) {
+                    let ed = item.ed
+                    let kind = ed.kind //kind = section (highlight), section-dg (ignore)
+
+                    let ar = ed.path.split('.')
+                    let indent = 8 * ar.length
+
+                    let link = `link${cntLink++}`
+                    hashLink[ed.path] = link
+
+
+                    if (kind !== 'section-dg' && inx > 0) {
+                        if (kind == 'section') {
+                            arDoc.push("<tr class='col1'>")
+                        } else {
+                            arDoc.push("<tr>")
+                        }
+
+                        arDoc.push(`<a name="${hashLink[ed.path]}-src"></a>`)
+                        arDoc.push(`<td style="text-indent:${indent}px">${ed.title}</td>`)
+                        //arDoc.push(`<td><a href="#${ed.path}">Link</a></td>`)
+
+
+                        //arDoc.push(`<td>${ed.kind}</td>`)
+                        arDoc.push(`<td style="width:10%">${ed.mult}</td>`)
+
+                        arDoc.push(`<td style="width:40%">${ed.description || ed.rules || ""}</td>`)
+
+                        if (kind !== 'section') {
+                            arDoc.push(`<td><a href="#${hashLink[ed.path]}">Details</a></td>`)
+                        } else {
+                            arDoc.push(`<td></td>`)
+                        }
+
+
+                        arDoc.push("</tr>")
+                    }
+                })
+
+                arDoc.push("</table>")
+
+
+                //-------- element details
+
+                arDoc.push(addTaggedLine("h1", "Element details"))
 
                 lst.forEach(function (item) {
                     let ed = item.ed
 
                     if (ed.type) {
                         let type = ed.type[0]
+
                         if (fhirDT.indexOf(type) == -1) {
                             //this is a group or a DataType
+                            arDoc.push(`<a name="${hashLink[ed.path]}"></a>`)
+
                             arDoc.push(addTaggedLine("h2", ed.title));
+
 
                         } else {
                             //arDoc.push(addTaggedLine("h2", $filter('lastInPath')(ed.path)));
+                            arDoc.push(`<a name="${hashLink[ed.path]}"></a>`)
                             arDoc.push(addTaggedLine("h3", ed.title));
 
                             arDoc.push("<table class='dTable'>");
@@ -55,25 +159,19 @@ angular.module("pocApp")
 
                                 addRowIfNotEmpty(arDoc, 'ValueSet', vs)
 
-
-
                             }
 
+                            if (ed.fixedCoding) {
+                                let disp = `${ed.fixedCoding.code} | ${ed.fixedCoding.display} | ${ed.fixedCoding.system}`
+                                addRowIfNotEmpty(arDoc, 'Fixed code', disp)
+                            }
 
                             arDoc.push("</table><br/>");
+
+                            //arDoc.push(`<td><a href="#${hashLink[ed.path]}-src">Back</a></td>`)
+                            arDoc.push(`<div style="text-align: right;"><a class="tocFont" href="#${hashLink[ed.path]}-src">Back to TOC</a></div>`)
                         }
-
-
-
-
-
-
                     }
-
-
-
-
-
                 })
 
 
@@ -99,6 +197,10 @@ angular.module("pocApp")
                         
                         .col1 {
                             background-color:Gainsboro;
+                        }
+                        
+                        .tocFont {
+                            font-family: Calibri, sans-serif;
                         }
                                    
                     </style>
