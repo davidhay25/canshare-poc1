@@ -164,7 +164,7 @@ angular.module("pocApp")
                             hashElementsById[item.ed.id] = item.ed
                         } else {
                             if (item.ed.path !==dgName) {   //the first element is the DG and won't have an id (or a path)
-                                console.error(`path ${item.ed.path} has no Id`)
+                               //just fills the log... console.error(`path ${item.ed.path} has no Id`)
                             }
 
                         }

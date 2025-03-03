@@ -494,6 +494,22 @@ angular.module("pocApp")
                 item.extension = item.extension || []
                 item.extension.push(ext)
             },
+            addExtensionOnce : function (item,ext) {
+                item.extension = item.extension || []
+                let canAdd = true
+                for (ext1 of item.extension) {
+                    if (ext1.url == ext.url) {
+                        canAdd = false
+                        break
+                    }
+                }
+                if (canAdd) {
+                    item.extension.push(ext)
+                }
+
+
+
+            },
             checkParentalHash : function (hash,path) {
                 //ensure that all segments in the path have an entry in the hash
                 //and that the 'parent' path (one less segment) has a .item that references the entry

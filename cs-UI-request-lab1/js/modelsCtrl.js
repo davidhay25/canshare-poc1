@@ -19,6 +19,7 @@ angular.module("pocApp")
 
            // $scope.fhirBase = "http://hl7.org/fhir/R4B/"
 
+            $scope.Math = Math;
 
             $scope.userMode = $localStorage.userMode || "playground"      //possible modes are 'library' or 'playground'
             //$scope.userMode = "library"
@@ -570,7 +571,7 @@ angular.module("pocApp")
                 $scope.allAdHocExt = snapshotSvc.getAllAdHocExt()
 
                 $scope.usageSummary = snapshotSvc.dgUseSummary()
-
+                $scope.diffAnalysis = snapshotSvc.diffAnalysis($scope.hashAllDG)
 
             }
 
@@ -2070,6 +2071,8 @@ angular.module("pocApp")
                 delete $scope.selectedNode
                 delete $scope.input.showDGList
                 delete $scope.selectedCompositionNode
+
+                $('#htmlHISO').contents().find('html').html('');
                 //delete $scope.input.showDGChildren
             }
 

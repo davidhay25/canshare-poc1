@@ -932,40 +932,61 @@ angular.module("pocApp")
                         ed.type = ['Group']
                     }
                 }
-
             }
         }
 
         return {
+
+
+            diffAnalysis : function (hashAllDG) {
+                //what diffs do - specifically diffs that are zeroing out something...
+                let arSummary = []
+                for (const key of Object.keys(hashAllDG)) {
+                    let dg = hashAllDG[key]
+                    let summary = {name:dg.name,cnt:0,zero:0}
+                    if (dg.diff) {
+                        for (const ed of dg.diff) {
+                            summary.cnt++
+                            if (ed.mult && ed.mult == '0..0') {
+                                summary.zero++
+                            }
+
+                        }
+                        arSummary.push(summary)
+                    }
+                }
+                arSummary.sort(function (a,b) {
+                    if (a.name > b.name) {
+                        return 1
+                    } else {
+                        return -1
+                    }
+                })
+                return arSummary
+            },
             dgUseSummary : function () {
-                //an analysis of where dgs are container by another
+                //an analysis of where dgs are contained by another. Uses the snapshot
                 let hashUsage = {}
                 let hashName = {}
                 let fhirDT = utilsSvc.fhirDataTypes()
                 for (const key of Object.keys(allDgSnapshot)) {
                     let dg = allDgSnapshot[key]
                     hashName[key] = {title:dg.title}
-                    for (ed of dg.snapshot) {
+                    for (const ed of dg.snapshot) {
                         let type = ed.type[0]
-                        if (fhirDT.indexOf(type) == -1) {
+                        if (fhirDT.indexOf(type) == -1) {   //not a FHIR DT
                             hashUsage[type] = hashUsage[type] || {cnt:0,names:{}}
                             hashUsage[type].cnt++
 
                             hashUsage[type].names[key] = hashUsage[type].names[key] || 0
                             hashUsage[type].names[key] ++
-                           // hashUsage[type].names.push(key)
                         }
                     }
                 }
 
 
-
                 let arUsage = []
                 for (const key of Object.keys(hashUsage)) {
-
-
-
-
                     arUsage.push({name:key,title:hashName[key].title,cnt:hashUsage[key].cnt,names:hashUsage[key].names})
                 }
 
@@ -977,11 +998,6 @@ angular.module("pocApp")
                     }
 
                 })
-
-
-                //console.log(hashUsage,hashName,arUsage)
-
-
 
                 return arUsage
 
@@ -1449,16 +1465,14 @@ angular.module("pocApp")
                     //alert(`No DG called ${dgName} found`)
                 }
 
+
+                //++++++++= temp Feb 27 error with re-order
+               // return lst
+
                 let lst1 = utilsSvc.reorder(lst)
 
-              //  console.log(lst1.length,lst.length)
-
-             //   lst1.splice(0,1)
                     return lst1
 
-               // console.log(utilsSvc.reorder(lst))
-
-               // return lst
             }
         }
 

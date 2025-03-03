@@ -1976,8 +1976,8 @@ angular.module("pocApp")
                                 item.answerOption = item.answerOption || []
                                 let ao = {valueCoding:concept,initialSelected:true}
                                 item.answerOption.push(ao)
-                                makeQHelperSvc.addExtension(item,{url:extHidden,valueBoolean:true})
-
+                                //makeQHelperSvc.addExtension(item,{url:extHidden,valueBoolean:true})
+                                makeQHelperSvc.addExtensionOnce(item,{url:extHidden,valueBoolean:true})
 
                             } else {
                                 //the fixedValueExtension needs to be added to the parent

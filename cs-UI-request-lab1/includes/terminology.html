@@ -289,6 +289,22 @@
 
     </uib-tab>
 
+    <uib-tab heading="Diff analysis">
+      <table class="table table-bordered">
+        <tr><td>DG Name</td><td>Diff count</td><td>Zero diff</td><td>% zero</td></tr>
+        <tr ng-repeat="diff in diffAnalysis">
+          <td class="clickable" ng-click="termSelectDG({DGName:diff.name})" >{{diff.name}}</td>
+          <td>{{diff.cnt}}</td>
+          <td>{{diff.zero}}</td>
+          <td>{{  Math.trunc( (diff.zero / diff.cnt) * 100 ) }}
+          </td>
+
+        </tr>
+      </table>
+
+    </uib-tab>
+
+
 
     <uib-tab heading="Notes">
       <div class="pull-right">Notes across all resources
