@@ -854,7 +854,7 @@ function setup(app) {
             jobs[jobId].progress = `${csId} done`
 
             //Set ConceptMaps.
-            for (cmId of ['canshare-select-valueset-map','canshare-select-valueset-map-dev']) {
+            for (let cmId of ['canshare-select-valueset-map','canshare-select-valueset-map-dev']) {
                 const options = {
                     method: 'POST',
                     url: `${serverHost}synd/setSyndicationStatus`,
@@ -969,6 +969,8 @@ function setup(app) {
         }
     })
 
+    // ====================== ConceptMap functions ===================
+
     //use when updating a ConceptMap
     app.put('/nzhts/ConceptMap/:id',async function(req,res){
 
@@ -984,10 +986,167 @@ function setup(app) {
             }
             res.json()      //no error
         } else {
-            res.status(400).json({msg:"Must have urlencoded qry query"})
+            res.status(400).json({msg:"Must have ConceptMap"})
 
         }
     })
+
+    //get all concept maps - use for display in updateVS & cmUI
+    //return the map names and next release number
+    app.get('/nzhts/ConceptMap/allVersions',async function(req,res){
+
+
+        let serverHost = "https://authoring.nzhts.digital.health.nz/"
+        let qry = `${serverHost}fhir/ConceptMap?identifier=http://canshare.co.nz/fhir/NamingSystem/conceptmaps%7c`
+
+        //let serverRoot =  'http://home.clinfhir.com:8054/baseR4/'
+
+        qry = "http://home.clinfhir.com:8054/baseR4/ConceptMap?identifier=http://canshare.co.nz/fhir/NamingSystem/conceptmaps%7c"  //<<<<< just for testing
+
+
+        let token = await getNZHTSAccessToken()
+        let config = {headers: {authorization: 'Bearer ' + token}}
+        config['content-type'] = "application/fhir+json"
+
+        if (token) {
+            try{
+
+                let response = await axios.get(qry,config)
+                let bundle = response.data
+
+                res.json(bundle)
+            } catch(ex) {
+                res.status(500).json(ex)
+            }
+
+        } else {
+            res.status(ex.response.status).json({msg:"Unable to get Access Token."})
+        }
+
+    })
+
+
+    //publish RC
+    app.post('/nzhts/ConceptMap/publishRC',async function(req,res){
+        let version = req.body.version
+
+        let nameRoot = 'canshare-select-valueset-map'
+        let serverRoot =  'http://home.clinfhir.com:8054/baseR4/'   //note - will need to get a token for nzhts and set syndicate
+
+        //first, retrieve the RC and update the status
+        //let rcId = `${nameRoot}-v${version}`
+        //let qryRC = `${serverRoot}/ConceptMap/${nameRoot}-dev`
+
+        try {
+            let qryRC = `${serverRoot}/ConceptMap/${nameRoot}-v${version}`
+            let response = await axios.get(qryRC)
+            let cm = response.data      //the conceptmap
+            cm.status = "active"
+
+
+            let result = await putResource(qryRC,cm,true)
+            if (result) {
+                //A result is returned if there is an error
+                res.status(400).json({msg:"Unable to update release candidate status"})
+                return
+            }
+
+            //now, save the RC as the current version
+            //version and status same as RC
+            cm.id = nameRoot
+            let identifier = {system:"http://canshare.co.nz/fhir/NamingSystem/conceptmaps"}
+            identifier.value = cm.id
+            cm.identifier = identifier
+            cm.url = `http://canshare.co.nz/fhir/ConceptMap/${nameRoot}`
+            cm.title = `Canshare select valueset map, current version`
+
+            let updateCurrent = `${serverRoot}/ConceptMap/${nameRoot}`
+            let result1 = await putResource(updateCurrent,cm,true)
+            if (result1) {
+                //A result is returned if there is an error
+                res.status(400).json({msg:"Unable to update the current version"})
+                return
+            }
+
+        } catch (ex) {
+            res.status(500).json({msg:ex.message})
+            return
+        }
+
+
+
+
+
+        //next save it as the current version
+
+
+
+
+
+
+        res.json({id:version})
+
+    })
+
+    //make release candidate. Pass in the dev version.
+    app.post('/nzhts/ConceptMap/makeRC',async function(req,res){
+        let nameRoot = 'canshare-select-valueset-map'
+        //let serverRoot = 'https://hapi.fhir.org/baseR4'
+        let serverRoot =  'http://home.clinfhir.com:8054/baseR4/'   //note - will need to get a token for nzhts
+
+        //retrieve the dev version
+        let qryDev = `${serverRoot}/ConceptMap/${nameRoot}-dev`
+        let response = await axios.get(qryDev)
+        let cm = response.data      //the conceptmap
+
+        //create the RC
+        let rc = JSON.parse(JSON.stringify(cm))         //make a copy
+        rc.id = `${nameRoot}-v${cm.version}`   //the dev version is the RC
+        rc.url = `http://canshare.co.nz/fhir/ConceptMap/${nameRoot}-v${cm.version}`
+        rc.title = `Canshare select valueset map, Release Candidate version ${cm.version}`
+        rc.status = 'draft'
+
+        let identifier = {system:"http://canshare.co.nz/fhir/NamingSystem/conceptmaps"}
+        identifier.value = rc.id
+        rc.identifier = identifier
+        let qryRC = `${serverRoot}/ConceptMap/${nameRoot}-v${cm.version}`
+        let result = await putResource(qryRC,rc,true)
+        if (result) {
+            //A result is returned if there is an error
+            res.status(400).json({msg:"Unable to create release candidate"})
+            return
+        }
+
+        //now update the dev version
+        cm.version ++       //update the version
+        let qry1 = `${serverRoot}/ConceptMap/${cm.id}`
+        let result1 = await putResource(qry1,cm,true)
+
+        if (result1) {
+            //A result is returned if there is an error
+            res.status(400).json({msg:"Unable to update the dev version"})
+            return
+        }
+
+        res.json()
+
+    })
+
+    //get current release candidate - if need to edit it..
+
+/*
+    //publish release candidate
+    app.post('/nzhts/ConceptMap/publishRC',async function(req,res) {
+
+        let cm = req.body       //cm is the curent dev version
+
+    })
+
+*/
+
+
+
+    //-----------------------------------------------
 
     app.get('/termQuery',async function(req,res) {
 

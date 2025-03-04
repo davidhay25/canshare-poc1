@@ -1,181 +1,257 @@
-<!--
-<div class="pull-right">
-  <a target="_blank" href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653">Concept Map spreadsheet</a>
-</div>
-<div class="clearfix"></div>
--->
-
-<!--
-<style>
-
-  textarea {
-    height: auto;  /* Adjust height as needed */
-    min-height: 200px;
-    overflow: auto; /* Ensure content doesn't get hidden */
-  }
-</style>
--->
 
 <br/>
-<div class="row">
-  <div class="col-md-2">
-    <button ng-show="input.cmData"
-         class="btn-link btn" ng-click="parseCMFile(input.cmData)">Parse content</button>
-  </div>
-  <div class="col-md-2">
-    <!--
-    <div ng-show="previousCMSS">
-      <button class="btn-link btn" ng-click="reloadCMSS(input.cmData)">Reload previous (Development only)</button>
 
+<uib-tabset>
+
+  <uib-tab ng-if="false" heading="View ConceptMap versions">
+
+    <button class="btn btn-link" ng-click="getConceptMapVersions()">Refresh list</button>
+
+
+    <table class="table-bordered table">
+      <tr ng-repeat="cm in allConceptMaps.entry">
+        <td>{{cm.resource.id}}</td>
+        <td>{{cm.resource.url}}</td>
+        <td>{{cm.resource.status}}</td>
+        <td>{{cm.resource.version}}</td>
+
+      </tr>
+    </table>
+
+    <pre>{{allConceptMaps | json}}</pre>
+
+
+
+  </uib-tab>
+
+  <uib-tab heading="Update ConceptMap">
+
+    <div class="row">
+
+
+
+
+
+
+
+      <div class="col-md-2">
+        <button ng-show="input.cmData"
+                class="btn-link btn" ng-click="parseCMFile(input.cmData)">Parse content</button>
+      </div>
+      <div class="col-md-2">
+        <!--
+        <div ng-show="previousCMSS">
+          <button class="btn-link btn" ng-click="reloadCMSS(input.cmData)">Reload previous (Development only)</button>
+
+
+        </div>
+        -->
+      </div>
+      <div class="col-md-2">
+        <div>
+          <button class="btn-link btn" ng-click="loadCurrent()">Download from Term. server</button>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <a class="btn" target="_blank" href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653">Concept Map spreadsheet</a>
+
+      </div>
+      <div class="col-md-4">
+        <div class="pull-right" ng-show="conceptMap && user.email">
+          <button   class="btn btn-danger " ng-click="uploadConceptMap(input.publishCMVer)">Upload ConceptMap</button>
+          <checkbox ng-model="input.publishCMVer"></checkbox> Release Candidate {{previousVersion}}
+        </div>
+
+      </div>
 
     </div>
-    -->
-  </div>
-  <div class="col-md-2">
-    <div>
-      <button class="btn-link btn" ng-click="loadCurrent()">Download from Term. server</button>
-    </div>
-  </div>
-  <div class="col-md-2">
-    <a class="btn" target="_blank" href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653">Concept Map spreadsheet</a>
 
-  </div>
-  <div class="col-md-4">
-    <div class="pull-right" ng-show="conceptMap && user.email">
-      <button   class="btn btn-danger " ng-click="uploadConceptMap()">Upload ConceptMap</button>
-      <checkbox ng-model="input.publishCMVer"></checkbox> Release version
-    </div>
+    <div class="row">
 
-  </div>
+      <div class="col-md-12">
+        <uib-tabset>
 
-</div>
+          <uib-tab  heading="Versions">
+            <button class="btn btn-link" ng-click="getConceptMapVersions()">Refresh list</button>
 
-<div class="row">
-
-  <div class="col-md-12">
-    <uib-tabset>
-
-      <uib-tab  heading="Table">
-        <br/>
-
-        <div class="row">
-          <div class="col-md-3">
-            <div class="list-group">
-              <div ng-class="{'list-group-item':true,listItemSelected:element == input.cmElement}"
-                   ng-click="selectCmElement(element)"
-                   style="cursor: pointer"
-                   ng-repeat="element in conceptMap.group[0].element">
-                {{element.display}}
-                <span class="pull-right badge">{{element.target.length}}</span>
+            <div class="pull-right">
+              <div ng-if="activeRC">
+                There is a Release Candidate ({{previousVersion}}) being tested. It can be edited or published,
+                but a new one cannot be created until it has been published.
               </div>
 
-            </div>
-          </div>
-          <div class="col-md-9" ng-if="input.cmElement">
-
-            <div class="banner">
-              {{input.cmElement.display}} ({{input.cmElement.code}})
+              <div ng-hide="activeRC">
+                There is not currently any Release Candidate. When ready, one can be created from the development version.
+              </div>
             </div>
 
-            <uib-tabset>
-              <uib-tab heading="Targets">
-                <div class="myScroll">
-                  <table class="table-bordered table-condensed table">
-                    <tr><th>Target VS / code</th><th>Depends On elements</th></tr>
-                    <tr ng-repeat="target in input.cmElement.target">
 
-                      <td>
-                        <div ng-if = "target.code.indexOf('http') > -1 " class="clickable" ng-click="viewVS(target.code)">{{target.display}}</div>
-                          <div ng-if = "target.code.indexOf('http') == -1 ">{{target.display}} ({{target.code}})</div>
+                <table ng-if="allConceptMaps" class="table-bordered table">
+                  <tr><th>Id</th><th>Identifier</th><th>Status</th><th>Version</th><th>Last updated</th><th>Action</th></tr>
+                  <tr ng-repeat="cm in allConceptMaps.entry">
+                    <td>
+                      <div class="clickable" ng-click="selectCM(cm.resource.id)">{{cm.resource.id}}</div></td>
+                    <td>{{cm.resource.identifier.value}}</td>
+                    <td>{{cm.resource.status}}</td>
+                    <td>{{cm.resource.version}}</td>
+                    <td>{{cm.resource.meta.lastUpdated | date}}</td>
+                    <td>
+                      <div ng-if="cm.resource.id == 'canshare-select-valueset-map-dev' && activeRC">
+                          Release Candidate {{previousVersion}} currently in testing</div>
 
-                        <!--
-                        <div>{{target.code | lastInUrl}}</div>
-                        -->
-                        <div>Row: {{target.comment}}</div>
+                      <div class="clickable" ng-if="cm.resource.id == 'canshare-select-valueset-map-dev' && ! activeRC"
+                        ng-click="makeRC(cm.resource.version)">
+                        Create as release candidate, version {{cm.resource.version}}</div>
 
-                      </td>
-                      <td>
-                        <table class="table-bordered table-condensed table">
-                          <tr><th>Property</th><th>Value</th><th>Display</th></tr>
-                          <tr ng-repeat = "don in target.dependsOn">
-                            <td>{{don.property}}</td>
-                            <td>{{don.value}}</td>
-                            <td>{{don.display}}</td>
-                          </tr>
-                        </table>
+                      <div class="clickable" ng-if="cm.resource.id == activeRCVersion"
+                           ng-click="publishRC(cm.resource.version)">
+                        Publish this release candidate
+                      </div>
 
-                      </td>
-                    </tr>
-                  </table>
+                    </td>
+
+                  </tr>
+                </table>
+
+
+
+
+
+            <!--
+            <pre>{{allConceptMaps | json}}</pre>
+            -->
+
+          </uib-tab>
+
+          <uib-tab  heading="Table">
+            <br/>
+            <strong>Elements</strong>
+            <div class="row">
+              <div class="col-md-3">
+
+                <div class="list-group">
+                  <div ng-class="{'list-group-item':true,listItemSelected:element == input.cmElement}"
+                       ng-click="selectCmElement(element)"
+                       style="cursor: pointer"
+                       ng-repeat="element in conceptMap.group[0].element">
+                    {{element.display}}
+                    <span class="pull-right badge">{{element.target.length}}</span>
+                  </div>
+
+                </div>
+              </div>
+              <div class="col-md-9" ng-if="input.cmElement">
+
+                <div class="banner">
+                  {{input.cmElement.display}} ({{input.cmElement.code}})
                 </div>
 
+                <uib-tabset>
+                  <uib-tab heading="Targets">
+                    <div class="myScroll">
+                      <table class="table-bordered table-condensed table">
+                        <tr><th>Target VS / code</th><th>Depends On elements</th></tr>
+                        <tr ng-repeat="target in input.cmElement.target">
 
-              </uib-tab>
+                          <td>
+                            <div ng-if = "target.code.indexOf('http') > -1 " class="clickable" ng-click="viewVS(target.code)">{{target.display}}</div>
+                            <div ng-if = "target.code.indexOf('http') == -1 ">{{target.display}} ({{target.code}})</div>
 
+                            <!--
+                            <div>{{target.code | lastInUrl}}</div>
+                            -->
+                            <div>Row: {{target.comment}}</div>
 
-              <uib-tab heading="Element Json">
-                <pre>{{input.cmElement | json}}</pre>
-              </uib-tab>
+                          </td>
+                          <td>
+                            <table class="table-bordered table-condensed table">
+                              <tr><th>Property</th><th>Value</th><th>Display</th></tr>
+                              <tr ng-repeat = "don in target.dependsOn">
+                                <td>{{don.property}}</td>
+                                <td>{{don.value}}</td>
+                                <td>{{don.display}}</td>
+                              </tr>
+                            </table>
 
-            </uib-tabset>
-          </div>
-        </div>
-
-      </uib-tab>
-
-      <uib-tab heading="Paste from spreadsheet">
-        <div class="alert alert-warning">NOTE: The second column (column B) will be removed</div>
-        <div class="myScroll">
-          <textarea id="pastetextbox" rows="20" class="form-control" ng-paste="handlePaste($event)" ng-model="input.cmData"></textarea>
-        </div>
-
-
-      </uib-tab>
-
-      <uib-tab>
-        <uib-tab-heading>Parsing errors <span class="badge">{{arLog.length}}</span> </uib-tab-heading>
-
-        <div>
-          <div class="pull-right">
-            <checkbox  ng-model="input.hideVSIssues"></checkbox> Hide ValueSet issues
-          </div>
-
-        </div>
-
-        <table class="table table-condensed table-bordered">
-          <tr ng-if="canShowRow(row)"
-                  ng-repeat="row in arLog">
-            <td>{{row.line}}</td>
-            <td>{{row.msg}}</td>
-          </tr>
-        </table>
-      </uib-tab>
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
 
 
-      <uib-tab ng-if="conceptMap" heading="ValueSets used">
-        <br/>
-        <table class="table table-bordered">
-          <tr><th>ValueSet Name</th><th>Rows where referenced</th></tr>
-          <tr ng-repeat="item in lstVSUsed">
-            <td>
-              <div  class="clickable" ng-click="viewVS(item.url)">{{item.url}}</div>
+                  </uib-tab>
 
-            </td>
-            <td>
-              <div ng-repeat="row in item.rows">
-                {{row.type}}: {{row.row}} <span ng-show="row.target">(target = <span class="clickable" ng-click="viewVS(row.target)">{{row.target}}</span>)</span>
+
+                  <uib-tab heading="Element Json">
+                    <pre>{{input.cmElement | json}}</pre>
+                  </uib-tab>
+
+                </uib-tabset>
               </div>
-            </td>
-          </tr>
-        </table>
+            </div>
 
-      </uib-tab>
+          </uib-tab>
 
-      <uib-tab ng-if="conceptMap" heading="ConceptMap Json">
-        <pre>{{conceptMap | json}}</pre>
-      </uib-tab>
-    </uib-tabset>
+          <uib-tab heading="Paste from spreadsheet">
+            <div class="alert alert-warning">NOTE: The second column (column B) will be removed</div>
+            <div class="myScroll">
+              <textarea id="pastetextbox" rows="20" class="form-control" ng-paste="handlePaste($event)" ng-model="input.cmData"></textarea>
+            </div>
 
-  </div>
-</div>
+
+          </uib-tab>
+
+          <uib-tab>
+            <uib-tab-heading>Parsing errors <span class="badge">{{arLog.length}}</span> </uib-tab-heading>
+
+            <div>
+              <div class="pull-right">
+                <checkbox  ng-model="input.hideVSIssues"></checkbox> Hide ValueSet issues
+              </div>
+
+            </div>
+
+            <table class="table table-condensed table-bordered">
+              <tr ng-if="canShowRow(row)"
+                  ng-repeat="row in arLog">
+                <td>{{row.line}}</td>
+                <td>{{row.msg}}</td>
+              </tr>
+            </table>
+          </uib-tab>
+
+
+          <uib-tab ng-if="conceptMap" heading="ValueSets used">
+            <br/>
+            <table class="table table-bordered">
+              <tr><th>ValueSet Name</th><th>Rows where referenced</th></tr>
+              <tr ng-repeat="item in lstVSUsed">
+                <td>
+                  <div  class="clickable" ng-click="viewVS(item.url)">{{item.url}}</div>
+
+                </td>
+                <td>
+                  <div ng-repeat="row in item.rows">
+                    {{row.type}}: {{row.row}} <span ng-show="row.target">(target = <span class="clickable" ng-click="viewVS(row.target)">{{row.target}}</span>)</span>
+                  </div>
+                </td>
+              </tr>
+            </table>
+
+          </uib-tab>
+
+          <uib-tab ng-if="conceptMap" heading="ConceptMap Json">
+            <pre>{{conceptMap | json}}</pre>
+          </uib-tab>
+        </uib-tabset>
+
+      </div>
+    </div>
+
+
+  </uib-tab>
+
+</uib-tabset>
+
+
 

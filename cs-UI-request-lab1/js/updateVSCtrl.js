@@ -185,23 +185,50 @@ angular.module("pocApp")
             }
 
 
-            
-            $scope.uploadConceptMap = function () {
-                let ver = 'draft'
-                if ($scope.input.publishCMVer) {
-                    ver = 'release'
+            //save the concept map. This will either be the dev version, or the most recent release candidate
+            //versioning doc: http://docs.google.com/document/d/1kVkdTc4wrHrU-04z30WCbMGr9XHBFeSNaBLycVvZZ_U/edit?tab=t.0
+            $scope.uploadConceptMap = function (rc) {
+                //if rc is true, then updating the release candidate
+
+                let nameRoot = 'canshare-select-valueset-map'
+
+                let version = "development"
+                if (rc) {
+                    version = `Release Candidate ${$scope.previousVersion}`
                 }
 
-                let msg = `This will update the ${ver} version of the ConceptMap. Are you sure you wish to do this. It will take several seconds.`
+
+                let msg = `This will update the ${version} version of the ConceptMap. Are you sure you wish to do this. It will take several seconds.`
                 if (confirm(msg)) {
                     //if the 'release version' is not checked then add '-dev' as a suffix to the id
 
+                    if (rc) {
+                        //Updating a specific Release Candidate
+                        $scope.conceptMap.id = `${nameRoot}-v${$scope.previousVersion}`
+                        $scope.conceptMap.url = `http://canshare.co.nz/fhir/ConceptMap/${nameRoot}-v${$scope.previousVersion}`
+                        $scope.conceptMap.identifier.value = $scope.conceptMap.id
+                        $scope.conceptMap.title = `Canshare select valueset map, Release Candidate ${$scope.previousVersion}`
+                        $scope.conceptMap.status = 'draft'
+                        $scope.conceptMap.version = $scope.previousVersion
+
+                    } else {
+                        //updating the development version
+                        $scope.conceptMap.id = `${nameRoot}-dev`
+                        $scope.conceptMap.url = `http://canshare.co.nz/fhir/ConceptMap/${nameRoot}-dev`
+                        $scope.conceptMap.identifier.value = $scope.conceptMap.id
+                        $scope.conceptMap.title = `Canshare select valueset map, development version`
+                        $scope.conceptMap.status = 'active'
+
+                    }
+
+/*
                     //Add '-dev' to the id if not release
                     if (! $scope.input.publishCMVer) {
                         let id = $scope.conceptMap.id
                         //ensure the suffix is only added once
 
-                        if (id.indexOf('-dev' == -1)) {
+                        if (rc) {
+                            //If this is the RC, then e
                             $scope.conceptMap.id = `${$scope.conceptMap.id}-dev`
                             $scope.conceptMap.url = `${$scope.conceptMap.url}-dev`
                             $scope.conceptMap.title = `${$scope.conceptMap.title}-development version`
@@ -209,9 +236,12 @@ angular.module("pocApp")
                         }
 
                     }
+                    */
 
+                    console.log($scope.conceptMap)
 
-                    //return
+                    return  //temp
+
                     let url = `/nzhts/ConceptMap/${$scope.conceptMap.id}`
                     $http.put(url,$scope.conceptMap).then(
                         function (data) {
@@ -228,7 +258,101 @@ angular.module("pocApp")
             }
 
 
-            //app.post('/nzhts/setSyndication',async function(req,res) {
+            $scope.publishRC = function (version) {
+                let msg = `This will publish the release candidate for version ${version} and make it the current version. Are you sure you wish to do this?`
+                if (confirm(msg)) {
+                    $http.post('/nzhts/ConceptMap/publishRC',{version:version}).then(
+                        function (data) {
+                           // alert(data.data)
+                            alert("The Release Candidate has been published.")
+                            $scope.getConceptMapVersions()
+                        }, function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+                }
+            }
+
+            //make a release candidate from the current dev CS
+            $scope.makeRC = function (version) {
+                let msg = `This will create a new release candidate for version ${version} from the dev version. Are you sure you wish to do this?`
+                if (confirm(msg)) {
+                    $http.post('/nzhts/ConceptMap/makeRC',$scope.conceptMap).then(
+                        function (data) {
+                            alert("The new Release Candidate has been created.")
+                            $scope.getConceptMapVersions()
+                        }, function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+                }
+
+
+
+            }
+
+            //get all the versions of the Conceptmap on the server
+            $scope.getConceptMapVersions = function () {
+                let qry = `/nzhts/ConceptMap/allVersions`
+                $scope.showWaiting = true
+                $http.get(qry).then(
+                    function (data) {
+                        $scope.allConceptMaps = data.data
+
+                        //get the next version number
+                        //$scope.nextVersion = 2         //as we're developing versioning after the first publication
+
+                        //get the current dev version. It will have the next version to release
+                        for (const entry of $scope.allConceptMaps.entry) {
+                            if (entry.resource.id == 'canshare-select-valueset-map-dev') {
+                                $scope.nextVersion = entry.resource.version
+                                break
+                            }
+                        }
+
+                        //so now we know what the next version is going to be. Is there a current RC waiting for release?
+                        //ie, is there a CM with status=draft and version = previous version. If there is:
+                        //      It can be formally published
+                        //      The dev version cannot be made a release candidate
+                        $scope.previousVersion = $scope.nextVersion -1
+                        delete $scope.activeRCVersion
+
+
+                        $scope.activeRC = false     //If there's an active RC, then it can be published, but a new one can't be created
+
+                        for (const entry of $scope.allConceptMaps.entry) {
+                            if (entry.resource.id == `canshare-select-valueset-map-v${$scope.previousVersion}`) {
+                                //this is the previous version. If it is draft then it is still being reviewed
+                                if (entry.resource.status == 'draft') {
+                                    $scope.activeRCVersion = entry.resource.id
+                                    $scope.activeRC = true
+                                }
+
+                                break
+                            }
+                        }
+
+
+
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                ).finally(
+                    function () {
+                        $scope.showWaiting = false
+                    }
+                )
+            }
+            $scope.getConceptMapVersions()
+
+            //called by versions - view a specific CM
+            $scope.selectCM = function (cmId) {
+                alert("will retrieve the CM and display it in the table view")
+
+            }
+
+
+
 
             // ============ VS Batch upload functions ===========
 
@@ -245,13 +369,11 @@ angular.module("pocApp")
             $scope.parseVSBatchFile = function (file) {
 
                 let arLines = file.split('\n')
-                console.log(arLines.length)
+                //console.log(arLines.length)
 
                 arLines.splice(0,1)     //the first line is a header line
 
                 $scope.arVSBatchLog = terminologyUpdateSvc.auditVSBatchFile(arLines)
-
-               // $localStorage.previousVSBatch = arLines
 
                 $scope.vsBatch = terminologyUpdateSvc.makeVSBatch(arLines)
                 $scope.vsBatchReport = terminologyUpdateSvc.VSBatchReport($scope.vsBatch,$scope.allVSItem)
@@ -871,10 +993,6 @@ angular.module("pocApp")
                     performUpdate($scope.selectedVS)
 
                 }
-
-
-
-
             }
 
             $scope.newVS = function () {
