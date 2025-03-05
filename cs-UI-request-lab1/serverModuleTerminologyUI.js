@@ -41,6 +41,8 @@ async function getNZHTSAccessToken() {
         currentToken.token = result.data['access_token']
         //set the expiry to an hour (even though, in theory, we have 24 hours)
         currentToken.expires = new Date().getTime() + 60 * 60 * 1000
+
+
         return currentToken.token
     } catch (ex) {
         console.log(ex)
@@ -546,65 +548,6 @@ function setup(app) {
 
 
 
-    //queries against the Terminology Server
-
-    app.get('/nzhts',async function(req,res){
-        let query = req.query.qry
-
-        let headers = req.headers
-
-
-        //The instance of the TS server that will be queried
-        let tsInstance = nzhtsconfig.serverBaseAuthor
-        if (headers['x-ts-instance'] == 'prod') {
-            tsInstance = nzhtsconfig.serverBaseProd
-        }
-
-        //disabling wth term server down...
-
-        //let qry = req.query.query || `https://authoring.nzhts.digital.health.nz/fhir/ValueSet/$expand?url=https://nzhts.digital.health.nz/fhir/ValueSet/canshare-data-absent-reason`
-        if (req.query.qry) {
-            let qry = tsInstance +  decodeURIComponent(req.query.qry)
-
-            //need to re-urlencode the |
-            qry = qry.split('|').join("%7c")
-
-
-            let token = await getNZHTSAccessToken()
-            //console.log(`nzhts query: ${req.query.qry}`)
-            if (token) {
-
-                var decoded = jwt_decode(token);
-               // let timeToExpire = decoded.exp * 1000 - Date.now()       //exp is in seconds
-               // console.log(timeToExpire / (1000 * 60 *60 ));
-
-                let config = {headers:{authorization:'Bearer ' + token}}
-                config['content-type'] = "application/fhir+json"
-
-                axios.get(qry,config).then(function(data) {
-
-                    res.json(data.data)
-
-                }).catch(function(ex) {
-                    if (ex.response) {
-                        //console.log("----- NOT found -----")
-                        res.status(ex.response.status).json(ex.response.data)
-                    } else {
-                        res.status(500).json(ex)
-                    }
-
-                })
-            } else {
-
-                res.status(500).json({msg:"Unable to get Access Token."})
-            }
-        } else {
-            res.status(400).json({msg:"Must have urlencoded qry query"})
-
-        }
-
-
-    })
 
 
     app.get('/generateQADEP',async function(req,res){
@@ -970,15 +913,31 @@ function setup(app) {
     })
 
     // ====================== ConceptMap functions ===================
+    let devMode = true      //indicates to use server other than NZHTS for CodeSystems. Needed for developing versioning
+    let csServerRoot = nzhtsconfig.serverBase       //codeSystem server root. Default to NZServerbase
+
+
+
+    if (devMode) {
+        csServerRoot = "http://home.clinfhir.com:8054/baseR4/"
+    }
 
     //use when updating a ConceptMap
     app.put('/nzhts/ConceptMap/:id',async function(req,res){
-
         let cm = req.body
 
+        let noSyndicate = false
+        if (devMode) {
+            noSyndicate = true
+        }
+
         if (cm) {
-            let qry = `${nzhtsconfig.serverBase}ConceptMap/${cm.id}`
-            let result = await putResource(qry,cm)
+            let qry = `${csServerRoot}ConceptMap/${cm.id}`
+            if (devMode) {
+                console.log('Put',qry)
+            }
+
+            let result = await putResource(qry,cm,noSyndicate)
             if (result) {
                 //A result is returned if there is an error
                 res.status(400).json({msg:"Unable to update ConceptMap"})
@@ -995,20 +954,17 @@ function setup(app) {
     //return the map names and next release number
     app.get('/nzhts/ConceptMap/allVersions',async function(req,res){
 
-
-        let serverHost = "https://authoring.nzhts.digital.health.nz/"
-        let qry = `${serverHost}fhir/ConceptMap?identifier=http://canshare.co.nz/fhir/NamingSystem/conceptmaps%7c`
-
-        //let serverRoot =  'http://home.clinfhir.com:8054/baseR4/'
-
-        qry = "http://home.clinfhir.com:8054/baseR4/ConceptMap?identifier=http://canshare.co.nz/fhir/NamingSystem/conceptmaps%7c"  //<<<<< just for testing
-
-
+       // let serverHost = "https://authoring.nzhts.digital.health.nz/"
+        let qry = `${csServerRoot}ConceptMap?identifier=http://canshare.co.nz/fhir/NamingSystem/conceptmaps%7c`
+        if (devMode) {
+            console.log('get',qry)
+        }
         let token = await getNZHTSAccessToken()
-        let config = {headers: {authorization: 'Bearer ' + token}}
-        config['content-type'] = "application/fhir+json"
 
         if (token) {
+            let config = {headers: {authorization: 'Bearer ' + token}}
+            config['content-type'] = "application/fhir+json"
+
             try{
 
                 let response = await axios.get(qry,config)
@@ -1016,7 +972,7 @@ function setup(app) {
 
                 res.json(bundle)
             } catch(ex) {
-                res.status(500).json(ex)
+                res.status(500).json({msg:ex.message})
             }
 
         } else {
@@ -1026,25 +982,34 @@ function setup(app) {
     })
 
 
-    //publish RC
+    //publish RC. Supply the version in the call
     app.post('/nzhts/ConceptMap/publishRC',async function(req,res){
         let version = req.body.version
 
         let nameRoot = 'canshare-select-valueset-map'
-        let serverRoot =  'http://home.clinfhir.com:8054/baseR4/'   //note - will need to get a token for nzhts and set syndicate
+        //let serverRoot =  'http://home.clinfhir.com:8054/baseR4/'   //note - will need to get a token for nzhts and set syndicate
 
-        //first, retrieve the RC and update the status
-        //let rcId = `${nameRoot}-v${version}`
-        //let qryRC = `${serverRoot}/ConceptMap/${nameRoot}-dev`
+        //if developing then don't update the syndication
+        let noSyndicate = false
+        if (devMode) {
+            noSyndicate = true
+        }
 
         try {
-            let qryRC = `${serverRoot}/ConceptMap/${nameRoot}-v${version}`
+
+            let qryRC = `${csServerRoot}ConceptMap/${nameRoot}-v${version}`
+
+            if (devMode) {
+                console.log('publishRC',qryRC)
+            }
+
+
             let response = await axios.get(qryRC)
             let cm = response.data      //the conceptmap
             cm.status = "active"
 
 
-            let result = await putResource(qryRC,cm,true)
+            let result = await putResource(qryRC,cm,noSyndicate)
             if (result) {
                 //A result is returned if there is an error
                 res.status(400).json({msg:"Unable to update release candidate status"})
@@ -1060,8 +1025,8 @@ function setup(app) {
             cm.url = `http://canshare.co.nz/fhir/ConceptMap/${nameRoot}`
             cm.title = `Canshare select valueset map, current version`
 
-            let updateCurrent = `${serverRoot}/ConceptMap/${nameRoot}`
-            let result1 = await putResource(updateCurrent,cm,true)
+            let updateCurrent = `${csServerRoot}/ConceptMap/${nameRoot}`
+            let result1 = await putResource(updateCurrent,cm,noSyndicate)
             if (result1) {
                 //A result is returned if there is an error
                 res.status(400).json({msg:"Unable to update the current version"})
@@ -1075,78 +1040,174 @@ function setup(app) {
 
 
 
-
-
-        //next save it as the current version
-
-
-
-
-
-
         res.json({id:version})
 
     })
 
-    //make release candidate. Pass in the dev version.
+    //make release candidate.
     app.post('/nzhts/ConceptMap/makeRC',async function(req,res){
         let nameRoot = 'canshare-select-valueset-map'
-        //let serverRoot = 'https://hapi.fhir.org/baseR4'
-        let serverRoot =  'http://home.clinfhir.com:8054/baseR4/'   //note - will need to get a token for nzhts
 
         //retrieve the dev version
-        let qryDev = `${serverRoot}/ConceptMap/${nameRoot}-dev`
-        let response = await axios.get(qryDev)
-        let cm = response.data      //the conceptmap
-
-        //create the RC
-        let rc = JSON.parse(JSON.stringify(cm))         //make a copy
-        rc.id = `${nameRoot}-v${cm.version}`   //the dev version is the RC
-        rc.url = `http://canshare.co.nz/fhir/ConceptMap/${nameRoot}-v${cm.version}`
-        rc.title = `Canshare select valueset map, Release Candidate version ${cm.version}`
-        rc.status = 'draft'
-
-        let identifier = {system:"http://canshare.co.nz/fhir/NamingSystem/conceptmaps"}
-        identifier.value = rc.id
-        rc.identifier = identifier
-        let qryRC = `${serverRoot}/ConceptMap/${nameRoot}-v${cm.version}`
-        let result = await putResource(qryRC,rc,true)
-        if (result) {
-            //A result is returned if there is an error
-            res.status(400).json({msg:"Unable to create release candidate"})
-            return
+        let qryDev = `${csServerRoot}/ConceptMap/${nameRoot}-dev`
+        let noSyndicate = false
+        if (devMode) {
+            noSyndicate = true
         }
 
-        //now update the dev version
-        cm.version ++       //update the version
-        let qry1 = `${serverRoot}/ConceptMap/${cm.id}`
-        let result1 = await putResource(qry1,cm,true)
 
-        if (result1) {
-            //A result is returned if there is an error
-            res.status(400).json({msg:"Unable to update the dev version"})
-            return
+        if (devMode) {
+            console.log('make rc',qryDev)
         }
 
-        res.json()
+        let token = await getNZHTSAccessToken()
+
+
+        if (token) {
+            let config = {headers: {authorization: 'Bearer ' + token}}
+            config['content-type'] = "application/fhir+json"
+            try {
+
+                let response = await axios.get(qryDev,config)
+                let cm = response.data      //the conceptmap
+
+                //create the RC
+                let rc = JSON.parse(JSON.stringify(cm))         //make a copy
+                rc.id = `${nameRoot}-v${cm.version}`   //the dev version is the RC version
+                rc.url = `http://canshare.co.nz/fhir/ConceptMap/${nameRoot}-v${cm.version}`
+                rc.title = `Canshare select valueset map, Release Candidate version ${cm.version}`
+                rc.status = 'draft'
+
+                let identifier = {system: "http://canshare.co.nz/fhir/NamingSystem/conceptmaps"}
+                identifier.value = rc.id
+                rc.identifier = identifier
+                let qryRC = `${csServerRoot}/ConceptMap/${nameRoot}-v${cm.version}`
+
+                if (devMode) {
+                    console.log('qryRC',qryRC)
+                }
+
+                let result = await putResource(qryRC, rc, noSyndicate)
+                if (result) {
+                    //A result is returned if there is an error
+                    res.status(500).json({msg: "Unable to create release candidate"})
+                    return
+                }
+
+                //now update the dev version
+                cm.version = cm.version || 0
+                cm.version++       //update the version
+                let qry1 = `${csServerRoot}/ConceptMap/${cm.id}`
+                let result1 = await putResource(qry1, cm, noSyndicate)
+
+                if (result1) {
+                    //A result is returned if there is an error
+                    res.status(500).json({msg: "Unable to update the dev version"})
+                    return
+                }
+
+                res.json()
+            } catch (ex) {
+                res.status(500).json({msg:ex.message})
+            }
+        } else {
+            res.status(500).json({msg:ex.message})
+        }
 
     })
 
-    //get current release candidate - if need to edit it..
 
-/*
-    //publish release candidate
-    app.post('/nzhts/ConceptMap/publishRC',async function(req,res) {
+    app.get('/nzhts/ConceptMap/:id',async function(req,res){
 
-        let cm = req.body       //cm is the curent dev version
+        let cmId = req.params.id
+        let qry = `${csServerRoot}ConceptMap/${cmId}?_summary=false`
 
+        if (devMode) {
+            console.log('get',qry)
+        }
+
+        let token = await getNZHTSAccessToken()
+        if (token) {
+            try {
+                let config = {headers:{authorization:'Bearer ' + token}}
+                config['content-type'] = "application/fhir+json"
+
+                let response = await axios.get(qry,config)
+                res.json(response.data)
+
+            } catch (e) {
+                res.status(500).json({msg: e.message})
+            }
+        } else {
+            res.status(500).json({msg: "Error getting token"})
+        }
     })
 
-*/
 
 
 
     //-----------------------------------------------
+
+    //general queries against the Terminology Server
+
+    app.get('/nzhts',async function(req,res){
+        let query = req.query.qry
+
+        let headers = req.headers
+
+
+        //The instance of the TS server that will be queried
+        let tsInstance = nzhtsconfig.serverBaseAuthor
+        if (headers['x-ts-instance'] == 'prod') {
+            tsInstance = nzhtsconfig.serverBaseProd
+        }
+
+        //disabling wth term server down...
+
+        //let qry = req.query.query || `https://authoring.nzhts.digital.health.nz/fhir/ValueSet/$expand?url=https://nzhts.digital.health.nz/fhir/ValueSet/canshare-data-absent-reason`
+        if (req.query.qry) {
+            let qry = tsInstance +  decodeURIComponent(req.query.qry)
+
+            //need to re-urlencode the |
+            qry = qry.split('|').join("%7c")
+
+
+            let token = await getNZHTSAccessToken()
+            //console.log(`nzhts query: ${req.query.qry}`)
+            if (token) {
+
+                var decoded = jwt_decode(token);
+                // let timeToExpire = decoded.exp * 1000 - Date.now()       //exp is in seconds
+                // console.log(timeToExpire / (1000 * 60 *60 ));
+
+                let config = {headers:{authorization:'Bearer ' + token}}
+                config['content-type'] = "application/fhir+json"
+
+                axios.get(qry,config).then(function(data) {
+
+                    res.json(data.data)
+
+                }).catch(function(ex) {
+                    if (ex.response) {
+                        //console.log("----- NOT found -----")
+                        res.status(ex.response.status).json(ex.response.data)
+                    } else {
+                        res.status(500).json(ex)
+                    }
+
+                })
+            } else {
+
+                res.status(500).json({msg:"Unable to get Access Token."})
+            }
+        } else {
+            res.status(400).json({msg:"Must have urlencoded qry query"})
+
+        }
+
+
+    })
+
 
     app.get('/termQuery',async function(req,res) {
 

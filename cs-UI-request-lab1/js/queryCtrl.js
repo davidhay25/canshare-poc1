@@ -3,7 +3,7 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,$uibModal,$q,$timeout,querySvc,utilsSvc,cmSvc,$window) {
 
             $scope.input = {}
-            //$scope.input.mainTabActive = 1      //just while developing - selects that conceptmap tab
+            $scope.input.mainTabActive = 1      //just while developing - selects that conceptmap tab
 
             let vsPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/"
 

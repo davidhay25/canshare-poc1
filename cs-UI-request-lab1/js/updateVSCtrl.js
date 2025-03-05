@@ -10,6 +10,8 @@ angular.module("pocApp")
             let nzDisplayLanguage = "en-x-sctlang-23162100-0210105"
             let snomed = "http://snomed.info/sct"
 
+            $scope.input.csMapOnly = true
+
             //delete any previous batch - cal remove later
             delete $localStorage.previousVSBatch
             delete $localStorage.previousCMSS
@@ -28,7 +30,7 @@ angular.module("pocApp")
 
 
             //get the CodeSystem used for pre published codes
-            updateVSSvc.getCodeSystem(csId,systemPrePub).then(
+            updateVSSvc.getCodeSystem(csId, systemPrePub).then(
                 function (cs) {
                     $scope.prePubCS = cs
 
@@ -43,10 +45,10 @@ angular.module("pocApp")
             )
 
 
-            $scope.updateTest = function() {
+            $scope.updateTest = function () {
                 if (confirm("This will copy all DG & Compositions from the Production Library to the Test Library. Are you sure?")) {
                     $scope.showWaiting = true
-                    $http.post('/library/backupProdToTest',{}).then(
+                    $http.post('/library/backupProdToTest', {}).then(
                         function (data) {
                             $scope.showWaiting = false
                             alert("Backup complete. All DataGroups & Compositions have been copied from the Production Library to the Test Library.")
@@ -66,7 +68,7 @@ angular.module("pocApp")
                 $http.get(fullQry).then(
                     function (data) {
                         console.log(data)
-                    },function () {
+                    }, function () {
 
                     }
                 )
@@ -78,11 +80,10 @@ angular.module("pocApp")
 
                 let host = `http://poc.canshare.co.nz/query.html?${name}`
 
-                $scope.localCopyToClipboard (host)
+                $scope.localCopyToClipboard(host)
                 alert(`Link: ${host} \ncopied to clipBoard`);
 
             }
-
 
 
             //============================== update ConceptMap functions
@@ -93,7 +94,7 @@ angular.module("pocApp")
             //just during development...
             $scope.reloadCMSSDEP = function () {
                 //reload the last 'file' copied in...
-                let vo1 = terminologyUpdateSvc.auditCMFile($scope.previousCMSS,$scope.allVSItem)
+                let vo1 = terminologyUpdateSvc.auditCMFile($scope.previousCMSS, $scope.allVSItem)
                 $scope.arLog = vo1.log
                 $scope.lstVSUsed = vo1.lstVSUsed
                 //console.log(arLog)
@@ -107,7 +108,7 @@ angular.module("pocApp")
                 $scope.input.cmElement = element
             }
 
-            $scope.loadCurrent= function () {
+            $scope.loadCurrent = function () {
                 //download the current CM
                 $scope.canUpdate = false        //stop it being uploaded again
 
@@ -134,9 +135,9 @@ angular.module("pocApp")
                 let arLines = file.split('\n')
                 console.log(arLines.length)
 
-                arLines.splice(0,2)     //the first 2 lines are header lines
+                arLines.splice(0, 2)     //the first 2 lines are header lines
 
-                let vo1 = terminologyUpdateSvc.auditCMFile(arLines,$scope.allVSItem)
+                let vo1 = terminologyUpdateSvc.auditCMFile(arLines, $scope.allVSItem)
                 $scope.arLog = vo1.log
 
 
@@ -153,13 +154,13 @@ angular.module("pocApp")
                 $uibModal.open({
                     templateUrl: 'modalTemplates/viewVS.html',
                     backdrop: 'static',
-                    size : 'lg',
+                    size: 'lg',
                     controller: 'viewVSCtrl',
 
                     resolve: {
                         url: function () {
                             return url
-                        }, refsetId : function () {
+                        }, refsetId: function () {
                             return ""
                         }
                     }
@@ -175,10 +176,10 @@ angular.module("pocApp")
                 return true
             }
 
-            $scope.handlePaste = function(event) {
-                setTimeout(function() {
-                var textarea = document.getElementById('pastetextbox');
-                textarea.scrollTop = 0;  // Scroll to the top
+            $scope.handlePaste = function (event) {
+                setTimeout(function () {
+                    var textarea = document.getElementById('pastetextbox');
+                    textarea.scrollTop = 0;  // Scroll to the top
                 }, 0);  // Wait for the paste to complete before updating the model
 
 
@@ -218,39 +219,23 @@ angular.module("pocApp")
                         $scope.conceptMap.identifier.value = $scope.conceptMap.id
                         $scope.conceptMap.title = `Canshare select valueset map, development version`
                         $scope.conceptMap.status = 'active'
+                        $scope.conceptMap.version = $scope.nextVersion
 
                     }
 
-/*
-                    //Add '-dev' to the id if not release
-                    if (! $scope.input.publishCMVer) {
-                        let id = $scope.conceptMap.id
-                        //ensure the suffix is only added once
-
-                        if (rc) {
-                            //If this is the RC, then e
-                            $scope.conceptMap.id = `${$scope.conceptMap.id}-dev`
-                            $scope.conceptMap.url = `${$scope.conceptMap.url}-dev`
-                            $scope.conceptMap.title = `${$scope.conceptMap.title}-development version`
-                            $scope.conceptMap.status = 'draft'
-                        }
-
-                    }
-                    */
 
                     console.log($scope.conceptMap)
 
-                    return  //temp
+                    // return  //temp
 
                     let url = `/nzhts/ConceptMap/${$scope.conceptMap.id}`
-                    $http.put(url,$scope.conceptMap).then(
+                    $http.put(url, $scope.conceptMap).then(
                         function (data) {
                             alert("Map updated")
                         }, function (err) {
                             alert(angular.toJson(err.data))
                         }
                     )
-
 
 
                 }
@@ -261,15 +246,18 @@ angular.module("pocApp")
             $scope.publishRC = function (version) {
                 let msg = `This will publish the release candidate for version ${version} and make it the current version. Are you sure you wish to do this?`
                 if (confirm(msg)) {
-                    $http.post('/nzhts/ConceptMap/publishRC',{version:version}).then(
+                    $scope.showWaiting = true
+                    $http.post('/nzhts/ConceptMap/publishRC', {version: version}).then(
                         function (data) {
-                           // alert(data.data)
+                            // alert(data.data)
                             alert("The Release Candidate has been published.")
                             $scope.getConceptMapVersions()
                         }, function (err) {
                             alert(angular.toJson(err.data))
                         }
-                    )
+                    ).finally(function () {
+                        $scope.showWaiting = false
+                    })
                 }
             }
 
@@ -277,19 +265,21 @@ angular.module("pocApp")
             $scope.makeRC = function (version) {
                 let msg = `This will create a new release candidate for version ${version} from the dev version. Are you sure you wish to do this?`
                 if (confirm(msg)) {
-                    $http.post('/nzhts/ConceptMap/makeRC',$scope.conceptMap).then(
+                    $scope.showWaiting = true
+                    $http.post('/nzhts/ConceptMap/makeRC', $scope.conceptMap).then(
                         function (data) {
                             alert("The new Release Candidate has been created.")
                             $scope.getConceptMapVersions()
                         }, function (err) {
                             alert(angular.toJson(err.data))
                         }
-                    )
+                    ).finally(function () {
+                        $scope.showWaiting = false
+                    })
                 }
-
-
-
             }
+
+
 
             //get all the versions of the Conceptmap on the server
             $scope.getConceptMapVersions = function () {
@@ -351,7 +341,16 @@ angular.module("pocApp")
 
             }
 
+            $scope.showCM = function (cm,mapOnly) {
+                if (! mapOnly) {
+                    return true
+                } else {
+                    if (cm.id.indexOf("canshare-select-valueset-map") > -1) {
+                        return true
+                    }
+                }
 
+            }
 
 
             // ============ VS Batch upload functions ===========

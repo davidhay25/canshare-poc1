@@ -10,7 +10,7 @@
         }
 
         .required {
-            color:red
+            font-weight: bold;
         }
     </style>
     <div class="modal-header">
@@ -232,12 +232,15 @@
             </uib-tab>
 
             <uib-tab heading="Base model content">
-                <em class="pull-right">Content directly defined by this model</em>
-                <br/>
+                <em >Content directly defined by this model</em>
+
+
+                <div class="btn-link btn pull-right" ng-click="sort()">Sort</div>
+                <div class="clearfix"></div>
 
                 <div class="myScroll">
                     <table class="table table-bordered">
-                        <tr><th>Inx</th><th>Path</th><th>Title</th><th>Type</th><th>Description</th><th>Card.</th><th>Move</th><th>Edit</th></tr>
+                        <tr><th>Inx</th><th>Path</th><th>Level</th><th>Title</th><th>Type</th><th>Description</th><th>Card.</th><th>Move</th><th>Delete</th></tr>
                         <tr ng-repeat="element in model.diff">
                             <td>{{$index}}</td>
 
@@ -252,6 +255,7 @@
                                     {{element.path | lastInPath}}
                                 </div>
                             </td>
+                            <td>{{element.path.split('.').length - 1}}</td>
                             <td>{{element.title}}</td>
                             <td>
                                 <div ng-repeat="type in element.type">
@@ -355,15 +359,13 @@
             </uib-tab>
 
             <uib-tab heading="Expanded model" >
-                <em class="pull-right">Full expansion - parents and DataGroups</em>
+                <em>Full expansion - parents and DataGroups</em>
                 <table class="table table-bordered">
-                    <tr><th>Path</th><th>Title</th><th>Type</th><th>Code</th><th>Card.</th><th>Fixed value</th><th>Source DG</th></tr>
+                    <tr><th>Path</th><th>Title</th><th>Type</th><th>Card.</th></tr>
                     <tr ng-repeat="element in allElements"
-                        ng-class = "{required:isRequired(element),overridden: hasBeenOverridden(element)}">
+                        ng-class = "{required:isRequired(element)}">
                         <td>
                             <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
-                                <!--{{element.ed.path | dropFirstInPath}}
-                                -->
                                 {{element.ed.path | lastInPath}}
                             </div>
                         </td>
@@ -378,19 +380,9 @@
                             </div>
 
                         </td>
-                        <td>
 
-                            <div ng-repeat="code in element.ed.code">
-                                {{code.code}}
-                            </div>
-
-                        </td>
                         <td>{{element.ed.mult}}</td>
-                        <td>
-                            {{element.ed.fixedCoding}}
 
-                        </td>
-                        <td>{{element.sourceModelName}}</td>
 
                     </tr>
                 </table>
@@ -399,15 +391,7 @@
 
             </uib-tab>
 
-            <uib-tab ng-if = "false" heading="Import">
-                <button class="btn btn-link pull-right" ng-click="import(input.import)">Import</button>
 
-                <br/>
-
-                <textarea rows="10" ng-model="input.import" class="form-control"></textarea>
-
-
-            </uib-tab>
 
             <uib-tab heading="Named queries">
                 <br/>

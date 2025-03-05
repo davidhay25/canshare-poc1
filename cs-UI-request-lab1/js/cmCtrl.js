@@ -12,75 +12,108 @@ angular.module("pocApp")
 
             $scope.cmProperties = {}
 
-            // $scope.local.conceptMapTab = 3      //select the UI tab while developing
             $scope.local.uiValues = {}          //a hash of values selected in the UI
-            $scope.log= []
-
-            //temp
-            //querySvc.getAllConceptMaps()
+            $scope.log = []
 
             let snomed = "http://snomed.info/sct"
             let vsPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/"
+            $scope.loadingCM = true
 
-            //functions to get ConceptMap & expanded ValueSet..
-            //localforage is defined by the library script. uses indexedDb as the local storage in the browser...
-            //https://localforage.github.io/localForage/#data-api-getitem
-            $scope.fromCache = false
-            localforage.getItem('cmData').then(function(value) {
-                // This code runs once the value has been loaded
-                // from the offline store.
-                if (value) {
-                    //if there's a value then the data was already in the cache
-                    $scope.fromCache = true
-                    $scope.fullSelectedCM = value.cm
-                    $scope.hashExpandedVs = value.vs
-                    $scope.cacheDate = value.when
-                    console.log('retrieved cm & vs from cache')
+            function loadFromCache() {
+                //functions to get ConceptMap & expanded ValueSet..
+                //localforage is defined by the library script. uses indexedDb as the local storage in the browser...
+                //https://localforage.github.io/localForage/#data-api-getitem
+               // $scope.loadingCM = true
 
-                    console.log(`Size of ConceptMap: ${utilsSvc.getSizeOfObject($scope.fullSelectedCM)/1000} Kb`)
-                    console.log(`Size of ValueSets : ${utilsSvc.getSizeOfObject($scope.hashExpandedVs)/1000} Kb`)
+                $scope.fromCache = false
+                localforage.getItem('cmData').then(function(value) {
+                    // This code runs once the value has been loaded
+                    // from the offline store.
+                    if (value) {
+                        //if there's a value then the data was already in the cache
+                        $scope.fromCache = true
+                        $scope.fullSelectedCM = value.cm
+                        $scope.hashExpandedVs = value.vs
+                        $scope.cacheDate = value.when
+                        console.log('retrieved cm & vs from cache')
 
-                    setup()
+                        //set the CM dropdown
+                        for (const id of $scope.allCM) {
+                            if (id == $scope.fullSelectedCM.id) {
+                                $scope.input.selectCMControl = id
+                                break
+                            }
+                        }
 
-                } else {
-                    //retrieve cs & vs from the terminology server. when complete the function
-                    //fires the hashExpandedVs event which is trapped below and will save in the cache.
-                    console.log('cache empty. Retrieving from TS.')
-                    alert("Need to build the terminology cache. This will take around 20 seconds, please wait.")
-                    $scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"}})
+
+                        console.log(`Size of ConceptMap: ${utilsSvc.getSizeOfObject($scope.fullSelectedCM)/1000} Kb`)
+                        console.log(`Size of ValueSets : ${utilsSvc.getSizeOfObject($scope.hashExpandedVs)/1000} Kb`)
+
+                        setup()
+
+                    } else {
+                        //retrieve cs & vs from the terminology server. when complete the function
+                        //fires the hashExpandedVs event which is trapped below and will save in the cache.
+                        console.log('cache empty. Retrieving from TS.')
+                        alert("Need to build the terminology cache. This will take around 20 seconds, please wait.")
+                        $scope.loadCM("canshare-select-valueset-map")
+                        //$scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"}})
+                    }
+
+
+
+                }).catch(function(err) {
+                    // This code runs if there were any errors
+                    console.log(err);
+                    alert(err.message)
+                });
+            }
+
+            $http.get('/nzhts/ConceptMap/allVersions').then(
+                function (data) {
+                    $scope.allCM = []
+                    data.data.entry.forEach(function (entry) {
+                        $scope.allCM.push(entry.resource.id)
+                    })
+
+                    loadFromCache()
+
+                }, function () {
+                    alert("Unable to load ConceptMaps")
                 }
+            )
 
-            }).catch(function(err) {
-                // This code runs if there were any errors
-                console.log(err);
-                alert(err.message)
-            });
+            $scope.loadSelected = function (id) {
+                let msg = "This will re-load all the artifacts from the terminology server. It will take several seconds (10-20) to complete. Are you sure?"
+                if (confirm(msg)) {
+                    $scope.loadCM(id)
+                }
+            }
 
-            $scope.refreshCache = function () {
+            $scope.refreshCacheDEP = function () {
                 let msg = "This will re-load all the artifacts from the terminology server. It will take several seconds (10-20) to complete. Are you sure?"
                 if (confirm(msg)) {
                     //$scope.refreshingCache = true
                     //just need to re-read from the TS. Will populate forage cache
-                    $scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"}})
+                    $scope.loadCM("http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map")
+                    //$scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"}})
                 }
             }
 
 
-
-
             //select the development version of the ConceptMap
             //could later generalize this to multiple CM
-            $scope.selectDev = function () {
+            $scope.selectDevDEP = function () {
 
                 let url = "http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map-dev"
                 //load the CM
 
-                querySvc.getOneConceptMap(url,true).then(
-                    function (ar) {
+                querySvc.getOneConceptMap("canshare-select-valueset-map-dev",true).then(
+                    function (CM) {
                         //now retrieve all the ValueSets (effectively refresh the cache)
 
 
-                        $scope.fullSelectedCM = ar[0]       //todo what of there's > 1
+                        $scope.fullSelectedCM = CM //ar[0]       //todo what of there's > 1
                         console.log($scope.fullSelectedCM)
 
 
@@ -120,9 +153,9 @@ angular.module("pocApp")
                                     //now we can add the VS to the full hash
 
                                     for (const url of Object.keys(hashNewVS) ) {
-                                        //- just while testing $scope.hashExpandedVs[url] = hashNewVS[url]
+                                        $scope.hashExpandedVs[url] = hashNewVS[url]
 
-                                        alert(url)
+                                      //  alert(url)
                                     }
 
                                 },
@@ -140,6 +173,9 @@ angular.module("pocApp")
 
 
 
+                    },
+                    function () {
+                        alert("canshare-select-valueset-map-dev not found")
                     }
                 )
 
@@ -1056,28 +1092,29 @@ angular.module("pocApp")
 
             //open a specific ConceptMap
             //if checkInCache is true then see if the VS is in the cache first - only retrieve from the TS if not
-            $scope.selectCMItem = function (item,checkInCache) {
-                $scope.selectedCM = item.cm
+            $scope.loadCM = function (cmId) {
+                //$scope.selectCMItem = function (item,checkInCache) {
+                //$scope.selectedCM = item.cm
                 delete $scope.fullSelectedCM
-                delete $scope.resultParameters
-                delete $scope.resultParametersList
-                delete $scope.translateParameters
+               // delete $scope.resultParameters
+               // delete $scope.resultParametersList
+               // delete $scope.translateParameters
                 delete $scope.doProperties
                 delete $scope.input.cmOptions
-                delete $scope.cmSources
-                delete $scope.myResult
-                delete $scope.translateError
+               // delete $scope.cmSources
+               // delete $scope.myResult
+              //  delete $scope.translateError
                 delete $scope.expandedCMVS
                 delete $scope.expandErrors
 
                 $scope.loadingCM = true
 
-
                 //get the map
-                querySvc.getOneConceptMap(item.cm.url,true).then(
-                    function (ar) {
+                querySvc.getOneConceptMap(cmId).then(
+                    //querySvc.getOneConceptMap(item.cm.url,true).then(
+                    function (CM) {
                         //now retrieve all the ValueSets (effectively refresh the cache)
-                        $scope.fullSelectedCM = ar[0]       //todo what of there's > 1
+                        $scope.fullSelectedCM = CM
 
                         //add the operator to the DependsOn element from the extension (makes UI processing easier
                         let lstVsUrl = []   //list of all ValueSets that are used by 'in-vs' rules
@@ -1160,9 +1197,7 @@ angular.module("pocApp")
 
 
 
-                        //make the download link
-                        // $scope.downloadLinkMap = window.URL.createObjectURL(new Blob([angular.toJson($scope.fullSelectedCM,true) ],{type:"application/json"}))
-                        // $scope.downloadLinkMapName = `ConceptMap-${$scope.fullSelectedCM.id}.json`
+
 
                         let treeData = querySvc.makeTree($scope.fullSelectedCM,$scope.cmProperties)
                         showCmTree(treeData)
@@ -1185,7 +1220,8 @@ angular.module("pocApp")
 
                     }
                 ).finally(function () {
-                    $scope.loadingCM = false
+                   // $scope.loadingCM = false
+                    //do this when the expand all VS is complete and the event fired
                 })
 
             }
@@ -1297,6 +1333,8 @@ angular.module("pocApp")
 
                         let treeData = querySvc.makeTree($scope.fullSelectedCM,$scope.cmProperties)
                         showCmTree(treeData)
+
+                        $scope.loadingCM = false    //will show the UI
 
 
                     },function (err) {

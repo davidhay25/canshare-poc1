@@ -310,33 +310,40 @@ angular.module("pocApp")
 
 
 
-
-                snapshotSvc.makeSnapshots($scope.hashAllDG)
-
-                $scope.ewSummary = []
-                let tot = 0
-                Object.keys($scope.hashAllDG).forEach(function (key) {
-                    let dg = $scope.world.dataGroups[key]
-                    tot += $scope.updateEnableWhen(dg,$scope.ewSummary)
-                })
-
-                console.log($scope.ewSummary)
-                console.log(`${tot} not found`)
-
-                analyse()
-                analyseDiff()
-
                 try {
-                    $scope.arDG.sort(function (a,b) {
-                        if (a.name.toLowerCase() > b.name.toLowerCase()) {
-                            return 1
-                        } else {
-                            return -1
-                        }
+                    snapshotSvc.makeSnapshots($scope.hashAllDG)
+                    $scope.ewSummary = []
+                    let tot = 0
+                    Object.keys($scope.hashAllDG).forEach(function (key) {
+                        let dg = $scope.world.dataGroups[key]
+                        tot += $scope.updateEnableWhen(dg,$scope.ewSummary)
                     })
-                } catch(ex) {
-                    alert(ex.message)
+
+                    console.log($scope.ewSummary)
+                    console.log(`${tot} not found`)
+
+                    analyse()
+                    analyseDiff()
+
+                    try {
+                        $scope.arDG.sort(function (a,b) {
+                            if (a.name.toLowerCase() > b.name.toLowerCase()) {
+                                return 1
+                            } else {
+                                return -1
+                            }
+                        })
+                    } catch(ex) {
+                        alert(ex.message)
+                    }
+                } catch (e) {
+
                 }
+
+
+
+
+
 
             }
             loadWorld()
@@ -362,8 +369,7 @@ angular.module("pocApp")
             }
 
             $scope.deleteDG = function () {
-                alert('disabled')
-                return
+
                 if (confirm("Are you sure you wish to remove this DG from local storage? (Any version on the Library is untouched")){
                     delete $localStorage.world.dataGroups[$scope.selectedDG.name]
                     delete $scope.selectedDG

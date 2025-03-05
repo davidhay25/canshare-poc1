@@ -72,6 +72,8 @@
         <uib-tabset>
 
           <uib-tab  heading="Versions">
+
+            <checkbox ng-model="input.csMapOnly"></checkbox> Only VS Maps
             <button class="btn btn-link" ng-click="getConceptMapVersions()">Refresh list</button>
 
             <div class="pull-right">
@@ -88,7 +90,8 @@
 
                 <table ng-if="allConceptMaps" class="table-bordered table">
                   <tr><th>Id</th><th>Identifier</th><th>Status</th><th>Version</th><th>Last updated</th><th>Action</th></tr>
-                  <tr ng-repeat="cm in allConceptMaps.entry">
+                  <tr ng-repeat="cm in allConceptMaps.entry"
+                    ng-show="showCM(cm.resource,input.csMapOnly)">
                     <td>
                       <div class="clickable" ng-click="selectCM(cm.resource.id)">{{cm.resource.id}}</div></td>
                     <td>{{cm.resource.identifier.value}}</td>

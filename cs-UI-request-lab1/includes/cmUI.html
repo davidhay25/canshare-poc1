@@ -31,16 +31,64 @@
         </div>
     </div>
 
+<!--
+    <div class="pull-right">
+        Url:{{fullSelectedCM.url}}
+    </div>
+-->
+
+    <div class="row" style="padding-top: 8px">
+        <div class="col-md-8">
+
+        </div>
+        <div  class="col-md-3">
+            <select class="form-control" ng-model="input.selectCMControl"
+                    ng-options="id for id in allCM"></select>
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-primary"
+                ng-click="loadSelected(input.selectCMControl)"
+            >Load CM</button>
+        </div>
+
+
+    </div>
+
+
+    <!--
+<br/>
+    <div class="pull-right">
+        <button class="btn btn-link" ng-click="refreshCache()"
+                uib-popover="Last updated: {{cacheDate | date : 'MMM dd  HH:mm:ss'}}"
+                popover-placement="left"
+                popover-trigger="'mouseenter'">Refresh cache</button>
+
+        <img ng-show="showWaiting || refreshingCache || loadingCM" src="css/ajax_loader_blue_32.gif"/>
+    </div>
 
     <div class="pull-right">
-        {{$scope.fullSelectedCM.url}}
+        <div class="btn btn-link pull-right" ng-click="selectDev()">Switch to development version</div>
     </div>
+
 
     <br/>
 
+-->
 
+    <div ng-show="loadingCM">
+        The ConceptMap is loading. Please wait.
+        <br/>
+        <br/>
+        Note that this can take quite a while - 20 seconds or more - when selecting a new ConceptMap as all the
+        ValueSets used by the map need to be expanded and downloaded from the Terminology Server.
+        <br/>
+        <br/>
+        Once all the ValueSets have been downloaded, they and the ConceptMap are saved in the browser cache, so it's much
+        faster to load next time.
 
-  <uib-tabset active="local.conceptMapTab">
+    </div>
+
+  <uib-tabset active="local.conceptMapTab" ng-hide="loadingCM">
 
 
 
@@ -117,125 +165,9 @@
                       </tr>
                   </table>
 
-                  <div class="pull-right">{{fullSelectedCM.title}}</div>
-
-                  <uib-tabset ng-if="false">
-                      <uib-tab heading="Progressive">
-                          <br/>
-                          <table class="table table-bordered">
-                              <tr ng-repeat = "(k,v) in cmProperties" ng-hide="k == 'patient-sex'">
-                                  <td width = "30%">
-                                      <div class = 'clickable' ng-click="setMaximalOptions(k)">{{k}}</div>
-                                  </td>
-                                  <td>
-                                      <div class="row">
-                                          <div class="col-md-10">
+                  <div class="pull-right"><strong>Current map:</strong> {{fullSelectedCM.title}}</div>
 
 
-
-
-                                      <!-- Allows us to explicitly decide when to show the message - not just
-                                      when the set of values has not been determined
-
-                                       probably not needed now - which means we can remove the 'noMatches' flag-->
-                                      <div ng-show="v.noMatches">
-                                          <!-- There were no matching ValueSets or Concepts -->
-
-                                      </div>
-
-
-
-                                      <div ng-show="v.singleConcept && v.options.length == 0">
-                                          <!--
-                                          <input type="text" class="form-control"  value="{{v.singleConcept.display}}"/>
-                                          -->
-                                          <select class="form-control">
-
-                                              <option>{{v.singleConcept.display}}</option>
-                                          </select>
-
-                                      </div>
-
-                                      <div ng-show="v.options.length > 0">
-                                          <select class="form-control" ng-model="local.cmPropertyValue[k]"
-                                                  ng-change="uiValueSelected(k,local.cmPropertyValue[k])"
-                                                  ng-options="v.display for (k,v) in v.options">
-
-                                          </select>
-<!--
-                                          <input type="text" ng-model="test"
-                                                 typeahead-editable = "false"
-                                                 typeahead-on-select="selectFromTA($item, k,k)"
-
-                                                 uib-typeahead="concept.display for concept in v.options | filter:$viewValue"
-                                                 class="form-control" />
-
--->
-                                      </div>
-                                      </div>
-                                      <div class="col-md-2">
-                                          <i class=" glyphicon glyphicon-search clickable"
-                                             ng-show="v.options.length > 10"
-                                             ng-click="selectConcept(k,v)"></i>
-<!--
-                                          <i ng-show="local.cmPropertyValue[k]" class=" glyphicon glyphicon-remove clickable"
-                                             ng-click="clearProperty(k)"></i>
--->
-                                      </div>
-                                      </div>
-                                  </td>
-                              </tr>
-                          </table>
-
-
-
-                      </uib-tab>
-                      <uib-tab heading="Histology">
-                          <br/>
-                          <table class="table table-bordered">
-
-                              <tr>
-                                  <td>Histology</td>
-                                  <td>
-                                      <input type="text" class="form-control" ng-model="local.cmPropertyValue['histologic-type-primary']"
-
-                                             typeahead-editable = "false
-"                                            typeahead-on-select = "histoSelected($item)"
-                                             uib-typeahead="concept.display for concept in histology | filter:$viewValue | limitTo:8" >
-                                  </td>
-                              </tr>
-
-                              <tr ng-repeat = "(k,v) in cmProperties"
-                                ng-hide="k=='histologic-type-primary'">
-                                  <td width = "30%">
-                                      <div>{{k}}</div>
-                                  </td>
-                                  <td>
-
-                                      <div ng-show="v.options.length == 1">
-                                          {{v.options[0].display}}
-                                      </div>
-
-                                      <div ng-show="v.options.length >1 && v.options.length < 5">
-                                          <div ng-repeat = "concept in v.options">
-                                              <input type="radio" ng-model="local.cmPropertyValue[k]" value="{{concept.code}}" /> {{concept.display}}
-                                          </div>
-
-                                      </div>
-
-                                      <div ng-show="v.options.length > 4">
-                                          <select class="form-control" ng-model="local.cmPropertyValue[k]"
-                                                  ng-options="v1.display for v1 in v.options">
-                                          </select>
-
-                                      </div>
-                                  </td>
-                              </tr>
-                          </table>
-
-
-                      </uib-tab>
-                  </uib-tabset>
 
 
 

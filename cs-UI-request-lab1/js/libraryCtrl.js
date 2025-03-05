@@ -67,6 +67,13 @@ angular.module("pocApp")
                 }
             )
 
+            $scope.importComponent = function (dg) {
+                if (confirm(`Are you sure you wish to import this component (${dg.title} into the form)`)) {
+                    $scope.$close({dg:dg})
+                }
+
+            }
+
             function loadNamedQueries() {
                 let qry = "/model/namedquery"
                 $http.get(qry).then(

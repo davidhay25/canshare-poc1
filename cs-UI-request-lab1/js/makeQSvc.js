@@ -52,6 +52,8 @@ angular.module("pocApp")
 
         extCalculatedExpression = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression"
 
+        extOriginalPath = "http://canshare.co.nz/fhir/StructureDefinition/original-path"
+
 
         //resources that have the patient reference attached.
         //The actual reference is to a variable with the name 'PatientID'
@@ -804,6 +806,9 @@ angular.module("pocApp")
                         item.extension.forEach(function (ext) {
 
                             switch (ext.url) {
+                                case extOriginalPath:
+                                    thing.originalPath = ext.valueString
+                                    break
                                 case extAllocateIdUrl:
                                     thing.allocateId = thing.allocateId ||  []
                                     thing.allocateId.push(ext.valueString)
@@ -1714,6 +1719,10 @@ angular.module("pocApp")
                         return
                     }
                     let excludeFromQ = false
+
+                    //save the original path. useful when tracking down the origin of things...
+                    makeQHelperSvc.addExtensionOnce(item,{url:extOriginalPath,valueString:ed.path})
+
 
                     let edType = ed.type[0]     //actually be the name of the DG
 

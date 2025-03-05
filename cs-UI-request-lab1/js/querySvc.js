@@ -357,8 +357,24 @@ angular.module("pocApp")
 
                 },
 
-                getOneConceptMap : function(url,expand,tsInstance) {
+                getOneConceptMap : function(id) {
+                    //getOneConceptMap : function(url,expand,tsInstance) {
                     let deferred = $q.defer()
+
+                    //Mar5 - change to use specific id (derived Url
+                    let qry = `nzhts/ConceptMap/${id}`
+                    $http.get(qry).then(
+                        function (data) {
+                            deferred.resolve(data.data)     //return the CM
+                        }, function () {
+                            deferred.reject("not found")
+                        }
+                    )
+
+
+//'/nzhts/ConceptMap/:id
+/*
+
 
                     let qry = `ConceptMap?url=${url}`  //?identifier=http://canshare.co.nz/fhir/NamingSystem/valuesets%7c`
 
@@ -390,7 +406,7 @@ angular.module("pocApp")
                             deferred.reject(err)
                         }
                     )
-
+*/
                     return deferred.promise
                 },
                 getConceptMapsDEP : function(tsInstance){

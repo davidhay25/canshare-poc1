@@ -108,14 +108,7 @@
 
             <div class="col-md-3">
                 <div class="navbar-text">
-<!--
-                   <select class="form-control pull-left"
-                           ng-change="changeInstance(input.tsInstance)"
-                           ng-model="input.tsInstance">
-                       <option value="authoring">Authoring Instance</option>
-                       <option value="prod">Production Instance</option>
-                   </select>
-                    -->
+
                 </div>
             </div>
 
@@ -282,7 +275,7 @@
         <uib-tab  heading="ConceptMap">
 
             <div ng-controller="cmCtrl">
-
+<!--
                 <div class="pull-right">
                     <button class="btn btn-link" ng-click="refreshCache()"
                             uib-popover="Last updated: {{cacheDate | date : 'MMM dd  HH:mm:ss'}}"
@@ -295,7 +288,7 @@
                 <div class="pull-right">
                     <div class="btn btn-link pull-right" ng-click="selectDev()">Switch to development version</div>
                 </div>
-
+-->
 
 
                 <ng-include src = "'./includes/cmUI.html'"></ng-include>

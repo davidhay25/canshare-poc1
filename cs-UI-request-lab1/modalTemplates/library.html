@@ -561,7 +561,9 @@
                 <td>{{dg.diff.length}}</td>
 
                 <td>
-                  <div ng-if="dg.nameExists" class="clickable">In form</div>
+                  <div ng-if="dg.nameExists">In form</div>
+                  <div ng-if="! dg.nameExists" class="clickable"
+                    ng-click="importComponent(dg)">Import</div>
 
                 </td>
               </tr>
