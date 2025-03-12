@@ -150,7 +150,7 @@ angular.module("pocApp")
                     //the new domain
                     let dom = ar[1].toUpperCase()
 
-                    if (dom !== $scope.selectedDomain) {
+                    if (dom !== $scope.input.selectedDomain) {
                         //load all the CM's for this domain. This will set the version numbers and RC status
                         //then the file can be parse
                         $scope.getConceptMapVersions(dom,function(){
@@ -161,20 +161,7 @@ angular.module("pocApp")
                         parse()
                     }
 
-                    /*
-
-                    if ($scope.allDomains.indexOf(dom) == -1) {
-                        //this is a new domain
-                        $scope.allDomains.push(dom)
-                    }
-
-                    //now find the domain in the list
-                    for (let d of $scope.allDomains) {
-                        if (d == dom) {
-                            $scope.selectedDomain = d
-                        }
-                    }
-                    */
+                    $scope.input.cmTabActive = 1        //seelct the table
 
                 } else {
                     alert("There must be a domain in the Spreadsheet to be able to parse it")
@@ -187,7 +174,7 @@ angular.module("pocApp")
                     let vo1 = terminologyUpdateSvc.auditCMFile(arLines, $scope.allVSItem)
                     $scope.arLog = vo1.log
 
-                    let vo = terminologyUpdateSvc.makeCM(arLines,$scope.selectedDomain)
+                    let vo = terminologyUpdateSvc.makeCM(arLines,$scope.input.selectedDomain)
                     $scope.conceptMap = vo.cm
                     $scope.canUpload = true
                 }
@@ -239,8 +226,6 @@ angular.module("pocApp")
             $scope.uploadConceptMap = function (rc) {
                 //if rc is true, then updating the release candidate
 
-                //let nameRoot = 'canshare-select-valueset-map'
-
                 //the nameRoot is the id of the current concept map. This contains the domain
                 let nameRoot = $scope.conceptMap.id
 
@@ -250,11 +235,14 @@ angular.module("pocApp")
                 }
 
                 let version = "development"
+                let displayId = `${nameRoot}-dev`
                 if (rc) {
                     version = `Release Candidate ${$scope.previousVersion}`
+                    displayId = `${nameRoot}-v${$scope.previousVersion}`
                 }
 
-                let msg = `This will update the ${version} version of the ConceptMap. Are you sure you wish to do this. It will take several seconds.`
+
+                let msg = `This will update the ${version} version of the ConceptMap with the id ${displayId}. Are you sure you wish to do this. It will take several seconds.`
                 if (confirm(msg)) {
                     //if the 'release version' is not checked then add '-dev' as a suffix to the id
 
@@ -263,7 +251,7 @@ angular.module("pocApp")
                         $scope.conceptMap.id = `${nameRoot}-v${$scope.previousVersion}`
                         $scope.conceptMap.url = `http://canshare.co.nz/fhir/ConceptMap/${nameRoot}-v${$scope.previousVersion}`
                         $scope.conceptMap.identifier.value = $scope.conceptMap.id
-                        $scope.conceptMap.title = `Canshare select valueset map, ${$scope.selectedDomain} domain, Release Candidate ${$scope.previousVersion}`
+                        $scope.conceptMap.title = `Canshare select valueset map, ${$scope.input.selectedDomain} domain, Release Candidate ${$scope.previousVersion}`
                         $scope.conceptMap.status = 'draft'
                         $scope.conceptMap.version = $scope.previousVersion
 
@@ -272,11 +260,12 @@ angular.module("pocApp")
                         $scope.conceptMap.id = `${nameRoot}-dev`
                         $scope.conceptMap.url = `http://canshare.co.nz/fhir/ConceptMap/${nameRoot}-dev`
                         $scope.conceptMap.identifier.value = $scope.conceptMap.id
-                        $scope.conceptMap.title = `Canshare select valueset map, ${$scope.selectedDomain} domain, development version`
+                        $scope.conceptMap.title = `Canshare select valueset map, ${$scope.input.selectedDomain} domain, development version`
                         $scope.conceptMap.status = 'active'
                         $scope.conceptMap.version = $scope.nextVersion
 
                     }
+
 
 
                     console.log($scope.conceptMap)
@@ -287,6 +276,7 @@ angular.module("pocApp")
                     $http.put(url, $scope.conceptMap).then(
                         function (data) {
                             alert("Map updated")
+                            $scope.canUpload = false    //will need to re-parse if want to upload again. Otherwose, the id gets anothe r'-dev' appended
                         }, function (err) {
                             alert(angular.toJson(err.data))
                         }
@@ -302,12 +292,12 @@ angular.module("pocApp")
                 let msg = `This will publish the release candidate for version ${version} and make it the current version. Are you sure you wish to do this?`
                 if (confirm(msg)) {
                     $scope.showWaiting = true
-                    let qry = `/nzhts/ConceptMap/publishRC/${$scope.selectedDomain}/${version}`
+                    let qry = `/nzhts/ConceptMap/publishRC/${$scope.input.selectedDomain}/${version}`
                     $http.post(qry, {version: version}).then(
                         function (data) {
                             // alert(data.data)
                             alert("The Release Candidate has been published.")
-                            $scope.getConceptMapVersions($scope.selectedDomain)
+                            $scope.getConceptMapVersions($scope.input.selectedDomain)
                         }, function (err) {
                             $scope.showWaiting = false
                             alert(angular.toJson(err.data))
@@ -323,11 +313,11 @@ angular.module("pocApp")
                 let msg = `This will create a new release candidate for version ${version} from the dev version. Are you sure you wish to do this?`
                 if (confirm(msg)) {
                     $scope.showWaiting = true
-                    let qry = `/nzhts/ConceptMap/makeRC/${$scope.selectedDomain}`
+                    let qry = `/nzhts/ConceptMap/makeRC/${$scope.input.selectedDomain}`
                     $http.post(qry, $scope.conceptMap).then(
                         function (data) {
                             alert("The new Release Candidate has been created.")
-                            $scope.getConceptMapVersions($scope.selectedDomain)
+                            $scope.getConceptMapVersions($scope.input.selectedDomain)
                         }, function (err) {
                             $scope.showWaiting = false
                             alert(angular.toJson(err.data))
@@ -403,9 +393,20 @@ angular.module("pocApp")
 
                         //if there are no previous CMs, then setup for a new domain
                         if ($scope.allConceptMaps.length == 0) {
-                            //add to the list of domains
-                            $scope.allDomains.push(domain.toUpperCase())
-                            $scope.selectedDomain = $scope.allDomains[$scope.allDomains.length -1]
+                            //add to the list of domains if not already there
+                            let alreadyThere = false
+                            for (let d of $scope.allDomains) {
+                                if (d == domain) {
+                                    alreadyThere = true
+                                    $scope.input.selectedDomain = d
+                                }
+                            }
+
+                            if (! alreadyThere) {
+                                $scope.allDomains.push(domain.toUpperCase())
+                                $scope.input.selectedDomain = $scope.allDomains[$scope.allDomains.length -1]
+                            }
+
                             $scope.activeRC = false     //the is no RC
                             $scope.nextVersion = 1
                             $scope.previousVersion = 0
@@ -414,7 +415,7 @@ angular.module("pocApp")
 
                             for (let d of $scope.allDomains) {
                                 if (d == domain) {
-                                    $scope.selectedDomain = d
+                                    $scope.input.selectedDomain = d
                                 }
                             }
                         }

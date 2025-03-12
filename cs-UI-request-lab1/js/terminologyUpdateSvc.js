@@ -606,6 +606,7 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
             let arLines = angular.copy(inLines)
 
             let arLog = []
+            //this id is used as the nameRoot when uploading the map so don't want '-dev' on the end..
             let id = `canshare-select-${domain.toLowerCase()}-valueset-map`
 
             arLog.push(`${arLines.length} lines to process`)

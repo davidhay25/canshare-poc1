@@ -962,6 +962,7 @@ function setup(app) {
         let qry = `${csServerRoot}ConceptMap?identifier=http://canshare.co.nz/fhir/NamingSystem/conceptmaps%7c`
         if (devMode) {
             console.log('get',qry)
+            qry += "&_count=50"
         }
         let token = await getNZHTSAccessToken()
 
