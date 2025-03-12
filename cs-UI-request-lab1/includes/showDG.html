@@ -971,12 +971,21 @@
                   ng-hide="$index==0 || (element.ed.mult.indexOf('..0') > -1)">
                 <td>
                   <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
+                    <!--
                     <div ng-hide="input.showFullModel">
                       {{element.ed.path | dropFirstInPath}}
                     </div>
+
+
                     <div ng-if="input.showFullModel">
                       {{element.ed.path | lastInPath}}
                     </div>
+-->
+                   <div class="clickable" ng-click="termSelectDGItem({hiddenDGName:selectedModel.name,path:element.ed.path})">
+                     {{element.ed.path | lastInPath}}
+                   </div>
+
+
                   </div>
 
 
@@ -1451,33 +1460,7 @@
       <hr/>
     </uib-tab>
 
-<!--
-    <uib-tab heading="Changes">
 
-      <div ng-controller="diffCtrl">
-        <button class="btn btn-link pull-right" ng-click="createDiff()">Create diff</button>
-        <ng-include src="'/includes/diff.html'"></ng-include>
-      </div>
-
-
-
-
-
-    </uib-tab>
-    -->
-
-
-<!--
-    <uib-tab heading="Profiling">
-      <br/>
-      <div ng-controller="profilingDGCtrl">
-        <ng-include src="'/includes/profilingDG.html'"></ng-include>
-      </div>
-
-
-    </uib-tab>
-
-   -->
 
 
 
@@ -1501,7 +1484,15 @@
             <tbody>
             <tr ng-repeat="ed in selectedModel.diff">
               <td>
+                <!--
                 <div class="clickableDotted" ng-click="input.selectedDiff = ed">{{ed.path}}</div>
+-->
+                <div class="clickable"
+                     ng-click="termSelectDGItem({hiddenDGName:selectedModel.name,path:ed.path})">{{ed.path}}</div>
+
+
+
+
               </td>
               <td>{{ed.title}}</td>
               <td>{{ed.description}}</td>

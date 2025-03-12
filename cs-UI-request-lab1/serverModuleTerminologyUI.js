@@ -7,6 +7,7 @@ const fs = require("fs")
 const commonModule = require("./serverModuleCommonUI.js")
 
 let jwt_decode = require( "jwt-decode")
+const domain = require("domain");
 
 //A hash to hold async long running jobs - eg batch updating Valuesets or setting sync
 let jobs = {}
@@ -954,6 +955,9 @@ function setup(app) {
     //return the map names and next release number
     app.get('/nzhts/ConceptMap/allVersions',async function(req,res){
 
+        //let domain = req.query.domain
+        //let identifier = `http://canshare.co.nz/fhir/NamingSystem/conceptmaps%7c`
+
        // let serverHost = "https://authoring.nzhts.digital.health.nz/"
         let qry = `${csServerRoot}ConceptMap?identifier=http://canshare.co.nz/fhir/NamingSystem/conceptmaps%7c`
         if (devMode) {
@@ -983,11 +987,23 @@ function setup(app) {
 
 
     //publish RC. Supply the version in the call
-    app.post('/nzhts/ConceptMap/publishRC',async function(req,res){
-        let version = req.body.version
+    app.post('/nzhts/ConceptMap/publishRC/:domain/:version',async function(req,res){
 
-        let nameRoot = 'canshare-select-valueset-map'
-        //let serverRoot =  'http://home.clinfhir.com:8054/baseR4/'   //note - will need to get a token for nzhts and set syndicate
+        let version = req.params.version
+        let domain = req.params.domain
+
+        if (! version || ! domain) {
+            res.status(400).json({msg:'Domain and Version are required'})
+            return
+        }
+
+        domain = domain.toLowerCase()
+
+     //   console.log(domain,version)
+       // res.json()
+      //  return
+
+        let nameRoot = `canshare-select-${domain}-valueset-map`
 
         //if developing then don't update the syndication
         let noSyndicate = false
@@ -1004,10 +1020,11 @@ function setup(app) {
             }
 
 
+            //change the status of the RC to active.
             let response = await axios.get(qryRC)
             let cm = response.data      //the conceptmap
             cm.status = "active"
-
+            cm.title = `Canshare select valueset map, ${domain.toUpperCase()} domain, version ${cm.version}`
 
             let result = await putResource(qryRC,cm,noSyndicate)
             if (result) {
@@ -1045,8 +1062,18 @@ function setup(app) {
     })
 
     //make release candidate.
-    app.post('/nzhts/ConceptMap/makeRC',async function(req,res){
-        let nameRoot = 'canshare-select-valueset-map'
+    app.post('/nzhts/ConceptMap/makeRC/:domain',async function(req,res){
+
+        let domain = req.params.domain
+        if (! domain) {
+            res.status(400).json({msg:"domain must be specified"})
+            return
+        }
+
+
+       // return
+
+        let nameRoot = `canshare-select-${domain.toLowerCase()}-valueset-map`
 
         //retrieve the dev version
         let qryDev = `${csServerRoot}/ConceptMap/${nameRoot}-dev`
@@ -1075,7 +1102,7 @@ function setup(app) {
                 let rc = JSON.parse(JSON.stringify(cm))         //make a copy
                 rc.id = `${nameRoot}-v${cm.version}`   //the dev version is the RC version
                 rc.url = `http://canshare.co.nz/fhir/ConceptMap/${nameRoot}-v${cm.version}`
-                rc.title = `Canshare select valueset map, Release Candidate version ${cm.version}`
+                rc.title = `Canshare select valueset map, ${domain.toUpperCase()} domain, Release Candidate version ${cm.version}`
                 rc.status = 'draft'
 
                 let identifier = {system: "http://canshare.co.nz/fhir/NamingSystem/conceptmaps"}

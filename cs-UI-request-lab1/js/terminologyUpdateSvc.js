@@ -598,26 +598,28 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
         makeVSListFromCM : function (arLines) {
 
         },
-        makeCM : function (inLines) {
+        makeCM : function (inLines,domain) {
 
             //the url that indicates the type of comparison perfromed when evaluating the 'dependsOn' element. If absent, this is assumed to be = (must be the same)
             let comparisonOperationUrl = "http://canshare.co.nz/fhir/StructureDefinition/do-operator"
 
             let arLines = angular.copy(inLines)
 
-            //remove the first 2 lines - the header lines in the SS
-         //   arLines.splice(0,2)
             let arLog = []
+            let id = `canshare-select-${domain.toLowerCase()}-valueset-map`
 
             arLog.push(`${arLines.length} lines to process`)
 
 
             let snomed = "http://snomed.info/sct"
 
-            let cm = {resourceType:"ConceptMap",id:"canshare-select-valueset-map"}
-            cm.url = "http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"
-            cm.identifier = {value:"canshare-select-valueset-map",system:"http://canshare.co.nz/fhir/NamingSystem/conceptmaps"}
-            cm.title = "CanShare select ValueSet ConceptMap"
+            //let cm = {resourceType:"ConceptMap",id:"canshare-select-valueset-map"}
+            let cm = {resourceType:"ConceptMap",id:id}
+            //cm.url = "http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"
+            cm.url = `http://canshare.co.nz/fhir/ConceptMap/${id}`
+            //cm.identifier = {value:"canshare-select-valueset-map",system:"http://canshare.co.nz/fhir/NamingSystem/conceptmaps"}
+            cm.identifier = {value:id,system:"http://canshare.co.nz/fhir/NamingSystem/conceptmaps"}
+            cm.title = `CanShare select ValueSet ConceptMap - ${domain.toUpperCase()} domain`
             cm.status = "active"
             cm.version = "1"
             let group = {source:snomed,target:snomed,element:[]}

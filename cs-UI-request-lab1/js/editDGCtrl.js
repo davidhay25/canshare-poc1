@@ -15,9 +15,13 @@ angular.module("pocApp")
             $scope.allTypes = angular.copy(hashTypes)
 
             //frozen DG - ie components
+
             $http.get('/allfrozen').then(
                 function (data) {
-                    $scope.allFrozen = data.data
+
+                    //only from library (LIM)
+                    $scope.allFrozen = data.data.filter(dg => dg.source == 'library')
+
                     populateControls()
 
                 },function (err) {

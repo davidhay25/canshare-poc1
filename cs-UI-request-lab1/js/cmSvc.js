@@ -329,9 +329,7 @@ angular.module("pocApp")
 
                                                     addUrlToList(dep.value)
 
-                                                  //  if (lstVsUrl.indexOf(dep.value) == -1) {
-                                                   //     lstVsUrl.push(dep.value)
-                                                  //  }
+
 
                                                 }
 

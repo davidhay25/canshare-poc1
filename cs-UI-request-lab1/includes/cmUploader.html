@@ -28,38 +28,42 @@
 
     <div class="row">
 
-
-
-
-
-
-
       <div class="col-md-2">
         <button ng-show="input.cmData"
                 class="btn-link btn" ng-click="parseCMFile(input.cmData)">Parse content</button>
       </div>
       <div class="col-md-2">
-        <!--
-        <div ng-show="previousCMSS">
-          <button class="btn-link btn" ng-click="reloadCMSS(input.cmData)">Reload previous (Development only)</button>
 
 
+        <div style="padding: 8px;font-weight: bold;color: #ef8fbe">
+            <select class="form-control" ng-model = "selectedDomain"
+                    ng-change="getConceptMapVersions(selectedDomain)"
+                    ng-options = "d for d in allDomains"></select>
         </div>
-        -->
+
+
+
       </div>
       <div class="col-md-2">
+        <!--
         <div>
           <button class="btn-link btn" ng-click="loadCurrent()">Download from Term. server</button>
         </div>
+        -->
       </div>
       <div class="col-md-2">
         <a class="btn" target="_blank" href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653">Concept Map spreadsheet</a>
 
       </div>
       <div class="col-md-4">
-        <div class="pull-right" ng-show="conceptMap && user.email">
-          <button   class="btn btn-danger " ng-click="uploadConceptMap(input.publishCMVer)">Upload ConceptMap</button>
-          <checkbox ng-model="input.publishCMVer"></checkbox> Release Candidate {{previousVersion}}
+        <div class="pull-right" ng-show="conceptMap && user.email && canUpload ">
+          <button style="padding-top: 8px"  class="btn btn-danger " ng-click="uploadConceptMap(input.publishCMVer)">Upload ConceptMap</button>
+
+          <span  ng-if="activeRC">
+            <checkbox ng-model="input.publishCMVer"></checkbox> Release Candidate {{previousVersion}}
+          </span>
+
+
         </div>
 
       </div>
@@ -69,11 +73,11 @@
     <div class="row">
 
       <div class="col-md-12">
-        <uib-tabset>
+        <uib-tabset active="input.cmTabActive">
 
           <uib-tab  heading="Versions">
 
-            <checkbox ng-model="input.csMapOnly"></checkbox> Only VS Maps
+
             <button class="btn btn-link" ng-click="getConceptMapVersions()">Refresh list</button>
 
             <div class="pull-right">
@@ -87,27 +91,25 @@
               </div>
             </div>
 
-
                 <table ng-if="allConceptMaps" class="table-bordered table">
                   <tr><th>Id</th><th>Identifier</th><th>Status</th><th>Version</th><th>Last updated</th><th>Action</th></tr>
-                  <tr ng-repeat="cm in allConceptMaps.entry"
-                    ng-show="showCM(cm.resource,input.csMapOnly)">
+                  <tr ng-repeat="cm in allConceptMaps">
                     <td>
-                      <div class="clickable" ng-click="selectCM(cm.resource.id)">{{cm.resource.id}}</div></td>
-                    <td>{{cm.resource.identifier.value}}</td>
-                    <td>{{cm.resource.status}}</td>
-                    <td>{{cm.resource.version}}</td>
-                    <td>{{cm.resource.meta.lastUpdated | date}}</td>
+                      <div class="clickable" ng-click="selectCM(cm.id)">{{cm.id}}</div></td>
+                    <td>{{cm.identifier.value}}</td>
+                    <td>{{cm.status}}</td>
+                    <td>{{cm.version}}</td>
+                    <td>{{cm.meta.lastUpdated | date : "MMM dd yyyy HH:mm"}}</td>
                     <td>
-                      <div ng-if="cm.resource.id == 'canshare-select-valueset-map-dev' && activeRC">
+                      <div ng-if="cm.id.indexOf('-dev') > -1 && activeRC">
                           Release Candidate {{previousVersion}} currently in testing</div>
 
-                      <div class="clickable" ng-if="cm.resource.id == 'canshare-select-valueset-map-dev' && ! activeRC"
-                        ng-click="makeRC(cm.resource.version)">
-                        Create as release candidate, version {{cm.resource.version}}</div>
+                      <div class="clickable" ng-if="cm.id.indexOf('-dev') > -1 && ! activeRC"
+                        ng-click="makeRC(cm.version)">
+                        Create as release candidate, version {{cm.version}}</div>
 
-                      <div class="clickable" ng-if="cm.resource.id == activeRCVersion"
-                           ng-click="publishRC(cm.resource.version)">
+                      <div class="clickable" ng-if="cm.id == activeRCVersion"
+                           ng-click="publishRC(cm.version)">
                         Publish this release candidate
                       </div>
 
@@ -156,7 +158,7 @@
                         <tr><th>Target VS / code</th><th>Depends On elements</th></tr>
                         <tr ng-repeat="target in input.cmElement.target">
 
-                          <td>
+                          <td style="width: 40%">
                             <div ng-if = "target.code.indexOf('http') > -1 " class="clickable" ng-click="viewVS(target.code)">{{target.display}}</div>
                             <div ng-if = "target.code.indexOf('http') == -1 ">{{target.display}} ({{target.code}})</div>
 
@@ -168,9 +170,10 @@
                           </td>
                           <td>
                             <table class="table-bordered table-condensed table">
-                              <tr><th>Property</th><th>Value</th><th>Display</th></tr>
+                              <tr><th>Property</th><th>Operator</th><th>Value</th><th>Display</th></tr>
                               <tr ng-repeat = "don in target.dependsOn">
                                 <td>{{don.property}}</td>
+                                <td>{{updateVSSvc.getCMOperator(don)}}</td>
                                 <td>{{don.value}}</td>
                                 <td>{{don.display}}</td>
                               </tr>

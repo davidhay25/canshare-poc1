@@ -16,6 +16,21 @@ angular.module("pocApp")
         let extMemberCount = "http://canshare.co.nz/fhir/StructureDefinition/vs-expanded-count"
 
         return {
+            getCMOperator : function(don) {
+                let op = '='
+
+
+                if (don.extension) {
+                    don.extension.forEach(function (ext) {
+                        if (ext.url == 'http://canshare.co.nz/fhir/StructureDefinition/do-operator') {
+                            op = ext.valueCode
+
+                        }
+                    })
+                }
+
+                return op
+            },
             getMemberCountDEP : function (vs) {
                 if (vs && vs.extension) {
                     for (ext of vs.extension) {

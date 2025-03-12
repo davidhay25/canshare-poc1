@@ -253,6 +253,16 @@
 
                         </uib-tab>
 
+                        <uib-tab heading="FSH">
+
+                            <div ng-repeat="concept in expandedVS.expansion.contains">
+                                * $snomed#{{concept.code}} "{{concept.display}}"
+
+                            </div>
+
+
+                        </uib-tab>
+
                         <uib-tab heading="Json">
                             <br/>
                             Query: {{termServerQuery}}

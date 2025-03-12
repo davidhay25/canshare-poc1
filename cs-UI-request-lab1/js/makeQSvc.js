@@ -1564,7 +1564,7 @@ angular.module("pocApp")
                                 vo.fullUrl = dg.idVariable
                             }
 
-                            //we need to see if the DG has any adHox extensions defined on the root
+                            //we need to see if the DG has any adHoc extensions defined on the root
                             if (dg.adHocExtension) {
 
                                 //now see if there is an allocateId. if there is, then it needs to be added to the extractDefinition vo and the extension removed from ad hoc
