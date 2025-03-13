@@ -598,7 +598,7 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
         makeVSListFromCM : function (arLines) {
 
         },
-        makeCM : function (inLines,domain) {
+        makeCM : function (inLines,domain,description) {
 
             //the url that indicates the type of comparison perfromed when evaluating the 'dependsOn' element. If absent, this is assumed to be = (must be the same)
             let comparisonOperationUrl = "http://canshare.co.nz/fhir/StructureDefinition/do-operator"
@@ -621,6 +621,9 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
             //cm.identifier = {value:"canshare-select-valueset-map",system:"http://canshare.co.nz/fhir/NamingSystem/conceptmaps"}
             cm.identifier = {value:id,system:"http://canshare.co.nz/fhir/NamingSystem/conceptmaps"}
             cm.title = `CanShare select ValueSet ConceptMap - ${domain.toUpperCase()} domain`
+            if (description) {
+                cm.description = description
+            }
             cm.status = "active"
             cm.version = "1"
             let group = {source:snomed,target:snomed,element:[]}

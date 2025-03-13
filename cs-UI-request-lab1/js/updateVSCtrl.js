@@ -143,6 +143,8 @@ angular.module("pocApp")
                 let lne = arLines[1]
                 let ar = lne.split('\t')
 
+                let description = ar[0]
+
                 //if there's an entry in ar[1] this is the domain.
                 if (ar[1]) {
 
@@ -174,8 +176,10 @@ angular.module("pocApp")
                     let vo1 = terminologyUpdateSvc.auditCMFile(arLines, $scope.allVSItem)
                     $scope.arLog = vo1.log
 
-                    let vo = terminologyUpdateSvc.makeCM(arLines,$scope.input.selectedDomain)
+                    let vo = terminologyUpdateSvc.makeCM(arLines,$scope.input.selectedDomain,description)
                     $scope.conceptMap = vo.cm
+
+
                     $scope.canUpload = true
                 }
 

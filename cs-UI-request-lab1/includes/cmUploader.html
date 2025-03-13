@@ -69,11 +69,11 @@
             </div>
 
                 <table ng-if="allConceptMaps" class="table-bordered table">
-                  <tr><th>Id</th><th>Identifier</th><th>Status</th><th>Version</th><th>Last updated</th><th>Action</th></tr>
+                  <tr><th>Id</th><th>Description</th><th>Status</th><th>Version</th><th>Last updated</th><th>Action</th></tr>
                   <tr ng-repeat="cm in allConceptMaps">
                     <td>
                       <div class="clickable" ng-click="selectCM(cm.id)">{{cm.id}}</div></td>
-                    <td>{{cm.identifier.value}}</td>
+                    <td>{{cm.description}}</td>
                     <td>{{cm.status}}</td>
                     <td>{{cm.version}}</td>
                     <td>{{cm.meta.lastUpdated | date : "MMM dd yyyy HH:mm"}}</td>
