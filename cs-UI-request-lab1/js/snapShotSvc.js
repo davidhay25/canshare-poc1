@@ -1222,6 +1222,43 @@ angular.module("pocApp")
 
                 }
             },
+            getVariables : function (dgName) {
+                //get all the SDC variables used by a single model
+
+                let dg = allDgSnapshot[dgName]
+                let arVariables = []
+                if (dg ) {
+                    getVariable(dg)
+                    if (dg && dg.snapshot) {
+                        for (ed of dg.snapshot) {
+                            getVariable(ed)
+                        } 
+                    }
+
+                }
+                return arVariables
+
+                function getVariable(el) {
+                    if (el.adHocExtension) {
+                        for (const ext of el.adHocExtension) {
+                            if (ext.extension) {
+                                for (const child of ext.extension) {
+                                    if (child.valueExpression ) {
+                                        let variable = child.valueExpression
+                                        if (variable) {
+                                            arVariables.push({url:ext.url,path:el.path,expression:variable,ext:ext})
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+
+
+            },
             getAllAdHocExt : function () {
                 //create an object containing all adHoc extensions on all DGs
                 let arAdHoc = []

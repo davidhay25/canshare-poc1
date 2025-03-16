@@ -572,6 +572,7 @@ angular.module("pocApp")
                 //all adhoc extensions in the model
                 $scope.allAdHocExt = snapshotSvc.getAllAdHocExt()
 
+
                 $scope.usageSummary = snapshotSvc.dgUseSummary()
                 $scope.diffAnalysis = snapshotSvc.diffAnalysis($scope.hashAllDG)
 
@@ -2201,9 +2202,10 @@ angular.module("pocApp")
                 delete $scope.errorLog
                 $scope.relationshipsSummary = snapshotSvc.getRelationshipsSummary(dg.name)
                 $scope.dgNamedQueries = snapshotSvc.getNamedQueries(dg.name)
+                $scope.variablesForDG =snapshotSvc.getVariables(dg.name)
 
 
-                //just testing
+                    //just testing
                 //snapshotSvc.getExtractableDG(dg.name)
 
                 $scope.refreshUpdates()     //update the xref
