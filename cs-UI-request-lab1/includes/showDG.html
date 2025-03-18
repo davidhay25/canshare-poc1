@@ -1248,9 +1248,24 @@
           <br/>
 
           <table class="table table-bordered">
+            <tr><th>Expression</th><th>Language</th><th>Url</th><th>Path</th></tr>
             <tr ng-repeat="item in variablesForDG">
               <td>{{item.expression.expression}}</td>
               <td>{{item.expression.language}}</td>
+              <td>
+                {{item.url | lastInUrl}}
+                <div
+                        class="clickableDotted"
+                        uib-popover-html="popoverText(item.ext)"
+                        popover-placement="top"
+                        popover-class="custom-popover-big"
+                        popover-trigger="'mouseenter'">
+
+                  Extension
+
+                </div>
+
+              </td>
               <td>
                 <div class="clickable" ng-click="termSelectDGItem({hiddenDGName:selectedModel.name,path:item.path})">
                   {{item.path }}
@@ -1258,25 +1273,12 @@
 
 
               </td>
-              <td>
-                {{item.url | lastInUrl}}
-                <div
-                     class="clickableDotted"
-                     uib-popover-html="popoverText(item.ext)"
-                     popover-placement="top"
-                     popover-class="custom-popover-big"
-                     popover-trigger="'mouseenter'">
 
-                  Extension
-
-                </div>
-
-              </td>
 
             </tr>
           </table>
 
-         
+
         </uib-tab>
 
 

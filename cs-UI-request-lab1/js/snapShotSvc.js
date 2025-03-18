@@ -964,6 +964,76 @@ angular.module("pocApp")
                 })
                 return arSummary
             },
+
+            dgContainedBy : function (dgName) {
+                //DG's that contain this one
+
+
+
+
+                //first, get all descendants of this DG
+                let descendants = findAllDescendants(dgName)
+
+
+               // return descendants
+
+
+
+
+                //now, find all DGs that contain any of these
+                //we'll keep on using the descendants array for convenience
+
+                let ar = []
+                for (const key of Object.keys(allDgSnapshot)) {
+                    if (descendants.indexOf(key) == -1) {
+                        //This dg is not a descendant
+                        let dg = allDgSnapshot[key]
+
+                        for (const ed of dg.snapshot) {
+                            let type = ed.type[0]
+                            if (descendants.indexOf(type) > -1) {
+                                //this type is one of the descendants
+                                if (descendants.indexOf(key) == -1) {   //it's not already in the list, add it
+                                    descendants.push(key)
+                                }
+                                break
+                            }
+
+                        }
+
+                    }
+
+
+                }
+                descendants.sort()
+
+                return descendants
+
+
+                function findAllDescendants(dgName) {
+
+                    let descendants = [dgName];
+                    let stack = [dgName];
+
+                    while (stack.length > 0) {
+                        let currentName = stack.pop();
+                        for (const key of Object.keys(allDgSnapshot)) {
+                            let dg = allDgSnapshot[key]
+
+                            if (dg.parent  && dg.parent === currentName) {
+                                descendants.push(dg.name);
+                                stack.push(dg.name); // Add to stack to explore its children
+                            }
+                        }
+                    }
+
+                    return descendants;
+                }
+
+
+
+            },
+
             dgUseSummary : function () {
                 //an analysis of where dgs are contained by another. Uses the snapshot
                 let hashUsage = {}
@@ -1241,7 +1311,16 @@ angular.module("pocApp")
                 function getVariable(el) {
                     if (el.adHocExtension) {
                         for (const ext of el.adHocExtension) {
-                            if (ext.extension) {
+                            if (ext.url == "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-extractAllocateId") {
+
+
+                                arVariables.push({url:ext.url,path:el.path,expression:{expression:ext.valueString},ext:ext})
+                            } else if (ext.valueExpression ) {
+                                let variable = ext.valueExpression
+                                if (variable) {
+                                    arVariables.push({url:ext.url,path:el.path,expression:variable,ext:ext})
+                                }
+                            } else if (ext.extension) {
                                 for (const child of ext.extension) {
                                     if (child.valueExpression ) {
                                         let variable = child.valueExpression

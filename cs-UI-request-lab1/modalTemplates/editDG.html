@@ -41,191 +41,219 @@
                 <br/>
 
                 <div class="row">
-                    <div class="col-md-2">
-                        Name
-                    </div>
-                    <div class="col-md-4">
-                        <input type="text"
-                               ng-disabled = "! isNew"
-                               ng-change="checkName(input.newModelName)"
-                               ng-blur = "checkExpand()"
-                               class = "form-control" ng-model="input.newModelName"/>
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-2">
+                                Name
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text"
+                                       ng-disabled = "! isNew"
+                                       ng-change="checkName(input.newModelName)"
+                                       ng-blur = "checkExpand()"
+                                       class = "form-control" ng-model="input.newModelName"/>
 
-                        <div style="color: green" ng-show="isNew && isUnique">Name is unique</div>
-                        <div style="color: red "ng-show="isNew && input.newModelName && ! isUnique">Name already in use</div>
+                                <div style="color: green" ng-show="isNew && isUnique">Name is unique</div>
+                                <div style="color: red "ng-show="isNew && input.newModelName && ! isUnique">Name already in use</div>
 
-                    </div>
-                    <div class="col-md-6">
-                        The model name will serve as the 'type' of the model should others
-                        reference it, so must be a single word (no spaces) and unique. This will be validated.
+                            </div>
+                            <div class="col-md-6">
+                                The model name will serve as the 'type' of the model should others
+                                reference it, so must be a single word (no spaces) and unique. This will be validated.
 
-                    </div>
-                </div>
-                <br/>
-                <div class="row">
-                    <div class="col-md-2">
-                        Title
-                    </div>
-                    <div class="col-md-4">
-                        <input type="text"
-                               ng-change="setModelAttribute('title',input.newModelTitle)"
-                               class = "form-control" ng-model="input.newModelTitle"/>
-                    </div>
-                    <div class="col-md-6">
-                        The model title describes what the model is about. Keep it short 2-4 words.
-                    </div>
-                </div>
-                <br/>
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="row">
+                            <div class="col-md-2">
+                                Title
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text"
+                                       ng-change="setModelAttribute('title',input.newModelTitle)"
+                                       class = "form-control" ng-model="input.newModelTitle"/>
+                            </div>
+                            <div class="col-md-6">
+                                The model title describes what the model is about. Keep it short 2-4 words.
+                            </div>
+                        </div>
+                        <br/>
 
-                <div class="row" ng-if = "userMode == 'library'">
-                    <div class="col-md-2">
-                        Parent
-                    </div>
-                    <div class="col-md-3">
-                        <select class="form-control" ng-model="input.newModelParent"
-                                ng-change="setModelAttribute('parent',input.newModelParent)"
-                                ng-options = "parent for parent in input.possibleParents"></select>
-                    </div>
-                    <div class="col-md-1">
-                        <button ng-show="input.newModelParent" class="btn btn-link"
-                                ng-click="deleteParent()">Delete</button>
-                    </div>
-                    <div class="col-md-6">
-                        If a parent is assigned to the model, then it will inherit all the elements
-                        in that parent - and the parent's parent's as well. Individual elements can be
-                        removed or altered if needed.
-                    </div>
-                </div>
-                <br/>
-
-
-                <div class="row">
-                    <div class="col-md-2">
-                        Extraction type
-                    </div>
-                    <div class="col-md-4">
-                        <input type="text" placeholder="eg Observation" class="form-control" ng-model="input.type">
-                    </div>
-                    <div class="col-md-6">
-                        If set to a FHIR resource type,
-                        <a target="_blank" href="https://build.fhir.org/ig/HL7/sdc/extraction.html#definition-extract">Definition based data extraction</a> will be enabled
-
-                    </div>
-                </div>
-                <br/>
-
-                <div ng-if="false" class="row">
-                    <div class="col-md-2">
-                        Id variable
-                    </div>
-                    <div class="col-md-4">
-                        <input type="text" placeholder="eg id-obs" class="form-control" ng-model="input.idVariable">
-                    </div>
-                    <div class="col-md-6">
-                        When the DG is extracted as a resource, this value (if set) will be set to a unique fhirpath variable
-                        that will set the resource id. <strong>If this variable is set, then there must be an SDC allocateId extension that
-                        defines it at the same level or higher in the Questionnaire.</strong>
-                    </div>
-                </div>
-                <br/>
-
-                <div class="row">
-                    <div class="col-md-2">
-                        Is container resource
-                    </div>
-                    <div class="col-md-4">
-                        <checkbox ng-model="input.isContainer"></checkbox>
-
-                    </div>
-                    <div class="col-md-6">
-                        If this is the container (top) level for the form. This is the one that will render
-                        the full Q in a playground
-
-                    </div>
-                    <br/> <br/>
-                </div>
-
-<!-- not yet enabled
-                <div ng-if="input.type == 'Observation'" class="row">
-                    <div class="col-md-2">
-                        Observation based extraction?
-                    </div>
-                    <div class="col-md-4">
-                        <checkbox ng-model="input.obsExtract"></checkbox>
-
-                    </div>
-                    <div class="col-md-6">
-                        Use Observation based extraction for simple Observations.
-
-                    </div>
-                    <br/> <br/>
-                </div>
--->
+                        <div class="row" ng-if = "userMode == 'library'">
+                            <div class="col-md-2">
+                                Parent
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-control" ng-model="input.newModelParent"
+                                        ng-change="setModelAttribute('parent',input.newModelParent)"
+                                        ng-options = "parent for parent in input.possibleParents"></select>
+                            </div>
+                            <div class="col-md-1">
+                                <button ng-show="input.newModelParent" class="btn btn-link"
+                                        ng-click="deleteParent()">Delete</button>
+                            </div>
+                            <div class="col-md-6">
+                                If a parent is assigned to the model, then it will inherit all the elements
+                                in that parent - and the parent's parent's as well. Individual elements can be
+                                removed or altered if needed.
+                            </div>
+                        </div>
+                        <br/>
 
 
-                <div class="row">
-                    <div class="col-md-2">
-                        Source reference
-                    </div>
-                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-2">
+                                Extraction type
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" placeholder="eg Observation" class="form-control" ng-model="input.type">
+                            </div>
+                            <div class="col-md-6">
+                                If set to a FHIR resource type,
+                                <a target="_blank" href="https://build.fhir.org/ig/HL7/sdc/extraction.html#definition-extract">Definition based data extraction</a> will be enabled
+
+                            </div>
+                        </div>
+                        <br/>
+
+                        <div ng-if="false" class="row">
+                            <div class="col-md-2">
+                                Id variable
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" placeholder="eg id-obs" class="form-control" ng-model="input.idVariable">
+                            </div>
+                            <div class="col-md-6">
+                                When the DG is extracted as a resource, this value (if set) will be set to a unique fhirpath variable
+                                that will set the resource id. <strong>If this variable is set, then there must be an SDC allocateId extension that
+                                defines it at the same level or higher in the Questionnaire.</strong>
+                            </div>
+                        </div>
+                        <br/>
+
+                        <div class="row">
+                            <div class="col-md-2">
+                                Is container resource
+                            </div>
+                            <div class="col-md-4">
+                                <checkbox ng-model="input.isContainer"></checkbox>
+
+                            </div>
+                            <div class="col-md-6">
+                                If this is the container (top) level for the form. This is the one that will render
+                                the full Q in a playground
+
+                            </div>
+                            <br/> <br/>
+                        </div>
+
+                        <!-- not yet enabled
+                                        <div ng-if="input.type == 'Observation'" class="row">
+                                            <div class="col-md-2">
+                                                Observation based extraction?
+                                            </div>
+                                            <div class="col-md-4">
+                                                <checkbox ng-model="input.obsExtract"></checkbox>
+
+                                            </div>
+                                            <div class="col-md-6">
+                                                Use Observation based extraction for simple Observations.
+
+                                            </div>
+                                            <br/> <br/>
+                                        </div>
+                        -->
+
+
+                        <div class="row">
+                            <div class="col-md-2">
+                                Source reference
+                            </div>
+                            <div class="col-md-4">
                         <textarea ng-change="setModelAttribute('sourceReference',input.sourceReference)"
                                   class = "form-control" ng-model="input.sourceReference">
 
                         </textarea>
 
-                    </div>
-                    <div class="col-md-6">
-                        The source of the information that defined the contents of this Data Group.
-                    </div>
-                </div>
-                <br/>
+                            </div>
+                            <div class="col-md-6">
+                                The source of the information that defined the contents of this Data Group.
+                            </div>
+                        </div>
+                        <br/>
 
-                <div class="row">
-                    <div class="col-md-2">
-                        Terminology server
-                    </div>
-                    <div class="col-md-4">
-                        <input type="text" placeholder="Full url to sever fhir root" class="form-control" ng-model="input.termSvr">
-                    </div>
-                    <div class="col-md-6">
-                        The Terminology server to use for ValueSet expansion in this DG.
+                        <div class="row">
+                            <div class="col-md-2">
+                                Terminology server
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" placeholder="Full url to sever fhir root" class="form-control" ng-model="input.termSvr">
+                            </div>
+                            <div class="col-md-6">
+                                The Terminology server to use for ValueSet expansion in this DG.
 
-                        <span class="clickable" ng-click="input.termSvr = 'https://backup.canshare.co.nz/proxy'">
+                                <span class="clickable" ng-click="input.termSvr = 'https://backup.canshare.co.nz/proxy'">
                             Set to the National New Zealand Terminology Server.</span>
-                    </div>
-                </div>
-                <br/>
+                            </div>
+                        </div>
+                        <br/>
 
-                <div class="row">
-                    <div class="col-md-2">
-                        Linked Component
-                    </div>
-                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-2">
+                                Linked Component
+                            </div>
+                            <div class="col-md-4">
 
-                        <select ng-model="input.linkedDG" class="form-control"
-                                ng-options = "fDG.name for fDG in allFrozen"></select>
+                                <select ng-model="input.linkedDG" class="form-control"
+                                        ng-options = "fDG.name for fDG in allFrozen"></select>
 
 
 
-                    </div>
-                    <div class="col-md-6">
-                        LIM component with elements that can be imported into this DG
+                            </div>
+                            <div class="col-md-6">
+                                LIM component with elements that can be imported into this DG
 
-                    </div>
-                    <br/> <br/>
-                </div>
+                            </div>
+                            <br/> <br/>
+                        </div>
 
-                <div class="row">
-                    <div class="col-md-2">
-                        Description
-                    </div>
-                    <div class="col-md-10">
+                        <div class="row">
+                            <div class="col-md-2">
+                                Description
+                            </div>
+                            <div class="col-md-10">
                         <textarea class="form-control" ng-model="input.newModelDescription"
                                   ng-change="setModelAttribute('description',input.newModelDescription)" ></textarea>
+                            </div>
+
+                        </div>
+
+
+
+
                     </div>
+                    <div class="col-md-4">
+                        <strong>DGs that reference this one</strong>
+                        <br/>
+                        <div class="myScroll">
+                            <ul>
+                                <li ng-repeat="dg in dgContainingThis">
+                                    {{dg}}
+                                </li>
+                            </ul>
 
+                            <!--
+                            <div class="list-group">
+                                <div class="list-group-item" ng-repeat="dg in dgContainingThis">
+                                    {{dg}}
+                                </div>
+                            </div>
+                            -->
+                        </div>
+
+
+                    </div>
                 </div>
-
 
 
 

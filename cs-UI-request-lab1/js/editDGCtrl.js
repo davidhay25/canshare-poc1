@@ -333,6 +333,7 @@ angular.module("pocApp")
 
             }
             //leave at the top as called when creating a new DG with a parent
+
             $scope.setModelAttribute = function(attribute,value) {
                 $scope.model[attribute] = value
 
@@ -368,7 +369,12 @@ angular.module("pocApp")
 
 
             } else {
+                //all DFGs that contain this one...
+                $scope.dgContainingThis = snapshotSvc.dgContainedBy(model.name)
+
+                //permitted input types
                 $scope.input.types = []
+
                 let ar = Object.keys(hashTypes)
                 ar.forEach(function(type) {
                     if (type !== model.name) {
