@@ -391,6 +391,18 @@
 
               </table>
 
+              <div>DG's that reference this one ({{dgContainingThis.length}})</div>
+              
+              <div class="myScroll">
+                <ul>
+                  <li ng-repeat="dgName in dgContainingThis"
+                      class="clickable"
+                      ng-click="termSelectDG({DGName:dgName},selectedModel.name)">
+                    {{dgName}}
+                  </li>
+                </ul>
+              </div>
+
             </div>
 
 
@@ -844,7 +856,25 @@
 
               </uib-tab>
 
+              <uib-tab ng-if = 'false'>
+                <uib-tab-heading>References <span class="badge">
+                  {{dgContainingThis.length || 0}}</span>
+                </uib-tab-heading>
+
+                <br/>
+                <div class="myScroll">
+                  <ul>
+                    <li ng-repeat="dg in dgContainingThis">
+                      {{dg}}
+                    </li>
+                  </ul>
+                </div>
+              </uib-tab>
+
               <uib-tab>
+
+
+
 
                 <uib-tab-heading>Conditional <span class="badge">
                   {{selectedNode.data.ed.enableWhen.length || 0}} | {{selectedNode.data.ed.conditionalVS.length || 0}}</span>

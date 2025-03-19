@@ -2045,12 +2045,17 @@ angular.module("pocApp")
                     } else {
                         //the model may have been updated - select it to refresh the various tabs
                         //note this is the model passed in for editing
+
                         traceSvc.addAction({action:'edit-model',model:model})
+                    //    console.time("Make all DT list")
                         $scope.makeAllDTList()      //as a parent may have been udpated or deleted
-
+                   //     console.timeEnd("Make all DT list")
+                   //     console.time("Make snapshots")
                         $scope.makeSnapshots()
+                    //    console.timeEnd("Make snapshots")
+                    //    console.time("Select model")
                         $scope.selectModel(model)
-
+                     //   console.timeEnd("Select model")
                     }
 
 
@@ -2203,6 +2208,7 @@ angular.module("pocApp")
                 $scope.relationshipsSummary = snapshotSvc.getRelationshipsSummary(dg.name)
                 $scope.dgNamedQueries = snapshotSvc.getNamedQueries(dg.name)
                 $scope.variablesForDG =snapshotSvc.getVariables(dg.name)
+                $scope.dgContainingThis = snapshotSvc.dgContainedBy(dg.name)    //all DGs that have a reference to this one or any of its children
 
 
                     //just testing
