@@ -2429,6 +2429,9 @@ angular.module("pocApp")
                     $(this).jstree("open_node",id);
                     //$(this).jstree("open_all");  //open all nodes
 
+                    //select the root node - displays the DG details
+                    $(this).jstree('select_node', id);
+
 
                     $scope.$digest()
                 })

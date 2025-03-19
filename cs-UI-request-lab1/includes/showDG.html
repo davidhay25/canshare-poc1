@@ -391,12 +391,13 @@
 
               </table>
 
-              <div>DG's that reference this one ({{dgContainingThis.length}})</div>
-              
-              <div class="myScroll">
+              <div>Descendants and DG's that reference this one or any descendants ({{dgContainingThis.length -1}})</div>
+
+              <div class="myScrollSmall">
                 <ul>
                   <li ng-repeat="dgName in dgContainingThis"
                       class="clickable"
+                      ng-if = "$index > 0"
                       ng-click="termSelectDG({DGName:dgName},selectedModel.name)">
                     {{dgName}}
                   </li>
