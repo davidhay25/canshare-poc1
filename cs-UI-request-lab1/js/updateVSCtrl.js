@@ -342,6 +342,7 @@ angular.module("pocApp")
                 domain = domain || "SACT"           //default to sact
 
                 $scope.allConceptMaps = []      //all CMs in the selected domain
+                $scope.everyConceptMap = []     //all CMs regardless of domain
                 let filter = `-${domain.toLowerCase()}-`
                 $scope.showWaiting = true
                 $scope.nextVersion = 1
@@ -349,9 +350,11 @@ angular.module("pocApp")
                     function (data) {   //return a bundle of all canshare ConceptMaps
 
                         //actually, we only want all the ConceptMaps for this domain.
-                       // $scope.allConceptMaps = []      //all CMs in the selected domain
                         data.data.entry.forEach(function (entry) {
-                            let cm = entry.resource
+                            let cm = entry.resource         //these are the full CM - may not be needed, but careful if changing...
+
+                            // add to the complete list - all domains
+                            $scope.everyConceptMap.push(cm)
 
                             //need to get a list of all domains
                             let ar = cm.id.split('-')
@@ -361,6 +364,7 @@ angular.module("pocApp")
                                     $scope.allDomains.push(dom)
                                 }
                             }
+
 
 
 
@@ -374,6 +378,19 @@ angular.module("pocApp")
 
                             }
                         })
+
+                        //sort the everyConceptMap list
+                        $scope.everyConceptMap.sort(function (a,b) {
+                            let inxa = a.id + a.version
+                            let inxb = b.id + b.version
+                            if (inxa > inxb) {
+                                return 1
+                            } else {
+                                return -1
+                            }
+
+                        })
+
 
 
                         //so now we know what the next version is going to be. Is there a current RC waiting for release?

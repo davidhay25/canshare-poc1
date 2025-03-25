@@ -6,6 +6,11 @@
 .fail {
     color: lightcoral;
 }
+
+.isEqual {
+    color: lightgreen;
+}
+
 .retiredVS {
     background-color: lightsalmon;
 }

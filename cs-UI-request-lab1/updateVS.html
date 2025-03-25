@@ -693,8 +693,31 @@
         </uib-tab>
         <uib-tab heading="ConceptMap">
 
+            <uib-tabset>
+                <uib-tab heading="Maps by domain">
+                    <ng-include src="'/includes/cmUploader.html'"></ng-include>
+                </uib-tab>
+                <uib-tab heading="All ConceptMaps">
 
-            <ng-include src="'/includes/cmUploader.html'"></ng-include>
+                    <table class="table-bordered table">
+                        <tr><th>Id</th><th>Description</th><th>Status</th><th>Version</th><th>Last updated</th></tr>
+                        <tr ng-repeat="cm in everyConceptMap">
+                            <td>
+                                <div class="clickable" ng-click="selectCMXXXX(cm.id)">{{cm.id}}</div></td>
+                            <td>{{cm.description}}</td>
+                            <td>{{cm.status}}</td>
+                            <td>{{cm.version}}</td>
+                            <td>{{cm.meta.lastUpdated | date : "MMM dd yyyy HH:mm"}}</td>
+
+                        </tr>
+                    </table>
+
+                    <pre>{{everyConceptMap | json}}</pre>
+
+                </uib-tab>
+            </uib-tabset>
+
+
 
 
 

@@ -1,6 +1,13 @@
 
 <div>
 
+
+  <style>
+
+
+
+  </style>
+
   <div class="modal-header">
 
     <div class="row">
@@ -20,13 +27,56 @@
   <div class="modal-body">
 
     <uib-tabset>
-      <uib-tab heading="Json">
+      <uib-tab heading="Table">
         <div class="row">
           <div class="col-md-6">
-            <pre>{{leftDiffDG | json}}</pre>
+            <table class="table table-bordered">
+              <tr><th>Path</th><th>Local</th><th>Component</th></tr>
+              <tr ng-repeat="(k,v) in rowsHash"
+                  ng-class="{listItemSelected:k == selectedPath}"
+                ng-click="selectRow(k,v)">
+                <td>{{k}}</td>
+                <td>{{v.local.title}}</td>
+                <td>{{v.component.title}}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="col-md-6" ng-if="selectedPath">
+
+
+            <table class="table table-bordered">
+              <tr><th>Path</th><th>Local</th><th>Component</th></tr>
+              <tr ng-repeat="(k,v) in elementsHash"
+                  ng-class="{listItemSelected:k == selectedPath,isEqual : v.isEqual}"
+                  ng-click="selectRowXX(k,v)">
+                <td>{{k}}</td>
+                <td>{{v.local}}</td>
+                <td>{{v.component}}</td>
+              </tr>
+            </table>
+
+
+
+            <strong>Local Element</strong>
+            <pre>{{selectedLocalEl | json}}</pre>
+
+            <strong>Component Element</strong>
+            <pre>{{selectedComponentEl | json}}</pre>
+          </div>
+        </div>
+
+      </uib-tab>
+
+      <uib-tab heading="Json">
+
+        <div class="row">
+          <div class="col-md-6">
+            <strong>Local DG</strong>
+            <pre>{{localDG | json}}</pre>
           </div>
           <div class="col-md-6">
-            <pre>{{rightDiffDG | json}}</pre>
+            <strong>Component DG</strong>
+            <pre>{{componentDG | json}}</pre>
           </div>
         </div>
       </uib-tab>

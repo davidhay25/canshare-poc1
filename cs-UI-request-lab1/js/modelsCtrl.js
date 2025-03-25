@@ -152,33 +152,31 @@ angular.module("pocApp")
 
 
 
+
+
+            //create a diff between the current model and the copy in the componnet store (if any0
             $scope.createDiff = function () {
-                let leftDiffDG = $scope.selectedModel
-                let key = `pg-${$scope.selectedModel.id}`
 
-                $localForage.getItem(key).then(
-                    function (data) {
-                        let rightDiffDG = data
+                let localDG =  snapshotSvc.getFrozenDG($scope.selectedModel.name)    //get the frozen version - ie with a snapshot
+                let componentDG = $scope.componentVersion   //The one currently in the component store
 
-
-                        $uibModal.open({
-                            templateUrl: 'modalTemplates/dgDiff.html',
-                            backdrop: 'static',
-                            size : 'xlg',
-                            controller: 'dgDiffCtrl',
-                            resolve : {
-                                leftDiffDG : function() {
-                                    return leftDiffDG
-                                },
-                                rightDiffDG: function () {
-                                    return rightDiffDG
-                                }
-                            }
-                        })
-
-
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/dgDiff.html',
+                    backdrop: 'static',
+                    size : 'xlg',
+                    controller: 'dgDiffCtrl',
+                    resolve : {
+                        localDG : function() {
+                            return localDG
+                        },
+                        componentDG: function () {
+                            return componentDG
+                        }
                     }
-                )
+                })
+
+
+
 
             }
 
@@ -574,6 +572,7 @@ angular.module("pocApp")
 
 
                 $scope.usageSummary = snapshotSvc.dgUseSummary()
+                $scope.leafDGs = snapshotSvc.leafDGs()
                 $scope.diffAnalysis = snapshotSvc.diffAnalysis($scope.hashAllDG)
 
             }
@@ -2209,6 +2208,18 @@ angular.module("pocApp")
                 $scope.dgNamedQueries = snapshotSvc.getNamedQueries(dg.name)
                 $scope.variablesForDG =snapshotSvc.getVariables(dg.name)
                 $scope.dgContainingThis = snapshotSvc.dgContainedBy(dg.name)    //all DGs that have a reference to this one or any of its children
+
+
+                //get this model from the compoenent store.
+                delete $scope.componentVersion
+                $http.get(`/frozen/${dg.name}`).then(
+                    function (data) {
+                        $scope.componentVersion = data.data
+                        console.log(data.data)
+
+                    }
+                )
+
 
 
                     //just testing

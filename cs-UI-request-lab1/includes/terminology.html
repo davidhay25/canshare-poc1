@@ -253,6 +253,22 @@
 
     </uib-tab>
 
+
+    <uib-tab heading = "Leaf DGs">
+      <em>DG's that are not parents to any other</em>
+      <div class="myScroll">
+        <table class="table-bordered table">
+          <tr><th>Name</th></tr>
+          <tr ng-repeat="rowDG in leafDGs">
+            <td><div class="clickable" ng-click="termSelectDG({DGName:rowDG.name})">{{rowDG.name}}</div></td>
+            <td>{{rowDG}}</td>
+          </tr>
+        </table>
+      </div>
+
+    </uib-tab>
+
+
     <uib-tab heading = "DG usage summary">
       <div class="row">
         <div class="col-md-6">

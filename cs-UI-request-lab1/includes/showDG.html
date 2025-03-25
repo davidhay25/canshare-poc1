@@ -30,7 +30,8 @@
 
         <div>
           <div ng-if="selectedModel.dirty">
-            <strong ng-click="createDiff()" class="pull-right clickable">DG has been updated</strong>
+            <strong  class="pull-right">DG has been updated</strong>
+            <!--  <strong ng-click="createDiff()" class="pull-right clickable">DG has been updated</strong>-->
           </div>
         </div>
 
@@ -387,6 +388,12 @@
                   </td>
                 </tr>
 
+                <tr ng-if="componentVersion">
+                  <td>Component</td>
+                  <td>
+                    <div class="clickable" ng-click="createDiff()">View differences</div>
+                  </td>
+                </tr>
 
 
               </table>

@@ -937,6 +937,31 @@ angular.module("pocApp")
 
         return {
 
+            leafDGs : function () {
+                //dg's that are leaf nodes
+                //create a list of all DG's that are referred to as a parent
+                let hashAllParents = {}
+                for (const key of Object.keys(allDgSnapshot)) {
+                    let dg = allDgSnapshot[key]
+                    if (dg.parent) {
+                        hashAllParents[dg.parent] = hashAllParents[dg.parent] || []
+                        hashAllParents[dg.parent].push(dg.name)     //this DG refers to that parent
+
+                    }
+                }
+                //now get the list of DG's never referred to as a parent
+                let leafDG = []
+                for (const key of Object.keys(allDgSnapshot)) {
+                    let dg = allDgSnapshot[key]
+                    if (! hashAllParents[dg.name]) {
+                        let item = {name:dg.name}
+                        leafDG.push(item)
+                    }
+                }
+
+                return leafDG
+
+            },
 
             diffAnalysis : function (hashAllDG) {
                 //what diffs do - specifically diffs that are zeroing out something...
