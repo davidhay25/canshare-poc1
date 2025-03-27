@@ -67,11 +67,16 @@ angular.module("pocApp")
                     // data is the key of the value > 10
                     try {
                         $scope.localStore.sort(function (a,b) {
-                            if (a.name.toLowerCase() > b.name.toLowerCase()) {
-                                return 1
-                            } else {
-                                return -1
+                            try {
+                                if (a.name.toLowerCase() > b.name.toLowerCase()) {
+                                    return 1
+                                } else {
+                                    return -1
+                                }
+                            } catch (e) {
+                                return 0
                             }
+
 
                         })
                     } catch (e) {

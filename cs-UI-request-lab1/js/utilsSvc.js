@@ -51,7 +51,7 @@ angular.module("pocApp")
 
         return {
             getVersion : function(){
-                return "1.0.1"
+                return "1.0.2"
             },
             getUUID : function () {
                 return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {

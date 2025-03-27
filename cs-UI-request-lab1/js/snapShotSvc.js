@@ -1082,7 +1082,11 @@ angular.module("pocApp")
 
                 let arUsage = []
                 for (const key of Object.keys(hashUsage)) {
-                    arUsage.push({name:key,title:hashName[key].title,cnt:hashUsage[key].cnt,names:hashUsage[key].names})
+                    let title = key
+                    if (hashName[key]) {
+                        title = hashName[key].title
+                    }
+                    arUsage.push({name:key,title:title,cnt:hashUsage[key].cnt,names:hashUsage[key].names})
                 }
 
                 arUsage.sort(function (a,b) {

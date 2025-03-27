@@ -434,11 +434,18 @@ angular.module("pocApp")
                 });
             }
 
+            //Import a DG from 'frozen' into a collection.
             $scope.importDG = function (inx) {
                 let dg = $scope.importableDG[inx]
-                $scope.hashAllDG[dg.name] = dg
-                $scope.init()
-                alert("DG has been imported")
+                let name = dg.name
+                let newName = prompt("What is the name for the importedDG (No spaces)",name)
+                if (newName) {
+                    dg.name = newName.replace(/\s/g, '')    //remove any spaces
+                    $scope.hashAllDG[dg.name] = dg
+                    $scope.init()
+                    alert(`DG has been imported`)
+                }
+
             }
             $scope.updateDG = function (inx) {
                 alert("Not yet implemented. Will update the DG from the component. Need a diff of some sort")
@@ -1978,8 +1985,10 @@ angular.module("pocApp")
                         //traceSvc.addAction({action:'new-model',model:newModel})
 
                         newModel.id = utilsSvc.getUUID()
+                        newModel.source = $scope.userMode
 
-                        if ($scope.user) {
+                        //Only update the Library (LIM) in LIM mode...
+                        if ($scope.user && $scope.userMode == 'library') {
                             newModel.author = $scope.user.email
                             librarySvc.checkOut(newModel,$scope.user)
                         }
@@ -1989,7 +1998,8 @@ angular.module("pocApp")
                         //if it's a new child and the parent has any enableWhens that they will
                         // have the root segment in the source as the parent dh name so a diff is needed that replaces
                         // it with the new name. The same thing happens with clone...
-                        if (newModel.parent) {
+                        //Mar28 - not needed with the change to using id's in the enableWhens..
+                        if (false && newModel.parent) {
                             let parentDG = $scope.hashAllDG[newModel.parent]
                             if (parentDG && parentDG.diff) {
                                 newModel.diff = newModel.diff || []

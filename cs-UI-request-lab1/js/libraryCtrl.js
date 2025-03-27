@@ -8,6 +8,13 @@ angular.module("pocApp")
             $scope.input.showForm = true
             $scope.user = user
             $scope.userMode = userMode
+
+            if (userMode == 'library') {
+                $timeout(function () {
+                  //  $scope.input.mainTabActive = 1
+                },1000)
+
+            }
             //$scope.input.mainTabActive = 1
 
             $scope.canBulkUpdateDGLibrary = function () {

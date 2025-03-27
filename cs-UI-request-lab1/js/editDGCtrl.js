@@ -25,6 +25,8 @@ angular.module("pocApp")
                     //only from library (LIM)
                     $scope.allFrozen = data.data.filter(dg => dg.source == 'library')
 
+                    $scope.allFrozen = data.data
+
                     populateControls()
 
                 },function (err) {
@@ -80,8 +82,6 @@ angular.module("pocApp")
                         $scope.input.type = vo.value
                     }
 
-
-
                 })
             }
 
@@ -93,8 +93,6 @@ angular.module("pocApp")
                     getFullElementList()    //update the full element list
                 }
             }
-
-
 
 
 
@@ -114,7 +112,6 @@ angular.module("pocApp")
                                 if ($scope.namedQueries.filter(item => item.name == nqName).length > 0) {
                                     $scope.input.nq[nqName] = true
                                 }
-
 
                             }
                         }
@@ -161,8 +158,6 @@ angular.module("pocApp")
 
                     }
 
-
-
                 }
 
             }
@@ -177,7 +172,7 @@ angular.module("pocApp")
 
             } else {
                 //all DFGs that contain this one...
-                $scope.dgContainingThis = snapshotSvc.dgContainedBy(model.name)
+                //$scope.dgContainingThis = snapshotSvc.dgContainedBy(model.name)
 
                 //permitted input types
                 $scope.input.types = []
@@ -240,6 +235,7 @@ angular.module("pocApp")
 
 
                     if (model.linkedDG) {
+                        //set the 'linkedDG' control to the selected model
                         let ar = $scope.allFrozen.filter(dg => dg.name == model.linkedDG)
                         if (ar.length == 1) {
                             $scope.input.linkedDG = ar[0]
@@ -375,6 +371,7 @@ angular.module("pocApp")
             //add a new item
             $scope.add = function () {
                 let element = {}
+                element.id = utilsSvc.getUUID()
                 element.path = $scope.input.path
                 element.title = $scope.input.title
                 element.type = [$scope.input.type]
@@ -397,6 +394,7 @@ angular.module("pocApp")
 
             $scope.remove = function (inx) {
               //  if (confirm("Are you sure you wish to remove this element")) {
+                //todo - check for children
 
                     $scope.model.diff.splice(inx,1)
                     getFullElementList()
