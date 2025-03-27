@@ -36,10 +36,11 @@ angular.module("pocApp")
             },
 
             updateDGId : function (dg) {
-                //add id's to the dg and all the ed. Update any conditionals
+                //add id's to the dg and all the ed. Update any conditionals. Can run any number of times.
+
 //return //just for now
 
-                return
+              //  return
                 dg.id = dg.id || utilsSvc.getUUID()
 
                 let hashByPath = {}
@@ -57,13 +58,18 @@ angular.module("pocApp")
                     if (ed.enableWhen) {
                         ed.enableWhen.forEach(function (ew) {
                             //note that ew.source has the dgName as a prefix. hashByPath does not.
-                            let key = `${dg.name}.${ew.source}`
+
+                            let key = ew.source
+
+
+                            //let key = `${dg.name}.${ew.source}`
+
                             let sourceId = hashByPath[key]
                             if (sourceId) {
                                 //ew.sourcePathId = sourceId
                                 ew.sourceId = sourceId
-                                ew.issue =  ew.issue || []
-                                ew.issue.push(`Unable to locate the key ${key} in this DG. It may be inherited or contained.`)
+                               // ew.issue =  ew.issue || []
+                               // ew.issue.push(`Unable to locate the key ${key} in this DG. It may be inherited or contained.`)
                             } else {
                                 console.error(`EW source path ${ew.source} not found in DG`)
                             }
@@ -157,11 +163,16 @@ angular.module("pocApp")
                 //construct a hash of all elements in this DG
                 let hashElements = {}
                 let hashElementsById = {}       //ew now use id's as the lookup
+                let hashByLast = {}              //hash by last in path
+
                 lstElements.forEach(function (item) {
                     if (item.ed.mult !== '0..0') {
                         hashElements[item.ed.path] = item.ed
-                        if (item.ed.id) {
+                        if (item.ed.id) {   //once updated, this should always be true
                             hashElementsById[item.ed.id] = item.ed
+                            let last = $filter('lastInPath')(item.ed.path)
+                            hashByLast[last] = hashByLast[last] || []
+                            hashByLast[last].push(item.ed)
                         } else {
                             if (item.ed.path !==dgName) {   //the first element is the DG and won't have an id (or a path)
                                //just fills the log... console.error(`path ${item.ed.path} has no Id`)
@@ -184,14 +195,40 @@ angular.module("pocApp")
                             let entry = {}
                             let sourceEd
 
-                            let findStrategy = 'path'        //so I can test different strategies
+                            let findStrategy = 'id'        //so I can test different strategies
 
                             if (findStrategy == 'id') {
-                                sourceEd = hashElementsById[source]
+                                if (ew.sourceId) {
+                                    sourceEd = hashElementsById[ew.sourceId]
 
-                                if (! sourceEd) {
-                                    entry.error = `Warning! source ed not found at path ${ew.source}`
+                                    if (! sourceEd) {
+
+                                        entry.error = `Warning! source ed ${ew.sourceId} not found`
+                                    }
+                                } else {
+
+                                    if (hashElements[ew.source]) {
+                                        entry.error = `Warning! EW ${ew.source}  missing sourceId, but sourcePath is found`
+                                    } else {
+                                        //is there any element where the last segment in the source matches
+                                        let sourceLast = $filter('lastInPath')(ew.source)
+                                        if (hashByLast[sourceLast]) {
+
+
+
+                                            entry.error = `Warning! EW ${ew.source}  missing sourceId, but ${hashByLast[sourceLast].length} elements found with last segment match`
+                                        } else {
+                                            entry.error = `Warning! EW ${ew.source}  missing sourceId`
+                                        }
+
+
+
+
+                                    }
+
+
                                 }
+
                             }
                             if (findStrategy == 'path') {
                                     sourceEd = hashElements[source]

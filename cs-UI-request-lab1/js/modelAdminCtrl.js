@@ -131,12 +131,22 @@ angular.module("pocApp")
 
                 Object.keys($scope.world.dataGroups).forEach(function (key) {
                     let dg = $scope.world.dataGroups[key]
-                    let allElements = snapshotSvc.getFullListOfElements(dg.name)
-
+                    let allElements = []
+                    try {
+                        allElements = snapshotSvc.getFullListOfElements(dg.name)
+                    } catch (e) {
+                        alert('from ss' + e.message)
+                    }
 
                     allElements.forEach(function (item) {
-                        hash[item.ed.path] = item.ed
-                        hashSourceId[item.ed.id] = item.ed
+                        if (! item.ed) {
+                            alert(`Empty ed in ${key}`)
+                        } else {
+                            hash[item.ed.path] = item.ed
+
+                            hashSourceId[item.ed.id] = item.ed
+                        }
+
                     })
 
                 })
@@ -193,8 +203,6 @@ angular.module("pocApp")
 
                                     item.issues.push('id search: ed not found')
                                 }
-
-
 
                                 $scope.allEW.push(item)
                             })
@@ -310,7 +318,7 @@ angular.module("pocApp")
 
 
 
-                try {
+             //   try {
                     snapshotSvc.makeSnapshots($scope.hashAllDG)
                     $scope.ewSummary = []
                     let tot = 0
@@ -336,9 +344,10 @@ angular.module("pocApp")
                     } catch(ex) {
                         alert(ex.message)
                     }
-                } catch (e) {
-
-                }
+           //     } catch (e) {
+            //        alert(e.message)
+             //       console.error(e.message)
+            //    }
 
 
 
@@ -448,6 +457,9 @@ angular.module("pocApp")
             $scope.selectTraceItem = function (item) {
                 $scope.selectedTraceItem = item
             }
+
+
+
 
 
 

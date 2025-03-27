@@ -3,7 +3,10 @@ angular.module("pocApp")
         function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc,snapshotSvc, parent,
                   utilsSvc, modelDGSvc,$http,userMode,$uibModal,$timeout,$filter,viewVS) {
 
-            $scope.model=model
+
+            //if parent is set, then 'isNew' will be also...
+
+            $scope.model= model
             $scope.input = {}
             $scope.edit = {}
             $scope.isNew = isNew        //if new, then allow the model metadata to be set
@@ -30,27 +33,7 @@ angular.module("pocApp")
                     populateControls()      //even in error
                 }
             )
-/*
-            $scope.editAdHocExtension = function (ed) {
-                $uibModal.open({
-                    templateUrl: 'modalTemplates/adHocExtension.html',
-                    backdrop: 'static',
-                    size : 'lg',
-                    controller: 'adHocExtensionCtrl',
-                    resolve: {
-                        currentExt: function () {
-                            return ed.adHocExtension
-                        }
-                    }
-                }).result.then(function (ext) {
 
-                    if (ext) {
-
-                    }
-                })
-            }
-
-*/
 
             //create a list of potential parent types for a new DG -
             $scope.input.possibleParents = []
@@ -69,83 +52,6 @@ angular.module("pocApp")
                 }
             })
             $scope.input.possibleParents.sort()
-
-            $scope.editPath = function (ed) {
-                let newPath = prompt("Enter new path",ed.path)
-                if (newPath) {
-                    ed.path = newPath
-                }
-               // alert(ed.path + " " + newPath)
-            }
-
-            $scope.viewVS = function (url) {
-                viewVS(url)
-            }
-
-            $scope.moveAfter = function (pos,element) {
-                let path = $filter('lastInPath')(element.path)
-                let msg = `This is row ${pos} (${path}). Enter the row number to move this row to.`
-                const input = prompt(msg);
-
-                if (input !== null) {
-                    let newPos = Number(input);
-                    if (!isNaN(newPos)) {
-                        alert(`You entered: ${newPos}`);
-                        if (newPos > 0 && newPos < model.diff.length) {
-                            const [row] = model.diff.splice(pos,1)
-                            if (newPos > pos) (
-                                newPos--
-                            )
-                            model.diff.splice(newPos,0,row)
-                        }
-
-
-                    } else {
-                        alert("That's not a valid number!");
-                    }
-                }
-
-
-            }
-
-
-            $scope.extBuilder = function () {
-                $uibModal.open({
-                    templateUrl: 'modalTemplates/makeSDCExtension.html',
-                    backdrop: 'static',
-                    size : 'lg',
-                    controller: 'makeSDCExtensionCtrl',
-                    resolve: {
-                        elements: function () {
-                            return $scope.allElements
-                        }, currentPath : function () {
-                            return model.name
-                        }
-                    }
-                }).result.then(function (ext) {
-
-                    if (ext) {
-                        $scope.model.adHocExtension = $scope.model.adHocExtension || []
-                        $scope.model.adHocExtension.push(ext)
-                       // $scope.input.adHocExt = angular.toJson(ext,true)
-                    }
-
-                    /*
-
-                    let json = angular.toJson(ext,true)
-
-                    if ($scope.input.adHocExt) {
-                        let l = $scope.input.adHocExt.length
-                        $scope.input.adHocExt = $scope.input.adHocExt.substring(0,l-1) + "," + json + '\n]'
-
-                    } else {
-                        $scope.input.adHocExt = `[${json}]`
-                    }
-*/
-
-                })
-
-            }
 
 
             //set the type for an ed. Only for a new one
@@ -182,10 +88,8 @@ angular.module("pocApp")
 
             $scope.deleteParent = function () {
                 if (confirm("Are you sure you wish to remove the parent?")) {
-
                     delete $scope.model.parent      //delete on the model
                     delete $scope.input.newModelParent //update the UI
-
                     getFullElementList()    //update the full element list
                 }
             }
@@ -193,103 +97,6 @@ angular.module("pocApp")
 
 
 
-            //fixed value stuff
-            $scope.addFixedValue = function (path,type,value) {
-
-                let v = value
-                try {
-                    //try to convert to an object. If it isn't then the value remins simple
-                    v = angular.fromJson(value)
-                } catch (ex) {
-
-                }
-
-
-
-                let fv = {path:path,type:type}
-                fv.value = v
-                $scope.input.fixedValues.push(fv)
-                delete $scope.input.fvPath
-                delete $scope.input.fvType
-                delete $scope.input.fvValue
-            }
-
-            $scope.removeFixedValue = function (inx) {
-                $scope.input.fixedValues.splice(inx,1)
-            }
-
-
-            //----------- resource references
-
-            $scope.getPathsForSource = function (rrSource) {
-
-                //get all the elements in the source Resource that are references
-                //called when both source and target resources are known so that the list is only valid references
-                //let fhirType = rrSource.type
-
-
-                if ($scope.input.rrSource && $scope.input.rrTarget) {
-
-                    let qry = `/fsh/fhirtype/${$scope.input.rrSource.fhirType}`
-                    $http.get(qry).then(
-                        function (data) {
-                            let arElements = data.data
-                            let sourceProfile = `http://hl7.org/fhir/StructureDefinition/${$scope.input.rrTarget.fhirType}`
-                            console.log(data.data)
-                            $scope.definitions = []
-                            arElements.forEach(function (el) {
-                                if (el.types) {
-                                    for (const typ of el.types) {
-                                        if (typ.code == 'Reference' && typ.targetProfile) {
-                                            for (const prof of typ.targetProfile) {
-
-                                                if (prof == sourceProfile || (prof == 'http://hl7.org/fhir/StructureDefinition/Resource')) {
-
-                                                    $scope.definitions.push(el)
-                                                    break
-                                                }
-                                            }
-
-
-                                        }
-                                    }
-                                }
-                            })
-                            console.log($scope.definitions)
-                        }
-
-                    )
-
-
-                }
-
-            }
-
-            $scope.addRR = function (source,definition,target,adHocDefinition) {
-                //target could be a string or an object with a property of path
-                $scope.input.resourceReferences = $scope.input.resourceReferences || []
-                //create the name that will be used in the allocateID extension
-
-                //let ar = target.path.split('.')
-                //connnectathon todo
-                let def = adHocDefinition
-                if (definition && definition.path) {
-                    def = definition.path
-                }
-
-                //let rr = {source:source.path,definition:definition.path,target:path}
-                let rr = {source:source.path,definition:def,target:target.path}
-                //let rr = {source:source.path,definition:definition.path,target:target.path}
-                $scope.input.resourceReferences.push(rr)
-                delete $scope.input.rrSource
-                delete $scope.input.rrDefinition
-                delete $scope.input.rrTarget
-
-            }
-
-            $scope.removeRR = function (inx) {
-                $scope.input.resourceReferences.splice(inx,1)
-            }
 
             //Load all the Named queries
             function loadNamedQueries() {
@@ -467,15 +274,8 @@ angular.module("pocApp")
                 }
             }
 
-
-
-
-
             $scope.input.cards = ["0..1","1..1","0..*",'1..*']
             $scope.input.card = $scope.input.cards[0]
-
-
-
 
             $scope.canEdit = function (element) {
                 //can the element be overridden - ie it comes from a referenced datatype not defined directly on the model
@@ -539,51 +339,7 @@ angular.module("pocApp")
 
             }
 
-            //return true if there is an override element in the model for this path..
-            $scope.hasBeenOverridden = function(element) {
-                //the path in the model.diff won't have the first field
-                if (! $scope.model || !$scope.model.diff) {
-                    //when adding a new DG
-                    return false
-                }
 
-                //todo - not sure why there are elements with no ed...
-                if (! element.ed || !element.ed.path) {
-                    console.log ("missing ed or path",element)
-                   return  false
-                }
-
-                let ar = element.ed.path.split('.')
-
-                if (ar.length == 2){
-                    return false // defined in the model
-                }
-                ar.splice(0,1)
-                let pathToCompare = ar.join('.')
-                let result = false
-                $scope.model.diff.forEach(function (e) {
-                    if (e.path == pathToCompare) {
-                        result = true
-                    }
-                })
-                return result
-            }
-
-
-
-            //select an element from the expanded elements list
-            $scope.selectElement = function (element) {
-                //delete $scope.selectedOverrideElement
-                //locate the element in the allElements array. This is that setting/removing override can update the contents
-
-                for (const el of $scope.allElements) {
-                    if (el.path == element.path) {
-                        $scope.selectedElementOverridden = $scope.hasBeenOverridden(el)
-                        $scope.selectedElement = el
-                        break
-                    }
-                }
-            }
 
 
 
@@ -619,8 +375,6 @@ angular.module("pocApp")
             //add a new item
             $scope.add = function () {
                 let element = {}
-                //element.status = 'new'
-                //$scope.model.status = 'changed'
                 element.path = $scope.input.path
                 element.title = $scope.input.title
                 element.type = [$scope.input.type]
@@ -662,33 +416,6 @@ angular.module("pocApp")
             }
 
 
-            $scope.validateJson = function(value,displayErr) {
-                //let v = value
-                if (! value) {
-                    return
-                }
-                try {
-                    //try to convert to an object. If it isn't then the value remins simple
-                    let v = angular.fromJson(value)
-                    let ok = true
-                    let msg = "All good. The Json is valid"
-                    if (! Array.isArray(v)) {
-                        msg = "It's json, but must be an array"
-                        ok = false
-                    }
-
-                    if (displayErr) {
-                        alert(msg)
-                    }
-                    return ok
-                } catch (ex) {
-                    if (displayErr) {
-                        alert("There is a problem. The Json is invalid. Are you using double quotes?")
-                    }
-                    return false
-                }
-            }
-
             $scope.save = function () {
                 $scope.model.type = $scope.input.type
 
@@ -704,11 +431,6 @@ angular.module("pocApp")
                     delete model.linkedDG
                 }
 
-
-
-
-
-
                 if ($scope.input.obsExtract) {
                     $scope.model.obsExtract = true
                 } else {
@@ -717,7 +439,6 @@ angular.module("pocApp")
 
                 //update the named queries
                 delete $scope.model.namedQueries
-
 
                 for (const key of Object.keys($scope.input.nq)) {
                     if (key && $scope.input.nq[key]) {
@@ -747,6 +468,8 @@ angular.module("pocApp")
 
             }
 
+
+            //from the base elements - there's a sort option
 
             $scope.sort = function () {
 
@@ -799,9 +522,286 @@ angular.module("pocApp")
 
 
 
+            //when editing a path in the 'base model content' tab
+            $scope.editPath = function (ed) {
+                let newPath = prompt("Enter new path",ed.path)
+                if (newPath) {
+                    ed.path = newPath
+                }
+            }
+
+            $scope.viewVS = function (url) {
+                viewVS(url)
+            }
+
+            $scope.moveAfter = function (pos,element) {
+                let path = $filter('lastInPath')(element.path)
+                let msg = `This is row ${pos} (${path}). Enter the row number to move this row to.`
+                const input = prompt(msg);
+
+                if (input !== null) {
+                    let newPos = Number(input);
+                    if (!isNaN(newPos)) {
+                        alert(`You entered: ${newPos}`);
+                        if (newPos > 0 && newPos < model.diff.length) {
+                            const [row] = model.diff.splice(pos,1)
+                            if (newPos > pos) (
+                                newPos--
+                            )
+                            model.diff.splice(newPos,0,row)
+                        }
+
+
+                    } else {
+                        alert("That's not a valid number!");
+                    }
+                }
+
+
+            }
 
 
 
+
+            //-========================   redundant  ==============
+
+
+            //return true if there is an override element in the model for this path..
+            $scope.hasBeenOverridden = function(element) {
+                //the path in the model.diff won't have the first field
+                if (! $scope.model || !$scope.model.diff) {
+                    //when adding a new DG
+                    return false
+                }
+
+                //todo - not sure why there are elements with no ed...
+                if (! element.ed || !element.ed.path) {
+                    console.log ("missing ed or path",element)
+                    return  false
+                }
+
+                let ar = element.ed.path.split('.')
+
+                if (ar.length == 2){
+                    return false // defined in the model
+                }
+                ar.splice(0,1)
+                let pathToCompare = ar.join('.')
+                let result = false
+                $scope.model.diff.forEach(function (e) {
+                    if (e.path == pathToCompare) {
+                        result = true
+                    }
+                })
+                return result
+            }
+
+
+
+            //select an element from the expanded elements list
+            $scope.selectElement = function (element) {
+                //locate the element in the allElements array. This is that setting/removing override can update the contents
+
+                for (const el of $scope.allElements) {
+                    if (el.path == element.path) {
+                        $scope.selectedElementOverridden = $scope.hasBeenOverridden(el)
+                        $scope.selectedElement = el
+                        break
+                    }
+                }
+            }
+
+
+
+            $scope.validateJson = function(value,displayErr) {
+                //let v = value
+                if (! value) {
+                    return
+                }
+                try {
+                    //try to convert to an object. If it isn't then the value remins simple
+                    let v = angular.fromJson(value)
+                    let ok = true
+                    let msg = "All good. The Json is valid"
+                    if (! Array.isArray(v)) {
+                        msg = "It's json, but must be an array"
+                        ok = false
+                    }
+
+                    if (displayErr) {
+                        alert(msg)
+                    }
+                    return ok
+                } catch (ex) {
+                    if (displayErr) {
+                        alert("There is a problem. The Json is invalid. Are you using double quotes?")
+                    }
+                    return false
+                }
+            }
+
+
+
+            //----------- resource references
+
+            $scope.getPathsForSource = function (rrSource) {
+
+                //get all the elements in the source Resource that are references
+                //called when both source and target resources are known so that the list is only valid references
+                //let fhirType = rrSource.type
+
+
+                if ($scope.input.rrSource && $scope.input.rrTarget) {
+
+                    let qry = `/fsh/fhirtype/${$scope.input.rrSource.fhirType}`
+                    $http.get(qry).then(
+                        function (data) {
+                            let arElements = data.data
+                            let sourceProfile = `http://hl7.org/fhir/StructureDefinition/${$scope.input.rrTarget.fhirType}`
+                            console.log(data.data)
+                            $scope.definitions = []
+                            arElements.forEach(function (el) {
+                                if (el.types) {
+                                    for (const typ of el.types) {
+                                        if (typ.code == 'Reference' && typ.targetProfile) {
+                                            for (const prof of typ.targetProfile) {
+
+                                                if (prof == sourceProfile || (prof == 'http://hl7.org/fhir/StructureDefinition/Resource')) {
+
+                                                    $scope.definitions.push(el)
+                                                    break
+                                                }
+                                            }
+
+
+                                        }
+                                    }
+                                }
+                            })
+                            console.log($scope.definitions)
+                        }
+
+                    )
+
+
+                }
+
+            }
+
+            $scope.addRR = function (source,definition,target,adHocDefinition) {
+                //target could be a string or an object with a property of path
+                $scope.input.resourceReferences = $scope.input.resourceReferences || []
+                //create the name that will be used in the allocateID extension
+
+                //let ar = target.path.split('.')
+                //connnectathon todo
+                let def = adHocDefinition
+                if (definition && definition.path) {
+                    def = definition.path
+                }
+
+                //let rr = {source:source.path,definition:definition.path,target:path}
+                let rr = {source:source.path,definition:def,target:target.path}
+                //let rr = {source:source.path,definition:definition.path,target:target.path}
+                $scope.input.resourceReferences.push(rr)
+                delete $scope.input.rrSource
+                delete $scope.input.rrDefinition
+                delete $scope.input.rrTarget
+
+            }
+
+            $scope.removeRR = function (inx) {
+                $scope.input.resourceReferences.splice(inx,1)
+            }
+
+            //fixed value stuff
+            $scope.addFixedValue = function (path,type,value) {
+
+                let v = value
+                try {
+                    //try to convert to an object. If it isn't then the value remins simple
+                    v = angular.fromJson(value)
+                } catch (ex) {
+
+                }
+
+
+
+                let fv = {path:path,type:type}
+                fv.value = v
+                $scope.input.fixedValues.push(fv)
+                delete $scope.input.fvPath
+                delete $scope.input.fvType
+                delete $scope.input.fvValue
+            }
+
+            $scope.removeFixedValue = function (inx) {
+                $scope.input.fixedValues.splice(inx,1)
+            }
+
+
+
+            $scope.extBuilder = function () {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/makeSDCExtension.html',
+                    backdrop: 'static',
+                    size : 'lg',
+                    controller: 'makeSDCExtensionCtrl',
+                    resolve: {
+                        elements: function () {
+                            return $scope.allElements
+                        }, currentPath : function () {
+                            return model.name
+                        }
+                    }
+                }).result.then(function (ext) {
+
+                    if (ext) {
+                        $scope.model.adHocExtension = $scope.model.adHocExtension || []
+                        $scope.model.adHocExtension.push(ext)
+                        // $scope.input.adHocExt = angular.toJson(ext,true)
+                    }
+
+                    /*
+
+                    let json = angular.toJson(ext,true)
+
+                    if ($scope.input.adHocExt) {
+                        let l = $scope.input.adHocExt.length
+                        $scope.input.adHocExt = $scope.input.adHocExt.substring(0,l-1) + "," + json + '\n]'
+
+                    } else {
+                        $scope.input.adHocExt = `[${json}]`
+                    }
+*/
+
+                })
+
+            }
+
+
+
+            /*
+                        $scope.editAdHocExtension = function (ed) {
+                            $uibModal.open({
+                                templateUrl: 'modalTemplates/adHocExtension.html',
+                                backdrop: 'static',
+                                size : 'lg',
+                                controller: 'adHocExtensionCtrl',
+                                resolve: {
+                                    currentExt: function () {
+                                        return ed.adHocExtension
+                                    }
+                                }
+                            }).result.then(function (ext) {
+
+                                if (ext) {
+
+                                }
+                            })
+                        }
+
+            */
 
 
 

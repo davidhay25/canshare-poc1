@@ -1605,12 +1605,15 @@ angular.module("pocApp")
                 }
 
 
+
+
                 //++++++++= temp Feb 27 error with re-order
-               // return lst
+                return lst
 
-                let lst1 = utilsSvc.reorder(lst)
+                //this is supposed to ensure that the order always has parents before children... - but it barfs if there are missing parents...
+            //    let lst1 = utilsSvc.reorder(lst)
 
-                    return lst1
+               //     return lst1
 
             }
         }

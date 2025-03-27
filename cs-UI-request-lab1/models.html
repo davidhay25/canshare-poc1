@@ -56,7 +56,7 @@
                     <span ng-if="userMode == 'playground'"
                           ng-click="changeUserMode($event,'library')">
                         <a class="navbar-brand" href="#">
-                            CanShare Form Builder
+                            CanShare Collections Builder
 
                              <div style="padding-top: 8px">{{world.name}}</div>
 
@@ -82,7 +82,7 @@
             <div class="col-md-1 col-sm-1">
                 <div class="navbar-text btn">
                     <button ng-if="userMode == 'playground'" class="btn btn-primary pull-right"
-                            ng-click="openPlaygrounds()">Forms</button>
+                            ng-click="openPlaygrounds()">Collections</button>
 
 
 
@@ -562,7 +562,7 @@
                     <table class="table table-bordered">
                         <tr><td style="width: 15%">Mode</td>
                             <td>
-                                <div ng-if="userMode == 'playground'">Forms</div>
+                                <div ng-if="userMode == 'playground'">Collections</div>
                                 <div ng-if="userMode == 'library'">Library</div>
 
 
@@ -667,7 +667,7 @@
                             <td>{{dg.title}}</td>
                             <td>{{dg.name}}</td>
                             <td>
-                                {{ { playground: "Form", library: "Library" }[dg.source] || dg.source}}
+                                {{ { playground: "Collection", library: "Library" }[dg.source] || dg.source}}
                             </td>
                             <td>{{dg.type}}</td>
                             <td>{{dg.description}}</td>
@@ -738,7 +738,7 @@
 
                 </uib-tab>
 
-                <uib-tab ng-if="userMode == 'playground'"  heading="Form history">
+                <uib-tab ng-if="userMode == 'playground'"  heading="Collection history">
                     <pre>{{playGroundHistory | json}}</pre>
                 </uib-tab>
 

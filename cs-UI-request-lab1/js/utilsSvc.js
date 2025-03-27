@@ -74,7 +74,6 @@ angular.module("pocApp")
 
                 let data = []
                 lstElements.forEach(function (item) {
-                    //data.push({path:item.ed.path,value:{title:item.ed.title,path:item.ed.path}})
                     data.push({path:item.ed.path,value:item.ed})
                 })
 
@@ -119,6 +118,9 @@ angular.module("pocApp")
                             if (node.children.length === 0) {
                                 delete node.children;
                             }
+
+                            //mat 26
+                          //  if ()
                         }
                     }
                     root.children.forEach(cleanUp);
@@ -157,6 +159,8 @@ angular.module("pocApp")
                 const hierarchicalHash = buildHierarchicalHash(data);
                 let ar = collectNodes(hierarchicalHash)
                 ar.splice(0,1)  //the first entry is null
+
+
                 return ar
 
             },

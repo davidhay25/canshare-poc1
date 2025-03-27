@@ -1317,7 +1317,7 @@ angular.module("pocApp")
                         $scope.cmProperties = data.data
 
                         //get the list of services from the ConceptMap
-                        let serviceUrl = "https://nzhts.digital.health.nz/fhir/ValueSet/canshare-cancer-service"
+                        let serviceUrl = "https://nzhts.digital.health.nz/fhir/ValueSet/canshare-sact-cancer-service"
                         let serviceConcepts = $scope.hashExpandedVs[serviceUrl]
 
                         $scope.input.allService = [{display:"No default"}]    //for default

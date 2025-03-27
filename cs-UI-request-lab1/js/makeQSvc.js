@@ -474,13 +474,25 @@ angular.module("pocApp")
                     let qEW = {}
                     qEW.question = sourceItem.prefix //  id //sourceItem.linkId
                     qEW.operator = '='
-                    qEW.answerCoding = {code:"74964007",system:'http://snomed.info/sct'}
+                    qEW.answerCoding = {code:"74964007",system:'http://snomed.info/sct',display:"Other"}
 
                     //If the original had definition set (ie where the element is extracted to) then add it to the new element as well
                     newItem.definition = sourceItem.definition
 
-                    newItem.enableWhen = sourceItem.enableWhen || []
+                    newItem.enableWhen = []
+                    for (const ew of sourceItem.enableWhen ) {
+                        newItem.enableWhen.push(ew)
+                    }
+
+                   // newItem.enableWhen = sourceItem.enableWhen || []
+
+
                     newItem.enableWhen.push(qEW)
+                    //if there is more thanone ew, then need to set the enableBehaviour
+                    if (newItem.enableWhen.length > 1) {
+                        newItem.enableBehavior = 'any'    //todo - may need to specify this
+                    }
+
 
                     break
                 case "textonly" :
@@ -527,7 +539,7 @@ angular.module("pocApp")
         //Add the 'enable when' to the Q
         //updates the item object directly
         //When used by the Composition, we add a prefix which is {compname}.{section name}. (note the trailing dot)
-        function addEnableWhen(ed,item,inPathPrefix) {
+        function addEnableWhen(ed,item,inPathPrefix,errorLog) {
 
 
 
@@ -543,7 +555,6 @@ angular.module("pocApp")
                     let qEW = {}
 
                     //When an EW is in a contained DG, then the paths of the source (in the EW) need to be updated
-                 //temp   let source = QutilitiesSvc.updateEWSourcePath(ed.path,ew.source)
                     let source = ew.source
 
                     //--------------
@@ -583,21 +594,34 @@ angular.module("pocApp")
                     //need to determine the path to the question. For now, assume that
                     //qEW.question = `${parent.linkId}.${ew.source}` //linkId of source is relative to the parent (DG)
                    // qEW.question = `${pathPrefix}${ew.source}` //linkId of source is relative to the parent (DG)
+                    //note deprecated - in favour of using an id
                     if (canAdd) {
-                        item.enableWhen = item.enableWhen || []
-                        item.enableWhen.push(qEW)
 
-                        //for the validation we need the target link as well... So this would be an invalid EW on the Q - don't add it!
-                        let copyEW = angular.copy(qEW)
-                        copyEW.target = item.linkId
+                        //if there is a source ID then the ew can be added. If not, then don't add
+                        if ( ew.sourceId ) {
+                            item.enableWhen = item.enableWhen || []
+                            item.enableWhen.push(qEW)
 
-                        allEW.push(copyEW)
+                            //for the validation we need the target link as well... So this would be an invalid EW on the Q - don't add it!
+                            let copyEW = angular.copy(qEW)
+                            copyEW.target = item.linkId
+
+                            allEW.push(copyEW)
 
 
-                        if (item.enableWhen.length == 2) {
-                            //if there are 2 EW then set the EW behaviour. More than 2 and it will already be set...
-                            item.enableBehavior = 'any'    //todo - may need to specify this
+                            if (item.enableWhen.length >1) {
+                                //if there are 2 EW then set the EW behaviour. More than 2 and it will already be set...
+                                item.enableBehavior = 'any'    //todo - may need to specify this
+                            }
+
+                        } else {
+                            errorLog.push({msg:`EW not added for ${ed.path} as sourceId missing in EW`})
                         }
+
+
+
+
+
                     }
 
                 })
@@ -1469,7 +1493,7 @@ angular.module("pocApp")
                         //console.log(path,extractionContext)
 
                         if (config.enableWhen) {
-                            let ar =  addEnableWhen(ed,currentItem,config.pathPrefix)
+                            let ar =  addEnableWhen(ed,currentItem,config.pathPrefix,errorLog)
                          //   allEW.push(...ar)
                         }
 
@@ -1545,7 +1569,7 @@ angular.module("pocApp")
                         decorateItem(currentItem,ed,extractionContext,dg,config)
 
                         if (config.enableWhen) {
-                            let ar = addEnableWhen(ed,currentItem,config.pathPrefix)
+                            let ar = addEnableWhen(ed,currentItem,config.pathPrefix,errorLog)
                         //    allEW.push(...ar)
                         }
 
@@ -2266,7 +2290,7 @@ angular.module("pocApp")
 
                 }
 
-                function correctEW(Q,conditionalED) {
+                function correctEWDEP(Q,conditionalED) {
 
                     function checkItem(item) {
 

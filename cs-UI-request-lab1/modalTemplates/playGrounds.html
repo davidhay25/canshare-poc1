@@ -5,7 +5,7 @@
 
         <div class="row">
             <div class="col-md-8 col-sm-8">
-                <h3 class="modal-title">Forms</h3>
+                <h3 class="modal-title">Collections</h3>
             </div>
 
             <div class="col-md-2">
@@ -26,7 +26,7 @@
 
         <div style="text-align: center" class="alert alert-warning" ng-if="currentDirty.length > 0">
             There are unsaved changes in the dataGroups <span ng-repeat="dg in currentDirty"><strong>{{dg}}</strong>, </span>.
-            If you load a Form or create a new one those changes will be lost.
+            If you load a Collection or create a new one those changes will be lost.
 
         </div>
 
@@ -50,7 +50,7 @@
                 </table>
             </uib-tab>
 
-            <uib-tab heading="Forms Repository">
+            <uib-tab heading="Collections Repository">
                 <table class="table table-bordered">
                     <tr><th>Name</th><th>Description</th><th># DG / Comp</th><th>Updated</th><th>Version</th>
 
@@ -79,7 +79,7 @@
                 </table>
             </uib-tab>
 
-            <uib-tab heading="New Form">
+            <uib-tab heading="New Collection">
                 <div><label>Name</label></div>
                 <input type="text" class="form-control" ng-model="input.name"/>
                 <br/>
@@ -87,7 +87,7 @@
                 <textarea class="form-control" ng-model="input.description"></textarea>
                 <br/>
                 <div>
-                    <button ng-if="input.name" class="btn btn-primary" ng-click="createNew()">Create new Form</button>
+                    <button ng-if="input.name" class="btn btn-primary" ng-click="createNew()">Create new Collection</button>
                 </div>
 
             </uib-tab>

@@ -2291,8 +2291,6 @@ angular.module("pocApp")
             $scope.selectModel = function (dg) {
                 if (dg) {
 
-
-
                     //ensure DG view selected
                     $scope.input.mainTabActive = $scope.ui.tabDG
 
@@ -2300,11 +2298,11 @@ angular.module("pocApp")
                     $scope.selectedModel = dg
 
                     //ensure that every ed has an id. If the DG does, then the EDs will as well...
-                    if (! $scope.selectedModel.id) {
+                  //  if (! $scope.selectedModel.id) {
 
-                        modelDGSvc.updateDGId($scope.selectedModel)    //add id's to DG & ED plus update conditionals
-                        $scope.hashAllDG[dg.name] = $scope.selectedModel //needed to update the local storage
-                    }
+                      //  modelDGSvc.updateDGId($scope.selectedModel)    //add id's to DG & ED plus update conditionals
+                      //  $scope.hashAllDG[dg.name] = $scope.selectedModel //needed to update the local storage
+                  // }
 
 
                     $scope.fhirResourceType = igSvc.findResourceType(dg,$scope.hashAllDG)   //not sure if this is used wo fsh stuff
