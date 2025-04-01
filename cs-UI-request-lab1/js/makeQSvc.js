@@ -480,9 +480,13 @@ angular.module("pocApp")
                     newItem.definition = sourceItem.definition
 
                     newItem.enableWhen = []
-                    for (const ew of sourceItem.enableWhen ) {
-                        newItem.enableWhen.push(ew)
+                    if (sourceItem.enableWhen) {
+                        for (const ew of sourceItem.enableWhen ) {
+                            newItem.enableWhen.push(ew)
+                        }
                     }
+
+
 
                    // newItem.enableWhen = sourceItem.enableWhen || []
 
@@ -1321,6 +1325,11 @@ angular.module("pocApp")
                     //now we need to look at the conditional ValueSets. If an item has condtional ValueSets defined
                     //then an ed is constructed for each VS with an enableWhen defined.
                     //todo - should the original be defined - what about the linkId
+/* Changing to use https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-candidateExpression.html
+
+
+iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
+| iif(%country.answer.value.code == 'NZ', 'http://example.org/Valueset/NZ-States')
 
                     if (thing.ed.conditionalVS && thing.ed.conditionalVS.length > 0) {
                         let ctr = 1
@@ -1343,6 +1352,8 @@ angular.module("pocApp")
 
                        okToAdd = false     //don't show the original
                     }
+
+                    */
 
                     if (okToAdd) {
                         lstQElements.push(thing)
@@ -1397,6 +1408,7 @@ angular.module("pocApp")
 
 
                 let hashIdName = {}     //associate an idname (from allocateId) with the path
+                //todo - think I've deprecated resourceReferences
                 if (dg.resourceReferences) {
                     //we need to set consistent 'idname' properties - that will be used by allocateId
 
@@ -1911,6 +1923,9 @@ angular.module("pocApp")
 
                     //add any units
                     addUnits(item,ed)
+
+                    //add extension for any conditional vs
+                    makeQHelperSvc.addConditionalVS(item,ed)
 
                     //The only way an element here will have hideInQ set but still be included is for fixed values.
                     //they get added to the Q - but with the hidden extension

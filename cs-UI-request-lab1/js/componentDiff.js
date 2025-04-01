@@ -1,29 +1,56 @@
 angular.module("pocApp")
-    .controller('dgDiffCtrl',
-        function ($scope,localDG,componentDG) {
+    .controller('componentDiffCtrl',
+        function ($scope,$http) {
 
-        $scope.localDG = localDG
-            $scope.componentDG = componentDG
+            $scope.componentDG = {} //componentDG
+
+        $scope.selectDG = function (dgName) {
+            delete $scope.componentDG
+            delete $scope.rowsHash
+            delete $scope.dgHashSummary
+
+
+            $scope.localDG = $scope.hashAllDG[dgName]
+        //    $scope.componentDG
+            $scope.selectedDiffDGName = dgName
+
+            //The key is the unique identifier for the component. If the local DG has a key, then it was
+            //imported from the component store so we can use that.
+            let key = $scope.localDG.key || $scope.localDG.name
+
+            $http.get(`/frozen/${key}}`).then(
+                function (data) {
+                    $scope.componentDG = data.data
+                  //  console.log(data.data)
+                    compareDG($scope.localDG,$scope.componentDG)
+                    makeElementList($scope.localDG,$scope.componentDG)
+
+                }, function () {
+                    alert("No component found")
+                  //  compareDG($scope.localDG,$scope.componentDG)
+                  //  makeElementList($scope.localDG,$scope.componentDG)
+                }
+            )
+
+            }
+
+
+
             
 
             //construct the list of elements in both local & component
-            function makeElementList() {
+            function makeElementList(local,component) {
 
                 //construct the combined hash = {local:ed, component:el}
                 let hash = {}
-                $scope.localDG.diff.forEach(function (el) {
+                local.diff.forEach(function (el) {
                     hash[el.path] = {local:el}
                 })
 
-                $scope.componentDG.diff.forEach(function (el) {
+                component.diff.forEach(function (el) {
                     hash[el.path] = hash[el.path] || {}
                     hash[el.path].component = el
                 })
-
-
-
-
-
 
 
                 //now compare the diff of the two.
@@ -53,7 +80,7 @@ angular.module("pocApp")
 
                 
             }
-            makeElementList()
+            //makeElementList()
 
             $scope.selectRow = function (k,v) {
                 $scope.selectedPath = k
@@ -139,7 +166,7 @@ angular.module("pocApp")
                // $scope.dgDi
 
             }
-            compareDG($scope.localDG,$scope.componentDG )
+            //compareDG($scope.localDG,$scope.componentDG )
 
 
 

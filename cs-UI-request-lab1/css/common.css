@@ -4,7 +4,8 @@
 }
 
 .fail {
-    color: lightcoral;
+    colorX: lightcoral;
+    color: red;
 }
 
 .isEqual {

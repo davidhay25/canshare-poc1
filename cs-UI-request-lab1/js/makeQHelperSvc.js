@@ -20,6 +20,10 @@ angular.module("pocApp")
 
         extensionUrls.initialExpression = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
 
+        extensionUrls.candidateExpression = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression"
+
+
+
         //colours for the questionnaire graph
         objColours = {
             "resource" : "tomato",
@@ -29,6 +33,59 @@ angular.module("pocApp")
 
 
         return {
+
+            addConditionalVS : function (item,ed) {
+                //Adds the extension to support conditional ValueSets
+             //   iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
+         //   | iif(%country.answer.value.code == 'NZ', 'http://example.org/Valueset/NZ-States')
+                /* "conditionalVS": [
+        {
+          "path": "cvs.control",
+          "value": {
+            "code": "opt1",
+            "display": "opt1"
+          },
+          "valueSet": "https://nzhts.digital.health.nz/fhir/ValueSet/canshare-tnm8-adrenal-cortical-carcinoma-cm"
+        },
+        {
+          "path": "cvs.control",
+          "value": {
+            "code": "opt2",
+            "display": "opt2"
+          },
+          "valueSet": "https://nzhts.digital.health.nz/fhir/ValueSet/canshare-tnm8-adrenal-cortical-carcinoma-cn"
+        }
+      ],*/
+
+                if (ed.conditionalVS && ed.conditionalVS.length > 0) {
+                    let ar = []
+                    for (const cv of ed.conditionalVS) {
+                        let path = cv.path   //the path to the controlling element
+                        let value = cv.value.code   //the code that will select the vs
+                        let vs = cv.valueSet // the valueset that will be returned
+                        let cond = `iif(descendants().where(linkId = '{{${path}}}').answer.first().value.code = '${value}', '${vs}')`
+                      //temp  ar.push(cond)
+ar[0] = cond
+                        console.log(cond)
+                    }
+
+                    //now construct the extension
+                    let exp = ""
+                    for (const cond of ar) {
+                        exp = exp + cond + " | "
+                    }
+                    exp = exp.slice(0,-2)
+
+                    let ext = {url:extensionUrls.candidateExpression}
+                    ext.valueExpression = {expression:exp,language:"text/fhirpath"}
+                    item.extension = item.extension || []
+                    item.extension.push(ext)
+
+
+
+                }
+
+            },
 
             removePrefix : function (Q) {
                 //we use the prefix to store the ED id's so they can be adjusted in for EW. This removed them when the Q is complete
@@ -53,7 +110,6 @@ angular.module("pocApp")
 
                     size : 'xlg',
                     templateUrl: 'modalTemplates/viewItem.html',
-
                     controller: 'viewItemCtrl',
 
                     resolve: {
@@ -238,7 +294,7 @@ angular.module("pocApp")
                 //placeholder
                 //if (item.extension) {
                     for (const ext of item.extension || []) {
-                        if (ext.url = extensionUrls.entryFormat) {
+                        if (ext.url == extensionUrls.entryFormat) {
                             vo.placeHolder = ext.valueString
                         }
                     }

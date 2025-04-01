@@ -18,16 +18,17 @@ async function setup(app,mongoDbName) {
     await client.connect()
     console.log("model connected in serverModulePlayground")
 
-    app.get('/frozen/:name', async function(req,res) {
-        let name = req.params.name
+    //key is the LIM name, or {name}-{collection id}
+    app.get('/frozen/:key', async function(req,res) {
+        let key = req.params.key
 
-        const query = {name:name}
+        const query = {key:key}
         try {
             const ar =  await database.collection("frozenDG").find(query).toArray()
             if (ar.length == 1) {
                 res.json(ar[0])
             } else {
-                res.status(400).json({msg:`There were ${ar.length} matches`})
+                res.status(400).json({msg:`There were ${ar.length} matches for ${key}`})
             }
 
 
@@ -38,12 +39,13 @@ async function setup(app,mongoDbName) {
         }
     })
 
-    app.put('/frozen/:name', async function(req,res) {
-        let name = req.params.name
+    app.put('/frozen/:key', async function(req,res) {
+        let key = req.params.key
         let frozen = req.body
         frozen.updated = new Date()
+        delete frozen['_id']
 
-        const query = {name:name}
+        const query = {key:key}
         try {
             await database.collection("frozenDG").replaceOne(query,frozen,{upsert:true})
 

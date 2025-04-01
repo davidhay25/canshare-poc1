@@ -6,7 +6,7 @@
     <div class="row">
       <div class="col-md-3">
         <h3 class="modal-title">
-          View Item
+          View Item: {{selectedItem.text}}
         </h3>
       </div>
 
@@ -62,7 +62,7 @@
 
               </div>
 
-             <div ng-repeat="ai in selectedSummary.allocateId">
+             <div ng-repeat="ai in selectedSummary.allocateId track by $index">
                  <strong>AllocateId:</strong> {{ai}}
              </div>
 
@@ -108,16 +108,43 @@
 
 
                      </uib-tab>
-                   </uib-tabset>
 
-                 </div>
-               </div>
+            <uib-tab>
+                <uib-tab-heading>
+                    Children <span class="badge">{{selectedItem.item.length}}</span>
+                </uib-tab-heading>
+
+                <br/>
+                <i>These are immediate children only</i>
+
+                <table class="table-bordered table">
+                    <tr ng-repeat="child in selectedItem.item">
+                        <td>
+                            <!--
+                            <div class="clickable" ng-click="selectItem(child)">
+                                {{child.text}}
+                            </div>
+                            -->
+                            {{child.text}}
+                        </td>
+                        <td>{{child.type}}</td>
+                        <td>{{child.linkId}}</td>
+                    </tr>
+                </table>
+
+
+
+            </uib-tab>
+       </uib-tabset>
+
+     </div>
+   </div>
 
 
 
 
-             </div>
-             <div class="modal-header">
+ </div>
+ <div class="modal-header">
 
-             </div>
-           </div>
+ </div>
+</div>

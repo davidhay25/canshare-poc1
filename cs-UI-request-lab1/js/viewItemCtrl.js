@@ -4,8 +4,9 @@ angular.module("pocApp")
         function ($scope,item,Q,makeQHelperSvc) {
 
             $scope.item = item
-            
-            
+            $scope.selectedItem = item
+
+
             //get the hierarchy for this item
 
             function getChainToNode(node, targetId, chain = []) {
@@ -17,7 +18,7 @@ angular.module("pocApp")
                     for (const item of clone.item) {
                         itemDisplay += item.linkId + " "
                     }
-                    delete clone.item
+                    //temp delete clone.item
                 }
 
                 clone.children = itemDisplay
@@ -41,6 +42,7 @@ angular.module("pocApp")
                 return null; // Return null if the target is not found in this branch
             }
 
+            $scope.hx = []  //history of item selections
 
 
 
@@ -50,10 +52,7 @@ angular.module("pocApp")
 
             $scope.chain = getChainToNode(tree,item.linkId)
             if ($scope.chain) {
-               //tmp $scope.chain.splice(0,1)
                 $scope.selectedItem = $scope.chain[$scope.chain.length -1]
-
-                //$scope.selectedItemNoSummary =
             }
 
             $scope.getDisplay = function (item) {
@@ -61,6 +60,7 @@ angular.module("pocApp")
                 let vo = angular.copy(item)
 
                 delete vo.summary
+                delete vo.item
                 return vo
             }
 
@@ -69,6 +69,11 @@ angular.module("pocApp")
             }
 
 
+            function getPeers(item) {
+                //get all peers of an item - all children of the parent
+
+
+            }
 
 
     })

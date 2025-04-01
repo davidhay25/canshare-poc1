@@ -28,6 +28,10 @@
       <div class="col-md-6">
         <strong>{{selectedModel.title}} </strong> ({{selectedModel.name}}) <em>{{selectedModel.description}}</em>
 
+      <div ng-if="selectedModel.linkedDG">
+        Linked to  <em>{{hashAllDG[selectedModel.linkedDG].title}}</em>
+      </div>
+
         <div>
           <div ng-if="selectedModel.dirty">
             <strong  class="pull-right">DG has been updated</strong>

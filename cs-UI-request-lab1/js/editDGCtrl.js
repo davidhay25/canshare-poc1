@@ -13,19 +13,53 @@ angular.module("pocApp")
             $scope.userMode = userMode
 
             $scope.input.fixedValues = []   //all the fixed values defined by this DG (not shared like Named Queries)
+/*
+            $scope.linkedItemFilter = function (item) {
+                if (!$scope.input.linkedDG) return true; // If no input, show nothing
+                console.log(item)
+                let a = item.title.toLowerCase()
+                let b = $scope.input.linkedDG.toLowerCase()
+                console.log(a,b,a.indexOf(b))
+
+                if (a.indexOf(b) == -1) {
+                    return false
+                } else {
+                    return true
+                }
+
+
+             //   return item.title.toLowerCase().includes($scope.input.linkedDG.toLowerCase());
+
+            };
+
+            $scope.$watch('input.linkedDG', function () {
+                console.log('e')
+                $scope.$applyAsync();  // Ensures UI updates correctly
+            });
+*/
 
             //construct a has of all types (DT + FHIR) for the full list of elements routine
             $scope.allTypes = angular.copy(hashTypes)
 
-            //frozen DG - ie components
-
+            //frozen DG - ie components - for the linked option
             $http.get('/allfrozen').then(
                 function (data) {
 
                     //only from library (LIM)
-                    $scope.allFrozen = data.data.filter(dg => dg.source == 'library')
+                   // $scope.allFrozen = data.data.filter(dg => dg.source == 'library')
 
+                    //change to all components
                     $scope.allFrozen = data.data
+                    $scope.hashTranslate = {'playground':"Collection","library": "LIM"}
+
+                    $scope.allFrozen.sort(function (a,b) {
+                        if (a.title > b.title) {
+                            return 1
+                        } else {
+                            return -1
+                        }
+
+                    })
 
                     populateControls()
 

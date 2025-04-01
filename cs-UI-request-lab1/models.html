@@ -177,7 +177,9 @@
 
     <div>
 
-        <button class="pull-right btn-link btn" ng-click="clearLocal()">Clear local</button>
+        <button class="pull-right btn-link btn"
+                ng-if="userMode == 'library'"
+                ng-click="clearLocal()">Clear local</button>
 
         <button class="pull-right btn-link btn" ng-click="export()">Import / Export</button>
 
@@ -495,7 +497,7 @@
 
         </uib-tab>
 
-        <uib-tab heading="Compositions"  select="setInitialTab(1)">
+        <uib-tab heading="Compositions" ng-if="userMode == 'library'" select="setInitialTab(1)">
             <br/>
 
             <div class="row">
@@ -618,7 +620,7 @@
 
                     <div>
                         <div class="btn btn-primary pull-right" ng-click="updatePlayground(true)">Update both Model Repository and Local Store</div>
-                        <div class="btn btn-link pull-right" ng-click="savePGtoLocal()">Update to Local Store</div>
+                        <div class="btn btn-link pull-right" ng-click="savePGtoLocal()">Update to Local Store only</div>
                         <!--
                         <div class="btn btn-link pull-right" ng-click="updatePlayground()">Update to Model Repository</div>
                         -->
@@ -735,6 +737,13 @@
                     </div>
 
 
+
+                </uib-tab>
+
+                <uib-tab heading="Component Diff">
+                    <div ng-controller="componentDiffCtrl">
+                        <ng-include src="'/includes/componentDiff.html'"></ng-include>
+                    </div>
 
                 </uib-tab>
 
@@ -991,7 +1000,7 @@
 
 <script src="js/dgDiff.js"></script>
 <script src="js/adHocExtensionCtrl.js"></script>
-
+<script src="js/componentDiff.js"></script>
 
 
 <script src="js/documentSvc.js"></script>

@@ -152,12 +152,10 @@ angular.module("pocApp")
 
 
 
-
-
             //create a diff between the current model and the copy in the componnet store (if any0
             $scope.createDiff = function () {
 
-                let localDG =  snapshotSvc.getFrozenDG($scope.selectedModel.name)    //get the frozen version - ie with a snapshot
+                let localDG =  snapshotSvc.getFrozenDG($scope.selectedModel.name)    //get the frozen version - ie with a snapshot in the diff
                 let componentDG = $scope.componentVersion   //The one currently in the component store
 
                 $uibModal.open({
@@ -180,6 +178,7 @@ angular.module("pocApp")
 
             }
 
+
             $scope.updateComponent = function (type,model) {
 
                 if (type == 'dg') {
@@ -188,6 +187,17 @@ angular.module("pocApp")
                         let frozen = snapshotSvc.getFrozenDG(model.name)
                         frozen.source = $scope.userMode
                         frozen.sourceId = $scope.world.id
+
+                        //the key is the unique identifier as the name will not be unique from a collection
+                        frozen.key = model.name     //default to the name (in the LIM)
+                        if ($scope.userMode == 'playground') {
+                            frozen.key = `${ model.name}-${$scope.world.id}`    //in a collection, append the collection id
+                        }
+
+
+                        //ensure that the key in the local model is in the model
+                        model.key = frozen.key
+
                         saveModel(frozen)
                     }
                 }
@@ -203,7 +213,7 @@ angular.module("pocApp")
 
                 function saveModel(frozen) {
 
-                    $http.put(`/frozen/${frozen.name}`,frozen).then(
+                    $http.put(`/frozen/${frozen.key}`,frozen).then(
                         function (data) {
                             alert("Component updated")
                         }, function (err) {
@@ -283,6 +293,7 @@ angular.module("pocApp")
 
             //----------------------
 
+            //playground was the initial code for collections
             $scope.openPlaygrounds = function () {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/playGrounds.html',
@@ -438,7 +449,7 @@ angular.module("pocApp")
             $scope.importDG = function (inx) {
                 let dg = $scope.importableDG[inx]
                 let name = dg.name
-                let newName = prompt("What is the name for the importedDG (No spaces)",name)
+                let newName = prompt("What is the name for the imported DG (No spaces)",name)
                 if (newName) {
                     dg.name = newName.replace(/\s/g, '')    //remove any spaces
                     $scope.hashAllDG[dg.name] = dg
@@ -2222,7 +2233,14 @@ angular.module("pocApp")
 
                 //get this model from the compoenent store.
                 delete $scope.componentVersion
-                $http.get(`/frozen/${dg.name}`).then(
+
+
+                let name = dg.name
+                if ($scope.userMode == 'playground') {
+                    name = `${name}-${$scope.world.id}` //for collections, append the collection id to the saved name...
+                }
+
+                $http.get(`/frozen/${name}`).then(
                     function (data) {
                         $scope.componentVersion = data.data
                         console.log(data.data)
@@ -2331,6 +2349,8 @@ angular.module("pocApp")
                                 } else {
                                     alert(`DG ${name} not found in the local storage`)
                                 }
+                            }, function (err) {
+                                console.log(err)
                             }
                         )
                     }

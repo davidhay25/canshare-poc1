@@ -22,6 +22,10 @@
 
 
     <style>
+
+        .isHidden {
+            text-decoration: line-through
+        }
         .form-background  {
             background-color: #f7f7f7;
             border: 1px solid gainsboro;
@@ -262,7 +266,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    ng-class="{background:entry.level == 2}"
+                                    ng-class="{background:entry.level % 2 == 0}"
                                     ng-repeat="entry in qReport.entries track by $index"
                                     ng-if="showReportLine(input.SDCOnly,entry)" >
                                 <td>
@@ -289,7 +293,7 @@
                                     </div>
 
                                     <div ng-if="entry.allocateId">
-                                        <div ng-repeat="ai in entry.allocateId">
+                                        <div ng-repeat="ai in entry.allocateId track by $index">
                                             <strong>Allocate Id: </strong>{{ai}}
                                         </div>
                                     </div>
@@ -427,7 +431,8 @@
                     <h4>Variable definition</h4>
 
                     <table class="table-bordered table">
-                            <tr><th style="width:15%">Name</th>
+                            <tr>
+                                <th style="width:15%">Name</th>
                             <th>
                                 <div class="row">
                                     <div class="col-md-2">
@@ -662,8 +667,9 @@
                                 </tr>
 
                                 <tr ng-if="selectedNodeFromItemGraph.item.definition">
-                                    <td>Extract path</td><td>{{selectedNodeFromItemGraph.item.definition}}</td>
+                                    <td>Definition</td><td>{{selectedNodeFromItemGraph.item.definition}}</td>
                                 </tr>
+
 
                             </table>
 

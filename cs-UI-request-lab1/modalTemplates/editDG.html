@@ -2,14 +2,15 @@
 <div>
     <!--<div ng-controller="newResourceCtrl">-->
     <style>
-        .model-vlg {
 
-        }
-        .overridden {
+
+
+
+        .overriddenDEP {
             font-weight: bold;
         }
 
-        .required {
+        .requiredDEP {
             font-weight: bold;
         }
     </style>
@@ -116,6 +117,33 @@
                         </div>
                         <br/>
 
+                        <div class="row">
+                            <div class="col-md-2">
+                                Linked Component
+                            </div>
+                            <div class="col-md-4">
+
+
+                                <input type="text" ng-model="input.linkedDG"
+                                       uib-typeahead="dg as dg.title for dg in allFrozen | filter:{title: $viewValue} | limitTo:10 "
+
+                                       class="form-control">
+
+
+                                <!--
+                                <select ng-model="input.linkedDG" class="form-control"
+                                        ng-options = "fDG.title + ' (' + hashTranslate[fDG.source] + ')' for fDG in allFrozen"></select>
+-->
+                            </div>
+                            <div class="col-md-6">
+                                Component with elements that can be imported into this DG
+                                <div style="padding-left: 8px">
+                                    <em>{{input.linkedDG.description}}</em></div>
+
+                            </div>
+                            <br/> <br/>
+                        </div>
+
                         <div ng-if="false" class="row">
                             <div class="col-md-2">
                                 Id variable
@@ -198,24 +226,7 @@
                         </div>
                         <br/>
 
-                        <div class="row">
-                            <div class="col-md-2">
-                                Linked Component
-                            </div>
-                            <div class="col-md-4">
 
-                                <select ng-model="input.linkedDG" class="form-control"
-                                        ng-options = "fDG.name for fDG in allFrozen"></select>
-
-
-
-                            </div>
-                            <div class="col-md-6">
-                                LIM component with elements that can be imported into this DG
-
-                            </div>
-                            <br/> <br/>
-                        </div>
 
                         <div class="row">
                             <div class="col-md-2">
@@ -337,6 +348,7 @@
 
 
                             </td>
+                            <td></td>
                             <td><input class="form-control" type="text" ng-model="input.title"/></td>
                             <td>
                                 <div class="row">

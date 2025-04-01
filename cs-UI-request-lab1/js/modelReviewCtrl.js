@@ -179,26 +179,7 @@ angular.module("pocApp")
             $scope.viewItem = function (item) {
 
                 makeQHelperSvc.showItemDetailsDlg(item,$scope.fullQ)
-/*
-                let config = {}
 
-                $uibModal.open({
-
-                    size : 'xlg',
-                    templateUrl: 'modalTemplates/viewItem.html',
-
-                    controller: 'viewItemCtrl',
-
-                    resolve: {
-                        item: function () {
-                            return item
-                        }, Q: function () {
-                            return $scope.fullQ
-                        }
-                    }
-
-                })
-*/
 
             }
 

@@ -75,9 +75,17 @@ angular.module("pocApp")
             )
 
             $scope.importComponent = function (dg) {
-                if (confirm(`Are you sure you wish to import this component (${dg.title} into the form)`)) {
+
+                let name = dg.name
+                let newName = prompt("What is the name for the imported DG (No spaces)",name)
+                if (newName) {
+                    dg.name = newName.replace(/\s/g, '')    //remove any spaces
                     $scope.$close({dg:dg})
                 }
+
+             //   if (confirm(`Are you sure you wish to import this component (${dg.title} into the form)`)) {
+               //     $scope.$close({dg:dg})
+              //  }
 
             }
 
