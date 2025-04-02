@@ -18,15 +18,15 @@ angular.module("pocApp")
             //imported from the component store so we can use that.
             let key = $scope.localDG.key || $scope.localDG.name
 
-            $http.get(`/frozen/${key}}`).then(
+            $http.get(`/frozen/${key}`).then(
                 function (data) {
                     $scope.componentDG = data.data
                   //  console.log(data.data)
                     compareDG($scope.localDG,$scope.componentDG)
                     makeElementList($scope.localDG,$scope.componentDG)
 
-                }, function () {
-                    alert("No component found")
+                }, function (err) {
+                    alert(`No component found: ${angular.toJson(err.data)}`)
                   //  compareDG($scope.localDG,$scope.componentDG)
                   //  makeElementList($scope.localDG,$scope.componentDG)
                 }

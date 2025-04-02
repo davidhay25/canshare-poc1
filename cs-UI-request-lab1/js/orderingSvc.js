@@ -165,10 +165,6 @@ angular.module("pocApp")
                         }
 
 
-
-
-
-
                         if (! insertPointFound) {
                             alert(`Insert point ${item.insertAfter} not found, no re-ordering occurred`)
                             //we need to put them back

@@ -110,8 +110,18 @@ angular.module("formsApp")
                         entry.type = 'leaf'
                         entry.item = item
                         entry.ed = hashEd[item.linkId]
+                        isFixedCoding(entry)
                         lst.push(entry)
                     }
+                }
+
+                function isFixedCoding(entry) {
+                    //is there a single option with initialOption set? In that case it's a fixed coding
+                    if (entry.item.type == 'choice' && entry.item.answerOption  && entry.item.answerOption.length == 1) {
+                        entry.ed = entry.ed || {}
+                        entry.ed.fixedCoding = entry.item.answerOption[0].valueCoding
+                    }
+
                 }
             },
 

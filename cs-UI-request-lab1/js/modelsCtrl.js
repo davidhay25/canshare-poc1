@@ -191,7 +191,7 @@ angular.module("pocApp")
                         //the key is the unique identifier as the name will not be unique from a collection
                         frozen.key = model.name     //default to the name (in the LIM)
                         if ($scope.userMode == 'playground') {
-                            frozen.key = `${ model.name}-${$scope.world.id}`    //in a collection, append the collection id
+                            frozen.key = `${model.name}-${$scope.world.id}`    //in a collection, append the collection id
                         }
 
 

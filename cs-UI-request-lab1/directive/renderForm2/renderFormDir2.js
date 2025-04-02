@@ -121,14 +121,10 @@ angular.module('formsApp')
                     let vo = renderFormsSvc2.makeTreeFromQ($scope.q)
 
                     $scope.treeData = vo.treeData
-                   // console.log(vo.treeData)
+
 
                     $scope.prepopExpression = vo.prepopExpression   //for evaluating pre-pop
                     $scope.hashItem = vo.hashItem   //also for pre-pop - eg date
-
-                    //get specific items for the display
-                    //let extInstruction = makeQHelperSvc.getExtension('displayCategory')
-
 
                     drawTree(vo.treeData)       //for drawing the tree
 
@@ -137,38 +133,6 @@ angular.module('formsApp')
                 }
 
 
-                $scope.prePopDEP = function () {
-                    //using the pre-pop expressions in the Q call the server and initialize dataEntered
-                    for (const exp of $scope.prepopExpression) {
-                        let qry = `/Q/prepop?fp=${exp.expression}`
-                        $http.get(qry).then(
-                            function (data) {
-
-                                if (data.data && data.data.result && data.data.result.length > 0) {
-                                    $scope.dataEntered[exp.linkId] = data.data.result[0]
-
-
-                                }
-
-                                let item = $scope.hashItem[exp.linkId]
-                                if (item) {
-                                    if (item.type == 'date' || item.type == 'dateTime') {
-                                        $scope.dataEntered[exp.linkId] = new Date(data.data.result[0])
-                                    }
-                                }
-
-                            }, function (err) {
-                                console.log(err)
-                            }
-                        )
-
-                    }
-
-
-
-
-
-                }
 
 
 

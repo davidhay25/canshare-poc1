@@ -65,6 +65,7 @@
               <select class="form-control"  ng-model="dataEntered[entry.linkId]"
                       ng-focus="onFocus(entry.item)"
                       ng-change = "dataUpdated(entry.item)"
+
                       ng-options="concept.display for concept in getOptions(entry.item)">
               </select>
             </div>

@@ -1089,7 +1089,8 @@ angular.module("pocApp")
                         let sectionEd = {linkId:sectionItem.linkId,path:sectionItem.linkId}
                         hashEd[sectionItem.linkId] = sectionEd
 
-                        for (const contentDG of section.items) {     //a section can have multiple DGs within it.
+                        // for (const contentDG of section.items) {
+                        for (const [sectionIndex, contentDG] of section.items.entries()) {     //a section can have multiple DGs within it.
                             let dgType = contentDG.type[0]        //the dg type. Generally a 'section' dg
 
                             //todo - should this ordering be done in the snapshot service???
@@ -1173,7 +1174,7 @@ angular.module("pocApp")
 
                                 //todo - added this level of nesting as CSIRO renderer doesn't support pre-pop in tabs
                                 //makes the tree bad though...
-                                let dgItem = {linkId:`${comp.name}.${section.name}.section`,text:section.title,type:'group',repeats:true,item:[]}
+                                let dgItem = {linkId:`${comp.name}.${section.name}.section.${sectionIndex}`,text:section.title,type:'group',repeats:true,item:[]}
 
 
                                 //-----------
@@ -2099,11 +2100,14 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
                                 }
                             } else if (ed.options && ed.options.length > 0) {
                                 item.answerOption = []
+
+
                                 for (const concept of ed.options) {
-                                    delete concept.fsn
-                                    delete concept.pt
-                                    concept.system = concept.system || unknownCodeSystem
-                                    item.answerOption.push({valueCoding : concept})
+                                    let con = makeQHelperSvc.cleanCC(concept)
+                                   // delete concept.fsn
+                                   // delete concept.pt
+                                   // concept.system = concept.system || unknownCodeSystem
+                                    item.answerOption.push({valueCoding : con})
                                 }
                             } else {
                                 //just leave out the message - fix it in the autooring side
@@ -2213,9 +2217,24 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
                     }
 
                     if (ed.defaultCoding) {
-                        item.initial = item.initial || []
+                        let defaultCoding =  makeQHelperSvc.cleanCC(ed.defaultCoding)
+                        let found = false
+                        if (item.answerOption) {
+                            for (const ao of item.answerOption) {
+                                if (ao.code == defaultCoding.code) { //only checking the code
+                                    ao.initialSelected = true
+                                    found = true
+                                    break
+                                }
+                            }
+                        }
+                        if (! found) {
+                            errorLog.push({msg:`${ed.path} has a default value not in the answerOptions (It may be in the valueset)`})
+                        }
 
-                        item.initial.push({valueCoding: makeQHelperSvc.cleanCC(ed.defaultCoding)})
+                       // item.initial = item.initial || []
+
+                       // item.initial.push({valueCoding: makeQHelperSvc.cleanCC(ed.defaultCoding)})
                     }
 
 

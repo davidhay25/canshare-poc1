@@ -83,8 +83,8 @@
 
         <uib-tab heading="Details">
 
-            <br/>
-            <table class="table table-bordered table-condensed">
+          <br/>
+          <table class="table table-bordered table-condensed">
 
               <tr ng-if="selectedEd.hideInQ">
 
@@ -313,6 +313,18 @@
 
 
             </table>
+
+          <div ng-if="selectedItem.type == 'choice'">
+            <table class="table table-bordered">
+              <tr ng-repeat="opt in getOptions(selectedItem)">
+                <td>{{opt.display}}</td>
+                <td>{{opt.code}}</td>
+                <td>{{opt.system}}</td>
+              </tr>
+            </table>
+          </div>
+
+
 
 <!--
             <div class="row">

@@ -23,6 +23,7 @@ async function setup(app,mongoDbName) {
         let key = req.params.key
 
         const query = {key:key}
+        console.log(query)
         try {
             const ar =  await database.collection("frozenDG").find(query).toArray()
             if (ar.length == 1) {

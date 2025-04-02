@@ -6,7 +6,7 @@ angular.module("pocApp")
 
             //if parent is set, then 'isNew' will be also...
 
-            $scope.model= model
+            $scope.model =  angular.copy(model)     //edit a copy of teh DG
             $scope.input = {}
             $scope.edit = {}
             $scope.isNew = isNew        //if new, then allow the model metadata to be set
@@ -449,6 +449,7 @@ angular.module("pocApp")
 
 
             $scope.save = function () {
+                
                 $scope.model.type = $scope.input.type
 
                 //todo - should this be $scope - need to re-write so cancel works properly!!!

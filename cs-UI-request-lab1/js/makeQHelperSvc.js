@@ -22,7 +22,7 @@ angular.module("pocApp")
 
         extensionUrls.candidateExpression = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression"
 
-
+        let unknownCodeSystem = "http://example.com/fhir/CodeSystem/example"
 
         //colours for the questionnaire graph
         objColours = {
@@ -332,6 +332,14 @@ ar[0] = cond
                 //remove the fsn attribute from a CC
                 if (cc) {
                     delete  cc.fsn
+                    delete  cc.pt
+                    if (cc.code) {
+                        cc.code = cc.code.replace(/\s+/g, '');
+                    } else {
+                        cc.code="unknown"
+                    }
+
+                    cc.system = cc.system || unknownCodeSystem
                     return cc
                 }
             },
@@ -425,18 +433,28 @@ ar[0] = cond
 
                 function processItem(item) {
                     if (item.enableWhen) {
+                        //we don't include any EW with errors as the form won't render
+                        let lst = item.enableWhen
+                        item.enableWhen = []
 
-                        item.enableWhen.forEach(function (ew) {
+                        lst.forEach(function (ew) {
                             //note that this is the id of the controlling element
                             let questionId = ew.question //ew.sourceId    //the ED id of the source (controlling) elemeny
 
                             if (hashId[questionId]) {
                                 ew.question = hashId[questionId]
+                                item.enableWhen.push(ew)
                             } else {
-                                logIssues.push({msg:`${questionId} not found at ${item.linkId}`})
-                                console.warn(`${questionId} not found at ${item.linkId}`)
+                                logIssues.push({msg:`EnableWhen at ${item.linkId} refers to ${questionId} which is not found`})
+                                //console.warn(`${questionId} not found at ${item.linkId}`)
                             }
                         })
+
+                        if (item.enableWhen.length == 0) {
+                            delete item.enableWhen
+                        }
+
+
 
                     }
                     if (item.item) {
