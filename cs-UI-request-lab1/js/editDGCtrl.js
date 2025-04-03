@@ -39,6 +39,7 @@ angular.module("pocApp")
 */
 
             //construct a has of all types (DT + FHIR) for the full list of elements routine
+            //construct a has of all types (DT + FHIR) for the full list of elements routine
             $scope.allTypes = angular.copy(hashTypes)
 
             //frozen DG - ie components - for the linked option
@@ -270,7 +271,8 @@ angular.module("pocApp")
 
                     if (model.linkedDG) {
                         //set the 'linkedDG' control to the selected model
-                        let ar = $scope.allFrozen.filter(dg => dg.name == model.linkedDG)
+                        //let ar = $scope.allFrozen.filter(dg => dg.name == model.linkedDG)
+                        let ar = $scope.allFrozen.filter(dg => dg.key == model.linkedDG)
                         if (ar.length == 1) {
                             $scope.input.linkedDG = ar[0]
                         }
@@ -391,7 +393,6 @@ angular.module("pocApp")
                         }
                     })
                 }
-
             }
 
             //called when a new element is being added. This is linked to the element name
@@ -399,8 +400,14 @@ angular.module("pocApp")
                 if (name && ! $scope.input.title) {
                     $scope.input.title = name.charAt(0).toUpperCase() + name.slice(1)
                 }
-
             }
+
+            $scope.cancel = function () {
+                if (confirm("Are you sure you want to cancel?")) {
+                    $scope.$dismiss()
+                }
+            }
+
 
             //add a new item
             $scope.add = function () {
@@ -429,8 +436,33 @@ angular.module("pocApp")
             $scope.remove = function (inx) {
               //  if (confirm("Are you sure you wish to remove this element")) {
                 //todo - check for children
+                let pathToDelete = $scope.model.diff[inx].path
+                let ar = [pathToDelete]
+                for (const ed of $scope.model.diff) {
+                    if (ed.path.isChildPath(pathToDelete)) {
+                        ar.push(ed.path)
+                    }
+                }
 
+                if (ar.length == 1) {
+                    //no children - just delete it
                     $scope.model.diff.splice(inx,1)
+                } else {
+                    if (confirm(`There are ${ar.length -1} children that will also be deleted. Are you sure?`)) {
+                        let ar1 = $scope.model.diff
+                        $scope.model.diff = []
+                        for (const ed of ar1) {
+                            if (ar.indexOf(ed.path) == -1) {
+                                $scope.model.diff.push(ed)
+                            }
+                        }
+
+
+                    }
+                }
+                //alert(ar.length)
+
+                  //temp  $scope.model.diff.splice(inx,1)
                     getFullElementList()
              //   }
             }
@@ -449,19 +481,20 @@ angular.module("pocApp")
 
 
             $scope.save = function () {
-                
+
+
                 $scope.model.type = $scope.input.type
 
                 //todo - should this be $scope - need to re-write so cancel works properly!!!
-                model.fixedValues = $scope.input.fixedValues
-                model.resourceReferences = $scope.input.resourceReferences
-                model.isContainer = $scope.input.isContainer
-                model.idVariable = $scope.input.idVariable
-                model.termSvr = $scope.input.termSvr
+                $scope.model.fixedValues = $scope.input.fixedValues
+                $scope.model.resourceReferences = $scope.input.resourceReferences
+                $scope.model.isContainer = $scope.input.isContainer
+                $scope.model.idVariable = $scope.input.idVariable
+                $scope.model.termSvr = $scope.input.termSvr
                 if ($scope.input.linkedDG) {
-                    model.linkedDG = $scope.input.linkedDG.name
+                    $scope.model.linkedDG = $scope.input.linkedDG.key
                 } else {
-                    delete model.linkedDG
+                    delete $scope.model.linkedDG
                 }
 
                 if ($scope.input.obsExtract) {
@@ -491,14 +524,15 @@ angular.module("pocApp")
                     if ($scope.isUnique) {
                         $scope.model.diff = $scope.model.diff || []
 
-                        $scope.$close($scope.model)
+                      //  $scope.$close($scope.model)
                     } else {
                         alert("The name is not valid - likely a duplicate")
+                        return
                     }
-                } else {
-                    $scope.$close()
                 }
 
+                //always pass back the model
+                $scope.$close($scope.model)
             }
 
 

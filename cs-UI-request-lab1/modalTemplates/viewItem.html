@@ -4,7 +4,7 @@
 
   <div class="modal-header">
     <div class="row">
-      <div class="col-md-3">
+      <div class="col-md-10">
         <h3 class="modal-title">
           View Item: {{selectedItem.text}}
         </h3>
@@ -13,7 +13,7 @@
 
 
 
-      <div class="col-md-9">
+      <div class="col-md-2">
         <button class="btn btn-link pull-right" ng-click="$close()">Close</button>
 
       </div>
@@ -30,7 +30,13 @@
                ng-click="selectItem(item)"
                style="cursor: pointer"
                ng-class="{'list-group-item':true,listItemSelected:item == selectedItem}"}>
-            {{item.text || 'Q'}} <span class="pull-right">{{item.linkId}}</span>
+
+            {{item.text || 'Q'}}
+              <!--
+              <span class="pull-right">
+              {{item.linkId}}
+          </span>
+              -->
           </div><br/>
 
           <br/>

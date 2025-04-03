@@ -12,6 +12,8 @@ angular.module("pocApp")
                 $scope.termSelectDGItem({hiddenDGName:$scope.selectedModel.name,path:displayPath})
             }
 
+            //$scope.linkedDG
+
             $scope.popoverText = function (adHoc) {
 
                 let json = angular.toJson(adHoc,true)
@@ -180,11 +182,10 @@ angular.module("pocApp")
             }
 
 
-
             $scope.cloneDG = function (dg) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/getName.html',
-                    //backdrop: 'static',
+                    backdrop: 'static',
                     //size : 'lg',
                     controller: 'getNameCtrl',
                     resolve: {
@@ -194,6 +195,44 @@ angular.module("pocApp")
                     }
 
                 }).result.then(function (vo) {
+                    //todo need to re-do all id's
+                    //need to adjust ew - create a service that copies the DG - updating the Ids and EWs...
+
+                    let newDG = modelDGSvc.copyDG(dg,vo)    //create a copy with id's and ew's updated
+                    if ($scope.userMode == 'playground') {
+                        //if in collections mode can just check the name in the DG hash
+                        if (! $scope.hashAllDG[newDG.name]) {
+                            addToDGList(newDG)
+                        } else {
+                            alert(`Sorry, this name (${vo.name}) is not unique`)
+                        }
+
+                    } else {
+                        //in LIM mode need to check for uniqueness on the server
+                        modelsSvc.isUniqueNameOnLibrary(vo.name,'dg').then(
+                            function () {
+                                newDG.checkedOut = $scope.user.email
+                                newDG.author = $scope.user.email
+                                addToDGList(newDG)
+
+                                //save a copy to the Library (as we do with DGs). As it's new, it won't be downloaded
+                                librarySvc.checkOut(newDG,$scope.user)
+
+                            },function () {
+                                alert(`Sorry, this name (${vo.name}) is not unique`)
+                            }
+                        )
+                    }
+
+                    return
+
+                    function addToDGList(newDG) {
+                        $scope.hashAllDG[newDG.name] = newDG
+                        $scope.makeSnapshots()
+                        $scope.makeAllDTList()  //create the various lists (and trees) for the dt list
+                        $scope.$emit('updateDGList',{name:newDG.name})
+                    }
+/*
                     modelsSvc.isUniqueNameOnLibrary(vo.name,'dg').then(
                         function () {
                             let newDG = angular.copy(dg)
@@ -245,6 +284,8 @@ angular.module("pocApp")
                             alert(`Sorry, this name (${vo.name}) is not unique`)
                         }
                     )
+
+                    */
                 })
             }
 

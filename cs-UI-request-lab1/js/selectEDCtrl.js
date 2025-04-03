@@ -19,7 +19,6 @@ angular.module("pocApp")
                     let ar = newPath.split('.')
                     currentChildren.push(ar[0])
                 }
-
             }
 
 

@@ -166,7 +166,7 @@ angular.module("pocApp")
 
 
                         if (! insertPointFound) {
-                            alert(`Insert point ${item.insertAfter} not found, no re-ordering occurred`)
+                            console.error(`Insert point ${item.insertAfter} not found, no re-ordering occurred`)
                             //we need to put them back
                             for (let i = itemsToMove.length-1; i > -1; i--) {
                                 lst.splice(currentPos,0,itemsToMove[i])

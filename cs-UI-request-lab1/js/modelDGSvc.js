@@ -8,6 +8,42 @@ angular.module("pocApp")
 
         return {
 
+            copyDG : function (DG,vo) {
+                //create a copy of a DG - updating the ids and any ews...
+                let hash = {} // we need to record id updates in the ED for EW
+                let newDG = angular.copy(DG)
+                newDG.name = vo.name
+                newDG.title = vo.title
+                newDG.description = vo.description
+
+                newDG.id = utilsSvc.getUUID()
+                if (newDG.diff) {
+                    //update all the ids
+                    for (let ed of newDG.diff) {
+                        let newId = utilsSvc.getUUID()
+                        hash[ed.id] = newId
+                        ed.id = newId
+                    }
+
+                    //now the EWs
+
+                    for (let ed of newDG.diff) {
+                        if (ed.enableWhen) {
+                            for (let ew of ed.enableWhen) {
+                                //replace the first segment in the path with the new dg name
+                                let ar = ew.source.split('.')
+                                ar[0] = newDG.name
+                                ew.source = ar.join('.')
+                                ew.sourceId = hash[ew.sourceId]     //update the id from the hash of changes
+                            }
+                        }
+                    }
+
+                }
+                return newDG
+
+            },
+
             makeSDCSummaryDEP : function (fullElementList,hashAllDG) {
                 //Make a summary of all the SDC extensions
 

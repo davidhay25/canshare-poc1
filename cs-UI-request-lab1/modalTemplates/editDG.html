@@ -16,7 +16,7 @@
     </style>
     <div class="modal-header">
         <div class="row">
-            <div class="col-md-8 col-sm-8">
+            <div class="col-md-9">
                 <h3 class="modal-title">
                     <div ng-hide="model.name">New DataGroup</div>
                     DataGroup: {{model.name}}
@@ -24,13 +24,12 @@
             </div>
 
 
-            <div class="col-md-4 col-sm-4">
-
-                <button ng-show="isNew" class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
-
+            <div class="col-md-3">
 
                 <button ng-show = "model.name && model.title"
-                        class="btn btn-primary pull-right" ng-click="save()">Close</button>
+                        class="btn btn-primary pull-right" ng-click="save()">Save</button>
+
+                <button  class="btn btn-link pull-right" ng-click="cancel()">Cancel</button>
             </div>
         </div>
 

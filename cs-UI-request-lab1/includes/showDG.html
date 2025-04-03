@@ -29,7 +29,7 @@
         <strong>{{selectedModel.title}} </strong> ({{selectedModel.name}}) <em>{{selectedModel.description}}</em>
 
       <div ng-if="selectedModel.linkedDG">
-        Linked to  <em>{{hashAllDG[selectedModel.linkedDG].title}}</em>
+        Linked to  <em>{{selectedModel.linkedDG.split('-')[0]}}</em>
       </div>
 
         <div>
@@ -903,15 +903,15 @@
                     <td>
                       {{dep.source | dropFirstInPath}}
 
-                      <span ng-if="dep.source.split('.')[0] !== selectedModel.name">
+                      <span ng-if="! hashFullElementsById[dep.sourceId]">
                         <i style="color: red"
-                           uib-popover="This source does not match an element in the DG: {{dep.source}}"
+                           uib-popover="The source {{dep.source}} and sourceId {{dep.sourceId}} does not match an element in the DG: "
                            popover-placement="right"
                            popover-trigger="'mouseenter'"
                            class="pull-right glyphicon glyphicon-warning-sign"></i>
-
-
                       </span>
+
+
 
                     </td>
 
@@ -964,8 +964,9 @@
                 <pre>{{edForJsonDisplay | json}}</pre>
                 Old
 
-
+<!--
                 <pre ng-show="selectedNode">{{selectedNode.data.ed | json}}</pre>
+                -->
 
               </uib-tab>
             </uib-tabset>
@@ -1493,21 +1494,26 @@
 
         </tr>
         <tr ng-repeat="dep in allDependencies"
-          ng-class="{error:dep.error}"
-          >
+          ng-class="{error:dep.error}">
           <td>
             <div class="clickable" ng-click="selectCondElement(dep.path)">
               {{dep.path | dropFirstInPath}}
-            </div>
 
+            </div>
+            <div><em>{{fullElementHash[dep.path].title}}</em></div>
           </td>
-          <td>{{dep.ew.source | dropFirstInPath}}</td>
+
+          <td>
+            {{dep.ew.source | dropFirstInPath}}
+            <div><em>{{dep.ed.title}}</em></div>
+          </td>
+
           <td>{{dep.ed.description}}
             <div ng-if="dep.error">
               <div class="alert alert-danger">{{dep.error}}</div>
             </div>
-
           </td>
+
           <td>{{dep.ew.operator}}</td>
           <td>
             <div ng-if="dep.ew.value.code">{{dep.ew.value.code}} | {{dep.ew.value.display}}</div>
