@@ -224,7 +224,8 @@ angular.module("pocApp")
             function checkForIssues(lst,clean) {
 
                 for (let ed of lst) {
-                    if (ed.enableWhen) {
+
+                    if (false && ed.enableWhen) {
                         let iss = `${ed.path} has conditionals (EnableWhen) set which will be disabled.`
                         for (const ew of ed.enableWhen) {
                             iss += `Conditional on ${ew.source}`
@@ -235,7 +236,6 @@ angular.module("pocApp")
                             addIssue(ed,ed.enableWhen)
                             delete ed.enableWhen
                         }
-
 
                     }
 

@@ -65,7 +65,7 @@ angular.module("pocApp")
                         let vs = cv.valueSet // the valueset that will be returned
                         let cond = `iif(descendants().where(linkId = '{{${path}}}').answer.first().value.code = '${value}', '${vs}')`
                       //temp  ar.push(cond)
-ar[0] = cond
+                        ar[0] = cond
                         console.log(cond)
                     }
 
