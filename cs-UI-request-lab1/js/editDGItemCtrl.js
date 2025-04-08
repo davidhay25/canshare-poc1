@@ -685,8 +685,6 @@ angular.module("pocApp")
             function editED (ed) {
 
 
-
-
                 ed.type = [$scope.input.selectedType]
                 //ed.path = `new.${$scope.input.path}`        //the 'new.' is stripped off, as the full path is passed in for editing existing
                 ed.description = $scope.input.description
@@ -903,6 +901,8 @@ angular.module("pocApp")
                     editED(ed)
 
 
+                   // let newEd = cleanObject(ed)
+                   // $scope.$close(newEd)
                     $scope.$close(ed)
 
                 } else {
@@ -912,9 +912,11 @@ angular.module("pocApp")
                     //will 'pass through' attributes not editable in this dialog
 
 
+                    //Apr 8
                     editED(item.ed)
 
-
+                    //let newEd = cleanObject(item.ed)
+                    //$scope.$close({item:newEd})
                     $scope.$close(item.ed)
                 }
 
@@ -1227,6 +1229,37 @@ angular.module("pocApp")
                 alert("Options have been updated")
 
             }
+
+
+            //from chatGPT
+            function cleanObject(obj) {
+                if (Array.isArray(obj)) {
+                    return obj
+                        .map(cleanObject)
+                        .filter(item => !isEmpty(item));
+                } else if (typeof obj === 'object' && obj !== null) {
+                    const newObj = {};
+                    for (const [key, value] of Object.entries(obj)) {
+                        const cleaned = cleanObject(value);
+                        if (!isEmpty(cleaned)) {
+                            newObj[key] = cleaned;
+                        }
+                    }
+                    return newObj;
+                }
+                return obj;
+            }
+
+            function isEmpty(value) {
+                return (
+                    value === undefined ||
+                    value === null ||
+                    value === '' ||
+                    (Array.isArray(value) && value.length === 0) ||
+                    (typeof value === 'object' && Object.keys(value).length === 0)
+                );
+            }
+
 
         }
     )

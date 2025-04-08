@@ -1,9 +1,10 @@
 angular.module("pocApp")
     .controller('adHocExtensionCtrl',
-        function ($scope,currentExt,$uibModal,fullElementList,currentPath) {
+        function ($scope,currentExt,$uibModal,fullElementList,currentPath,canEdit) {
 
             $scope.currentExt = angular.copy(currentExt)
             $scope.currentPath = currentPath
+            $scope.canEdit = canEdit
 
             $scope.selectExt = function (ext) {
                 $scope.selectedExt = ext

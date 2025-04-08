@@ -58,6 +58,7 @@
         </span>
 
         <span class="clickable spacer"
+              ng-if = "canEdit()"
               ng-click="updateComponent('dg',selectedModel)">Update component</span>
 
 
@@ -115,7 +116,9 @@
       </div>
       <div class="col-md-6">
 
-      <button class="btn btn-link" ng-click="deleteDG(selectedModel.name)">Delete</button>
+      <button class="btn btn-link"
+              ng-if = canEdit()
+              ng-click="deleteDG(selectedModel.name)">Delete</button>
 
         <!--
       <a class="btn btn-link"
@@ -150,20 +153,7 @@
           </div>
         </div>
 
-        <!--
-        <div ng-if="userMode == 'playground'">
-          <div ng-repeat="(k,v) in hashAllDG">
-            <div ng-if="v.isContainer"
-                 class="btn btn-link"
-                ng-click="showContainerQ(k)">
 
-              {{k}} Questionnaire
-            </div>
-
-          </div>
-
-        </div>
-        -->
 
       </div>
 <br/>

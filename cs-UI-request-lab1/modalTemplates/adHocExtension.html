@@ -26,15 +26,19 @@
              ng-click="selectExt(ext)"
              ng-repeat="ext in currentExt">
 
-          <span class="pull-right"><i style="color: red" class="glyphicon glyphicon-remove clickable"
-             ng-click="deleteExt($index)"></i></span>
+          <span ng-if="canEdit" class="pull-right">
+            <i style="color: red" class="glyphicon glyphicon-remove clickable"
+             ng-click="deleteExt($index)"></i>
+          </span>
 
 
           {{ext.url | sdcExtensionName}}
         </div>
       </div>
 
-      <button class="btn-link btn" ng-click="addExt()">Add new extension</button>
+      <button class="btn-link btn"
+              ng-if = canEdit
+              ng-click="addExt()">Add new extension</button>
     </div>
     <div class="col-md-9">
       <pre>{{selectedExt | json}}</pre>

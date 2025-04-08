@@ -403,7 +403,7 @@ angular.module("pocApp")
                             if (both) {
                                 //update repo and local
                                 $scope.savePGtoLocal(true,true,function () {
-                                    alert("Both repository and local copies of the Form have been updated.")
+                                    alert("Repository has been updated.")
                                 })
 
                             } else {
@@ -481,8 +481,23 @@ angular.module("pocApp")
                 if (newMode == 'library') {
                     //changing from playground. Can only do this if logged in.
                     if ($scope.user && $scope.user.email) {
-                        let msg = "Are you sure you wish to enter LIM mode? This will replace the current Form."
-                        if (confirm(msg)) {
+
+                        let diffs = playgroundsSvc.currentPlaygroundDiff($scope.world,$localStorage.initialPlayground)  //hash of DG's that have changed
+                        if (Object.keys(diffs).length > 0) {
+                            let msg = "There are changes to DGs in this Collection. You can view them from the Collections button. Are you sure you wish to enter LIM mode and lose these changes?"
+                            if (! confirm(msg)) {
+                                return
+                            }
+                        } else {
+                            let msg = "Are you sure you wish to enter LIM mode? This will replace the current Form."
+                            if (! confirm(msg)) {
+                                return
+                            }
+                        }
+
+
+                       // let msg = "Are you sure you wish to enter LIM mode? This will replace the current Form."
+                       // if (confirm(msg)) {
                             resetLocalEnvironment()
 
                             let qry = '/model/allDG'
@@ -510,7 +525,7 @@ angular.module("pocApp")
 
 
 
-                        }
+                     //   }
                     } else {
                         alert("You need to be logged in to use Library mode")
                     }
@@ -764,7 +779,14 @@ angular.module("pocApp")
 
             $scope.canEdit = function (model) {
                 if ($scope.userMode == 'playground') {
-                    return true
+                    //in a playground (collection) locking is at the collection level, not the DG
+
+
+                    if ($scope.user && $scope.world &&  $scope.world.lockedTo == $scope.user.email)   {
+                        return true
+                    }
+
+
                 } else if ($scope.user && model && model.checkedOut == $scope.user.email) {
                     return true
                 }
@@ -1569,6 +1591,7 @@ angular.module("pocApp")
                                 ed1.defaultCode = ed.defaultCode
                                 ed1.defaultCoding = ed.defaultCoding
                                 ed1.defaultQuantity = ed.defaultQuantity
+
                                 ed1.defaultRatio = ed.defaultRatio
 
                                 setValue(ed1,'options',ed.options,'array')

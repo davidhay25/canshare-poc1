@@ -14,6 +14,7 @@ angular.module("pocApp")
             }
 
             $scope.differences = playgroundsSvc.currentPlaygroundDiff(playground,initialPlayground)
+
             $scope.areDifferences = function () {
                 if (Object.keys($scope.differences).length > 0) {
                     return true

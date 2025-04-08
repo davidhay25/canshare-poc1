@@ -36,10 +36,6 @@ angular.module("pocApp")
                         //initialHash = angular.toJson(initialPG.dataGroups[key])
 
                         if (initialHash !== currentHash) {
-                            //yep. It's different
-                            //delete
-
-
                             response[key] = [{msg:"DG was changed"}]
                         }
 

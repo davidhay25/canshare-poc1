@@ -61,6 +61,9 @@ angular.module("pocApp")
                         },fullElementList : function () {
                             return $scope.fullElementList
 
+                        },
+                        canEdit : function () {
+                            return $scope.canEdit()
                         }
                     }
                 }).result.then(function (ext) {

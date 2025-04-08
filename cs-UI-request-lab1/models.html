@@ -175,7 +175,16 @@
         </div>
     </nav>
 
-    <div>
+    <div style="padding-top: 8px">
+
+        <div class="btn btn-primary pull-right"
+             ng-if = "canEdit()"
+             ng-click="updatePlayground(true)">Update Repository</div>
+
+        <div  ng-if = "! canEdit()" class="btn btn-warning pull-right">
+            Read only mode
+        </div>
+
 
         <button class="pull-right btn-link btn"
                 ng-if="userMode == 'library'"
@@ -212,7 +221,8 @@
                         <uib-tab heading = "Inheritance"  select="setSelectTab(0)">
                             <div>
 
-                                <div class="pull-right clickable spacer" ng-if = "user.email || userMode == 'playground'"
+                                <div class="pull-right clickable spacer"
+                                     ng-if = "(userMode == 'library' && user.email) || canEdit()"
                                      ng-click="newModel('dg')">New DG</div>
 
                                 <div class="pull-right clickable spacer"
