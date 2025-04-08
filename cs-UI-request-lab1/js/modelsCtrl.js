@@ -152,7 +152,7 @@ angular.module("pocApp")
 
 
 
-            //create a diff between the current model and the copy in the componnet store (if any0
+            //create a diff between the current model and the copy in the componnet store (if any)
             $scope.createDiff = function () {
 
                 let localDG =  snapshotSvc.getFrozenDG($scope.selectedModel.name)    //get the frozen version - ie with a snapshot in the diff
@@ -169,6 +169,9 @@ angular.module("pocApp")
                         },
                         componentDG: function () {
                             return componentDG
+                        },
+                        otherDisplay: function () {
+                            return "Component"
                         }
                     }
                 })
@@ -307,16 +310,10 @@ angular.module("pocApp")
                         playground: function () {
                             return $localStorage.world
                         },
-                        currentDirty: function () {
-                            //have any of the DG's been changed
-                            let dirty = []
-                            for (const key of Object.keys($scope.hashAllDG)) {
-                                if ($scope.hashAllDG[key].dirty) {
-                                    dirty.push(key)
-                                }
-                            }
-                            return dirty
+                        initialPlayground: function () {
+                            return $localStorage.initialPlayground
                         },
+
                         user : function () {
                             return $scope.user
                         }
@@ -329,12 +326,14 @@ angular.module("pocApp")
                             $localStorage.world = playground
                             $scope.world = playground
 
+                            $localStorage.initialPlayground = angular.copy(playground) //save the loaded version so we know if it has been changed
+/*
                             //reset the dirty flag of all DGs
                             for (const key of Object.keys($localStorage.world.dataGroups)) {
                                 let DG = $localStorage.world.dataGroups[key]
                                 DG.dirty = false
                             }
-
+*/
                             $scope.input.types = $localStorage.world.dataGroups  //todo - fix this<<<< temp
                             $scope.hashAllDG = $localStorage.world.dataGroups
 
@@ -387,14 +386,19 @@ angular.module("pocApp")
                         $localStorage.world.version ++
                     } else {$localStorage.world.version = 1}
 
+                    /*
                     //reset the dirty flag of all DGs
                     for (const key of Object.keys($localStorage.world.dataGroups)) {
                         let DG = $localStorage.world.dataGroups[key]
                         DG.dirty = false
                     }
+                    */
 
                     $http.put(`/playground/${$localStorage.world.id}`,$localStorage.world).then(
                         function (data) {
+
+                            //reset the change checked
+                            $localStorage.initialPlayground = angular.copy($localStorage.world)
 
                             if (both) {
                                 //update repo and local
@@ -1449,7 +1453,7 @@ angular.module("pocApp")
                     }
 
                 }).result.then(function (ed) {
-                    $scope.selectedModel.dirty = true
+                    //$scope.selectedModel.dirty = true
 
                     let displayPath = ""  //this will be the path in the changes display
                     if (isNew) {
@@ -1529,8 +1533,7 @@ angular.module("pocApp")
                                 //ed1.hideInQ = ed.hideInQ
                                 setValue(ed1,'hiddenInQ',ed.hiddenInQ,'bool')
 
-                                //setValue(ed1,'autoPop',ed.controlHint,'string')
-                                //ed1.autoPop = ed.autoPop
+
                                 ed1.helpText = ed.helpText
                                 ed1.collapsible = ed.collapsible
 

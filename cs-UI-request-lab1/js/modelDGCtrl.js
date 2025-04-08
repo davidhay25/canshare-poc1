@@ -413,7 +413,7 @@ angular.module("pocApp")
                     }
 
                 }).result.then(function (vo) {
-                    $scope.selectedModel.dirty = true
+                    //$scope.selectedModel.dirty = true
                     $scope.addEnableWhen({ed:vo.ed},vo.value,vo.op)
 
                     //need to re-build the key elements

@@ -2451,6 +2451,10 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
 
                 if (ed.type) {
                     switch (ed.type[0]) {
+                        case 'display' :
+                            controlType = "display"
+                            controlHint = "display"
+                            break
                         case 'string' :
                             controlType = "string"      //default to single text box
                             if (ed.controlHint == 'text') {

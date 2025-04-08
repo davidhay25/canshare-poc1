@@ -395,7 +395,7 @@
                 <tr ng-if="componentVersion">
                   <td>Component</td>
                   <td>
-                    <div class="clickable" ng-click="createDiff()">View differences</div>
+                    <div class="clickable" ng-click="createDiff()">View differences to component</div>
                   </td>
                 </tr>
 
@@ -521,13 +521,13 @@
                       </div>
 
 
-                      <div ng-hide="fhirDataTypes.indexOf(type) > -1" class="clickable"
+                      <div ng-hide="fhirDataTypes.indexOf(type) > -1 || type == 'display'" class="clickable"
                            style="padding-right: 12px"
                            ng-click="termSelectDG({DGName:type},selectedModel.name)">
                         {{type}}&nbsp;
                       </div>
 
-                        <div ng-show="fhirDataTypes.indexOf(type) > -1">
+                        <div ng-show="fhirDataTypes.indexOf(type) > -1 || type == 'display'">
                           {{type}}&nbsp;
                         </div>
 
@@ -554,11 +554,14 @@
 
                           {{selectedNode.data.ed.controlHint}}
 
+                          <!-- Apr 8
                           <span ng-repeat = "opt in qControlOptions">
                             <input type="radio"
                                    ng-change="setControlHint(selectedNode.data.ed,opt)"
                                    ng-model="input.controlHint" value="{{opt}}"> {{opt}}
                           </span>
+                          -->
+
 
 
                         </div>

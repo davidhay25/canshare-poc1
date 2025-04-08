@@ -1,6 +1,7 @@
 angular.module("pocApp")
     .controller('playgroundsCtrl',
-        function ($scope,$http,userMode,playground,utilsSvc,$localForage,currentDirty,user) {
+        function ($scope,$http,userMode,playground,utilsSvc,$localForage,user,initialPlayground,playgroundsSvc,
+                  $uibModal) {
 
             $scope.input = {}
 
@@ -12,7 +13,16 @@ angular.module("pocApp")
                 }
             }
 
-            $scope.currentDirty = currentDirty
+            $scope.differences = playgroundsSvc.currentPlaygroundDiff(playground,initialPlayground)
+            $scope.areDifferences = function () {
+                if (Object.keys($scope.differences).length > 0) {
+                    return true
+                }
+            }
+
+            console.log($scope.differences)
+
+
 
 
             //Lock a from so no-one else can update
@@ -102,10 +112,6 @@ angular.module("pocApp")
 
 
             function convertAdHoc(world) {
-
-
-
-
                for (let key of  Object.keys(world.dataGroups)) {
                    let dg = world.dataGroups[key]
                    if (dg.adHocExt) {
@@ -121,8 +127,46 @@ angular.module("pocApp")
 
             }
 
+            //show the detailed diff for a DG
+            $scope.showDiff = function (name) {
+
+
+
+                let currentDG = playground.dataGroups[name]
+                let initialDG = initialPlayground.dataGroups[name]
+
+                    $uibModal.open({
+                    templateUrl: 'modalTemplates/dgDiff.html',
+                    backdrop: 'static',
+                    size : 'xlg',
+                    controller: 'dgDiffCtrl',
+                    resolve : {
+                        localDG : function() {
+                            return currentDG
+                        },
+                        componentDG: function () {
+                            //name of 'component' is the original use..
+                            return initialDG
+                        },
+                        otherDisplay: function () {
+                            return "Initial"
+                        }
+                    }
+                })
+
+
+
+
+            }
+
             $scope.load = function (playground,source) {
-                let msg = "This action will replace the current form. Are you sure you wish to load a new one?"
+
+                let msg = "This action will replace the current form. Are you sure you wish to load a new one (It is safe to do so as the current Collection has not been updated)?"
+                if (Object.keys($scope.differences).length > 0) {
+                    msg = "Warning! There are changes in the current collection which will be lost. Are you sure you wish to load this one?"
+                }
+
+
                 if (confirm(msg)) {
                     if (source == 'repo') {
                         //from the library repository

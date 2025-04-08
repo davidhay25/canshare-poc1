@@ -1,8 +1,10 @@
 angular.module("pocApp")
     .controller('dgDiffCtrl',
-        function ($scope,localDG,componentDG) {
+        function ($scope,localDG,componentDG,otherDisplay) {
 
         $scope.localDG = localDG
+            //note that componentDG is the 'non-current' DG - currently the component or initial\
+            $scope.otherDisplay = otherDisplay
             $scope.componentDG = componentDG
             
 

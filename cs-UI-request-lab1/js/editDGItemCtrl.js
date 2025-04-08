@@ -6,6 +6,13 @@ angular.module("pocApp")
             $scope.allTypes = allTypes  //DGs only
             $scope.input = {}
 
+            //specific to Q
+
+            //changed on Apr 8
+            $scope.allTypes = angular.copy(allTypes)
+            $scope.allTypes.push('display')
+
+
 
             $scope.textareaStyles = {
                 'background-color': '#f9f9f9',
@@ -851,7 +858,8 @@ angular.module("pocApp")
                 }
 
 
-                if (allTypes.indexOf($scope.input.selectedType) == -1) {
+                //if (allTypes.indexOf($scope.input.selectedType) == -1) {
+                if ($scope.allTypes.indexOf($scope.input.selectedType) == -1) {
                     alert("Invalid type")
                     return
                 }

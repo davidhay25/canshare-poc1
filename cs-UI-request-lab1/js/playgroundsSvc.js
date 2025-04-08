@@ -4,7 +4,69 @@ angular.module("pocApp")
 
         return {
 
-            savePlayground : function (pg,email) {
+            currentPlaygroundDiff : function (currentPG, initialPG) {
+                //look for diffs between the pg (which is the current PG) and initialPG (which was originally loaded)
+                //for now, a simple json based comparison of DGs - later could be a more detailed diff
+                if (! initialPG || ! currentPG) {
+                    return {}
+                }
+
+                let response = {}    //dgnames that are different
+                let hashInitialDGs = {}     //hash by name of DGs in the initial load
+                //create a hash of all DGs in the initial load
+                for (const key of Object.keys(initialPG.dataGroups)) {
+                    hashInitialDGs[key] = simpleHash(angular.toJson(initialPG.dataGroups[key]))
+                }
+
+                //look for new DGs
+                for (const key of Object.keys(currentPG.dataGroups)) {
+                    if (! hashInitialDGs[key]) {
+                        response[key] = [{msg:"This is a new DG"}]
+                    }
+                }
+
+                //for (const dg of pg.dataGroups) {
+                for (const key of Object.keys(currentPG.dataGroups)) {
+                    if (hashInitialDGs[key]) {
+                        //the DG is still there, has it changed?
+                        let initialHash = hashInitialDGs[key]
+                        let currentHash = simpleHash(angular.toJson(currentPG.dataGroups[key]))
+
+                        //currentHash = angular.toJson(currentPG.dataGroups[key])
+                        //initialHash = angular.toJson(initialPG.dataGroups[key])
+
+                        if (initialHash !== currentHash) {
+                            //yep. It's different
+                            //delete
+
+
+                            response[key] = [{msg:"DG was changed"}]
+                        }
+
+                    } else {
+                        //the DG was deleted
+                        response[key] = [{msg:"DG was deleted"}]
+                    }
+
+                }
+
+                return response
+
+
+                function simpleHash(str) {
+                    let hash = 0;
+                    for (let i = 0; i < str.length; i++) {
+                        const chr = str.charCodeAt(i);
+                        hash = (hash << 5) - hash + chr; // same as hash * 31 + chr
+                        hash |= 0; // Convert to 32-bit integer
+                    }
+                    return hash;
+                }
+
+
+            },
+
+            savePlaygroundDEP : function (pg,email) {
                 let deferred = $q.defer()
                 $http.get(`/playground/${$localStorage.world.id}`).then(
 

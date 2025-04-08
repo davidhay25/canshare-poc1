@@ -221,8 +221,10 @@ angular.module("pocApp")
             }
 
 
+            $scope.input.types.push("display")
 
             $scope.input.types.sort()
+
             //now add the FHIR datatypes
             $scope.input.types = utilsSvc.fhirDataTypes().concat($scope.input.types) //.concat(modelsSvc.fhirDataTypes())
 
