@@ -15,6 +15,7 @@ angular.module("pocApp")
 
             $scope.differences = playgroundsSvc.currentPlaygroundDiff(playground,initialPlayground)
 
+
             $scope.areDifferences = function () {
                 if (Object.keys($scope.differences).length > 0) {
                     return true
@@ -131,8 +132,6 @@ angular.module("pocApp")
             //show the detailed diff for a DG
             $scope.showDiff = function (name) {
 
-
-
                 let currentDG = playground.dataGroups[name]
                 let initialDG = initialPlayground.dataGroups[name]
 
@@ -246,8 +245,10 @@ angular.module("pocApp")
                 pg.id = utilsSvc.getUUID()
                 pg.dataGroups = {}
                 pg.compositions = {}
+                pg.lockedTo = user.email
 
-                alert("The form has been created in the working model. It won't be created in the Local store until you update it.")
+
+                alert("The form has been created in your browser. It won't be created in the Repository until you update it.")
                 $scope.$close(pg)
 
 

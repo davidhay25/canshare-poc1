@@ -561,7 +561,7 @@
                 <td>{{dg.diff.length}}</td>
 
                 <td>
-                  <div ng-if="dg.nameExists">In form</div>
+                  <div ng-if="dg.nameExists">In collection</div>
                   <div ng-if="! dg.nameExists" class="clickable"
                     ng-click="importComponent(dg)">Import</div>
 
@@ -570,6 +570,8 @@
             </table>
           </div>
           <div class="col-md-3">
+            <div class="pull-right">Id: {{clone.id | lastInUUID}}</div>
+            <div class="pull-right">Key: {{clone.key | lastInUUID}}</div>
             <div id="componentGraph"></div>
           </div>
         </div>

@@ -2,11 +2,21 @@ angular.module("pocApp")
     .controller('dgDiffCtrl',
         function ($scope,localDG,componentDG,otherDisplay) {
 
-        $scope.localDG = localDG
+            $scope.localDG = localDG
+
             //note that componentDG is the 'non-current' DG - currently the component or initial\
-            $scope.otherDisplay = otherDisplay
             $scope.componentDG = componentDG
-            
+            $scope.otherDisplay = otherDisplay
+
+            //What if either of the versions is missing?
+            if (! $scope.localDG) {
+                $scope.localDG = {diff:[]}
+            }
+
+            if (! $scope.componentDG) {
+                $scope.componentDG = {diff:[]}
+            }
+
 
             //construct the list of elements in both local & component
             function makeElementList() {
@@ -23,12 +33,8 @@ angular.module("pocApp")
                 })
 
 
-
-
-
-
-
                 //now compare the diff of the two.
+                //todo - could this be a hash instead?
                 for (const path of Object.keys(hash)) {
 
                     let jLocal
@@ -40,9 +46,6 @@ angular.module("pocApp")
                     if (hash[path].component) {
                         jComponent = angular.toJson( hash[path].component)
                     }
-
-
-
 
 
                     if (jLocal == jComponent) {

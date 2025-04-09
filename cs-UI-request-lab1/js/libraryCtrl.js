@@ -37,7 +37,7 @@ angular.module("pocApp")
             }
 
             $scope.selectFromComponent = function (dg) {
-                let clone = angular.copy(dg)
+                let clone = angular.copy(dg)    //to make sure we don't inadvertantly update the DG
                 let fullElementList = snapshotSvc.getFullListOfElements(clone.name)// vo.allElements
                 let elementList = [{ed:{path:clone.name,title:clone.name}}]
 
@@ -46,6 +46,7 @@ angular.module("pocApp")
                     elementList.push({ed:ed})
                 }
 
+                $scope.clone = clone        //just for the UI
                 let treeData = modelsSvc.makeTreeFromElementList(elementList)
                 $('#componentGraph').jstree('destroy');
                 $('#componentGraph').jstree(
@@ -83,9 +84,7 @@ angular.module("pocApp")
                     $scope.$close({dg:dg})
                 }
 
-             //   if (confirm(`Are you sure you wish to import this component (${dg.title} into the form)`)) {
-               //     $scope.$close({dg:dg})
-              //  }
+
 
             }
 

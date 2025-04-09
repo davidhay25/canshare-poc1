@@ -58,7 +58,7 @@
         </span>
 
         <span class="clickable spacer"
-              ng-if = "canEdit()"
+              ng-if = "canEdit(selectedModel)"
               ng-click="updateComponent('dg',selectedModel)">Update component</span>
 
 
@@ -117,7 +117,7 @@
       <div class="col-md-6">
 
       <button class="btn btn-link"
-              ng-if = canEdit()
+              ng-if = canEdit(selectedModel)
               ng-click="deleteDG(selectedModel.name)">Delete</button>
 
         <!--
@@ -904,6 +904,13 @@
                            class="pull-right glyphicon glyphicon-warning-sign"></i>
                       </span>
 
+                      <span ng-if="!dep.sourceId">
+                        <i style="color: red"
+                           uib-popover="The sourceId is missing "
+                           popover-placement="right"
+                           popover-trigger="'mouseenter'"
+                           class="pull-right glyphicon glyphicon-warning-sign"></i>
+                      </span>
 
 
                     </td>

@@ -181,7 +181,7 @@
              ng-if = "canEdit()"
              ng-click="updatePlayground(true)">Update Repository</div>
 
-        <div  ng-if = "! canEdit()" class="btn btn-warning pull-right">
+        <div  ng-if = "! canEdit() && userMode == 'playground'" class="btn btn-warning pull-right">
             Read only mode
         </div>
 
@@ -628,7 +628,7 @@
 
                     </table>
 
-                    <div>
+                    <div ng-if="false">
                         <div class="btn btn-primary pull-right" ng-click="updatePlayground(true)">Update both Model Repository and Local Store</div>
                         <div class="btn btn-link pull-right" ng-click="savePGtoLocal()">Update to Local Store only</div>
                         <!--

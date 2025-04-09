@@ -154,7 +154,6 @@ angular.module("pocApp")
                 ext.extension.push({url:"fullUrl",valueString:`%${vo.fullUrl}`})
             }
 
-
             if (vo.ifNoneExist) {
                 ext.extension.push({url:"ifNoneMatch",valueString:vo.ifNoneExist})
             }
@@ -1410,7 +1409,7 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
 
                 let hashIdName = {}     //associate an idname (from allocateId) with the path
                 //todo - think I've deprecated resourceReferences
-                if (dg.resourceReferences) {
+                if (false && dg.resourceReferences) {
                     //we need to set consistent 'idname' properties - that will be used by allocateId
 
                     let ctr = 0
@@ -1593,8 +1592,7 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
                         extractionContext = getExtractionContext(dgName,config.hashAllDG) //the FHIR resource type defined on the DG
                         if (extractionContext) {
 
-
-                            let vo = {definition:extractionContext}
+                            let vo = {definition:extractionContext}     //this will be for definitionExtract
 
                             //currently disabled Feb2025- should this be set only in the extensions
                             if (false && dg.idVariable) {
@@ -1602,9 +1600,12 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
                             }
 
                             //we need to see if the DG has any adHoc extensions defined on the root
-                            if (dg.adHocExtension) {
+                            //9Apr2025 - hold on, these will have been processed by decorate item...
+                            //todo - it's really the allocateID
+                            if (false && dg.adHocExtension) {
 
-                                //now see if there is an allocateId. if there is, then it needs to be added to the extractDefinition vo and the extension removed from ad hoc
+                                //now see if there is an allocateId. if there is, then it needs to be added to the
+                                // extractDefinition vo and the extension removed from ad hoc
                                 let newAdHoc = []
                                 for (const ext of dg.adHocExtension) {
                                     if (ext.url == extAllocateIdUrl) {
@@ -1617,6 +1618,7 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
                                         newAdHoc.push(ext)
                                     }
                                 }
+
                                 addAdHocExt(currentItem,newAdHoc)
 
                             }
@@ -1655,9 +1657,6 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
                                 let expression = "%patientID"
                                 addFixedValue(currentItem,definition,null,null,expression)
                             }
-
-
-
 
                             // - same functionity as addDefinitionExtract setExtractionContext(currentItem,extractionContext)
                             //if there's an extraction context, then add any 'DG scope' fixed values.

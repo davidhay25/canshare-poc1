@@ -185,21 +185,30 @@ angular.module("pocApp")
             $scope.updateComponent = function (type,model) {
 
                 if (type == 'dg') {
-                    let msg = "Copy the expanded version of this DG to the Component store. Can subsequently be imported into Forms."
+                    let msg = "Copy the expanded version of this DG to the Component store. Can subsequently be imported into Collections."
+                    if ($scope.userMode == 'playground') {
+                        msg = "Update in the  Component store"
+                    }
                     if (confirm(msg)) {
                         let frozen = snapshotSvc.getFrozenDG(model.name)
                         frozen.source = $scope.userMode
                         frozen.sourceId = $scope.world.id
 
+/*
                         //the key is the unique identifier as the name will not be unique from a collection
-                        frozen.key = model.name     //default to the name (in the LIM)
-                        if ($scope.userMode == 'playground') {
-                            frozen.key = `${model.name}-${$scope.world.id}`    //in a collection, append the collection id
+                        //The key should already exist - if it does then leave it. Otherwise create it
+                        if (! frozen.key) {
+                            frozen.key = model.name     //default to the name (in the LIM)
+                            if ($scope.userMode == 'playground') {
+                                frozen.key = `${model.name}-${$scope.world.id}`    //in a collection, append the collection id
+                            }
+                            //ensure that the key in the local model is in the model
+                            model.key = frozen.key
                         }
 
+*/
 
-                        //ensure that the key in the local model is in the model
-                        model.key = frozen.key
+
 
                         saveModel(frozen)
                     }
@@ -216,7 +225,7 @@ angular.module("pocApp")
 
                 function saveModel(frozen) {
 
-                    $http.put(`/frozen/${frozen.key}`,frozen).then(
+                    $http.put(`/frozen/${frozen.name}`,frozen).then(
                         function (data) {
                             alert("Component updated")
                         }, function (err) {
@@ -537,13 +546,13 @@ angular.module("pocApp")
                     let cntDG = countCheckedOut($scope.hashAllDG)
                     let cntComp = countCheckedOut($scope.hashAllCompositions)
                     if ((cntDG + cntComp) > 0) {
-                        let msg = `There are ${cntDG} DG's  and ${cntComp} Compositions still checked out. Are you sure you wish to enter Forms mode`
+                        let msg = `There are ${cntDG} DG's  and ${cntComp} Compositions still checked out. Are you sure you wish to enter Collections mode`
                         if (! confirm(msg)) {
                             return
                         }
 
                     } else {
-                        let msg = "Are you sure you wish to enter Forms mode? This will replace the current model."
+                        let msg = "Are you sure you wish to enter Collections mode? This will replace the current model."
                         if (! confirm(msg)) {
                             return
                         }
@@ -1353,6 +1362,10 @@ angular.module("pocApp")
 
                         $scope.makeAllDTList()
                         $scope.refreshUpdates()
+                        sortDG()        //will update the list view
+
+                       // $scope.makeAllDTList()      //updated
+                       // $scope.makeSnapshots()
                         //alert("The DG has been removed. It is advisable to refresh the page.")
                     }
                 }
@@ -2262,10 +2275,11 @@ angular.module("pocApp")
 
 
                 let name = dg.name
+                /*
                 if ($scope.userMode == 'playground') {
                     name = `${name}-${$scope.world.id}` //for collections, append the collection id to the saved name...
                 }
-
+*/
                 $http.get(`/frozen/${name}`).then(
                     function (data) {
                         $scope.componentVersion = data.data

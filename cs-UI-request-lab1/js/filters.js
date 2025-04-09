@@ -2,7 +2,19 @@ angular.module("pocApp")
 
 
 
+    .filter('lastInUUID',function(){
+        //return the last segment in a uuid
+        return function(uuid) {
 
+            if (uuid ) {
+                let ar = uuid.split('-')
+
+                return ar[ar.length-1]
+            }
+
+
+        }
+    })
 
     .filter('sdcExtensionName',function(){
         //return a version of the path removing unneeded segments (for display)

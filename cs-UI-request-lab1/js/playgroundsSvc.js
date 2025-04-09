@@ -11,20 +11,23 @@ angular.module("pocApp")
                     return {}
                 }
 
+
+
+
                 let response = {}    //dgnames that are different
                 let hashInitialDGs = {}     //hash by name of DGs in the initial load
                 //create a hash of all DGs in the initial load
                 for (const key of Object.keys(initialPG.dataGroups)) {
                     hashInitialDGs[key] = simpleHash(angular.toJson(initialPG.dataGroups[key]))
                 }
-
+/*
                 //look for new DGs
                 for (const key of Object.keys(currentPG.dataGroups)) {
                     if (! hashInitialDGs[key]) {
                         response[key] = [{msg:"This is a new DG"}]
                     }
                 }
-
+*/
                 //for (const dg of pg.dataGroups) {
                 for (const key of Object.keys(currentPG.dataGroups)) {
                     if (hashInitialDGs[key]) {
@@ -36,14 +39,21 @@ angular.module("pocApp")
                         //initialHash = angular.toJson(initialPG.dataGroups[key])
 
                         if (initialHash !== currentHash) {
-                            response[key] = [{msg:"DG was changed"}]
+                            response[key] = [{type:"changed",msg:"DG was changed"}]
                         }
 
                     } else {
                         //the DG was deleted
-                        response[key] = [{msg:"DG was deleted"}]
+                        response[key] = [{type:"added",msg:"DG was added"}]
                     }
 
+                }
+
+                //look for deleted DGs
+                for (const key of Object.keys(initialPG.dataGroups)) {
+                    if (! currentPG.dataGroups[key]) {
+                        response[key] = [{type:"deleted",msg:"This is a deleted DG"}]
+                    }
                 }
 
                 return response

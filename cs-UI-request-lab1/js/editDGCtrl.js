@@ -605,19 +605,26 @@ angular.module("pocApp")
 
             $scope.moveAfter = function (pos,element) {
                 let path = $filter('lastInPath')(element.path)
-                let msg = `This is row ${pos} (${path}). Enter the row number to move this row to.`
+                let msg = `This is row ${pos+1} (${path}). Enter the row number to move this row to.`
                 const input = prompt(msg);
 
                 if (input !== null) {
                     let newPos = Number(input);
                     if (!isNaN(newPos)) {
-                        alert(`You entered: ${newPos}`);
-                        if (newPos > 0 && newPos < model.diff.length) {
-                            const [row] = model.diff.splice(pos,1)
+                        //alert(`You entered: ${newPos}`);
+                        newPos--
+                        if (newPos > 0 && newPos < $scope.model.diff.length-1) {
+                            const [row] = $scope.model.diff.splice(pos,1)
                             if (newPos > pos) (
                                 newPos--
                             )
-                            model.diff.splice(newPos,0,row)
+
+                           // $timeout(() => {
+                                $scope.model.diff.splice(newPos,0,row)
+                          //  });
+
+
+
                         }
 
 

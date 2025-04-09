@@ -16,9 +16,9 @@ angular.module("pocApp")
 
             //The key is the unique identifier for the component. If the local DG has a key, then it was
             //imported from the component store so we can use that.
-            let key = $scope.localDG.key || $scope.localDG.name
+            //let key = $scope.localDG.key || $scope.localDG.name
 
-            $http.get(`/frozen/${key}`).then(
+            $http.get(`/frozen/${$scope.localDG.name}`).then(
                 function (data) {
                     $scope.componentDG = data.data
                   //  console.log(data.data)
