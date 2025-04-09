@@ -970,6 +970,7 @@ angular.module("pocApp")
                             let meta = {name:$scope.world.name,id:$scope.world.id}
                             meta.description = $scope.world.description
                             meta.version = $scope.world.version
+                            meta.lockedTo = $scope.world.lockedTo
                             return meta
                         }
                     }
@@ -996,6 +997,7 @@ angular.module("pocApp")
                         $scope.world.id = vo.meta.id
                         $scope.world.description = vo.meta.description
                         $scope.world.version = vo.meta.version || 0
+                        $scope.world.lockedTo = vo.meta.lockedTo
 
                     }
 
