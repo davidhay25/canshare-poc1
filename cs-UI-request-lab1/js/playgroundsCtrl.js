@@ -47,7 +47,7 @@ angular.module("pocApp")
 
                 $http.post(`/playground/unlock`,vo).then(
                     function (data) {
-                        alert("This form can now be updated by anyone")
+                        alert("This form can now locked by someone else")
                         delete row.lockedTo  //just to update the UI
                     }, function (err) {
                         alert(angular.toJson(err.data) )
