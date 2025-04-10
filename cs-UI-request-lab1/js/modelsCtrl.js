@@ -3,7 +3,7 @@
 angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,orderingSvc,
-                  snapshotSvc,vsSvc,makeQSvc,playgroundsSvc,$localForage,documentSvc,
+                  snapshotSvc,vsSvc,makeQSvc,playgroundsSvc,$localForage,documentSvc, reportSvc,
                   $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
 
             //change the background colour of the DG summary according to the environment
@@ -317,7 +317,7 @@ angular.module("pocApp")
                             return $scope.userMode
                         },
                         playground: function () {
-                            return $localStorage.world
+                            return $scope.world
                         },
                         initialPlayground: function () {
                             return $localStorage.initialPlayground
@@ -336,6 +336,7 @@ angular.module("pocApp")
                             $scope.world = playground
 
                             $localStorage.initialPlayground = angular.copy(playground) //save the loaded version so we know if it has been changed
+
 /*
                             //reset the dirty flag of all DGs
                             for (const key of Object.keys($localStorage.world.dataGroups)) {
@@ -480,6 +481,7 @@ angular.module("pocApp")
             resetLocalEnvironment = function () {
                 $localStorage.world = {compositions:{},dataGroups: {}}
                 $scope.world = $localStorage.world
+
                 $scope.hashAllDG = $localStorage.world.dataGroups
                 $scope.hashAllCompositions = $localStorage.world.compositions
             }
@@ -505,9 +507,12 @@ angular.module("pocApp")
                         }
 
 
+
                        // let msg = "Are you sure you wish to enter LIM mode? This will replace the current Form."
                        // if (confirm(msg)) {
                             resetLocalEnvironment()
+                            delete $scope.initialPlayground  //initialPlayground doesn't apply in LIM mode
+                            delete $localStorage.initialPlayground
 
                             let qry = '/model/allDG'
                             $http.get(qry).then(
@@ -561,7 +566,7 @@ angular.module("pocApp")
 
                     resetLocalEnvironment()
 
-                    alert("Reset complete. You can create a new Form - or download an existing one.")
+                    alert("Reset complete. You can create a new Collection - or download an existing one.")
 
                    // $scope.$emit('updateDGList',{})
                     $scope.userMode = newMode
@@ -2760,6 +2765,10 @@ angular.module("pocApp")
                 }
 
                 document.body.removeChild(textArea);
+            }
+
+            $scope.checkIds = function () {
+                $scope.idAnalysis = reportSvc.checkIds($scope.hashAllDG)
             }
 
 

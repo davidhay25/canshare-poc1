@@ -205,6 +205,8 @@ angular.module("pocApp")
                                 let playground = data.data      //the playground being copied
                                 playground.name = name
                                 playground.id = utilsSvc.getUUID()
+                                playground.lockedTo = user.email
+                                alert("The copy has been downloaded. You'll need to udpate the repository for it to be saved there.")
                                 $scope.$close(playground)
 
                             }
