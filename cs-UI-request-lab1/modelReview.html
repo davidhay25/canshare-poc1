@@ -576,10 +576,13 @@
                             <table class="table table-bordered">
                                 <tr><th>LinkId</th><th>Text</th><th>Code</th><th>DataType</th><th>Value</th></tr>
                                 <tr ng-repeat="entry in lstQRItem"
-                                    ng-class="{background:entry.dt == 'Group'}"
-                                    >
+                                    ng-class="{background:entry.dt == 'Group'}">
                                     <td>{{entry.item.linkId}}</td>
-                                    <td>{{entry.item.text}}</td>
+
+                                    <td>
+                                        <div ng-style="{ 'padding-left': (entry.level * 6) }">
+                                        {{entry.item.text}}</div>
+                                    </td>
                                     <td>
                                         <div ng-repeat="code in entry.item.code">
                                             {{code.code}}

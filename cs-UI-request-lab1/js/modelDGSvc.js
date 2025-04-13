@@ -8,6 +8,7 @@ angular.module("pocApp")
 
         return {
 
+
             copyDG : function (DG,vo) {
                 //create a copy of a DG - updating the ids and any ews...
                 let hash = {} // we need to record id updates in the ED for EW
@@ -44,32 +45,6 @@ angular.module("pocApp")
 
             },
 
-            makeSDCSummaryDEP : function (fullElementList,hashAllDG) {
-                //Make a summary of all the SDC extensions
-
-
-
-                let ar = []
-
-                return ar
-                for (const item of fullElementList) {
-                    let ed = item.ed
-                    if (ed.type) {
-                        let type = ed.type[0]
-                        if (hashAllDG[type] && hashAllDG[type].adHocExt) {  //note we're not looking up an inheritance tree = ? should we
-                            ed.adHocExt = hashAllDG[type].adHocExt
-                           // ar.push(ed)
-
-                        } else if (ed.adHocExt) {
-                            ar.push(ed)
-                        }
-                    }
-
-
-                }
-                return ar
-
-            },
 
             updateDGId : function (dg) {
                 //add id's to the dg and all the ed. Update any conditionals. Can run any number of times.
@@ -316,7 +291,7 @@ angular.module("pocApp")
                 })
             },
 
-            checkAllDG : function (hashAllDG) {
+            checkAllDGDEP : function (hashAllDG) {
                 //check DG for invalid construction that can crash the browser
                 let that = this
                 Object.keys(hashAllDG).forEach(function (key) {

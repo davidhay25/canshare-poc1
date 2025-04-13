@@ -39,6 +39,31 @@ angular.module("pocApp")
                 $localStorage.trace.on = ! $localStorage.trace.on
             }
 
+            $scope.canShowComponent = function (dg,filter) {
+                if (! filter) {
+                    return true
+                }
+                if (dg) {
+                    let f = filter.toLowerCase()
+                    let name = dg.name.toLowerCase()
+                    if (name.indexOf(f) > -1) {
+                        return true
+                    }
+
+                    if (dg.title) {
+                        let t = dg.title.toLowerCase()
+                        if (t.indexOf(f) > -1) {
+                            return true
+                        }
+                    }
+
+
+                }
+
+
+            }
+
+
             //This is the browser cache object.
             $localStorage.world = $localStorage.world || {dataGroups:{},compositions:{},Q:{}}
             $localStorage.world.Q =  $localStorage.world.Q || {}
@@ -218,12 +243,15 @@ angular.module("pocApp")
 
                     //make the DG replica of a composition
                     let frozen = snapshotSvc.getFrozenComp($scope.selectedComposition,$scope.allCompElements)
-
+                    frozen.source = $scope.userMode
                     saveModel(frozen)
 
                 }
 
                 function saveModel(frozen) {
+
+
+
 
                     $http.put(`/frozen/${frozen.name}`,frozen).then(
                         function (data) {
@@ -267,6 +295,13 @@ angular.module("pocApp")
                     //need the named queries for Q variables
                     makeQSvc.getNamedQueries(function (hashNamedQueries) {
 
+                        //need to create a Q name that is unique
+                        let qName = model.name
+                        if ($scope.userMode == 'playground') {
+                            qName = `${$scope.world.name}-${model.name}`
+                        }
+                        qName = qName.replace(/\s+/g, "");
+
                         let voQ
                         if (kind == 'dg') {
                             let config = {expandVS:true,enableWhen:true}
@@ -274,22 +309,27 @@ angular.module("pocApp")
                             config.hashAllDG = $scope.hashAllDG
                             config.fhirType = model.type// Used for definition based extraction
                             config.expandVS = false     //use proxy to expand vs
-                           // let allElements = snapshotSvc.getFullListOfElements(model.name)
-                            voQ = makeQSvc.makeHierarchicalQFromDG(model,allElements,config) //,$scope.hashAllDG)
+                            config.name = qName
+
+
+                            voQ = makeQSvc.makeHierarchicalQFromDG(model,allElements,config)
                         } else {
                             let compConfig = {hideEnableWhen : false}
                             voQ = makeQSvc.makeHierarchicalQFromComp(model,$scope.hashAllDG,hashNamedQueries,compConfig)
                         }
 
-                        let qry = `/Questionnaire/${model.name}`
+
+                        let qry = `/Questionnaire/${qName}`
+
+
                         let t = {Q:voQ.Q,errorLog:voQ.errorLog, lidHash: voQ.lidHash}
                         $http.put(qry,t).then(
                             function () {
-                                if (confirm("Load questionnaire viewer?")) {
-                                    const url = `modelReview.html?q-${model.name}`
+                              //  if (confirm("Load questionnaire viewer?")) {
+                                    const url = `modelReview.html?q-${qName}`
                                     const features = 'noopener,noreferrer'
                                     window.open(url, '_blank', features)
-                                }
+                              //  }
 
                             }, function (ex) {
                                 alert(angular.toJson(ex.data))
@@ -465,10 +505,37 @@ angular.module("pocApp")
                 let name = dg.name
                 let newName = prompt("What is the name for the imported DG (No spaces)",name)
                 if (newName) {
-                    dg.name = newName.replace(/\s/g, '')    //remove any spaces
-                    $scope.hashAllDG[dg.name] = dg
-                    $scope.init()
-                    alert(`DG has been imported`)
+                    newName = newName.replace(/\s/g, '')    //remove any spaces
+                    dg.name = newName
+
+                    if (newName !== name) {
+                        //this is a new component - check to see if there is already one with  that name
+                        $http.get(`/frozen/${newName}`).then(
+                            function () {
+                                alert("There is already a component with that name. You will need to choose another.")
+                            }, function (err) {
+                                //nothing there - can add
+                                if (err.status == 404) {
+                                    $scope.hashAllDG[dg.name] = dg
+                                    $scope.init()
+                                    alert(`DG has been imported`)
+                                } else {
+                                    alert(`There was an issue and the Component was not downloaded: ${err.data.msg}`)
+                                }
+
+                            }
+                        )
+                    } else {
+                        //if the name is not being changed, then don't need to check (we know it's there and accept that it can be updated!)
+                        $scope.hashAllDG[dg.name] = dg
+                        $scope.init()
+                        alert(`DG has been imported`)
+                    }
+
+
+
+
+
                 }
 
             }
@@ -1789,10 +1856,14 @@ angular.module("pocApp")
                 //selct the element in the DG tree. Need to wait for the tree to be built...
                 $timeout(function () {
 
+                    $('#dgTree').jstree('deselect_all')
 
                     //from chatgpt
                     var tree = $('#dgTree').jstree(true);
+
                     tree.select_node(path);
+
+
                     $('#dgTree').trigger('select_node.jstree', {node: tree.get_node(path)});
 
                     //NO - don't do this here!! The select event won't fire...

@@ -31,7 +31,12 @@ async function setup(app,mongoDbName) {
                 delete dg['_id']
                 res.json(dg)
             } else {
-                res.status(400).json({msg:`There were ${ar.length} matches for ${name}`})
+                if (ar.length == 0) {
+                    res.status(404).json({msg:`${name} not found`})
+                } else {
+                    res.status(400).json({msg:`There were ${ar.length} matches for ${name}`})
+                }
+
             }
 
 
@@ -62,7 +67,8 @@ async function setup(app,mongoDbName) {
 
     app.get('/allfrozen', async function(req,res) {
         try {
-            const cursor = await database.collection("frozenDG").find({}).toArray()
+            let qry = {deleted : {$ne : true}}
+            const cursor = await database.collection("frozenDG").find(qry).toArray()
             res.json(cursor)
 
         } catch(ex) {

@@ -528,7 +528,7 @@
         <br/>
 
         <div class="row">
-          <div class="col-md-9">
+          <div class="col-md-8">
 
             <span style="margin-right: 20px">Source:</span> <checkbox ng-model="input.showLibrary"></checkbox> LIM
             <span style="margin-left: 20px">
@@ -540,6 +540,7 @@
             <table class="table table-bordered">
               <tr><th>Title</th><th>Source</th><th>Type</th><th>Description</th><th>Cnt</th><th></th></tr>
               <tr ng-repeat="dg in components"
+                  ng-class="{listItemSelected:dg.name == clone.name}"
                 ng-if="canShowComponent(dg)" >
                 <td>
                   <div class="clickable" ng-click="selectFromComponent(dg)">
@@ -564,15 +565,26 @@
                   <div ng-if="dg.nameExists">In collection</div>
                   <div ng-if="! dg.nameExists" class="clickable"
                     ng-click="importComponent(dg)">Import</div>
+                  <div ng-click="deleteComponent(dg)">Delete</div>
 
                 </td>
               </tr>
             </table>
           </div>
-          <div class="col-md-3">
-            <div class="pull-right">Id: {{clone.id | lastInUUID}}</div>
-            <div class="pull-right">Key: {{clone.key | lastInUUID}}</div>
-            <div id="componentGraph"></div>
+          <div class="col-md-4">
+            <div>Id: {{clone.id | lastInUUID}}</div>
+
+            <div ng-show="dupsCount" class="alert alert-danger">
+              There are {{dupsCount}} elements with duplicate or missing ids which need to be fixed. This may
+              break conditionals which will need to be manually fixed (You can see them in the Dependencies tab).
+              The fix will be applied when the Component is imported. After fixing them in the Collection
+              copy, save the Component back to the library.
+
+
+            </div>
+
+            <br/>
+            <div id="componentTree"></div>
           </div>
         </div>
 

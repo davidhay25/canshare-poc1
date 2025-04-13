@@ -673,9 +673,23 @@
 
                 <uib-tab ng-if="userMode == 'playground'" heading="Import Component">
                     <br/>
+                    <div class="row">
+                        <div class="col-md-1">
+                            <div style="margin-top:8px">Filter</div>
+                        </div>
+                        <div class="col-md-2">
+                            <input class="form-control" type="input" ng-model="input.filter"/>
+                        </div>
+                        <div class="col-md-8">
+                            <div style="margin-top:8px"><em>Filter on Title or name</em></div>
+
+
+                        </div>
+                    </div>
+                    <br/>
                     <table class="table table-bordered">
                         <tr><th>Title</th><th>Name</th><th>Source</th><th>Type</th><th>Description</th><th>Cnt</th><th></th></tr>
-                        <tr ng-repeat="dg in importableDG">
+                        <tr ng-repeat="dg in importableDG" ng-show="canShowComponent(dg,input.filter)">
                             <td>{{dg.title}}</td>
                             <td>{{dg.name}}</td>
                             <td>
@@ -688,7 +702,7 @@
 
                             <td>
                                 <div ng-if="dg.nameExists" class="clickable" ng-click="updateDG($index)">Replace</div>
-                                <div ng-if="!dg.nameExists"class="clickable" ng-click="importDG($index)">Import</div>
+                                <div ng-if="!dg.nameExists" class="clickable" ng-click="importDG($index)">Import</div>
                             </td>
                         </tr>
                     </table>

@@ -1373,23 +1373,14 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
                 let Q = {resourceType:'Questionnaire'}
                 //Q.id = `canshare-${firstElement.ed.path}`
                 Q.id = `canshare-${dg.name}`
-                Q.name = dg.name //firstElement.ed.path
+                Q.name = config.name || dg.name //firstElement.ed.path
                 Q.title = dg.title //firstElement.title
                 Q.status = 'active'
                 Q.title = dg.title
                 Q.url = `http://canshare.co.nz/questionnaire/${dg.name}`
                 Q.description = dg.description
 
-                //temp Q.meta = {tag: [{code:'debug'}]} //invokes debug in the lab
 
-                //adhoc defined on the DG
-               // addAdHocExtension(Q,dg)
-                /*
-                let adHocExt = snapshotSvc.getAdHocExt(dg.name)
-                if (adHocExt) {
-                    addAdHocExt(Q,adHocExt)
-                }
-*/
                 addPrePopExtensions(Q)      //launchPatient & LaunchPractitioner
                 addUseContext(Q)
                 addPublisher(Q)

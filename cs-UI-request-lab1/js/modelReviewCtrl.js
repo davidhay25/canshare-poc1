@@ -43,29 +43,28 @@ angular.module("pocApp")
 
                             //get the definition of the items from the Q
                             let Q = data.data.entry[0].resource
+                            //build a hash of Q items by linkId
                             for (const item of Q.item) {
                                 processQItem(item)
                             }
 
                             //get the answers from the QR
                             for (const item of QR.item) {
-                                processQRItem(item)
+                                processQRItem(item,0)
                             }
 
                         } else {
                             alert(`The Q with the url ${qUrl} was not found`)
                         }
 
-
-
                     },function (err) {
                         alert(angular.toJson(err.data))
                     }
                 )
 
-
                 function processQItem(item) {
                     $scope.hashLinkId[item.linkId] = item
+
                     if (item.item) {
                         for (const child of item.item) {
                             processQItem(child)
@@ -74,7 +73,7 @@ angular.module("pocApp")
                 }
 
 
-                function processQRItem(item) {
+                function processQRItem(item,level) {
                     console.log(item.linkId)
 
                     let def = angular.copy($scope.hashLinkId[item.linkId])
@@ -84,7 +83,7 @@ angular.module("pocApp")
                       //  delete def.item
                         //answer[] is the answer from the QR (an array), answerDisplay[] is a display form
                         let thing = {item:def,answer:item.answer,answerDisplay:[]}
-
+                        thing.level = level
                         //a simplified answer for display
                         for (let ans of item.answer) {
                             //ans will have a single property - valueCoding, valueString etc
@@ -121,13 +120,23 @@ angular.module("pocApp")
 
                     } else {
                         //there is no answer, but add as a 'section'
+
+
                         let thing = {item:def,answer:item.answer,answerDisplay:[]}
-                        thing.dt = "Group"
+
+                        if (item.item) {
+                            thing.dt = "Group"
+                        }
+
+                        thing.level = level
                         $scope.lstQRItem.push(thing)
                     }
+
+
                     if (item.item) {
+                        level++
                         for (const child of item.item) {
-                            processQRItem(child)
+                            processQRItem(child,level)
                         }
                     }
                 }

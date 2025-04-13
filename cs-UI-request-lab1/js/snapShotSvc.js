@@ -1168,6 +1168,7 @@ angular.module("pocApp")
 
                 delete dg.fullDiff
                 delete dg.snapshot
+                delete dg.ssOrder       //not needed in a component
                 return dg
 
             },

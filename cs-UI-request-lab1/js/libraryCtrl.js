@@ -8,13 +8,15 @@ angular.module("pocApp")
             $scope.input.showForm = true
             $scope.user = user
             $scope.userMode = userMode
-
+/*
             if (userMode == 'library') {
                 $timeout(function () {
                   //  $scope.input.mainTabActive = 1
                 },1000)
 
             }
+
+            */
             //$scope.input.mainTabActive = 1
 
             $scope.canBulkUpdateDGLibrary = function () {
@@ -27,6 +29,10 @@ angular.module("pocApp")
             }
 
             $scope.canShowComponent = function (dg) {
+                if (! dg.source) {
+                    return true
+                }
+
                 if (dg.source == 'playground' && $scope.input.showForm) {
                     return true
                 }
@@ -36,20 +42,50 @@ angular.module("pocApp")
 
             }
 
+            $scope.deleteComponent = function (dg) {
+                if (confirm(`Are you sure you wish to delete the component: ${dg.name}`)) {
+                    dg.deleted = true
+                    $http.put(`/frozen/${dg.name}`,dg).then(
+                        function () {
+                            alert("Component has been removed (It's still there, but hidden ")
+                            playgroundsSvc.getImportableDG(allDG).then(
+                                function (data) {
+                                    $scope.components = data
+                                }
+                            )
+                        }, function (err) {
+                            alert("There was an error deleting the component:" + angular.toJson(err.data))
+                        }
+
+                    )
+                }
+            }
+
+
             $scope.selectFromComponent = function (dg) {
                 let clone = angular.copy(dg)    //to make sure we don't inadvertantly update the DG
-                let fullElementList = snapshotSvc.getFullListOfElements(clone.name)// vo.allElements
+                //let fullElementList = snapshotSvc.getFullListOfElements(clone.name)// vo.allElements
                 let elementList = [{ed:{path:clone.name,title:clone.name}}]
 
+                //while preparing the element list, check for dups
+                let hashId = {}
+                $scope.dups = {}
+                $scope.dupsCount = 0
+
                 for (const ed of clone.diff) {
+                    if (hashId[ed.id]) {
+                        $scope.dupsCount++
+                        $scope.dups[ed.id] = true   //record the duplicate for the fix
+                    }
+                    hashId[ed.id] = true
                     ed.path = `${dg.name}.${ed.path}`
                     elementList.push({ed:ed})
                 }
 
                 $scope.clone = clone        //just for the UI
                 let treeData = modelsSvc.makeTreeFromElementList(elementList)
-                $('#componentGraph').jstree('destroy');
-                $('#componentGraph').jstree(
+                $('#componentTree').jstree('destroy');
+                $('#componentTree').jstree(
                     {'core':
                             {'multiple': false,
                                 'data': treeData,
@@ -65,6 +101,11 @@ angular.module("pocApp")
             }
 
 
+            $scope.fixIds = function () {
+                //assign new ids for any duplicates.
+
+            }
+
             $scope.close = function () {
                 $scope.$close()
             }
@@ -76,6 +117,31 @@ angular.module("pocApp")
             )
 
             $scope.importComponent = function (dg) {
+
+
+                //replace any duplicated ids. Conditionals will need to be manually fixed.
+                let hashId = {}
+                let dups = {}
+
+                //pass 1 - find all dups
+                for (const ed of dg.diff) {
+                    let id = ed.id
+                    if (hashId[id]) {
+                        //this is a duplicate - get a new uuid for it (don't care if this happens > once
+                        dups[id] = true
+                    } else {
+                        hashId[id] = true
+                    }
+                }
+
+                //pass 2 - update the ed id. All duplicated ids are replaced
+                for (let ed of dg.diff) {
+                    let id = ed.id
+                    if (dups[id] || ! ed.id) {
+                        //this is a duplicate - replace it with a new one
+                        ed.id = utilsSvc.getUUID()
+                    }
+                }
 
                 let name = dg.name
                 let newName = prompt("What is the name for the imported DG (No spaces)",name)
