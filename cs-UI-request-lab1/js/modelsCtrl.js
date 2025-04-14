@@ -533,9 +533,6 @@ angular.module("pocApp")
                     }
 
 
-
-
-
                 }
 
             }
@@ -2358,11 +2355,14 @@ angular.module("pocApp")
                     name = `${name}-${$scope.world.id}` //for collections, append the collection id to the saved name...
                 }
 */
+                //get the current component version of this (if any) for the diff...
                 $http.get(`/frozen/${name}`).then(
                     function (data) {
                         $scope.componentVersion = data.data
                         console.log(data.data)
 
+                    }, function(err) {
+                        console.log(`${name} not found in component store (Not necessarily an error`)
                     }
                 )
 

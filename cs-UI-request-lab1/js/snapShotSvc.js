@@ -1168,7 +1168,7 @@ angular.module("pocApp")
 
                 delete dg.fullDiff
                 delete dg.snapshot
-                delete dg.ssOrder       //not needed in a component
+                //delete dg.ssOrder       //not needed in a component
                 return dg
 
             },
@@ -1471,7 +1471,19 @@ angular.module("pocApp")
 
                 logToConsole = false
 
+
+
+
+
                 allDgSnapshot = angular.copy(hashAllDG) //this will be a local clone
+
+                //April14 2025 - somehow the clone is getting saved - this interferes with the snapshot generation
+                for (let key of Object.keys(allDgSnapshot)) {
+                    delete allDgSnapshot[key].snapshotComplete
+                }
+
+
+
 
                 try {
                     //construct a complete diff for each dg including the hierarchy
