@@ -28,6 +28,23 @@ angular.module("pocApp")
                 }
             }
 
+            $scope.loadAllQNames = function () {
+                $http.get('/Questionnaire/getSummary').then(
+                    function (data) {
+                        $scope.lstQ = data.data.lstQ
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                )
+            }
+
+            $scope.loadAllQNames()
+            $scope.loadQ = function (qName) {
+                const url = `modelReview.html?q-${qName}`
+                const features = 'noopener,noreferrer'
+                window.open(url, '_blank', features)
+            }
+
             $scope.canShowComponent = function (dg) {
                 if (! dg.source) {
                     return true
@@ -118,30 +135,8 @@ angular.module("pocApp")
 
             $scope.importComponent = function (dg) {
 
+                librarySvc.checkIds(dg)     //check all id's present and unique
 
-                //replace any duplicated ids. Conditionals will need to be manually fixed.
-                let hashId = {}
-                let dups = {}
-
-                //pass 1 - find all dups
-                for (const ed of dg.diff) {
-                    let id = ed.id
-                    if (hashId[id]) {
-                        //this is a duplicate - get a new uuid for it (don't care if this happens > once
-                        dups[id] = true
-                    } else {
-                        hashId[id] = true
-                    }
-                }
-
-                //pass 2 - update the ed id. All duplicated ids are replaced
-                for (let ed of dg.diff) {
-                    let id = ed.id
-                    if (dups[id] || ! ed.id) {
-                        //this is a duplicate - replace it with a new one
-                        ed.id = utilsSvc.getUUID()
-                    }
-                }
 
                 let name = dg.name
                 let newName = prompt("What is the name for the imported DG (No spaces)",name)

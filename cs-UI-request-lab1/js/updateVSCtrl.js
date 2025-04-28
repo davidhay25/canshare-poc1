@@ -1010,16 +1010,17 @@ angular.module("pocApp")
                             bundle.entry.forEach(function (entry) {
                                 //let vs = entry.resp
 
-                                //we don't want non-snomed in this list
+                                //we don't want non-snomed in this list - changed on 24Apr 2025
                                 //"http://canshare.co.nz/fhir/NamingSystem/nonsnomed-valuesets
                                 let vs = entry.resource
                                 let canInclude = true
+/*
                                 for (const identifier of entry.resource.identifier) {
                                     if (identifier.system == "http://canshare.co.nz/fhir/NamingSystem/nonsnomed-valuesets") {
                                         canInclude = false
                                     }
                                 }
-
+*/
                                 if (canInclude) {
                                     let item = {vs:entry.resource}
                                     item.display = entry.resource.title || entry.resource.name
@@ -1086,6 +1087,130 @@ angular.module("pocApp")
                 }
             )
 
+            
+            //---- functions for 'other CodeSystem
+            $scope.addOtherCsConcept = function () {
+                let concept = {}
+                concept.code = $scope.input.newOtherCsCode
+                concept.display = $scope.input.newOtherCsDisplay
+                concept.system = $scope.input.newOtherCsSystem
+
+                let qry = `CodeSystem/$lookup?system=${concept.system}&code=${concept.code}`
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        $scope.input.otherCsConcepts = $scope.input.otherCsConcepts || []
+                        $scope.input.otherCsConcepts.push(concept)
+
+                        delete $scope.input.newOtherCsCode
+                        delete $scope.input.newOtherCsDisplay
+                        delete $scope.input.newOtherCsSystem
+
+                        $scope.makeVS()
+
+                    }, function () {
+                        alert("Concept not found on server")
+                    }
+                )
+
+
+
+            }
+
+            //allow other concepts to be entered from a spreadsheet
+            $scope.selectOtherConcepts = function (arConcepts,system) {
+
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/enterConcepts.html',
+                    backdrop: 'static',
+                    size : 'lg',
+                    controller: 'enterConceptsCtrl',
+                    resolve: {
+                        vo: function () {
+                            let vo = {}
+                            vo.existing = arConcepts     //for duplicate checking
+                            vo.system = system
+                            //vo.existing = $scope.input.otherCsConcepts     //for duplicate checking
+                            return vo
+                        }
+                    }
+                }).result.then(function (concepts) {
+                    //return an array of concepts
+                    if (concepts.length > 0) {
+                        arConcepts = arConcepts || []
+                        arConcepts.push(...concepts)
+
+                        //$scope.input.otherCsConcepts = $scope.input.otherCsConcepts || []
+                        //$scope.input.otherCsConcepts.push(...concepts)
+                        $scope.makeVS()
+                    }
+
+                })
+
+                /*
+
+                let qry = `CodeSystem?url=${url}&_summary=false`
+                let encodedQry = encodeURIComponent(qry)
+
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        console.log(data)
+                        let bundle = data.data
+                        if (bundle.entry) {
+
+                            if (bundle.entry.length > 0) {
+
+
+                                if (bundle.entry.length > 1) {
+                                    alert(`There were ${bundle.entry.length} CodeSystems found! Using the first one`)
+                                }
+
+
+                                let concepts = bundle.entry[0].resource.concept
+                                if (confirm(`There are ${concepts.length} entries in this CodeSystem. Add them all to the ValueSet?`)) {
+                                    $scope.input.otherCsConcepts = $scope.input.otherCsConcepts || []
+
+                                    let hash = {}
+                                    for (const concept of $scope.input.otherCsConcepts) {
+                                        let key =  `${concept.code}-${concept.system}`
+                                        hash[key] = true
+                                    }
+
+                                    for (const concept of concepts) {
+                                        //ensure no dups
+                                        if (! hash[`${concept.code}-${url}`]) {
+                                            concept.system = url
+                                            $scope.input.otherCsConcepts.push(concept)
+                                        }
+
+
+                                    }
+                                    delete $scope.input.newOtherCsSystem
+                                    $scope.makeVS()
+                                }
+
+                            } else {
+                                alert(`There were ${bundle.entry.length} CodeSystems found! This is an error...`)
+                               // alert(`CodeSystem with the URL: ${url} not found`)
+                            }
+                        } else {
+                            alert(`There was no CodeSystem with the url: ${url}`)
+                        }
+
+
+                    }, function () {
+                        alert(`CodeSystem with the URL: ${url} not found`)
+                    })
+
+                */
+            }
+            
+            $scope.removeOtherCsConcept = function (inx) {
+
+                $scope.input.otherCsConcepts.splice(inx,1)
+                $scope.makeVS()
+            }
 
 
             //add a concept to the list directly included in the VS. In an include section with the snomed system
@@ -1141,7 +1266,7 @@ angular.module("pocApp")
                     }
                 }
                 if (ok) {
-                    makeVS()
+                    $scope.makeVS()
                 }
             }
 
@@ -1186,7 +1311,7 @@ angular.module("pocApp")
                 }
                 if (confirm(msg)) {
 
-                    console.log(angular.toJson($scope.selectedVS,null,2))
+                   // console.log(angular.toJson($scope.selectedVS,null,2))
                     performUpdate($scope.selectedVS)
 
                 }
@@ -1213,6 +1338,8 @@ angular.module("pocApp")
                 delete $scope.qUsingVS
                 //delete $scope.dummyQR
                 delete $scope.input.prePubConcepts
+                delete $scope.input.otherCsConcepts
+                delete $scope.input.displayConcepts
 
 
 
@@ -1226,12 +1353,7 @@ angular.module("pocApp")
             }
 
             $scope.testECL = function (ecl) {
-
-                //displays the ECL in a modal list
-               // $scope.listConcepts(ecl)
-
-
-
+                
                 let vo = {ecl:ecl}
 
                 $http.post(`nzhts/ecl`,vo).then(
@@ -1246,7 +1368,7 @@ angular.module("pocApp")
 
             $scope.canSave = function () {
                 return $scope.input.id && $scope.input.title && $scope.input.description &&
-                    $scope.input.ecl && $scope.isDirty
+                    $scope.isDirty
             }
 
             //whether to show a particular VS
@@ -1263,32 +1385,15 @@ angular.module("pocApp")
                     return true
                 }
 
-                if ((item.display.toLowerCase().indexOf(filter.toLowerCase()) > -1) ||
-                    (item.vs.id.toLowerCase().indexOf(filter.toLowerCase()) > -1)) {
+                filter = filter.toLowerCase()
+
+                if ((item.display.toLowerCase().indexOf(filter) > -1) ||
+                    (item.vs.id.toLowerCase().indexOf(filter) > -1)) {
 
                     return true
                 } else {
                     return false
                 }
-
-/*
-                if ($scope.input.onlyRetired) {
-                    if (item.vs.status == 'retired') {
-                        return true
-                    }
-                } else {
-                    let filter = $scope.input.filterlist
-                    if (filter) {
-                        if (item.display.toLowerCase().indexOf(filter.toLowerCase()) > -1) {
-                            return true
-                        } else {
-                            return false
-                        }
-                    } else {
-                        return true
-                    }
-                }
-                */
 
             }
 
@@ -1303,7 +1408,15 @@ angular.module("pocApp")
 
                 delete $scope.input.displayConcepts
                 delete $scope.input.prePubConcepts
+                delete $scope.input.otherCsConcepts
                 delete $scope.input.ecl
+                $scope.csInVs = []      //any codeSystems referenced by thie VS - ie when defining a CS
+                delete $scope.isMaximalVS   //if true, this is a maximal VS created when creating a CodeSystem
+                for (const identifier of vs.identifier || []) {
+                    if (identifier.system == "http://canshare.co.nz/fhir/NamingSystem/nonsnomed-valuesets") {
+                        $scope.isMaximalVS = true
+                    }
+                }
 
 
                 //there are now potentially 3 include statements
@@ -1329,16 +1442,23 @@ angular.module("pocApp")
                                 if (inc.system == snomed) {
                                     $scope.input.displayConcepts = $scope.input.displayConcepts || []
                                     $scope.input.displayConcepts.push(concept)
-                                } else {
+                                } else if (inc.system == "http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished") {
                                     $scope.input.prePubConcepts = $scope.input.prePubConcepts || []
                                     $scope.input.prePubConcepts.push(concept)
+                                } else {
+                                    //these are 'other' - ie non snomed - codes
+                                    concept.system = inc.system
+                                    $scope.input.otherCsConcepts = $scope.input.otherCsConcepts || []
+                                    $scope.input.otherCsConcepts.push(concept)
+
                                 }
-
-
 
                             })
                         } else {
-                            alert(`Unknown include element: ${angular.toJson(inc)}`)
+                            //this can happen with ValueSets created by the CodeSystem editing domain
+                            $scope.csInVs.push(inc.system)
+
+                           // alert(`Unknown include element: ${angular.toJson(inc)}`)
                         }
 
                     })
@@ -1363,6 +1483,7 @@ angular.module("pocApp")
                 //delete $scope.dummyQR
                 delete $scope.input.prePubConcepts
                 delete $scope.input.displayConcepts
+                delete $scope.input.otherCsConcepts
 
                 let qry = `ValueSet?url=${item.vs.url}&_summary=false`
 
@@ -1478,15 +1599,6 @@ angular.module("pocApp")
 
             $scope.getMemberCountDEP = function (vs) {
                 return updateVSSvc.getMemberCount(vs)
-              /*  if (vs && vs.extension) {
-                    for (ext of vs.extension) {
-                        if (ext.url == extMemberCount) {
-                            return ext.valueInteger
-                            break
-                        }
-                    }
-                }
-                */
             }
 
             $scope.getVersions = function (vs) {
@@ -1537,6 +1649,7 @@ angular.module("pocApp")
                     description:$scope.input.description,
                     displayConcepts: $scope.input.displayConcepts,
                     prePubConcepts: $scope.input.prePubConcepts,
+                    otherCsConcepts: $scope.input.otherCsConcepts,
                     ecl:$scope.input.ecl}
                 $scope.selectedVS = makeVSFromVo(vo)
                 $scope.isDirty = true
@@ -1664,16 +1777,23 @@ angular.module("pocApp")
 
 
                 //This is the main ECL part of the VS
-                let filter = {property:"constraint",op:"=",value:`${vo.ecl}`}
-                let include = {system:snomed,version:versionEcl,filter:[filter]}
-                vs.compose = {include:[include]}
+                vs.compose = {include:[]}
+                if (vo.ecl) {
+                    let filter = {property:"constraint",op:"=",value:`${vo.ecl}`}
+                    let include = {system:snomed,version:versionEcl,filter:[filter]}
+                    vs.compose.include.push(include)
+                }
+
+
+
+
 
                 if (vo.displayConcepts && vo.displayConcepts.length > 0) {
                     //These are concepts added to the VS that are in the publishing env. but not the main env.
 
                     let displayInclude = {system:snomed,concept:[]}
                     vo.displayConcepts.forEach(function (concept) {
-                        displayInclude.concept.push(concept)
+                        displayInclude.concept.push({code:concept.code,display:concept.display})
                     })
                     vs.compose.include.push(displayInclude)
 
@@ -1683,11 +1803,33 @@ angular.module("pocApp")
                     //These are concepts directly added to the VS that are in the publishing env. but not the main env.
                     let ppInclude = {system:systemPrePub,concept:[]}
                     vo.prePubConcepts.forEach(function (concept) {
-                        ppInclude.concept.push(concept)
+                        ppInclude.concept.push({code:concept.code,display:concept.display})
                     })
                     vs.compose.include.push(ppInclude)
+                }
+
+                if (vo.otherCsConcepts) {
+                    //Concepts from codesystems other than snomed. Each system will be in its own compose.include
+                    let hashSystem = {}
+                    for (const concept of vo.otherCsConcepts) {
+                        hashSystem[concept.system] = hashSystem[concept.system] || []
+                        hashSystem[concept.system].push({code:concept.code,display:concept.display})
+                    }
+
+                    for (const system of Object.keys(hashSystem)) {
+
+                        let osInclude = {system:system,concept:[]}
+                        for (const concept of hashSystem[system]) {
+
+                            //delete concept.system
+                            osInclude.concept.push({code:concept.code,display:concept.display})
+                        }
+                        vs.compose.include.push(osInclude)
+                    }
+
 
                 }
+
 
                 return vs
             }

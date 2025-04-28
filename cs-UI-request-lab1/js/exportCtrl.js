@@ -16,7 +16,6 @@ angular.module("pocApp")
 
             $scope.import = function () {
 
-               // $scope.$close({dg:$scope.uploadedDG,comp: $scope.uploadedComp})
                 $scope.$close($scope.uploadedWorld)
             }
 

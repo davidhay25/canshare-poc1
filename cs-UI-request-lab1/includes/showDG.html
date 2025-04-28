@@ -265,7 +265,7 @@
 
           <div>
             <div>
-              <div class="clickable pull-right" ng-if="canEdit(selectedModel)"
+              <div class="clickable pull-right" ng-if="canAdd(selectedModel,selectedNode)"
                       ng-click="editDGItem()">Add new element
                 <span ng-if="selectedNode">to {{selectedNode.data.ed.path}}</span>
 
@@ -1015,23 +1015,12 @@
               <tr><th>Path</th><th>Title</th><th>Description</th><th>DG Type</th><th>Card.</th><th>SDC attributes</th><th>Source</th></tr>
               </thead>
               <tbody>
-              <!---     <tr ng-repeat="element in fullElementList">
 
-              -->
               <tr ng-repeat="element in fullElementList"
                   ng-hide="$index==0 || (element.ed.mult.indexOf('..0') > -1)">
                 <td>
                   <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
-                    <!--
-                    <div ng-hide="input.showFullModel">
-                      {{element.ed.path | dropFirstInPath}}
-                    </div>
 
-
-                    <div ng-if="input.showFullModel">
-                      {{element.ed.path | lastInPath}}
-                    </div>
--->
                    <div class="clickable" ng-click="termSelectDGItem({hiddenDGName:selectedModel.name,path:element.ed.path})">
                      {{element.ed.path | lastInPath}}
                    </div>
@@ -1070,19 +1059,29 @@
                 <td>{{element.ed.mult}}</td>
 
                 <td>
+
+
+                  <div ng-if="element.ed.fixedCode || element.ed.fixedCoding || element.ed.fixedDecimal ||
+                      element.ed.fixedString || ed.fixedQuantity">
+                    Fixed value
+
+                  </div>
+<!--
                   {{element.ed.fixedCode}}{{element.ed.fixedCoding}}
                   {{element.ed.fixedDecimal}}{{element.ed.fixedString}}
                   {{element.ed.fixedQuantity.value}} {{element.ed.fixedQuantity.unit}}
-
+                  -->
 
                   <div ng-if="element.ed.itemCode">Code: {{element.ed.itemCode.code}}</div>
                   <div ng-if="element.ed.definition">Extract: {{element.ed.definition}}</div>
                   <div ng-if="element.ed.prePop">PrePop: {{element.ed.prePop}}</div>
 
+
+
                   {{getExtractType(element.ed)}}
 
 
-                  <div ng-if="element.ed.adHocExtension"
+                  <div ng-if="element.ed.adHocExtension && element.ed.adHocExtension.length > 0"
                        class="clickableDotted"
                        uib-popover-html="popoverText(element.ed.adHocExtension)"
                        popover-placement="left"

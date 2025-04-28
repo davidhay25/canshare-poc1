@@ -15,6 +15,63 @@ angular.module("pocApp")
                 $scope.generateResources()
             }
 
+            $scope.parseConceptList = function (file) {
+
+                let hash={}
+                for (const concept of $scope.model.concepts) {
+                    hash[concept.code] = true
+                }
+                let msg = ""
+                let missing = 0
+                let dups = []
+                let added = 0
+                let arLines = file.split('\n')
+                console.log(arLines)
+                for (const lne of arLines) {
+                    let ar = lne.split('\t')
+                    if (ar[0] && ar[1]) {
+                        let concept = {code:ar[0],display:ar[1]}
+                        if (hash[concept.code]) {
+                            //msg = "There were duplicate codes not added"
+                            dups.push(concept.code)
+                            added++
+                        } else {
+                            $scope.model.concepts.push(concept)
+                        }
+
+
+                    } else {
+                        missing++
+                        //msg = "There were lines where either the code or the display was missing. "
+                    }
+                    console.log(ar)
+                }
+
+                if (missing > 0) {
+                    msg = `There were ${missing} lines missing the code or display. `
+                }
+
+                if (dups.length > 0) {
+                    msg += "The following codes already exist and were not added: "
+                    for (const code of dups) {
+                        msg += code + " "
+                    }
+                }
+
+                if (added > 0 ) {
+                    msg += `There were ${added} codes added.`
+                }
+
+                if (msg) {
+                    alert(msg)
+                }
+
+
+
+
+
+            }
+
             $scope.removeCustomConcept = function (inx) {
                 $scope.model.concepts.splice(inx,1)
                 $scope.ccDirty = true
@@ -65,6 +122,7 @@ angular.module("pocApp")
                         $scope.input.name = vs.id || vs.name.replace(/_/g,'-')     //the expanded vs doesn't include the vs name etc.
                         $scope.input.status = vs.status
                         $scope.input.title = vs.title
+
                         $scope.input.description = vs.description
                         $scope.model = {concepts:[]}
                         for (const concept of expandedVs.expansion.contains) {
@@ -73,7 +131,7 @@ angular.module("pocApp")
                         }
 
 
-                        $scope.generateResources()
+                        $scope.generateResources()  //creates $scope.cs & vs
                         $scope.ccDirty = false      //is set by generate resources
 
                        // $scope.canSetId = false
@@ -171,7 +229,7 @@ angular.module("pocApp")
             
 
 
-            //generate he CS & VS from the
+            //generate the CS & VS from the
             $scope.generateResources = function() {
 
                 let da = new Date().toISOString()

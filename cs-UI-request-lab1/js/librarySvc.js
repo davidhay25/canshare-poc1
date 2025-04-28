@@ -1,8 +1,52 @@
 angular.module("pocApp")
 
-    .service('librarySvc', function($q,$http) {
+    .service('librarySvc', function($q,$http,utilsSvc) {
 
         return {
+
+
+            makeQTree : function (Q) {
+                //make a simple tree for the display in the Library
+
+
+            },
+            checkIds : function (dg) {
+                //ensure all ids are present and unique
+
+                if (! dg.diff) {
+                    return
+                }
+
+                dg.id = dg.id || utilsSvc.getUUID()
+
+                //replace any duplicated ids. Conditionals will need to be manually fixed.
+                let hashId = {}
+                let dups = {}
+
+                //pass 1 - find all dups
+                for (const ed of dg.diff) {
+                    let id = ed.id
+                    if (hashId[id]) {
+                        //this is a duplicate - get a new uuid for it (don't care if this happens > once
+                        dups[id] = true
+                    } else {
+                        hashId[id] = true
+                    }
+                }
+
+                //pass 2 - update the ed id. All duplicated ids are replaced
+                for (let ed of dg.diff) {
+                    let id = ed.id
+                    if (dups[id] || ! ed.id) {
+                        //this is a duplicate - replace it with a new one
+                        ed.id = utilsSvc.getUUID()
+                    }
+                }
+
+
+            },
+
+
             getAllCheckedOut : function(hashAllDG,user){
                 //get all the checked out models - regardless of user
                 

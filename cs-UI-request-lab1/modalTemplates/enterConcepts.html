@@ -1,0 +1,79 @@
+
+<div>
+  <!--<div ng-controller="newResourceCtrl">-->
+
+  <style>
+    .conceptScroll {
+      height: 200px;
+      overflow-y: scroll;
+
+    }
+  </style>
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-8">
+        <h3 class="modal-title">
+          Enter Concepts
+        </h3>
+      </div>
+
+
+      <div class="col-md-4">
+        <button class="btn btn-primary pull-right"
+                ng-show="local.selectedConcept"
+                ng-click="select()">Select</button>
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+        <button ng-show="concepts.length > 0 && url" class="btn btn-primary pull-right" ng-click="import()">Import</button>
+
+
+
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-body">
+
+
+
+    <input type="text" placeHolder = "Enter CodeSystem Url" class="form-control" autofocus
+           ng-change = filterList(filter)
+           ng-model="url"/>
+
+    <div class="row">
+      <div class="col-md-6">
+        <textarea rows = "10" class="form-control"ng-model="input.pastedCodes"></textarea>
+      </div>
+      <div class="col-md-6">
+
+
+        <div class="clickable pull-right" ng-click="parseConceptList(input.pastedCodes)">Parse</div>
+        <br/>
+
+        <div ng-show="msg" class="alert alert-warning">
+          {{msg}}
+        </div>
+
+
+        <table class="table table-bordered">
+          <tr ng-repeat="concept in concepts">
+            <td>{{concept.code}}</td>
+            <td>{{concept.display}}</td>
+          </tr>
+        </table>
+
+
+
+      </div>
+    </div>
+
+
+
+  </div>
+  <div class="modal-header">
+    <em>Please paste in the concepts to be added to the CodeSystem. You should add these
+      into a spreadsheet, then copy the cells from the Spreadsheet. The copy area should be 2 columns wide
+      with the code in the first column and the display in the second.</em>
+
+  </div>
+</div>

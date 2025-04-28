@@ -223,6 +223,9 @@ angular.module("pocApp")
 
             function checkForIssues(lst,clean) {
 
+                return  //not checking for anything at the moment
+
+
                 for (let ed of lst) {
 
                     if (false && ed.enableWhen) {
@@ -239,7 +242,7 @@ angular.module("pocApp")
 
                     }
 
-                    if (ed.conditionalVS) {
+                    if (false && ed.conditionalVS) {
                         let iss = `${ed.path} has conditional ValueSets which will be disabled.`
                         $scope.issues.push(iss)
                         if (clean) {

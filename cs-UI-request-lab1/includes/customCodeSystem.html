@@ -5,6 +5,7 @@
   <div class="row">
 
     <div class="col-md-3">
+      <strong></strong>
       <div class="myScroll">
         <div class="list-group">
           <div ng-class="{'list-group-item':true,listItemSelected:selectedCsItem.vs.id==item.vs.id,retired:item.vs.status == 'retired'}"
@@ -14,8 +15,10 @@
             <div class="clearfix"></div>
           </div>
         </div>
-
-        <button class="btn-link btn" ng-click="newCS()">New CodeSystem</button>
+        <em>These are 'Maximal' ValueSets that refer to the entire CodeSystem and are automatically created. To create a ValueSet that
+        has a subset of codes, you'll need to create a new valueSet.</em>
+        <br/>
+        <button class="btn-link btn pull-right" ng-click="newCS()">New CodeSystem</button>
 
       </div>
     </div>
@@ -41,6 +44,25 @@
             </tr>
 
             <tr>
+              <td>CodeSystem Url</td>
+              <td><input type="text" class="form-control"
+                 disabled = "disabled"
+                 ng-model="cs.url"/>
+
+              </td>
+            </tr>
+
+            <tr>
+              <td>ValueSet Url</td>
+              <td><input type="text" class="form-control"
+                         disabled = "disabled"
+                         ng-model="vs.url"/>
+
+              </td>
+            </tr>
+
+
+            <tr>
               <td>VS Status</td>
               <td>
                 <select ng-model="input.status" class="form-control"  ng-change="generateResources()">
@@ -64,27 +86,53 @@
 
           </table>
 
-          <table class="table table-bordered">
-            <tr><th>Code</th><th>Display</th></tr>
-            <tr ng-repeat="concept in model.concepts">
-              <td>{{concept.code}}</td>
-              <td>{{concept.display}}</td>
-              <td>
-                <i style="color: red" class="glyphicon glyphicon-remove clickable"
-                   ng-click="removeCustomConcept($index)"></i>
-              </td>
-            </tr>
-            <tr>
-              <td><input type="text" class="form-control" ng-model="input.newCode"/> </td>
-              <td><input type="text" class="form-control" ng-model="input.newDisplay"/> </td>
-              <td>
-                <i style="color: green" class="glyphicon glyphicon-ok clickable"
-                   ng-show="input.newCode && input.newDisplay"
-                   ng-click="addCustomConcept()"></i>
-              </td>
+          <uib-tabset>
+            <uib-tab heading="Contents">
+              <table class="table table-bordered">
+                <tr><th>Code</th><th>Display</th></tr>
+                <tr ng-repeat="concept in model.concepts">
+                  <td>{{concept.code}}</td>
+                  <td>{{concept.display}}</td>
+                  <td>
+                    <i style="color: red" class="glyphicon glyphicon-remove clickable"
+                       ng-click="removeCustomConcept($index)"></i>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="text" class="form-control" ng-model="input.newCode"/> </td>
+                  <td><input type="text" class="form-control" ng-model="input.newDisplay"/> </td>
+                  <td>
+                    <i style="color: green" class="glyphicon glyphicon-ok clickable"
+                       ng-show="input.newCode && input.newDisplay"
+                       ng-click="addCustomConcept()"></i>
+                  </td>
 
-            </tr>
-          </table>
+                </tr>
+              </table>
+            </uib-tab>
+            <uib-tab heading="Import">
+              <br/>
+              <em>Paste in from spreadsheet</em>
+              <div class="row">
+                <div class="col-md-6">
+                  <textarea rows = "10" class="form-control"ng-model="input.pastedCodes"></textarea>
+                </div>
+                <div class="col-md-6">
+                  <em>Please paste in the concepts to be added to the CodeSystem. You should add these
+                  into a spreadsheet, then copy the cells from the Spreadsheet. The copy area should be 2 columns wide
+                    with the code in the first column and the display in the second.</em>
+                  <br/><br/>
+
+                  <div class="clickable" ng-click="parseConceptList(input.pastedCodes)">Import</div>
+                </div>
+              </div>
+
+
+
+            </uib-tab>
+          </uib-tabset>
+
+
         </uib-tab>
         <uib-tab heading="Json">
           <pre>{{vs | json}}</pre>

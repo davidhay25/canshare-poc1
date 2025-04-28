@@ -503,6 +503,9 @@ angular.module("pocApp")
             $scope.importDG = function (inx) {
                 let dg = $scope.importableDG[inx]
                 let name = dg.name
+
+                librarySvc.checkIds(dg)     //check all id's present and unique
+
                 let newName = prompt("What is the name for the imported DG (No spaces)",name)
                 if (newName) {
                     newName = newName.replace(/\s/g, '')    //remove any spaces
@@ -855,11 +858,28 @@ angular.module("pocApp")
 
             $scope.hxDGLoad = []        //a history of DG's that were loaded by termSelectDGItem. Used for the 'back' function
 
+
+            //can a new item be added here
+            $scope.canAdd = function (model,node) {
+                if ($scope.canEdit(model)) {
+                    //we're in edit mode - is the current node a suitable parent
+                    if (node && node.data && node.data.ed && node.data.ed.type) {
+                        let type = node.data.ed.type[0]
+                        if (type == "Group") {
+                            return true
+                        }
+                    } else {
+                        //no node selected - will add to root
+                        return true
+                    }
+                }
+
+            }
+
+            //can an item be edited
             $scope.canEdit = function (model) {
                 if ($scope.userMode == 'playground') {
                     //in a playground (collection) locking is at the collection level, not the DG
-
-
                     if ($scope.user && $scope.world &&  $scope.world.lockedTo == $scope.user.email)   {
                         return true
                     }
@@ -1035,7 +1055,8 @@ angular.module("pocApp")
                         },
                         hashAllCompositions: function () {
                             return $scope.hashAllCompositions
-                        },meta :function () {
+                        },
+                        meta :function () {
                             let meta = {name:$scope.world.name,id:$scope.world.id}
                             meta.description = $scope.world.description
                             meta.version = $scope.world.version
@@ -1045,6 +1066,10 @@ angular.module("pocApp")
                     }
 
                 }).result.then(function (vo) {
+                    //vo is actually the downloaded world object
+                    $localStorage.initialPlayground = vo    //so we can track changes
+
+
                     if (vo.dg) {
                         //a hash of dg
                         Object.keys(vo.dg).forEach(function (key) {
@@ -1053,6 +1078,7 @@ angular.module("pocApp")
                         })
 
                     }
+
                     if (vo.comp) {
                         //a hash of dg
                         Object.keys(vo.comp).forEach(function (key) {
@@ -1061,15 +1087,22 @@ angular.module("pocApp")
                         })
 
                     }
-                    if (vo.meta) {
-                        $scope.world.name = vo.meta.name
-                        $scope.world.id = vo.meta.id
-                        $scope.world.description = vo.meta.description
-                        $scope.world.version = vo.meta.version || 0
-                        $scope.world.lockedTo = vo.meta.lockedTo
 
+
+                    //should be present in all
+                    vo.meta = vo.meta || {}
+
+                    $scope.world.name = vo.meta.name || "No name"
+                    $scope.world.name = `${$scope.world.name}-imported`
+                    $scope.world.id = utilsSvc.getUUID()    //if saved will be a new collection
+                    $scope.world.description = vo.meta.description || ""
+                    $scope.world.version = vo.meta.version || 0
+                    delete $scope.world.lockedTo
+
+                    //make sure the local user can edit it
+                    if ($scope.user) {
+                        $scope.world.lockedTo = $scope.user.email
                     }
-
 
                     $scope.init()
 
@@ -2131,7 +2164,6 @@ angular.module("pocApp")
 
                                     parentDG.diff.forEach(function (ed) {
 
-
                                         if (ed.enableWhen || (ed.conditionalVS && ed.conditionalVS.length > 0)) {
                                             let newEd = angular.copy(ed)
 
@@ -2568,7 +2600,6 @@ angular.module("pocApp")
                 let x = $('#dgTree').jstree(
                     config
                 ).on('select_node.jstree', function (e, data) {
-                //).on('changed.jstree', function (e, data) {
                     // the node selection event...
 
 
@@ -2686,7 +2717,7 @@ angular.module("pocApp")
 
             //is called by init()
             $scope.createAllDGGraph = function () {
-                vo = modelDGSvc.makeFullGraph($scope.hashAllDG,false,false)
+                let vo = modelDGSvc.makeFullGraph($scope.hashAllDG,false,false)
                 makeGraphAllDG(vo.graphData)
             }
 
@@ -2709,8 +2740,6 @@ angular.module("pocApp")
 
                     }
 
-
-
                 }
 
                 /* temp */
@@ -2725,7 +2754,6 @@ angular.module("pocApp")
                 delete $scope.selectedModel
 
                 //DGs that can be imported into this model from the library
-
                 playgroundsSvc.getImportableDG($scope.hashAllDG).then(
                     function (data) {
                         $scope.importableDG = data

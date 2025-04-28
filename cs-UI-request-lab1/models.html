@@ -574,8 +574,19 @@
                     <table class="table table-bordered">
                         <tr><td style="width: 15%">Mode</td>
                             <td>
-                                <div ng-if="userMode == 'playground'">Collections</div>
-                                <div ng-if="userMode == 'library'">Library</div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div ng-if="userMode == 'playground'">Collections</div>
+                                        <div ng-if="userMode == 'library'">Library</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="pull-right">{{world.id}}</div>
+                                    </div>
+                                </div>
+
+
+
 
 
                             </td>
@@ -586,6 +597,7 @@
                                 <div class="col-md-9">
                                     <input class="form-control" type="text" ng-model="world.name"/>
                                 </div>
+
                                 <div class="col-md-3">
                                     Version: {{world.version}}
                                     <div ng-if="world.lockedTo"
@@ -598,6 +610,8 @@
 
 
                         </td></tr>
+
+
                         <tr ng-if="false"><td>Id</td><td>{{world.id}}</td></tr>
                         <tr><td>Description</td><td><textarea class="form-control" ng-model="world.description"></textarea></td></tr>
                         <tr>

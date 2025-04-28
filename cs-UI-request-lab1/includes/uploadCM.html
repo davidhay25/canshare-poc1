@@ -1,0 +1,62 @@
+<div>
+  <div class="row">
+    <div class="col-md-6">
+
+      <uib-tabset>
+        <uib-tab heading="Json to upload">
+          <div class="banner">Paste ConceptMap here</div>
+          <textarea class="form-control" rows="20" ng-model="input.cmJson"></textarea>
+        </uib-tab>
+        <uib-tab heading="Parsed ConceptMap">
+          <pre>{{cmUpload | json}}</pre>
+
+        </uib-tab>
+      </uib-tabset>
+
+
+      <div>
+        <div class="pull-right clickable " ng-show="input.cmJson" ng-click="parseUCM()">Parse</div>
+      </div>
+
+
+    </div>
+    <div class="col-md-6">
+      <div class="banner">MetaData</div>
+
+      <table class="table table-bordered">
+        <tr>
+          <td>Id</td>
+          <td><input type="text" class="form-control" ng-model="cmUpload.id"/> </td>
+        </tr>
+        <tr>
+          <td>Url</td>
+          <td><input type="text" class="form-control" ng-model="cmUpload.url"/> </td>
+        </tr>
+        <tr>
+          <td>Status</td>
+          <td><input type="text" class="form-control" disabled="disabled" ng-model="cmUpload.status"/> </td>
+        </tr>
+        <tr>
+          <td>Title</td>
+          <td><input type="text" class="form-control" ng-model="cmUpload.title"/> </td>
+        </tr>
+
+        <tr>
+          <td>Description</td>
+          <td><input type="text" class="form-control" ng-model="cmUpload.description"/> </td>
+        </tr>
+
+        <tr>
+          <td>Don't Syndicate</td>
+          <td><checkbox ng-model="cmUpload.experimental"></checkbox>  <em>If checked, ConceptMap will NOT be syndicated</em></td>
+        </tr>
+
+      </table>
+
+      <div>
+        <div class="pull-right btn btn-danger" ng-show="cmUpload" ng-click="uploadUCM()">Upload</div>
+      </div>
+
+    </div>
+  </div>
+</div>

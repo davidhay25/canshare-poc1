@@ -927,10 +927,20 @@ function setup(app) {
     app.put('/nzhts/ConceptMap/:id',async function(req,res){
         let cm = req.body
 
+
+
         let noSyndicate = false
         if (devMode) {
             noSyndicate = true
         }
+
+        //experimental CodeSystems aren't syndicated
+        if (cm.experimental) {
+            noSyndicate = true
+        }
+
+
+
 
         if (cm) {
             let qry = `${csServerRoot}ConceptMap/${cm.id}`

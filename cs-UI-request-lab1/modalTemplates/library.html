@@ -120,75 +120,6 @@
           </div>
         </div>
 
-
-
-<!--
-        <uib-tabset>
-          <uib-tab heading="Summary">
-
-            <div>Library DG count: {{libraryDGCount}}</div>
-            <div>Local DG count: {{localDGCount}}</div>
-
-
-            <table class="table table-bordered table-condensed">
-              <tr><th>Title</th><th>Local count</th><th>Library count</th><th>Note</th></tr>
-              <tr ng-repeat="item in summary">
-                <td>{{item.title}}</td>
-                <td>{{item.local.diff.length}}
-
-                  <div class="clickableDotted"
-                       uib-popover-html="getPopoverHtml(item.local)"
-                       popover-placement="right"
-                       popover-trigger="'mouseenter'">
-                    {{item.local.diff.length}}
-                  </div>
-
-
-                </td>
-                <td>{{item.library.diff.length}}</td>
-                <td>{{item.note}}</td>
-              </tr>
-            </table>
-
-            <pre>{{summary}}</pre>
-
-          </uib-tab>
-          <uib-tab heading="Synchronise">
-            <br/>
-            <div class="row">
-              <div class="col-md-4">
-                <button class="btn btn-danger" ng-click="refreshFromRepo()">Refresh local store
-                  <i class="glyphicon glyphicon-arrow-down"></i>
-                </button>
-              </div>
-              <div class="col-md-8">
-                Will <strong>download the latest copies</strong> of all the DataGroups from the Library. This includes
-                both core and custom (user created) DGs. This will replace any local copies with the one from the library. eg
-                if you have changed a core DG locally, that change will be lost. If you have local custom DGs that haven't yet
-                been saved in the Library, they will still be there
-
-              </div>
-            </div>
-            <br/>
-            <div class="row">
-              <div class="col-md-4">
-                <button class="btn btn-danger" ng-click="updateRepo()">Update Library  <i class="glyphicon glyphicon-arrow-up"></i></button>
-              </div>
-              <div class="col-md-8">
-                Will <strong>upload all the DataGroups</strong> to the Library from any local copies you may have. This includes
-                both core and custom (user created) DGs. Your local store will not be affected, but the library will be updated
-                with any changes you may have made to any DataGroup.
-
-              </div>
-            </div>
-            <br/>
-            <em>These options to synchronise ALL DataGroups between the library and the local browser store. If you just want to
-              upload / download a single DataGroup theres a 'Compare to Library' link on the tree details page of each DataGroup.</em>
-          </uib-tab>
-        </uib-tabset>
-
--->
-
       </uib-tab>
 
       <uib-tab ng-if="userMode == 'library'" heading="DataGroups sync" >
@@ -413,6 +344,89 @@
 
       </uib-tab>
 
+      <uib-tab heading="Components">
+        <br/>
+
+        <div class="row">
+          <div class="col-md-8">
+
+            <span style="margin-right: 20px">Source:</span> <checkbox ng-model="input.showLibrary"></checkbox> LIM
+            <span style="margin-left: 20px">
+               <checkbox ng-model="input.showForm"></checkbox> Collection
+            </span>
+
+            <br/><br/>
+
+            <table class="table table-bordered">
+              <tr><th>Title</th><th>Source</th><th>Type</th><th>Description</th><th>Cnt</th><th></th></tr>
+              <tr ng-repeat="dg in components"
+                  ng-class="{listItemSelected:dg.name == clone.name}"
+                  ng-if="canShowComponent(dg)" >
+                <td>
+                  <div class="clickable" ng-click="selectFromComponent(dg)">
+                    {{dg.title}}
+                  </div>
+
+                </td>
+
+                <td>
+                  {{ { playground: "Form", library: "LIM" }[dg.source] || dg.source}}
+                </td>
+                <td>{{dg.type}}</td>
+                <td>{{dg.description}}
+                  <div style="color: red" ng-if = "dg.lockedTo" >Locked to: {{dg.lockedTo}}</div>
+
+
+                </td>
+
+                <td>{{dg.diff.length}}</td>
+
+                <td>
+                  <div ng-if="dg.nameExists">In collection</div>
+                  <div ng-if="! dg.nameExists" class="clickable"
+                       ng-click="importComponent(dg)">Import</div>
+                  <div class="clickable" ng-click="deleteComponent(dg)">Delete</div>
+
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="col-md-4">
+            <div>Id: {{clone.id | lastInUUID}}</div>
+
+            <div ng-show="dupsCount" class="alert alert-danger">
+              There are {{dupsCount}} elements with duplicate or missing ids which need to be fixed. This may
+              break conditionals which will need to be manually fixed (You can see them in the Dependencies tab).
+              The fix will be applied when the Component is imported. After fixing them in the Collection
+              copy, save the Component back to the library.
+
+
+            </div>
+
+            <br/>
+            <div id="componentTree"></div>
+          </div>
+        </div>
+
+
+
+
+      </uib-tab>
+
+      <uib-tab heading="Questionnaires">
+        <table class="table table-bordered">
+          <tr ng-repeat="vo in lstQ">
+            <td>
+              <div>{{vo.Q.name}}</div>
+            </td>
+            <td>{{vo.Q.description}}</td>
+            <td>
+              <div class="clickable"  ng-click="loadQ(vo.Q.name)">Load</div>
+            </td>
+          </tr>
+        </table>
+      </uib-tab>
+
       <uib-tab heading="Named queries" >
 
         <div class="myScroll">
@@ -524,74 +538,9 @@
 
       </uib-tab>
 
-      <uib-tab heading="Components">
-        <br/>
-
-        <div class="row">
-          <div class="col-md-8">
-
-            <span style="margin-right: 20px">Source:</span> <checkbox ng-model="input.showLibrary"></checkbox> LIM
-            <span style="margin-left: 20px">
-               <checkbox ng-model="input.showForm"></checkbox> Collection
-            </span>
-
-            <br/><br/>
-
-            <table class="table table-bordered">
-              <tr><th>Title</th><th>Source</th><th>Type</th><th>Description</th><th>Cnt</th><th></th></tr>
-              <tr ng-repeat="dg in components"
-                  ng-class="{listItemSelected:dg.name == clone.name}"
-                ng-if="canShowComponent(dg)" >
-                <td>
-                  <div class="clickable" ng-click="selectFromComponent(dg)">
-                    {{dg.title}}
-                  </div>
-
-                </td>
-
-                <td>
-                  {{ { playground: "Form", library: "LIM" }[dg.source] || dg.source}}
-                </td>
-                <td>{{dg.type}}</td>
-                <td>{{dg.description}}
-                  <div style="color: red" ng-if = "dg.lockedTo" >Locked to: {{dg.lockedTo}}</div>
-
-
-                </td>
-
-                <td>{{dg.diff.length}}</td>
-
-                <td>
-                  <div ng-if="dg.nameExists">In collection</div>
-                  <div ng-if="! dg.nameExists" class="clickable"
-                    ng-click="importComponent(dg)">Import</div>
-                  <div ng-click="deleteComponent(dg)">Delete</div>
-
-                </td>
-              </tr>
-            </table>
-          </div>
-          <div class="col-md-4">
-            <div>Id: {{clone.id | lastInUUID}}</div>
-
-            <div ng-show="dupsCount" class="alert alert-danger">
-              There are {{dupsCount}} elements with duplicate or missing ids which need to be fixed. This may
-              break conditionals which will need to be manually fixed (You can see them in the Dependencies tab).
-              The fix will be applied when the Component is imported. After fixing them in the Collection
-              copy, save the Component back to the library.
-
-
-            </div>
-
-            <br/>
-            <div id="componentTree"></div>
-          </div>
-        </div>
 
 
 
-
-      </uib-tab>
 
     </uib-tabset>
 

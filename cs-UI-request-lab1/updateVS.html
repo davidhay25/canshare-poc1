@@ -50,12 +50,13 @@
     <script src="js/loginCtrl.js"></script>
     <script src="js/utilsSvc.js"></script>
     <script src="js/viewVSCtrl.js"></script>
-
+    <script src="js/uploadCM.js"></script>
     <script src="js/terminologyUpdateSvc.js"></script>
 
 
     <script src="js/filters.js"></script>
     <script src="js/customCodeSystemCtrl.js"></script>
+    <script src="js/enterConceptsCtrl.js"></script>
 
     <script src="js/libs/firebase.js"></script>
     <script src="js/libs/angularfire.min.js"></script>
@@ -229,7 +230,6 @@
 
                 </div>
 
-
                 <div ng-show="selectedVS" class="col-md-8">
 
                     <div class="alert-info alert" ng-hide="user">
@@ -241,9 +241,16 @@
                         {{selectedVS.title}}
                     </div>
 
+                    <div ng-show="isMaximalVS" class="banner">
+                        >>> This is a Maximal ValueSet for referencing a CodeSystem. It is not editable. <<<
+                    </div>
+
+
+
+
                     <div>
 
-                        <button ng-show = "user && user.email && canSave()" class="btn btn-danger pull-right">
+                        <button ng-show = "user && user.email && canSave() && ! isMaximalVS" class="btn btn-danger pull-right">
                             <span ng-show="isNew" ng-click="newVS()">Save new VS</span>
                             <span ng-hide="isNew" ng-click="updateVS(selectedVS)">Update VS</span>
                         </button>
@@ -254,6 +261,8 @@
 
 
                     <uib-tabset active="input.mainTabActive">
+
+
 
                         <uib-tab heading="Edit ValueSet">
                             <table class="table">
@@ -273,19 +282,22 @@
                                                         class="pull-right btn btn-link">Link to ValueSet</button>
                                             </div>
                                         </div>
+                                    </td>
 
-
-
-
-
+                                </tr>
+                                <tr>
+                                    <td>Url</td>
+                                    <td>
+                                        <input type="text" class="form-control" disabled="disabled" ng-model="selectedVS.url"/>
 
                                     </td>
+
                                 </tr>
 
                                 <tr>
                                     <td>VS Status</td>
                                     <td>
-                                        <select ng-model="input.status" class="form-control" ng-change = makeVS()>
+                                        <select ng-disabled="isMaximalVS" ng-model="input.status" class="form-control" ng-change = makeVS()>
                                             <option value="active">Active</option>
                                             <option value="retired">Retired</option>
                                             <option value="draft">Draft</option>
@@ -318,25 +330,21 @@
                                 </tr>
 
 
-
-
-
-
                                 <tr>
                                     <td>Title</td>
                                     <td>
-                                        <input type="text" class="form-control" ng-change = makeVS() ng-model="input.title"/>
+                                        <input  ng-disabled="isMaximalVS" type="text" class="form-control" ng-change = makeVS() ng-model="input.title"/>
                                     </td>
                                 </tr>
 
                                 <tr>
                                     <td>Description</td>
                                     <td>
-                                        <textarea class="form-control" ng-change = makeVS() ng-model="input.description"></textarea>
+                                        <textarea  ng-disabled="isMaximalVS" class="form-control" ng-change = makeVS() ng-model="input.description"></textarea>
                                     </td>
                                 </tr>
 
-                                <tr>
+                                <tr ng-if=" ! isMaximalVS">
                                     <td>ECL
 
                                         <div ng-show = "testEclVS.expansion.contains.length > 0">
@@ -363,24 +371,32 @@
 
 
 
-                                <tr>
+                                <tr ng-if=" !isMaximalVS">
                                     <td  width = "20%">Display concepts
                                         <div><br/><em>Published concepts where the description is incorrect</em></div>
                                     </td>
                                     <td>
 
                                         <table class="table table-bordered">
-                                            <tr><th>Code</th><th>Display</th><th></th></tr>
+                                            <tr><th>Code</th><th>Display</th><th>
+
+                                                <i  class="glyphicon glyphicon-plus-sign clickable pull-right"
+                                                    uib-popover="Add multiple concepts"
+                                                    popover-placement="left"
+                                                    popover-trigger="'mouseenter'"
+                                                    ng-click="selectOtherConcepts(input.displayConcepts,'http://snomed.info/sct')"></i>
+
+                                            </th></tr>
                                             <tr ng-repeat="concept in input.displayConcepts">
-                                                <td>
+                                                <td width="20%">
                                                     {{concept.code}}
                                                 </td>
                                                 <td>{{concept.display}}</td>
-                                                <td><i style="color: red" class="glyphicon glyphicon-remove clickable"
+                                                <td width="10%"><i style="color: red" class="glyphicon glyphicon-remove clickable"
                                                        ng-click="removeDisplayConcept($index)"></i></td>
                                             </tr>
                                             <tr>
-                                                <td>
+                                                <td width="20%">
                                                     <div class="row">
                                                         <div class="col-md-10">
                                                             <input ng-model="input.newDisplayCode" type="text" class="form-control"/>
@@ -410,9 +426,7 @@
 
 
 
-
-
-                                <tr>
+                                <tr ng-if=" !isMaximalVS">
                                     <td>Unpublished concepts
                                         <div><em><br/>Concepts created but not yet published. They are in a separate CodeSystem</em></div>
 
@@ -425,17 +439,24 @@
                                     <td>
 
                                         <table class="table table-bordered">
-                                            <tr><th>Code</th><th>Display</th><th></th></tr>
+                                            <tr><th>Code</th><th>Display</th><th>
+                                                <i  class="glyphicon glyphicon-plus-sign clickable pull-right"
+                                                    uib-popover="Add multiple concepts"
+                                                    popover-placement="left"
+                                                    popover-trigger="'mouseenter'"
+                                                    ng-click="selectOtherConcepts(input.prePubConcepts,'http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished')"></i>
+
+                                            </th></tr>
                                             <tr ng-repeat="concept in input.prePubConcepts">
-                                                <td>
+                                                <td width="20%">
                                                     {{concept.code}}
                                                 </td>
                                                 <td>{{concept.display}}</td>
-                                                <td><i style="color: red" class="glyphicon glyphicon-remove clickable"
+                                                <td width="10%"><i style="color: red" class="glyphicon glyphicon-remove clickable"
                                                        ng-click="removePPConcept($index)"></i></td>
                                             </tr>
                                             <tr>
-                                                <td>
+                                                <td width="20%">
                                                     <div class="row">
                                                         <div class="col-md-10">
                                                             <input ng-model="input.newPPCode" type="text" class="form-control"/>
@@ -468,9 +489,103 @@
                                     </td>
                                 </tr>
 
+                                <tr  ng-if=" !isMaximalVS">
+                                    <td>Other CodeSystems
+                                        <div><em><br/>Concepts from some other CodeSystem</em></div>
+
+                                        <div ng-show = "input.otherCS.length > 0">
+                                            <br/>
+                                            <em>{{input.otherCS.length}} concepts</em>
+                                        </div>
+
+
+
+                                    </td>
+                                    <td>
+<!--
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <input ng-model="input.newOtherCsSystem" type="text"
+                                                       placeholder="Enter the fullUrl of the CodeSystem to import"
+                                                       class="form-control"/>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class='clickable' ng-show="input.newOtherCsSystem"
+                                                     ng-click="selectOtherConcepts(input.newOtherCsSystem)">Validate</div>
+
+                                            </div>
+                                        </div>
+                                        -->
+
+                                        <br/>
+
+                                        <table class="table table-bordered">
+                                            <tr><th>Code</th><th>Display</th><th>System</th><th>
+
+                                                <i  class="glyphicon glyphicon-plus-sign clickable pull-right"
+                                                   uib-popover="Add multiple concepts"
+                                                   popover-placement="left"
+                                                   popover-trigger="'mouseenter'"
+                                                   ng-click="selectOtherConcepts(input.otherCsConcepts)"></i>
+
+
+
+
+                                            </th></tr>
+                                            <tr ng-repeat="concept in input.otherCsConcepts">
+                                                <td>
+                                                    {{concept.code}}
+                                                </td>
+                                                <td>{{concept.display}}</td>
+                                                <td>{{concept.system}}</td>
+                                                <td><i style="color: red" class="glyphicon glyphicon-remove clickable"
+                                                       ng-click="removeOtherCsConcept($index)"></i></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td  width="20%">
+                                                    <div class="row">
+                                                        <div class="col-md-10">
+                                                            <input ng-model="input.newOtherCsCode" type="text" class="form-control"/>
+                                                        </div>
+
+                                                    </div>
+
+                                                </td>
+                                                <td><input ng-model="input.newOtherCsDisplay" type="text" class="form-control"/> </td>
+                                                <td>
+                                                    <input ng-model="input.newOtherCsSystem" type="text"
+                                                           class="form-control"/>
+                                                </td>
+
+                                                <td width="10%">
+
+                                                    <i style="color: green" class="glyphicon glyphicon-ok clickable"
+                                                       ng-show="input.newOtherCsCode && input.newOtherCsDisplay && input.newOtherCsSystem"
+                                                       ng-click="addOtherCsConcept()"></i>
+
+                                                </td>
+                                            </tr>
+
+
+                                        </table>
+                                    </td>
+                                </tr>
+
+
+                                <tr ng-if="csInVs.length > 0">
+                                    <td>CodeSystem/s in VS</td>
+                                    <td>
+                                        <div ng-repeat="system in csInVs">
+                                            {{system}}
+                                        </div>
+                                    </td>
+                                </tr>
+
 
                             </table>
 
+                            <!--
                             <div ng-show="testEclVS">
                                 <strong>ECL result</strong> {{testEclVS.expansion.contains.length}} concepts
                                 <table class="table table-bordered table-condensed">
@@ -484,6 +599,7 @@
                                 </table>
 
                             </div>
+                            -->
 
 
                         </uib-tab>
@@ -517,7 +633,7 @@
                                             <tr ng-repeat="concept in expandedVS.expansion.contains">
                                                 <td>{{concept.display}}</td>
                                                 <td>
-                                                    <div  class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</div></td>
+                                                    <div  class="clickable" ng-click="lookup(concept.code,concept.system)">{{concept.code}}</div></td>
                                                 <td>{{concept.system}}</td>
                                             </tr>
                                         </table>
@@ -685,14 +801,15 @@
 
 
 
-        <uib-tab heading="Non-SNOMED ValueSets">
+        <uib-tab heading="Create CodeSystem">
+            <br/>
             <div ng-controller="customCodeSystemCtrl">
                 <ng-include src="'/includes/customCodeSystem.html'"></ng-include>
             </div>
 
         </uib-tab>
         <uib-tab heading="ConceptMap">
-
+            <br/>
             <uib-tabset>
                 <uib-tab heading="Maps by domain">
                     <ng-include src="'/includes/cmUploader.html'"></ng-include>
@@ -712,7 +829,13 @@
                         </tr>
                     </table>
 
-                    <pre>{{everyConceptMap | json}}</pre>
+                </uib-tab>
+                <uib-tab heading="Upload ConceptMap Json">
+                    <div ng-controller="uploadCmCtrl">
+                        <ng-include src="'/includes/uploadCM.html'"></ng-include>
+                    </div>
+
+
 
                 </uib-tab>
             </uib-tabset>

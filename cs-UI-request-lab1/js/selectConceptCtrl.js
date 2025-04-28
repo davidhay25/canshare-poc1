@@ -22,10 +22,6 @@ angular.module("pocApp")
                 return isMatch
 
 
-             //   if (display.indexOf($scope.filterString) > -1) {
-            //        return true
-             //   }
-
             }
             $scope.selectConcept = function (concept) {
                 $scope.local.selectedConcept = concept

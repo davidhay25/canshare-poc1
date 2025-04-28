@@ -1144,7 +1144,6 @@ angular.module("pocApp")
                 //used for the playground ATM
                 let that = this
 
-
                 let dg = angular.copy(allDgSnapshot[dgName])
                 dg.type = that.getExtractResource(dgName)       //the resource this DG extracts to, if any
 
@@ -1168,7 +1167,7 @@ angular.module("pocApp")
 
                 delete dg.fullDiff
                 delete dg.snapshot
-                //delete dg.ssOrder       //not needed in a component
+                delete dg.ssOrder       //not needed in a component (it was commented out - why??)
                 return dg
 
             },

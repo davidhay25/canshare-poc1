@@ -18,11 +18,11 @@ async function setup(app,mongoDbName) {
     await client.connect()
     console.log("model connected in serverModulePlayground")
 
-    //key is the LIM name, or {name}-{collection id}
+    //key is the DG name - whether from LIM or Collection
     app.get('/frozen/:name', async function(req,res) {
         let name = req.params.name
 
-        const query = {name:name}
+        const query = {name:name,deleted : {$ne : true}}
        // console.log(query)
         try {
             const ar =  await database.collection("frozenDG").find(query).toArray()

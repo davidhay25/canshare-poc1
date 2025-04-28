@@ -274,9 +274,14 @@ angular.module("pocApp")
                     if (model.linkedDG) {
                         //set the 'linkedDG' control to the selected model
                         //let ar = $scope.allFrozen.filter(dg => dg.name == model.linkedDG)
-                        let ar = $scope.allFrozen.filter(dg => dg.key == model.linkedDG)
-                        if (ar.length == 1) {
+                        let ar = $scope.allFrozen.filter(dg => dg.name == model.linkedDG)
+
+
+                        if (ar.length >0) {
                             $scope.input.linkedDG = ar[0]
+                            if (ar.length > 1) {
+                                alert(`${ar.length} components found with the name ${model.linkedDG}. Selecting the first one.`)
+                            }
                         }
                     }
 
@@ -494,7 +499,7 @@ angular.module("pocApp")
                 $scope.model.idVariable = $scope.input.idVariable
                 $scope.model.termSvr = $scope.input.termSvr
                 if ($scope.input.linkedDG) {
-                    $scope.model.linkedDG = $scope.input.linkedDG.key
+                    $scope.model.linkedDG = $scope.input.linkedDG.name
                 } else {
                     delete $scope.model.linkedDG
                 }
