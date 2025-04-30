@@ -31,6 +31,12 @@ angular.module("pocApp")
             let csId = "canshare-unpublished-concepts"   //the id for the CodeSystem
 
 
+            $http.get('/cmConfig').then(
+                function (data) {
+                    $scope.cmConfig = data.data
+                }
+            )
+
             //get the CodeSystem used for pre published codes
             updateVSSvc.getCodeSystem(csId, systemPrePub).then(
                 function (cs) {
