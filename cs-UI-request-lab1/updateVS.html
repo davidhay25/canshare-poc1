@@ -870,11 +870,12 @@
                     <uib-tabset>
                         <uib-tab heading="Table">
                             <table class="table-bordered table">
-                                <tr><th>Property</th><th>UI display</th><th>Code</th><th>Next property</th><th>Previous property</th><th>Full VS</th></tr>
+                                <tr><th>Property</th><th>Code</th><th>UI display</th><th>Next property</th><th>Previous property</th><th>Full VS</th></tr>
                                 <tr ng-repeat = "(k,v) in cmConfig">
                                     <td>{{k}}</td>
-                                    <td>{{v.UI}}</td>
                                     <td>{{v.concept.code}}</td>
+                                    <td>{{v.UI}}</td>
+
                                     <td>{{v.next}}</td>
                                     <td>{{v.previous}}</td>
                                     <td><div class="clickable" ng-click="viewVS(v.fullVS)">{{v.fullVS}}</div> </td>
