@@ -72,7 +72,10 @@
                   <tr><th>Id</th><th>Description</th><th>Status</th><th>Version</th><th>Last updated</th><th>Action</th></tr>
                   <tr ng-repeat="cm in allConceptMaps">
                     <td>
-                      <div class="clickable" ng-click="selectCM(cm.id)">{{cm.id}}</div></td>
+                      <div class="clickable"
+                           ng-click="viewConceptMap(cm)"
+                           ng-clickX="selectCMDEP(cm.id)">{{cm.id}}
+                      </div></td>
                     <td>{{cm.description}}</td>
                     <td>{{cm.status}}</td>
                     <td>{{cm.version}}</td>

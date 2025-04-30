@@ -866,7 +866,7 @@ function setup(app) {
 
 
 
-    //get a Codesystem based on it's id
+
 
     //use when updating a CodeSystem
     app.put('/nzhts/CodeSystem',async function(req,res){
@@ -927,8 +927,6 @@ function setup(app) {
     app.put('/nzhts/ConceptMap/:id',async function(req,res){
         let cm = req.body
 
-
-
         let noSyndicate = false
         if (devMode) {
             noSyndicate = true
@@ -939,9 +937,6 @@ function setup(app) {
             noSyndicate = true
         }
 
-
-
-
         if (cm) {
             let qry = `${csServerRoot}ConceptMap/${cm.id}`
             if (devMode) {
@@ -951,7 +946,7 @@ function setup(app) {
             let result = await putResource(qry,cm,noSyndicate)
             if (result) {
                 //A result is returned if there is an error
-                res.status(400).json({msg:"Unable to update ConceptMap"})
+                res.status(400).json(result)
                 return
             }
             res.json()      //no error
@@ -961,14 +956,46 @@ function setup(app) {
         }
     })
 
-    //get all concept maps - use for display in updateVS & cmUI
-    //return the map names and next release number
+    let getCM = async function (req,res,system) {
+        let qry = `${csServerRoot}ConceptMap?identifier=${system}%7c`
+        if (devMode) {
+            console.log('get',qry)
+            qry += "&_count=50"
+        }
+        let token = await getNZHTSAccessToken()
+
+        if (token) {
+            let config = {headers: {authorization: 'Bearer ' + token}}
+            config['content-type'] = "application/fhir+json"
+
+            try{
+
+                let response = await axios.get(qry,config)
+                let bundle = response.data
+
+                res.json(bundle)
+            } catch(ex) {
+                res.status(500).json({msg:ex.message})
+            }
+
+        } else {
+            res.status(ex.response.status).json({msg:"Unable to get Access Token."})
+        }
+
+    }
+
+    //get all concept maps - use for display in updateVS & cmUI - ie dynamic UI
+    app.get('/nzhts/ConceptMap/allAnalytic',async function(req,res) {
+
+        getCM(req, res, "http://canshare.co.nz/fhir/NamingSystem/conceptmaps-analytics")
+    })
+
+    //get all concept maps - use for display in updateVS & cmUI - ie dynamic UI
     app.get('/nzhts/ConceptMap/allVersions',async function(req,res){
 
-        //let domain = req.query.domain
-        //let identifier = `http://canshare.co.nz/fhir/NamingSystem/conceptmaps%7c`
+        getCM(req,res,"http://canshare.co.nz/fhir/NamingSystem/conceptmaps")
 
-       // let serverHost = "https://authoring.nzhts.digital.health.nz/"
+/*
         let qry = `${csServerRoot}ConceptMap?identifier=http://canshare.co.nz/fhir/NamingSystem/conceptmaps%7c`
         if (devMode) {
             console.log('get',qry)
@@ -994,7 +1021,11 @@ function setup(app) {
             res.status(ex.response.status).json({msg:"Unable to get Access Token."})
         }
 
+        */
+
     })
+
+
 
 
     //publish RC. Supply the version in the call
@@ -1174,7 +1205,13 @@ function setup(app) {
                 res.json(response.data)
 
             } catch (e) {
-                res.status(500).json({msg: e.message})
+                let status = 500
+
+                if (e.response) {
+                   status = e.response.status
+                }
+
+                res.status(status).json({msg: e.message})
             }
         } else {
             res.status(500).json({msg: "Error getting token"})
@@ -1220,6 +1257,8 @@ function setup(app) {
 
                 let config = {headers:{authorization:'Bearer ' + token}}
                 config['content-type'] = "application/fhir+json"
+
+                //console.log('general query:',qry)
 
                 axios.get(qry,config).then(function(data) {
 

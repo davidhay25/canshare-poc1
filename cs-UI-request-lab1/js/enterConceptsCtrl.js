@@ -70,7 +70,7 @@ angular.module("pocApp")
                         } else {
 
                             if ($scope.url == unPublishedSystem) {
-                                //don't need to validate unpublished codes
+                                //don't need to validate unpublished codes - they will be added to the CS if missing
                                 $scope.concepts.push(concept)
 
                             } else {

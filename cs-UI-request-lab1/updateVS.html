@@ -57,6 +57,7 @@
     <script src="js/filters.js"></script>
     <script src="js/customCodeSystemCtrl.js"></script>
     <script src="js/enterConceptsCtrl.js"></script>
+    <script src="js/cmViewerCtrl.js"></script>
 
     <script src="js/libs/firebase.js"></script>
     <script src="js/libs/angularfire.min.js"></script>
@@ -764,8 +765,8 @@
 
             <uib-tabset>
                 <uib-tab heading="List">
-                    <em>This is the custom ValueSet for unpublished concepts. These are concepts that have been defined
-                        in SNOMED but not yet published. They have a different system url (as they don't yet exist in the
+                    <em>This is the custom CodeSystem for unpublished concepts. These are concepts that have been defined
+                        in SNOMED-CT but not yet published. They have a different system url (as they don't yet exist in the
                         Terminology Server). If they are used by an implementer, then they will be responsible for making
                         any changes required once the concepts are formally published. </em>
                     <uib-tabset>
@@ -815,22 +816,54 @@
                     <ng-include src="'/includes/cmUploader.html'"></ng-include>
                 </uib-tab>
                 <uib-tab heading="All ConceptMaps">
+                    <br/>
+                    <uib-tabset>
+                        <uib-tab heading="UI ConceptMaps">
+                            <em>These are all ConceptMaps that are intended for driving a dynamic UI.
+                                Specifically, they do NOT include ConceptMaps that were uploaded using the 'Upload external CM' tab</em>
+                            <br/>
+                            <table class="table-bordered table">
+                                <tr><th>Id</th><th>Description</th><th>Status</th><th>Version</th><th>Last updated</th></tr>
+                                <tr ng-repeat="cm in everyConceptMap">
+                                    <td>
+                                        <div class="clickable" ng-click="viewConceptMap(cm)">{{cm.id}}</div></td>
+                                    <td>{{cm.description}}</td>
+                                    <td>{{cm.status}}</td>
+                                    <td>{{cm.version}}</td>
+                                    <td>{{cm.meta.lastUpdated | date : "MMM dd yyyy HH:mm"}}</td>
 
-                    <table class="table-bordered table">
-                        <tr><th>Id</th><th>Description</th><th>Status</th><th>Version</th><th>Last updated</th></tr>
-                        <tr ng-repeat="cm in everyConceptMap">
-                            <td>
-                                <div class="clickable" ng-click="selectCMXXXX(cm.id)">{{cm.id}}</div></td>
-                            <td>{{cm.description}}</td>
-                            <td>{{cm.status}}</td>
-                            <td>{{cm.version}}</td>
-                            <td>{{cm.meta.lastUpdated | date : "MMM dd yyyy HH:mm"}}</td>
+                                </tr>
+                            </table>
+                        </uib-tab>
+                        <uib-tab heading="External (Analytics) ConceptMaps">
+                            <em>These are all ConceptMaps that are intended for analytics - or, at least, not driving a UI.
+                                They are the ones that were uploaded using the 'Upload external CM' tab</em>
+                            <br/>
+                            <table class="table-bordered table">
+                                <tr><th>Id</th><th>Description</th><th>Status</th><th>Version</th><th>Last updated</th></tr>
+                                <tr ng-repeat="entry in allAnalyticCMBundle.entry">
+                                    <td>
+                                        <div class="clickable" ng-click="viewConceptMap(entry.resource)">{{entry.resource.id}}</div></td>
+                                    <td>{{entry.resource.description}}</td>
+                                    <td>{{entry.resource.status}}</td>
+                                    <td>{{entry.resource.version}}</td>
+                                    <td>{{entry.resource.meta.lastUpdated | date : "MMM dd yyyy HH:mm"}}</td>
 
-                        </tr>
-                    </table>
+                                </tr>
+                            </table>
+
+
+
+
+
+
+                        </uib-tab>
+                    </uib-tabset>
+
+
 
                 </uib-tab>
-                <uib-tab heading="Upload ConceptMap Json">
+                <uib-tab heading="Upload External ConceptMap Json">
                     <div ng-controller="uploadCmCtrl">
                         <ng-include src="'/includes/uploadCM.html'"></ng-include>
                     </div>

@@ -23,19 +23,36 @@
     <div class="col-md-6">
       <div class="banner">MetaData</div>
 
-      <table class="table table-bordered">
+      <table class="table table-bordered" ng-if="cmUpload.group.length > 0">
         <tr>
           <td>Id</td>
-          <td><input type="text" class="form-control" ng-model="cmUpload.id"/> </td>
+          <td><input type="text" class="form-control"
+                     ng-blur = "setUrl(cmUpload.id)"
+                     ng-model="cmUpload.id"/> </td>
         </tr>
         <tr>
           <td>Url</td>
-          <td><input type="text" class="form-control" ng-model="cmUpload.url"/> </td>
+          <td>{{cmUpload.url}} </td>
         </tr>
         <tr>
-          <td>Status</td>
-          <td><input type="text" class="form-control" disabled="disabled" ng-model="cmUpload.status"/> </td>
+          <td>Identifier</td>
+          <td>
+            System: {{cmUpload.identifier.system}} <div>value: {{cmUpload.identifier.value}}</div>
+          </td>
         </tr>
+        <tr>
+
+          <td>Status</td>
+          <td>
+            <select style="width: 150px" class="form-control" ng-model="cmUpload.status">
+              <option value="draft">draft</option>
+              <option value="active">active</option>
+              <option value="retired">retired</option>
+              <option value="unknown">unknown</option>
+            </select>
+          </td>
+        </tr>
+
         <tr>
           <td>Title</td>
           <td><input type="text" class="form-control" ng-model="cmUpload.title"/> </td>
@@ -43,7 +60,14 @@
 
         <tr>
           <td>Description</td>
-          <td><input type="text" class="form-control" ng-model="cmUpload.description"/> </td>
+          <td><textarea class="form-control" ng-model="cmUpload.description"></textarea> </td>
+        </tr>
+
+        <tr>
+          <td>Source CodeSystem</td>
+          <td><input type="text" class="form-control"
+                     ng-blur="checkCS(input.sourceCS)"
+                     ng-model="input.sourceCS"/> </td>
         </tr>
 
         <tr>
@@ -53,9 +77,16 @@
 
       </table>
 
-      <div>
-        <div class="pull-right btn btn-danger" ng-show="cmUpload" ng-click="uploadUCM()">Upload</div>
+      <div class="row" ng-show="message && input.sourceCS">
+        <div class="col-md-8">
+          <div ng-show="exists" class="alert alert-danger">{{message}}</div>
+          <div ng-hide="exists" class="alert alert-info">{{message}}</div>
+        </div>
+        <div class="col-md-4">
+          <div class="pull-right btn btn-danger"  ng-click="uploadUCM(cmUpload.id)">Upload</div>
+        </div>
       </div>
+
 
     </div>
   </div>

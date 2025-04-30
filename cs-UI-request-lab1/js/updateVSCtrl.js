@@ -46,6 +46,37 @@ angular.module("pocApp")
                 }
             )
 
+            $scope.getAnalyticsConceptMaps = function () {
+                //get all the analytic conceptmaps. These are the ones uploaded using the 'external upload' option
+                $http.get('/nzhts/ConceptMap/allAnalytic').then(
+                    function (data) {
+                        $scope.allAnalyticCMBundle = data.data
+                    }, function (err) {
+                        alert('Error getting analytic ConceptMaps' + angular.toJson(err))
+                    }
+                )
+            }
+            $scope.getAnalyticsConceptMaps()
+
+
+
+
+            $scope.viewConceptMap = function (cm) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/cmViewer.html',
+                    backdrop: 'static',
+                    size: 'xlg',
+                    controller: 'cmViewerCtrl',
+
+                    resolve: {
+                        conceptMap: function () {
+                            return cm
+                        }
+                    }
+
+                })
+            }
+
 
             $scope.updateTest = function () {
                 if (confirm("This will copy all DG & Compositions from the Production Library to the Test Library. Are you sure?")) {
@@ -456,7 +487,7 @@ angular.module("pocApp")
             $scope.getConceptMapVersions('SACT')
 
 
-            $scope.getCMForDomain = function (domain) {
+            $scope.getCMForDomainDEP = function (domain) {
 
             }
 
@@ -466,10 +497,6 @@ angular.module("pocApp")
                 $http.get(qry).then(
                     function (data) {
                         $scope.allConceptMaps = data.data
-
-
-
-
 
                         //get the next version number
                         //$scope.nextVersion = 2         //as we're developing versioning after the first publication
@@ -518,7 +545,7 @@ angular.module("pocApp")
             }
 
             //called by versions - view a specific CM
-            $scope.selectCM = function (cmId) {
+            $scope.selectCMDEP = function (cmId) {
                 $scope.canUpload = false    //to prevent it being uploaded again...
                 //alert("will retrieve the CM and display it in the table view")
                 let qry = `/nzhts/ConceptMap/${cmId}`
@@ -1138,12 +1165,27 @@ angular.module("pocApp")
                 }).result.then(function (concepts) {
                     //return an array of concepts
                     if (concepts.length > 0) {
+                        //add to the specific list - unpublished, other, display
                         arConcepts = arConcepts || []
                         arConcepts.push(...concepts)
+
+                        if (system == systemPrePub) {
+                            //for unpublished codes, we need to add it to the CodeSystem if not prsent
+                            for (const concept of concepts) {
+                                if (updateVSSvc.addConceptToCodeSystem( $scope.prePubCS,concept)) {
+                                    $scope.csDirty = true
+                                }
+                            }
+
+                        }
+
 
                         //$scope.input.otherCsConcepts = $scope.input.otherCsConcepts || []
                         //$scope.input.otherCsConcepts.push(...concepts)
                         $scope.makeVS()
+
+
+
                     }
 
                 })
@@ -1238,12 +1280,13 @@ angular.module("pocApp")
 
                 $scope.input.prePubConcepts = $scope.input.prePubConcepts || []
                 let concept = {code:$scope.input.newPPCode, display:$scope.input.newPPDisplay}
-               // updateVSSvc.setConceptType(concept,'prepub') //adds the concepttype extension
+
                 $scope.input.prePubConcepts.push(concept)
 
                 if (updateVSSvc.addConceptToCodeSystem( $scope.prePubCS,concept)) {
                     $scope.csDirty = true
                 }
+
                 delete $scope.input.newPPCode
                 delete $scope.input.newPPDisplay
                 $scope.makeVS()

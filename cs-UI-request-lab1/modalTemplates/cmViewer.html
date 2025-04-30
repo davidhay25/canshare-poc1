@@ -1,0 +1,118 @@
+<div>
+  <!--<div ng-controller="newResourceCtrl">-->
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-8 col-sm-8">
+        <h3 class="modal-title">
+          CM viewer: {{conceptMap.id}}
+        </h3>
+      </div>
+
+
+      <div class="col-md-4 col-sm-4">
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
+
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-body">
+    <uib-tabset>
+      <uib-tab heading="View">
+
+        <br/>
+        <!--
+        <div class="banner">
+          {{conceptMap.id}}
+        </div>
+        -->
+
+
+        <div class="row">
+          <div class="col-md-3">
+            <div class="banner">Elements<br/><br/></div>
+            <div class="list-group">
+              <div ng-class="{'list-group-item':true,listItemSelected:element == input.cmElement}"
+                   ng-click="selectCmElement(element)"
+                   style="cursor: pointer"
+                   ng-repeat="element in conceptMap.group[0].element">
+                {{element.display}}
+                <span class="pull-right badge">{{element.target.length}}</span>
+              </div>
+
+            </div>
+          </div>
+          <div class="col-md-9" ng-if="input.cmElement">
+
+            <div class="banner">
+              {{input.cmElement.display}}
+              <div>{{input.cmElement.code}} {{conceptMap.group[0].source}}</div>
+            </div>
+
+
+
+            <uib-tabset>
+              <uib-tab heading="Targets">
+<!--
+                <div>
+                  Code: {{input.cmElement.code}} Display: {{input.cmElement.display}} System: {{conceptMap.group[0].source}}
+                </div>
+                -->
+
+                <div class="myScroll">
+                  <table class="table-bordered table-condensed table">
+                    <tr><th>Target VS / code</th><th>Depends On elements</th></tr>
+                    <tr ng-repeat="target in input.cmElement.target">
+
+                      <td style="width: 40%">
+                        <div ng-if = "target.code.indexOf('http') > -1 " class="clickable" ng-click="viewVS(target.code)">{{target.display}}</div>
+                        <div ng-if = "target.code.indexOf('http') == -1 ">{{target.display}} ({{target.code}})</div>
+
+                        <!--
+                        <div>{{target.code | lastInUrl}}</div>
+                        -->
+                        <div ng-if="target.comment">Row: {{target.comment}}</div>
+
+                      </td>
+                      <td>
+                        <table class="table-bordered table-condensed table">
+                          <tr><th>Property</th><th>Operator</th><th>Value</th><th>Display</th></tr>
+                          <tr ng-repeat = "don in target.dependsOn">
+                            <td>{{don.property}}</td>
+                            <td>{{updateVSSvc.getCMOperator(don)}}</td>
+                            <td>{{don.value}}</td>
+                            <td>{{don.display}}</td>
+                          </tr>
+                        </table>
+
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+
+
+              </uib-tab>
+
+
+              <uib-tab heading="Element Json">
+                <pre>{{input.cmElement | json}}</pre>
+              </uib-tab>
+
+            </uib-tabset>
+          </div>
+        </div>
+
+      </uib-tab>
+      <uib-tab heading="Json">
+        <pre>{{conceptMap | json}}</pre>
+      </uib-tab>
+    </uib-tabset>
+
+
+
+  </div>
+  <div class="modal-header">
+
+  </div>
+</div>
