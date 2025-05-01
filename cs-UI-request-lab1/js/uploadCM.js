@@ -67,6 +67,8 @@ angular.module("pocApp")
                     function (data) {
                         if (data.data && data.data.entry && data.data.entry.length > 0) {
                             cb(true)
+                        } else {
+                            cb(false)
                         }
                     }, function () {
                         cb(false)

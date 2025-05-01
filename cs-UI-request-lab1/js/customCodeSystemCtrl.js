@@ -207,8 +207,12 @@ angular.module("pocApp")
                             $scope.input.name = newName
                             delete $scope.input.title
                             delete $scope.input.description
+                            delete $scope.input.status
 
                             $scope.model = {concepts:[],url:"",title:"",description:""}
+
+                            $scope.generateResources()
+
 
 
                         }, function (err) {
@@ -261,9 +265,6 @@ angular.module("pocApp")
                 $scope.cs.publisher = "Te Aho o Te Kahu"
                 $scope.cs.contact = [{telecom:[{system:'email',value:'info@teaho.govt.nz'}]}]
                 $scope.cs.concept = $scope.model.concepts
-
-
-
 
                 $scope.vs = {resourceType:"ValueSet",status:status}
                 $scope.vs.id = name
