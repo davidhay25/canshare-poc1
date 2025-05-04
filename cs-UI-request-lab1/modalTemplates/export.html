@@ -105,6 +105,28 @@
 
 
             </uib-tab>
+            <uib-tab heading="SpreadSheet import">
+                <div class="row">
+                    <div class="col-md-6">
+                        <textarea class="form-control" ng-model="input.ss" rows="10">
+
+                        </textarea>
+                        <br/>
+                        <div class="clickable pull-right" ng-click="importFromSS(input.ss)">Import</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div ng-show="errors.length > 0" class="alert alert-warning">
+                            There were errors so the import was cancelled.
+                            <br/>
+                            <div ng-repeat="err in errors">
+                                {{err}}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </uib-tab>
         </uib-tabset>
 
 

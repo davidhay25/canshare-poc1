@@ -1046,7 +1046,7 @@ angular.module("pocApp")
                 $uibModal.open({
                     templateUrl: 'modalTemplates/export.html',
                     backdrop: 'static',
-                    //size : 'lg',
+                    size : 'lg',
                     controller: 'exportCtrl',
 
                     resolve: {
