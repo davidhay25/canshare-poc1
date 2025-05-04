@@ -81,7 +81,8 @@ angular.module("pocApp")
                     EleType: 7,
                     EleDescription: 8,
                     EleCardinality : 9,
-                    EleValueSet: 10
+                    EleValueSet: 10,
+                    EleNote: 11
 
                 }
 
@@ -157,7 +158,7 @@ angular.module("pocApp")
                             let ed
                             let ar1 = currentDG.diff.filter(ed => ed.path == path)
                             if (ar1.length == 1) {
-                                ed = ar[0]
+                                ed = ar1[0]
                             } else {
                                 isNewED = true
                                 ed = {path: path}
@@ -196,6 +197,7 @@ angular.module("pocApp")
 
                             addIfNotEmpty(ed, 'description', ar, cols.EleDescription)
                             addIfNotEmpty(ed, 'valueSet', ar, cols.EleValueSet)
+                            addIfNotEmpty(ed, 'notes', ar, cols.EleNote)
 
 
                             if (isNewED) {
