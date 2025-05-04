@@ -1074,6 +1074,11 @@ angular.module("pocApp")
                         //a hash of dg
                         Object.keys(vo.dg).forEach(function (key) {
                             let dg = vo.dg[key]
+
+                            if ($scope.user) {
+                                dg.checkedOut = $scope.user.email
+                            }
+
                             $scope.hashAllDG[dg.name] = dg
                         })
 
