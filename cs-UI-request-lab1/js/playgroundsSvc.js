@@ -7,7 +7,7 @@ angular.module("pocApp")
             currentPlaygroundDiff : function (currentPG, initialPG) {
                 //look for diffs between the pg (which is the current PG) and initialPG (which was originally loaded)
                 //for now, a simple json based comparison of DGs - later could be a more detailed diff
-                if (! initialPG || ! currentPG) {
+                if (! initialPG || ! initialPG.dataGroups || ! currentPG) {
                     return {}
                 }
 

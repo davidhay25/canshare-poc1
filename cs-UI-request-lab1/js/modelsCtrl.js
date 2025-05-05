@@ -1062,6 +1062,9 @@ angular.module("pocApp")
                             meta.version = $scope.world.version
                             meta.lockedTo = $scope.world.lockedTo
                             return meta
+                        },
+                        userMode : function () {
+                            return $scope.userMode
                         }
                     }
 

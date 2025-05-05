@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('exportCtrl',
-        function ($scope,hashAllDG,hashAllCompositions,meta,utilsSvc) {
+        function ($scope,hashAllDG,hashAllCompositions,meta,utilsSvc,userMode) {
 
             //create the json & TSV download
             $scope.input = {}
@@ -76,13 +76,13 @@ angular.module("pocApp")
                     DGTitle: 2,
                     DGDescription: 3,
                     EleName: 4,
-                    EleCode: 5,
-                    EleTitle: 6,
-                    EleType: 7,
-                    EleDescription: 8,
-                    EleCardinality : 9,
-                    EleValueSet: 10,
-                    EleNote: 11
+                    EleTitle: 5,
+                    EleType: 6,
+                    EleDescription: 7,
+                    EleCardinality : 8,
+                    EleValueSet: 9,
+                    EleNote: 10,
+                    EleCode: 11
 
                 }
 
@@ -128,31 +128,15 @@ angular.module("pocApp")
                             //check if this is a new DG. If one exists with the same name
                             //then update the elements from the SS - leave the others.
                             //this allows modification of other elements in the tool
-
                             currentDG = cloneHashDG[DGName]     //we know its there as we addded them above...
-/*
-                            if (cloneHashDG[DGName]) {
-                                currentDG = cloneHashDG[DGName]
-                            } else {
-                                //this is a new DG
-                                let newDG = {kind: 'dg', name: DGName, title: ar[cols.DGTitle], diff: []}
-                                let parent = ar[cols.DGParent]
-                                if (parent) {
-                                    newDG.parent = parent
-                                }
-                                cloneHashDG[newDG.name] = newDG
-                                currentDG = newDG
-                            }
-                            */
 
                         } else {
                             //these are elements in the DG currently being parsed
 
-                            //todo - need to check is there is already an ED in this DG with this name
-                            //if there is then we update the existong one (to preserve other changes)
-                            //if not then we create a new one
-
                             let path = ar[cols.EleName]
+
+                            validatePath(currentDG,path,inx)
+
                             let isNewED = false
 
                             let ed
@@ -210,11 +194,54 @@ angular.module("pocApp")
 
                 console.log(cloneHashDG,errors)
 
-                //todo check dattypes - need to wait until all DGs created
+                //if in collections mode, expand all the contained DG
+                if (userMode == 'playground') {
+                    for (const key of Object.keys(cloneHashDG)) {
+                        let dg = cloneHashDG[key]
 
+
+                        //always work off the diff. todo ?what happens when a dg is passed in?
+
+
+                        if (dg.snapshot) {
+                            //if there's a snapshot, then this DG was passed in.
+                        } else {
+
+                        }
+                    }
+
+
+                }
 
                 return {hashAllDG: cloneHashDG,errors:errors} //hashDG
 
+
+                //check that the path is valid if a compound one
+                // ? unique in DG
+                //add to errors if invalid
+                function validatePath(currentDG,path,inx) {
+                    let hashPath = {}
+                    currentDG.diff.forEach(function (ed) {
+                        hashPath[ed.path] = true
+                    })
+
+                    let ar = path.split('.')
+                    if (ar.length > 1) {
+                        ar.pop() //
+                        let parentPath = ar.join('.')
+                        console.log(path,parentPath)
+                        if (! hashPath[parentPath]) {
+                            errors.push(`Line ${inx} - parent path  '${parentPath}' not found`)
+                        }
+
+                    } else {
+                        //could check for uniqueness here
+
+                        return true
+                    }
+
+
+                }
 
                 function checkNotEmpty(v,message) {
                     if (! v) {
