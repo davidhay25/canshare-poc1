@@ -44,7 +44,7 @@ angular.module("pocApp").service('exportSvc', function() {
 
 
                     }
-                    ar.push("")
+                    ar.push("\r\n")
 
                 }
 
