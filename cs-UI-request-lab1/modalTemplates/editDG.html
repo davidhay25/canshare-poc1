@@ -162,17 +162,28 @@
                             <div class="col-md-2">
                                 Is container resource
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-1">
                                 <checkbox ng-model="input.isContainer"></checkbox>
 
                             </div>
+
+                            <div class="col-md-3">
+                                <div ng-show="input.isContainer">
+                                    Is a Tabbed container
+                                    <checkbox   ng-model="input.isTabbedContainer"></checkbox>
+                                </div>
+
+
+                            </div>
+
                             <div class="col-md-6">
                                 If this is the container (top) level for the form. This is the one that will render
-                                the full Q in a playground
+                                the full Q in a playground. If the tabbed checkbox is set, the immediate children will be rendered in tabs.
 
                             </div>
                             <br/> <br/>
                         </div>
+                        <br/>
 
                         <!-- not yet enabled
                                         <div ng-if="input.type == 'Observation'" class="row">

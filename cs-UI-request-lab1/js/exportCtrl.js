@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('exportCtrl',
-        function ($scope,hashAllDG,hashAllCompositions,meta,utilsSvc,userMode) {
+        function ($scope,hashAllDG,hashAllCompositions,meta,utilsSvc,userMode,exportSvc) {
 
             //create the json & TSV download
             $scope.input = {}
@@ -10,12 +10,24 @@ angular.module("pocApp")
             let obj = {dg:hashAllDG,comp:hashAllCompositions}
             obj.meta = meta
 
+            //variables for the Json downlaod
             $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([angular.toJson(obj,true) ],{type:"application/json"}))
 
             $scope.downloadLinkJsonName = `allDataGroups.json`
             if (meta.name) {
                 $scope.downloadLinkJsonName = `${meta.name}.json`
             }
+
+
+            //variables for the spreadsheet downlaod
+            let download = exportSvc.makeDGSimpleExport(hashAllDG)
+            $scope.downloadLinkSS = window.URL.createObjectURL(new Blob([download ],{type:"application/json"}))
+
+            $scope.downloadLinkSSName = `allDataGroups.tsv`
+            if (meta.name) {
+                $scope.downloadLinkSSName = `${meta.name}.tsv`
+            }
+
 
             $scope.import = function () {
 
@@ -192,28 +204,57 @@ angular.module("pocApp")
                     }
                 }
 
-                console.log(cloneHashDG,errors)
+                //console.log(cloneHashDG,errors)
 
                 //if in collections mode, expand all the contained DG
-                if (userMode == 'playground') {
+                if ( userMode == 'playground') {
                     for (const key of Object.keys(cloneHashDG)) {
                         let dg = cloneHashDG[key]
+                        delete dg.parent    //don't have parents in collection mode
 
 
                         //always work off the diff. todo ?what happens when a dg is passed in?
 
+                        /*
 
                         if (dg.snapshot) {
                             //if there's a snapshot, then this DG was passed in.
                         } else {
 
+                            console.log(dg.name)
+                            let lst = []    //the nw diff list
+                            addED(lst,dg)
+                            dg.diff = lst
+                            console.log(dg.diff)
+
+                            delete dg.parent        //we don't support parents in collections mode
                         }
+
+                        */
                     }
 
 
                 }
 
                 return {hashAllDG: cloneHashDG,errors:errors} //hashDG
+
+
+                function addED(array,DG) {
+                    for (let ed of DG.diff) {
+                        let type = ed.type[0]
+                        if (fhirDT.indexOf(type) > -1) {
+                            //this is a FHIR DT
+                            array.push(ed)
+                        } else {
+                            //This is another dg
+                          //  ed.type = ['Group']
+                         //   array.push(ed)
+                            addED(array,cloneHashDG[type])
+                        }
+
+                    }
+
+                }
 
 
                 //check that the path is valid if a compound one

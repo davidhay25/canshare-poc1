@@ -47,7 +47,7 @@ angular.module("pocApp")
                     if (! target.dependsOn) {
                         //No depends on means the VS contents are added
                         target.matched = true
-                        lstVs.push(target.code)
+                        lstVs.push(target.code)     //todo 7 may - what is tge code is actually a code not a vs url???
                     } else {
 
                         //let hashPropertiesExamined = {}     //a hash for all the properties in the DON

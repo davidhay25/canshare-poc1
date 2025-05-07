@@ -383,28 +383,28 @@ angular.module("pocApp")
                 //unless we only want to set this one
 
 
-                    let def = $scope.cmProperties[propKey]
-                    if (def && def.next) {
-                        //next is the property after this one (defined in the initial setup)
-                        //def.next is the next control in the order
-                        $scope.log.push({msg:`Populate UI control for ${def.next}`})
-                        $scope.populateUIControl(def.next)  //populate the UI with the set of possible values. Will check all following properties
+                let def = $scope.cmProperties[propKey]
+                if (def && def.next) {
+                    //next is the property after this one (defined in the initial setup)
+                    //def.next is the next control in the order
+                    $scope.log.push({msg:`Populate UI control for ${def.next}`})
+                    $scope.populateUIControl(def.next)  //populate the UI with the set of possible values. Will check all following properties
 
-                        //if the property that was selected (propKey) is the cancer type, then it may be possible
-                        //to default the primary site.
-                        if (propKey == 'cancer-type') {
-                            getDefaultPrimarySite(value,function (value) {
-                                if (value) {
-                                    //there was a single primary site which was set.
-                                    //we need to invoke the forward engine to set the laterality...
-                                    $scope.uiValueSelected  ('primary-site',value)
-                                }
+                    //if the property that was selected (propKey) is the cancer type, then it may be possible
+                    //to default the primary site.
+                    if (propKey == 'cancer-type') {
+                        getDefaultPrimarySite(value,function (value) {
+                            if (value) {
+                                //there was a single primary site which was set.
+                                //we need to invoke the forward engine to set the laterality...
+                                $scope.uiValueSelected  ('primary-site',value)
+                            }
 
-                            })
-
-                        }
+                        })
 
                     }
+
+                }
 
 
 
@@ -613,7 +613,7 @@ angular.module("pocApp")
 
                 $scope.log.push({msg:`Executed rules engine for ${propKey}`,obj:vo,objTitle:"Engine response"})
 
-                $scope.uiMatchingVS = vo.lstVS                //The valuesets from all rules that were matched
+                $scope.uiMatchingVS = vo.lstVS                //The valuesets from all rules that were matched (includes single concepts)
                 //$scope.uiMmatchedRules = vo.lstMatches         //the actual targets that matched
                 $scope.uiMatchingTargets = vo.lstMatchingTargets
 
@@ -711,12 +711,12 @@ angular.module("pocApp")
 
 
 
-                //we still have to check all the lower ones as well
-                    // todo - not completely sure this is right. If so, then we can re-factor the code to alwqys do it (duplicated code ATM)
-                let next = $scope.cmProperties[propKey].next
-                if (next && ! noNext) {
-                    $scope.populateUIControl(next)
-                }
+                    //we still have to check all the lower ones as well
+                        // todo - not completely sure this is right. If so, then we can re-factor the code to alwqys do it (duplicated code ATM)
+                    let next = $scope.cmProperties[propKey].next
+                    if (next && ! noNext) {
+                        $scope.populateUIControl(next)
+                    }
 
 
                 } else {
@@ -777,12 +777,14 @@ angular.module("pocApp")
                     let propKeyToExamine = propKey
 
                     while (propKeyToExamine) {
+                        //hashValues is current values of all properties before this one
                         let hashValues = getHashValues(propKeyToExamine)
 
                         $scope.log.push({msg:`Performing reverse lookup from ${propKeyToExamine} value ${value.code}`,
                             obj:hashValues,objTitle:"Values passed to reverse engine"})
 
                         let result = cmSvc.reverseRulesEngine(cmElement,value, $scope.hashExpandedVs,hashValues)
+
                         if (result.targets.length == 0) {
                             //look at the previous propkey
                             propKeyToExamine = $scope.cmProperties[propKeyToExamine].previous
@@ -881,6 +883,7 @@ angular.module("pocApp")
 
                                 //If there's a value, then make sure it is in the new list
                                 //otherwise remove it
+                                //todo - Wed 7 May - is this segment redundant, given the checkCurrentValue() call below?
                                 if ($scope.local.cmPropertyValue[propName]) {
                                     let concept = $scope.local.cmPropertyValue[propName]
                                     let ar = newList.filter(concept1 => concept1.code == concept.code )

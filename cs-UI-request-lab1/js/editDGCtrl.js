@@ -252,6 +252,8 @@ angular.module("pocApp")
                     $scope.input.sourceReference = model.sourceReference
                     $scope.input.newModelDescription = model.description
                     $scope.input.isContainer = model.isContainer
+                    $scope.input.isTabbedContainer = model.isTabbedContainer
+
                     $scope.input.idVariable = model.idVariable
 
                     $scope.input.namedQueries = model.namedQueries          //the array of named queries this DG requires...
@@ -410,7 +412,7 @@ angular.module("pocApp")
             }
 
             $scope.cancel = function () {
-                if (confirm("Are you sure you want to cancel?")) {
+                if (confirm("Are you sure you want to close without saving any changes?")) {
                     $scope.$dismiss()
                 }
             }
@@ -496,6 +498,13 @@ angular.module("pocApp")
                 $scope.model.fixedValues = $scope.input.fixedValues
                 $scope.model.resourceReferences = $scope.input.resourceReferences
                 $scope.model.isContainer = $scope.input.isContainer
+
+                delete $scope.model.isTabbedContainer
+                if ($scope.model.isContainer && $scope.input.isTabbedContainer) {
+                    $scope.model.isTabbedContainer = true
+                }
+
+
                 $scope.model.idVariable = $scope.input.idVariable
                 $scope.model.termSvr = $scope.input.termSvr
                 if ($scope.input.linkedDG) {

@@ -8,8 +8,6 @@ angular.module("pocApp")
         let unknownCodeSystem = "http://example.com/fhir/CodeSystem/example"
         let extLaunchContextUrl = "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
 
-
-
         extensionUrls = makeQHelperSvc.getExtensionUrls()  //{}
 
        // extensionUrls.displayCategory = "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory"
@@ -1398,6 +1396,9 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
                 Q.extension.push(ext)
 
 
+
+
+
                 let hashIdName = {}     //associate an idname (from allocateId) with the path
                 //todo - think I've deprecated resourceReferences
                 if (false && dg.resourceReferences) {
@@ -1570,6 +1571,20 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
 
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
                         decorateItem(currentItem,ed,extractionContext,dg,config)
+
+
+                        if (dg.isTabbedContainer) {
+                            let ext = {url: extItemControlUrl}
+                            ext.valueCodeableConcept = {
+                                coding: [{
+                                    code: "tab-container",
+                                    system: "http://hl7.org/fhir/questionnaire-item-control"
+                                }]
+                            }
+                            currentItem.extension = currentItem.extension || []
+                            currentItem.extension.push(ext)
+                        }
+
 
                         if (config.enableWhen) {
                             let ar = addEnableWhen(ed,currentItem,config.pathPrefix,errorLog)

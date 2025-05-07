@@ -878,6 +878,9 @@ angular.module("pocApp")
 
             //can an item be edited
             $scope.canEdit = function (model) {
+                
+                model = model || $scope.selectedModel
+
                 if ($scope.userMode == 'playground') {
                     //in a playground (collection) locking is at the collection level, not the DG
                     if ($scope.user && $scope.world &&  $scope.world.lockedTo == $scope.user.email)   {
