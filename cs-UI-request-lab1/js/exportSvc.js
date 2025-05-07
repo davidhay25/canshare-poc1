@@ -10,7 +10,7 @@ angular.module("pocApp").service('exportSvc', function() {
                 let ar = []
 
                 ar.push("DG Name\tDG Parent\tDG title\tDG description\tElement Name\tElement title\tElement type\tElement Description\tCardinality\tValueSet\tNotes\tConcept code\r\n")
-                ar.push("")
+                ar.push("\r\n")
                 for (const key of Object.keys(hashAllDG)) {
                     //a line for the DG
                     let dg = hashAllDG[key]
@@ -44,7 +44,7 @@ angular.module("pocApp").service('exportSvc', function() {
 
 
                     }
-                    ar.push("\r\n")
+
 
                 }
 
