@@ -19,7 +19,7 @@
     <div class="modal-body">
 
         <uib-tabset>
-            <uib-tab heading="Export">
+            <uib-tab heading="Json Export">
                 <div class="row">
                     <div class="col-md-6">
                         <a class="btn btn-link" download="{{downloadLinkJsonName}}"
@@ -50,7 +50,7 @@
                 </div>
 
             </uib-tab>
-            <uib-tab heading="Import">
+            <uib-tab heading="Json Import">
                 <div class="row" ng-hide="uploadComplete">
                     <div class="col-md-6 col-sm-6">
                         <div ng-hide="uploadedDG">
@@ -105,7 +105,13 @@
 
 
             </uib-tab>
-            <uib-tab heading="SpreadSheet import">
+            <uib-tab heading="SpreadSheet Export">
+                <a class="btn btn-link" download="{{downloadLinkSSName}}"
+                   href="{{downloadLinkSS}}" title="{{downloadLinkSSName}}" >
+                    Download TSV to computer
+                </a>
+            </uib-tab>
+            <uib-tab heading="SpreadSheet Import">
                 <div class="row">
                     <div class="col-md-6">
                         <textarea class="form-control" ng-model="input.ss" rows="10">
@@ -128,12 +134,7 @@
 
             </uib-tab>
 
-            <uib-tab heading="SpreadSheet export">
-                <a class="btn btn-link" download="{{downloadLinkSSName}}"
-                   href="{{downloadLinkSS}}" title="{{downloadLinkSSName}}" >
-                    Download TSV to computer
-                </a>
-            </uib-tab>
+
 
 
 
