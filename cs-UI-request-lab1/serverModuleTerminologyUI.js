@@ -914,7 +914,8 @@ function setup(app) {
     })
 
     // ====================== ConceptMap functions ===================
-    let devMode = true      //indicates to use server other than NZHTS for CodeSystems. Needed for developing versioning
+    //temp let devMode = true      //indicates to use server other than NZHTS for CodeSystems. Needed for developing versioning
+    let devMode = false
     let csServerRoot = nzhtsconfig.serverBase       //codeSystem server root. Default to NZServerbase
 
 
@@ -957,7 +958,7 @@ function setup(app) {
     })
 
     let getCM = async function (req,res,system) {
-        let qry = `${csServerRoot}ConceptMap?identifier=${system}%7c`
+        let qry = `${csServerRoot}ConceptMap?identifier=${system}%7c&_summary=false`
         if (devMode) {
             console.log('get',qry)
             qry += "&_count=50"

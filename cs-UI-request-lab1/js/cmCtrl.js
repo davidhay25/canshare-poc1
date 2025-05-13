@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('cmCtrl',
-        function ($scope,$http,$q,querySvc,cmSvc,$uibModal,utilsSvc,$timeout) {
+        function ($scope,$http,$q,querySvc,cmSvc,$uibModal,utilsSvc,$timeout,updateVSSvc) {
 
             $scope.local = {cmOptions : {},cm:{property:{}}}
             $scope.default = {}
@@ -90,98 +90,6 @@ angular.module("pocApp")
                 }
             }
 
-            $scope.refreshCacheDEP = function () {
-                let msg = "This will re-load all the artifacts from the terminology server. It will take several seconds (10-20) to complete. Are you sure?"
-                if (confirm(msg)) {
-                    //$scope.refreshingCache = true
-                    //just need to re-read from the TS. Will populate forage cache
-                    $scope.loadCM("http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map")
-                    //$scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"}})
-                }
-            }
-
-
-            //select the development version of the ConceptMap
-            //could later generalize this to multiple CM
-            $scope.selectDevDEP = function () {
-
-                let url = "http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map-dev"
-                //load the CM
-
-                querySvc.getOneConceptMap("canshare-select-valueset-map-dev",true).then(
-                    function (CM) {
-                        //now retrieve all the ValueSets (effectively refresh the cache)
-
-
-                        $scope.fullSelectedCM = CM //ar[0]       //todo what of there's > 1
-                        console.log($scope.fullSelectedCM)
-
-
-
-                        let lstVsUrl = []   //list of all ValueSets that are used by 'in-vs' rules
-
-                        //parse the CM to get all referenced VS. Update the lstVsUrl
-                        cmSvc.getAllVSinCM($scope.fullSelectedCM,lstVsUrl)
-
-
-                        lstVsUrl.sort()
-                        lstVsUrl.forEach(function (url) {
-                            console.log('|' + url + '|  ' + url.length)
-                           // console.log(url.match(/[^\x20-\x7E]/g))
-                        })
-
-                        let newVS = []  //this will be  a list of new ValueSets that need to be retrieved
-                        if (lstVsUrl.length > 0) {
-                            for (url of lstVsUrl) {
-                                if (! $scope.hashExpandedVs[url]) {
-                                    newVS.push(url)
-                                }
-                            }
-                        }
-
-                        console.log(newVS)
-
-                        if (newVS.length > 0 ) {
-                            //there are new ValueSets in the dev version that need to be retrieved and added to the cache
-
-                            $scope.showWaiting = true
-                            cmSvc.getVSContentsHash(newVS).then(
-                                function (vo) {
-                                    let hashNewVS = vo.hashExpanded
-                                    $scope.expandErrors = vo.errors
-                                    console.log('vs size',utilsSvc.getSizeOfObject(hashNewVS)/1024 )
-                                    //now we can add the VS to the full hash
-
-                                    for (const url of Object.keys(hashNewVS) ) {
-                                        $scope.hashExpandedVs[url] = hashNewVS[url]
-
-                                      //  alert(url)
-                                    }
-
-                                },
-                                function (err) {
-                                    alert(err)
-                                }
-                            ).finally(function () {
-                                $scope.showWaiting = false
-                            })
-                        }
-
-
-                        let treeData = querySvc.makeTree($scope.fullSelectedCM,$scope.cmProperties)
-                        showCmTree(treeData)
-
-
-
-                    },
-                    function () {
-                        alert("canshare-select-valueset-map-dev not found")
-                    }
-                )
-
-
-
-            }
 
             //as the expansion is performed by a child controller, we use this event to get the hash
             $scope.$on('hashExpandedVs',function (event,data) {
@@ -226,8 +134,7 @@ angular.module("pocApp")
 
                 delete $scope.local.cmPropertyValue[propKey]
                 delete $scope.cmProperties[propKey].singleConcept
-              //  $scope.log.push({msg:`Start populate from ${propKey}`})
-               // $scope.populateUIControl(propKey)
+
 
             }
 
@@ -264,11 +171,13 @@ angular.module("pocApp")
 
             $scope.setMaximalOptions = function (propName) {
 
+
                 let currentValue = $scope.local.cmPropertyValue[propName]
 
                 let vsUrl = `${vsPrefix}${$scope.cmProperties[propName].fullVS}`
                 console.log(vsUrl,$scope.hashExpandedVs[vsUrl])
-                $scope.cmProperties[propName].options = angular.copy($scope.hashExpandedVs[vsUrl])
+                let options = $scope.hashExpandedVs[vsUrl]
+                $scope.cmProperties[propName].options = angular.copy(options)
 
                 if (currentValue) {
                     for (const concept of $scope.cmProperties[propName].options) {
@@ -278,10 +187,6 @@ angular.module("pocApp")
                         }
                     }
                 }
-
-
-
-
             }
 
             //handler when a value is selected
@@ -412,6 +317,8 @@ angular.module("pocApp")
                 //so that the dropdowns work, make sure the value (local.cmPropertyValue) is from the list cmProperties[k].options
                 //Otherwise angular doesn't set the dropdown correctly
                 setDropDowns()
+                
+                $scope.$broadcast('dxChanged',{values:$scope.local.cmPropertyValue})
 
 
                 function setDropDowns() {
@@ -506,21 +413,7 @@ angular.module("pocApp")
                                 }
                             }
 
-                            /* original - mostly working
 
-                            let defaultSiteConceptCode = siteCodes[0]
-
-                            let foundConcept = null
-
-                            //is
-                            for (const concept of $scope.cmProperties['primary-site'].options) {
-                                if (concept.code == defaultSiteConceptCode) {
-                                    $scope.local.cmPropertyValue['primary-site'] = concept
-                                    foundConcept = concept
-                                    break
-                                }
-                            }
-*/
 
                             if (foundConcept) {
                                 console.log(`${foundConcept.code} found`)
@@ -529,7 +422,7 @@ angular.module("pocApp")
                                 cb(foundConcept)
                             } else {
                                 $scope.log.push({msg:`Code not found in list, ignoring`})
-                                console.log(`${foundConcept.code} not found`)
+                                console.log(`${concept.code} not found`)
                                 $scope.lookUpCache[concept.code] = "notfound"
                                 cb()
                             }
@@ -602,6 +495,7 @@ angular.module("pocApp")
                     if (prop == propKey) {
                         // 27-may - use all values break
                     }
+                    //todo - this seems a duplication...
                     $scope.uiHashValues[prop] = $scope.local.cmPropertyValue[prop] //$scope.local.cmPropertyValue has the data entered thus far.
                 }
 
@@ -1093,20 +987,13 @@ angular.module("pocApp")
 
             //------------- end of main form UI functions
 
-            //open a specific ConceptMap
-            //if checkInCache is true then see if the VS is in the cache first - only retrieve from the TS if not
+            //retrieve a specific ConceptMap and save it in the
             $scope.loadCM = function (cmId) {
-                //$scope.selectCMItem = function (item,checkInCache) {
-                //$scope.selectedCM = item.cm
+
                 delete $scope.fullSelectedCM
-               // delete $scope.resultParameters
-               // delete $scope.resultParametersList
-               // delete $scope.translateParameters
+
                 delete $scope.doProperties
                 delete $scope.input.cmOptions
-               // delete $scope.cmSources
-               // delete $scope.myResult
-              //  delete $scope.translateError
                 delete $scope.expandedCMVS
                 delete $scope.expandErrors
 
@@ -1114,16 +1001,35 @@ angular.module("pocApp")
 
                 //get the map
                 querySvc.getOneConceptMap(cmId).then(
-                    //querySvc.getOneConceptMap(item.cm.url,true).then(
                     function (CM) {
-                        //now retrieve all the ValueSets (effectively refresh the cache)
+
                         $scope.fullSelectedCM = CM
 
+                        //a hash of elemets from the CM by code.
+                        $scope.hashElementsByCode = {}
+
+
+                        //now retrieve all the ValueSets (effectively refresh the cache)
                         //add the operator to the DependsOn element from the extension (makes UI processing easier
                         let lstVsUrl = []   //list of all ValueSets that are used by 'in-vs' rules
                         //add the VS with all topography. used for the primary-site-laterality
                         lstVsUrl.push('https://nzhts.digital.health.nz/fhir/ValueSet/canshare-topography')
                         lstVsUrl.push('https://nzhts.digital.health.nz/fhir/ValueSet/canshare-cancer-service')
+
+
+                        //these are ones I added dusinr satging testing. May be incomplete...
+                        lstVsUrl.push('https://nzhts.digital.health.nz/fhir/ValueSet/canshare-sact-cancer-service')
+                        lstVsUrl.push('canshare-who-sact-primary-histology')
+
+
+                        //Add all the 'maximal valuesets' from the config
+                        for (const key of Object.keys($scope.cmProperties)) {
+                            let prop = $scope.cmProperties[key]
+                            if (prop.fullVS) {
+                                lstVsUrl.push(`https://nzhts.digital.health.nz/fhir/ValueSet/${prop.fullVS}`)
+                            }
+                        }
+
 
 
                         /* - wed 2 oct. to check.
@@ -1281,8 +1187,6 @@ angular.module("pocApp")
                         $scope.showWaiting = false
                     }
                 )
-
-
             }
 
 
@@ -1317,7 +1221,21 @@ angular.module("pocApp")
 
                 $http.get('/cmConfig').then(
                     function (data) {
-                        $scope.cmProperties = data.data
+                        let config = data.data
+
+                        $scope.cmConfig = config //added so staging can access config
+                        $scope.tnmLUT = config.tnmLUT   //lookup table for snomed codes for TNM
+
+                        //cmProperties will have only those entries that are in the diagnostic tab
+                        $scope.cmProperties = {}
+                        $scope.cmProperties = config.diagnosticProperties
+                        $scope.stagingProperties = config.stagingProperties
+
+
+                        //a hash of code keyed on propertyKey. Used in conjunction with hashElements
+                        //$scope.hashCodeByPropKey = {}
+
+
 
                         //get the list of services from the ConceptMap
                         let serviceUrl = "https://nzhts.digital.health.nz/fhir/ValueSet/canshare-sact-cancer-service"
@@ -1345,62 +1263,7 @@ angular.module("pocApp")
                     }
                 )
 
-                /*
-                $scope.cmProperties = {}
 
-                $scope.cmProperties['patient-sex'] = {concept: {code:"184100006"},UI:'Patient sex',
-                    next:'cancer-service',options:[]}
-
-                $scope.cmProperties['cancer-service'] = {concept: {code:"299801000210106"},UI:"Cancer Service",
-                    next:'cancer-stream',options:[],fullVS:'canshare-cancer-service'}
-
-                $scope.cmProperties['cancer-stream'] = {concept:{code:"299811000210108",display:"Cancer Stream",system:snomed}, UI:"Cancer Stream",
-                    next:'cancer-substream',previous:'cancer-service', options : [],fullVS:'canshare-cancer-stream'}
-
-                $scope.cmProperties['cancer-substream'] = {concept: {code:"299821000210103"}, UI:"Cancer Substream",
-                    next:'cancer-type',previous:'cancer-stream',options:[],fullVS:'canshare-cancer-substream'}
-
-                $scope.cmProperties['cancer-type'] = {concept: {code:"299831000210101"}, UI:"Cancer Type",
-                    next:'primary-site',previous:'cancer-substream',options:[],fullVS:'canshare-cancer-type'}
-
-                $scope.cmProperties['primary-site'] = {concept: {code:"399687005"}, UI:"Primary Site",
-                    next:'primary-site-laterality',previous:'cancer-type',options:[],fullVS:'canshare-primary-topography'}
-
-                $scope.cmProperties['primary-site-laterality'] = {concept: {code:"297561000210100"},UI:"Laterality or Side",
-                    next:'histologic-type-primary',previous:'primary-site',options:[],fullVS:'canshare-laterality'}
-
-                $scope.cmProperties['histologic-type-primary'] = {concept: {code:"512001000004108"},options:[],fullVS:'canshare-who-histology',UI:"Primary Histology",
-                    previous:'primary-site-laterality'}
-
-                $scope.cmProperties['patient-sex'].options.push({code:"U",display:"Unknown"})
-                $scope.cmProperties['patient-sex'].options.push({code:"O",display:"Other"})
-                $scope.cmProperties['patient-sex'].options.push({code:"F",display:"Female"})
-                $scope.cmProperties['patient-sex'].options.push({code:"M",display:"Male"})
-
-console.log(JSON.stringify($scope.cmProperties,null,2))
-
-                */
-
-                /*
-                //get the list of services from the ConceptMap
-                let serviceUrl = "https://nzhts.digital.health.nz/fhir/ValueSet/canshare-cancer-service"
-                let serviceConcepts = $scope.hashExpandedVs[serviceUrl]
-
-                $scope.input.allService = [{display:"No default"}]    //for default
-
-                if (serviceConcepts) {
-                    for (const concept of serviceConcepts) {
-                        $scope.cmProperties['cancer-service'].options.push(concept)
-                        $scope.input.allService.push(concept)
-                    }
-                } else {
-                    alert(`The service ValueSet ${serviceUrl} was not found`)
-                }
-
-                let treeData = querySvc.makeTree($scope.fullSelectedCM,$scope.cmProperties)
-                showCmTree(treeData)
-
-                */
 
             }
 
@@ -1421,7 +1284,117 @@ console.log(JSON.stringify($scope.cmProperties,null,2))
                 $scope.singleTargetByRow = $scope.targetByRow[rowNumber]
             }
 
+
+            $scope.viewConceptMap = function () {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/cmViewer.html',
+                    backdrop: 'static',
+                    size: 'xlg',
+                    controller: 'cmViewerCtrl',
+
+                    resolve: {
+                        conceptMap: function () {
+                            return $scope.fullSelectedCM
+                        }
+                    }
+
+                })
+            }
+
+
             //====================  deprecated functions here....
+            $scope.refreshCacheDEP = function () {
+                let msg = "This will re-load all the artifacts from the terminology server. It will take several seconds (10-20) to complete. Are you sure?"
+                if (confirm(msg)) {
+                    //$scope.refreshingCache = true
+                    //just need to re-read from the TS. Will populate forage cache
+                    $scope.loadCM("http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map")
+                    //$scope.selectCMItem({cm:{url:"http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map"}})
+                }
+            }
+
+
+            //select the development version of the ConceptMap
+            //could later generalize this to multiple CM
+            $scope.selectDevDEP = function () {
+
+                let url = "http://canshare.co.nz/fhir/ConceptMap/canshare-select-valueset-map-dev"
+                //load the CM
+
+                querySvc.getOneConceptMap("canshare-select-valueset-map-dev",true).then(
+                    function (CM) {
+                        //now retrieve all the ValueSets (effectively refresh the cache)
+
+
+                        $scope.fullSelectedCM = CM //ar[0]       //todo what of there's > 1
+                        console.log($scope.fullSelectedCM)
+
+
+
+                        let lstVsUrl = []   //list of all ValueSets that are used by 'in-vs' rules
+
+                        //parse the CM to get all referenced VS. Update the lstVsUrl
+                        cmSvc.getAllVSinCM($scope.fullSelectedCM,lstVsUrl)
+
+
+                        lstVsUrl.sort()
+                        lstVsUrl.forEach(function (url) {
+                            console.log('|' + url + '|  ' + url.length)
+                            // console.log(url.match(/[^\x20-\x7E]/g))
+                        })
+
+                        let newVS = []  //this will be  a list of new ValueSets that need to be retrieved
+                        if (lstVsUrl.length > 0) {
+                            for (url of lstVsUrl) {
+                                if (! $scope.hashExpandedVs[url]) {
+                                    newVS.push(url)
+                                }
+                            }
+                        }
+
+                        console.log(newVS)
+
+                        if (newVS.length > 0 ) {
+                            //there are new ValueSets in the dev version that need to be retrieved and added to the cache
+
+                            $scope.showWaiting = true
+                            cmSvc.getVSContentsHash(newVS).then(
+                                function (vo) {
+                                    let hashNewVS = vo.hashExpanded
+                                    $scope.expandErrors = vo.errors
+                                    console.log('vs size',utilsSvc.getSizeOfObject(hashNewVS)/1024 )
+                                    //now we can add the VS to the full hash
+
+                                    for (const url of Object.keys(hashNewVS) ) {
+                                        $scope.hashExpandedVs[url] = hashNewVS[url]
+
+                                        //  alert(url)
+                                    }
+
+                                },
+                                function (err) {
+                                    alert(err)
+                                }
+                            ).finally(function () {
+                                $scope.showWaiting = false
+                            })
+                        }
+
+
+                        let treeData = querySvc.makeTree($scope.fullSelectedCM,$scope.cmProperties)
+                        showCmTree(treeData)
+
+
+
+                    },
+                    function () {
+                        alert("canshare-select-valueset-map-dev not found")
+                    }
+                )
+
+
+
+            }
 
 
 

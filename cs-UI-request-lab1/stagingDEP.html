@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>Staging</title>
+
+    <script src="js/libs/jquery-1.9.0.min.js"></script>
+    <script src="js/libs/angular.min1-5.js"></script>
+    <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+    <script src="js/libs/moment.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/common.css"/>
+
+    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+
+    <style>
+        .retired {
+            background-color: lightsalmon;
+        }
+
+        .error {
+            background-color: mistyrose;
+        }
+    </style>
+
+    <script>
+        angular.module("pocApp",['ui.bootstrap','ui.checkbox',"firebase",'ngStorage']).config(function($locationProvider) {
+            $locationProvider.html5Mode(true);
+            $locationProvider.hashPrefix('!');
+        });
+
+        angular.module("pocApp").config(['$compileProvider', function ($compileProvider) {
+            $compileProvider.aHrefSanitizationWhitelist(/^\s*(http|https?|ftp|mailto|blob):/);
+        }]);
+
+
+        angular.module("pocApp").constant("moment", moment);
+
+        angular.module("formsApp",[])
+        angular.module('topApp', ['pocApp', 'formsApp'])
+
+
+    </script>
+    <script src="js/libs/ngStorage.min.js"></script>
+
+    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
+
+    <script src="js/utilsSvc.js"></script>
+    <script src="js/filters.js"></script>
+
+    <script src="js/stagingCtrl.js"></script>
+    <script src="js/stagingSvc.js"></script>
+    <script src="js/cmSvc.js"></script>
+    <script src="js/querySvc.js"></script>
+    <script src="js/commonSvc.js"></script>
+    <script src="js/libs/localforage.min.js"></script>
+
+
+    <!--
+    <script src="js/modelDGSvc.js"></script>
+    <script src="js/modelAdminCtrl.js"></script>
+    <script src="js/querySvc.js"></script>
+    <script src="js/showParameters.js"></script>
+    <script src="js/loginCtrl.js"></script>
+    <script src="js/snapShotSvc.js"></script>
+    -->
+
+
+    <script src="js/libs/firebase.js"></script>
+    <script src="js/libs/angularfire.min.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDG1ToLHycsMUX0CfX0OZVSRUUpFQeKE9o",
+            authDomain: "canshare-730e6.firebaseapp.com",
+            projectId: "canshare-730e6",
+            storageBucket: "canshare-730e6.appspot.com",
+            messagingSenderId: "12147821347",
+            appId: "1:12147821347:web:5963d577cb050259475a96"
+        };
+        if (firebase) {
+            console.log('init firebase')
+            firebase.initializeApp(firebaseConfig);
+
+        }
+    </script>
+
+
+
+</head>
+<body style="padding: 8px;padding-top: 80px">
+<div ng-app="topApp" ng-controller="stagingCtrl" class="container-fluid">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+        <div class="container-fluid">
+            <div class="col-md-5">
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            Staging
+                        </a>
+                    </span>
+
+            </div>
+
+            <div class="col-md-3">
+                <div class="navbar-text">
+
+                </div>
+
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <form class="navbar-form navbar-left">
+                    <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+
+                </form>
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <div class="navbar-text " ng-hide="user">
+                    <span style="font-size:1.2em; cursor: pointer" uib-popover="Click to log in"
+                          popover-placement="left"
+                          popover-trigger="'mouseenter'">
+                        <div ng-click="login()">
+                            <i class="glyphicon glyphicon-log-in"></i>
+                        </div>
+                    </span>
+                </div>
+
+                <div class="navbar-text"  ng-show="user">
+                    <span style="font-size:1.2em;  cursor: pointer" uib-popover="{{user.email}}"
+                          popover-placement="left"
+                          popover-trigger="'mouseenter'">
+                        <div ng-click="logout()">
+                            <i class="glyphicon glyphicon-log-out"></i>
+                        </div>
+                    </span>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <a href="https://teaho.govt.nz/" target="_blank">
+                    <img width="150" height="auto" class="pull-right"
+                         style="padding: 3px"
+                         src="images/TAK-logo-midgreen.png"/>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <h4> Top level selection boxes here</h4>
+
+    <em> items here have their contents altered based on the value of other entries in this group.
+    We'll start by assuming that selection is top down - no reverse engine</em>
+
+
+    <table class="table table-bordered">
+        <tr ng-repeat = "(k,v) in cmProperties" ng-if="v.staging1">
+            <td width = "30%">
+                <div class = 'clickable' ng-click="setMaximalOptions(k)">{{v.UI}}</div>
+            </td>
+            <td>
+                <div class="row">
+                    <div class="col-md-10">
+                        <div>
+                            <select class="form-control" ng-model="local.cmPropertyValue[k]"
+                                    ng-change="uiValueSelected(k,local.cmPropertyValue[k])"
+                                    ng-options="v.display for (k,v) in v.options">
+
+                            </select>
+
+                        </div>
+                    </div>
+
+                </div>
+            </td>
+        </tr>
+    </table>
+
+
+
+
+    <h4> Prefix selection here</h4>
+    <em>select the prefix & suffix. Focus on prefix first</em>
+    <div class="row">
+        <div class="col-md-3">
+            Prefix
+        </div>
+
+        <div class="col-md-9">
+            <input type="radio" name="prefix" ng-model="input.prefix" value="none">No prefix</input>
+            <input type="radio" name="prefix" ng-model="input.prefix" value="Y">Y</input>
+            <input type="radio" name="prefix" ng-model="input.prefix" value="R">R</input>
+        </div>
+
+
+    </div>
+
+
+    <h4> TNM stuff here. Pathological & Clinical</h4>
+
+    <em>2 panes: <div>left is the TNM selected. Contents of these controls affected by top level section</div>
+
+    <div> right pane is the prefixed TNM value. values are extracted from CM based on tnm in left + prefix</div>
+    </em>
+
+    <h4> Ancillary studies here</h4>
+    <em>The values in these controls is affected by the top level section, but changes here don't affect anything else </em>
+
+
+</div>
+</body>

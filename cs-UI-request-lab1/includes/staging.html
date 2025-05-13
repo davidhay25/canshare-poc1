@@ -1,0 +1,96 @@
+<div>
+
+  <!-- staging first panel -->
+  <table class="table table-bordered">
+    <tr ng-repeat = "(k,v) in stagingProperties" ng-if="v.staging1">
+      <td width = "30%">
+        <div class = 'clickable' ng-click="setMaximalOptions(k)">{{v.UI}}</div>
+      </td>
+      <td>
+        <div class="row">
+          <div class="col-md-10">
+            <div>
+              <select class="form-control" ng-model="staging.cmPropertyValue[k]"
+                      ng-change="stagingValueSelected(k,staging.cmPropertyValue[k])"
+                      ng-options="v.display for (k,v) in v.options">
+
+              </select>
+
+            </div>
+          </div>
+
+        </div>
+      </td>
+    </tr>
+
+    <!-- Staging prefix select-->
+    <tr>
+      <td>Prefix</td>
+      <td>
+        <div ng-click="selectPrefix(staging.stagingPrefix)">
+          <input type="radio" name="prefix" ng-model="staging.stagingPrefix" value=""> No prefix</input>&nbsp;&nbsp;&nbsp;
+          <input type="radio" name="prefix" ng-model="staging.stagingPrefix" value="y"> Y</input>&nbsp;&nbsp;&nbsp;
+          <input type="radio" name="prefix" ng-model="staging.stagingPrefix" value="r"> R</input>
+        </div>
+      </td>
+    </tr>
+
+    <tr ng-repeat = "(k,v) in TNMhash">
+      <td>{{k}} category</td>
+      <td>
+        <div class="row">
+          <div class="col-md-4">
+            <select class="form-control"></select>
+
+          </div>
+          <div class="col-md-4">
+            <div uib-popover="{{v.prefixedPropertyCode}}"
+                 popover-placement="top"
+                 popover-trigger="'mouseenter'">
+              {{v.prefixedProperty}}
+            </div>
+
+          </div>
+          <div class="col-md-4">
+            <input type="text" disabled = "disabled" class="form-control"/>
+          </div>
+        </div>
+      </td>
+    </tr>
+
+    <!-- TNM values-->
+    <tr ng-repeat = "(k,v) in stagingProperties" ng-if="v.staging2">
+      <td width = "30%">
+        <div class = 'clickable' ng-click="setMaximalOptions(k)">{{v.UI}}</div>
+      </td>
+      <td>
+        <div class="row">
+          <div class="col-md-10">
+            <div>
+              <select class="form-control" ng-model="local.cmPropertyValue[k]"
+                      ng-change="uiValueSelected(k,local.cmPropertyValue[k])"
+                      ng-options="v.display for (k,v) in v.options">
+
+              </select>
+
+            </div>
+          </div>
+
+        </div>
+      </td>
+    </tr>
+
+
+
+
+  </table>
+
+
+
+
+  <!-- Staging TNM-->
+
+  <!-- Staging last panel (? what name)-->
+
+
+</div>

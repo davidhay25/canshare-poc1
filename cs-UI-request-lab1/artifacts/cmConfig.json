@@ -1,98 +1,191 @@
 {
-    "patient-sex": {
-        "concept": {
-            "code": "184100006"
-        },
-        "UI": "Patient sex",
-        "next": "cancer-service",
-        "options": [
-            {
-                "code": "U",
-                "display": "Unknown"
+    "tnmLUT" : {
+        "ct": "399504009",
+        "yct" : "332761000210106",
+        "rct": "333281000210102",
+        "cn" : "399534004",
+        "ycn" : "332781000210103",
+        "rcn" : "333301000210101",
+        "cm" : "399387003",
+        "ycm" : "",
+        "rcm" : "333321000210109",
+        "pt": "384625004",
+        "ypt" : "332771000210100",
+        "rpt": "333291000210100",
+        "pn" : "371494008",
+        "ypn" : "332791000210101",
+        "rpn" : "333311000210104",
+        "pm" : "371497001",
+        "ypm" : "",
+        "rpm" : "333331000210106"
+    },
+    "diagnosticProperties" : {
+        "patient-sex": {
+            "concept": {
+                "code": "184100006"
             },
-            {
-                "code": "O",
-                "display": "Other"
-            },
-            {
-                "code": "F",
-                "display": "Female"
-            },
-            {
-                "code": "M",
-                "display": "Male"
-            }
-        ]
-    },
-    "cancer-service": {
-        "concept": {
-            "code": "299801000210106"
+            "UI": "Patient sex",
+            "next": "cancer-service",
+            "options": [
+                {
+                    "code": "U",
+                    "display": "Unknown"
+                },
+                {
+                    "code": "O",
+                    "display": "Other"
+                },
+                {
+                    "code": "F",
+                    "display": "Female"
+                },
+                {
+                    "code": "M",
+                    "display": "Male"
+                }
+            ]
         },
-        "UI": "Cancer Service",
-        "next": "cancer-stream",
-        "options": [],
-        "fullVS": "canshare-cancer-service"
-    },
-    "cancer-stream": {
-        "concept": {
-            "code": "299811000210108",
-            "display": "Cancer Stream",
-            "system": "http://snomed.info/sct"
-        },
-        "UI": "Cancer Stream",
-        "next": "cancer-substream",
-        "previous": "cancer-service",
-        "options": [],
-        "fullVS": "canshare-cancer-stream"
-    },
-    "cancer-substream": {
-        "concept": {
-            "code": "299821000210103"
-        },
-        "UI": "Cancer Substream",
-        "next": "cancer-type",
-        "previous": "cancer-stream",
-        "options": [],
-        "fullVS": "canshare-cancer-substream"
-    },
-    "cancer-type": {
-        "concept": {
-            "code": "299831000210101"
-        },
-        "UI": "Cancer Type",
-        "next": "primary-site",
-        "previous": "cancer-substream",
-        "options": [],
-        "fullVS": "canshare-cancer-type"
-    },
-    "primary-site": {
-        "concept": {
-            "code": "399687005"
-        },
-        "UI": "Primary Site",
-        "next": "primary-site-laterality",
-        "previous": "cancer-type",
-        "options": [],
-        "fullVS": "canshare-primary-topography"
-    },
-    "primary-site-laterality": {
-        "concept": {
-            "code": "297561000210100"
-        },
-        "UI": "Laterality or Side",
-        "next": "histologic-type-primary",
-        "previous": "primary-site",
-        "options": [],
-        "fullVS": "canshare-laterality"
-    },
-    "histologic-type-primary": {
-        "concept": {
-            "code": "512001000004108"
-        },
-        "options": [],
-        "fullVS": "canshare-who-histology",
-        "UI": "Primary Histology",
+        "cancer-service": {
 
-        "previous": "primary-site-laterality"
+            "concept": {
+                "code": "299801000210106"
+            },
+            "UI": "Cancer Service",
+            "next": "cancer-stream",
+
+            "options": [],
+            "fullVS": "canshare-cancer-service"
+        },
+        "cancer-stream": {
+
+            "concept": {
+                "code": "299811000210108",
+                "display": "Cancer Stream",
+                "system": "http://snomed.info/sct"
+            },
+            "UI": "Cancer Stream",
+            "next": "cancer-substream",
+            "previous": "cancer-service",
+            "options": [],
+            "fullVS": "canshare-cancer-stream"
+        },
+        "cancer-substream": {
+
+            "concept": {
+                "code": "299821000210103"
+            },
+            "UI": "Cancer Substream",
+            "next": "cancer-type",
+            "previous": "cancer-stream",
+            "options": [],
+            "fullVS": "canshare-cancer-substream"
+        },
+        "cancer-type": {
+
+
+            "concept": {
+                "code": "299831000210101"
+            },
+            "UI": "Cancer Type",
+            "next": "primary-site",
+            "previous": "cancer-substream",
+            "options": [],
+            "fullVS": "canshare-cancer-type"
+        },
+        "primary-site": {
+
+
+            "concept": {
+                "code": "399687005"
+            },
+            "UI": "Primary Site",
+            "next": "primary-site-laterality",
+            "previous": "cancer-type",
+            "options": [],
+            "fullVS": "canshare-primary-topography"
+        },
+        "primary-site-laterality": {
+
+            "concept": {
+                "code": "297561000210100"
+            },
+            "UI": "Laterality or Side",
+            "next": "histologic-type-primary",
+            "previous": "primary-site",
+            "options": [],
+            "fullVS": "canshare-laterality"
+        },
+        "histologic-type-primary": {
+
+
+            "concept": {
+                "code": "512001000004108"
+            },
+            "options": [],
+            "fullVS": "canshare-who-histology",
+            "UI": "Primary Histology",
+
+            "previous": "primary-site-laterality"
+        }
+    },
+    "stagingProperties" : {
+
+        "staging-system" : {
+            "staging1": true,
+            "concept": {
+                "code": "297601000210100"
+            },
+            "UI": "Staging System"
+        },
+        "cancer-staging-type" : {
+            "staging1": true,
+            "concept": {
+                "code": "361501000210102"
+            },
+            "UI": "Staging Type"
+        },
+
+        "cancer-staging-table" : {
+            "staging1": true,
+            "concept": {
+                "code": "507281000210100"
+            },
+            "UI": "Staging Table"
+        },
+
+        "histologic-grade" : {
+            "staging2": true,
+            "concept": {
+                "code": "371469007"
+            },
+            "UI": "Grade"
+        },
+        "grading-system" : {
+            "staging2": false,
+            "concept": {
+                "code": "384739005"
+            },
+            "UI": "Grading system",
+            "note" : "Not used at present"
+        },"er-tumour-status" : {
+            "staging2": true,
+            "concept": {
+                "code": "4450280080"
+            },
+            "UI": "ER tumour status"
+        },"pr-tumour-status" : {
+            "staging2": true,
+            "concept": {
+                "code": "445029000"
+            },
+            "UI": "PR tumour status"
+        },"her2-tumour-status" : {
+            "staging2": true,
+            "concept": {
+                "code": "476171000210109"
+            },
+            "UI": "HER2 tumour status"
+        }
     }
+
 }

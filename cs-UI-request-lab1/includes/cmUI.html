@@ -164,11 +164,14 @@
 
                   <div class="pull-right"><strong>Current map:</strong> {{fullSelectedCM.title}}</div>
 
-
-
-
-
                   <button class="btn-primary btn" ng-click="resetUI()">Reset</button>
+
+
+                  <button class="btn-primary btn" ng-click="viewConceptMap()">View Map</button>
+
+
+
+
 
 
               </div>
@@ -185,299 +188,309 @@
                       </p>
                   </div>
 
-                  <h3>{{local.uiTitle}}</h3>
+
 
                   <uib-tabset>
-
-
-
-
-                      <uib-tab heading="Log">
-                          <div class="row">
-                              <div class="col-md-6">
-                                  <div class="myScrollSmall">
-                                      <table class="table table-bordered">
-                                          <tr ng-repeat="entry in log"
-                                              ng-class="{clickable:entry.obj}"
-                                              ng-click="local.logEntry = entry">
-                                              <td>{{entry.msg}}</td>
-                                          </tr>
-                                      </table>
-                                  </div>
-
-                              </div>
-                              <div class="col-md-6">
-                                  <h4>{{local.logEntry.objTitle}}</h4>
-                                  <div class="myScroll">
-                                      <pre ng-show="local.logEntry.obj">{{local.logEntry.obj | json}}</pre>
-                                  </div>
-
-
-                              </div>
+                      <uib-tab heading="Staging">
+                          <div ng-controller="stagingCtrl">
+                              <ng-include src = "'./includes/staging.html'"></ng-include>
                           </div>
                       </uib-tab>
-
-                      <uib-tab heading="Defaults">
-                          <br/>
-
-                          <checkbox ng-click="selectManualOverride(default.manual)" ng-model="default.manual"></checkbox> &nbsp;Manual override (All options available)
-
-                          <!--
-
-                          <div class="row">
-                              <div class="col-md-4">
-                                  Mode
-                              </div>
-                              <div class="col-md-4">
-                                  <select class="form-control" ng-model="default.mode"
-                                          ng-change = "changeMode(default.mode)">
-                                      <option value="directed">Directed</option>
-                                      <option value="manual">Manual</option>
-                                  </select>
-                              </div>
-                          </div>
-                          -->
-
-                          <br/><hr/>
-
-                          <div class="row">
-                              <div class="col-md-4">
-                                  Cancer Service
-                              </div>
-                              <div class="col-md-4">
-                                  <select class="form-control" ng-model="default.service"
-                                          ng-change = "setDefaultService(default.service)"
-                                          ng-options="concept.display for concept in input.allService"/>
-                              </div>
-                          </div>
-
-                          <br/>
-
-
-
-
-                          <!--
-
-                                                    <div class="row" ng-show="default.service.code">
-                                                        <div class="col-md-4">
-                                                            Cancer Stream
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <select class="form-control" ng-model="default.stream"
-                                                                    ng-change = "resetUI()"
-                                                                    ng-options="concept.display for concept in input.allStreams"/>
-                                                        </div>
-                                                    </div>
-
-                                                   -->
-
-
-
-
-                      </uib-tab>
-
-                      <uib-tab heading="Reverse engine">
-                          <div class="banner">
-                              <div>Property: {{reverseLookup.element.display}}
-
-                                  ( <span class="clickable" ng-click="lookup(reverseLookup.element.code)">
-                                      {{reverseLookup.element.code}}
-                                  </span> )
-                              </div>
-                              <div>Selected value: {{reverseLookup.sourceConcept.display}}
-                                  (<span class="clickable" ng-click="lookup(reverseLookup.sourceConcept.code)">
-                                  {{reverseLookup.sourceConcept.code}})</span></div>
-                          </div>
-
-<!--
-                          <div class="pull-right clickable" ng-click="applyReverse()">Apply</div>
--->
+                      <uib-tab heading="Debug">
+                          <h3>{{local.uiTitle}}</h3>
                           <uib-tabset>
 
+                              <uib-tab heading="Log">
+                                  <div class="row">
+                                      <div class="col-md-6">
+                                          <div class="myScrollSmall">
+                                              <table class="table table-bordered">
+                                                  <tr ng-repeat="entry in log"
+                                                      ng-class="{clickable:entry.obj}"
+                                                      ng-click="local.logEntry = entry">
+                                                      <td>{{entry.msg}}</td>
+                                                  </tr>
+                                              </table>
+                                          </div>
 
-                              <uib-tab heading = "Options by property">
+                                      </div>
+                                      <div class="col-md-6">
+                                          <h4>{{local.logEntry.objTitle}}</h4>
+                                          <div class="myScroll">
+                                              <pre ng-show="local.logEntry.obj">{{local.logEntry.obj | json}}</pre>
+                                          </div>
 
-                                  <table class="table table-bordered">
-                                      <tr ng-repeat = "(k,v) in reverseLookup.hashProperty">
-                                          <td>{{k}}</td>
-                                          <td>
-                                              <ul class="list-unstyled" ng-repeat="concept in v">
-                                                  <li>{{concept.display}}  (
 
-                                                      <span ng-show="concept.code.startsWith('http')">
+                                      </div>
+                                  </div>
+                              </uib-tab>
+
+                              <uib-tab heading="Defaults">
+                                  <br/>
+
+                                  <checkbox ng-click="selectManualOverride(default.manual)" ng-model="default.manual"></checkbox> &nbsp;Manual override (All options available)
+
+                                  <!--
+
+                                  <div class="row">
+                                      <div class="col-md-4">
+                                          Mode
+                                      </div>
+                                      <div class="col-md-4">
+                                          <select class="form-control" ng-model="default.mode"
+                                                  ng-change = "changeMode(default.mode)">
+                                              <option value="directed">Directed</option>
+                                              <option value="manual">Manual</option>
+                                          </select>
+                                      </div>
+                                  </div>
+                                  -->
+
+                                  <br/><hr/>
+
+                                  <div class="row">
+                                      <div class="col-md-4">
+                                          Cancer Service
+                                      </div>
+                                      <div class="col-md-4">
+                                          <select class="form-control" ng-model="default.service"
+                                                  ng-change = "setDefaultService(default.service)"
+                                                  ng-options="concept.display for concept in input.allService"/>
+                                      </div>
+                                  </div>
+
+                                  <br/>
+
+
+
+
+                                  <!--
+
+                                                            <div class="row" ng-show="default.service.code">
+                                                                <div class="col-md-4">
+                                                                    Cancer Stream
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <select class="form-control" ng-model="default.stream"
+                                                                            ng-change = "resetUI()"
+                                                                            ng-options="concept.display for concept in input.allStreams"/>
+                                                                </div>
+                                                            </div>
+
+                                                           -->
+
+
+
+
+                              </uib-tab>
+
+                              <uib-tab heading="Reverse engine">
+                                  <div class="banner">
+                                      <div>Property: {{reverseLookup.element.display}}
+
+                                          ( <span class="clickable" ng-click="lookup(reverseLookup.element.code)">
+                                      {{reverseLookup.element.code}}
+                                  </span> )
+                                      </div>
+                                      <div>Selected value: {{reverseLookup.sourceConcept.display}}
+                                          (<span class="clickable" ng-click="lookup(reverseLookup.sourceConcept.code)">
+                                  {{reverseLookup.sourceConcept.code}})</span></div>
+                                  </div>
+
+                                  <!--
+                                                            <div class="pull-right clickable" ng-click="applyReverse()">Apply</div>
+                                  -->
+                                  <uib-tabset>
+
+
+                                      <uib-tab heading = "Options by property">
+
+                                          <table class="table table-bordered">
+                                              <tr ng-repeat = "(k,v) in reverseLookup.hashProperty">
+                                                  <td>{{k}}</td>
+                                                  <td>
+                                                      <ul class="list-unstyled" ng-repeat="concept in v">
+                                                          <li>{{concept.display}}  (
+
+                                                              <span ng-show="concept.code.startsWith('http')">
                                                           <span class="clickable" ng-click="viewVS(concept.code)">{{concept.code}}</span>
                                                       </span>
-                                                      <span ng-hide="concept.code.startsWith('http')">
+                                                              <span ng-hide="concept.code.startsWith('http')">
                                                           <span class="clickable" ng-click="lookup(concept.code)">{{concept.code}}</span>
                                                       </span>
 
 
 
 
-                                                      )</li>
-                                              </ul>
+                                                              )</li>
+                                                      </ul>
 
-                                          </td>
-                                      </tr>
-                                  </table>
-
-
-                                  <pre>{{hashProperty | json}}</pre>
-                              </uib-tab>
+                                                  </td>
+                                              </tr>
+                                          </table>
 
 
-                              <uib-tab heading = "Targets (table)">
-                                  <div ng-repeat="target in reverseLookup.targets">
-                                      <div>
-                                          <strong class="clickable" ng-click="viewVS(target.code)">{{target.display}}</strong>
-                                          ({{target.comment}})
-                                      </div>
-
-                                      <table class="table-bordered table">
-                                          <tr ng-repeat="don in target.dependsOn">
-                                              <td style="width: 20%">{{don.property}}</td>
-                                              <td style="width: 10%">{{don['x-operator']}}</td>
-                                              <td style="width: 15%">
-                                                  <div ng-show="don['x-operator'] == 'in-vs'">
-                                                      <div class="clickable" ng-click="viewVS(don.value)">{{don.value}}</div>
-                                                  </div>
-                                                  <div ng-show="don['x-operator'] == '='">
-                                                      <div class="clickable" ng-click="lookup(don.value)">{{don.value}}</div>
-                                                  </div>
+                                          <pre>{{hashProperty | json}}</pre>
+                                      </uib-tab>
 
 
-                                              </td>
-                                              <td>{{don.display}}</td>
-                                          </tr>
-                                      </table>
-                                  </div>
-
-
-                              </uib-tab>
-
-
-                              <uib-tab heading = "Targets (list)">
-                                  <div class="row">
-                                      <div class="col-md-3">
-                                          <div class="list-group">
-                                              <div class="list-group-item"
-                                                   ng-click="selectTarget(target)"
-                                                   ng-repeat = "target in reverseLookup.targets" >
-                                                  {{target.display}}
+                                      <uib-tab heading = "Targets (table)">
+                                          <div ng-repeat="target in reverseLookup.targets">
+                                              <div>
+                                                  <strong class="clickable" ng-click="viewVS(target.code)">{{target.display}}</strong>
+                                                  ({{target.comment}})
                                               </div>
 
+                                              <table class="table-bordered table">
+                                                  <tr ng-repeat="don in target.dependsOn">
+                                                      <td style="width: 20%">{{don.property}}</td>
+                                                      <td style="width: 10%">{{don['x-operator']}}</td>
+                                                      <td style="width: 15%">
+                                                          <div ng-show="don['x-operator'] == 'in-vs'">
+                                                              <div class="clickable" ng-click="viewVS(don.value)">{{don.value}}</div>
+                                                          </div>
+                                                          <div ng-show="don['x-operator'] == '='">
+                                                              <div class="clickable" ng-click="lookup(don.value)">{{don.value}}</div>
+                                                          </div>
+
+
+                                                      </td>
+                                                      <td>{{don.display}}</td>
+                                                  </tr>
+                                              </table>
                                           </div>
+
+
+                                      </uib-tab>
+
+
+                                      <uib-tab heading = "Targets (list)">
+                                          <div class="row">
+                                              <div class="col-md-3">
+                                                  <div class="list-group">
+                                                      <div class="list-group-item"
+                                                           ng-click="selectTarget(target)"
+                                                           ng-repeat = "target in reverseLookup.targets" >
+                                                          {{target.display}}
+                                                      </div>
+
+                                                  </div>
+                                              </div>
+
+
+                                              <div class="col-md-9">
+                                                  <pre>{{selectedTarget | json}}</pre>
+                                              </div>
+                                          </div>
+                                      </uib-tab>
+
+                                  </uib-tabset>
+
+
+                              </uib-tab>
+
+                              <uib-tab heading="Internals">
+                                  <div class="row">
+                                      <div class="col-md-6">
+                                          <strong>cmProperties (Property definition)</strong>
+                                          <pre>{{cmProperties | json}}</pre>
                                       </div>
-
-
-                                      <div class="col-md-9">
-                                          <pre>{{selectedTarget | json}}</pre>
+                                      <div class="col-md-6">
+                                          <strong>local.cmPropertyValue (Property values)</strong>
+                                          <pre>{{local.cmPropertyValue | json}}</pre>
                                       </div>
                                   </div>
                               </uib-tab>
 
-                          </uib-tabset>
+                              <uib-tab heading="Options">
+
+                                  <div ng-show="singleConcept">
+                                      <h4>A single concept was returned</h4>
+                                      {{singleConcept.display}} {{singleConcept.code}} {{singleConcept.system}}
+                                  </div>
+                                  <div ng-hide="singleConcept">
+                                      <h4>Matching ValueSet/s</h4>
+                                      <ul class="list-unstyled">
+                                          <li ng-repeat="url in uiMatchingVS">{{url}}</li>
+                                      </ul>
 
 
-                      </uib-tab>
-
-                      <uib-tab heading="Internals">
-                          <div class="row">
-                              <div class="col-md-6">
-                                  <strong>cmProperties (Property definition)</strong>
-                                  <pre>{{cmProperties | json}}</pre>
-                              </div>
-                              <div class="col-md-6">
-                                  <strong>local.cmPropertyValue (Property values)</strong>
-                                  <pre>{{local.cmPropertyValue | json}}</pre>
-                              </div>
-                          </div>
-                      </uib-tab>
-
-                      <uib-tab heading="Options">
-
-                          <div ng-show="singleConcept">
-                              <h4>A single concept was returned</h4>
-                              {{singleConcept.display}} {{singleConcept.code}} {{singleConcept.system}}
-                          </div>
-                          <div ng-hide="singleConcept">
-                              <h4>Matching ValueSet/s</h4>
-                              <ul class="list-unstyled">
-                                  <li ng-repeat="url in uiMatchingVS">{{url}}</li>
-                              </ul>
+                                      <h4>Possible values</h4>
 
 
-                              <h4>Possible values</h4>
+                                      <div class="tableFixHead">
+                                          <table class="table table-bordered table-condensed">
+                                              <thead>
+                                              <tr><th>Display</th><th>Code</th><th>System</th></tr>
+                                              </thead>
+                                              <tbody>
+                                              <tr ng-repeat="concept in lstMatchingConceptsForUI">
+                                                  <td>{{concept.display}}</td>
+                                                  <td>
+                                                      <div class="clickable" ng-click="lookup(concept.code)">
+                                                          {{concept.code}}
+                                                      </div>
 
+                                                  </td>
+                                                  <td>{{concept.system}}</td>
+                                              </tr>
+                                              </tbody>
+                                          </table>
+                                      </div>
+                                  </div>
 
-                              <div class="tableFixHead">
-                                  <table class="table table-bordered table-condensed">
-                                      <thead>
-                                      <tr><th>Display</th><th>Code</th><th>System</th></tr>
-                                      </thead>
-                                      <tbody>
-                                      <tr ng-repeat="concept in lstMatchingConceptsForUI">
-                                          <td>{{concept.display}}</td>
+                              </uib-tab>
+
+                              <uib-tab heading="Forward engine">
+                                  <h4>Property values used by engine when locating matching targets</h4>
+                                  <table class="table table-condensed table-bordered">
+                                      <tr><th>Property</th><th>Display</th><th>Code</th><th>System</th></tr>
+                                      <tr ng-repeat="(k,v) in uiHashValues">
+                                          <td>{{k}}</td>
+                                          <td>{{v.display}}</td>
                                           <td>
-                                              <div class="clickable" ng-click="lookup(concept.code)">
-                                                  {{concept.code}}
+                                              <div class="clickable" ng-click="lookup(v.code)">
+                                                  {{v.code}}
                                               </div>
 
                                           </td>
-                                          <td>{{concept.system}}</td>
+                                          <td>{{v.system}}</td>
                                       </tr>
-                                      </tbody>
                                   </table>
-                              </div>
-                          </div>
 
-                      </uib-tab>
+                                  <uib-tabset>
+                                      <uib-tab heading="Matched targets">
+                                          <pre>{{uiMatchingTargets | json}}</pre>
+                                      </uib-tab>
+                                      <uib-tab heading="Lookup target by row number">
+                                          <div class="row">
+                                              <div class="col-md-2">
+                                                  <input type="text" class="form-control" ng-model="input.rowNumber">
+                                                  <div><button class="btn btn-link" ng-click="lookupByRowNumber(input.rowNumber)">Get target</button> </div>
+                                              </div>
+                                              <div class="col-md-10">
+                                                  <pre>{{singleTargetByRow | json}}</pre>
 
-                      <uib-tab heading="Forward engine">
-                          <h4>Property values used by engine when locating matching targets</h4>
-                          <table class="table table-condensed table-bordered">
-                              <tr><th>Property</th><th>Display</th><th>Code</th><th>System</th></tr>
-                              <tr ng-repeat="(k,v) in uiHashValues">
-                                  <td>{{k}}</td>
-                                  <td>{{v.display}}</td>
-                                  <td>
-                                      <div class="clickable" ng-click="lookup(v.code)">
-                                          {{v.code}}
-                                      </div>
+                                              </div>
+                                          </div>
 
-                                  </td>
-                                  <td>{{v.system}}</td>
-                              </tr>
-                          </table>
+                                      </uib-tab>
+                                  </uib-tabset>
 
-                          <uib-tabset>
-                              <uib-tab heading="Matched targets">
-                                  <pre>{{uiMatchingTargets | json}}</pre>
-                              </uib-tab>
-                              <uib-tab heading="Lookup target by row number">
-                                  <div class="row">
-                                      <div class="col-md-2">
-                                          <input type="text" class="form-control" ng-model="input.rowNumber">
-                                          <div><button class="btn btn-link" ng-click="lookupByRowNumber(input.rowNumber)">Get target</button> </div>
-                                      </div>
-                                      <div class="col-md-10">
-                                          <pre>{{singleTargetByRow | json}}</pre>
-
-                                      </div>
-                                  </div>
 
                               </uib-tab>
+
+                              <uib-tab ng-if = "expandErrors.length > 0" heading="Errors">
+                                  <pre>{{expandErrors | json}}</pre>
+                              </uib-tab>
+
+
                           </uib-tabset>
 
-
                       </uib-tab>
-
-                      <uib-tab ng-if = "expandErrors.length > 0" heading="Errors">
-                          <pre>{{expandErrors | json}}</pre>
-                      </uib-tab>
-
-
                   </uib-tabset>
+
+
 
               </div>
           </div>

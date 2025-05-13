@@ -304,6 +304,38 @@ angular.module("pocApp")
 
             },
 
+            getElementByCode : function (cm,code) {
+                //return the ConceptMap.group[0].element with the matching code
+                let element
+                for (let el of cm.group[0].element) {
+                    if (el.code == code) {
+                        element = el
+                        break
+                    }
+                }
+                return element
+
+            },
+            getConceptsFromTarget : function (lstTarget,hashAllVS) {
+                //given a set of  targets, return all the concepts
+                let concepts = []
+                for (const target of lstTarget) {
+                    if (target.code.indexOf('http') > -1) {
+                        let ar = hashAllVS[target.code]
+                        if (ar) {
+                            concepts.push(...ar)
+                        } else {
+                            console.log(`Url ${target.code} not found in ValueSet list`)
+                        }
+                    } else {
+                        concepts.push({code:target.code})
+                    }
+                }
+                return concepts
+
+
+            },
+
             getAllVSinCM : function (CM,lstVsUrl) {
                 //get all the VS referenced by a CM. Update the lstVsUrl
 
@@ -330,7 +362,6 @@ angular.module("pocApp")
                                                     addUrlToList(dep.value)
 
 
-
                                                 }
 
                                             }
@@ -351,7 +382,6 @@ angular.module("pocApp")
                     if (lstVsUrl.indexOf(url) == -1) {
                         lstVsUrl.push(url)
                     }
-
                 }
 
             },
@@ -428,11 +458,11 @@ angular.module("pocApp")
                     deferred.resolve({hashExpanded:hashExpanded,errors:errors})
 
                 }, function () {
-                    //console.log(hashExpanded)
+
                         console.log(errors)
-                        //hashExpanded['errors'] = errors     //todo really should use a VO here...
+
                         deferred.resolve({hashExpanded:hashExpanded,errors:errors})
-                    //deferred.resolve(hashExpanded)
+
                     }
 
                 )
@@ -482,7 +512,6 @@ angular.module("pocApp")
 
                             console.log(`${url} fail`)
 
-                          //  hash[response.data.url] = ar
 
                             defer.resolve()
                         }
