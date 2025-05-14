@@ -54,18 +54,14 @@
 
             <uib-tabset>
               <uib-tab heading="Targets">
-<!--
-                <div>
-                  Code: {{input.cmElement.code}} Display: {{input.cmElement.display}} System: {{conceptMap.group[0].source}}
-                </div>
-                -->
+
 
                 <div class="myScroll">
                   <table class="table-bordered table-condensed table">
                     <tr><th>Target VS / code</th><th>Depends On elements</th></tr>
                     <tr ng-repeat="target in input.cmElement.target">
 
-                      <td style="width: 40%">
+                      <td style="width: 30%">
                         <div ng-if = "target.code.indexOf('http') > -1 " class="clickable" ng-click="viewVS(target.code)">{{target.display}}</div>
                         <div ng-if = "target.code.indexOf('http') == -1 ">{{target.display}} ({{target.code}})</div>
 
@@ -81,7 +77,14 @@
                           <tr ng-repeat = "don in target.dependsOn">
                             <td>{{don.property}}</td>
                             <td>{{updateVSSvc.getCMOperator(don)}}</td>
-                            <td>{{don.value}}</td>
+                            <td>
+                              <div ng-if="don['x-operator']=='in-vs'"
+                                   class="clickable"
+                                   ng-click="viewVS(don.value)" >{{don.value}}</div>
+
+                              <div ng-if="don['x-operator']!=='in-vs'">{{don.value}}</div>
+
+                            </td>
                             <td>{{don.display}}</td>
                           </tr>
                         </table>
@@ -94,6 +97,80 @@
 
               </uib-tab>
 
+              <uib-tab heading="Other properties">
+                <br/>
+                <em>Other properties whose value has an effect on this (they are in target.dependsOn).
+                The matching process uses the forward rules engine.</em>
+                <br/><br/>
+                <div class="alert alert-warning" ng-if="noVS">
+                  This list will be incomplete (no 'in-vs' rules could be expanded. Invoke from the dynamic
+                  UI for full functionality
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <table class="table table-bordered">
+                      <tr ng-repeat="(k,v) in hashProperty">
+                        <td>{{k}}</td>
+                        <td>
+
+                          <select class="form-control" ng-model = "input.testCode[k]"
+                                  ng-change = "lookupTargets()"
+                                  ng-options="c.display for c in v"></select>
+                          <div>{{input.testCode[k].code}}</div>
+
+                        </td>
+                        <td>{{v.length}}</td>
+                      </tr>
+                    </table>
+                  </div>
+                  <div class="col-md-6">
+                    <!--
+                    <div class="clickable pull-right" ng-click="lookupTargets()">Lookup</div>
+                    -->
+
+
+                    <!--
+                    <table class="table table-bordered">
+                      <tr ng-repeat="(k,v) in hashProperty">
+                        <td>{{k}}</td>
+                        <td>
+                          {{input.testCode[k]}}
+
+                        </td>
+
+                      </tr>
+                    </table>
+
+
+                    <br/><br/>
+                    -->
+                    <div ng-if="matchingTargets.length > 0">
+                      <strong>Targets that matched</strong>
+                      <table class="table table-bordered">
+                        <tr><th>Row</th><th>Code</th></tr>
+                        <tr ng-repeat="target in matchingTargets">
+                          <td>{{target.comment}}</td>
+                          <td>{{target.code}}</td>
+                        </tr>
+                      </table>
+
+
+                      <strong>ValueSets and Concepts</strong>
+                      <div ng-repeat = "vs in matchingVS">
+                        <div ng-if="vs.indexOf('http') > -1"
+                             class="clickable"
+                             ng-click="viewVS(vs)" >{{vs}}</div>
+
+                        <div ng-if="vs.indexOf('http') == -1">{{vs}}</div>
+                      </div>
+                    </div>
+
+
+                  </div>
+                </div>
+
+              </uib-tab>
 
               <uib-tab heading="Element Json">
                 <pre>{{input.cmElement | json}}</pre>

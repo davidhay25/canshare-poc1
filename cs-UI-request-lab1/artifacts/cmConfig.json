@@ -145,42 +145,88 @@
             "UI": "Staging Type"
         },
 
-        "cancer-staging-table" : {
-            "staging1": true,
+        "ct-category-prefix-free" : {
+            "staging2": true,
             "concept": {
-                "code": "507281000210100"
+                "code": "567101000210102"
             },
-            "UI": "Staging Table"
+            "UI": "cT category (prefix free)"
         },
 
-        "histologic-grade" : {
+
+        "cn-category-prefix-free" : {
             "staging2": true,
+            "concept": {
+                "code": "567111000210100"
+            },
+            "UI": "cN category (prefix free)"
+        },
+
+        "cm-category-prefix-free" : {
+            "staging2": true,
+            "concept": {
+                "code": "567121000210105"
+            },
+            "UI": "cM category (prefix free)"
+        },
+
+        "pt-category-prefix-free" : {
+            "staging2": true,
+            "concept": {
+                "code": "567141000210104"
+            },
+            "UI": "pT category (prefix free)"
+        },
+
+        "pn-category-prefix-free" : {
+            "staging2": true,
+            "concept": {
+                "code": "567151000210101"
+            },
+            "UI": "pN category (prefix free)"
+        },
+
+        "pm-category-prefix-free" : {
+            "staging2": true,
+            "concept": {
+                "code": "567161000210103"
+            },
+            "UI": "pM category (prefix free)"
+        },
+
+
+
+
+
+
+        "histologic-grade" : {
+            "staging3": true,
             "concept": {
                 "code": "371469007"
             },
             "UI": "Grade"
         },
         "grading-system" : {
-            "staging2": false,
+            "staging3": false,
             "concept": {
                 "code": "384739005"
             },
             "UI": "Grading system",
             "note" : "Not used at present"
         },"er-tumour-status" : {
-            "staging2": true,
+            "staging3": true,
             "concept": {
                 "code": "4450280080"
             },
             "UI": "ER tumour status"
         },"pr-tumour-status" : {
-            "staging2": true,
+            "staging3": true,
             "concept": {
                 "code": "445029000"
             },
             "UI": "PR tumour status"
         },"her2-tumour-status" : {
-            "staging2": true,
+            "staging3": true,
             "concept": {
                 "code": "476171000210109"
             },

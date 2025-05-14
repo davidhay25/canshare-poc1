@@ -103,7 +103,9 @@
                   <table class="table table-bordered">
                       <tr ng-repeat = "(k,v) in cmProperties" ng-hide="k == 'patient-sex'">
                           <td width = "30%">
-                              <div class = 'clickable' ng-click="setMaximalOptions(k)">{{v.UI}}</div>
+                              <span class = 'clickable' ng-click="setMaximalOptions(k)">{{v.UI}}</span>
+                              <i class=" glyphicon glyphicon-info-sign clickable pull-right"
+                                 ng-click="viewConceptMap(k)"></i>
                           </td>
                           <td>
                               <div class="row">
@@ -137,25 +139,17 @@
                                                   ng-options="v.display for (k,v) in v.options">
 
                                           </select>
-                                          <!--
-                                                                                    <input type="text" ng-model="test"
-                                                                                           typeahead-editable = "false"
-                                                                                           typeahead-on-select="selectFromTA($item, k,k)"
 
-                                                                                           uib-typeahead="concept.display for concept in v.options | filter:$viewValue"
-                                                                                           class="form-control" />
-
-                                          -->
                                       </div>
                                   </div>
                                   <div class="col-md-2">
                                       <i class=" glyphicon glyphicon-search clickable"
                                          ng-show="v.options.length > 10"
                                          ng-click="selectConcept(k,v)"></i>
-                                      <!--
-                                                                                <i ng-show="local.cmPropertyValue[k]" class=" glyphicon glyphicon-remove clickable"
-                                                                                   ng-click="clearProperty(k)"></i>
-                                      -->
+
+
+
+
                                   </div>
                               </div>
                           </td>
@@ -392,13 +386,15 @@
                               <uib-tab heading="Internals">
                                   <div class="row">
                                       <div class="col-md-6">
-                                          <strong>cmProperties (Property definition)</strong>
-                                          <pre>{{cmProperties | json}}</pre>
-                                      </div>
-                                      <div class="col-md-6">
                                           <strong>local.cmPropertyValue (Property values)</strong>
                                           <pre>{{local.cmPropertyValue | json}}</pre>
                                       </div>
+
+                                      <div class="col-md-6">
+                                          <strong>cmProperties (Property definition)</strong>
+                                          <pre>{{cmProperties | json}}</pre>
+                                      </div>
+
                                   </div>
                               </uib-tab>
 

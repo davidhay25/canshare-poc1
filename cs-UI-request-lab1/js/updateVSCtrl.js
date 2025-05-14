@@ -77,6 +77,10 @@ angular.module("pocApp")
                     resolve: {
                         conceptMap: function () {
                             return cm
+                        },hashExpandedVs : function () {
+                            return null
+                        }, selectedProperty : function () {
+                            return ""
                         }
                     }
 

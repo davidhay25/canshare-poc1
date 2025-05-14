@@ -3,6 +3,7 @@ angular.module("pocApp")
     .service('cmSvc', function($q,$http) {
 
         let config= {}
+        let cmConfig = {}
 
 
         return {
@@ -39,6 +40,7 @@ angular.module("pocApp")
                 //console.log(hashExpandedVs)
 
                 let lstVs = []          //this will be a list of valueSets whose contents are in the list of possible values
+                //let lstVS1 = []         //same as lstVs except is the concept when not a VS. I don't want to change lstVs
                 let lstMatchingRules = []       //the index of rules/targets that were matched
                 let lstMatchingTargets = []     //the targets that matched
                 element.target.forEach(function (target,inx) {
@@ -48,6 +50,7 @@ angular.module("pocApp")
                         //No depends on means the VS contents are added
                         target.matched = true
                         lstVs.push(target.code)     //todo 7 may - what is tge code is actually a code not a vs url???
+                     //   lstVs1.push(target.code)     //todo 7 may - what is tge code is actually a code not a vs url???
                     } else {
 
                         //let hashPropertiesExamined = {}     //a hash for all the properties in the DON
@@ -125,6 +128,8 @@ angular.module("pocApp")
                             // yes!
                             //todo - could tidy this up a bit
                             lstVs.push(target.code)
+
+                          //  lstVs1.push(target)
                             lstMatchingRules.push(inx)
                             lstMatchingTargets.push(target)
                             target.matched = true
@@ -300,6 +305,20 @@ angular.module("pocApp")
                     }
 
 
+                }
+
+            },
+            setConfig : function (config) {
+                cmConfig = config
+            },
+            getConceptFromProperty : function (property) {
+                //return the element code that corresponds to the property name
+                if (cmConfig.stagingProperties[property]) {
+                    return cmConfig.stagingProperties[property].concept
+                } else if (cmConfig.diagnosticProperties[property]) {
+                    return cmConfig.diagnosticProperties[property].concept
+                } else {
+                    return {}
                 }
 
             },

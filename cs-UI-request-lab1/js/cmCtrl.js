@@ -372,7 +372,7 @@ angular.module("pocApp")
                         let parameters = data.data
                         if (parameters.parameter) {
                             for (const p of parameters.parameter) {
-                                console.log(p)
+
                                 if (p.name == 'property' && p.part) {
                                     for (const part of p.part) {
                                         if (part.name == 'subproperty' && part.part) {
@@ -389,7 +389,7 @@ angular.module("pocApp")
                                 }
                             }
                         }
-                        console.log(angular.toJson(data.data) )
+
 
                         if (siteCodes.length == 0) {
                             $scope.log.push({msg:`No site codes found for this concept`})
@@ -1224,7 +1224,8 @@ angular.module("pocApp")
                         let config = data.data
 
                         $scope.cmConfig = config //added so staging can access config
-                        $scope.tnmLUT = config.tnmLUT   //lookup table for snomed codes for TNM
+                        $scope.tnmLUT = config.tnmLUT   //lookup table for snomed codes for TNM\
+                        cmSvc.setConfig(config)         //so cmService can manipulate it
 
                         //cmProperties will have only those entries that are in the diagnostic tab
                         $scope.cmProperties = {}
@@ -1285,7 +1286,7 @@ angular.module("pocApp")
             }
 
 
-            $scope.viewConceptMap = function () {
+            $scope.viewConceptMap = function (property) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/cmViewer.html',
                     backdrop: 'static',
@@ -1295,6 +1296,11 @@ angular.module("pocApp")
                     resolve: {
                         conceptMap: function () {
                             return $scope.fullSelectedCM
+                        },
+                        hashExpandedVs : function () {
+                            return $scope.hashExpandedVs
+                        }, selectedProperty : function () {
+                            return property
                         }
                     }
 
