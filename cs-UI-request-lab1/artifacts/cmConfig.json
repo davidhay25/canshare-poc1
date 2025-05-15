@@ -219,18 +219,21 @@
             "UI": "Grading system",
             "note" : "Not used at present"
         },"er-tumour-status" : {
+            "hideIfNoOptions" : true,
             "staging3": true,
             "concept": {
                 "code": "445028008"
             },
             "UI": "ER tumour status"
         },"pr-tumour-status" : {
+            "hideIfNoOptions" : true,
             "staging3": true,
             "concept": {
                 "code": "445029000"
             },
             "UI": "PR tumour status"
         },"her2-tumour-status" : {
+            "hideIfNoOptions" : true,
             "staging3": true,
             "concept": {
                 "code": "476171000210109"

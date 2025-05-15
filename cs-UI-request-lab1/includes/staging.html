@@ -84,7 +84,8 @@
     </tr>
 
     <!-- ancillary studies values-->
-    <tr ng-repeat = "(k,v) in stagingProperties" ng-if="v.staging3">
+    <tr ng-repeat = "(k,v) in stagingProperties" ng-if="v.staging3"
+      ng-hide="staging.hide[k]">
       <td width = "30%">
         <span class = 'clickable'>{{v.UI}}</span>
 

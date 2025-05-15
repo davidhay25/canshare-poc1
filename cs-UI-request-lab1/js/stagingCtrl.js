@@ -7,6 +7,7 @@ angular.module("pocApp")
            // $scope.input = {}
             $scope.staging = {}
             $scope.staging.stagingPrefix = ""
+            $scope.staging.hide = {} //for properties that are hidden is there are no values
 
             $scope.staging.cmPropertyValue = {}     //values for staging properties keyed on propKey
 
@@ -49,6 +50,7 @@ angular.module("pocApp")
                     }
                 }
                 $scope.selectPrefix("")     //set up initial prefix
+                hideIfEmpty()   //hide elements that aren't shown if no options
 
                 console.log($scope.TNMhash)
             })
@@ -137,32 +139,6 @@ angular.module("pocApp")
                 //note that the staging1 propertien only change when the 'diagnostic' properties change
 
                 updateSpecificStaging('staging1')
-
-                /*
-                for (const key of Object.keys($scope.stagingProperties)) {
-                    let property = $scope.stagingProperties[key]
-                    property.options = property.options || []
-
-                    if (property.staging1) {
-                        //this is a property that sits at the top of the staging. system, type & table at present
-                        let code = property.concept.code    //the snomed code for this element
-                        let cmElement = cmSvc.getElementByCode($scope.fullSelectedCM,code)    //get the element
-                        if (cmElement && cmElement.code) {
-                            let vo = cmSvc.rulesEngine($scope.local.cmPropertyValue,cmElement,$scope.hashExpandedVs)
-                            let concepts = cmSvc.getConceptsFromTarget(vo.lstMatchingTargets,$scope.hashExpandedVs)
-
-                            property.options = concepts
-
-                            $scope.local.cmPropertyValue[key] = property.options[0]
-
-                           // console.log(vo,concepts)
-                        } else {
-                            console.error(`Code ${code} has no associated element`)
-                        }
-                    }
-                }
-
-                */
                 $scope.updateStaging()
             });
 
@@ -221,6 +197,29 @@ angular.module("pocApp")
 
                 //now update the 'staging3 controls
                 updateSpecificStaging('staging3')
+
+                //hide properties that have no options and are configured to hide
+                hideIfEmpty()
+            }
+
+            function hideIfEmpty() {
+                // if a propert has 'hideIfNoOptions' set, then hide if there are no options
+                for (const [key, value] of Object.entries($scope.stagingProperties)) {
+                    if (value.hideIfNoOptions) {
+                        $scope.staging.hide[key] = true
+
+
+                        if ($scope.stagingProperties[key] && $scope.stagingProperties[key].options &&
+                            $scope.stagingProperties[key].options.length > 0)
+                        {
+                            $scope.staging.hide[key] = false
+
+                        }
+                    }
+
+                }
+                console.log($scope.staging.hide)
+
 
             }
 
