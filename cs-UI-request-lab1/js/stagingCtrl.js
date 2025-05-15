@@ -39,6 +39,7 @@ angular.module("pocApp")
 
             //get the  code from the config file. We have the tnm stuff in a searate object
             //as it's a bit more complicated with the prefixes..
+
             $timeout(function(){
                 for (const key of Object.keys($scope.TNMhash)) {
                     let tnmItem = $scope.TNMhash[key]
