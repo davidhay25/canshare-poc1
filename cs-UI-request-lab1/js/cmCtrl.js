@@ -1237,6 +1237,8 @@ angular.module("pocApp")
                         $scope.cmProperties = config.diagnosticProperties
                         $scope.stagingProperties = config.stagingProperties
 
+                        $scope.$broadcast("cmConfigLoaded")
+
 
                         //a hash of code keyed on propertyKey. Used in conjunction with hashElements
                         //$scope.hashCodeByPropKey = {}

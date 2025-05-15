@@ -40,6 +40,19 @@ angular.module("pocApp")
             //get the  code from the config file. We have the tnm stuff in a searate object
             //as it's a bit more complicated with the prefixes..
 
+            $scope.$on('cmConfigLoaded',function () {
+                for (const key of Object.keys($scope.TNMhash)) {
+                    let tnmItem = $scope.TNMhash[key]
+                    let item = $scope.stagingProperties[tnmItem.propName]
+                    if (item) {
+                        $scope.TNMhash[key].concept = item.concept
+                    }
+                }
+                $scope.selectPrefix("")     //set up initial prefix
+
+                console.log($scope.TNMhash)
+            })
+/*
             $timeout(function(){
                 for (const key of Object.keys($scope.TNMhash)) {
                     let tnmItem = $scope.TNMhash[key]
@@ -52,7 +65,7 @@ angular.module("pocApp")
 
                 console.log($scope.TNMhash)
             },2000)
-
+*/
             $scope.selectPrefix = function (prefix) {
                 //when the prefix is selected we need to adjust the values in the TNMhasha
                 for (const [key, value] of Object.entries($scope.TNMhash)) {
