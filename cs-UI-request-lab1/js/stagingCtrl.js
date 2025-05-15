@@ -50,7 +50,7 @@ angular.module("pocApp")
                 $scope.selectPrefix("")     //set up initial prefix
 
                 console.log($scope.TNMhash)
-            },1000)
+            },2000)
 
             $scope.selectPrefix = function (prefix) {
                 //when the prefix is selected we need to adjust the values in the TNMhasha
