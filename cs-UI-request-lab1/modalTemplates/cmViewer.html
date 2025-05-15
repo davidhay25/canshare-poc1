@@ -31,16 +31,19 @@
 
         <div class="row">
           <div class="col-md-3">
-            <div class="banner">Elements<br/><br/></div>
-            <div class="list-group">
-              <div ng-class="{'list-group-item':true,listItemSelected:element == input.cmElement}"
-                   ng-click="selectCmElement(element)"
-                   style="cursor: pointer"
-                   ng-repeat="element in conceptMap.group[0].element">
-                {{element.display}}
-                <span class="pull-right badge">{{element.target.length}}</span>
-              </div>
+            <div class="banner">Elements<br/>
+              (Properties)<br/></div>
+            <div class="myScroll">
+              <div class="list-group">
+                <div ng-class="{'list-group-item':true,listItemSelected:element == input.cmElement}"
+                     ng-click="selectCmElement(element)"
+                     style="cursor: pointer"
+                     ng-repeat="element in sortedElements">
+                  {{element.display}}
+                  <span class="pull-right badge">{{element.target.length}}</span>
+                </div>
 
+              </div>
             </div>
           </div>
           <div class="col-md-9" ng-if="input.cmElement">
@@ -53,8 +56,8 @@
 
 
             <uib-tabset>
-              <uib-tab heading="Targets">
-
+              <uib-tab>
+                <uib-tab-heading>Targets <span class="badge">{{input.cmElement.target.length}}</span> </uib-tab-heading>
 
                 <div class="myScroll">
                   <table class="table-bordered table-condensed table">
@@ -97,9 +100,12 @@
 
               </uib-tab>
 
-              <uib-tab heading="Other properties">
-                <br/>
-                <em>Other properties whose value has an effect on this (they are in target.dependsOn).
+              <uib-tab>
+
+                <uib-tab-heading>Other properties <span class="badge">{{hashPropertyCount}}</span> </uib-tab-heading>
+
+
+                <em>Other properties / elements whose value has an effect on this (they are in target.dependsOn).
                 The matching process uses the forward rules engine.</em>
                 <br/><br/>
                 <div class="alert alert-warning" ng-if="noVS">
@@ -172,8 +178,28 @@
 
               </uib-tab>
 
+              <uib-tab>
+                <uib-tab-heading>Properties that depend on this <span class="badge">{{thisEffectsCount}}</span> </uib-tab-heading>
+                <em>Other properties / elements that are effected by the value of this one</em>
+                <br/>
+                <div class="myScrollSmallest">
+                  <table class="table table-bordered">
+                    <tr ng-repeat="(k,v) in thisEffects">
+                      <td>
+                        <div class="clickable" ng-click="selectElement(v)"> {{v.display}}</div>
+                      </td>
+                      <td>{{k}}</td>
+                    </tr>
+                  </table>
+                </div>
+
+
+              </uib-tab>
+
               <uib-tab heading="Element Json">
-                <pre>{{input.cmElement | json}}</pre>
+                <div class="myScroll">
+                  <pre>{{input.cmElement | json}}</pre>
+                </div>
               </uib-tab>
 
             </uib-tabset>
@@ -182,7 +208,10 @@
 
       </uib-tab>
       <uib-tab heading="Json">
-        <pre>{{conceptMap | json}}</pre>
+        <div class="myScroll">
+          <pre>{{conceptMap | json}}</pre>
+        </div>
+
       </uib-tab>
     </uib-tabset>
 

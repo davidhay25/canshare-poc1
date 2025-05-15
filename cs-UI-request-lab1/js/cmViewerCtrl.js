@@ -10,6 +10,20 @@ angular.module("pocApp")
                 $scope.noVS = true
             }
 
+            //create sorted list of elements for display
+            $scope.sortedElements = conceptMap.group[0].element
+            $scope.sortedElements.sort(function (a,b) {
+                if (a.display > b.display) {
+                    return 1
+                } else {
+                    return  -1
+                }
+            })
+
+            $scope.selectElement = function (element) {
+                $scope.input.cmElement = element
+                $scope.selectCmElement($scope.input.cmElement)
+            }
 
             //from the 'other propertirs' tab to find matching targets
             $scope.lookupTargets = function () {
@@ -29,6 +43,9 @@ angular.module("pocApp")
                 $scope.input.cmElement = element
                 analyseElement(element)
                 $scope.lookupTargets()
+
+                let propKey = cmSvc.getPropKeyFromCode(element.code)
+                whatDependsOnThis(propKey) //set $scope.thisEffects
             }
 
             //if a property is passed in to the viewer. This function mst be after  $scope.selectCmElement and $scope.lookupTargets
@@ -66,6 +83,7 @@ angular.module("pocApp")
                             addConcept($scope.hashProperty[don.property],don.value,don.display)
                         }
                     }
+                    $scope.hashPropertyCount = Object.keys($scope.hashProperty).length
                 }
 
                 function addConcept(ar,code,display) {
@@ -74,6 +92,24 @@ angular.module("pocApp")
                         ar.push({code:code,display:display})
                     }
                 }
+            }
+
+            //locate all elements that are affected bt t
+            function whatDependsOnThis(propKey) {
+                $scope.thisEffects = {}
+                for (const element of $scope.conceptMap.group[0].element || []) {
+                    for (const target of element.target || []) {
+                        for (const don of target.dependsOn) {
+                            if (don.property == propKey) {
+                               // let el = cmSvc.getElementByCode($scope.conceptMap,code)
+
+                                $scope.thisEffects[element.code] = element
+                            }
+                        }
+                    }
+                }
+                $scope.thisEffectsCount = Object.keys($scope.thisEffects).length
+
 
             }
 

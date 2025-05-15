@@ -156,12 +156,13 @@
                       </tr>
                   </table>
 
-                  <div class="pull-right"><strong>Current map:</strong> {{fullSelectedCM.title}}</div>
+                  <div><strong>Current map:</strong> {{fullSelectedCM.title}}</div>
+                  <br/>
 
                   <button class="btn-primary btn" ng-click="resetUI()">Reset</button>
 
 
-                  <button class="btn-primary btn" ng-click="viewConceptMap()">View Map</button>
+                  <button class="btn-primary btn pull-right" ng-click="viewConceptMap()">View Map</button>
 
 
 
@@ -189,6 +190,31 @@
                           <div ng-controller="stagingCtrl">
                               <ng-include src = "'./includes/staging.html'"></ng-include>
                           </div>
+                      </uib-tab>
+                      <uib-tab heading="Data">
+                          <em>Current values for properties</em>
+                          <table class="table-bordered table">
+                              <tr><th>Property</th><th>Property code</th><th>Result code</th><th>Result display</th>
+                                  <th>Result system</th></tr>
+                              <tr ng-repeat="(k,v) in local.cmPropertyValue">
+                                  <td>{{k}}</td>
+                                  <td>
+                                      <div class="clickable" ng-click="lookup(cmSvc.getConceptFromProperty(k).code)">
+                                          {{cmSvc.getConceptFromProperty(k).code}}
+                                      </div>
+
+                                  </td>
+                                  <td>
+                                      <div class="clickable" ng-click="lookup(v.code,v.system)">
+                                          {{v.code}}
+                                      </div>
+
+
+                                  </td>
+                                  <td>{{v.display}}</td>
+                                  <td>{{v.system}}</td>
+                              </tr>
+                          </table>
                       </uib-tab>
                       <uib-tab heading="Debug">
                           <h3>{{local.uiTitle}}</h3>

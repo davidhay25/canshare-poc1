@@ -29,12 +29,12 @@ angular.module("pocApp")
             //prefixedValue will be the calculated value from the CM
             //todo - replace with data from config... - add the base proprty to the config
             $scope.TNMhash = {}
-            $scope.TNMhash.ct = {display:'cT',baseProperty:'cT',propName:"ct-category-prefix-free"} //,prefixedProperty:'cT'}
-            $scope.TNMhash.cn = {display:'cN',baseProperty:'cN',propName:"cn-category-prefix-free"} //,prefixedProperty:'cN'}
-            $scope.TNMhash.cm = {display:'cM',baseProperty:'cM',propName:"cm-category-prefix-free"} //,prefixedProperty:'cM'}
-            $scope.TNMhash.pt = {display:'pT',baseProperty:'pT',propName:"pt-category-prefix-free"} //,prefixedProperty:'pT'}
-            $scope.TNMhash.pn = {display:'pN',baseProperty:'pN',propName:"pn-category-prefix-free"} //,prefixedProperty:'pN'}
-            $scope.TNMhash.pm = {display:'pM',baseProperty:'pM',propName:"pm-category-prefix-free"} //,prefixedProperty:'pM'}
+            $scope.TNMhash.ct = {display:'cT',baseProperty:'cT',propName:"ct-category-prefix-free"}
+            $scope.TNMhash.cn = {display:'cN',baseProperty:'cN',propName:"cn-category-prefix-free"}
+            $scope.TNMhash.cm = {display:'cM',baseProperty:'cM',propName:"cm-category-prefix-free"}
+            $scope.TNMhash.pt = {display:'pT',baseProperty:'pT',propName:"pt-category-prefix-free"}
+            $scope.TNMhash.pn = {display:'pN',baseProperty:'pN',propName:"pn-category-prefix-free"}
+            $scope.TNMhash.pm = {display:'pM',baseProperty:'pM',propName:"pm-category-prefix-free"}
 
 
             //get the  code from the config file. We have the tnm stuff in a searate object
@@ -76,9 +76,37 @@ angular.module("pocApp")
                     $scope.processTNMSelect(key,value)
 
                 }
-                
+
             }
 
+
+            function updateSpecificStaging(stageGroup) {
+                for (const key of Object.keys($scope.stagingProperties)) {
+                    let property = $scope.stagingProperties[key]
+                    property.options = property.options || []
+
+
+                    if (property[stageGroup]) {
+                        //this is a property that sits at the top of the staging. system, type & table at present
+                        let code = property.concept.code    //the snomed code for this element
+                        let cmElement = cmSvc.getElementByCode($scope.fullSelectedCM,code)    //get the element
+                        if (cmElement && cmElement.code) {
+                            let vo = cmSvc.rulesEngine($scope.local.cmPropertyValue,cmElement,$scope.hashExpandedVs)
+                            let concepts = cmSvc.getConceptsFromTarget(vo.lstMatchingTargets,$scope.hashExpandedVs)
+
+                            property.options = concepts
+
+                            $scope.local.cmPropertyValue[key] = property.options[0]
+
+                            // console.log(vo,concepts)
+                        } else {
+                            console.error(`Code ${code} has no associated element`)
+                        }
+                    }
+                }
+
+
+            }
 
 
             //When the 'diagnostic' side has finished processing, this calls the staging
@@ -92,6 +120,11 @@ angular.module("pocApp")
 
                 console.log( $scope.local.cmPropertyValue)
 
+                //note that the staging1 propertien only change when the 'diagnostic' properties change
+
+                updateSpecificStaging('staging1')
+
+                /*
                 for (const key of Object.keys($scope.stagingProperties)) {
                     let property = $scope.stagingProperties[key]
                     property.options = property.options || []
@@ -112,14 +145,15 @@ angular.module("pocApp")
                         } else {
                             console.error(`Code ${code} has no associated element`)
                         }
-
                     }
                 }
+
+                */
                 $scope.updateStaging()
             });
 
             //called when the prefix free version of tnm is called. Separate (for now) as
-            //we need to process the prefixed version
+            //we need to process the prefixed version. processes a single TNM
             $scope.processTNMSelect = function (k,v) {
                 console.log(k,v)
 
@@ -129,6 +163,7 @@ angular.module("pocApp")
                 $scope.local.cmPropertyValue[`${k}-category-prefix-free`] = $scope.local.cmPropertyValue[k]
 
                 //set the staging type to clinical ? todo add to TNMHash (possibly in cmConfig originally
+                //could look at the first letter - 'c' = clinicap, 'p' - pathological
                 $scope.local.cmPropertyValue["cancer-staging-type"] = {code:"80631005"}
 
                 //the code for prefixed property - eg rct. We use it to get the element in the CT that defines this property
@@ -162,14 +197,16 @@ angular.module("pocApp")
 
                         value.options = concepts
                         $scope.local.cmPropertyValue[key] = value.options[0]
-
-                         //console.log(vo,concepts)
+                        $scope.processTNMSelect(key,value)      //update the prefixed displays
                     } else {
                         console.error(`Code ${code} has no associated element`)
                     }
 
                 }
 
+
+                //now update the 'staging3 controls
+                updateSpecificStaging('staging3')
 
             }
 

@@ -138,12 +138,21 @@
             "UI": "Staging System"
         },
         "cancer-staging-type" : {
-            "staging1": true,
+            "staging1": false,
             "concept": {
                 "code": "361501000210102"
             },
-            "UI": "Staging Type"
+            "UI": "Staging Type",
+            "note" : "disabled"
         },
+        "cancer-staging-table" : {
+            "staging1": true,
+            "concept": {
+                "code": "507281000210100"
+            },
+            "UI": "Staging Table"
+        },
+
 
         "ct-category-prefix-free" : {
             "staging2": true,
@@ -195,10 +204,6 @@
         },
 
 
-
-
-
-
         "histologic-grade" : {
             "staging3": true,
             "concept": {
@@ -216,7 +221,7 @@
         },"er-tumour-status" : {
             "staging3": true,
             "concept": {
-                "code": "4450280080"
+                "code": "445028008"
             },
             "UI": "ER tumour status"
         },"pr-tumour-status" : {
@@ -231,6 +236,19 @@
                 "code": "476171000210109"
             },
             "UI": "HER2 tumour status"
+        },"stage-clinical" : {
+            "staging3": true,
+            "concept": {
+                "code": "399537006"
+            },
+            "UI": "Clinical Stage"
+        },
+        "stage-pathological" : {
+            "staging3": true,
+            "concept": {
+                "code": "399588009"
+            },
+            "UI": "Pathological stage"
         }
     }
 

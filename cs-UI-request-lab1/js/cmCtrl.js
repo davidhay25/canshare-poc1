@@ -4,6 +4,7 @@ angular.module("pocApp")
 
             $scope.local = {cmOptions : {},cm:{property:{}}}
             $scope.default = {}
+            $scope.cmSvc = cmSvc
 
             let nzDisplayLanguage = "en-x-sctlang-23162100-0210105"
 
@@ -651,6 +652,10 @@ angular.module("pocApp")
                 // This variable is then used by $scope.applyReverse()
                 delete $scope.reverseLookup
                 //the concept code is needed for the lookup.
+                if (! $scope.cmProperties[propKey]) {
+                    console.error(`There is no current value for ${propKey}`)
+                    return
+                }
                 let elementCode = $scope.cmProperties[propKey].concept
 
                 //locate the cm.element for that property / code

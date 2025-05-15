@@ -97,7 +97,7 @@
           <div class="col-md-10">
             <div>
               <select class="form-control" ng-model="local.cmPropertyValue[k]"
-                      ng-change="uiValueSelected(k,local.cmPropertyValue[k])"
+
                       ng-options="v.display for (k,v) in v.options">
 
               </select>

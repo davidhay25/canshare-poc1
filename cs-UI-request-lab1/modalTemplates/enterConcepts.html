@@ -34,11 +34,19 @@
   </div>
   <div class="modal-body">
 
+    <div class="row">
+      <div class="col-md-2">
+        CodeSystem Url:
+      </div>
+      <div class="col-md-10">
+        <input type="text" placeHolder = "Enter CodeSystem Url" class="form-control" autofocus
+               ng-model="url"/>
+      </div>
+    </div>
+    <br/>
 
 
-    <input type="text" placeHolder = "Enter CodeSystem Url" class="form-control" autofocus
-           ng-change = filterList(filter)
-           ng-model="url"/>
+
 
     <div class="row">
       <div class="col-md-6">
@@ -47,11 +55,16 @@
       <div class="col-md-6">
 
 
-        <div class="clickable pull-right" ng-click="parseConceptList(input.pastedCodes)">Parse</div>
+        <div class="clickable pull-right"
+             ng-if = "url"
+             ng-click="parseConceptList(input.pastedCodes)">Parse</div>
         <br/>
 
-        <div ng-show="msg" class="alert alert-warning">
-          {{msg}}
+        <div ng-show="msg.length > 0" class="alert alert-warning">
+          <div ng-repeat="m in msg">
+            {{m}}
+          </div>
+
         </div>
 
 
@@ -74,6 +87,7 @@
     <em>Please paste in the concepts to be added to the CodeSystem. You should add these
       into a spreadsheet, then copy the cells from the Spreadsheet. The copy area should be 2 columns wide
       with the code in the first column and the display in the second.</em>
+    <div><em>If the CodeSystem does not exist or the codes are not in the CodeSystem then they won't be added</em></div>
 
   </div>
 </div>

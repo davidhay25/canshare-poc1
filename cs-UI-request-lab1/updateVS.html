@@ -870,9 +870,10 @@
                     <em>This is the configuration used in the Dynamic UI app</em>
                     <uib-tabset>
                         <uib-tab heading="Table">
+                            <strong>Diagnostic properties</strong>
                             <table class="table-bordered table">
                                 <tr><th>Property</th><th>Code</th><th>UI display</th><th>Next property</th><th>Previous property</th><th>Full VS</th></tr>
-                                <tr ng-repeat = "(k,v) in cmConfig">
+                                <tr ng-repeat = "(k,v) in cmConfig.diagnosticProperties">
                                     <td>{{k}}</td>
                                     <td>{{v.concept.code}}</td>
                                     <td>{{v.UI}}</td>
@@ -886,6 +887,24 @@
                                 </tr>
                             </table>
 
+                            <strong>Staging properties</strong>
+                            <table class="table-bordered table">
+                                <tr><th>Property</th><th>Group</th><th>Code</th><th>UI display</th></tr>
+                                <tr ng-repeat = "(k,v) in cmConfig.stagingProperties">
+                                    <td>{{k}}</td>
+                                    <td>
+                                        <div ng-if="v.staging1">Section 1</div>
+                                        <div ng-if="v.staging2">Section 2</div>
+                                    </td>
+                                    <td>{{v.concept.code}}</td>
+
+                                    <td>{{v.UI}}</td>
+
+
+
+
+                                </tr>
+                            </table>
 
                         </uib-tab>
                         <uib-tab heading="Json">

@@ -118,6 +118,12 @@
 
 }
 
+.myScrollSmallest {
+    height: 400px;
+    overflow-y: scroll;
+
+}
+
 .custom-textarea {
     width: 100%;
     min-height: 100px;

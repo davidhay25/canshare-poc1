@@ -54,7 +54,7 @@ angular.module("pocApp")
             $scope.parseConceptList = function (file) {
                 $scope.concepts = []
 
-                $scope.msg = ""
+                $scope.msg = []
                 let missing = 0
                 let dups = []
                 let added = 0
@@ -80,7 +80,7 @@ angular.module("pocApp")
                                     function (data) {
                                         $scope.concepts.push(concept)
                                     }, function (err) {
-                                        $scope.msg += `${concept.code} ${$scope.url} not found on the Terminology server.`
+                                        $scope.msg.push(`Code: ${concept.code}  not in this CodeSystem.`)
                                     }
                                 )
                             }
@@ -92,24 +92,24 @@ angular.module("pocApp")
 
                     } else {
                         missing++
-                        //msg = "There were lines where either the code or the display was missing. "
+
                     }
                     console.log(ar)
                 }
 
                 if (missing > 0) {
-                    $scope.msg += `There were ${missing} lines missing the code or display. `
+                    $scope.msg.push(`There were ${missing} lines missing the code or display. `)
                 }
 
                 if (dups.length > 0) {
-                    $scope.msg += "The following codes already exist and were not added: "
+                    $scope.msg.push("The following codes already exist and were not added: ")
                     for (const code of dups) {
-                        $scope.msg += code + " "
+                        $scope.msg.push(code)
                     }
                 }
 
                 if (added > 0 ) {
-                    $scope.msg += `There were ${added} codes added.`
+                    $scope.msg.push(`There were ${added} codes added.`)
                 }
 
 

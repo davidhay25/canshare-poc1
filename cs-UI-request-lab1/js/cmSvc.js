@@ -322,7 +322,29 @@ angular.module("pocApp")
                 }
 
             },
+            getPropKeyFromCode : function (code) {
+                //given a snomed code, what's the propKey?
+                for (const key of ['stagingProperties','diagnosticProperties']) {
+                    let branch = cmConfig[key]
+                    let propKey = lookInBranch(branch,code)
+                    if (propKey) {
+                        return propKey
+                        break
+                    }
+                }
 
+                function lookInBranch(branch,code) {
+                    for (const [key, value] of Object.entries(branch)) {
+                        if (value.concept.code == code) {
+                            return key
+                            break
+                        }
+                    }
+
+                }
+
+
+            },
             getElementByCode : function (cm,code) {
                 //return the ConceptMap.group[0].element with the matching code
                 let element

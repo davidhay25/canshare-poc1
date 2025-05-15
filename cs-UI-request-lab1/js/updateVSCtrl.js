@@ -1176,7 +1176,23 @@ angular.module("pocApp")
                     //return an array of concepts
                     if (concepts.length > 0) {
                         //add to the specific list - unpublished, other, display
+                        //create new ar with concepts from modal ovewriting existing ones (so display can change)
+
                         arConcepts = arConcepts || []
+                        let newList = arConcepts
+
+                        /*
+
+                        const people = [
+  { name: 'Alice', age: 30 },
+  { name: 'Bob', age: 25 }
+];
+
+const hasBob = people.some(p => p.name === 'Bob'); // true
+
+                         */
+
+
                         arConcepts.push(...concepts)
 
                         if (system == systemPrePub) {
