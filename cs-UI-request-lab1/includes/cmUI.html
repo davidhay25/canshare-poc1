@@ -26,8 +26,8 @@
             </a>
         </div>
         <div class="alert alert-info">
-            This tab contains functions that display the contents of the ConceptMap that represent the
-            selection of specific properties for ACT-NOW data
+            This tab represents a Pathologist report on a specimen
+
         </div>
     </div>
 
@@ -37,10 +37,26 @@
     </div>
 -->
 
-    <div class="row" style="padding-top: 8px">
-        <div class="col-md-7">
+    <div class="row rounded-box" style="padding-top: 8px; background-color: #faf2cc">
+        <div class="col-md-1">
+            <div style="padding-top: 8px">Patient</div>
+        </div>
+        <div class="col-md-5">
+            <select class="form-control" ng-model="xxx">
+                <option>27yr Male, No past Hx</option>
+                <option>40yr Female</option>
+            </select>
+        </div>
+
+
+
+        <div class="col-md-1">
+            <div style="padding-top: 8px">ConceptMap</div>
 
         </div>
+
+
+
         <div  class="col-md-4">
             <select class="form-control" ng-model="input.selectCMControl"
                     ng-options="id for id in allCM"></select>
@@ -54,26 +70,9 @@
 
     </div>
 
-
-    <!--
-<br/>
-    <div class="pull-right">
-        <button class="btn btn-link" ng-click="refreshCache()"
-                uib-popover="Last updated: {{cacheDate | date : 'MMM dd  HH:mm:ss'}}"
-                popover-placement="left"
-                popover-trigger="'mouseenter'">Refresh cache</button>
-
-        <img ng-show="showWaiting || refreshingCache || loadingCM" src="css/ajax_loader_blue_32.gif"/>
-    </div>
-
-    <div class="pull-right">
-        <div class="btn btn-link pull-right" ng-click="selectDev()">Switch to development version</div>
-    </div>
+    <hr/>
 
 
-    <br/>
-
--->
 
     <div ng-show="loadingCM">
         The ConceptMap is loading. Please wait.
@@ -87,6 +86,11 @@
         faster to load next time.
 
     </div>
+
+
+
+
+    
 
   <uib-tabset active="local.conceptMapTab" ng-hide="loadingCM">
 
