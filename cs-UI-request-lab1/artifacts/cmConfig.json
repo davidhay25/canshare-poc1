@@ -46,7 +46,7 @@
             ]
         },
         "cancer-service": {
-
+            "docSection": "dx",
             "concept": {
                 "code": "299801000210106"
             },
@@ -57,7 +57,7 @@
             "fullVS": "canshare-cancer-service"
         },
         "cancer-stream": {
-
+            "docSection": "dx",
             "concept": {
                 "code": "299811000210108",
                 "display": "Cancer Stream",
@@ -70,9 +70,11 @@
             "fullVS": "canshare-cancer-stream"
         },
         "cancer-substream": {
-
+            "docSection": "dx",
             "concept": {
-                "code": "299821000210103"
+                "code": "299821000210103",
+                "display": "Cancer Sub Stream",
+                "system": "http://snomed.info/sct"
             },
             "UI": "Cancer Substream",
             "next": "cancer-type",
@@ -81,10 +83,12 @@
             "fullVS": "canshare-cancer-substream"
         },
         "cancer-type": {
-
+            "docSection": "dx",
 
             "concept": {
-                "code": "299831000210101"
+                "code": "299831000210101",
+                "display": "Cancer Type",
+                "system": "http://snomed.info/sct"
             },
             "UI": "Cancer Type",
             "next": "primary-site",
@@ -93,10 +97,12 @@
             "fullVS": "canshare-cancer-type"
         },
         "primary-site": {
-
+            "docSection": "dx",
 
             "concept": {
-                "code": "399687005"
+                "code": "399687005",
+                "display": "Primary site",
+                "system": "http://snomed.info/sct"
             },
             "UI": "Primary Site",
             "next": "primary-site-laterality",
@@ -105,9 +111,11 @@
             "fullVS": "canshare-primary-topography"
         },
         "primary-site-laterality": {
-
+            "docSection": "dx",
             "concept": {
-                "code": "297561000210100"
+                "code": "297561000210100",
+                "display": "Laterality",
+                "system": "http://snomed.info/sct"
             },
             "UI": "Laterality or Side",
             "next": "histologic-type-primary",
@@ -116,10 +124,12 @@
             "fullVS": "canshare-laterality"
         },
         "histologic-type-primary": {
-
+            "docSection": "dx",
 
             "concept": {
-                "code": "512001000004108"
+                "code": "512001000004108",
+                "display": "Primary histology",
+                "system": "http://snomed.info/sct"
             },
             "options": [],
             "fullVS": "canshare-who-histology",
@@ -161,7 +171,6 @@
             },
             "UI": "cT category (prefix free)"
         },
-
 
         "cn-category-prefix-free" : {
             "staging2": true,
@@ -219,24 +228,30 @@
             "UI": "Grading system",
             "note" : "Not used at present"
         },"er-tumour-status" : {
+            "docSection": "ancillary",
             "hideIfNoOptions" : true,
             "staging3": true,
             "concept": {
-                "code": "445028008"
+                "code": "445028008",
+                "display" : "er-tumour-status"
             },
             "UI": "ER tumour status"
         },"pr-tumour-status" : {
+            "docSection": "ancillary",
             "hideIfNoOptions" : true,
             "staging3": true,
             "concept": {
-                "code": "445029000"
+                "code": "445029000",
+                "display": "pr-tumour-status"
             },
             "UI": "PR tumour status"
         },"her2-tumour-status" : {
+            "docSection": "ancillary",
             "hideIfNoOptions" : true,
             "staging3": true,
             "concept": {
-                "code": "476171000210109"
+                "code": "476171000210109",
+                "display": "her2-tumour-status"
             },
             "UI": "HER2 tumour status"
         },"stage-clinical" : {
@@ -253,6 +268,11 @@
             },
             "UI": "Pathological stage"
         }
-    }
+    },
+    "sections" : [
+        {"key": "dx","title": "Diagnostic"},
+        {"key": "tnm","title": "TNM Stage"},
+        {"key": "ancillary","title": "Ancillary studies"}
+    ]
 
 }

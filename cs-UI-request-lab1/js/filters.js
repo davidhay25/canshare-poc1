@@ -1,6 +1,35 @@
 angular.module("pocApp")
 
 
+    .filter('objectToArrayDEP', function() {
+        return function(input, key) {
+            return function(obj, sortProp) {
+                if (!angular.isObject(obj)) return [];
+
+                // Convert object values into a new array (don't mutate originals)
+                const valuesArray = Object.keys(obj).map(function(key) {
+                    return angular.extend({}, obj[key], { _key: key }); // optional: preserve key
+                });
+
+                // Sort by the specified property
+                return valuesArray.sort(function(a, b) {
+                    const valA = a[sortProp];
+                    const valB = b[sortProp];
+
+                    if (valA == null) return 1;
+                    if (valB == null) return -1;
+
+                    if (typeof valA === 'string' && typeof valB === 'string') {
+                        return valA.localeCompare(valB);
+                    }
+
+                    return valA > valB ? 1 : valA < valB ? -1 : 0;
+                });
+            };
+        }
+    })
+
+
 
     .filter('lastInUUID',function(){
         //return the last segment in a uuid

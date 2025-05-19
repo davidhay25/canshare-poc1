@@ -305,6 +305,43 @@ angular.module("pocApp")
                 )
             }
 
+
+            $scope.copyObjectToClipboard = function(obj) {
+                let text = angular.toJson(obj,true)
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(function() {
+                        alert('Copied to clipboard successfully!');
+                    }, function(err) {
+                        alert('Failed to copy: ', err);
+                    });
+                }
+
+                return
+
+
+                let textArea = document.createElement("textarea");
+                textArea.value = text;
+
+                // Avoid scrolling to bottom
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.position = "fixed";
+
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    let successful = document.execCommand('copy');
+                    let msg = successful ? 'successful' : 'unsuccessful';
+                    console.log('Fallback: Copying text command was ' + msg);
+                } catch (err) {
+                    alert('Fallback: Oops, unable to copy', err);
+                }
+
+                document.body.removeChild(textArea);
+            }
+
             //============ deprecated
 
             function setServerDEP() {

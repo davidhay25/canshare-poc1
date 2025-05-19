@@ -176,7 +176,7 @@ angular.module("pocApp")
                 let currentValue = $scope.local.cmPropertyValue[propName]
 
                 let vsUrl = `${vsPrefix}${$scope.cmProperties[propName].fullVS}`
-                console.log(vsUrl,$scope.hashExpandedVs[vsUrl])
+                //console.log(vsUrl,$scope.hashExpandedVs[vsUrl])
                 let options = $scope.hashExpandedVs[vsUrl]
                 $scope.cmProperties[propName].options = angular.copy(options)
 
@@ -1296,7 +1296,7 @@ angular.module("pocApp")
             $scope.viewConceptMap = function (property) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/cmViewer.html',
-                    backdrop: 'static',
+                    //backdrop: 'static',
                     size: 'xlg',
                     controller: 'cmViewerCtrl',
 
@@ -1308,6 +1308,8 @@ angular.module("pocApp")
                             return $scope.hashExpandedVs
                         }, selectedProperty : function () {
                             return property
+                        }, data : function() {
+                            return $scope.local.cmPropertyValue
                         }
                     }
 

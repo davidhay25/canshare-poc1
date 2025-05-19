@@ -81,7 +81,10 @@ angular.module("pocApp")
                             return null
                         }, selectedProperty : function () {
                             return ""
+                        }, data : function() {
+                            return null
                         }
+
                     }
 
                 })

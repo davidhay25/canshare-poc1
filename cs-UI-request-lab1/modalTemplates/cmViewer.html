@@ -19,7 +19,7 @@
   </div>
   <div class="modal-body">
     <uib-tabset>
-      <uib-tab heading="View">
+      <uib-tab heading="ConceptMap View">
 
         <br/>
         <!--
@@ -163,13 +163,14 @@
 
 
                       <strong>ValueSets and Concepts</strong>
-                      <div ng-repeat = "vs in matchingVS">
+                      <div ng-repeat = "vs in matchingVS track by $index">
                         <div ng-if="vs.indexOf('http') > -1"
                              class="clickable"
                              ng-click="viewVS(vs)" >{{vs}}</div>
 
                         <div ng-if="vs.indexOf('http') == -1">{{vs}}</div>
                       </div>
+
                     </div>
 
 
@@ -196,6 +197,9 @@
 
               </uib-tab>
 
+
+
+
               <uib-tab heading="Element Json">
                 <div class="myScroll">
                   <pre>{{input.cmElement | json}}</pre>
@@ -207,6 +211,28 @@
         </div>
 
       </uib-tab>
+      <uib-tab ng-if="data" heading="Current Data">
+        <table class="table-bordered table">
+          <tr><th>Property</th><th>Result display</th><th>Result code</th>
+            <th>Result system</th></tr>
+
+          <tr ng-repeat="item in sortedData">
+            <td>{{item.propKey}}</td>
+            <td>{{item.display}}</td>
+            <td>
+              <div class="clickable" ng-click="lookup(item.code,item.system)">
+                {{item.code}}
+              </div>
+
+            </td>
+
+            <td>{{item.system}}</td>
+          </tr>
+        </table>
+
+       
+      </uib-tab>
+
       <uib-tab heading="Json">
         <div class="myScroll">
           <pre>{{conceptMap | json}}</pre>

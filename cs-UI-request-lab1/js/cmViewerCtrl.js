@@ -1,7 +1,40 @@
 angular.module("pocApp")
     .controller('cmViewerCtrl',
-        function ($scope,updateVSSvc,conceptMap,$uibModal,cmSvc,hashExpandedVs,selectedProperty) {
+        function ($scope,updateVSSvc,conceptMap,$uibModal,cmSvc,hashExpandedVs,selectedProperty,data,$http) {
             $scope.input = {}
+
+            $scope.data = data
+
+            let snomed = "http://snomed.info/sct"
+
+            //create an array for the data display table
+            if (data) {
+                let lst = []
+                for (const [key, value] of Object.entries(data)) {
+                    if (value) {
+                        let item = {}
+                        item.propKey = key
+
+                        item.code = value.code
+                        item.display = value.display
+                        item.system = value.system
+
+                        lst.push(item)
+                    }
+
+
+                }
+
+                lst.sort(function (a,b) {
+                    if (a.propKey > b.propKey) {
+                        return 1
+                    } else {
+                        return -1
+                    }
+                })
+                $scope.sortedData = lst
+
+            }
 
             $scope.conceptMap = conceptMap
             $scope.updateVSSvc = updateVSSvc
@@ -99,7 +132,7 @@ angular.module("pocApp")
                 $scope.thisEffects = {}
                 for (const element of $scope.conceptMap.group[0].element || []) {
                     for (const target of element.target || []) {
-                        for (const don of target.dependsOn) {
+                        for (const don of target.dependsOn || []) {
                             if (don.property == propKey) {
                                // let el = cmSvc.getElementByCode($scope.conceptMap,code)
 
@@ -131,6 +164,45 @@ angular.module("pocApp")
 
                 })
             }
+
+            $scope.lookup = function (code,system) {
+                system = system || snomed
+                let qry = `CodeSystem/$lookup?system=${system}&code=${code}`
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+
+                        $uibModal.open({
+                            templateUrl: 'modalTemplates/showParameters.html',
+                            //backdrop: 'static',
+                            //size : 'lg',
+                            controller : "showParametersCtrl",
+                            resolve: {
+                                parameters: function () {
+                                    return data.data
+                                },
+                                title : function () {
+                                    return `Concept lookup (${code})`
+                                },
+                                code: function () {
+                                    return code
+                                },
+                                system : function () {
+                                    return system
+                                }
+                            }
+                        })
+
+
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                ).finally(function () {
+                    $scope.showWaiting = false
+                })
+            }
+
 
 
         }

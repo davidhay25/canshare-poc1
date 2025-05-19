@@ -1,9 +1,10 @@
 angular.module("pocApp")
 
-    .service('cmSvc', function($q,$http) {
+    .service('cmSvc', function($q,$http,utilsSvc) {
 
         let config= {}
         let cmConfig = {}
+
 
 
         return {
@@ -322,6 +323,177 @@ angular.module("pocApp")
                 }
 
             },
+            makeDocument : function (inHashValues,inTnmHash, inTnmValues) {
+
+                let hashValues = angular.copy(inHashValues)
+                let tnmHash = angular.copy(inTnmHash)
+                let tnmValues = angular.copy(inTnmValues)
+
+                //construct a document bundle from the entered data
+                //hashValues = $scope.local.cmPropertyValue from controller
+                let that = this
+                let bundle = {resourceType:"Bundle",type:'document',entry:[]}
+                bundle.timestamp = new Date().toISOString()
+                bundle.identifier = {system:"http://canshare.co/nz/NamingSystem/Assessments",value:"test"}
+                let patient = {resourceType:"Patient",id:utilsSvc.getUUID(),name:[{text:"Test patient"}]}
+                setText(patient,"Patient")  //todo - replace with real text
+                //obs.setText("Observation")  //todo - replace with real text
+                let practitioner  = {resourceType:"Practitioner",id:utilsSvc.getUUID(),name:[{text:"Test practitioner"}]}
+                setText(practitioner,"Practitioner")  //todo - replace with real text
+                let comp = {resourceType:"Composition",id:utilsSvc.getUUID()}
+                setText(comp,"Composition text here")  //todo - replace with real text
+                comp.status = 'preliminary'
+                comp.type = {coding:[{code:'11526-1',display:'Pathology study',system:'http://loinc.org'}]}
+                comp.date = new Date().toISOString()
+                comp.title = "Cancer assessment report"
+                comp.subject = {reference:`urn:uuid:${patient.id}`}
+                comp.author = [{reference:`urn:uuid:${practitioner.id}`}]
+                comp.section = []
+                let localDisplay = []   //to show a simplified report for in-app display
+
+                bundle.entry.push({fullUrl:`urn:uuid:${comp.id}`, resource:comp})
+
+                bundle.entry.push({fullUrl:`urn:uuid:${patient.id}`, resource:patient})
+                bundle.entry.push({fullUrl:`urn:uuid:${practitioner.id}`, resource:practitioner})
+
+                let hashSections = {}
+                for (const sect of cmConfig.sections) {
+                    //sect has key, title
+                    let sectionKey = sect.key
+                    let sectionTitle = sect.title
+                    let arText = []     //will be all the display, value of matching properties for the section.text
+
+                    let compSection = angular.copy(sect)      //this will be the section in the composition
+                    delete compSection.key    //key is used by properties to indicate which section they are in
+                    //compSection.entry = []
+                    comp.section.push(compSection)
+                    hashSections[sect.key] = compSection
+
+
+                    if (sectionKey == 'tnm') {
+                        //TNM are processed separately as they depend on the prefix...
+                        tnmStaging(compSection,bundle,hashValues,tnmHash,arText,tnmValues)
+                    } else {
+                        //the values of all properties configured to this section
+                        let ar = getPropertyValue(sectionKey,hashValues)
+
+                        for (const vo of ar) {
+                            let obs = {resourceType:"Observation",id:utilsSvc.getUUID()}
+                            setText(obs,"Observation")  //todo - replace with real text
+                            obs.status = "final"
+                            obs.effectiveDateTime = new Date().toISOString()
+                            let concept = that.getConceptFromProperty(vo.propKey)
+                            concept.system = "http://snomed.info/ct"
+                            obs.code = {coding:[concept]}
+                            //obs.code = that.getConceptFromProperty(vo.propKey)
+                            obs.subject = ({reference:`urn:uuid:${patient.id}`})
+                            obs.performer = [{reference:`urn:uuid:${practitioner.id}`}]
+                            obs.valueCodeableConcept = {coding:[vo.value]}
+                            bundle.entry.push({fullUrl:`urn:uuid:${obs.id}`, resource:obs})
+                           // bundle.entry.push(obs)
+                            compSection.entry = compSection.entry || []
+                            compSection.entry.push({reference:`urn:uuid:${obs.id}`})
+
+                            let display = vo.definition.UI //obs.code.coding[0].display
+                            arText.push({display:display,value:obs.valueCodeableConcept.coding[0].display})
+
+                        }
+                    }
+
+
+
+                    //now construct the section text as a list
+                    //todo ? should add this to the composition.text as well?
+                    let text = "<div xmlns='http://www.w3.org/1999/xhtml'><table>"
+                    for (const item of arText) {
+                        text += `<tr><td>${item.display}</td><td>${item.value}</td></tr>`
+                    }
+                    text += "</table></div>"
+                    compSection.text = {div:text}
+                    compSection.text.status = "generated"
+                    //the local display array
+                    localDisplay.push({sectionKey:sectionKey,  sectionTitle: sectionTitle,summary:arText})
+
+                    //"div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">text</div>"
+
+                }
+
+
+
+                return {bundle:bundle,comp:comp,localDisplay:localDisplay}
+
+                //get all the property values for properties that are marked as being in this section of the document
+                function getPropertyValue(sectionKey,hashValues) {
+                    let ar = []
+                    for (const [propKey,definition] of Object.entries(cmConfig.stagingProperties)) {
+                        if (definition.docSection == sectionKey) {
+                            //this propertu belongs to this section. Is there a value?
+                            if (hashValues[propKey]) {
+                                ar.push({"propKey":propKey,"definition":definition,value:hashValues[propKey]})
+                            }
+                        }
+
+                    }
+                    for (const [propKey,definition] of Object.entries(cmConfig.diagnosticProperties)) {
+                        if (definition.docSection == sectionKey) {
+                            //this propertu belongs to this section. Is there a value?
+                            if (hashValues[propKey]) {
+                                ar.push({"propKey":propKey,"definition":definition,value:hashValues[propKey]})
+                            }
+                        }
+
+                    }
+
+                    return ar
+                }
+
+                //TNM staging info is not stored in the config but are fixed.
+                //The actual TNM values depend on the cancer-staging-prefix property - no prefix, Y or R
+                //todo magic numbers
+                function tnmStaging(compSection,bundle,hashValues,tnmHash,arText,tnmValues) {
+
+                    //tnm.prefixedPropertyCode is the code for the specific (incl. prefix)
+                    //tnm.currentValue is the currently selected value
+
+                    for ([k,v] of Object.entries(tnmHash)) {
+
+                        let concept = tnmValues[k]  //current value (if any)
+                        if (concept && concept.code) {
+                            // if (v.currentValue) {
+                            let obs = {resourceType:"Observation",id:utilsSvc.getUUID()}
+                            //let text = `${v.prefixedProperty}:${v.currentValue.display}`
+                            //let text = `${k}:${concept.display}`
+                            let text = `${v.display}:${concept.display}`
+
+                            setText(obs,text)
+                            obs.status = "final"
+                            obs.effectiveDateTime = new Date().toISOString()
+                            obs.subject = ({reference:`urn:uuid:${patient.id}`})
+                            obs.performer = [{reference:`urn:uuid:${practitioner.id}`}]
+                            obs.code = {coding:[v.concept]}
+
+                            //obs.valueCodeableConcept = {coding:[v.currentValue]}
+                            obs.valueCodeableConcept = {coding:[concept]}
+                            //bundle.entry.push(obs)
+                            bundle.entry.push({fullUrl:`urn:uuid:${obs.id}`, resource:obs})
+                            compSection.entry = compSection.entry || []
+                            compSection.entry.push({reference:`urn:uuid:${obs.id}`})
+                            arText.push({display:v.display,value:obs.valueCodeableConcept.coding[0].display})
+                        }
+                    }
+
+                }
+
+                function setText(resource,str) {
+                    let text = `<div xmlns='http://www.w3.org/1999/xhtml'>${str}</div>`
+
+                    resource.text = {div:text}
+                    resource.text.status = "generated"
+
+                }
+
+
+            },
             getPropKeyFromCode : function (code) {
                 //given a snomed code, what's the propKey?
                 for (const key of ['stagingProperties','diagnosticProperties']) {
@@ -358,7 +530,7 @@ angular.module("pocApp")
 
             },
             getConceptsFromTarget : function (lstTarget,hashAllVS) {
-                //given a set of  targets, return all the concepts
+                //given a set of  targets, return all the concepts as an array
                 let concepts = []
                 for (const target of lstTarget) {
                     if (target.code.indexOf('http') > -1) {
@@ -369,7 +541,8 @@ angular.module("pocApp")
                             console.log(`Url ${target.code} not found in ValueSet list`)
                         }
                     } else {
-                        concepts.push({code:target.code})
+                        //concepts.push({code:target.code})
+                        concepts.push(target)
                     }
                 }
                 return concepts
