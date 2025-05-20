@@ -6,6 +6,13 @@ angular.module("pocApp")
 
             $scope.ccDirty = false
 
+            $scope.deleteAll = function () {
+                if (confirm("Are you sure you wish to remove all the concepts in this CodeSystem?")) {
+                    $scope.model.concepts = []
+                    $scope.generateResources()
+                }
+            }
+
             $scope.addCustomConcept = function () {
                 let concept = {code:$scope.input.newCode,display:$scope.input.newDisplay}
                 $scope.model.concepts.push(concept)
@@ -19,11 +26,11 @@ angular.module("pocApp")
 
                 let hash={}
                 for (const concept of $scope.model.concepts) {
-                    hash[concept.code] = true
+                    hash[concept.code] = concept
                 }
                 let msg = ""
                 let missing = 0
-                let dups = []
+                let cntDups = 0         //count of duplicates
                 let added = 0
                 let arLines = file.split('\n')
                 console.log(arLines)
@@ -31,13 +38,15 @@ angular.module("pocApp")
                     let ar = lne.split('\t')
                     if (ar[0] && ar[1]) {
                         let concept = {code:ar[0],display:ar[1]}
+
                         if (hash[concept.code]) {
-                            //msg = "There were duplicate codes not added"
-                            dups.push(concept.code)
+                            cntDups++
                             added++
                         } else {
                             $scope.model.concepts.push(concept)
+                            added++
                         }
+                        hash[concept.code] = concept
 
 
                     } else {
@@ -47,19 +56,25 @@ angular.module("pocApp")
                     console.log(ar)
                 }
 
+                //now re-create the list of concepts from the hash
+                $scope.model.concepts = []
+                for (const [key,value] of Object.entries(hash)) {
+                    $scope.model.concepts.push(value)
+                }
+
+
+
                 if (missing > 0) {
                     msg = `There were ${missing} lines missing the code or display. `
                 }
 
-                if (dups.length > 0) {
-                    msg += "The following codes already exist and were not added: "
-                    for (const code of dups) {
-                        msg += code + " "
-                    }
+                if (cntDups > 0) {
+                    msg += `There were ${cntDups} that already existed and were replaced. `
+
                 }
 
                 if (added > 0 ) {
-                    msg += `There were ${added} codes added.`
+                    msg += `In total there were ${added-cntDups} new codes added.`
                 }
 
                 if (msg) {

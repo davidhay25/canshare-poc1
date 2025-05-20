@@ -541,8 +541,9 @@ angular.module("pocApp")
                             console.log(`Url ${target.code} not found in ValueSet list`)
                         }
                     } else {
-                        //concepts.push({code:target.code})
-                        concepts.push(target)
+
+                        concepts.push({code:target.code, display:target.display, system:"http://snomed.info/ct"})
+                        //concepts.push(target)
                     }
                 }
                 return concepts

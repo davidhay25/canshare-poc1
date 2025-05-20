@@ -1184,17 +1184,6 @@ angular.module("pocApp")
                         arConcepts = arConcepts || []
                         let newList = arConcepts
 
-                        /*
-
-                        const people = [
-  { name: 'Alice', age: 30 },
-  { name: 'Bob', age: 25 }
-];
-
-const hasBob = people.some(p => p.name === 'Bob'); // true
-
-                         */
-
 
                         arConcepts.push(...concepts)
 

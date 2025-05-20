@@ -117,6 +117,16 @@ angular.module("pocApp")
                         }
                     }
                     $scope.hashPropertyCount = Object.keys($scope.hashProperty).length
+
+                    //Now create a var with the current values (if any)
+                    $scope.hashPropertyValue = {}
+                    for (let [key,value] of Object.entries($scope.hashProperty)) {
+                        if ($scope.data && $scope.data[key]) {
+                            $scope.hashPropertyValue[key] = $scope.data[key]
+
+                        }
+                    }
+
                 }
 
                 function addConcept(ar,code,display) {
