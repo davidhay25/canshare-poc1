@@ -134,7 +134,7 @@ function setup(app) {
     //Analyse the unpublished codes. Specifically wanting to check if there are unpublished codes in a VS
     //that have since been published. In this case the VS will need to be updated (removing the unpublished code -
     //as we assume that the VS ECL now incorporates those codes). The CodeSystem is re-built from codes that
-    //remain unpublished. This routine just perfroms the analysis and creates the updated VS / CS. It doesn't u[date the server.
+    //remain unpublished. This routine just performs the analysis and creates the updated VS / CS. It doesn't update the server.
     app.get('/analyseUnpublished',async function(req,res){
         let token = await getNZHTSAccessToken()
         if (token) {
@@ -1225,12 +1225,11 @@ function setup(app) {
     //-----------------------------------------------
 
     //general queries against the Terminology Server
-
+    //must the the last one
     app.get('/nzhts',async function(req,res){
         let query = req.query.qry
 
         let headers = req.headers
-
 
         //The instance of the TS server that will be queried
         let tsInstance = nzhtsconfig.serverBaseAuthor

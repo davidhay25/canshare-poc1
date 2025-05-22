@@ -273,13 +273,13 @@
     "gradingProperties" : {
         "grading-system" : {
             "concept": {
-                "code": "unknown"
+                "code": "384739005"
             },
             "UI": "Grading System"
         },
-        "grade" : {
+        "histologic-grade" : {
             "concept": {
-                "code": "unknown"
+                "code": "371469007"
             },
             "UI": "Grade"
         }

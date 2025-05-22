@@ -391,7 +391,12 @@
                                             </th></tr>
                                             <tr ng-repeat="concept in input.displayConcepts">
                                                 <td width="20%">
-                                                    {{concept.code}}
+
+                                                    <div  class="clickable" ng-click="lookup(concept.code,concept.system)">{{concept.code}}</div>
+
+
+
+
                                                 </td>
                                                 <td>{{concept.display}}</td>
                                                 <td width="10%"><i style="color: red" class="glyphicon glyphicon-remove clickable"
@@ -451,7 +456,8 @@
                                             </th></tr>
                                             <tr ng-repeat="concept in input.prePubConcepts">
                                                 <td width="20%">
-                                                    {{concept.code}}
+                                                    <div  class="clickable" ng-click="lookup(concept.code,'http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished')">{{concept.code}}</div>
+
                                                 </td>
                                                 <td>{{concept.display}}</td>
                                                 <td width="10%"><i style="color: red" class="glyphicon glyphicon-remove clickable"
