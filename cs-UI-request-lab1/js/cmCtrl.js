@@ -18,7 +18,7 @@ angular.module("pocApp")
 
             let snomed = "http://snomed.info/sct"
             let vsPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/"
-            $scope.loadingCM = true
+           // $scope.loadingCM = true
 
             function loadFromCache() {
                 //functions to get ConceptMap & expanded ValueSet..
@@ -1002,7 +1002,7 @@ angular.module("pocApp")
                 delete $scope.expandedCMVS
                 delete $scope.expandErrors
 
-                $scope.loadingCM = true
+                $scope.$parent.loadingCM = true
 
                 //get the map
                 querySvc.getOneConceptMap(cmId).then(
@@ -1105,6 +1105,7 @@ angular.module("pocApp")
                                     alert(err)
                                 }
                             ).finally(function () {
+                                $scope.$parent.loadingCM = false
                                 $scope.showWaiting = false
                             })
                         }
@@ -1263,7 +1264,7 @@ angular.module("pocApp")
                         let treeData = querySvc.makeTree($scope.fullSelectedCM,$scope.cmProperties)
                         showCmTree(treeData)
 
-                        $scope.loadingCM = false    //will show the UI
+                      //  $scope.loadingCM = false    //will show the UI
 
 
                     },function (err) {

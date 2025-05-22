@@ -214,6 +214,7 @@
 
 
         "histologic-grade" : {
+            "hideIfNoOptions" : true,
             "staging3": true,
             "concept": {
                 "code": "371469007"
@@ -257,16 +258,30 @@
         },"stage-clinical" : {
             "staging3": true,
             "concept": {
-                "code": "399537006"
+                "code": "370761000210105"
             },
             "UI": "Clinical Stage"
         },
         "stage-pathological" : {
             "staging3": true,
             "concept": {
-                "code": "399588009"
+                "code": "405978005"
             },
             "UI": "Pathological stage"
+        }
+    },
+    "gradingProperties" : {
+        "grading-system" : {
+            "concept": {
+                "code": "unknown"
+            },
+            "UI": "Grading System"
+        },
+        "grade" : {
+            "concept": {
+                "code": "unknown"
+            },
+            "UI": "Grade"
         }
     },
     "sections" : [

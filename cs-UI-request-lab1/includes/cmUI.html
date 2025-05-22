@@ -33,14 +33,14 @@
 
 
 
-    <div class="row rounded-box" style="padding-top: 8px; background-color: #faf2cc">
+    <div class="row rounded-box" style="padding-top: 8px; background-color: lightyellow">
         <div class="col-md-1">
             <div style="padding-top: 8px">Patient</div>
         </div>
         <div class="col-md-4">
             <select class="form-control" >
-                <option selected="selected">27yr Male, No past Hx</option>
-                <option>40yr Female</option>
+                <option>27yr Male, No past Hx</option>
+                <option selected="selected">40yr Female</option>
             </select>
         </div>
 
@@ -74,15 +74,18 @@
 
 
     <div ng-show="loadingCM">
-        The ConceptMap is loading. Please wait.
-        <br/>
-        <br/>
-        Note that this can take quite a while - 20 seconds or more - when selecting a new ConceptMap as all the
-        ValueSets used by the map need to be expanded and downloaded from the Terminology Server.
-        <br/>
-        <br/>
-        Once all the ValueSets have been downloaded, they and the ConceptMap are saved in the browser cache, so it's much
-        faster to load next time.
+        <div class="alert alert-danger">
+            The ConceptMap is loading. Please wait.
+            <br/>
+            <br/>
+            Note that this can take quite a while - 20 seconds or more - when selecting a new ConceptMap as all the
+            ValueSets used by the map need to be expanded and downloaded from the Terminology Server.
+            <br/>
+            <br/>
+            Once all the ValueSets have been downloaded, they and the ConceptMap are saved in the browser cache, so it's much
+            faster to load next time.
+
+        </div>
 
     </div>
 
@@ -150,6 +153,11 @@
                         </td>
                     </tr>
                 </table>
+
+                <div ng-controller="gradingCtrl">
+                    <ng-include src = "'./includes/grading.html'"></ng-include>
+                </div>
+
 
                 <div><strong>Current map:</strong> {{fullSelectedCM.title}}</div>
                 <br/>

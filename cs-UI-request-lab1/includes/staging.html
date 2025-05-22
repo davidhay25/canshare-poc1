@@ -1,5 +1,10 @@
 <div>
 
+  <style>
+    .tnm {
+      background-color: lightyellow;
+    }
+  </style>
   <!-- staging first panel -->
   <table class="table table-bordered">
     <tr ng-repeat = "(k,v) in stagingProperties" ng-if="v.staging1">
@@ -38,22 +43,45 @@
       </td>
     </tr>
 
-    <!-- Staging prefix select-->
     <tr>
-      <td>Prefix</td>
+      <td colspan="2"></td>
+    </tr>
+
+    <!-- Staging prefix select-->
+    <tr class="tnm">
+      <td>Prefix / Suffix</td>
       <td>
+          <span class="pull-right" >
+          <checkbox ng-model="test"></checkbox> M (Multiple tumours)
+        </span>
+
         <div ng-click="selectPrefix(staging.stagingPrefix)">
-          <input type="radio" name="prefix" ng-model="staging.stagingPrefix" value=""> No prefix</input>&nbsp;&nbsp;&nbsp;
-          <input type="radio" name="prefix" ng-model="staging.stagingPrefix" value="y"> Y</input>&nbsp;&nbsp;&nbsp;
-          <input type="radio" name="prefix" ng-model="staging.stagingPrefix" value="r"> R</input>
+          <input type="radio" name="prefix" ng-model="staging.stagingPrefix" value=""
+                 style="transform: scale(1.5)"
+                 uib-popover="After diagnosis, before treatment"
+                 popover-placement="top"
+                 popover-trigger="'mouseenter'"> No prefix</input>&nbsp;&nbsp;&nbsp;
+          <input type="radio" name="prefix" ng-model="staging.stagingPrefix" value="y"
+                 style="transform: scale(1.5)"
+                 uib-popover="After therapy, before surgery"
+                 popover-placement="top"
+                 popover-trigger="'mouseenter'"> Y</input>&nbsp;&nbsp;&nbsp;
+          <input type="radio" name="prefix" ng-model="staging.stagingPrefix" value="r"
+                 style="transform: scale(1.5)"
+                 uib-popover="After recurrance"
+                 popover-placement="top"
+                 popover-trigger="'mouseenter'" > R</input>
         </div>
+
+
+
       </td>
     </tr>
 
     <!-- TNM values-->
-    <tr ng-repeat = "(k,v) in TNMhash">
+    <tr class="tnm" ng-repeat = "(k,v) in TNMhash">
       <td>
-        {{k}} category
+        {{v.display}} category
         <i class=" glyphicon glyphicon-info-sign clickable pull-right"
            ng-click="viewConceptMap(v.propName)"></i>
       </td>
@@ -86,6 +114,10 @@
           </div>
         </div>
       </td>
+    </tr>
+
+    <tr>
+      <td colspan="2"></td>
     </tr>
 
     <!-- ancillary studies values-->

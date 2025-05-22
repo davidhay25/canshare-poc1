@@ -1,0 +1,44 @@
+<table class="table table-bordered">
+    <tr ng-repeat = "(k,v) in cmConfig.gradingProperties" >
+        <td width = "30%">
+            <span >{{v.UI}}</span>
+
+            <i class=" glyphicon glyphicon-info-sign clickable pull-right"
+               ng-click="viewConceptMap(k)"></i>
+
+        </td>
+        <td>
+            <div class="row">
+                <div class="col-md-10">
+                    <div>
+
+
+                        <select class="form-control" ng-model="local.cmPropertyValue[k]"
+
+                                ng-options="v1.display for (k1,v1) in v.options">
+                        </select>
+                        <!--
+                        <div ng-show = "v.options.length > 1">
+                            <select class="form-control" ng-model="local.cmPropertyValue[k]"
+
+                                    ng-options="v1.display for (k1,v1) in v.options">
+                            </select>
+                        </div>
+
+
+                        <div ng-show = "v.options.length == 1">
+                            {{v.options[0].display}}
+                        </div>
+                        -->
+
+                    </div>
+                </div>
+                <div class="col-md-2">
+
+
+
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>

@@ -22,11 +22,7 @@
       <uib-tab heading="ConceptMap View">
 
         <br/>
-        <!--
-        <div class="banner">
-          {{conceptMap.id}}
-        </div>
-        -->
+
 
 
         <div class="row">
@@ -61,19 +57,10 @@
 
                 <div class="myScroll">
                   <table class="table-bordered table-condensed table">
-                    <tr><th>Target VS / code</th><th>Depends On elements</th></tr>
+                    <tr><th>Depends On elements</th><th>Target VS / code</th></tr>
                     <tr ng-repeat="target in input.cmElement.target">
 
-                      <td style="width: 30%">
-                        <div ng-if = "target.code.indexOf('http') > -1 " class="clickable" ng-click="viewVS(target.code)">{{target.display}}</div>
-                        <div ng-if = "target.code.indexOf('http') == -1 ">{{target.display}} ({{target.code}})</div>
 
-                        <!--
-                        <div>{{target.code | lastInUrl}}</div>
-                        -->
-                        <div ng-if="target.comment">Row: {{target.comment}}</div>
-
-                      </td>
                       <td>
                         <table class="table-bordered table-condensed table">
                           <tr><th>Property</th><th>Operator</th><th>Value</th><th>Display</th></tr>
@@ -91,6 +78,16 @@
                             <td>{{don.display}}</td>
                           </tr>
                         </table>
+
+                      </td>
+                      <td style="width: 30%">
+                        <div ng-if = "target.code.indexOf('http') > -1 " class="clickable" ng-click="viewVS(target.code)">{{target.display}}</div>
+                        <div ng-if = "target.code.indexOf('http') == -1 ">{{target.display}} ({{target.code}})</div>
+
+                        <!--
+                        <div>{{target.code | lastInUrl}}</div>
+                        -->
+                        <div ng-if="target.comment">Row: {{target.comment}}</div>
 
                       </td>
                     </tr>
@@ -232,9 +229,9 @@
             <td>{{item.system}}</td>
           </tr>
         </table>
-
+<!--
         <pre>{{data | json}}</pre>
-
+-->
       </uib-tab>
 
       <uib-tab heading="Json">
