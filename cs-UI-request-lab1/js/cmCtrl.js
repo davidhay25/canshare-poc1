@@ -783,7 +783,8 @@ angular.module("pocApp")
                                 //If there's a value, then make sure it is in the new list
                                 //otherwise remove it
                                 //todo - Wed 7 May - is this segment redundant, given the checkCurrentValue() call below?
-                                if ($scope.local.cmPropertyValue[propName]) {
+
+                                if (false && $scope.local.cmPropertyValue[propName]) {
                                     let concept = $scope.local.cmPropertyValue[propName]
                                     let ar = newList.filter(concept1 => concept1.code == concept.code )
                                     if (ar.length == 0) {
@@ -799,7 +800,8 @@ angular.module("pocApp")
 
 
                                 //Check that any current value is still in the list of options ($scope.cmProperties[propName].options)
-                                checkCurrentValue(propName,arNewOptions)
+
+                               checkCurrentValue(propName,arNewOptions)
 
                                 /*
                                 if (! $scope.local.cmPropertyValue[propName]) {
