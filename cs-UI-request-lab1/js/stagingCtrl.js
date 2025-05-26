@@ -30,14 +30,20 @@ angular.module("pocApp")
             //value will be the selected value for the base property
             //propName is the propertyname for the non-prefixed version of this property
             //prefixedValue will be the calculated value from the CM
-            //todo - replace with data from config... - add the base proprty to the config
+            //todo - add as a node to config... - add the base property to the config
             $scope.TNMhash = {}
-            $scope.TNMhash.ct = {display:'cT',baseProperty:'cT',propName:"ct-category-prefix-free"}
-            $scope.TNMhash.cn = {display:'cN',baseProperty:'cN',propName:"cn-category-prefix-free"}
-            $scope.TNMhash.cm = {display:'cM',baseProperty:'cM',propName:"cm-category-prefix-free"}
-            $scope.TNMhash.pt = {display:'pT',baseProperty:'pT',propName:"pt-category-prefix-free"}
-            $scope.TNMhash.pn = {display:'pN',baseProperty:'pN',propName:"pn-category-prefix-free"}
-            $scope.TNMhash.pm = {display:'pM',baseProperty:'pM',propName:"pm-category-prefix-free"}
+            $scope.TNMhash.ct = {display:'cT',baseProperty:'cT',propName:"ct-category-prefix-free",
+                mcodeProfile:"http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-tnm-primary-tumor-category"}
+            $scope.TNMhash.cn = {display:'cN',baseProperty:'cN',propName:"cn-category-prefix-free",
+                mcodeProfile:"http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-tnm-regional-nodes-category"}
+            $scope.TNMhash.cm = {display:'cM',baseProperty:'cM',propName:"cm-category-prefix-free",
+                mcodeProfile:"http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-tnm-distant-metastases-category"}
+            $scope.TNMhash.pt = {display:'pT',baseProperty:'pT',propName:"pt-category-prefix-free",
+                mcodeProfile:"http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-tnm-primary-tumor-category"}
+            $scope.TNMhash.pn = {display:'pN',baseProperty:'pN',propName:"pn-category-prefix-free",
+                mcodeProfile:"http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-tnm-regional-nodes-category"}
+            $scope.TNMhash.pm = {display:'pM',baseProperty:'pM',propName:"pm-category-prefix-free",
+                mcodeProfile:"http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-tnm-distant-metastases-category"}
 
 
             //get the  code from the config file after it has loaded. We have the tnm stuff in a searate object

@@ -1054,53 +1054,65 @@ function setup(app) {
             noSyndicate = true
         }
 
-        try {
 
-            let qryRC = `${csServerRoot}ConceptMap/${nameRoot}-v${version}`
-
-            if (devMode) {
-                console.log('publishRC',qryRC)
-            }
+        let token = await getNZHTSAccessToken()
 
 
-            //change the status of the RC to active.
-            let response = await axios.get(qryRC)
-            let cm = response.data      //the conceptmap
-            cm.status = "active"
-            cm.title = `Canshare select valueset map, ${domain.toUpperCase()} domain, version ${cm.version}`
+        if (token) {
+            let config = {headers: {authorization: 'Bearer ' + token}}
+            config['content-type'] = "application/fhir+json"
 
-            let result = await putResource(qryRC,cm,noSyndicate)
-            if (result) {
-                //A result is returned if there is an error
-                res.status(400).json({msg:"Unable to update release candidate status"})
+            try {
+
+                let qryRC = `${csServerRoot}ConceptMap/${nameRoot}-v${version}`
+
+                if (devMode) {
+                    console.log('publishRC', qryRC)
+                }
+
+
+                //change the status of the RC to active.
+                let response = await axios.get(qryRC,config)
+                let cm = response.data      //the conceptmap
+                cm.status = "active"
+                cm.title = `Canshare select valueset map, ${domain.toUpperCase()} domain, version ${cm.version}`
+
+                let result = await putResource(qryRC, cm, noSyndicate)
+                if (result) {
+                    //A result is returned if there is an error
+                    res.status(400).json({msg: "Unable to update release candidate status"})
+                    return
+                }
+
+                //now, save the RC as the current version
+                //version and status same as RC
+                cm.id = nameRoot
+                let identifier = {system: "http://canshare.co.nz/fhir/NamingSystem/conceptmaps"}
+                identifier.value = cm.id
+                cm.identifier = identifier
+                cm.url = `http://canshare.co.nz/fhir/ConceptMap/${nameRoot}`
+                cm.title = `Canshare select valueset map, current version`
+
+                let updateCurrent = `${csServerRoot}ConceptMap/${nameRoot}`
+                let result1 = await putResource(updateCurrent, cm, noSyndicate)
+                if (result1) {
+                    //A result is returned if there is an error
+                    res.status(400).json({msg: "Unable to update the current version"})
+                    return
+                }
+
+            } catch (ex) {
+                res.status(500).json({msg: ex.message})
                 return
             }
+            res.json({id:version})
+        } else {
+                res.status(500).json({msg:"Could not authenticate to Terminology Server"})
 
-            //now, save the RC as the current version
-            //version and status same as RC
-            cm.id = nameRoot
-            let identifier = {system:"http://canshare.co.nz/fhir/NamingSystem/conceptmaps"}
-            identifier.value = cm.id
-            cm.identifier = identifier
-            cm.url = `http://canshare.co.nz/fhir/ConceptMap/${nameRoot}`
-            cm.title = `Canshare select valueset map, current version`
-
-            let updateCurrent = `${csServerRoot}/ConceptMap/${nameRoot}`
-            let result1 = await putResource(updateCurrent,cm,noSyndicate)
-            if (result1) {
-                //A result is returned if there is an error
-                res.status(400).json({msg:"Unable to update the current version"})
-                return
-            }
-
-        } catch (ex) {
-            res.status(500).json({msg:ex.message})
-            return
         }
 
 
 
-        res.json({id:version})
 
     })
 
@@ -1119,7 +1131,7 @@ function setup(app) {
         let nameRoot = `canshare-select-${domain.toLowerCase()}-valueset-map`
 
         //retrieve the dev version
-        let qryDev = `${csServerRoot}/ConceptMap/${nameRoot}-dev`
+        let qryDev = `${csServerRoot}ConceptMap/${nameRoot}-dev`
         let noSyndicate = false
         if (devMode) {
             noSyndicate = true
@@ -1137,8 +1149,9 @@ function setup(app) {
             let config = {headers: {authorization: 'Bearer ' + token}}
             config['content-type'] = "application/fhir+json"
             try {
-
+console.log(qryDev)
                 let response = await axios.get(qryDev,config)
+                console.log('ok')
                 let cm = response.data      //the conceptmap
 
                 //create the RC
@@ -1151,7 +1164,7 @@ function setup(app) {
                 let identifier = {system: "http://canshare.co.nz/fhir/NamingSystem/conceptmaps"}
                 identifier.value = rc.id
                 rc.identifier = identifier
-                let qryRC = `${csServerRoot}/ConceptMap/${nameRoot}-v${cm.version}`
+                let qryRC = `${csServerRoot}ConceptMap/${nameRoot}-v${cm.version}`
 
                 if (devMode) {
                     console.log('qryRC',qryRC)
@@ -1167,7 +1180,7 @@ function setup(app) {
                 //now update the dev version
                 cm.version = cm.version || 0
                 cm.version++       //update the version
-                let qry1 = `${csServerRoot}/ConceptMap/${cm.id}`
+                let qry1 = `${csServerRoot}ConceptMap/${cm.id}`
                 let result1 = await putResource(qry1, cm, noSyndicate)
 
                 if (result1) {
@@ -1178,6 +1191,7 @@ function setup(app) {
 
                 res.json()
             } catch (ex) {
+               // console.log(ex.message)
                 res.status(500).json({msg:ex.message})
             }
         } else {

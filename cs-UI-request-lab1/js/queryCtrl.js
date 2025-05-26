@@ -14,7 +14,7 @@ angular.module("pocApp")
                 $scope.inputVs = `${vsPrefix}${srch.substr(1)}`
             }
 
-         //   $scope.localStorage = $localStorage
+            $scope.localStorage = $localStorage
 
             $scope.loadingCM = false
 

@@ -1,6 +1,6 @@
 angular.module("pocApp")
     .controller('updateCtrl',
-        function ($scope,$http,$uibModal,$q,updateVSSvc,utilsSvc,terminologyUpdateSvc,$localStorage,$interval) {
+        function ($scope,$http,$uibModal,$q,updateVSSvc,utilsSvc,terminologyUpdateSvc,$localStorage,$interval,cmSvc) {
 
             $scope.version = utilsSvc.getVersion()
 
@@ -34,6 +34,7 @@ angular.module("pocApp")
             $http.get('/cmConfig').then(
                 function (data) {
                     $scope.cmConfig = data.data
+                    cmSvc.setConfig(data.data)
                 }
             )
 

@@ -455,12 +455,18 @@ angular.module("pocApp")
                     //tnm.prefixedPropertyCode is the code for the specific (incl. prefix)
                     //tnm.currentValue is the currently selected value
 
-                    for ([k,v] of Object.entries(tnmHash)) {
+                    for (const [k,v] of Object.entries(tnmHash)) {
 
                         let concept = tnmValues[k]  //current value (if any)
                         if (concept && concept.code) {
                             // if (v.currentValue) {
                             let obs = {resourceType:"Observation",id:utilsSvc.getUUID()}
+
+
+                            if (v.mcodeProfile) {
+                                obs.meta = {profile:[v.mcodeProfile]}
+                            }
+
                             //let text = `${v.prefixedProperty}:${v.currentValue.display}`
                             //let text = `${k}:${concept.display}`
                             let text = `${v.display}:${concept.display}`
@@ -470,7 +476,14 @@ angular.module("pocApp")
                             obs.effectiveDateTime = new Date().toISOString()
                             obs.subject = ({reference:`urn:uuid:${patient.id}`})
                             obs.performer = [{reference:`urn:uuid:${practitioner.id}`}]
-                            obs.code = {coding:[v.concept]}
+                            //obs.code = {coding:[v.concept]}
+                            obs.code = {coding:[{code:v.prefixedPropertyCode,system:"http://snomed.info/ct",display:v.prefixedProperty}]}
+                            obs.category = [{coding:[
+                                {code:'imaging',display:'Imaging',system:"http://terminology.hl7.org/CodeSystem/observation-category"}]}]
+
+
+
+
 
                             //obs.valueCodeableConcept = {coding:[v.currentValue]}
                             obs.valueCodeableConcept = {coding:[concept]}

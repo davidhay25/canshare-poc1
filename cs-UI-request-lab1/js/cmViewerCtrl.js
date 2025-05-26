@@ -1,11 +1,13 @@
 angular.module("pocApp")
     .controller('cmViewerCtrl',
-        function ($scope,updateVSSvc,conceptMap,$uibModal,cmSvc,hashExpandedVs,selectedProperty,data,$http) {
+        function ($scope,updateVSSvc,conceptMap,$uibModal,cmSvc,hashExpandedVs,selectedProperty,data,$http,$timeout) {
             $scope.input = {}
 
             $scope.data = data
 
             let snomed = "http://snomed.info/sct"
+
+
 
             //create an array for the data display table
             if (data) {

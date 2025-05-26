@@ -68,11 +68,12 @@
                             <td>{{don.property}}</td>
                             <td>{{updateVSSvc.getCMOperator(don)}}</td>
                             <td>
-                              <div ng-if="don['x-operator']=='in-vs'"
+
+                              <div ng-if="updateVSSvc.getCMOperator(don) =='in-vs'"
                                    class="clickable"
                                    ng-click="viewVS(don.value)" >{{don.value}}</div>
 
-                              <div ng-if="don['x-operator']!=='in-vs'">{{don.value}}</div>
+                              <div ng-if="updateVSSvc.getCMOperator(don) !=='in-vs'">{{don.value}}</div>
 
                             </td>
                             <td>{{don.display}}</td>
@@ -240,6 +241,11 @@
         </div>
 
       </uib-tab>
+      <uib-tab heading="Json (collapseable)">
+        <json-viewer id="viewer"></json-viewer>
+
+      </uib-tab>
+
     </uib-tabset>
 
 
