@@ -55,6 +55,10 @@
               <uib-tab>
                 <uib-tab-heading>Targets <span class="badge">{{input.cmElement.target.length}}</span> </uib-tab-heading>
 
+                <em>The available options are combined from all matching targets. </em>
+                A value of '0' matches when there is no value for that property</em>
+                <br/>  <br/>
+
                 <div class="myScroll">
                   <table class="table-bordered table-condensed table">
                     <tr><th>Depends On elements</th><th>Target VS / code</th></tr>
@@ -73,7 +77,11 @@
                                    class="clickable"
                                    ng-click="viewVS(don.value)" >{{don.value}}</div>
 
-                              <div ng-if="updateVSSvc.getCMOperator(don) !=='in-vs'">{{don.value}}</div>
+                              <div ng-if="updateVSSvc.getCMOperator(don) !=='in-vs'"
+                                class="clickable" ng-click="lookup(don.value)">
+
+                                {{don.value}}
+                              </div>
 
                             </td>
                             <td>{{don.display}}</td>
@@ -93,7 +101,11 @@
                       </td>
                     </tr>
                   </table>
+                  <br/>
+
                 </div>
+
+
 
 
               </uib-tab>
@@ -128,6 +140,7 @@
                       </tr>
                     </table>
 
+                    <h4>Current values</h4>
 
                     <pre>{{hashPropertyValue | json}}</pre>
                   </div>
@@ -186,11 +199,16 @@
                 <br/>
                 <div class="myScrollSmallest">
                   <table class="table table-bordered">
+                    <tr><th>Property</th><th>Code</th></tr>
                     <tr ng-repeat="(k,v) in thisEffects">
+
                       <td>
                         <div class="clickable" ng-click="selectElement(v)"> {{v.display}}</div>
                       </td>
-                      <td>{{k}}</td>
+                      <td>
+                        <div class="clickable" ng-click="lookup(k)">{{k}}</div>
+
+                      </td>
                     </tr>
                   </table>
                 </div>

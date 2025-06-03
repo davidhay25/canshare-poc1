@@ -34,6 +34,10 @@
 
 
     <div class="row rounded-box" style="padding-top: 8px; background-color: lightyellow">
+
+        <div class="col-md-6">
+        </div>
+        <!--
         <div class="col-md-1">
             <div style="padding-top: 8px">Patient</div>
         </div>
@@ -48,9 +52,10 @@
             <div style="padding-top: 8px" class="clickable">Clinical Hx</div>
 
         </div>
+        -->
 
         <div class="col-md-1">
-            <div style="padding-top: 8px">Template</div>
+            <div style="padding-top: 8px">ConceptMap</div>
 
         </div>
 
@@ -121,15 +126,27 @@
 
 
                                     <div ng-show="v.singleConcept && v.options.length == 0">
+
+
+
+                                        <input type="text" class="form-control"  disabled="disabled" value="{{v.singleConcept.display}}"/>
+
+
+
                                         <!--
-                                        <input type="text" class="form-control"  value="{{v.singleConcept.display}}"/>
-                                        -->
                                         <select class="form-control">
 
                                             <option>{{v.singleConcept.display}}</option>
                                         </select>
+                                        -->
 
                                     </div>
+
+
+
+
+
+
 
                                     <div ng-show="v.options.length > 0">
                                         <select class="form-control" ng-model="local.cmPropertyValue[k]"
