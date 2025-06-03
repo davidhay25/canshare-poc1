@@ -126,10 +126,10 @@
 
 
                                     <div ng-show="v.singleConcept && v.options.length == 0">
+                                    <!--  <div ng-show="v.singleConcept && v.options.length == 0">-->
 
-
-
-                                        <input type="text" class="form-control"  disabled="disabled" value="{{v.singleConcept.display}}"/>
+                                        <input type="text" class="form-control"
+                                               disabled="disabled" value="{{v.singleConcept.display}}"/>
 
 
 
@@ -147,7 +147,7 @@
 
 
 
-
+                                    <!-- <div ng-show="v.options.length > 0"> -->
                                     <div ng-show="v.options.length > 0">
                                         <select class="form-control" ng-model="local.cmPropertyValue[k]"
                                                 ng-change="uiValueSelected(k,local.cmPropertyValue[k])"
