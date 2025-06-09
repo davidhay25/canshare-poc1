@@ -154,6 +154,9 @@ angular.module("pocApp")
 
                 let v = $scope.TNMhash[k]
 
+                //clear the current value
+                delete $scope.staging.prefixedTNM[k]
+
                 //the value for the tnm dropdown is bound to the propKey for the item - eg ct, cn etc.
                 //it needs to be bound to "ct-category-prefix-free" ? maybe the
                 $scope.local.cmPropertyValue[`${k}-category-prefix-free`] = $scope.local.cmPropertyValue[k]
