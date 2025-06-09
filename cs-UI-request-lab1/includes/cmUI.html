@@ -206,7 +206,7 @@
 
 
 
-                <uib-tabset>
+                <uib-tabset  ng-show="stagingProperties['staging-system'].options.length > 0" >
                     <uib-tab heading="Staging selection">
                         <div ng-controller="stagingCtrl">
                             <ng-include src = "'./includes/staging.html'"></ng-include>

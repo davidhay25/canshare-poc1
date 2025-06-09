@@ -318,6 +318,8 @@ angular.module("pocApp")
                     return cmConfig.stagingProperties[property].concept
                 } else if (cmConfig.diagnosticProperties[property]) {
                     return cmConfig.diagnosticProperties[property].concept
+                } else if (cmConfig.gradingProperties[property]) {
+                    return cmConfig.gradingProperties[property].concept
                 } else {
                     return {}
                 }

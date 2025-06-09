@@ -5,13 +5,30 @@ angular.module("pocApp")
 
 
 
-            function updateGrading(stageGroup) {
+            //called when a control on the grading group changes...
+            //examines the 'changes' attrobute in the config file.
+            $scope.updateGrading = function (property) {
+               // console.log(property)
+
+                updateGrading(property)
+
+
+            }
+
+
+            //called when any elements in the diagnostic group change (via the 'dxChanged' event.
+            // Sets the values for all elements in this group
+            //if called with a property name, then don't update that proiperty (used when called from within the grading section)
+            function updateGrading(excludeProperty) {
                 for (const key of Object.keys($scope.cmConfig.gradingProperties)) {
-                    let property = $scope.cmConfig.gradingProperties[key]
-                    property.options = property.options || []
 
 
-                  //  if (property[stageGroup]) {
+                    if (key !== excludeProperty) {
+                        let property = $scope.cmConfig.gradingProperties[key]
+                        property.options = property.options || []
+
+
+                        //  if (property[stageGroup]) {
                         //this is a property that sits at the top of the staging. system, type & table at present
                         let code = property.concept.code    //the snomed code for this element
                         let cmElement = cmSvc.getElementByCode($scope.fullSelectedCM,code)    //get the element
@@ -22,21 +39,25 @@ angular.module("pocApp")
 
                             property.options = concepts
 
-                            $scope.local.cmPropertyValue[key] = property.options[0]
+                            // - don't set a default value$scope.local.cmPropertyValue[key] = property.options[0]
 
                             // console.log(vo,concepts)
                         } else {
 
-                            console.warn(`Code ${code} has no associated element in the CM. key:${key} group:${stageGroup}`)
+                            console.warn(`Code ${code} has no associated element in the CM. key:${key} `)
                         }
+                    }
+
+
+
                    // }
                 }
 
             }
 
             $scope.$on('dxChanged', function(event, data) {
-                console.log(data);
-                //set the defaults for the 'staging1' properties - the ones that are always present
+                //console.log(data);
+                //set the defaults for the 'grading' properties - the ones that are always present
                 //data.values is hash of current values from diagnostic staging keyed on propertyKey
                 //$scope.cmConfig is the complete config file. set during initialization
                 //$scope.local.cmPropertyValue was set in cmCtrl

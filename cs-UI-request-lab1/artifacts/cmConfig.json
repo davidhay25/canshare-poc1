@@ -213,14 +213,6 @@
         },
 
 
-        "histologic-grade" : {
-            "hideIfNoOptions" : true,
-            "staging3": true,
-            "concept": {
-                "code": "371469007"
-            },
-            "UI": "Grade"
-        },
         "grading-system" : {
             "staging3": false,
             "concept": {
@@ -275,13 +267,30 @@
             "concept": {
                 "code": "384739005"
             },
-            "UI": "Grading System"
+            "UI": "Grading System",
+            "changes" : [
+                "histologic-grade"
+            ]
         },
         "histologic-grade" : {
             "concept": {
                 "code": "371469007"
             },
             "UI": "Grade"
+        },
+
+        "prognostic-scoring-system" : {
+            "concept": {
+                "code": "297641000210102"
+            },
+            "UI": "Prognostic scoring system"
+        },
+
+        "prognostic-score" : {
+            "concept": {
+                "code": "297631000210105"
+            },
+            "UI": "Prognostic score"
         }
     },
     "sections" : [

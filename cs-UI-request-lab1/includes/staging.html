@@ -6,6 +6,7 @@
     }
   </style>
   <!-- staging first panel -->
+  <div>
   <table class="table table-bordered">
     <tr ng-repeat = "(k,v) in stagingProperties" ng-if="v.staging1">
       <td width = "30%">
@@ -124,7 +125,7 @@
       <td colspan="2"></td>
     </tr>
 
-    <!-- ancillary studies values-->
+    <!-- staging properties values-->
     <tr ng-repeat = "(k,v) in stagingProperties" ng-if="v.staging3"
       ng-hide="staging.hide[k]">
       <td width = "30%">
@@ -171,7 +172,7 @@
 
 
   </table>
-
+  </div>
 
 
 

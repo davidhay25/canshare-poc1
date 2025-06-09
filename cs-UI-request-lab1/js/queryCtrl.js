@@ -176,7 +176,11 @@ angular.module("pocApp")
                             if (ar.length > 0) {
                                 $scope.input.filterlist = $scope.inputVs
                                 //$scope.showVS()
+                                $scope.input.mainTabActive = 0
                                 $scope.selectVSItem(ar[0])
+
+
+
                             }
 
 

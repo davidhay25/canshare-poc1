@@ -1,4 +1,5 @@
 //The Staging UI. Will eventually include the CM Diagnostic UI
+//doc https://docs.google.com/document/d/1MJw82ZM8eiqJlYx3t8Q-IgmVXvRx-YQKL59pkAulmzg/edit?tab=t.0
 angular.module("pocApp")
     .controller('stagingCtrl',
         function ($scope,$timeout,cmSvc) {
@@ -112,7 +113,10 @@ angular.module("pocApp")
 
                             property.options = concepts
 
-                            $scope.local.cmPropertyValue[key] = property.options[0]
+                            if (property.options.length == 1) {
+                                $scope.local.cmPropertyValue[key] = property.options[0]
+                            }
+
 
                             // console.log(vo,concepts)
                         } else {
@@ -143,10 +147,10 @@ angular.module("pocApp")
             });
 
             //called when the prefix free version of tnm is changed (ie the dropdown). Separate functionity (for now) as
-            //we need to process the prefixed version. processes a single TNM
+            //we need to process the prefixed version. processes a single TNM value
             //also called when any of the other properties change
             $scope.processTNMSelect = function (k) {
-               // console.log(k,v)
+
 
                 let v = $scope.TNMhash[k]
 
@@ -155,8 +159,8 @@ angular.module("pocApp")
                 $scope.local.cmPropertyValue[`${k}-category-prefix-free`] = $scope.local.cmPropertyValue[k]
 
                 //set the staging type to clinical ? todo add to TNMHash (possibly in cmConfig originally
-                //could look at the first letter - 'c' = clinicap, 'p' - pathological
-                $scope.local.cmPropertyValue["cancer-staging-type"] = {code:"80631005"}
+                //could look at the first letter - 'c' = clinical, 'p' - pathological
+             //temp jun4   $scope.local.cmPropertyValue["cancer-staging-type"] = {code:"80631005"}
 
                 //the code for prefixed property - eg rct. We use it to get the element in the CT that defines this property
                 let prefixedPropertyCode = v.prefixedPropertyCode
@@ -168,6 +172,11 @@ angular.module("pocApp")
                     let vo = cmSvc.rulesEngine($scope.local.cmPropertyValue, cmElement, $scope.hashExpandedVs)
                     console.log(vo)
                     //we look at the list of matching targets (rather than matching VS) as that will give us the display. lstVs has only the code when it's a concept not a VS
+
+
+                    //clear any currentl value
+                    //delete $scope.staging.prefixedTNM[k]
+
                     if (vo.lstMatchingTargets.length > 0) {
                         //assume only 1 for now
                         let target = vo.lstMatchingTargets[0]
@@ -186,9 +195,10 @@ angular.module("pocApp")
                 } else {
                     //todo this is only necessary (I think) when the tnm is not in the CM
                     if ($scope.TNMhash[k].options) {
-                       // $scope.TNMhash[k].currentValue = $scope.TNMhash[k].options[0]
 
-                        $scope.staging.prefixedTNM[k] = $scope.TNMhash[k].options[0]
+
+                        //changed to not autopolulate so must be in the CM to work...
+                      //temp - Jun5  $scope.staging.prefixedTNM[k] = $scope.TNMhash[k].options[0]
                     }
 
                 }
@@ -198,13 +208,23 @@ angular.module("pocApp")
             $scope.makeDocument = function() {
                 //return
 
-
-                let vo = cmSvc.makeDocument($scope.local.cmPropertyValue,$scope.TNMhash,$scope.staging.prefixedTNM)
-
-                $scope.$parent.fhirDoc = vo.bundle
-                $scope.$parent.fhirComposition = vo.comp
-                $scope.$parent.fhirLocalDisplay = vo.localDisplay
+                $scope.$parent.fhirDoc = {}
+                $scope.$parent.fhirComposition = {}
+                $scope.$parent.fhirLocalDisplay = []
                 $scope.$parent.fhirprefixedTNM = $scope.TNMhash
+
+                try {
+                    let vo = cmSvc.makeDocument($scope.local.cmPropertyValue,$scope.TNMhash,$scope.staging.prefixedTNM)
+                    $scope.$parent.fhirDoc = vo.bundle
+                    $scope.$parent.fhirComposition = vo.comp
+                    $scope.$parent.fhirLocalDisplay = vo.localDisplay
+                    //$scope.$parent.fhirprefixedTNM = $scope.TNMhash
+                } catch (ex) {
+
+                    console.error(ex)
+                }
+
+
 
             }
 
@@ -222,7 +242,14 @@ angular.module("pocApp")
                         let concepts = cmSvc.getConceptsFromTarget(vo.lstMatchingTargets,$scope.hashExpandedVs)
 console.log(key,concepts)
                         value.options = concepts
-                        $scope.local.cmPropertyValue[key] = value.options[0]
+
+                        if (value.options.length == 1) {
+                            $scope.local.cmPropertyValue[key] = value.options[0]
+                        }
+
+
+
+
                         $scope.processTNMSelect(key,value)      //update the prefixed displays
                     } else {
                         console.error(`Code ${code} has no associated element`)

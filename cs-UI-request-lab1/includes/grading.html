@@ -13,29 +13,15 @@
                     <div>
 
 
-
                         <select class="form-control" ng-model="local.cmPropertyValue[k]"
-
-                                ng-options="v1.display for (k1,v1) in v.options">
+                            ng-change="updateGrading(k)"
+                            ng-options="v1.display for (k1,v1) in v.options">
                         </select>
-                        <!--
-                        <div ng-show = "v.options.length > 1">
-                            <select class="form-control" ng-model="local.cmPropertyValue[k]"
-
-                                    ng-options="v1.display for (k1,v1) in v.options">
-                            </select>
-                        </div>
-
-
-                        <div ng-show = "v.options.length == 1">
-                            {{v.options[0].display}}
-                        </div>
-                        -->
 
                     </div>
                 </div>
                 <div class="col-md-2">
-
+                    <span class="pull-right"> {{v.options.length}}</span>
 
 
                 </div>
