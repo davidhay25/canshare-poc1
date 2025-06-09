@@ -219,9 +219,10 @@ angular.module("pocApp")
                             console.log(voReport)
 
                             //a graph of items
+                            /* very slow with large graphs
                             let vo = makeQHelperSvc.getItemGraph($scope.fullQ)
                             makeItemsGraph(vo.graphData)
-
+*/
 
                         })
 
