@@ -63,7 +63,7 @@ angular.module("pocApp")
                 $scope.selectPrefix("")     //set up initial prefix
                 hideIfEmpty()   //hide elements that aren't shown if no options
 
-                console.log($scope.TNMhash)
+                //console.log($scope.TNMhash)
             })
 
             $scope.selectPrefix = function (prefix) {
@@ -78,10 +78,10 @@ angular.module("pocApp")
                     let prefixPropName = "cancer-staging-prefix"
                     switch (prefix) {
                         case "y":
-                            $scope.local.cmPropertyValue[prefixPropName] = {code:"576031000210100"}
+                            $scope.local.cmPropertyValue[prefixPropName] = {code:"576031000210100",display:"Cancer staging prefix",system:"http://snomed.info/ct"}
                             break
                         case "r":
-                            $scope.local.cmPropertyValue[prefixPropName] = {code:"361271000210107"}
+                            $scope.local.cmPropertyValue[prefixPropName] = {code:"361271000210107",display:"Cancer staging prefix",system:"http://snomed.info/ct"}
                             break
                         default:
                             delete $scope.local.cmPropertyValue[prefixPropName]
@@ -96,14 +96,14 @@ angular.module("pocApp")
 
 
             //update the non-tnm stuff
-            function updateSpecificStaging(stageGroup) {
+            function updateSpecificStaging(stageGroup,propThatCalled) {
                 for (const key of Object.keys($scope.stagingProperties)) {
                     let property = $scope.stagingProperties[key]
                     property.options = property.options || []
 
 
-                    if (property[stageGroup]) {
-                        //this is a property that sits at the top of the staging. system, type & table at present
+                    if (property[stageGroup] && key !== propThatCalled) {
+                        //this is a property that sits at the top of the staging. system & table at present
                         let code = property.concept.code    //the snomed code for this element
                         let cmElement = cmSvc.getElementByCode($scope.fullSelectedCM,code)    //get the element
                         if (cmElement && cmElement.code) {
@@ -231,8 +231,12 @@ angular.module("pocApp")
 
             }
 
-            //called when any of the staging properties change - actually not the TNM ones
-            $scope.updateStaging = function()  {
+            //called when staging system / table  change - ie the staging1 group
+            $scope.updateStaging = function(propThatCalled)  {
+
+                //Update the others in the staging1 group
+                updateSpecificStaging('staging1',propThatCalled)
+
                 //set the values for all the prefix free TNM controls
                 for (const key of Object.keys($scope.TNMhash)) {
                     let value = $scope.TNMhash[key]
@@ -247,7 +251,7 @@ console.log(key,concepts)
                         value.options = concepts
 
                         if (value.options.length == 1) {
-                            $scope.local.cmPropertyValue[key] = value.options[0]
+                         //   $scope.local.cmPropertyValue[key] = value.options[0]
                         }
 
 
@@ -258,8 +262,12 @@ console.log(key,concepts)
                         console.error(`Code ${code} has no associated element`)
                     }
 
-                }
 
+                    //test 12 jun - causes endless loop
+                  //  $scope.$broadcast('dxChanged',{values:$scope.local.cmPropertyValue})
+
+
+                }
 
                 //now update the 'staging3 controls
                 updateSpecificStaging('staging3')

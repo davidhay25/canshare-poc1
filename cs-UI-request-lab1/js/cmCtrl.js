@@ -304,6 +304,14 @@ angular.module("pocApp")
                                 //there was a single primary site which was set.
                                 //we need to invoke the forward engine to set the laterality...
                                 $scope.uiValueSelected  ('primary-site',value)
+
+
+
+                                //new 12 jun
+                               // $scope.$broadcast('dxChanged',{values:$scope.local.cmPropertyValue})
+
+
+
                             }
 
                         })

@@ -23,7 +23,7 @@
 
               <div ng-show = "v.options.length > 1">
                 <select class="form-control" ng-model="local.cmPropertyValue[k]"
-                        ng-change="updateStaging()"
+                        ng-change="updateStaging(k)"
                         ng-options="v1.display for (k1,v1) in v.options">
                 </select>
               </div>
