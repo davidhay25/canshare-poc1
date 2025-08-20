@@ -101,7 +101,6 @@ angular.module('formsApp')
                     $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([angular.toJson(obj,true) ],{type:"application/json"}))
                     $scope.downloadLinkJsonName = `${$scope.q.name}.json`
 
-
                     //create the redirect url to fhirPathLab.
                     let qry = `${$scope.serverbase}Questionnaire/${$scope.q.id}`
 

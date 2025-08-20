@@ -69,7 +69,7 @@
                 </table>
             </uib-tab>
 
-            <uib-tab heading="New Collection">
+            <uib-tab ng-show="user.email" heading="New Collection">
                 <div><label>Name</label></div>
                 <input type="text" class="form-control" ng-model="input.name"/>
                 <br/>
