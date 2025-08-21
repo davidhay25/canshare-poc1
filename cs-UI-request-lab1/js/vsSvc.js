@@ -1,11 +1,9 @@
 angular.module("pocApp")
 
-    .service('vsSvc', function(cmSvc,utilsSvc,$q,$http) {
+    .service('vsSvc', function(cmTesterSvc,utilsSvc,$q,$http) {
 
         //cache of all vs. rebuilt each time the app runs. todo: could load into persistent browser cache like conceptmap stuff
         let cache = {}
-
-
 
 
         return {
@@ -28,7 +26,7 @@ angular.module("pocApp")
 
             updateCacheFromList : function(lst,cb) {
                 let that = this
-                cmSvc.getVSContentsHash(lst).then(
+                cmTesterSvc.getVSContentsHash(lst).then(
                     function (vo) {
                         let hash = vo.hashExpanded
 

@@ -6,7 +6,7 @@ There's no update capability - concept maps are authored in a spreadsheet and im
 
 angular.module("pocApp")
     .controller('cmViewerCtrl',
-        function ($scope,conceptMap,$uibModal,cmSvc,hashExpandedVs,selectedProperty,data,$http,$timeout) {
+        function ($scope,conceptMap,$uibModal,cmTesterSvc,hashExpandedVs,selectedProperty,data,$http,$timeout) {
             $scope.input = {}
 
             $scope.data = data
@@ -84,7 +84,7 @@ angular.module("pocApp")
 
                 $scope.matchingVS = []
                 if (hashExpandedVs) {
-                    let vo = cmSvc.rulesEngine($scope.input.testCode,$scope.input.cmElement,hashExpandedVs)
+                    let vo = cmTesterSvc.rulesEngine($scope.input.testCode,$scope.input.cmElement,hashExpandedVs)
 
                     $scope.matchingVS = vo.lstVS
                     $scope.matchingTargets = vo.lstMatchingTargets
@@ -98,15 +98,15 @@ angular.module("pocApp")
                 analyseElement(element)
                 $scope.lookupTargets()
 
-                let propKey = cmSvc.getPropKeyFromCode(element.code)
+                let propKey = cmTesterSvc.getPropKeyFromCode(element.code)
                 whatDependsOnThis(propKey) //set $scope.thisEffects
             }
 
             //if a property is passed in to the viewer. This function mst be after  $scope.selectCmElement and $scope.lookupTargets
             if (selectedProperty) {
-                let concept = cmSvc.getConceptFromProperty(selectedProperty)
+                let concept = cmTesterSvc.getConceptFromProperty(selectedProperty)
                 if (concept.code) {
-                    let element = cmSvc.getElementByCode(conceptMap,concept.code)
+                    let element = cmTesterSvc.getElementByCode(conceptMap,concept.code)
                     if (element) {
                         $scope.input.cmElement = element
                         $scope.selectCmElement($scope.input.cmElement)
@@ -180,7 +180,7 @@ angular.module("pocApp")
                     for (const target of element.target || []) {
                         for (const don of target.dependsOn || []) {
                             if (don.property == propKey) {
-                               // let el = cmSvc.getElementByCode($scope.conceptMap,code)
+                               // let el = cmTesterSvc.getElementByCode($scope.conceptMap,code)
 
                                 $scope.thisEffects[element.code] = element
                             }
