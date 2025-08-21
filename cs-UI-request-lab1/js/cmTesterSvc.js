@@ -1,6 +1,6 @@
 angular.module("pocApp")
 
-    .service('cmSvc', function($q,$http,utilsSvc) {
+    .service('cmTesterSvc', function($q,$http,utilsSvc) {
 
         let config= {}
         let cmConfig = {}

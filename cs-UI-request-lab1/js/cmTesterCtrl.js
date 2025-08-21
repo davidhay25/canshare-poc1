@@ -1,10 +1,15 @@
+/*
+
+The controller used in the cmTester
+ */
+
 angular.module("pocApp")
-    .controller('cmCtrl',
-        function ($scope,$http,$q,querySvc,cmSvc,$uibModal,utilsSvc,$timeout,updateVSSvc) {
+    .controller('cmTesterCtrl',
+        function ($scope,$http,$q,querySvc,cmTesterSvc,$uibModal,utilsSvc) {
 
             $scope.local = {cmOptions : {},cm:{property:{}}}
             $scope.default = {}
-            $scope.cmSvc = cmSvc
+            $scope.cmTesterSvc = cmTesterSvc
 
             let nzDisplayLanguage = "en-x-sctlang-23162100-0210105"
 
@@ -18,7 +23,7 @@ angular.module("pocApp")
 
             let snomed = "http://snomed.info/sct"
             let vsPrefix = "https://nzhts.digital.health.nz/fhir/ValueSet/"
-           // $scope.loadingCM = true
+
 
             function loadFromCache() {
                 //functions to get ConceptMap & expanded ValueSet..
@@ -112,6 +117,9 @@ angular.module("pocApp")
                 });
 
             })
+
+
+
 
 
             //------------- functions supporting the form UI
@@ -512,7 +520,7 @@ angular.module("pocApp")
 
                 //now, execute the rules engine to this element and set of codes
                 //note that the values passed to this function are only those 'before' this one...
-                let vo = cmSvc.rulesEngine($scope.uiHashValues,cmElement,$scope.hashExpandedVs)
+                let vo = cmTesterSvc.rulesEngine($scope.uiHashValues,cmElement,$scope.hashExpandedVs)
 
                 $scope.log.push({msg:`Executed rules engine for ${propKey}`,obj:vo,objTitle:"Engine response"})
 
@@ -690,7 +698,7 @@ angular.module("pocApp")
                         $scope.log.push({msg:`Performing reverse lookup from ${propKeyToExamine} value ${value.code}`,
                             obj:hashValues,objTitle:"Values passed to reverse engine"})
 
-                        let result = cmSvc.reverseRulesEngine(cmElement,value, $scope.hashExpandedVs,hashValues)
+                        let result = cmTesterSvc.reverseRulesEngine(cmElement,value, $scope.hashExpandedVs,hashValues)
 
                         if (result.targets.length == 0) {
                             //look at the previous propkey
@@ -958,7 +966,7 @@ angular.module("pocApp")
                     if (element.code == serviceCode) {     //this is the set of targets which could match this code
 
                         let hash = {'cancer-service':concept}
-                        let vo = cmSvc.rulesEngine(hash,element,$scope.hashExpandedVs)
+                        let vo = cmTesterSvc.rulesEngine(hash,element,$scope.hashExpandedVs)
                         console.log(vo)
 
                         $scope.input.allStreams = $scope.hashExpandedVs[vo.lstVS[0]]
@@ -1089,7 +1097,7 @@ angular.module("pocApp")
                         */
 
                         //parse the CM to get all referenced VS. Update the lstVsUrl
-                        cmSvc.getAllVSinCM($scope.fullSelectedCM,lstVsUrl)
+                        cmTesterSvc.getAllVSinCM($scope.fullSelectedCM,lstVsUrl)
 
                         //expand all the valuesets
                         if (lstVsUrl.length > 0) {
@@ -1103,7 +1111,7 @@ angular.module("pocApp")
 
 
                             $scope.showWaiting = true
-                            cmSvc.getVSContentsHash(lstVsUrl).then(
+                            cmTesterSvc.getVSContentsHash(lstVsUrl).then(
                                 function (data) {
                                     let hashExpanded = data.hashExpanded
                                     $scope.expandErrors = data.errors
@@ -1119,9 +1127,6 @@ angular.module("pocApp")
                                 $scope.showWaiting = false
                             })
                         }
-
-
-
 
 
                         let treeData = querySvc.makeTree($scope.fullSelectedCM,$scope.cmProperties)
@@ -1241,7 +1246,7 @@ angular.module("pocApp")
 
                         $scope.cmConfig = config //added so staging can access config
                         $scope.tnmLUT = config.tnmLUT   //lookup table for snomed codes for TNM\
-                        cmSvc.setConfig(config)         //so cmService can manipulate it
+                        cmTesterSvc.setConfig(config)         //so cmService can manipulate it
 
                         //cmProperties will have only those entries that are in the diagnostic tab
                         $scope.cmProperties = {}
@@ -1360,7 +1365,7 @@ angular.module("pocApp")
                         let lstVsUrl = []   //list of all ValueSets that are used by 'in-vs' rules
 
                         //parse the CM to get all referenced VS. Update the lstVsUrl
-                        cmSvc.getAllVSinCM($scope.fullSelectedCM,lstVsUrl)
+                        cmTesterSvc.getAllVSinCM($scope.fullSelectedCM,lstVsUrl)
 
 
                         lstVsUrl.sort()
@@ -1384,7 +1389,7 @@ angular.module("pocApp")
                             //there are new ValueSets in the dev version that need to be retrieved and added to the cache
 
                             $scope.showWaiting = true
-                            cmSvc.getVSContentsHash(newVS).then(
+                            cmTesterSvc.getVSContentsHash(newVS).then(
                                 function (vo) {
                                     let hashNewVS = vo.hashExpanded
                                     $scope.expandErrors = vo.errors

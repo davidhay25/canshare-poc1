@@ -70,14 +70,14 @@
                           <tr><th>Property</th><th>Operator</th><th>Value</th><th>Display</th></tr>
                           <tr ng-repeat = "don in target.dependsOn">
                             <td>{{don.property}}</td>
-                            <td>{{updateVSSvc.getCMOperator(don)}}</td>
+                            <td>{{getCMOperator(don)}}</td>
                             <td>
 
-                              <div ng-if="updateVSSvc.getCMOperator(don) =='in-vs'"
+                              <div ng-if="getCMOperator(don) =='in-vs'"
                                    class="clickable"
                                    ng-click="viewVS(don.value)" >{{don.value}}</div>
 
-                              <div ng-if="updateVSSvc.getCMOperator(don) !=='in-vs'"
+                              <div ng-if="getCMOperator(don) !=='in-vs'"
                                 class="clickable" ng-click="lookup(don.value)">
 
                                 {{don.value}}

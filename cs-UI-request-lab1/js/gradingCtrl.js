@@ -1,7 +1,7 @@
 //The Staging UI. Will eventually include the CM Diagnostic UI
 angular.module("pocApp")
     .controller('gradingCtrl',
-        function ($scope,$timeout,cmSvc) {
+        function ($scope,$timeout,cmTesterSvc) {
 
 
 
@@ -31,11 +31,11 @@ angular.module("pocApp")
                         //  if (property[stageGroup]) {
                         //this is a property that sits at the top of the staging. system, type & table at present
                         let code = property.concept.code    //the snomed code for this element
-                        let cmElement = cmSvc.getElementByCode($scope.fullSelectedCM,code)    //get the element
+                        let cmElement = cmTesterSvc.getElementByCode($scope.fullSelectedCM,code)    //get the element
                         if (cmElement && cmElement.code) {
-                            let vo = cmSvc.rulesEngine($scope.local.cmPropertyValue,cmElement,$scope.hashExpandedVs)
+                            let vo = cmTesterSvc.rulesEngine($scope.local.cmPropertyValue,cmElement,$scope.hashExpandedVs)
 
-                            let concepts = cmSvc.getConceptsFromTarget(vo.lstMatchingTargets,$scope.hashExpandedVs)
+                            let concepts = cmTesterSvc.getConceptsFromTarget(vo.lstMatchingTargets,$scope.hashExpandedVs)
 
                             property.options = concepts
 

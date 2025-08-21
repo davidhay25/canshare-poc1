@@ -1,6 +1,13 @@
+/*
+* The controller for the VSLookup function.
+*
+*
+* */
+
+
 angular.module("pocApp")
-    .controller('queryCtrl',
-        function ($scope,$http,$localStorage,$uibModal,$q,$timeout,querySvc,utilsSvc,cmSvc,$window) {
+    .controller('vsLookupCtrl',
+        function ($scope,$http,$localStorage,$uibModal,$q,$timeout,querySvc,utilsSvc,$window) {
 
             $scope.input = {}
             $scope.input.mainTabActive = 1      //just while developing - selects that conceptmap tab
@@ -16,7 +23,7 @@ angular.module("pocApp")
 
             $scope.localStorage = $localStorage
 
-            $scope.loadingCM = false
+            //$scope.loadingCM = false
 
             $scope.version = utilsSvc.getVersion()
 
@@ -116,7 +123,7 @@ angular.module("pocApp")
 
             // ========================== end of conceptmap functions ====================
 
-
+/*
             $scope.adhocQuery = function (qry) {
                 delete $scope.adhocResult
                 delete $scope.adhocError
@@ -143,11 +150,14 @@ angular.module("pocApp")
             $scope.selectAdhoc = function (resource) {
                 $scope.selectedAdhocResource = resource
             }
-
-            $scope.addCanshareIdent = function (type){
+$scope.addCanshareIdent = function (type){
                 $scope.input.adHocQuery = $scope.input.adHocQuery || ""
                 $scope.input.adHocQuery += `?identifier=http://canshare.co.nz/fhir/NamingSystem/${type}%7c&_summary=false`
             }
+
+            */
+
+
 
             //get the canshare valuesets from the TS
             $scope.showLoadingMessage = true
@@ -310,7 +320,7 @@ angular.module("pocApp")
             }
 
 
-            $scope.copyObjectToClipboard = function(obj) {
+            $scope.copyObjectToClipboardDEP = function(obj) {
                 let text = angular.toJson(obj,true)
                 if (navigator.clipboard) {
                     navigator.clipboard.writeText(text).then(function() {
@@ -346,36 +356,7 @@ angular.module("pocApp")
                 document.body.removeChild(textArea);
             }
 
-            //============ deprecated
 
-            function setServerDEP() {
-                if ($localStorage.currentServer) {
-                    $scope.selectedServer = $localStorage.currentServer
-                    $scope.allServers.forEach(function (svr) {
-                        if (svr.url == $scope.selectedServer.url) {
-                            $scope.svr = svr
-                        }
-                    })
-                } else {
-                    $scope.selectedServer = $scope.allServers[0]
-                }
-            }
-
-            //when a source is selected in the ConceptMap mapper, set the possible 'depends on' properties
-            $scope.setDependsOnPropertiesDEP = function (source) {
-                if (source) {
-                    delete $scope.translateParameters
-                    let vo = querySvc.getCMProperties($scope.fullSelectedCM,source.code)
-                    $scope.doProperties = vo.hashProperties // querySvc.getCMProperties($scope.fullSelectedCM)
-                }
-
-            }
-
-            $scope.selectQfromVSListDEP = function(Q) {
-                $scope.selectedQ = Q
-                $scope.dummyQR = {}
-                $scope.dummyFormData = {}
-            }
 
 
         }

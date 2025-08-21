@@ -2,7 +2,7 @@
 //doc https://docs.google.com/document/d/1MJw82ZM8eiqJlYx3t8Q-IgmVXvRx-YQKL59pkAulmzg/edit?tab=t.0
 angular.module("pocApp")
     .controller('stagingCtrl',
-        function ($scope,$timeout,cmSvc) {
+        function ($scope,$timeout,cmTesterSvc) {
 
 
 
@@ -105,11 +105,11 @@ angular.module("pocApp")
                     if (property[stageGroup] && key !== propThatCalled) {
                         //this is a property that sits at the top of the staging. system & table at present
                         let code = property.concept.code    //the snomed code for this element
-                        let cmElement = cmSvc.getElementByCode($scope.fullSelectedCM,code)    //get the element
+                        let cmElement = cmTesterSvc.getElementByCode($scope.fullSelectedCM,code)    //get the element
                         if (cmElement && cmElement.code) {
-                            let vo = cmSvc.rulesEngine($scope.local.cmPropertyValue,cmElement,$scope.hashExpandedVs)
+                            let vo = cmTesterSvc.rulesEngine($scope.local.cmPropertyValue,cmElement,$scope.hashExpandedVs)
 
-                            let concepts = cmSvc.getConceptsFromTarget(vo.lstMatchingTargets,$scope.hashExpandedVs)
+                            let concepts = cmTesterSvc.getConceptsFromTarget(vo.lstMatchingTargets,$scope.hashExpandedVs)
 
                             property.options = concepts
 
@@ -170,9 +170,9 @@ angular.module("pocApp")
 
 
                 //the element from the CM
-                let cmElement = cmSvc.getElementByCode($scope.fullSelectedCM,prefixedPropertyCode)    //get the element
+                let cmElement = cmTesterSvc.getElementByCode($scope.fullSelectedCM,prefixedPropertyCode)    //get the element
                 if (cmElement && cmElement.code) {
-                    let vo = cmSvc.rulesEngine($scope.local.cmPropertyValue, cmElement, $scope.hashExpandedVs)
+                    let vo = cmTesterSvc.rulesEngine($scope.local.cmPropertyValue, cmElement, $scope.hashExpandedVs)
                     console.log(vo)
                     //we look at the list of matching targets (rather than matching VS) as that will give us the display. lstVs has only the code when it's a concept not a VS
 
@@ -217,11 +217,11 @@ angular.module("pocApp")
                 $scope.$parent.fhirprefixedTNM = $scope.TNMhash
 
                 try {
-                    let vo = cmSvc.makeDocument($scope.local.cmPropertyValue,$scope.TNMhash,$scope.staging.prefixedTNM)
+                    let vo = cmTesterSvc.makeDocument($scope.local.cmPropertyValue,$scope.TNMhash,$scope.staging.prefixedTNM)
                     $scope.$parent.fhirDoc = vo.bundle
                     $scope.$parent.fhirComposition = vo.comp
                     $scope.$parent.fhirLocalDisplay = vo.localDisplay
-                    //$scope.$parent.fhirprefixedTNM = $scope.TNMhash
+
                 } catch (ex) {
 
                     console.error(ex)
@@ -241,13 +241,13 @@ angular.module("pocApp")
                 for (const key of Object.keys($scope.TNMhash)) {
                     let value = $scope.TNMhash[key]
                     let code = value.concept.code    //the snomed code for this element
-                    let cmElement = cmSvc.getElementByCode($scope.fullSelectedCM,code)    //get the element
+                    let cmElement = cmTesterSvc.getElementByCode($scope.fullSelectedCM,code)    //get the element
 
                     if (cmElement && cmElement.code) {
-                        let vo = cmSvc.rulesEngine($scope.local.cmPropertyValue,cmElement,$scope.hashExpandedVs)
+                        let vo = cmTesterSvc.rulesEngine($scope.local.cmPropertyValue,cmElement,$scope.hashExpandedVs)
 
-                        let concepts = cmSvc.getConceptsFromTarget(vo.lstMatchingTargets,$scope.hashExpandedVs)
-console.log(key,concepts)
+                        let concepts = cmTesterSvc.getConceptsFromTarget(vo.lstMatchingTargets,$scope.hashExpandedVs)
+//console.log(key,concepts)
                         value.options = concepts
 
                         if (value.options.length == 1) {

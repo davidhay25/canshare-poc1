@@ -1,13 +1,17 @@
+
+/*
+The controller for the modal that will display the contents of a ConceptMap (cmViewer) and allow them to be viewed.
+There's no update capability - concept maps are authored in a spreadsheet and imported into the server.
+ */
+
 angular.module("pocApp")
     .controller('cmViewerCtrl',
-        function ($scope,updateVSSvc,conceptMap,$uibModal,cmSvc,hashExpandedVs,selectedProperty,data,$http,$timeout) {
+        function ($scope,conceptMap,$uibModal,cmSvc,hashExpandedVs,selectedProperty,data,$http,$timeout) {
             $scope.input = {}
 
             $scope.data = data
 
             let snomed = "http://snomed.info/sct"
-
-
 
             //create an array for the data display table
             if (data) {
@@ -39,7 +43,22 @@ angular.module("pocApp")
             }
 
             $scope.conceptMap = conceptMap
-            $scope.updateVSSvc = updateVSSvc
+            //$scope.updateVSSvc = updateVSSvc
+
+            $scope.getCMOperator = function(don) {
+                let op = '='
+                if (don.extension) {
+                    don.extension.forEach(function (ext) {
+                        if (ext.url == 'http://canshare.co.nz/fhir/StructureDefinition/do-operator') {
+                            op = ext.valueCode
+                        }
+                    })
+                }
+
+                return op
+            }
+
+
 
             if (! hashExpandedVs) {
                 $scope.noVS = true

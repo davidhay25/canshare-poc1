@@ -190,7 +190,7 @@ angular.module("pocApp")
             },
 
             //todo - convert to server side function that follows paging...
-            retrieveAllDRforPatient : function (patient) {
+            retrieveAllDRforPatientDEP : function (patient) {
                 let deferred = $q.defer()
                 let qry = `${this.config.canShare.fhirServer.url}/DiagnosticReport?patient._id=${patient.id}&_include=DiagnosticReport:result`
                 qry += "&_count=50"
@@ -267,7 +267,7 @@ angular.module("pocApp")
                 )
                 return deferred.promise
             },
-            getSRForPatient : function(patientId) {
+            getSRForPatientDEP : function(patientId) {
                 let that=this
                 let deferred = $q.defer()
 
@@ -296,7 +296,7 @@ angular.module("pocApp")
                 */
                 return deferred.promise
             },
-            getAllPatients : function() {
+            getAllPatientsDEP : function() {
                 let that=this
                 let deferred = $q.defer()
                 //let url = `${this.config.canShare.fhirServer.url}/Patient`
@@ -316,7 +316,7 @@ angular.module("pocApp")
                 }
                 return deferred.promise
             },
-            retrieveSRandDetails : function(SR) {
+            retrieveSRandDetailsDEP : function(SR) {
                 let deferred = $q.defer()
                 //given an SR, retrieve the associated reesources - QR and DR bundle
                 let that = this
@@ -434,7 +434,7 @@ angular.module("pocApp")
 
             },
 
-            getPatientName : function(patient) {
+            getPatientNameDEP : function(patient) {
                 let name = ""
                 if (patient && patient.name) {
                     //todo look for firstName, lastName etc.
@@ -445,31 +445,8 @@ angular.module("pocApp")
                // console.log(patient,name)
                 return name
             },
-            parseQ : function(Q) {
-                //parse a Q into a simple display structure - sections holding questions. 2 level only.
-                if (!Q) {
-                    return []
-                }
 
-                let arSections = []
-                Q.item.forEach(function (sectionItem) {
-                    let section = {text:sectionItem.text,questions:[]}
-                    arSections.push(section)
-                    if (sectionItem.item) {
-                        sectionItem.item.forEach(function (questionItem) {
-                            //let question = {text:questionItem.text,type:questionItem.type,linkId:questionItem.linkId}
-
-                            section.questions.push(questionItem)
-                            //section.questions.push(question)
-
-                        })
-                    }
-
-                })
-                return arSections
-
-            },
-            makePOSTEntry :function (resource) {
+            makePOSTEntryDEP :function (resource) {
                 //Make a create entry. Assume the resource has an id that is a UUID
                 let entry = {}
                 entry.fullUrl = "urn:uuid:"+ resource.id
