@@ -173,10 +173,60 @@
     </nav>
 
     <div class="row">
-        <div class="col-md-9">
+        <div class="col-md-8">
+
+            <!-- List filters published, name/description filter-->
+
+            <table class="table table-bordered">
+                <tr><th>Name</th><th>Description</th></tr>
+                <tr ng-repeat = "pg in playgrounds"
+                    style="cursor: pointer"
+                    ng-click="selectPG(pg)">
+                    <td>{{pg.name}}</td>
+                    <td>{{pg.description}}</td>
+                </tr>
+            </table>
 
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
+            <!-- Adjust list based on logged in status-->
+            <h4>Links to CanShare modules</h4>
+
+            <div><a target="_blank" href="../vsLookup.html">ValueSet explorer</a></div>
+            <div><a target="_blank" href="../models.html">Designer</a></div>
+            <div><a target="_blank" href="../modelReview.html">Review form</a></div>
+            <div><a target="_blank" href="../updateVS.html">ValueSet updater</a></div>
+            <div><a target="_blank" href="../updateVS.html">ConceptMap updater</a></div>
+            <div><a target="_blank" href="../cmTester.html">ConceptMap Tester</a></div>
+
+
+            <br/><br/>
+
+            <div ng-show="selectedPG">
+                <button class="btn btn-primary pull-right" ng-click="viewQ()">Details</button>
+                <h4>Selected Standard metadata</h4>
+
+                <div><strong>Name</strong></div>
+                <div>{{selectedPG.name}}</div>
+                <div><strong>Description</strong></div>
+                <div>{{selectedPG.description}}</div>
+                <div><strong>Internal Id</strong></div>
+                <div>{{selectedPG.id}}</div>
+                <div><strong>Last updated</strong></div>
+                <div>{{selectedPG.updated | date}}</div>
+
+               <br/>
+
+
+                <h4>Downloads</h4>
+                <div>Download TSV</div>
+                <div>Download MSWord spec</div>
+                <div>Download Questionnaire</div>
+
+            </div>
+
+
+
 
         </div>
     </div>
