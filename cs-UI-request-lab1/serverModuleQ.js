@@ -1,59 +1,45 @@
 
 
-const fhirpath = require('fhirpath');
-// For FHIR model data (choice type support) pull in the model file:
-const fhirpath_r4_model = require('fhirpath/fhir-context/r4');
+let MongoClient = require('mongodb').MongoClient;
+let database        //this will be the database connection
 
-const sample = require("./artifacts/sampleBundle.json")
+async function setup(app,mongoDbName) {
 
+    const uri = "mongodb://127.0.0.1:27017"  //local machine
+    const client = new MongoClient(uri);
+    database = client.db(mongoDbName)
 
-function setup(app) {
-    app.get('/Q/prepopDEP',async function(req,res){
-        let fp = req.query.fp
+    await client.connect()
+    console.log("model connected in serverModuleQ")
 
-        console.log(fp)
+    app.get('/qr/all', async function(req,res) {
+        try {
+            const cursor = await database.collection("pathQR").find().sort({runDate:-1}).toArray()
+            res.json(cursor)
 
-        //the fp will be appropriate from within a Q - eg %patient.identifier.first().value
-        //we need to convert it into a form to query a Bundle Bundle.entry.resource.where(resourceType='Patient').identifier.first().value
-        //This will be a likely implementer pattern - retrieve the candidate bundle (eg resources associated
-        //with a path request) when execute the queries against that todo: ? a blog post
-        let ar = fp.split('.')
-        let first = ar[0]
-        ar.shift()
-        let rest = ar.join('.')
-
-        let qry
-        switch (first) {
-            case '%LaunchPatient' :
-                qry = `Bundle.entry.resource.where(resourceType='Patient')`
-                if (rest) {
-                    qry += `.${rest}`
-                }
-                break
-            case '%LaunchPractitioner' :
-                qry = `Bundle.entry.resource.where(resourceType='Practitioner')`
-                if (rest) {
-                    qry += `.${rest}`
-                }
-                break
-            default:
-                break
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
         }
-        let result
-        if (qry) {
+    })
+
+    //upload QR's created by AI function creating QR from dictated reports
+    app.post('/qr/upload',async function(req,res){
+        let upload = req.body
+        for (let item of upload) {
+
+            const query = {runId:item.runId}
             try {
-                result = fhirpath.evaluate(sample,qry)
-            } catch (ex) {
-                res.status(400).send(ex.message)
+                await database.collection("pathQR").replaceOne(query,item,{upsert:true})
+            } catch(ex) {
+                console.log(ex)
+                res.status(500).json(ex.message)
                 return
-            }
 
+            }
         }
 
-
-
-
-        res.json({qry:qry,result:result})
+        res.json({})
 
 
     })

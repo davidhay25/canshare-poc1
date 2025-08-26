@@ -4,6 +4,43 @@ angular.module("pocApp")
 
         return {
 
+            getVersions : function (pgId) {
+                let deferred = $q.defer()
+                let qry = `/playgroundVersion/${pgId}`
+                $http.get(qry).then(
+                    function (data) {
+                        deferred.resolve(data.data)
+                    }, function (err) {
+                        deferred.reject(err)
+                    }
+                )
+
+                return deferred.promise
+
+            },
+
+            saveAsVersion : function (pg) {
+                //Inflate the playground and save as a version
+                let deferred = $q.defer()
+
+                //todo - inflate all the contained DG's for container DG's
+                //only these will be in the version
+
+                //post the playground to the version API. It will be rejected is there are duplicate versions
+                $http.post(`/playgroundVersion`,pg).then(
+                    function (data) {
+                        deferred.resolve()
+                    }, function (err) {
+                        deferred.reject(err)
+
+                        //alert(angular.toJson(err.data))
+                    }
+                )
+
+                return deferred.promise
+
+            },
+
             currentPlaygroundDiff : function (currentPG, initialPG) {
                 //look for diffs between the pg (which is the current PG) and initialPG (which was originally loaded)
                 //for now, a simple json based comparison of DGs - later could be a more detailed diff

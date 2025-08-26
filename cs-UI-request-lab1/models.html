@@ -192,6 +192,8 @@
 
         <button class="pull-right btn-link btn" ng-click="export()">Import / Export</button>
 
+
+
         <div ng-if="userMode == 'playground'">
             <div ng-repeat="(k,v) in hashAllDG">
                 <div ng-if="v.isContainer"
@@ -576,12 +578,12 @@
                             <td>
 
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-9">
                                         <div ng-if="userMode == 'playground'">Collections</div>
                                         <div ng-if="userMode == 'library'">Library</div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="pull-right">{{world.id}}</div>
+                                    <div class="col-md-3">
+                                        <div>{{world.id}}</div>
                                     </div>
                                 </div>
 
@@ -614,6 +616,21 @@
 
                         <tr ng-if="false"><td>Id</td><td>{{world.id}}</td></tr>
                         <tr><td>Description</td><td><textarea class="form-control" ng-model="world.description"></textarea></td></tr>
+                        <tr ng-if="world.publishedVersion > 1"><td>Published version</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        {{world.publishedVersion -1 }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button ng-if="userMode == 'playground'" class="pull-right btn-primary btn"
+                                                ng-click="savePGVersion()">Publish a version</button>
+                                    </div>
+                                </div>
+
+
+                            </td>
+                        </tr>
                         <tr>
                             <td>Container DGs</td>
                             <td>

@@ -1,4 +1,6 @@
 //Playground routines
+//note re-labelled as collections
+
 
 let MongoClient = require('mongodb').MongoClient;
 let database        //this will be the database connection
@@ -195,6 +197,7 @@ async function setup(app,mongoDbName) {
                 let item = {id:entry.id,name:entry.name,description:entry.description,updated:entry.updated}
                 item.version = entry.version
                 item.lockedTo = entry.lockedTo
+                item.publishedVersion =entry.publishedVersion
                 if (entry.dataGroups) {
                     item.dgCount = Object.keys(entry.dataGroups).length
                 }
@@ -227,8 +230,6 @@ async function setup(app,mongoDbName) {
         }
     })
 
-
-
     //create / update a single Playground. In theory the name param is not needed, but cleaner
     app.put('/playground/:id', async function(req,res) {
         let id = req.params.id
@@ -240,7 +241,6 @@ async function setup(app,mongoDbName) {
         try {
 
             await database.collection("playgroundBackup").insertOne(playgroundBackup)     //insert into the backup collection
-
             const cursor = await database.collection("playground").replaceOne(query,playground,{upsert:true})
 
             res.json(playground)
@@ -250,6 +250,45 @@ async function setup(app,mongoDbName) {
 
         }
     })
+
+    // -----------  versions ----------
+
+    //save the supplied playground as a version
+    //contains only DGs that are container DG's. assume the caller has inflated them
+
+    app.post('/playgroundVersion', async function(req,res) {
+        let playground = req.body
+        delete playground['_id']
+        let id = playground.id
+        let version = playground.publishedVersion    //assume the caller has set this correctly
+
+        //todo if there's already an entry with this version then reject the call
+
+
+        //save the version
+        try {
+            await database.collection("playgroundVersion").insertOne(playground)     //insert into the backup collection
+            res.json({})
+        } catch (ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+        }
+    })
+
+    //get all the versions for a playground
+    app.get('/playgroundVersion/:id', async function(req,res) {
+        let id = req.params.id
+        const query = {id:id}
+        try {
+            const cursor = await database.collection("playgroundVersion").find(query).toArray()
+            res.json(cursor)
+
+        } catch(ex) {
+            console.log(ex)
+            res.status(500).json(ex.message)
+        }
+    })
+
 
 }
 

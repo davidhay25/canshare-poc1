@@ -126,36 +126,32 @@
 
             <uib-tabset>
 
-                <uib-tab heading="QRs from file">
+                <uib-tab heading="QRs from Db">
 
-                    <div class="list-group">
-                        <div ng-class={"list-group-item":true,listItemSelected:item==selectedItem}
-                             style="cursor: pointer"
-                             ng-repeat = "item in items"
-                             ng-click="selectItem(item)">
-                            {{item.inputName}}
+                    <div class="myScroll">
+                        <div class="list-group">
+                            <div ng-class={"list-group-item":true,listItemSelected:item==selectedItem}
+                                 style="cursor: pointer"
+                                 ng-repeat = "item in items"
+                                 ng-click="selectItem(item)">
+                                {{item.inputName}}
+                                <div><em class="pull-right">{{item.runDate | date}}</em></div>
+                                <div class="clearfix"></div>
+                            </div>
+
                         </div>
-
                     </div>
 
-                    <!--
-                    <table class="table table-bordered">
-                        <tr><th>Name</th><th>Date</th><th>Error</th></tr>
-                        <tr ng-repeat = "item in items"
-                            style="cursor: pointer"
-                            ng-click="selectItem(item)">
-                            <td>{{item.inputName}}</td>
-                            <td>{{item.runDate}}</td>
 
-                            <td>{{item.error}}</td>
-                        </tr>
-                    </table>
-                    -->
+
                 </uib-tab>
 
                 <uib-tab heading="Raw file">
                     <button ng-show="input.qrCsv"
                             class="btn-link btn" ng-click="parseQRFile(input.qrCsv)">Parse content</button>
+                    <button ng-show="items"
+                            class="btn-link btn" ng-click="upload(input.qrCsv)">Upload</button>
+
 
                     <div class="myScroll">
                     <textarea id="pastetextbox" rows="20" class="form-control"

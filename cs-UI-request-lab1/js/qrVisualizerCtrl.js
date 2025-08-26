@@ -7,9 +7,18 @@ angular.module("pocApp")
         function ($scope,$http,$localStorage,$sce,$uibModal,qrVisualizerSvc,makeQHelperSvc,utilsSvc) {
             $scope.input = {}
 
-            $scope.input.qrCsv =  $localStorage.qrCsv //dev
+            // switch to using db$scope.input.qrCsv =  $localStorage.qrCsv //dev
             let snomed = "http://snomed.info/sct"
             $scope.serverbase = "https://fhir.forms-lab.com/"
+
+            //get all the QR's that have been uploaded
+            $http.get('/qr/all').then(
+                function (data) {
+                    $scope.items = data.data
+                }, function (err) {
+                    alert(angular.toJson(err))
+                }
+            )
 
             //parse the input CSV file containing multiple QRs...
             $scope.parseQRFile = function (file) {
@@ -64,6 +73,18 @@ angular.module("pocApp")
 
 
                 $localStorage.qrCsv = file
+            }
+
+            $scope.upload = function () {
+                let qry = "/qr/upload"
+                $http.post(qry,$scope.items).then(
+                    function (data) {
+                        alert("Upload complete")
+                    }, function (err) {
+                        alert(angular.toJson(err))
+
+                    }
+                )
             }
 
             //parse the file if it was read from the browser cache
@@ -164,25 +185,6 @@ angular.module("pocApp")
 
                 makeQHelperSvc.showItemDetailsDlg(item,$scope.selectedQ)
 
-/*
-                $uibModal.open({
-
-                    size : 'xlg',
-                    templateUrl: 'modalTemplates/viewItem.html',
-                    controller: 'viewItemCtrl',
-
-                    resolve: {
-                        item: function () {
-                            return item
-                        }, Q: function () {
-                            return $scope.selectedQ
-                        }
-                    }
-                })
-                */
-
-
-                //alert("Details of this item - including if codes are in VS.")
                 console.log(item)
             }
 

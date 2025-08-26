@@ -403,6 +403,27 @@ angular.module("pocApp")
 
             }
 
+            //save the current Collection/PG as a version
+            $scope.savePGVersion = function () {
+                //$localStorage.world.publishedVersion = $localStorage.world.publishedVersion || 1
+                let msg = `This will create a new version (${$localStorage.world.publishedVersion}) of this Collection. Are you sure?`
+                if (confirm(msg)) {
+
+                    playgroundsSvc.saveAsVersion($localStorage.world).then(
+                        function (data) {
+                            //The version was saved. Can update the version number
+                            alert(`The Collection was saved with the published id of ${$localStorage.world.publishedVersion}`)
+                            $localStorage.world.publishedVersion = $localStorage.world.publishedVersion +1
+                        }, function (err) {
+                            alert(angular.toJson(err))
+
+                        }
+                    )
+                }
+
+
+            }
+
             $scope.updatePlayground = function (both) {
 
                 //save the current playground to the library

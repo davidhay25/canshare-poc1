@@ -4,8 +4,10 @@
 */
 angular.module("pocApp")
     .controller('csFrontPageCtrl',
-        function ($scope,$http) {
+        function ($scope,$http,playgroundsSvc) {
 
+            $scope.input = {}
+            $scope.input.versions = {}
 
                 $http.get('playgroundSummary').then(
                     function (data) {
@@ -23,7 +25,23 @@ angular.module("pocApp")
             }
 
             $scope.selectPG = function (pg) {
+
                 $scope.selectedPG = pg
+                $scope.input.versions = {}
+
+
+                    playgroundsSvc.getVersions(pg.id).then(
+                        function (data) {
+                            $scope.versions = data
+                            console.log($scope.versions)
+                            $scope.input.versions[pg.id] = data
+
+
+                        }, function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    )
+
             }
 
         })

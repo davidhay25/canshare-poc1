@@ -37,6 +37,8 @@
 
 
     <script src="js/csFrontPageCtrl.js"></script>
+    <script src="js/playgroundsSvc.js"></script>
+    <script src="js/utilsSvc.js"></script>
 
     <!--
     <script src="js/libs/ngStorage.min.js"></script>
@@ -65,19 +67,6 @@
     <script src="js/cmSvc.js"></script>
 
 
-    <script>
-        //add a function to determine if a given path is a child of another. Used when excluding paths
-        //eg seg1.seg2 is a child of seg1.  seg1path is not.
-        //Add here to ensure it is available before any functions that use it are loaded...
-        String.prototype.isChildPath = function (parent) {
-            let test = parent + "."
-            if (this.indexOf(test) > -1) {
-                return true
-            } else { return false}
-
-        };
-
-    </script>
 -->
     <script>
         const firebaseConfig = {
@@ -178,12 +167,21 @@
             <!-- List filters published, name/description filter-->
 
             <table class="table table-bordered">
-                <tr><th>Name</th><th>Description</th></tr>
+                <tr><th>Name</th><th>Description</th><th>Version</th></tr>
                 <tr ng-repeat = "pg in playgrounds"
                     style="cursor: pointer"
                     ng-click="selectPG(pg)">
                     <td>{{pg.name}}</td>
-                    <td>{{pg.description}}</td>
+                    <td>{{pg.description}}
+                    <div>
+                        <div ng-repeat="v in input.versions[pg.id]">
+                            {{v.publishedVersion}}
+                        </div>
+
+                    </div>
+
+                    </td>
+                    <td>{{pg.publishedVersion}}</td>
                 </tr>
             </table>
 

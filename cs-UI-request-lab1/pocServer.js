@@ -86,7 +86,7 @@ terminologyModule.setup(app)
 modelModule.setup(app,mongoDbName)      //pass in the mongo database name to use
 reviewModule.setup(app,mongoDbName)
 validatorModule.setup(app)
-QModule.setup(app)
+QModule.setup(app,mongoDbName)
 compVersionsModule.setup(app)
 libraryModule.setup(app)
 playgroundModule.setup(app,mongoDbName)
