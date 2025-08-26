@@ -42,6 +42,10 @@
     <script src="js/showParameters.js"></script>
     <script src="js/filters.js"></script>
     <script src="js/viewVSCtrl.js"></script>
+    <script src="js/qrVisualizerSvc.js"></script>
+    <script src="js/viewItemCtrl.js"></script>
+    <script src="js/makeQHelperSvc.js"></script>
+    <script src="js/utilsSvc.js"></script>
 
     <style>
         .fixed-span {
@@ -54,6 +58,10 @@
 
         .inVS {
             background-color: lightgreen;
+        }
+
+        .missingAnswer {
+            background-color: mistyrose;
         }
     </style>
 
@@ -169,17 +177,34 @@
 
         </div>
 
-        <div class="col-md-6">
-            <h4>QuestionnaireResponse</h4>
+        <div class="col-md-6" ng-show="selectedItem">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>QuestionnaireResponse</h4>
+                </div>
+                <div class="col-md-6">
+                        <div class="clickable pull-right"
+                             style="padding-top: 8px"
+                             ng-click="openQReview()">Open Questionnaire in review app</div>
+                </div>
+            </div>
+
             <uib-tabset>
 
                 <uib-tab heading="Report">
+                    <br/>
                     <div class="myScroll">
                         <table class="table table-bordered">
                         <tr><th>LinkId</th><th>Text</th><th>Code</th><th>DataType</th><th>Value</th></tr>
-                        <tr ng-repeat="entry in lstQRItem"
-                            ng-class="{background:entry.dt == 'Group'}">
+
+
+                            <!--  <tr ng-repeat="entry in lstQRItem"
+                            ng-class="{background:entry.dt == 'Group'}">-->
+
+                        <tr ng-repeat="entry in qBasedReport"
+                            ng-class="{background:entry.dt == 'Group',missingAnswer:entry.missingAnswer }">
                             <td>
+
                                 <div class="clickable" ng-click="itemDetails(entry.item)">{{entry.item.linkId}}</div>
                             </td>
 
@@ -193,7 +218,9 @@
                                 </div>
 
                             </td>
-                            <td>{{entry.dt}}</td>
+                            <td>
+                                {{entry.dt}}
+                            </td>
                             <td>
                                 <div ng-repeat="ans in entry.answerDisplay">
                                     {{ans}}
@@ -204,43 +231,18 @@
                     </table>
                     </div>
                 </uib-tab>
-                <uib-tab heading="Json">
-                    <div class="myScroll">
-                        <pre>{{selectedItem.qr | json}}</pre>
-                    </div>
 
-                </uib-tab>
-                <uib-tab heading="Validation">
-                    Validate QR against Q
-                    <button class="btn btn-link" ng-click="validate(selectedItem.qr)">Validate</button>
-
-                    <table class="table table-bordered">
-                        <tr ng-repeat="iss in oo.issue track by $index">
-                            <td>{{iss.severity}}</td>
-                            <td>{{iss.diagnostics}}
-                                <div>
-                                    {{iss.location[0]}}
-
-                                </div>
-                                <div>{{iss.details.text}}</div>
-                                <div ng-repeat = "exp in iss.expression">
-                                    <em><span class="clickable" ng-click="getItemFromOO(exp,iss)">{{exp}}</span></em>
-                                </div>
-                            </td>
-
-                        </tr>
-                    </table>
-
-                    {{oo.issue}}
-                </uib-tab>
                 <uib-tab heading="Coded answers">
 
                     <div class="clickable pull-right" ng-click="checkAllCodes(codedItems)">Check codes in ValueSet</div>
                     <table>
 
                         <tr><th>LinkId</th><th>Item text</th><th>Answer code</th><th>Answer text</th><th>ValueSet</th></tr>
-                        <tr ng-repeat="thing in codedItems">
-                            <td>{{thing.item.linkId}}</td>
+                        <tr ng-repeat="thing in codedItems"
+                            ng-class="{missingAnswer:thing.missingAnswer }">
+                            <td>
+                                <div class="clickable" ng-click="itemDetails(thing.item)">{{thing.item.linkId}}</div>
+                            </td>
                             <td>
                                 <div ng-style="{ 'padding-left': (thing.level * 6) }">
                                     {{thing.item.text}}</div>
@@ -267,13 +269,70 @@
                     </table>
 
 
-                  
+
 
                 </uib-tab>
-                <uib-tab heading="Questionnaire">
-                    retrieve the Q and display as a tree. Have a link to the reviewQ form for more details
+
+                <uib-tab ng-show="false" heading="QR tree">
+                    Tree view of QR
+
 
                 </uib-tab>
+
+                <uib-tab ng-show="false" heading="Extract">
+                    Invoke $extract on the lab to get back the extracted resources.
+                    Various views - list, table, graph
+                    pass bundle to bundle visualizer
+                    I think the SDC stuff could be simplified (support Observation extraction) and have
+                    common patterns for reports and requests.
+
+
+
+                </uib-tab>
+
+                <uib-tab heading="Validation">
+
+                    <button class="btn btn-link pull-right" ng-click="validate(selectedItem.qr)">Validate</button>
+
+                    <div class="clearfix"></div>
+                    <div class="myScroll">
+                        <table class="table table-bordered">
+                            <tr ng-repeat="iss in oo.issue track by $index"
+                                ng-class="{missingAnswer:iss.severity=='error'}">
+                                <td>
+                                    <div >{{iss.severity}}</div>
+                                </td>
+                                <td>{{iss.diagnostics}}
+                                    <div>
+                                        {{iss.location[0]}}
+
+                                    </div>
+                                    <div>{{iss.details.text}}</div>
+                                    <div ng-repeat = "exp in iss.expression">
+                                        <em><span class="clickable" ng-click="getItemFromOO(exp,iss)">{{exp}}</span></em>
+                                    </div>
+                                </td>
+
+                            </tr>
+                        </table>
+
+                    </div>
+
+
+                </uib-tab>
+
+
+                <uib-tab heading="Json">
+
+                    <div class="clickable pull-right" ng-click="copyQRToClipboard()">Save to clipboard</div>
+
+                    <div class="clearfix"></div>
+                    <div class="myScroll">
+                        <pre>{{selectedItem.qr | json}}</pre>
+                    </div>
+
+                </uib-tab>
+
             </uib-tabset>
 
         </div>

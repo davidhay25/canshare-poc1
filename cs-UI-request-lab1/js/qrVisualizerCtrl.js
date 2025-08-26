@@ -4,9 +4,8 @@
 */
 angular.module("pocApp")
     .controller('qrVisualizerCtrl',
-        function ($scope,$http,$localStorage,$sce,$uibModal) {
+        function ($scope,$http,$localStorage,$sce,$uibModal,qrVisualizerSvc,makeQHelperSvc,utilsSvc) {
             $scope.input = {}
-
 
             $scope.input.qrCsv =  $localStorage.qrCsv //dev
             let snomed = "http://snomed.info/sct"
@@ -39,11 +38,6 @@ angular.module("pocApp")
                                 // Fix double quotes from CSV escaping
                                 content = content.replace(/""/g, '"');
 
-
-                                // Remove leading/trailing quotes, unescape double quotes
-                                //const jsonStr = content.replace(/^"|"$/g, '').replace(/""/g, '"');
-
-                               // const jsonStr = lne["Content"].replace(/""/g, '"');
                                 if (inx == 0) {
                                     console.log(content)
                                 }
@@ -77,11 +71,31 @@ angular.module("pocApp")
                 $scope.parseQRFile($scope.input.qrCsv)
             }
 
+            $scope.copyQRToClipboard = function () {
+
+                let qr = $scope.selectedItem.qr
+                utilsSvc.copyToClipboard(angular.toJson(qr,true))
+                //$scope.localCopyToClipboard (fsh)
+                alert("QR on clipboard")
+            }
+
+            //open the modelReview app with this Q
+            $scope.openQReview = function () {
+                //in canshare, the Q name is the last segment of the Q url
+                let qUrl = $scope.selectedItem.qr.questionnaire
+                //let ar = qUrl.split('/')
+                //let qName = ar[ar.length -1]
+
+                const url = `modelReview.html?url-${qUrl}`
+                const features = 'noopener,noreferrer'
+                window.open(url, '_blank', features)
+            }
+
+            //'thing.item' is the item from the Q
             $scope.checkAllCodes = function (things) {
                 //$scope.codedItems
                 for (let thing of things) {
                     console.log(thing)
-
 
                     if (thing.item.answerValueSet && thing.answerCoding) {
                         let qry = `ValueSet/$validate-code?url=${thing.item.answerValueSet}`
@@ -118,7 +132,6 @@ angular.module("pocApp")
                                             thing.validatedConcept.version = param.valueString
                                             break
                                     }
-
                                 }
 
                             }, function (err) {
@@ -130,16 +143,46 @@ angular.module("pocApp")
                             }
                         )
 
+                    } else if (thing.item.answerOption && thing.answerCoding) {
+                        //this uses options in the Q rather than a VS
+                        for (const option of thing.item.answerOption) {
+                            let concept = option.valueCoding
+                            if (concept.code == thing.answerCoding.code && concept.system == thing.answerCoding.system) {
+                                //it's not really in a VS, but this drives the display
+                                thing.inVS = true
+                            }
+                        }
+
                     }
-
-
 
                 }
             }
 
 
+
             $scope.itemDetails = function (item) {
-                alert("Details of this item - including if codes are in VS.")
+
+                makeQHelperSvc.showItemDetailsDlg(item,$scope.selectedQ)
+
+/*
+                $uibModal.open({
+
+                    size : 'xlg',
+                    templateUrl: 'modalTemplates/viewItem.html',
+                    controller: 'viewItemCtrl',
+
+                    resolve: {
+                        item: function () {
+                            return item
+                        }, Q: function () {
+                            return $scope.selectedQ
+                        }
+                    }
+                })
+                */
+
+
+                //alert("Details of this item - including if codes are in VS.")
                 console.log(item)
             }
 
@@ -177,19 +220,20 @@ angular.module("pocApp")
             $scope.selectItem = function (item) {
                 $scope.selectedItem = item
                 parseQR($scope.selectedItem)
-
             }
 
-            //parse a QR item
+            //parse a QR item from the file list - ie {qr: }
            let parseQR = function (item) {
 
                 delete $scope.textReport
+               delete $scope.selectedQ
+
                 $scope.codedItems = []
 
                 let QR = item.qr
 
-                $scope.hashLinkId = {}
-                $scope.lstQRItem = []
+                $scope.hashLinkId = {}  //a hash of all items from the Q
+                $scope.lstQRItem = []   //a list of items from the QR for the report
 
 
                 let qUrl = QR.questionnaire
@@ -199,11 +243,21 @@ angular.module("pocApp")
 
                 $http.get(qry,config).then(
                     function (data) {
-                        //console.log(data.data)
+                        console.log(data.data)
                         if (data.data.entry && data.data.entry.length > 0) {
 
                             //get the definition of the items from the Q
+                            //note - assumes a single response
                             let Q = data.data.entry[0].resource
+                            $scope.selectedQ = Q
+                            let vo = qrVisualizerSvc.makeReport(Q,QR)
+                            $scope.qBasedReport = vo.report
+                            $scope.codedItems = vo.codedItems
+                            $scope.textReport = vo.textReport
+
+                          /*
+                            //used to load the Q review app. It needs the name
+                           // $scope.selectedQName = Q.name
                             //build a hash of Q items by linkId
                             for (const item of Q.item) {
                                 processQItem(item)
@@ -214,9 +268,10 @@ angular.module("pocApp")
                             for (const item of QR.item) {
                                 processQRItem(item,0)
                             }
-
+*/
                         } else {
                             alert(`The Q with the url ${qUrl} was not found`)
+                            //todo we could do a diminished report - that only had the info in the QR
                         }
 
                     },function (err) {
@@ -224,7 +279,7 @@ angular.module("pocApp")
                     }
                 )
 
-                function processQItem(item) {
+                function processQItemDEP(item) {
                     $scope.hashLinkId[item.linkId] = item
 
 
@@ -236,7 +291,7 @@ angular.module("pocApp")
                 }
 
 
-                function processQRItem(item,level) {
+                function processQRItemDEP(item,level) {
                     //console.log(item.linkId)
 
                     if (item.linkId == "id-2") {         //todo add a code to the Q.item and use that
@@ -285,11 +340,10 @@ angular.module("pocApp")
                                         if (thing.item.linkId !== 'id-2') {
                                             thing.answerDisplay.push(value)
                                         } else {
-                                            thing.answerDisplay.push("Text removed to improve display")
+                                            thing.answerDisplay.push("Text removed to improve report display")
                                         }
 
                                 }
-
                             }
                             $scope.lstQRItem.push(thing)
 
@@ -301,8 +355,6 @@ angular.module("pocApp")
 
                     } else {
                         //there is no answer, but add as a 'section'
-
-
                         let thing = {item:def,answer:item.answer,answerDisplay:[]}
 
                         if (item.item) {

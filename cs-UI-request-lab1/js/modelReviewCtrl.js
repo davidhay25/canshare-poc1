@@ -192,6 +192,37 @@ angular.module("pocApp")
 
             }
 
+
+
+            //update the other local variables from the Q
+            function processQ(Q) {
+                $scope.hashEd = {}
+
+                //get all the VS in the Q - returne
+                //also constructs a hashEd with an ED generated from the item - as best as possible
+                let ar = qHelperSvc.getAllVS($scope.fullQ)
+
+                for (const thing of ar) {
+                    $scope.hashEd[thing.ed.path] = thing.ed
+                }
+
+                vsSvc.getAllVS(ar, function () {
+
+                    //A report focussed on pre-popupation & extraction
+                    let voReport =  makeQSvc.makeReport($scope.fullQ)
+                    $scope.qReport =voReport.report
+
+                    console.log(voReport)
+
+                    //a graph of items
+                    /* very slow with large graphs
+                    let vo = makeQHelperSvc.getItemGraph($scope.fullQ)
+                    makeItemsGraph(vo.graphData)
+*/
+
+                })
+            }
+
             //Load the Q from the database
             $scope.loadQ = function (qName) {
                 let qry = `/Questionnaire/${qName}`
@@ -200,6 +231,8 @@ angular.module("pocApp")
                         $scope.input.mainTabActive = 1
                         $scope.fullQ = data.data.Q
                         $scope.errorLog = data.data.errorLog
+                        processQ($scope.fullQ)
+                        /*
                         $scope.hashEd = {}
 
                         //get all the VS in the Q - returne
@@ -222,11 +255,11 @@ angular.module("pocApp")
                             /* very slow with large graphs
                             let vo = makeQHelperSvc.getItemGraph($scope.fullQ)
                             makeItemsGraph(vo.graphData)
-*/
+
 
                         })
 
-
+*/
                     }, function (err) {
                         alert(angular.toJson(err.data))
                     }
@@ -237,13 +270,34 @@ angular.module("pocApp")
 
             if (modelName) {
                 if (modelName.startsWith('q-')) {
-                    //a Q reference was passed
+                    //a Q reference was passed. The Q will be retrieved from the database
                     let qName = modelName.slice(2)
                     $scope.loadQ(qName)
 
+                } else if (modelName.startsWith('url-')) {
+                    //a url was passed. This will be retrieved from the lab server
+                    let qUrl = modelName.slice(4)
+                    //let qry = `${$scope.serverbase}`
 
+                    let qry = `${$scope.serverbase}Questionnaire?url=${qUrl}`
+                    let config = {headers: {'content-type': 'application/fhir+json'}}
+
+                    $http.get(qry, config).then(
+                        function (data) {
+                            console.log(data.data)
+                            if (data.data.entry && data.data.entry.length > 0) {
+                                $scope.fullQ = data.data.entry[0].resource
+                                processQ($scope.fullQ)  //update internal variables
+                                $scope.input.mainTabActive = 1
+
+                            } else {
+                                alert(`Error contacting server: ${qry}`)
+                            }
+                        })
                 } else {
+
                     //todo this is the older style - can be removed once compositions is enabled
+                    /*
                     $http.get('/model/allDG').then(
                         function (data) {
                             //console.log(data.data)
@@ -316,6 +370,9 @@ angular.module("pocApp")
 
                         }
                     )
+
+                    */
+
                 }
 
             } else {
