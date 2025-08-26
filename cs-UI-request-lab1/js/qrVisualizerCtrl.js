@@ -255,6 +255,9 @@ angular.module("pocApp")
                             $scope.codedItems = vo.codedItems
                             $scope.textReport = vo.textReport
 
+
+                            $scope.checkAllCodes($scope.codedItems)
+
                           /*
                             //used to load the Q review app. It needs the name
                            // $scope.selectedQName = Q.name
