@@ -190,21 +190,34 @@ async function setup(app,mongoDbName) {
 
     //get a summary of playgrounds
     app.get('/playgroundSummary', async function(req,res) {
+        let publishedOnly = req.query.publishedOnly      //will only return pgs that have been published
         try {
             const cursor = await database.collection("playground").find().sort({name:1}).toArray()
             let ar = []
             for (const entry of cursor) {
-                let item = {id:entry.id,name:entry.name,description:entry.description,updated:entry.updated}
-                item.version = entry.version
-                item.lockedTo = entry.lockedTo
-                item.publishedVersion =entry.publishedVersion
-                if (entry.dataGroups) {
-                    item.dgCount = Object.keys(entry.dataGroups).length
+
+                let include = true
+                if (publishedOnly) {
+                    if (! entry.publishedVersion) {
+                        include = false
+                    }
                 }
-                if (entry.compositions) {
-                    item.compCount = Object.keys(entry.compositions).length
+
+                if (include) {
+                    let item = {id:entry.id,name:entry.name,description:entry.description,updated:entry.updated}
+                    item.version = entry.version
+                    item.lockedTo = entry.lockedTo
+                    item.publishedVersion =entry.publishedVersion
+                    item.publishedDate =entry.publishedDate
+                    if (entry.dataGroups) {
+                        item.dgCount = Object.keys(entry.dataGroups).length
+                    }
+                    if (entry.compositions) {
+                        item.compCount = Object.keys(entry.compositions).length
+                    }
+                    ar.push(item)
                 }
-                ar.push(item)
+
             }
 
             try {
@@ -260,7 +273,7 @@ async function setup(app,mongoDbName) {
         let playground = req.body
         delete playground['_id']
         let id = playground.id
-        let version = playground.publishedVersion    //assume the caller has set this correctly
+        //let version = playground.publishedVersion    //assume the caller has set this correctly
 
         //todo if there's already an entry with this version then reject the call
 

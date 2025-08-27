@@ -42,7 +42,7 @@
             <uib-tab heading="Collections Repository">
                 <em class="pull-right">To edit a collection, first lock it then load it.</em>
                 <table class="table table-bordered">
-                    <tr><th>Name</th><th>Description</th><th># DG / Comp</th><th>Updated</th><th>Version</th>
+                    <tr><th>Name</th><th>Description</th><th># DG / Comp</th><th>Updated</th><th>Version</th><th>Published version</th>
 
                         <th style="width: 20%">Commands</th></tr>
                     <tr ng-repeat="row in playgrounds">
@@ -55,6 +55,7 @@
                         <td>{{row.dgCount}} / {{row.compCount}}</td>
                         <td>{{row.updated | date : 'MMM dd, h:mm a'}}</td>
                         <td>{{row.version}}</td>
+                        <td>{{row.publishedVersion}}</td>
                         <td><span class="clickable"  ng-click="load(row,'repo')">Load</span>
                             <span style="padding-left: 20px" class="clickable"  ng-click="copy(row,'repo')">Copy</span>
                             <span style="padding-left: 20px" class="clickable"

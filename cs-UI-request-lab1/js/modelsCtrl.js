@@ -404,16 +404,20 @@ angular.module("pocApp")
             }
 
             //save the current Collection/PG as a version
+            //the 'publishedVersion' refers to the latest version that was published. This is incremented
+            //at the time the version is published
             $scope.savePGVersion = function () {
                 //$localStorage.world.publishedVersion = $localStorage.world.publishedVersion || 1
-                let msg = `This will create a new version (${$localStorage.world.publishedVersion}) of this Collection. Are you sure?`
+                let currentVersion = $localStorage.world.publishedVersion || 0
+                let msg = `This will create a new version (${currentVersion + 1}) of this Collection. It will also update the Repository. Are you sure?`
                 if (confirm(msg)) {
-
+                    $localStorage.world.publishedVersion = currentVersion + 1
+                    $localStorage.world.publishedDate = new Date()
                     playgroundsSvc.saveAsVersion($localStorage.world).then(
                         function (data) {
-                            //The version was saved. Can update the version number
+                            //The version was saved. Can update the repository
                             alert(`The Collection was saved with the published id of ${$localStorage.world.publishedVersion}`)
-                            $localStorage.world.publishedVersion = $localStorage.world.publishedVersion +1
+                            $scope.updatePlayground(true)
                         }, function (err) {
                             alert(angular.toJson(err))
 
@@ -447,23 +451,16 @@ angular.module("pocApp")
                         } else {
                             alert(angular.toJson(err.data))
                         }
-
                     }
                 )
 
                 function updatePlayground() {
                     $localStorage.world.updated = new Date()
-                    if ($localStorage.world.version) {
+                    if ($localStorage.world.version) {      //the version is incremented whenever the pg is updated. It's not the same as the published version
                         $localStorage.world.version ++
                     } else {$localStorage.world.version = 1}
 
-                    /*
-                    //reset the dirty flag of all DGs
-                    for (const key of Object.keys($localStorage.world.dataGroups)) {
-                        let DG = $localStorage.world.dataGroups[key]
-                        DG.dirty = false
-                    }
-                    */
+
 
                     $http.put(`/playground/${$localStorage.world.id}`,$localStorage.world).then(
                         function (data) {

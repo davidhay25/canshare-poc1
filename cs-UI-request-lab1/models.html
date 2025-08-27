@@ -610,20 +610,26 @@
                                 </div>
                             </div>
 
-
-                        </td></tr>
+                        </td>
+                        </tr>
 
 
                         <tr ng-if="false"><td>Id</td><td>{{world.id}}</td></tr>
                         <tr><td>Description</td><td><textarea class="form-control" ng-model="world.description"></textarea></td></tr>
-                        <tr ng-if="world.publishedVersion > 1"><td>Published version</td>
+                        <tr ><td>Published version</td>
                             <td>
                                 <div class="row">
                                     <div class="col-md-9">
-                                        {{world.publishedVersion -1 }}
+                                        <div ng-if="world.publishedVersion > 0">
+                                            {{world.publishedVersion  }}
+                                        </div>
+                                        <div ng-hide = "world.publishedVersion > 0">
+                                            This model has not yet been published
+                                        </div>
+
                                     </div>
                                     <div class="col-md-3">
-                                        <button ng-if="userMode == 'playground'" class="pull-right btn-primary btn"
+                                        <button ng-if="userMode == 'playground' && canEdit()" class="pull-right btn-primary btn"
                                                 ng-click="savePGVersion()">Publish a version</button>
                                     </div>
                                 </div>

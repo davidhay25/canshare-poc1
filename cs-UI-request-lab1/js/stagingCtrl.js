@@ -101,7 +101,6 @@ angular.module("pocApp")
                     let property = $scope.stagingProperties[key]
                     property.options = property.options || []
 
-
                     if (property[stageGroup] && key !== propThatCalled) {
                         //this is a property that sits at the top of the staging. system & table at present
                         let code = property.concept.code    //the snomed code for this element

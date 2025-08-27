@@ -1,6 +1,7 @@
 /*
 
 The controller used in the cmTester
+design doc: https://docs.google.com/document/d/1Z-gWvO99gsBvndovjjcmNu4lb6I5zV8KmrDqoCfr3DU/edit?tab=t.0#heading=h.8v6dl2cn94e5
  */
 
 angular.module("pocApp")
@@ -119,19 +120,6 @@ angular.module("pocApp")
             })
 
 
-
-
-
-            //------------- functions supporting the form UI
-
-            //Key variables
-            //$scope.cmProperties[key] - the definition of the property.
-            //  .options() has the set of possible concepts
-            //  .concept is the snomed concept for the property
-            //  .singleConcept is set when there is only a single possible value for the property
-
-            //$scope.local.cmPropertyValue[key] - the actual value (a concept) for the property
-            
             $scope.clearProperty = function (propKey) {
                 //todo should just be empty
 
@@ -146,8 +134,6 @@ angular.module("pocApp")
 
 
             }
-
-
 
             //called when the 'select concept' icon is clicked to display the filter dialog
             $scope.selectConcept = function (propKey,propDef) {
