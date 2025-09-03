@@ -1,0 +1,374 @@
+<!--
+
+ Options to update the ConceptMaps.
+ Functions to maintain versions with a 'release candidate' type workflow.
+ Intended for internal use only
+ Separate includes for the f=dynamic UI maps and the analytics maps
+ -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>Update ConceptMap</title>
+
+    <script src="js/libs/jquery-1.9.0.min.js"></script>
+    <script src="js/libs/angular.min1-5.js"></script>
+    <script src="js/libs/ui-bootstrap-tpls-2.0.1.min.js"></script>
+    <script src="js/libs/moment.min.js"></script>
+
+    <script src="js/libs/ngStorage.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="css/vis.min.css"/>
+
+
+    <style>
+        .invalidCode {
+            background-color: lightsalmon;
+        }
+    </style>
+
+
+    <script>
+        angular.module("pocApp",['ui.bootstrap','ui.checkbox',"firebase",'ngStorage']).config(function($locationProvider) {
+            $locationProvider.html5Mode(true);
+            $locationProvider.hashPrefix('!');
+        });
+        angular.module("pocApp").constant("moment", moment);
+
+        angular.module("pocApp").config(['$compileProvider', function ($compileProvider) {
+            $compileProvider.aHrefSanitizationWhitelist(/^\s*(http|https?|ftp|mailto|blob):/);
+        }]);
+
+        angular.module("formsApp",[])
+        angular.module('topApp', ['pocApp', 'formsApp'])
+
+    </script>
+
+
+
+    <script src="js/libs/angular-bootstrap-checkbox.js"></script>
+    <script src="js/updateCMCtrl.js"></script>
+    <script src="js/querySvc.js"></script>
+    <script src="js/updateVSSvc.js"></script>
+    <script src="js/showParameters.js"></script>
+    <script src="js/loginCtrl.js"></script>
+    <script src="js/utilsSvc.js"></script>
+    <script src="js/viewVSCtrl.js"></script>
+    <script src="js/analyticsCM.js"></script>
+    <script src="js/terminologyUpdateSvc.js"></script>
+
+
+    <script src="js/filters.js"></script>
+    <script src="js/customCodeSystemCtrl.js"></script>
+    <script src="js/enterConceptsCtrl.js"></script>
+    <script src="js/cmViewerCtrl.js"></script>
+    <script src="js/cmTesterSvc.js"></script>
+
+    <script src="js/libs/firebase.js"></script>
+    <script src="js/libs/angularfire.min.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDG1ToLHycsMUX0CfX0OZVSRUUpFQeKE9o",
+            authDomain: "canshare-730e6.firebaseapp.com",
+            projectId: "canshare-730e6",
+            storageBucket: "canshare-730e6.appspot.com",
+            messagingSenderId: "12147821347",
+            appId: "1:12147821347:web:5963d577cb050259475a96"
+        };
+        if (firebase) {
+            console.log('init firebase')
+            firebase.initializeApp(firebaseConfig);
+
+        }
+    </script>
+
+</head>
+<body style="padding: 8px;padding-top: 80px">
+<div ng-app="topApp" ng-controller="updateCMCtrl" class="container-fluid">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+        <div class="container-fluid">
+            <div class="col-md-4">
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            Update ConceptMap
+                        </a>
+                    </span>
+
+            </div>
+
+            <div class="col-md-3">
+
+
+            </div>
+
+            <div class="col-md-1">
+                <div class="navbar-text" >
+                    <div class="pull-right btn">{{version}}</div>
+                </div>
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <form class="navbar-form navbar-left">
+                    <img ng-show="showWaiting" src="css/ajax_loader_blue_32.gif"/>
+
+                </form>
+            </div>
+
+            <div class="col-md-1 col-sm-1">
+                <div class="navbar-text " ng-hide="user">
+                    <span style="font-size:1.2em; cursor: pointer" uib-popover="Click to log in"
+                          popover-placement="left"
+                          popover-trigger="'mouseenter'">
+                        <div ng-click="login()">
+                            <i class="glyphicon glyphicon-log-in"></i>
+                        </div>
+                    </span>
+                </div>
+
+                <div class="navbar-text"  ng-show="user">
+                    <span style="font-size:1.2em;  cursor: pointer" uib-popover="{{user.email}}"
+                          popover-placement="left"
+                          popover-trigger="'mouseenter'">
+                        <div ng-click="logout()">
+                            <i class="glyphicon glyphicon-log-out"></i>
+                        </div>
+                    </span>
+                </div>
+
+            </div>
+
+
+
+            <div class="col-md-2">
+                <a href="https://teaho.govt.nz/" target="_blank">
+                    <img width="150" height="auto" class="pull-right"
+                         style="padding: 3px"
+                         src="images/TAK-logo-midgreen.png"/>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+
+    <div>
+        <br/>
+        <uib-tabset>
+            <uib-tab heading="Dynamic UI maps by domain">
+                <ng-include src="'/includes/dynamicCM.html'"></ng-include>
+            </uib-tab>
+
+            <uib-tab heading="Analytic ConceptMap">
+                <div ng-controller="analyticsCmCtrl">
+                    <ng-include src="'/includes/analyticsCM.html'"></ng-include>
+                </div>
+            </uib-tab>
+
+            <uib-tab heading="All ConceptMaps">
+                <br/>
+                <uib-tabset>
+                    <uib-tab heading="UI ConceptMaps">
+                        <em>These are all ConceptMaps that are intended for driving a dynamic UI.
+                            Specifically, they do NOT include ConceptMaps that were uploaded using the 'Upload external CM' tab</em>
+                        <br/>
+                        <table class="table-bordered table">
+                            <tr><th>Id</th><th>Description</th><th>Status</th><th>Version</th><th>Last updated</th></tr>
+                            <tr ng-repeat="cm in everyConceptMap">
+                                <td>
+                                    <div class="clickable" ng-click="viewConceptMap(cm)">{{cm.id}}</div></td>
+                                <td>{{cm.description}}</td>
+                                <td>{{cm.status}}</td>
+                                <td>{{cm.version}}</td>
+                                <td>{{cm.meta.lastUpdated | date : "MMM dd yyyy HH:mm"}}</td>
+
+                            </tr>
+                        </table>
+                    </uib-tab>
+                    <uib-tab heading="External (Analytics) ConceptMaps">
+                        <em>These are all ConceptMaps that are intended for analytics - or, at least, not driving a UI.
+                            They are the ones that were uploaded using the 'Upload external CM' tab</em>
+                        <br/>
+                        <table class="table-bordered table">
+                            <tr><th>Id</th><th>Description</th><th>Status</th><th>Version</th><th>Last updated</th></tr>
+                            <tr ng-repeat="entry in allAnalyticCMBundle.entry">
+                                <td>
+                                    <div class="clickable" ng-click="viewConceptMap(entry.resource)">{{entry.resource.id}}</div></td>
+                                <td>{{entry.resource.description}}</td>
+                                <td>{{entry.resource.status}}</td>
+                                <td>{{entry.resource.version}}</td>
+                                <td>{{entry.resource.meta.lastUpdated | date : "MMM dd yyyy HH:mm"}}</td>
+
+                            </tr>
+                        </table>
+
+
+
+
+
+
+                    </uib-tab>
+                </uib-tabset>
+
+
+
+            </uib-tab>
+
+
+            <uib-tab heading="ConceptMap configuration">
+                <br/>
+                <div class="row">
+                    <div class="col-md-6">
+                        <em>The configuration used in the Dynamic UI app</em>
+                    </div>
+                    <div class="col-md-1">
+
+                        <a class="btn btn-link" download="{{downloadLinkJsonName}}"
+                           href="{{downloadLinkJson}}" title="{{downloadLinkJsonName}}" >
+                            Export
+                        </a>
+
+
+                    </div>
+                    <div class="col-md-1">
+                        <div class="btn btn-link" style="cursor: pointer" ng-click="importCMConfig()">Import</div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="pull-right">
+                            <div class="btn btn-link" style="cursor: pointer" ng-click="checkDynamicUIConcepts()">Check all concepts</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="btn btn-danger pull-right" style="cursor: pointer"
+                             ng-show = dirty
+                             ng-click="updateConfigOnServer()">Save changes</div>
+                    </div>
+                </div>
+                <br/>
+
+
+
+                <uib-tabset>
+                    <uib-tab heading="Table">
+                        <br/>
+                        <strong>Diagnostic properties</strong>
+                        <table class="table-bordered table">
+                            <tr><th>Property</th><th>OE Code</th><th>UI display</th><th>Next property</th><th>Previous property</th><th>Full VS</th></tr>
+                            <tr ng-repeat = "(k,v) in cmConfig.diagnosticProperties">
+                                <td style="width: 15%">{{k}}</td>
+                                <td ng-class="{invalidCode:hashInvalidCode[v.concept.code]}">
+                                    <div class="clickable" ng-click="lookup(v.concept.code)">
+                                        {{v.concept.code}} ({{v.concept.display}})
+                                    </div>
+
+                                </td>
+                                <td>{{v.UI}}</td>
+
+                                <td>{{v.next}}</td>
+                                <td>{{v.previous}}</td>
+                                <td><div class="clickable" ng-click="viewVS(v.fullVS)">{{v.fullVS}}</div> </td>
+
+
+
+                            </tr>
+                        </table>
+
+
+                        <br/>
+                        <strong>Staging properties</strong>
+                        <table class="table-bordered table">
+                            <tr><th>Property</th><th>OE Code</th><th>UI display</th><th>Group</th></tr>
+                            <tr ng-repeat = "(k,v) in cmConfig.stagingProperties">
+                                <td>{{k}}</td>
+
+                                <td ng-class="{invalidCode:hashInvalidCode[v.concept.code]}">
+                                    <div class="clickable" ng-click="lookup(v.concept.code)">
+                                        {{v.concept.code}} ({{v.concept.display}})
+                                    </div>
+                                </td>
+
+                                <td>{{v.UI}}</td>
+                                <td>
+                                    <div ng-if="v.staging1">Section 1</div>
+                                    <div ng-if="v.staging2">Section 2</div>
+                                </td>
+
+                            </tr>
+                        </table>
+                        <div style="padding: 8px" class="pull-right clickable" ng-click="addConfigLine('stagingProperties')">Add new Staging property</div>
+
+                        <br/>
+                        <strong>Grading properties</strong>
+                        <table class="table-bordered table">
+                            <tr><th>Property</th><th>OE Code</th><th>UI display</th><th>Group</th></tr>
+                            <tr ng-repeat = "(k,v) in cmConfig.gradingProperties">
+                                <td>{{k}}</td>
+
+                                <td ng-class="{invalidCode:hashInvalidCode[v.concept.code]}">
+                                    <div class="clickable" ng-click="lookup(v.concept.code)">
+                                        {{v.concept.code}} ({{v.concept.display}})
+                                    </div>
+                                </td>
+
+                                <td>{{v.UI}}</td>
+                                <td>
+                                    <div ng-if="v.staging1">Section 1</div>
+                                    <div ng-if="v.staging2">Section 2</div>
+                                </td>
+
+
+
+
+                            </tr>
+                        </table>
+                        <div style="padding: 8px" class="pull-right clickable" ng-click="addConfigLine('stagingProperties')">Add new Grading property</div>
+
+                        <br/>
+                        <strong>TNM Observables</strong>
+                        <table class="table-bordered table">
+                            <tr><th>Property</th><th>OE Code</th></tr>
+                            <tr ng-repeat = "(k,v) in cmConfig.tnmLUT">
+                                <td>{{k}}</td>
+
+                                <td ng-class="{invalidCode:hashInvalidCode[v]}">
+                                    <div class="clickable" ng-click="lookup(v)">
+                                        {{v}}
+                                    </div>
+                                </td>
+
+                            </tr>
+                        </table>
+
+
+
+                    </uib-tab>
+                    <uib-tab heading="Json">
+
+
+
+                        <pre>{{cmConfig | json}}</pre>
+                    </uib-tab>
+                </uib-tabset>
+            </uib-tab>
+
+
+
+        </uib-tabset>
+
+
+
+
+
+    </div>
+
+
+
+
+</div>
+</body>

@@ -403,18 +403,67 @@ angular.module("pocApp")
 
             }
 
+
+            //make a release candidate for this collection.
+            $scope.savePGRC = function () {
+                $localStorage.world.publishedVersion = $localStorage.world.publishedVersion || 1
+                $localStorage.world.publishedRCCount = $localStorage.world.publishedRCCount || 0
+
+                let msg = `This will create Version ${$localStorage.world.publishedVersion},  Release candidate ${$localStorage.world.publishedRCCount +1 }. It will also update the Repository. Are you sure?`
+
+                if (confirm(msg)) {
+                    //we increment the release count, not the version (though the version is set to 1 if undefined)
+                    let clone = angular.copy($localStorage.world)
+
+                    clone.publishedRCCount = clone.publishedRCCount + 1
+                    clone.publishedStatus = "Release Candidate"
+                    clone.publishedDate = new Date()
+                    playgroundsSvc.saveAsVersion(clone).then(
+                        function (data) {
+                            //The version was saved. Can update the local copy and repository
+                            $localStorage.world.publishedDate = clone.publishedDate
+                            $localStorage.world.publishedRCCount = clone.publishedRCCount
+                            $scope.updatePlayground(true)
+                            alert(`Version ${$localStorage.world.publishedVersion}, Release candidate ${$localStorage.world.publishedRCCount} was saved`)
+
+
+
+                        }, function (err) {
+                            alert(angular.toJson(err))
+
+
+                        }
+                    )
+                }
+            }
+
             //save the current Collection/PG as a version
             //the 'publishedVersion' refers to the latest version that was published. This is incremented
             //at the time the version is published
             $scope.savePGVersion = function () {
                 //$localStorage.world.publishedVersion = $localStorage.world.publishedVersion || 1
-                let currentVersion = $localStorage.world.publishedVersion || 0
+                let currentVersion = $localStorage.world.publishedVersion || 1
                 let msg = `This will create a new version (${currentVersion + 1}) of this Collection. It will also update the Repository. Are you sure?`
                 if (confirm(msg)) {
-                    $localStorage.world.publishedVersion = currentVersion + 1
-                    $localStorage.world.publishedDate = new Date()
-                    playgroundsSvc.saveAsVersion($localStorage.world).then(
+
+                    let clone = angular.copy($localStorage.world)
+
+                    delete clone.publishedRCCount //not needed for a version
+                    clone.publishedStatus = "Final"
+                    clone.publishedDate = new Date()
+
+
+                    //$localStorage.world.publishedRCCount = 0
+                   // $localStorage.world.publishedStatus = "Final"
+                    //$localStorage.world.publishedDate = new Date()
+
+                    playgroundsSvc.saveAsVersion(clone).then(
                         function (data) {
+
+                            $localStorage.world.publishedVersion = currentVersion + 1 //increment version. We're working on the next version
+                            $localStorage.world.publishedRCCount = 0    //haven't done a RC for this version yet
+                            $localStorage.world.publishedDate = clone.publishedDate
+
                             //The version was saved. Can update the repository
                             alert(`The Collection was saved with the published id of ${$localStorage.world.publishedVersion}`)
                             $scope.updatePlayground(true)
@@ -424,9 +473,9 @@ angular.module("pocApp")
                         }
                     )
                 }
-
-
             }
+
+
 
             $scope.updatePlayground = function (both) {
 

@@ -15,7 +15,7 @@ const axios = require("axios");
 
 //const gofshClient = require('gofsh').gofshClient;//.gofshClient
 const sushiClient = require('fsh-sushi').sushiClient;
-const serverModuleIg = require('./serverModuleIG')
+//const serverModuleIg = require('./serverModuleIG')
 
 const fhirResourceTypes = require('./artifacts/resourceElementsR4.json')
 
@@ -186,7 +186,7 @@ async function setup(app,mongoDbName) {
 
     //get the DG index for the IG
     //todo >>>>>>> not currently used
-    app.get('/model/dgIndex', async function(req,res) {
+    app.get('/model/dgIndexDEP', async function(req,res) {
         //retrieve all the active DGs
         let query = {active:true} // active: { $lt: 15 } };
 

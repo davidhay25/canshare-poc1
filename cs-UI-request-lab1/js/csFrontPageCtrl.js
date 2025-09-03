@@ -36,7 +36,7 @@ angular.module("pocApp")
                             console.log($scope.versions)
                             $scope.input.versions[pg.id] = data
 
-                            $scope.ddVersions = [{version:'current',display:"Current"}]
+                            $scope.ddVersions = [{version:'latest',display:"Latest"}]
                             for (v of data) {
                                 let date = $filter('date')(v.publishedDate)
                                 $scope.ddVersions.push({version:v.publishedVersion,display:`${v.publishedVersion} ${date}`})

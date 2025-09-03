@@ -1,11 +1,11 @@
 angular.module("pocApp")
-    .controller('uploadCmCtrl',
+    .controller('analyticsCmCtrl',
         function ($scope,$http) {
 
 
             $scope.cmUpload = {}
 
-            $scope.parseUCM = function () {
+            $scope.parseAnalyticsCM = function () {
 
                 try {
                     $scope.cmUpload = angular.fromJson($scope.input.cmJson)
@@ -86,7 +86,7 @@ angular.module("pocApp")
             }
 
             //construct the url and identifier based on the id
-            $scope.uploadUCM = function (id) {
+            $scope.uploadAnalyticsCM = function (id) {
                 if (confirm("Are you sure you wish to upload this ConceptMap")) {
 
                     //check that the source CodeSystem exists

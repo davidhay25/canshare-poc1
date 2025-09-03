@@ -14,7 +14,13 @@ let jobs = {}
 
 //load the config file for accessing NZHTS (the file is excluded from git)
 const nzhtsconfig = JSON.parse(fs.readFileSync("./nzhtsconfig.config").toString())
-const cmconfig = JSON.parse(fs.readFileSync("./artifacts/cmConfig.json").toString())
+
+const path_to_config = "./artifacts/cmConfig.json"
+
+let cmconfig = JSON.parse(fs.readFileSync(path_to_config).toString()) //not const as can be changed
+
+
+
 
 
 let currentToken = {token:null,expires:null}    //expires is the date.getTime() of when the token expires
@@ -53,6 +59,7 @@ async function getNZHTSAccessToken() {
 
 
 function setup(app) {
+
 
 
 
@@ -106,8 +113,24 @@ function setup(app) {
 
     app.get('/cmConfig',function (req,res) {
         res.json(cmconfig)
+    })
+
+    app.put('/cmConfig',function (req,res) {
+        //when the config file is updated from the UI
+
+        cmconfig = req.body
+        try {
+            let json = JSON.stringify(cmconfig)
+            fs.writeFileSync(path_to_config,json)
+            res.json({msg: 'config updated'})
+        } catch (ex) {
+            console.log(ex)
+            res.status(400).json({msg:ex.message})
+        }
 
     })
+
+
 
     //get the status of a specific job
     app.get('/job/status/:token',function (req,res) {

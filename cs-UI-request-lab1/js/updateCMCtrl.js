@@ -1,5 +1,14 @@
+
+/*
+* The controller for the ConceptMap udpdate app (split off from the update VS app)
+* This is mostly the dynamic UI maps - the analytics maps have a separate controller
+*             //versioning doc: http://docs.google.com/document/d/1kVkdTc4wrHrU-04z30WCbMGr9XHBFeSNaBLycVvZZ_U/edit?tab=t.0
+*                               //https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653
+* */
+
+
 angular.module("pocApp")
-    .controller('updateVSCtrl',
+    .controller('updateCMCtrl',
         function ($scope,$http,$uibModal,$q,updateVSSvc,utilsSvc,terminologyUpdateSvc,$localStorage,$interval,cmTesterSvc) {
 
             $scope.version = utilsSvc.getVersion()
@@ -30,32 +39,135 @@ angular.module("pocApp")
             let systemPrePub = "http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished"
             let csId = "canshare-unpublished-concepts"   //the id for the CodeSystem
 
-/*
+
+            function setUpConfigFile(data) {
+                $scope.cmConfig = data
+                cmTesterSvc.setConfig(data)
+
+                $scope.downloadLinkJson = window.URL.createObjectURL(new Blob([angular.toJson($scope.cmConfig,true) ],{type:"application/json"}))
+                $scope.downloadLinkJsonName = `cmConfig.json`
+            }
+
             $http.get('/cmConfig').then(
                 function (data) {
-                    $scope.cmConfig = data.data
-                    cmTesterSvc.setConfig(data.data)
-                }
-            )
-            */
-
-            //get the CodeSystem used for pre published codes
-            updateVSSvc.getCodeSystem(csId, systemPrePub).then(
-                function (cs) {
-                    $scope.prePubCS = cs
-
-                    //there was a validation issue with the CodeSystem so we're fixing them here.
-                    //$scope.prePubCS.name = "Canshare_unpublished_concepts"
-                    //$scope.prePubCS.caseSensitive = true
-
-
-                }, function (err) {
-                    alert(err)
+                    setUpConfigFile(data.data)
                 }
             )
 
-            $scope.getAnalyticsConceptMapsDEP = function () {
-                //get all the analytic conceptmaps. These are the ones uploaded using the 'external upload' option
+
+            $scope.addConfigLine = function (type) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/addCMConfigEntry.html',
+                    backdrop: 'static',
+                    //size: 'xlg',
+                    controller: function ($scope) {
+                        $scope.input = {}
+/*
+                        $scope.types = []
+                        $scope.types.push({name:"stagingProperties",display:"Staging property"})
+                        $scope.types.push({name:"gradingProperties",display:"Grading property"})
+                        $scope.input.type= $scope.types[0]
+*/
+                        $scope.save = function () {
+                            let entry = {}
+                            //entry.type = $scope.input.type
+                            entry.property = $scope.input.property
+
+                            entry.item = {concept:{code:$scope.input.code}}
+                            entry.item.UI = $scope.input.display
+
+
+                           // entry.code = $scope.input.code
+                            //entry.display = $scope.input.display
+                            $scope.$close(entry)
+                        }
+
+                    }
+                }).result.then(function (entry) {
+
+                    console.log(entry)
+
+                    let vo = $scope.cmConfig[type]
+                    vo[entry.property] = entry.item
+                    setUpConfigFile($scope.cmConfig)
+                    $scope.dirty = true
+
+                })
+            }
+            
+            $scope.importCMConfig = function () {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/importCMConfig.html',
+                    backdrop: 'static',
+                    //size: 'xlg',
+                    controller: function ($scope) {
+                        $scope.uploadJson = function() {
+                            let id = "#fileUploadFileRef"    //in importCMConfig
+                            let file = $(id)
+                            let fileList = file[0].files
+                            if (fileList.length == 0) {
+                                alert("Please select a file first")
+                                return;
+                            }
+
+                            let fileObject = fileList[0]  //is a complex object
+
+                            let r = new FileReader();
+
+                            //called when the upload completes
+                            r.onloadend = function (e) {
+                                let data = e.target.result;
+                                try {
+                                    let obj = angular.fromJson(data)
+                                    //quick validation
+
+                                    if (! obj || !obj.tnmLUT || !obj.diagnosticProperties) {
+                                        alert("This does not appear to be a valid config file")
+                                        return
+                                    }
+
+                                    $scope.$close(obj)
+
+                                } catch (ex) {
+                                    alert("This is not a valid Json file")
+                                    return
+                                }
+                            }
+
+                            //perform the read...
+                            r.readAsText(fileObject);
+                        }
+                    },
+
+                }).result.then(function (configJson) {
+                    //This should be a config file - though minimal validation
+                    $scope.dirty = true
+                    $scope.cmConfig = configJson
+                    setUpConfigFile($scope.cmConfig)
+
+
+
+                })
+            }
+
+
+
+            $scope.updateConfigOnServer = function () {
+                if (confirm("Are you sure you wish to update the ConceptMap configuration file")) {
+                    //update the server
+                    $http.put('/cmConfig',$scope.cmConfig).then(
+                        function (data) {
+                            alert("CM config updated on server")
+                        }, function (err) {
+                            alert(err.data.msg)
+                        }
+                    )
+                }
+            }
+
+
+            $scope.getAnalyticsConceptMaps = function () {
+                //get all the analytic conceptmaps. These are the ones uploaded using the 'analytics' tab
                 $http.get('/nzhts/ConceptMap/allAnalytic').then(
                     function (data) {
                         $scope.allAnalyticCMBundle = data.data
@@ -64,12 +176,15 @@ angular.module("pocApp")
                     }
                 )
             }
-            //$scope.getAnalyticsConceptMaps()
+            $scope.getAnalyticsConceptMaps()
 
 
 
 
-            $scope.viewConceptMapDEP = function (cm) {
+
+
+            //displays the CM viewer for the currently selected map. This allows a better view of the map and some testing
+            $scope.viewConceptMap = function (cm) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/cmViewer.html',
                     backdrop: 'static',
@@ -92,7 +207,7 @@ angular.module("pocApp")
                 })
             }
 
-
+/*
             $scope.updateTest = function () {
                 if (confirm("This will copy all DG & Compositions from the Production Library to the Test Library. Are you sure?")) {
                     $scope.showWaiting = true
@@ -108,8 +223,9 @@ angular.module("pocApp")
                 }
 
             }
+           */
 
-
+/*
             $scope.executeBespoke = function (qry) {
                 let encodedQry = encodeURIComponent(qry)
                 let fullQry = `/nzhts?qry=${encodedQry}`
@@ -120,13 +236,12 @@ angular.module("pocApp")
 
                     }
                 )
-
             }
+*/
+            $scope.showLinkDEP = function (name) {
 
-            $scope.showLink = function (name) {
 
-
-                let host = `http://poc.canshare.co.nz/vsLookup.html?${name}`
+                let host = `http://poc.canshare.co.nz/query.html?${name}`
 
                 $scope.localCopyToClipboard(host)
                 alert(`Link: ${host} \ncopied to clipBoard`);
@@ -134,8 +249,58 @@ angular.module("pocApp")
             }
 
 
+
+
+
+            $scope.checkDynamicUIConcepts = function() {
+                $scope.hashInvalidCode = {}         //a hash of concept not found in the terminology server
+
+                function checkConcepts(obj){
+                    for (const key of Object.keys(obj)) {
+                        let item = obj[key]
+                        //start by assuming that we have an object (all except tnmLUT)
+                        let concept = item.concept
+                        let system = concept.system || snomed
+
+                        //the value of tnmLUT is just the code
+                        if (item !== null && typeof item !== "object") {
+                            concept = item
+                        }
+
+
+                        if (concept.code) {
+
+
+                            let qry = `CodeSystem/$lookup?system=${system}&code=${concept.code}`
+                            let encodedQry = encodeURIComponent(qry)
+                            //$scope.showWaiting = true
+                            $http.get(`nzhts?qry=${encodedQry}`).then(
+                                function (data) {
+                                    //if the code exisit then all good. todo could check display?
+
+                                }, function (err) {
+                                    $scope.hashInvalidCode[concept.code] = true     //flag that the code cannot be found
+                                }
+                            )
+                        }
+                    }
+
+                }
+
+                checkConcepts($scope.cmConfig.stagingProperties)
+                checkConcepts($scope.cmConfig.gradingProperties)
+                checkConcepts($scope.cmConfig.diagnosticProperties)
+                checkConcepts($scope.cmConfig.tnmLUT)
+
+
+            }
+
+
+
+
+
             //============================== update ConceptMap functions
-            //https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653
+
 
             //$scope.previousCMSS = $localStorage.previousCMSS
 
@@ -178,8 +343,8 @@ angular.module("pocApp")
             }
 
 
-            //parse a CM 'file' copied from the spreadsheet
-            $scope.parseCMFileDEP = function (file) {
+            //parse a CM 'file' for dynamic UIcopied from the spreadsheet. in cmUploader.html
+            $scope.parseCMFile = function (file) {
 
 
                 let arLines = file.split('\n')
@@ -253,7 +418,7 @@ angular.module("pocApp")
                 })
             }
 
-            $scope.canShowRow = function (row) {
+            $scope.canShowRowDEP = function (row) {
                 //to show / hide specific rows in the audit
                 if ($scope.input.hideVSIssues && row.msg.indexOf('does not exist on the terminology server') !== -1) {
                     return false
@@ -273,7 +438,7 @@ angular.module("pocApp")
 
             //save the concept map. This will either be the dev version, or the most recent release candidate
             //versioning doc: http://docs.google.com/document/d/1kVkdTc4wrHrU-04z30WCbMGr9XHBFeSNaBLycVvZZ_U/edit?tab=t.0
-            $scope.uploadConceptMapDEP = function (rc) {
+            $scope.uploadConceptMap = function (rc) {
                 //if rc is true, then updating the release candidate
 
                 //the nameRoot is the id of the current concept map. This contains the domain
@@ -338,7 +503,7 @@ angular.module("pocApp")
             }
 
 
-            $scope.publishRCDEP = function (version) {
+            $scope.publishRC = function (version) {
                 let msg = `This will publish the release candidate for version ${version} and make it the current version. Are you sure you wish to do this?`
                 if (confirm(msg)) {
                     $scope.showWaiting = true
@@ -359,7 +524,7 @@ angular.module("pocApp")
             }
 
             //make a release candidate from the current dev CS
-            $scope.makeRCDEP = function (version) {
+            $scope.makeRC = function (version) {
                 let msg = `This will create a new release candidate for version ${version} from the dev version. Are you sure you wish to do this?`
                 if (confirm(msg)) {
                     $scope.showWaiting = true
@@ -383,7 +548,7 @@ angular.module("pocApp")
 
             //load all the CM from the server, update allDomains and allConcepMaps
 
-            $scope.getConceptMapVersionsDEP = function (domain,cb) {
+            $scope.getConceptMapVersions = function (domain,cb) {
                 let qry = `/nzhts/ConceptMap/allVersions`
                 domain = domain || "SACT"           //default to sact
 
@@ -499,7 +664,46 @@ angular.module("pocApp")
                 )
             }
             //always start with SACT - routine will build the list of all domains
-            //$scope.getConceptMapVersions('SACT')
+            $scope.getConceptMapVersions('SACT')
+
+
+            $scope.lookup = function (code,system) {
+                system = system || snomed
+                let qry = `CodeSystem/$lookup?system=${system}&code=${code}`
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+
+                        $uibModal.open({
+                            templateUrl: 'modalTemplates/showParameters.html',
+                            //backdrop: 'static',
+                            //size : 'lg',
+                            controller : "showParametersCtrl",
+                            resolve: {
+                                parameters: function () {
+                                    return data.data
+                                },
+                                title : function () {
+                                    return `Concept lookup (${code})`
+                                },
+                                code: function () {
+                                    return code
+                                },
+                                system : function () {
+                                    return system
+                                }
+                            }
+                        })
+
+
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                ).finally(function () {
+                    $scope.showWaiting = false
+                })
+            }
 
 
 
@@ -603,7 +807,7 @@ angular.module("pocApp")
 
             }
 
-            $scope.parseVSBatchFile = function (file) {
+            $scope.parseVSBatchFileDEP = function (file) {
 
                 let arLines = file.split('\n')
                 //console.log(arLines.length)
@@ -617,14 +821,14 @@ angular.module("pocApp")
 
             }
 
-            $scope.handleVSBatchPaste = function(event) {
+            $scope.handleVSBatchPasteDEP = function(event) {
                 setTimeout(function () {
                     var textarea = document.getElementById('pasteVSBatchTextbox');
                     textarea.scrollTop = 0;  // Scroll to the top
                 }, 0);  // Wait for the paste to complete before updating the model
             }
 
-            $scope.listConcepts = function (ecl) {
+            $scope.listConceptsDEP = function (ecl) {
                 //display the concepts based on the ecl
                // let ecl = vs.compose.include[0].filter[0].value     //we constructed this VS so we know this path is valid
                 let vo = {ecl:ecl}
@@ -661,7 +865,7 @@ angular.module("pocApp")
 
             }
 
-            $scope.displayJson = function (json) {
+            $scope.displayJsonDEP = function (json) {
                 $uibModal.open({
                     templateUrl: 'modalTemplates/displayJson.html',
                     //backdrop: 'static',
@@ -677,11 +881,11 @@ angular.module("pocApp")
                 })
             }
 
-            $scope.clearText = function () {
+            $scope.clearTextDEP = function () {
                 delete $scope.input.vsBatchData
             }
 
-            $scope.uploadVSBatch = function () {
+            $scope.uploadVSBatchDEP = function () {
                 let msg = `This will upload the ValueSet batch. It can take up to 5 minutes to complete (depending on the size). Are you sure you wish to do this.`
                 if (confirm(msg)) {
 
@@ -750,7 +954,7 @@ angular.module("pocApp")
                 }
             }
 
-            $scope.expandAllVS = function () {
+            $scope.expandAllVSDEP = function () {
 
                 //$scope.action= "Expanding ECL"
                 makeMultipleRequests().then((results) => {
@@ -799,14 +1003,14 @@ angular.module("pocApp")
 
             //=============================
 
-            $scope.getMemberCountDate = function () {
+            $scope.getMemberCountDateDEP = function () {
                 if ($localStorage.memberCount) {
                     return $localStorage.memberCount.date
                 }
 
             }
 
-            $scope.getMCOneVS = function (url) {
+            $scope.getMCOneVSDEP = function (url) {
                 let count = ""
                 if ($localStorage.memberCount) {
                     count = $localStorage.memberCount.members[url]
@@ -814,7 +1018,7 @@ angular.module("pocApp")
                 return count
             }
 
-            $scope.updateAllMemberCount = function () {
+            $scope.updateAllMemberCountDEP = function () {
                 let msg = `This will determine the count of all ValueSet concepts. It can take up to 5 minutes to complete (depending on the size). Are you sure you wish to do this.`
                 if (confirm(msg)) {
 
@@ -891,7 +1095,7 @@ angular.module("pocApp")
 
             //-------------------
 
-            $scope.setSyndicationStatus = function () {
+            $scope.setSyndicationStatusDEP = function () {
                 if (confirm("Are you sure you wish to set the syndication status for all resources. This will take over a minute.")) {
                     $scope.showWaiting = true
                     $scope.showWaitingTimeout = true
@@ -949,7 +1153,7 @@ angular.module("pocApp")
             }
 
             //used by the long running functions - setSyndicationStatus & batch vs upload
-            function stopUIDisplay(intervalPromise) {
+            function stopUIDisplayDEP(intervalPromise) {
                 $interval.cancel(intervalPromise);
                 $scope.showWaiting = false
                 $scope.showWaitingTimeout = false
@@ -958,9 +1162,9 @@ angular.module("pocApp")
 
             //============ unpublished codes
 
-            $scope.input.showTableCell = []
+            //$scope.input.showTableCell = []
 
-            $scope.analyseUnpublished = function () {
+            $scope.analyseUnpublishedDEP = function () {
                 $scope.analysingUnpublished = true
                 let url = "/analyseUnpublished"
                 $http.get(url).then(
@@ -986,7 +1190,7 @@ angular.module("pocApp")
                 //terminologyUpdateSvc.checkUnpublishedCodes($scope.allVSItem)
             }
 
-            $scope.updateUnpublished = function () {
+            $scope.updateUnpublishedDEP = function () {
                 if (confirm("This will update the ValueSets that need changing, and the new CodeSystem")) {
                     let updateBatch = $scope.unpublishedReport.updateBatch
 
@@ -1021,7 +1225,7 @@ angular.module("pocApp")
                 }
             }
 
-            $scope.selectFromUnpublished = function (vs) {
+            $scope.selectFromUnpublishedDEP = function (vs) {
                 $scope.selectVSItem({vs:vs})
                 $scope.input.topTabActive = 0
             }
@@ -1029,7 +1233,7 @@ angular.module("pocApp")
             //===========================
 
             //retrieve all ValueSets
-            getValueSets = function (identifier) {
+            getValueSetsDEP = function (identifier) {
                 //return a list of subsetted canshare valuesets
                 identifier = identifier || "http://canshare.co.nz/fhir/NamingSystem/valuesets%7c"
 
@@ -1089,7 +1293,7 @@ angular.module("pocApp")
             }
             
 
-            $scope.makeVSDownload = function() {
+            $scope.makeVSDownloadDEP = function() {
                 //create download
 
 
@@ -1103,6 +1307,7 @@ angular.module("pocApp")
 
             }
 
+            /*
             getValueSets().then(
                 function (ar) {
                     $scope.allVSItem = ar
@@ -1126,10 +1331,10 @@ angular.module("pocApp")
 
                 }
             )
-
+*/
             
             //---- functions for 'other CodeSystem
-            $scope.addOtherCsConcept = function () {
+            $scope.addOtherCsConceptDEP = function () {
                 let concept = {}
                 concept.code = $scope.input.newOtherCsCode
                 concept.display = $scope.input.newOtherCsDisplay
@@ -1159,7 +1364,7 @@ angular.module("pocApp")
             }
 
             //allow other concepts to be entered from a spreadsheet
-            $scope.selectOtherConcepts = function (arConcepts,system) {
+            $scope.selectOtherConceptsDEP = function (arConcepts,system) {
 
                 $uibModal.open({
                     templateUrl: 'modalTemplates/enterConcepts.html',
@@ -1266,7 +1471,7 @@ angular.module("pocApp")
                 */
             }
             
-            $scope.removeOtherCsConcept = function (inx) {
+            $scope.removeOtherCsConceptDEP = function (inx) {
 
                 $scope.input.otherCsConcepts.splice(inx,1)
                 $scope.makeVS()
@@ -1274,7 +1479,7 @@ angular.module("pocApp")
 
 
             //add a concept to the list directly included in the VS. In an include section with the snomed system
-            $scope.addDisplayConcept = function () {
+            $scope.addDisplayConceptDEP = function () {
 
                 $scope.input.displayConcepts = $scope.input.displayConcepts || []
                 let concept = {code:$scope.input.newDisplayCode,display:$scope.input.newDisplayDisplay}
@@ -1286,7 +1491,7 @@ angular.module("pocApp")
                 $scope.makeVS()
             }
 
-            $scope.removeDisplayConcept = function (inx) {
+            $scope.removeDisplayConceptDEP = function (inx) {
                 $scope.input.displayConcepts.splice(inx,1)
                 $scope.makeVS()
 
@@ -1294,7 +1499,7 @@ angular.module("pocApp")
 
 
             //add a concept to the list of pre-published items
-            $scope.addPPConcept = function () {
+            $scope.addPPConceptDEP = function () {
 
                 $scope.input.prePubConcepts = $scope.input.prePubConcepts || []
                 let concept = {code:$scope.input.newPPCode, display:$scope.input.newPPDisplay}
@@ -1310,13 +1515,13 @@ angular.module("pocApp")
                 $scope.makeVS()
             }
 
-            $scope.removePPConcept = function (inx) {
+            $scope.removePPConceptDEP = function (inx) {
                 $scope.input.prePubConcepts.splice(inx,1)
                 $scope.makeVS()
 
             }
 
-            $scope.checkNewVS = function (id) {
+            $scope.checkNewVSDEP = function (id) {
                 let ok = true
                 for (const item of $scope.allVSItem ) {
                     if (item.vs.id == id) {
@@ -1331,7 +1536,7 @@ angular.module("pocApp")
                 }
             }
 
-            function performUpdate(vs) {
+            function performUpdateDEP(vs) {
 
                 //Update the CodeSystem then the ValueSet...
 
@@ -1365,7 +1570,7 @@ angular.module("pocApp")
             }
 
             //called by the 'Update VS button
-            $scope.updateVS = function (vs) {
+            $scope.updateVSDEP = function (vs) {
                 let msg = "Are you sure you wish to update this valueSet"
                 if ($scope.csDirty) {
                     msg += " and CodeSystem"
@@ -1378,14 +1583,14 @@ angular.module("pocApp")
                 }
             }
 
-            $scope.newVS = function () {
+            $scope.newVSDEP = function () {
                 if (confirm("Are you sure you wish to create this valueSet")) {
                     performUpdate($scope.selectedVS)
                 }
 
             }
 
-            $scope.createNew = function () {
+            $scope.createNewDEP = function () {
                 $scope.isNew = true
                 delete $scope.input.id
                 delete $scope.input.title
@@ -1413,7 +1618,7 @@ angular.module("pocApp")
 
             }
 
-            $scope.testECL = function (ecl) {
+            $scope.testECLDEP = function (ecl) {
                 
                 let vo = {ecl:ecl}
 
@@ -1427,13 +1632,13 @@ angular.module("pocApp")
 
             }
 
-            $scope.canSave = function () {
+            $scope.canSaveDEP = function () {
                 return $scope.input.id && $scope.input.title && $scope.input.description &&
                     $scope.isDirty
             }
 
             //whether to show a particular VS
-            $scope.showVS = function (item) {
+            $scope.showVSDEP = function (item) {
 
                 if (! $scope.input.includeRetired) {
                     if (item.vs.status == 'retired' || item.vs.status == 'draft') {
@@ -1460,7 +1665,7 @@ angular.module("pocApp")
 
 
             //parse the contents of the VS into the scope values
-            function parseVS(vs) {
+            function parseVSDEP(vs) {
                 delete $scope.parseError
                 $scope.input.status = vs.status
                 $scope.input.id = vs.id
@@ -1528,7 +1733,7 @@ angular.module("pocApp")
             }
 
             //When a ValueSet is selected from the list
-            $scope.selectVSItem = function (item) {
+            $scope.selectVSItemDEP = function (item) {
                 $scope.isDirty = false
                 delete $scope.textEclVS
                 //retrieve the complete VS. we know the id, but we'll still search by url as that's the recommended
@@ -1662,7 +1867,7 @@ angular.module("pocApp")
                 return updateVSSvc.getMemberCount(vs)
             }
 
-            $scope.getVersions = function (vs) {
+            $scope.getVersionsDEP = function (vs) {
 
                 let qry = `ValueSet/${vs.id}/_history?_summary=false`
 
@@ -1690,12 +1895,12 @@ angular.module("pocApp")
                 )
             }
 
-            $scope.selectVersion = function (vs) {
+            $scope.selectVersionDEP = function (vs) {
                 $scope.selectedVersion = vs
             }
 
             //when a history item is selected
-            $scope.revert = function (vs) {
+            $scope.revertDEP = function (vs) {
                 $scope.selectedVS = vs
                 parseVS($scope.selectedVS)
                 $scope.isDirty = true
@@ -1703,7 +1908,7 @@ angular.module("pocApp")
 
             }
 
-            $scope.makeVS = function () {
+            $scope.makeVSDEP = function () {
                 let vo = {id:$scope.input.id,
                     title:$scope.input.title,
                     status : $scope.input.status,
@@ -1716,7 +1921,7 @@ angular.module("pocApp")
                 $scope.isDirty = true
             }
 
-            $scope.expandVSInTS = function (vs) {
+            $scope.expandVSInTSDEP = function (vs) {
                 delete $scope.expandedVS
                 let qry = `ValueSet/$expand?url=${vs.url}&_summary=false&displayLanguage=${nzDisplayLanguage}`
 
@@ -1746,7 +1951,7 @@ angular.module("pocApp")
 
 
             //The display for a concept code. Used when adding pre-published codes
-            $scope.getDisplay = function (code,control) {
+            $scope.getDisplayDEP = function (code,control) {
 
                 let qry = `CodeSystem/$lookup?system=${snomed}&code=${code}`
                 let encodedQry = encodeURIComponent(qry)
@@ -1774,46 +1979,7 @@ angular.module("pocApp")
 
             }
 
-            $scope.lookup = function (code,system) {
-                system = system || snomed
-                let qry = `CodeSystem/$lookup?system=${system}&code=${code}`
-                let encodedQry = encodeURIComponent(qry)
-                $scope.showWaiting = true
-                $http.get(`nzhts?qry=${encodedQry}`).then(
-                    function (data) {
-
-                        $uibModal.open({
-                            templateUrl: 'modalTemplates/showParameters.html',
-                            //backdrop: 'static',
-                            //size : 'lg',
-                            controller : "showParametersCtrl",
-                            resolve: {
-                                parameters: function () {
-                                    return data.data
-                                },
-                                title : function () {
-                                    return `Concept lookup (${code})`
-                                },
-                                code: function () {
-                                    return code
-                                },
-                                system : function () {
-                                    return system
-                                }
-                            }
-                        })
-
-
-                    }, function (err) {
-                        alert(angular.toJson(err.data))
-                    }
-                ).finally(function () {
-                    $scope.showWaiting = false
-                })
-            }
-
-
-            function makeVSFromVo(vo) {
+            function makeVSFromVoDEP(vo) {
 
                 let da = new Date().toISOString()
                 let ar = da.split('T')

@@ -586,11 +586,6 @@
                                         <div>{{world.id}}</div>
                                     </div>
                                 </div>
-
-
-
-
-
                             </td>
 
                         </tr>
@@ -614,7 +609,7 @@
                         </tr>
 
 
-                        <tr ng-if="false"><td>Id</td><td>{{world.id}}</td></tr>
+
                         <tr><td>Description</td><td><textarea class="form-control" ng-model="world.description"></textarea></td></tr>
                         <tr ><td>Published version</td>
                             <td>
@@ -629,6 +624,7 @@
 
                                     </div>
                                     <div class="col-md-3">
+
                                         <button ng-if="userMode == 'playground' && canEdit()" class="pull-right btn-primary btn"
                                                 ng-click="savePGVersion()">Publish a version</button>
                                     </div>

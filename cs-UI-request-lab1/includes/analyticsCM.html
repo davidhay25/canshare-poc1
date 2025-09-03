@@ -1,4 +1,58 @@
+<!--
+
+Accept a pasted CM, parse it and upload it to the Terminology Server
+These are CM's intended for code mapping during analytics ingestion - not for dynamic UI
+-->
+
+
 <div>
+
+
+  <div class="row" ng-show="false">
+
+    <div class="col-md-2">
+      <button ng-show="input.cmData"
+              class="btn-link btn" ng-click="parseCMFile(input.cmData)">Parse content</button>
+    </div>
+    <div class="col-md-2">
+
+
+      <div style="padding: 8px;font-weight: bold;color: #ef8fbe">
+        <select class="form-control" ng-model = "input.selectedDomain"
+                ng-change="getConceptMapVersions(input.selectedDomain)"
+                ng-options = "d for d in allDomains"></select>
+      </div>
+
+
+
+    </div>
+    <div class="col-md-2">
+      <!--
+      <div>
+        <button class="btn-link btn" ng-click="loadCurrent()">Download from Term. server</button>
+      </div>
+      -->
+    </div>
+    <div class="col-md-2">
+      <a class="btn" target="_blank" href="https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit#gid=285304653">Concept Map spreadsheet</a>
+
+    </div>
+    <div class="col-md-4">
+      <div class="pull-right" ng-show="conceptMap && user.email && canUpload ">
+        <button style="padding-top: 8px"  class="btn btn-danger " ng-click="uploadConceptMap(input.publishCMVer)">Upload ConceptMap</button>
+
+        <span  ng-if="activeRC">
+            <checkbox ng-model="input.publishCMVer"></checkbox> Release Candidate {{previousVersion}}
+          </span>
+
+
+      </div>
+
+    </div>
+
+  </div>
+
+
   <div class="row">
     <div class="col-md-6">
 
@@ -15,7 +69,7 @@
 
 
       <div>
-        <div class="pull-right clickable " ng-show="input.cmJson" ng-click="parseUCM()">Parse</div>
+        <div class="pull-right clickable " ng-show="input.cmJson" ng-click="parseAnalyticsCM()">Parse</div>
       </div>
 
 
@@ -83,7 +137,7 @@
           <div ng-hide="exists" class="alert alert-info">{{message}}</div>
         </div>
         <div class="col-md-4">
-          <div class="pull-right btn btn-danger"  ng-click="uploadUCM(cmUpload.id)">Upload</div>
+          <div class="pull-right btn btn-danger"  ng-click="uploadAnalyticsCM(cmUpload.id)">Upload</div>
         </div>
       </div>
 

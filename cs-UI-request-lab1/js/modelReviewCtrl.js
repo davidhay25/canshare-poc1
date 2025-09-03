@@ -1,7 +1,7 @@
 angular.module("pocApp")
     .controller('modelReviewCtrl',
         function ($scope,$http,modelsSvc,modelCompSvc,$timeout, $uibModal,makeQSvc,utilsSvc,$window,
-                  orderingSvc,snapshotSvc,vsSvc,qHelperSvc,$localStorage,makeQHelperSvc) {
+                  orderingSvc,snapshotSvc,vsSvc,qHelperSvc,$localStorage,makeQHelperSvc,modelReviewSvc) {
 
             $scope.input = {}
 
@@ -395,8 +395,13 @@ angular.module("pocApp")
             $scope.pasteQ = function (Qstring) {
                 let testQ = {}
                 try {
-                    testQ = JSON.parse(Qstring)
-                } catch {
+
+                    let vo = modelReviewSvc.convertR4(JSON.parse(Qstring))
+                    testQ = vo.Q
+                    console.log(vo.log)
+
+                } catch (ex) {
+                    console.log(ex)
                     alert("This is not a valid Json string")
                     return
                 }

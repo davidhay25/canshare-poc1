@@ -1,0 +1,70 @@
+
+<div>
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-8 col-sm-8">
+        <h3 class="modal-title">
+          Add a new entry to the CM config
+        </h3>
+      </div>
+
+
+      <div class="col-md-4 col-sm-4">
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+        <button ng-show = "input.property && input.code && input.display"
+                class="btn btn-primary pull-right" ng-click="save()">Close</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="modal-body">
+<!--
+    <div class="row">
+      <div class="col-md-3">
+        Type
+      </div>
+      <div class="col-md-9">
+        <select class="form-control" ng-model="input.type"
+                ng-options="t.display for t in types"></select>
+      </div>
+    </div>
+    -->
+
+    <div class="row">
+      <div class="col-md-5">
+        Property name
+      </div>
+      <div class="col-md-7">
+        <input type="text" class="form-control" ng-model="input.property"/>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-5">
+        OE SNOMED code
+      </div>
+      <div class="col-md-7">
+        <input type="text" class="form-control" ng-model="input.code"/>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-5">
+        UI display
+      </div>
+      <div class="col-md-7">
+        <input type="text" class="form-control" ng-model="input.display"/>
+      </div>
+    </div>
+
+
+
+
+  </div>
+  <div class="modal-header">
+    <em>Import a Json config file into the current environment. Should really be an export from
+    the app - perhaps modified but the structure is fixed.</em>
+  </div>
+</div>

@@ -1,9 +1,16 @@
+<!--
+
+Updates the ValueSets. Has functions for direct editing and importing from spreadsheets
+ Intended for internal use only
+-->
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <base href="/">
     <meta charset="UTF-8">
-    <title>Terminology maintenance</title>
+    <title>Update ValueSet</title>
 
     <script src="js/libs/jquery-1.9.0.min.js"></script>
     <script src="js/libs/angular.min1-5.js"></script>
@@ -50,18 +57,24 @@
     <script src="js/loginCtrl.js"></script>
     <script src="js/utilsSvc.js"></script>
     <script src="js/viewVSCtrl.js"></script>
-    <script src="js/uploadCM.js"></script>
+
     <script src="js/terminologyUpdateSvc.js"></script>
 
 
     <script src="js/filters.js"></script>
     <script src="js/customCodeSystemCtrl.js"></script>
     <script src="js/enterConceptsCtrl.js"></script>
-    <script src="js/cmViewerCtrl.js"></script>
-    <script src="js/cmTesterSvc.js"></script>
+
 
     <script src="js/libs/firebase.js"></script>
     <script src="js/libs/angularfire.min.js"></script>
+    <script src="js/cmTesterSvc.js"></script>
+
+    <!--
+        <script src="js/uploadCM.js"></script>
+        <script src="js/cmViewerCtrl.js"></script>
+
+    -->
 
     <script>
         const firebaseConfig = {
@@ -81,7 +94,7 @@
 
 </head>
 <body style="padding: 8px;padding-top: 80px">
-<div ng-app="topApp" ng-controller="updateCtrl" class="container-fluid">
+<div ng-app="topApp" ng-controller="updateVSCtrl" class="container-fluid">
 
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
@@ -89,7 +102,7 @@
             <div class="col-md-4">
                     <span>
                         <a class="navbar-brand" href="#">
-                            Terminology maintenance
+                            Update ValueSet
                         </a>
                     </span>
 
@@ -749,18 +762,7 @@
 
 
         </uib-tab>
-        <uib-tab ng-if="false" heading="List VS by date modified">
-            <table class="table-bordered table">
-                <tr ng-repeat = "item in sortedVS">
-                    <td>{{item.vs.meta.lastUpdated | date : "MMM d, h:mm a y"}} </td>
-                    <td>{{item.vs.meta.lastUpdated | ageSeconds}}</td>
-                    <td>{{item.display}}</td>
 
-
-                </tr>
-            </table>
-
-        </uib-tab>
 
 
         <uib-tab>
@@ -816,6 +818,8 @@
             </div>
 
         </uib-tab>
+
+        <!--
         <uib-tab heading="ConceptMap">
             <br/>
             <uib-tabset>
@@ -935,6 +939,7 @@
 
 
         </uib-tab>
+        -->
 
         <uib-tab heading="Batch ValueSet upload">
 

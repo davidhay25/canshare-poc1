@@ -1,11 +1,13 @@
-//The server for the example UI - requester and lab
+/*
+    The main server for the tooling. Orginally for the POC but evolved since then
+    start with ./pocrun.sh or ./localrun.sh which supplies the environment variables see below
 
+
+*/
 
 let fs = require('fs')
 let http = require('http');
 const axios = require("axios");
-
-
 
 console.log('port',process.env.POCSERVERBASE)
 
@@ -34,10 +36,10 @@ console.log("")
 let serverBase = process.env.SERVERBASE
 
 const requesterModule = require("./serverModuleRequesterUI.js")
-const labModule = require("./serverModuleLabUI.js")
-const dashBoardModule = require("./serverModuleDashboardUI.js")
+//const labModule = require("./serverModuleLabUI.js")
+//const dashBoardModule = require("./serverModuleDashboardUI.js")
 const commonModule = require("./serverModuleCommonUI.js")
-const clinicalViewerModule = require("./serverModuleClinicalViewerUI")
+//const clinicalViewerModule = require("./serverModuleClinicalViewerUI")
 const terminologyModule = require("./serverModuleTerminologyUI")
 const modelModule = require("./serverModuleModel")
 const reviewModule = require("./serverModuleReview")
@@ -79,9 +81,9 @@ app.use((req, res, next) => {
 */
 
 requesterModule.setup(app)
-labModule.setup(app)
-dashBoardModule.setup(app)
-clinicalViewerModule.setup(app)
+//labModule.setup(app)
+//dashBoardModule.setup(app)
+//clinicalViewerModule.setup(app)
 terminologyModule.setup(app)
 modelModule.setup(app,mongoDbName)      //pass in the mongo database name to use
 reviewModule.setup(app,mongoDbName)
