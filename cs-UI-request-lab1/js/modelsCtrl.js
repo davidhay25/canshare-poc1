@@ -448,10 +448,11 @@ angular.module("pocApp")
 
                     let clone = angular.copy($localStorage.world)
 
+                    currentVersion++ //increment version. We're working on the next version
                     delete clone.publishedRCCount //not needed for a version
                     clone.publishedStatus = "Final"
                     clone.publishedDate = new Date()
-
+                    clone.publishedVersion = currentVersion
 
                     //$localStorage.world.publishedRCCount = 0
                    // $localStorage.world.publishedStatus = "Final"
@@ -460,7 +461,7 @@ angular.module("pocApp")
                     playgroundsSvc.saveAsVersion(clone).then(
                         function (data) {
 
-                            $localStorage.world.publishedVersion = currentVersion + 1 //increment version. We're working on the next version
+                            $localStorage.world.publishedVersion = currentVersion
                             $localStorage.world.publishedRCCount = 0    //haven't done a RC for this version yet
                             $localStorage.world.publishedDate = clone.publishedDate
 

@@ -199,7 +199,7 @@
                             <tr><th>Id</th><th>Description</th><th>Status</th><th>Version</th><th>Last updated</th></tr>
                             <tr ng-repeat="entry in allAnalyticCMBundle.entry">
                                 <td>
-                                    <div class="clickable" ng-click="viewConceptMap(entry.resource)">{{entry.resource.id}}</div></td>
+                                    <div class="clickable" ng-click="viewAnalyticsConceptMap(entry.resource)">{{entry.resource.id}}</div></td>
                                 <td>{{entry.resource.description}}</td>
                                 <td>{{entry.resource.status}}</td>
                                 <td>{{entry.resource.version}}</td>
@@ -327,7 +327,7 @@
 
                             </tr>
                         </table>
-                        <div style="padding: 8px" class="pull-right clickable" ng-click="addConfigLine('stagingProperties')">Add new Grading property</div>
+                        <div style="padding: 8px" class="pull-right clickable" ng-click="addConfigLine('gradingProperties')">Add new Grading property</div>
 
                         <br/>
                         <strong>TNM Observables</strong>

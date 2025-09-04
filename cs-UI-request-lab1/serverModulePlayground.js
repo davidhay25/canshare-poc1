@@ -293,7 +293,7 @@ async function setup(app,mongoDbName) {
         let id = req.params.id
         const query = {id:id}
         try {
-            const cursor = await database.collection("playgroundVersion").find(query).toArray()
+            const cursor = await database.collection("playgroundVersion").find(query).sort({publishedDate:-1}).toArray()
             res.json(cursor)
 
         } catch(ex) {

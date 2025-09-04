@@ -158,6 +158,7 @@ angular.module("pocApp")
                     $http.put('/cmConfig',$scope.cmConfig).then(
                         function (data) {
                             alert("CM config updated on server")
+                            delete $scope.dirty
                         }, function (err) {
                             alert(err.data.msg)
                         }
@@ -200,6 +201,42 @@ angular.module("pocApp")
                             return ""
                         }, data : function() {
                             return null
+                        }
+
+                    }
+
+                })
+            }
+
+            $scope.viewAnalyticsConceptMap = function (cm) {
+                $uibModal.open({
+                    templateUrl: 'modalTemplates/viewAnalyticsCM.html',
+                    backdrop: 'static',
+                    size: 'xlg',
+                    controller: function($scope,CM){
+                        $scope.CM = CM
+
+                        $scope.clear = function () {
+                            delete $scope.selectedElement
+                        }
+
+                        $scope.lookup = function (code) {
+                            delete $scope.selectedElement
+
+                            for (const el of CM.group[0].element) {
+                                if (el.code == code) {
+
+                                    $scope.selectedElement = el
+                                    break
+                                }
+                            }
+
+                        }
+                    },
+
+                    resolve: {
+                        CM: function () {
+                            return cm
                         }
 
                     }

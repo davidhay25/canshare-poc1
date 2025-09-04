@@ -1,0 +1,98 @@
+
+<div>
+
+  <div class="modal-header">
+    <div class="row">
+      <div class="col-md-8 col-sm-8">
+        <h3 class="modal-title">
+          Analytics ConceptMap
+        </h3>
+      </div>
+
+
+      <div class="col-md-4 col-sm-4">
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Close</button>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="modal-body">
+
+
+    Source: {{CM.group[0].source}}
+    <div>Target: {{CM.group[0].target}}</div>
+    <br/>
+
+    <uib-tabset>
+      <uib-tab heading="Table">
+        <div class="myScroll">
+          <table class="table-bordered table table-condensed">
+            <tr><th>Code</th><th>Display</th><th>Mappings</th></tr>
+            <tr ng-repeat="el in CM.group[0].element">
+              <td>{{el.code}}</td>
+              <td>{{el.display}}</td>
+              <td>
+                <table class="table-bordered table table-condensed">
+                  <tr ng-repeat = "targ in el.target">
+                    <td>{{targ.code}}</td>
+                    <td>{{targ.display}}</td>
+                    <td>{{targ.equivalence}}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+          </table>
+        </div>
+
+
+
+      </uib-tab>
+
+      <uib-tab heading="Lookup">
+        <br/>
+        <div class="row">
+          <div class="col-md-2">
+            Source code
+          </div>
+          <div class="col-md-2">
+            <input type="text"  ng-keypress="clear()" class="form-control" ng-model="code"/>
+          </div>
+          <div class="col-md-7">
+            {{selectedElement.display}}
+          </div>
+          <div class="col-md-1">
+            <button class="btn-link btn" ng-click="lookup(code)">Lookup</button>
+          </div>
+        </div>
+        <br/>
+        <table class="table-bordered table table-condensed">
+          <tr><th>Code</th><th>Display</th><th>Equivalence</th></tr>
+          <tr ng-repeat = "targ in selectedElement.target">
+            <td>{{targ.code}}</td>
+            <td>{{targ.display}}</td>
+            <td>{{targ.equivalence}}</td>
+          </tr>
+        </table>
+
+      </uib-tab>
+
+      <uib-tab heading="Json">
+        <div class="myScroll">
+          <pre>{{CM | json}}</pre>
+        </div>
+
+      </uib-tab>
+    </uib-tabset>
+
+
+
+
+
+  </div>
+  <div class="modal-header">
+
+  </div>
+</div>

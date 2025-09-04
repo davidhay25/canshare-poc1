@@ -32,14 +32,22 @@ angular.module("pocApp")
 
                     playgroundsSvc.getVersions(pg.id).then(
                         function (data) {
-                            $scope.versions = data
+                            $scope.versions = data  //sorted by publishedDate descending
                             console.log($scope.versions)
+
                             $scope.input.versions[pg.id] = data
 
-                            $scope.ddVersions = [{version:'latest',display:"Latest"}]
-                            for (v of data) {
+                            //$scope.ddVersions = [{version:'latest',display:"Latest"}]
+                            $scope.ddVersions = []
+                            let first = true
+                            for (const v of data) {
                                 let date = $filter('date')(v.publishedDate)
-                                $scope.ddVersions.push({version:v.publishedVersion,display:`${v.publishedVersion} ${date}`})
+                                let display = `${v.publishedVersion} ${date}`
+                                if (first) {
+                                    display += ' (current)'
+                                    first = false
+                                }
+                                $scope.ddVersions.push({version:v.publishedVersion,display:display})
                             }
 
                             $scope.input.ddSelectedVersion = $scope.ddVersions[0]
