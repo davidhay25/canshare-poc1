@@ -43,6 +43,7 @@ angular.module("pocApp")
                 let name = 'noname'
                 if (Q.title) {
                     name = Q.title.replace(/\s+/g, "")
+                    name = name.replace(/:/g, "")
                 }
 
                 Q.id = `canshare-rcpa-${name}`
