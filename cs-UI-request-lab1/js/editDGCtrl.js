@@ -1,7 +1,7 @@
 angular.module("pocApp")
     .controller('editDGCtrl',
-        function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc,snapshotSvc, parent,
-                  utilsSvc, modelDGSvc,$http,userMode,$uibModal,$timeout,$filter,viewVS) {
+        function ($scope,model,hashTypes,hashValueSets,isNew,modelsSvc,snapshotSvc, parent,$localStorage,
+                  utilsSvc, modelDGSvc,$http,userMode,$uibModal,$timeout,$filter,viewVS,modelReviewSvc) {
 
 
             //if parent is set, then 'isNew' will be also...
@@ -13,30 +13,46 @@ angular.module("pocApp")
             $scope.userMode = userMode
 
             $scope.input.fixedValues = []   //all the fixed values defined by this DG (not shared like Named Queries)
-/*
-            $scope.linkedItemFilter = function (item) {
-                if (!$scope.input.linkedDG) return true; // If no input, show nothing
-                console.log(item)
-                let a = item.title.toLowerCase()
-                let b = $scope.input.linkedDG.toLowerCase()
-                console.log(a,b,a.indexOf(b))
 
-                if (a.indexOf(b) == -1) {
-                    return false
-                } else {
-                    return true
+
+            $scope.input.pastedQ = $localStorage.pastedQ    //todo just when developing
+            $scope.input.parseMakeGroup = true
+            //when a DG is to be created from a Q
+            $scope.pasteQ = function (Qstring) {
+
+                let testQ = {}
+                try {
+
+                    let vo = modelReviewSvc.convertR4(JSON.parse(Qstring),$scope.input.parseMakeGroup)
+                    testQ = vo.Q
+                    console.log(vo.Q)
+                    let vo1 = modelReviewSvc.makeDG(testQ)
+
+                    //console.log(vo1.dg)
+                    $scope.model = vo1.dg
+                    $scope.input.newModelName = $scope.model.name
+                    $scope.checkName($scope.input.newModelName)
+                    $scope.input.newModelTitle= $scope.model.title
+
+                    $localStorage.pastedQ = Qstring //todo just when developing
+                    alert("DG has been created from the Q. Details visible on other tabs.")
+
+                } catch (ex) {
+                    console.log(ex)
+                    alert("This is not a valid Json string")
+                    return
                 }
 
 
-             //   return item.title.toLowerCase().includes($scope.input.linkedDG.toLowerCase());
 
-            };
 
-            $scope.$watch('input.linkedDG', function () {
-                console.log('e')
-                $scope.$applyAsync();  // Ensures UI updates correctly
-            });
-*/
+
+
+
+            }
+
+
+
 
             //construct a has of all types (DT + FHIR) for the full list of elements routine
             //construct a has of all types (DT + FHIR) for the full list of elements routine

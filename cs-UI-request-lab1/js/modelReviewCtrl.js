@@ -11,6 +11,9 @@ angular.module("pocApp")
 
             $scope.serverbase = "https://fhir.forms-lab.com/"
 
+
+            $scope.input.pastedQ = $localStorage.pastedQ
+
             // ----------- consume events emitted by the v2 Q renderer ----
             $scope.$on('viewVS',function (event,vs) {
                 $scope.viewVS(vs)
@@ -215,10 +218,10 @@ angular.module("pocApp")
                     console.log(voReport)
 
                     //a graph of items
-                    /* very slow with large graphs
-                    let vo = makeQHelperSvc.getItemGraph($scope.fullQ)
-                    makeItemsGraph(vo.graphData)
-*/
+                    //very slow with large graphs todo - ? only look for small Q
+                  //  let vo = makeQHelperSvc.getItemGraph($scope.fullQ)
+                        //makeItemsGraph(vo.graphData)
+
 
                 })
             }
@@ -393,12 +396,24 @@ angular.module("pocApp")
 
             //paste in a Q
             $scope.pasteQ = function (Qstring) {
+
+
+                $localStorage.pastedQ = Qstring
+
                 let testQ = {}
                 try {
 
-                    let vo = modelReviewSvc.convertR4(JSON.parse(Qstring))
+                    let vo = modelReviewSvc.convertR4(JSON.parse(Qstring),$scope.input.parseMakeGroup)
                     testQ = vo.Q
                     console.log(vo.log)
+/*
+                    let vo1 = modelReviewSvc.makeDG(testQ)
+                    //>>>>>>>> temp!!
+                    let key = vo1.dg.name
+                    $localStorage.world.dataGroups = {}
+                    $localStorage.world.dataGroups[key] = vo1.dg
+                    */
+                   // console.log(vo1.dg)
 
                 } catch (ex) {
                     console.log(ex)
@@ -409,10 +424,15 @@ angular.module("pocApp")
                 try {
                     $scope.hashEd = {}
                     //A report focussed on pre-popupation & extraction
+
+
                     let voReport =  makeQSvc.makeReport(testQ)
                     $scope.qReport =voReport.report
                     $scope.fullQ = testQ
+                    processQ(testQ)
                     $scope.input.mainTabActive = 1
+
+
                 } catch {
                     alert("This is a valid Json string, but there were errors parsing it.")
 

@@ -1,19 +1,6 @@
 
 <div>
-    <!--<div ng-controller="newResourceCtrl">-->
-    <style>
 
-
-
-
-        .overriddenDEP {
-            font-weight: bold;
-        }
-
-        .requiredDEP {
-            font-weight: bold;
-        }
-    </style>
     <div class="modal-header">
         <div class="row">
             <div class="col-md-9">
@@ -437,8 +424,6 @@
 
             </uib-tab>
 
-
-
             <uib-tab heading="Named queries">
                 <br/>
 
@@ -586,6 +571,30 @@
                                   will be copied into the Q Item. Use double quotes - not single quotes.</em>
 
               -->
+            </uib-tab>
+
+
+            <uib-tab heading="Import from Q">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Paste in a new Questionnaire</h5>
+                    </div>
+                    <div class="col-md-3">
+                        <div style="padding: 8px">
+                            <checkbox ng-model = 'input.parseMakeGroup'></checkbox> Make groups
+                        </div>
+
+                    </div>
+                    <div class="col-md-3">
+
+
+                        <button class="btn btn-link pull-right"
+                                ng-click="pasteQ(input.pastedQ)"
+                                ng-if="input.pastedQ">Parse Questionnaire</button>
+                    </div>
+                </div>
+
+                <textarea class="form-control" ng-model="input.pastedQ" rows="20"></textarea>
             </uib-tab>
 
             <uib-tab heading="Json">
