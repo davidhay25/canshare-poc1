@@ -1781,7 +1781,6 @@ angular.module("pocApp")
                 $scope.showWaiting = true
                 $http.get(`nzhts?qry=${encodedQry}`).then(
                     function (data) {
-
                         $uibModal.open({
                             templateUrl: 'modalTemplates/showParameters.html',
                             //backdrop: 'static',
@@ -1802,7 +1801,6 @@ angular.module("pocApp")
                                 }
                             }
                         })
-
 
                     }, function (err) {
                         alert(angular.toJson(err.data))

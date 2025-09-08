@@ -107,7 +107,17 @@
                 </td>
               </tr>
 
-              <tr>
+            <tr>
+              <td class="detailName" >OE Code</td>
+              <td>
+
+                <div class="clickable" ng-click="lookup(selectedItem.code[0].code)">{{selectedItem.code[0].code}}</div>
+                <div>{{selectedItem.code[0].display}}</div>
+              </td>
+            </tr>
+
+
+            <tr>
                 <td class="detailName" >Type</td>
                 <td>
                   <div ng-repeat="type in selectedEd.type">
@@ -315,10 +325,11 @@
             </table>
 
           <div ng-if="selectedItem.type == 'choice'">
+
             <table class="table table-bordered">
               <tr ng-repeat="opt in getOptions(selectedItem)">
                 <td>{{opt.display}}</td>
-                <td>{{opt.code}}</td>
+                <td><div class="clickable" ng-click="lookup(opt.code)">{{opt.code}}</div> </td>
                 <td>{{opt.system}}</td>
               </tr>
             </table>

@@ -27,6 +27,9 @@ angular.module("pocApp")
                         ed.mult += '1'
                     }
 
+                    if (item.code) {
+                        ed.itemCode = item.code[0]
+                    }
 
                     ed.mult = '0..1'
 
@@ -85,10 +88,11 @@ angular.module("pocApp")
 
 
             },
-            convertR4: function(Q,makeGroup){
+            convertR4: function(Q,makeGroup,source){
                 //convert an R5 Q to R4 (at least the bits I care about)
-                //todo - make specific for rcpa (or souece)
-                //written for the Q from RCPA
+                //todo - make specific (if needed) for source of Q
+                //todo - need to think of the best way to do this
+                //if makeGroup true, then if a non-group has child items, they are all pushed into a separate group type parent
                 let log = []
 
                 function processItem(item) {

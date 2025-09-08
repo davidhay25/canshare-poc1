@@ -15,7 +15,7 @@ angular.module("pocApp")
             $scope.input.fixedValues = []   //all the fixed values defined by this DG (not shared like Named Queries)
 
 
-            $scope.input.pastedQ = $localStorage.pastedQ    //todo just when developing
+            //$scope.input.pastedQ = $localStorage.pastedQ    //todo just when developing
             $scope.input.parseMakeGroup = true
             //when a DG is to be created from a Q
             $scope.pasteQ = function (Qstring) {
@@ -34,7 +34,7 @@ angular.module("pocApp")
                     $scope.checkName($scope.input.newModelName)
                     $scope.input.newModelTitle= $scope.model.title
 
-                    $localStorage.pastedQ = Qstring //todo just when developing
+                    //$localStorage.pastedQ = Qstring //todo just when developing
                     alert("DG has been created from the Q. Details visible on other tabs.")
 
                 } catch (ex) {

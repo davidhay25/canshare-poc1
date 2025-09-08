@@ -205,6 +205,7 @@ angular.module("pocApp")
                 //also constructs a hashEd with an ED generated from the item - as best as possible
                 let ar = qHelperSvc.getAllVS($scope.fullQ)
 
+                //todo this doesn't seem right...
                 for (const thing of ar) {
                     $scope.hashEd[thing.ed.path] = thing.ed
                 }

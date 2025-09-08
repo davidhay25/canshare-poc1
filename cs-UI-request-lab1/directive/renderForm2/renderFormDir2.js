@@ -24,6 +24,8 @@ angular.module('formsApp')
                 //let localPatientId = $scope.patientid || "dietrich-blake-louis"
                 let localPractitionerId = '10652933'//'alderson-helene'     //connectathon
 
+                let snomed = "http://snomed.info/sct"
+
                 $scope.datePopup = {}
                 $scope.dataEntered = {}
 
@@ -92,6 +94,43 @@ angular.module('formsApp')
                 $scope.viewItem = function (item) {
                     makeQHelperSvc.showItemDetailsDlg(item,$scope.q)
                 }
+
+                $scope.lookup = function (code,system) {
+                    system = system || snomed
+                    let qry = `CodeSystem/$lookup?system=${system}&code=${code}`
+                    let encodedQry = encodeURIComponent(qry)
+                    $scope.showWaiting = true
+                    $http.get(`nzhts?qry=${encodedQry}`).then(
+                        function (data) {
+                            $uibModal.open({
+                                templateUrl: 'modalTemplates/showParameters.html',
+                                //backdrop: 'static',
+                                //size : 'lg',
+                                controller : "showParametersCtrl",
+                                resolve: {
+                                    parameters: function () {
+                                        return data.data
+                                    },
+                                    title : function () {
+                                        return `Concept lookup (${code})`
+                                    },
+                                    code: function () {
+                                        return code
+                                    },
+                                    system : function () {
+                                        return system
+                                    }
+                                }
+                            })
+
+                        }, function (err) {
+                            alert(angular.toJson(err.data))
+                        }
+                    ).finally(function () {
+                        $scope.showWaiting = false
+                    })
+                }
+
 
 
 
