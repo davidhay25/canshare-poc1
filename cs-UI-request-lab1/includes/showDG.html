@@ -476,7 +476,9 @@
                   <tr ng-if="selectedNode.data.ed.itemCode">
                     <td class="detailName" style="width : 20%">Item code</td>
                     <td>
-                      {{selectedNode.data.ed.itemCode.code}} | {{selectedNode.data.ed.itemCode.display}} | {{selectedNode.data.ed.itemCode.system}}
+                      <span class="clickable" ng-click="lookup(selectedNode.data.ed.itemCode.code,selectedNode.data.ed.itemCode.system)">{{selectedNode.data.ed.itemCode.code}}</span>  |
+                      {{selectedNode.data.ed.itemCode.display}} |
+                      {{selectedNode.data.ed.itemCode.system}}
                     </td>
                   </tr>
 
@@ -1107,6 +1109,74 @@
           </div>
 
         </uib-tab>
+
+
+        <uib-tab heading="Codes">
+          <br/>
+          <div class="tableFixHead">
+            <table class="table-bordered table">
+              <thead>
+              <tr><th>Path</th><th>Description</th><th>DG Type</th><th>OE Code</th></tr>
+              </thead>
+              <tbody>
+
+              <tr ng-repeat="element in fullElementList"
+                  ng-hide="$index==0 || (element.ed.mult.indexOf('..0') > -1)">
+                <td>
+                  <div  ng-style="{ 'padding-left': (element.ed.path | pathindent) }">
+
+                    <div class="clickable" ng-click="termSelectDGItem({hiddenDGName:selectedModel.name,path:element.ed.path})">
+                      {{element.ed.title}}
+                      <!--{{element.ed.path | lastInPath}}-->
+                    </div>
+
+
+                  </div>
+
+
+                </td>
+
+                <td>
+
+                  {{element.ed.description}}
+                </td>
+                <td>
+                  <div ng-repeat="type in element.ed.type">
+                    {{type}}
+                  </div>
+                  <div>
+                    <em class="clickable" ng-if = "element.ed.valueSet"
+                        uib-popover="{{element.ed.valueSet}}"
+                        popover-placement="top"
+                        popover-trigger="'mouseenter'"
+                        ng-click="viewVS(element.ed.valueSet)">
+                      View VS
+                      <!--   {{element.ed.valueSet}}-->
+                    </em>
+                  </div>
+
+                  <div ng-if="element.ed.options.length > 0" >
+                    <em class="clickable"
+                        ng-click = "editDGOptionsList(element.ed)">View {{element.ed.options.length}} options
+                    </em> </div>
+
+                </td>
+
+                <td>
+                  <span class="clickable" ng-click="lookup(element.ed.itemCode.code,element.ed.itemCode.system)">{{element.ed.itemCode.code}}</span>  {{element.ed.itemCode.system}}
+                  <div>{{element.ed.itemCode.display}}</div>
+                </td>
+
+
+
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </uib-tab>
+
+
 
 
         <uib-tab heading="Graph" select="fitGraph()">

@@ -21,6 +21,8 @@ angular.module("pocApp")
 
             $scope.Math = Math;
 
+            let snomed = "http://snomed.info/sct"
+
             $scope.userMode = $localStorage.userMode || "playground"      //possible modes are 'library' or 'playground'
             //$scope.userMode = "library"
 
@@ -77,6 +79,43 @@ angular.module("pocApp")
 
             //create a separate object for the DG - evel though still referenced by world. Will assist split between DG & comp
             $scope.hashAllDG = $localStorage.world.dataGroups
+
+
+            $scope.lookup = function (code,system) {
+                system = system || snomed
+                let qry = `CodeSystem/$lookup?system=${system}&code=${code}`
+                let encodedQry = encodeURIComponent(qry)
+                $scope.showWaiting = true
+                $http.get(`nzhts?qry=${encodedQry}`).then(
+                    function (data) {
+                        $uibModal.open({
+                            templateUrl: 'modalTemplates/showParameters.html',
+                            //backdrop: 'static',
+                            //size : 'lg',
+                            controller : "showParametersCtrl",
+                            resolve: {
+                                parameters: function () {
+                                    return data.data
+                                },
+                                title : function () {
+                                    return `Concept lookup (${code})`
+                                },
+                                code: function () {
+                                    return code
+                                },
+                                system : function () {
+                                    return system
+                                }
+                            }
+                        })
+
+                    }, function (err) {
+                        alert(angular.toJson(err.data))
+                    }
+                ).finally(function () {
+                    $scope.showWaiting = false
+                })
+            }
 
 
             //look for DG errors like repeating parents in the hierarchy tree
