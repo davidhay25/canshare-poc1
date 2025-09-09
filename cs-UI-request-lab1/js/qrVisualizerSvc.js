@@ -75,7 +75,8 @@ angular.module("pocApp")
                                          */
                                     default :
                                         //todo - replace wirh code
-                                        if (lne.item.linkId !== 'id-2') {
+                                        //if (lne.item.linkId !== 'id-2') {
+                                            if (lne.item.text !== 'text') {
                                             lne.answerDisplay.push(value)
                                         } else {
                                             lne.answerDisplay.push("Text removed to improve report display")
