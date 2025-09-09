@@ -96,7 +96,6 @@ angular.module("pocApp")
 
                 let qr = $scope.selectedItem.qr
                 utilsSvc.copyToClipboard(angular.toJson(qr,true))
-                //$scope.localCopyToClipboard (fsh)
                 alert("QR on clipboard")
             }
 
@@ -240,12 +239,30 @@ angular.module("pocApp")
 
                 let qUrl = QR.questionnaire
 
+               //
+              // qUrl = qUrl.replace("report2","ColorectalMVPReport2")
+
+               ///-------- this is a hack to cover an issue we have ---------
+               // will remove when done
+                //url for colorectal - http://canshare.co.nz/questionnaire/report1
+               //url for breast - http://canshare.co.nz/questionnaire/BreastMVPReport1
+
+               let txt = angular.toJson(QR)
+
+               qUrl = "http://canshare.co.nz/questionnaire/BreastMVPReport1"
+                if (txt.indexOf('Colorectal') > -1) {
+                    qUrl = "http://canshare.co.nz/questionnaire/report1"
+                }
+
+
+               //qUrl='http://canshare.co.nz/questionnaire/report1'  //debug
+
                 let qry = `${$scope.serverbase}Questionnaire?url=${qUrl}`
                 let config = {headers:{'content-type':'application/fhir+json'}}
 
                 $http.get(qry,config).then(
                     function (data) {
-                        console.log(data.data)
+                        //console.log(data.data)
                         if (data.data.entry && data.data.entry.length > 0) {
 
                             //get the definition of the items from the Q

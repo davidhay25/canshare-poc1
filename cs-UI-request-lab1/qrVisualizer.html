@@ -318,7 +318,10 @@
                 </uib-tab>
 
 
-                <uib-tab heading="Json">
+                <uib-tab heading="QR Json">
+
+                    Questionnaire URL: {{selectedItem.qr.questionnaire}}
+                    <br/>
 
                     <div class="clickable pull-right" ng-click="copyQRToClipboard()">Save to clipboard</div>
 
@@ -328,6 +331,19 @@
                     </div>
 
                 </uib-tab>
+
+
+                <uib-tab heading="Q Json">
+                    URL: {{selectedQ.url}}
+
+
+                <div class="clearfix"></div>
+                <div class="myScroll">
+                    <pre>{{selectedQ | json}}</pre>
+                </div>
+
+                </uib-tab>
+
 
             </uib-tabset>
 

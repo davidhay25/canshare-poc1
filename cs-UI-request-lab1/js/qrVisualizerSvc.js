@@ -18,6 +18,7 @@ angular.module("pocApp")
 
                 function processQRItem(hash,item) {
 
+                    //looking for the textual report
                     if (item.text == 'text'  ) {
                      //   if (item.linkId == "id-2"  ) {         //todo add a code to the Q.item and use that
                         if (item.answer) {
@@ -35,15 +36,19 @@ angular.module("pocApp")
                     }
                 }
 
+                //the result of this will be to populate hashQR with ann answers, keyed by linkId
                 for (const item of QR.item) {
                     processQRItem(hashQR,item)
                 }
+
+
+                console.log(hashQR)
 
                 //lne = {
                 function processQItem(lst,item,level) {
                     let lne = {item:item,answerDisplay:[],level:level}
                     let linkId = item.linkId
-                    let qrItem = hashQR[linkId]
+                    let qrItem = hashQR[linkId]     //the item from the QR that has any answers
                     if (qrItem && qrItem.answer) {
                         // there is an answer in the qr
                         lne.answer = qrItem.answer
@@ -76,7 +81,7 @@ angular.module("pocApp")
                                     default :
                                         //todo - replace wirh code
                                         //if (lne.item.linkId !== 'id-2') {
-                                            if (lne.item.text !== 'text') {
+                                        if (qrItem.text  !== 'text') {
                                             lne.answerDisplay.push(value)
                                         } else {
                                             lne.answerDisplay.push("Text removed to improve report display")
@@ -116,6 +121,7 @@ angular.module("pocApp")
                     }
                 }
 
+                //now iterate over the Q. Get the answer from the hashQR
                 for (const item of Q.item) {
                     processQItem(arReport,item,1)
                 }
