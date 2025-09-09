@@ -18,7 +18,8 @@ angular.module("pocApp")
 
                 function processQRItem(hash,item) {
 
-                    if (item.linkId == "id-2") {         //todo add a code to the Q.item and use that
+                    if (item.text == 'text'  ) {
+                     //   if (item.linkId == "id-2"  ) {         //todo add a code to the Q.item and use that
                         if (item.answer) {
                             let report = item.answer[0].valueString
                             report = report.replace(/\n/g, '<br>')
