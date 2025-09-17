@@ -312,6 +312,75 @@ angular.module("pocApp")
                 $scope.loadReview('dg',model)
             }
 
+
+            //publish a formal version of a Q
+            $scope.publishQ = function (dg) {
+
+                let allElements = snapshotSvc.getFullListOfElements(dg.name) //$scope.fullElementList
+
+                vsSvc.getAllVS(allElements, function () { //todo not sure if this is needed if we're just creating a Q...
+                    $scope.showWaiting = false
+                    //the second option expands the valuesets as options into the Q - todo make this an option
+
+                    //need the named queries for Q variables
+                    makeQSvc.getNamedQueries(function (hashNamedQueries) {
+
+
+                        //need to create a Q name that is unique - todo get this from dg so can update independantly of name
+                        let qName = dg.name
+                        qName = qName.replace(/\s+/g, "");
+
+                        //update the qversion.
+                        dg.qVersion = dg.qVersion || 0
+
+                        let config = {expandVS:true,enableWhen:true}
+                        config.namedQueries = hashNamedQueries
+                        config.hashAllDG = $scope.hashAllDG
+                        config.fhirType = dg.type// Used for definition based extraction
+                        config.expandVS = false     //use proxy to expand vs
+                        config.name = qName
+                        config.version = dg.qVersion +1
+                        //we make the Q with the new version. If it is not published, then the dg won't be updated so all good
+
+                        config.url = $scope.world.name + '-' + dg.name
+
+                        let voQ = makeQSvc.makeHierarchicalQFromDG(dg,allElements,config)
+                        let Q = voQ.Q
+
+
+                        $uibModal.open({
+                            templateUrl: 'modalTemplates/publishQ.html',
+                            backdrop: 'static',
+                            size : 'lg',
+                            controller: 'publishQCtrl',
+                            resolve: {
+                                Q: function () {
+                                    return Q
+
+                                }
+                            }
+                        }).result.then(function (Q) {
+
+                            //update the version in the DG
+                            $scope.hashAllDG[dg.name].qVersion = Q.version
+                            $scope.updatePlayground(true)
+
+                        })
+
+
+
+                    })
+
+                })
+
+
+
+
+
+
+            }
+
+
             $scope.loadReview = function (kind,model) {
                 //allCompElements
 

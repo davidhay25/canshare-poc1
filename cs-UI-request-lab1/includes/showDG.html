@@ -60,9 +60,9 @@
         <span class="clickable spacer"
               ng-if = "canEdit(selectedModel)"
               ng-click="updateComponent('dg',selectedModel)">Update component</span>
-
-
         <br/>
+
+
         <div>
 
           <div class="row">
@@ -131,6 +131,10 @@
         <button class="btn btn-link" ng-click="loadReview('dg')">Questionnaire</button>
 
       <button class="btn btn-link" ng-click="showLink('dg')">Link</button>
+
+        <button class="btn btn-link"
+                ng-if = canEdit(selectedModel)
+                ng-click="publishQ(selectedModel)">Publish</button>
 
       <div class="pull-right">
         <div ng-if="user.email && (userMode == 'library')">

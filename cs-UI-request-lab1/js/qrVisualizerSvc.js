@@ -42,7 +42,7 @@ angular.module("pocApp")
                 }
 
 
-                console.log(hashQR)
+
 
                 //lne = {
                 function processQItem(lst,item,level) {
@@ -126,8 +126,7 @@ angular.module("pocApp")
                     processQItem(arReport,item,1)
                 }
 
-                console.log(hashQR)
-                console.log(arReport)
+
 
                 return {report:arReport,codedItems:codedItems,textReport:textReport}
 

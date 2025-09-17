@@ -218,7 +218,7 @@ angular.module("pocApp")
             if (isNew) {
                 $scope.input.types = Object.keys(hashTypes) //an array for the new type dropdown
 
-                $scope.input.termSvr = 'https://backup.canshare.co.nz/proxy'
+                $scope.input.termSvr = 'https://test.canshare.co.nz/proxy'
 
 
             } else {
@@ -283,11 +283,12 @@ angular.module("pocApp")
 
                     $scope.extractedResources =  snapshotSvc.getExtractableDG(model.name)
 
-
                     $scope.input.adHocExt = model.adHocExt
 
                     $scope.input.termSvr = model.termSvr
 
+                    $scope.input.qVersion = model.qVersion
+                    $scope.input.qUrl = model.qUrl
 
                     if (model.linkedDG) {
                         //set the 'linkedDG' control to the selected model
@@ -514,6 +515,7 @@ angular.module("pocApp")
                 $scope.model.fixedValues = $scope.input.fixedValues
                 $scope.model.resourceReferences = $scope.input.resourceReferences
                 $scope.model.isContainer = $scope.input.isContainer
+                $scope.model.qUrl = $scope.input.qUrl
 
                 delete $scope.model.isTabbedContainer
                 if ($scope.model.isContainer && $scope.input.isTabbedContainer) {

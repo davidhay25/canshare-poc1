@@ -3,104 +3,33 @@
  Note that the collections are called palygrounds for historical reasons
 */
 angular.module("pocApp")
-    .controller('qrVisualizerCtrl',
+    .controller('qrVisualizerAdHocCtrl',
         function ($scope,$http,$localStorage,$sce,$uibModal,qrVisualizerSvc,makeQHelperSvc,utilsSvc) {
             $scope.input = {}
 
             // switch to using db$scope.input.qrCsv =  $localStorage.qrCsv //dev
             let snomed = "http://snomed.info/sct"
-            $scope.serverbase = "https://fhir.forms-lab.com/"
+            $scope.serverbase = "https://fhir.forms-lab.com/"    //use for validation
+            $scope.formManager = $localStorage.formManager || "https://fhir.forms-lab.com/"      //used for retrieving the Q
 
-            //get all the QR's that have been uploaded
-            $http.get('/qr/all').then(
-                function (data) {
-                    $scope.items = data.data
-                }, function (err) {
-                    alert(angular.toJson(err))
-                }
-            )
+            $scope.input.changingFormManager = false
 
-            //parse the input CSV file containing multiple QRs...
-            $scope.parseQRFile = function (file) {
-                $scope.items = []
-                Papa.parse(file, {
-                    header: true, // true = return objects with column headers as keys
-                    dynamicTyping: true, // converts numbers/dates
-                    complete: function(results) {
-                        console.log("Parsed data:", results.data);
-                        console.log("Errors:", results.errors);
+            $scope.input.adHocQR =  $localStorage.adHocQR
 
-                        results.data.forEach(function (lne,inx) {
-                            if (lne["Run ID"]) {
-                                let item={}
-                                item.runId = lne["Run ID"]
-                                item.runDate = lne["Run Date"]
-                                item.modelUsed = lne["Model Used"]
-                                item.success = lne["Success"]
-                                item.inputName = lne["Input Name"]
-
-
-                                let content = lne["Content"]
-                                // Remove markdown fences if present
-                                content = content.replace(/```json|```/g, "").trim();
-
-                                // Fix double quotes from CSV escaping
-                                content = content.replace(/""/g, '"');
-
-                                if (inx == 0) {
-                                    console.log(content)
-                                }
-
-                                try {
-                                    const obj = JSON.parse(content);
-
-                                    item.qr = obj
-                                    console.log('Parse OK')
-
-                                } catch (ex) {
-                                    console.log('Parse fail',ex.message)
-                                    item.error = "Failed parsing"
-                                }
-
-                                $scope.items.push(item)
-                                //console.log(item.qr)
-
-                            }
-                           // console.log(lne["Run ID"])
-                        })
-                    }
-                });
-
-
-                $localStorage.qrCsv = file
-            }
-
-            $scope.upload = function () {
-                let qry = "/qr/upload"
-                $http.post(qry,$scope.items).then(
-                    function (data) {
-                        alert("Upload complete")
-                    }, function (err) {
-                        alert(angular.toJson(err))
-
-                    }
-                )
-            }
-
-            //parse the file if it was read from the browser cache
-            if ($scope.input.qrCsv) {
-                $scope.parseQRFile($scope.input.qrCsv)
+            $scope.setFormManager = function (url) {
+                $localStorage.formManager = url
+                alert("The Form Manager url has been updated.")
             }
 
             $scope.copyQRToClipboard = function () {
 
-                let qr = $scope.selectedItem.qr
+                let qr = $scope.selectedQR
                 utilsSvc.copyToClipboard(angular.toJson(qr,true))
                 alert("QR on clipboard")
             }
 
             //open the modelReview app with this Q
-            $scope.openQReview = function () {
+            $scope.openQReviewDEP = function () {
                 //in canshare, the Q name is the last segment of the Q url
                 let qUrl = $scope.selectedItem.qr.questionnaire
                 //let ar = qUrl.split('/')
@@ -115,14 +44,13 @@ angular.module("pocApp")
             $scope.checkAllCodes = function (things) {
                 //$scope.codedItems
                 for (let thing of things) {
-                    console.log(thing)
+
 
                     if (thing.item.answerValueSet && thing.answerCoding) {
                         let qry = `ValueSet/$validate-code?url=${thing.item.answerValueSet}`
                         qry += `&code=${thing.answerCoding.code}`
                         qry += `&system=${thing.answerCoding.system}`
-                        console.log(qry)
-                        //  break
+
 
                         $scope.expandQry = qry
                         let lookupQry = encodeURIComponent(qry)
@@ -130,7 +58,7 @@ angular.module("pocApp")
 
                         $http.get(`nzhts?qry=${lookupQry}`).then(
                             function (data) {
-                                console.log(data)
+
                                 let parameters = data.data //returns a parameters resource
                                 for (const param of parameters.parameter) {
 
@@ -182,7 +110,6 @@ angular.module("pocApp")
 
                 makeQHelperSvc.showItemDetailsDlg(item,$scope.selectedQ)
 
-                //console.log(item)
             }
 
             $scope.validate = function (QR) {
@@ -216,55 +143,34 @@ angular.module("pocApp")
                 )
             }
 
-            $scope.selectItem = function (item) {
-                $scope.selectedItem = item
-                parseQR($scope.selectedItem)
+            $scope.parseAdHocQR = function (txt) {
+                $scope.selectedQR = angular.fromJson(txt)
+
+                $localStorage.adHocQR = txt     //just for debug
+
+                parseQR($scope.selectedQR)
             }
 
             //parse a QR item from the file list - ie {qr: }
-           let parseQR = function (item) {
+           let parseQR = function (QR) {
 
-                delete $scope.textReport
                 delete $scope.selectedQ
 
                 $scope.codedItems = []
 
-                let QR = item.qr
-
                 $scope.hashLinkId = {}  //a hash of all items from the Q
                 $scope.lstQRItem = []   //a list of items from the QR for the report
 
-
                 let qUrl = QR.questionnaire
 
-               //
-              // qUrl = qUrl.replace("report2","ColorectalMVPReport2")
+               let formManager = $scope.formManager.endsWith('/') ? $scope.formManager : $scope.formManager + '/';
 
-               ///-------- this is a hack to cover an issue we have ---------
-               // will remove when done
-                //url for colorectal - http://canshare.co.nz/questionnaire/report1
-               //url for breast - http://canshare.co.nz/questionnaire/BreastMVPReport1
-
-               let txt = angular.toJson(QR)
-
-               qUrl = "http://canshare.co.nz/questionnaire/BreastMVPReport1"
-                if (txt.indexOf('Colorectal') > -1) {
-                    qUrl = "http://canshare.co.nz/questionnaire/report1"
-                }
-
-
-                //from Nicolas email http://canshare.co.nz/questionnaire/BreastMVPReport1
-               // http://canshare.co.nz/questionnaire/report1
-
-
-               //qUrl='http://canshare.co.nz/questionnaire/report1'  //debug
-
-                let qry = `${$scope.serverbase}Questionnaire?url=${qUrl}`
+                let qry = `${formManager}Questionnaire?url=${qUrl}`
                 let config = {headers:{'content-type':'application/fhir+json'}}
 
                 $http.get(qry,config).then(
                     function (data) {
-                        //console.log(data.data)
+
                         if (data.data.entry && data.data.entry.length > 0) {
 
                             //get the definition of the items from the Q
@@ -286,106 +192,10 @@ angular.module("pocApp")
                         }
 
                     },function (err) {
-                        alert(angular.toJson(err.data))
+
+                        alert(`The server ${formManager} was not found`)
                     }
                 )
-
-                function processQItemDEP(item) {
-                    $scope.hashLinkId[item.linkId] = item
-
-
-                    if (item.item) {
-                        for (const child of item.item) {
-                            processQItem(child)
-                        }
-                    }
-                }
-
-
-                function processQRItemDEP(item,level) {
-                    //console.log(item.linkId)
-
-                    if (item.linkId == "id-2") {         //todo add a code to the Q.item and use that
-                        if (item.answer) {
-                            let report = item.answer[0].valueString
-                            report = report.replace(/\n/g, '<br>')
-                            $scope.textReport = report
-                        }
-                    }
-
-                    let def = angular.copy($scope.hashLinkId[item.linkId])
-                    delete def.item
-                    if (item.answer) {
-                        // let def = angular.copy($scope.hashLinkId[item.linkId])
-                        //  delete def.item
-                        //answer[] is the answer from the QR (an array), answerDisplay[] is a display format
-                        let thing = {item:def,answer:item.answer,answerDisplay:[]}
-                        thing.level = level
-                        //a simplified answer for display
-                        for (let ans of item.answer) {
-                            //ans will have a single property - valueCoding, valueString etc
-                            let keys = Object.keys(ans)
-                            for (const key of keys ) {
-                                let value = ans[key]
-                                thing.dt = key.replace("value","")
-
-                                //should only be 1
-                                switch (key) {
-                                    case "valueCoding":
-                                        thing.answerDisplay.push(`${value.code} | ${value.display} | ${value.system}`)
-
-                                        thing.answerCoding = value
-                                        $scope.codedItems.push(thing)
-
-                                        break
-                                    case "valueQuantity":
-                                        thing.answerDisplay.push(`${value.value} ${value.code}`)
-                                        break
-                                    /*     case "valueString" :
-                                             thing.dt = 'String'
-                                             thing.answerDisplay.push(value)
-                                             break
-                                         */
-                                    default :
-                                        //todo - replace wirh code
-                                        if (thing.item.linkId !== 'id-2') {
-                                            thing.answerDisplay.push(value)
-                                        } else {
-                                            thing.answerDisplay.push("Text removed to improve report display")
-                                        }
-
-                                }
-                            }
-                            $scope.lstQRItem.push(thing)
-
-
-
-                        }
-
-
-
-                    } else {
-                        //there is no answer, but add as a 'section'
-                        let thing = {item:def,answer:item.answer,answerDisplay:[]}
-
-                        if (item.item) {
-                            thing.dt = "Group"
-                        }
-
-                        thing.level = level
-                        $scope.lstQRItem.push(thing)
-                    }
-
-
-                    if (item.item) {
-                        level++
-                        for (const child of item.item) {
-                            processQRItem(child,level)
-                        }
-                    }
-                }
-
-
 
             }
 

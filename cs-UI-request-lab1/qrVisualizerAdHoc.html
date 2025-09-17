@@ -37,7 +37,7 @@
     </script>
 
 
-    <script src="js/qrVisualizerCtrl.js"></script>
+    <script src="js/qrVisualizerAdHocCtrl.js"></script>
     <script src="js/libs/angular-sanitize.js"></script>
     <script src="js/showParameters.js"></script>
     <script src="js/filters.js"></script>
@@ -68,7 +68,7 @@
 
 </head>
 <body style="padding: 8px;padding-top: 80px">
-<div ng-app="topApp" ng-controller="qrVisualizerCtrl" class="container-fluid">
+<div ng-app="topApp" ng-controller="qrVisualizerAdHocCtrl" class="container-fluid">
 
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
@@ -76,7 +76,7 @@
             <div class="col-md-3">
                     <span>
                         <a class="navbar-brand" href="#">
-                            QR visualizer for AI Path
+                            QR visualizer
                         </a>
                     </span>
 
@@ -122,64 +122,43 @@
     </nav>
 
     <div class="row">
-        <div class="col-md-2">
-
-            <uib-tabset>
-
-                <uib-tab heading="QRs from Db">
-
-                    <div class="myScroll">
-                        <div class="list-group">
-                            <div ng-class={"list-group-item":true,listItemSelected:item==selectedItem}
-                                 style="cursor: pointer"
-                                 ng-repeat = "item in items"
-                                 ng-click="selectItem(item)">
-                                {{item.inputName}}
-                                <div><em class="pull-right">{{item.runDate | date}}</em></div>
-                                <div class="clearfix"></div>
-                            </div>
-
-                        </div>
-                    </div>
+        <div class="col-md-6">
 
 
+            <textarea class="form-control" rows="20" ng-model="input.adHocQR">
 
-                </uib-tab>
+            </textarea>
+            <br/>
+            <div class="row">
+                <div class="col-md-2">
+                    <div style="padding: 8px"> Form Manager Url</div>
+                </div>
 
-                <uib-tab heading="Raw file">
-                    <button ng-show="input.qrCsv"
-                            class="btn-link btn" ng-click="parseQRFile(input.qrCsv)">Parse content</button>
-                    <button ng-show="items"
-                            class="btn-link btn" ng-click="upload(input.qrCsv)">Upload</button>
 
+                <div class="col-md-6">
+                   <input type="text"
+                          ng-change = "input.changingFormManager = true"
+                          class="form-control" ng-model="formManager"/>
+                </div>
+                <div class="col-md-3">
+                    <div ng-show="input.changingFormManager" ng-click="setFormManager(formManager)"
+                         class="btn btn-link">Save Form Manager</div>
+                </div>
 
-                    <div class="myScroll">
-                    <textarea id="pastetextbox" rows="20" class="form-control"
-                              ng-paste="handlePaste($event)" ng-model="input.qrCsv"></textarea>
-                    </div>
-                </uib-tab>
-            </uib-tabset>
-
-        </div>
-
-        <div class="col-md-4">
-            <h4>Text report</h4>
-
-            <div class="myScroll">
-                <p style="margin-left: 10px" ng-bind-html="to_trusted(textReport)"></p>
+                <div class="col-md-1">
+                    <div class="btn btn-primary pull-right" ng-click="parseAdHocQR(input.adHocQR)">Parse</div>
+                </div>
             </div>
-
-
-
         </div>
 
-        <div class="col-md-6" ng-show="selectedItem">
+
+        <div class="col-md-6" ng-show="selectedQ">
             <div class="row">
                 <div class="col-md-6">
                     <h4>QuestionnaireResponse</h4>
                 </div>
                 <div class="col-md-6">
-                        <div class="clickable pull-right"
+                        <div ng-show="false" class="clickable pull-right"
                              style="padding-top: 8px"
                              ng-click="openQReview()">Open Questionnaire in review app</div>
                 </div>
@@ -194,8 +173,6 @@
                         <tr><th>LinkId</th><th>Text</th><th>Code</th><th>DataType</th><th>Value</th></tr>
 
 
-                            <!--  <tr ng-repeat="entry in lstQRItem"
-                            ng-class="{background:entry.dt == 'Group'}">-->
 
                         <tr ng-repeat="entry in qBasedReport"
                             ng-class="{background:entry.dt == 'Group',missingAnswer:entry.missingAnswer }">
@@ -269,11 +246,6 @@
 
                 </uib-tab>
 
-                <uib-tab ng-show="false" heading="QR tree">
-                    Tree view of QR
-
-
-                </uib-tab>
 
                 <uib-tab ng-show="false" heading="Extract">
                     Invoke $extract on the lab to get back the extracted resources.
@@ -288,7 +260,7 @@
 
                 <uib-tab heading="Validation">
 
-                    <button class="btn btn-link pull-right" ng-click="validate(selectedItem.qr)">Validate</button>
+                    <button class="btn btn-link pull-right" ng-click="validate(selectedQR)">Validate</button>
 
                     <div class="clearfix"></div>
                     <div class="myScroll">
@@ -320,14 +292,14 @@
 
                 <uib-tab heading="QR Json">
 
-                    Questionnaire URL: {{selectedItem.qr.questionnaire}}
+                    Questionnaire URL: {{selectedQR.questionnaire}}
                     <br/>
 
                     <div class="clickable pull-right" ng-click="copyQRToClipboard()">Save to clipboard</div>
 
                     <div class="clearfix"></div>
                     <div class="myScroll">
-                        <pre>{{selectedItem.qr | json}}</pre>
+                        <pre>{{selectedQR | json}}</pre>
                     </div>
 
                 </uib-tab>

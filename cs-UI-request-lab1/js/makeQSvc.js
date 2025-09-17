@@ -1375,7 +1375,11 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
                 Q.title = dg.title //firstElement.title
                 Q.status = 'active'
                 Q.title = dg.title
-                Q.url = `http://canshare.co.nz/questionnaire/${dg.name}`
+
+                let qUrl = config.url || dg.name
+                Q.url = `http://canshare.co.nz/questionnaire/${qUrl}`
+                Q.version = config.version
+
                 Q.description = dg.description
 
 

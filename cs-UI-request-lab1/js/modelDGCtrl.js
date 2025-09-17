@@ -20,9 +20,8 @@ angular.module("pocApp")
 
 
                 return `<pre>${json}</pre>`
-                //let t = angular.fromJson(json)
-               // return text.replace(/\n/g, '<br>')
             }
+
 
             //return the extract type if the type of this ed is a DG
             $scope.getExtractType = function (ed) {

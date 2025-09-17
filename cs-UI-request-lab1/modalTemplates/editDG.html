@@ -209,6 +209,35 @@
 
                         <div class="row">
                             <div class="col-md-2">
+                                Questionnaire version
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" disabled = disabled  class="form-control" ng-model="input.qVersion">
+                            </div>
+                            <div class="col-md-6">
+                                The current Questionnaire version (if this DG has been published as a Questionnaire).
+                                Incremented when the Q is published.
+                            </div>
+                        </div>
+                        <br/>
+
+                        <div class="row">
+                            <div class="col-md-2">
+                                Questionnaire URL
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text"  class="form-control" ng-model="input.qUrl">
+                            </div>
+                            <div class="col-md-6">
+                                The url - which is the primary identifier. If not specified it default to {collection name}-{dg name}.
+                                Once set it should not be changed - unless you are sure!
+
+                            </div>
+                        </div>
+                        <br/>
+
+                        <div class="row">
+                            <div class="col-md-2">
                                 Terminology server
                             </div>
                             <div class="col-md-4">
@@ -216,8 +245,8 @@
                             </div>
                             <div class="col-md-6">
                                 The Terminology server to use for ValueSet expansion in this DG.
-
-                                <span class="clickable" ng-click="input.termSvr = 'https://backup.canshare.co.nz/proxy'">
+                                <!-- changed ts from backup - doesn't work with poc.canshare..  - why?-->
+                                <span class="clickable" ng-click="input.termSvr = 'https://test.canshare.co.nz/proxy'">
                             Set to the National New Zealand Terminology Server.</span>
                             </div>
                         </div>

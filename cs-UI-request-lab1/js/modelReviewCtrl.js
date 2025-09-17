@@ -11,7 +11,6 @@ angular.module("pocApp")
 
             $scope.serverbase = "https://fhir.forms-lab.com/"
 
-
             $scope.input.pastedQ = $localStorage.pastedQ
 
             // ----------- consume events emitted by the v2 Q renderer ----
@@ -195,8 +194,6 @@ angular.module("pocApp")
 
             }
 
-
-
             //update the other local variables from the Q
             function processQ(Q) {
                 $scope.hashEd = {}
@@ -227,7 +224,7 @@ angular.module("pocApp")
                 })
             }
 
-            //Load the Q from the database
+            //Load the Q from the database created by the Q designer.. (not published Q)
             $scope.loadQ = function (qName) {
                 let qry = `/Questionnaire/${qName}`
                 $http.get(qry).then(
@@ -236,34 +233,7 @@ angular.module("pocApp")
                         $scope.fullQ = data.data.Q
                         $scope.errorLog = data.data.errorLog
                         processQ($scope.fullQ)
-                        /*
-                        $scope.hashEd = {}
 
-                        //get all the VS in the Q - returne
-                        //also constructs a hashEd with an ED generated from the item - as best as possible
-                        let ar = qHelperSvc.getAllVS($scope.fullQ)
-
-                        for (const thing of ar) {
-                            $scope.hashEd[thing.ed.path] = thing.ed
-                        }
-
-                        vsSvc.getAllVS(ar, function () {
-
-                            //A report focussed on pre-popupation & extraction
-                            let voReport =  makeQSvc.makeReport($scope.fullQ)
-                            $scope.qReport =voReport.report
-
-                            console.log(voReport)
-
-                            //a graph of items
-                            /* very slow with large graphs
-                            let vo = makeQHelperSvc.getItemGraph($scope.fullQ)
-                            makeItemsGraph(vo.graphData)
-
-
-                        })
-
-*/
                     }, function (err) {
                         alert(angular.toJson(err.data))
                     }
@@ -271,17 +241,27 @@ angular.module("pocApp")
             }
 
 
+            //Load the Q viewer with the selected Q
+            $scope.loadQViewerForPublishedQ = function () {
+
+
+
+                const url = `modelReview.html?q-${qName}`
+                const features = 'noopener,noreferrer'
+                window.open(url, '_blank', features)
+            }
 
             if (modelName) {
                 if (modelName.startsWith('q-')) {
                     //a Q reference was passed. The Q will be retrieved from the database
+                    //this is the da created by the Q designer
                     let qName = modelName.slice(2)
                     $scope.loadQ(qName)
 
                 } else if (modelName.startsWith('url-')) {
                     //a url was passed. This will be retrieved from the lab server
                     let qUrl = modelName.slice(4)
-                    //let qry = `${$scope.serverbase}`
+
 
                     let qry = `${$scope.serverbase}Questionnaire?url=${qUrl}`
                     let config = {headers: {'content-type': 'application/fhir+json'}}
@@ -298,84 +278,24 @@ angular.module("pocApp")
                                 alert(`Error contacting server: ${qry}`)
                             }
                         })
-                } else {
+                } else if (modelName.startsWith('pub-'))  {
+                    //This is from the csFrontPage - retrieve a published Q
+                    let tmp = modelName.slice(4)
+                    let ar = tmp.split('|')
 
-                    //todo this is the older style - can be removed once compositions is enabled
-                    /*
-                    $http.get('/model/allDG').then(
+                    let qry = `/q/${ar[0]}/v/${ar[1]}` //get that verson of the Q
+                    $http.get(qry).then(
                         function (data) {
-                            //console.log(data.data)
-                            $scope.hashAllDG = {}
-                            data.data.forEach(function (dg) {
-                                $scope.hashAllDG[dg.name] = dg
+                            console.log(data)
+                            $scope.fullQ = data.data
+                            processQ($scope.fullQ)  //update internal variables
+                            $scope.input.mainTabActive = 1
 
-                                //has both dgs & fhir dta
-                                // $scope.input.types = modelsSvc.getAllTypes($scope.hashAllDG)
-
-
-                            })
-
-                            //has both dgs & fhir dta
-                            $scope.input.types = modelsSvc.getAllTypes($scope.hashAllDG)
-
-
-                            //need to generate the snapshot for all DG. This is needed for the Q generation
-                            //the snapshots are all held within the service...
-
-                            snapshotSvc.makeSnapshots($scope.hashAllDG)
-
-                            //assign the snapshot svc to the modelSvc so that it can read the snapshots of DGs
-                            modelCompSvc.setSnapshotSvc(snapshotSvc)
-
-
-                            //todo - if we decide that this app won't have the ability to select dg/comp
-                            //then we don't need to get all the composiitons (will always need all the DGs)
-                            //but keep it for now (though there is a performance hit...
-                            $http.get('/model/allCompositions').then(
-                                function (data) {
-                                    //console.log(data.data)
-                                    $scope.hashAllCompositions = {}
-                                    data.data.forEach(function (comp) {
-                                        $scope.hashAllCompositions[comp.name] = comp
-                                    })
-
-
-                                    //now that we have all the DG & Compositions, was a modelName passed in?
-
-                                    if (modelName) {
-                                        if ($scope.hashAllCompositions[modelName]) {
-                                            //this was a composition
-                                            $scope.modelType = 'comp'
-                                            $scope.selectedModel = $scope.hashAllCompositions[modelName]
-                                            $scope.selectComposition($scope.hashAllCompositions[modelName],$scope.compVersion)
-                                            $scope.selectedFromUrl = true      //to indicate that the modelname was passed in on the url
-
-                                            $scope.input.mainTabActive = 1
-
-                                        } else if ($scope.hashAllDG[modelName]) {
-                                            //this is a DG
-                                            $scope.modelType = 'dg'
-                                            $scope.selectedModel = $scope.hashAllDG[modelName]
-                                            $scope.selectDG($scope.hashAllDG[modelName])
-
-                                            $scope.selectedFromUrl = true      //to indicate that the modelname was passed in on the url
-                                            $scope.input.mainTabActive = 1
-                                        } else {
-
-                                            alert(`The model name: ${modelName} was not found in the library for either Composition or DataGroup`)
-                                        }
-
-                                    } else {
-                                        alert("You need to supply the name of a DG or Composition in the call")
-                                    }
-
-                                }
-                            )
-
+                        }, function (err) {
+                            console.log(err)
+                            alert("Q version not found")
                         }
                     )
-
-                    */
 
                 }
 
@@ -446,7 +366,7 @@ angular.module("pocApp")
             }
 
 
-            $scope.rebuildQ = function () {
+            $scope.rebuildQDEP = function () {
                 if ( $scope.modelType == 'dg') {
                     //call the select function with the disable conditional flag set
                     $scope.selectDG($scope.selectedModel,true)
@@ -792,7 +712,7 @@ angular.module("pocApp")
             }
 
             //todo - ? disable select capability
-            $scope.selectDG = function (dg,disableConditional) {
+            $scope.selectDGDEP = function (dg,disableConditional) {
                 console.log(dg)
                 //todo just for dev atm - not sure if
                 $scope.selectedComp = dg
@@ -844,7 +764,6 @@ angular.module("pocApp")
             }
 
 
-
             $scope.getRowColour = function (ed) {
                 let colour
                 switch (ed.kind) {
@@ -861,7 +780,7 @@ angular.module("pocApp")
                 return colour
             }
 
-            $scope.selectComposition = function (comp,version,hideConditional) {
+            $scope.selectCompositionDEP = function (comp,version,hideConditional) {
 
                 if (! comp) {
                     return
@@ -1003,9 +922,5 @@ angular.module("pocApp")
 
 
             }
-
-
-
-
 
         })

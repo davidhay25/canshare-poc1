@@ -13,7 +13,17 @@
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/common.css"/>
 
+    <style>
+        .inset  {
+            padding-left: 8px;
+        }
+    </style>
+
+
+    <!--suppress HtmlUnknownAttribute, HtmlUnknownTag, HtmlUnknownTarget -->
     <script src="https://cdn.counter.dev/script.js" data-id="437589a2-a80a-4e16-bf57-5440607b1050" data-utcoffset="12"></script>
+
+
 
     <script>
         angular.module("pocApp",['ui.bootstrap',"firebase"]).config(function($locationProvider) {
@@ -134,11 +144,29 @@
     </nav>
 
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-7">
 
             <!-- List filters published, name/description filter-->
 
-            <table class="table table-bordered">
+            <h3>Questionnaires available for download</h3>
+
+            <table  class="table table-bordered">
+                <tr><th>Name</th><th>Description</th><th>Latest Version</th><th>Date</th></tr>
+                <tr ng-repeat = "Q in allQ "
+                    style="cursor: pointer"
+                    ng-class="{listItemSelected:selectedQ == Q}"
+                    ng-click="selectQ(Q)">
+                    <td>{{Q.name}}</td>
+                    <td>{{Q.description}}
+
+
+                    <td>{{Q.version}}</td>
+                    <td width="15%">{{Q.date | date}}</td>
+                </tr>
+            </table>
+
+
+            <table ng-show="false" class="table table-bordered">
                 <tr><th>Name</th><th>Description</th><th>Latest Version</th><th>Date</th></tr>
                 <tr ng-repeat = "pg in playgrounds"
                     style="cursor: pointer"
@@ -146,77 +174,112 @@
                     ng-click="selectPG(pg)">
                     <td>{{pg.name}}</td>
                     <td>{{pg.description}}
-                    <div>
-                        <!--
-                        <div style="padding-left: 20px" ng-repeat="v in input.versions[pg.id]">
-                            Version: {{v.publishedVersion}} Published {{v.publishedDate | date}}
-                        </div>
-                        -->
-                    </div>
-                    </td>
+
+
                     <td>{{pg.publishedVersion}}</td>
                     <td width="15%">{{pg.publishedDate | date}}</td>
                 </tr>
             </table>
 
+
+
         </div>
-        <div class="col-md-4">
+        <div class="col-md-5">
 
 
-            <div ng-show="selectedPG">
+            <div ng-show="selectedQ">
+                <!--
                 <button class="btn btn-primary pull-right" ng-click="viewQ()">Details</button>
-                <h4>Selected Standard metadata</h4>
+                -->
+                <h4>Metadata</h4>
 
                 <div><strong>Name</strong></div>
-                <div>{{selectedPG.name}}</div>
+                <div class="inset">{{selectedQ.name}}</div>
                 <div><strong>Description</strong></div>
-                <div>{{selectedPG.description}}</div>
+                <div class="inset">{{selectedQ.description}}</div>
 
-                <!--
-                <div><strong>Internal Id</strong></div>
-                <div>{{selectedPG.id}}</div>
-                -->
                 <div><strong>Last updated</strong></div>
-                <div>{{selectedPG.updated | date}}</div>
+                <div class="inset">{{selectedQ.date | date}}</div>
+
+                <div><strong>Url</strong></div>
+                <div class="inset">{{selectedQ.url}}</div>
+
+                <div><strong>Release notes</strong></div>
+                <div class="rounded-box inset">Notes for the most recent release. ? have history </div>
+                <br/>
+                <div class="row">
+
+                    <div class="col-md-5">
+                        <div style="padding-bottom: 8px"><strong>Version</strong></div>
+                        <select class="form-control" ng-model="input.ddSelectedVersion"
+                                ng-options="v.display for v in ddVersions"
+                                ng-change="makeQDownload(input.ddSelectedVersion.Q)">
+                        </select>
+                    </div>
+                    <div class="col-md-7">
+                        <div><button class="btn btn-link" ng-click="viewQ()">View in Questionnaire viewer</button></div>
+                        <a class="btn btn-link" download="{{downloadLinkJsonName}}"
+                           href="{{downloadLinkJson}}" title="{{downloadLinkJsonName}}" >
+                            Download Questionnaire
+                        </a>
+                    </div>
+                </div>
+                <br/>
+                <div class="banner">
+                    To refer to this Questionnaire in a QuestionnaireResponse, QR.questionnaire value:
+
+                    <div><strong>{{selectedQVersion.url}}|{{selectedQVersion.version}}</strong></div>
+
+                </div>
 
                <br/>
 
 
-                <h4>Downloads</h4>
 
-                <div class="row">
-                    <div class="col-md-2">
-                        <div style="padding-top: 6px"> Version</div>
-                    </div>
-                    <div class="col-md-6">
-                        <select class="form-control" ng-model="input.ddSelectedVersion"
-                                ng-options="v.display for v in ddVersions">
-                        </select>
-                    </div>
-                </div>
+
+                <!--
+                <h4>Downloads & Links</h4>
+                <div><button class="btn btn-link ">Show in Fhirpath Lab</button></div>
+                -->
+
+
+<!--
+                <a class="btn btn-link" download="{{downloadLinkJsonName}}"
+                   href="{{downloadLinkJson}}" title="{{downloadLinkJsonName}}" >
+                    Download Questionnaire Json ({{downloadLinkJsonName}})
+                </a>
+-->
+
 
 
                 <br/>
-
+                <!--
                 <div class="clickable">Download MSWord spec</div>
                 <div class="clickable">Download Questionnaire</div>
                 <div class="clickable">Download Questionnaire Response (for AI)</div>
                 <div class="clickable">Download TSV</div>
+                -->
 
-                <br/><br/>
+
             </div>
 
 
             <!-- Adjust list based on logged in status-->
-            <h4>Links to CanShare modules</h4>
+            <h3>Links to CanShare modules</h3>
 
-            <div><a target="_blank" href="../vsLookup.html">ValueSet explorer</a></div>
-            <div ng-show="user"><a target="_blank" href="../models.html">Forms designer</a></div>
-            <div><a target="_blank" href="../modelReview.html">Review form</a></div>
-            <div ng-show="user"><a target="_blank" href="../updateVS.html">ValueSet updater</a></div>
-            <div ng-show="user"><a target="_blank" href="../updateCM.html">ConceptMap updater</a></div>
-            <div><a target="_blank" href="../cmTester.html">ConceptMap Tester</a></div>
-            <div><a target="_blank" href="../qrVisualizer.html">QR Visualizer</a></div>
+            <h4>ValueSets</h4>
+            <div><a target="_blank" href="../vsLookup.html">ValueSet viewer</a></div>
+            <div ng-show="user"><a target="_blank" href="../updateVS.html">ValueSet editor</a></div>
+            <h4>Forms (Questionnaires)</h4>
+            <div ng-show="user"><a target="_blank" href="../models.html">Forms editor</a></div>
+            <div><a target="_blank" href="../modelReview.html">Questionnaire viewer</a></div>
+            <div><a target="_blank" href="../qrVisualizer.html">QuestionnaireResponse viewer for AI path</a></div>
+            <div><a target="_blank" href="../qrVisualizerAdHoc.html">QuestionnaireResponse viewer</a></div>
+            <h4>ConceptMaps</h4>
+
+            <div ng-show="user"><a target="_blank" href="../updateCM.html">ConceptMap editor</a></div>
+            <div><a target="_blank" href="../cmTester.html">ConceptMap viewer</a></div>
+
 
 
 
