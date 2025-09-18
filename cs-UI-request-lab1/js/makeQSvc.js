@@ -424,11 +424,7 @@ angular.module("pocApp")
                         controlHint = "display"
                         controlType = "display"
                         break
-                    /*
-                    case 'Identifier' :
-                        controlHint = "Identifier"
-                        controlType = "Identifier"
-*/
+
 
                 }
 
@@ -1323,35 +1319,7 @@ angular.module("pocApp")
                     //now we need to look at the conditional ValueSets. If an item has condtional ValueSets defined
                     //then an ed is constructed for each VS with an enableWhen defined.
                     //todo - should the original be defined - what about the linkId
-/* Changing to use https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-candidateExpression.html
 
-
-iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
-| iif(%country.answer.value.code == 'NZ', 'http://example.org/Valueset/NZ-States')
-
-                    if (thing.ed.conditionalVS && thing.ed.conditionalVS.length > 0) {
-                        let ctr = 1
-                        let adjustedPath = `${pathPrefix}${thing.ed.path}`
-                        conditionalED[adjustedPath] = []
-                        thing.ed.conditionalVS.forEach(function (cvs) {
-                            let newThing = angular.copy(thing)
-                            //delete newThing.enableWhen
-
-                            let ew = {source:cvs.path,operator:'=',value:cvs.value}
-
-                            newThing.ed.enableWhen = [ew]
-                            newThing.ed.valueSet = cvs.valueSet
-                            newThing.ed.path =`${thing.ed.path}-${ctr++}`
-                            lstQElements.push(newThing)
-
-                            //the hash has a list of all the new eds that were created to replace the one with the conditional ValueSet
-                            conditionalED[adjustedPath].push(`${pathPrefix}${newThing.ed.path}`)
-                        })
-
-                       okToAdd = false     //don't show the original
-                    }
-
-                    */
 
                     if (okToAdd) {
                         lstQElements.push(thing)
@@ -1363,8 +1331,10 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
                     //We need to be able to put extensions on the first element - which is the DG.
                     //this entry in allItems is missing a lot of the ed stuff (naturally) so we need to add it here
                     //we have to set a type so the decorateRoutine won't reject it. todo - can this restriction be removed?
+
                     lstQElements[0].ed.adHocExtension = dg.adHocExtension
-                    lstQElements[0].ed.type=['string']      //todo - not sure about this...
+                    //sep 18lstQElements[0].ed.type=['string']      //todo - not sure about this...
+                    lstQElements[0].ed.type=['group']      //todo - not sure about this...
                 }
 
 
@@ -1547,6 +1517,12 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
                             hashItems[parentItemPath].item = hashItems[parentItemPath].item || []
                             hashItems[parentItemPath].item.push(currentItem)
                             //temp Sep182025 hashItems[parentItemPath].type = "group"
+
+
+
+
+
+
                             hashItems[path] = currentItem   //ready to act as a parent...
 
                             //We also need to process 'other' items. These are used in choice elements when the desired option is not in the options list
@@ -1573,8 +1549,11 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
                     } else {
                         //this is the first item in the DG Q.
 
-                        currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
+                        // Sep18currentItem = {linkId:`${pathPrefix}${path}`,type:'display',text:ed.title}
+                        currentItem = {linkId:`${pathPrefix}${path}`,type:'group',text:ed.title}
+
                         decorateItem(currentItem,ed,extractionContext,dg,config)
+
 
 
                         if (dg.isTabbedContainer) {
@@ -1633,25 +1612,7 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
 
                             }
 
-                            /*
-                            if (dg.adHocExt) {
 
-                               // addAdHocExt(item,ed.adHocExt)
-
-                                //now see if there is an allocateId. if there is, then it needs to be added to the extractDefinition vo and the extension removed from ad hoc
-                                let json = angular.fromJson(dg.adHocExt)
-                                let newAdHoc = []
-                                for (const ext of json) {
-                                    if (ext.url == extAllocateIdUrl) {
-                                        vo.fullUrl = ext.valueString
-                                    } else {
-                                        newAdHoc.push(ext)
-                                    }
-                                }
-                                addAdHocExt(currentItem,angular.toJson(newAdHoc))
-
-                            }
-                            */
 
                             addDefinitionExtract(currentItem,vo)        //ie the extractDefinition that sets the resource to extract to...
 
@@ -1830,15 +1791,6 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
                             }
 
 
-                            //now we can set the definitionExtract extension on this item
-                        //    addDefinitionExtract(item,vo)
-/*
-                            //Have any adhoc extensions been added to this DG (or any of its parents) - but not elements
-                            let adHocExt = snapshotSvc.getAdHocExt(referencedDG.name)
-                            if (adHocExt) {
-                                addAdHocExt(item,adHocExt)
-                            }
-*/
 
 
                             addAdHocExtension(Q,item,referencedDG.adHocExtension)
@@ -1849,8 +1801,7 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
                             if (false && ed.markTarget) {
                                 //this is a resource that is the target of another. It needs the canonical - not allocateId extension
                                 vo.fullUrl = ed.markTarget
-                                //item.extension = item.extension || []
-                               // item.extension.push({url:extAllocateIdUrl,valueString: ed.markTarget})
+
                             }
 
 
@@ -1889,15 +1840,9 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
 
                         extractionContext = getExtractionContext(edType,config.hashAllDG) || extractionContext
 
-                        //let extractionContext = config.hashAllDG[edType].type
+
                         if (extractionContext) {
-                            //The DG defines a new extraction context
 
-                            //temp - not needed I thinksetExtractionContext(item,extractionContext)
-
-                            //if there's an extraction context, then add any 'DG scope' fixed values.
-                            //fixed values can also be defined on an item... todo TBD
-                            //this is for referenced DGs
                             addFixedValues(item,referencedDG)
 
 
@@ -2513,8 +2458,13 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
                             }
                             break
                         case 'Group' :
-                            controlHint = "display"
-                            controlType = "display"
+                        case 'group' :
+                            //sep18controlHint = "display"
+                            //sep18controlType = "display"
+
+                            controlHint = "group"
+                            controlType = "group"
+
                             break
                         /*
                         case 'Identifier' :

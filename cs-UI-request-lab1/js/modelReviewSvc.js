@@ -1,10 +1,11 @@
 angular.module("pocApp")
 
-    .service('modelReviewSvc', function(utilsSvc) {
+    .service('modelReviewSvc', function(utilsSvc,makeQHelperSvc) {
 
         let config = {}
         let cmConfig = {}
 
+        let extensionUrls = makeQHelperSvc.getExtensionUrls()
 
         return {
             makeDG: function(Q){
@@ -27,7 +28,23 @@ angular.module("pocApp")
                     ed.id = utilsSvc.getUUID()
                     hashLinkId[item.linkId] = ed.id
 
-                    ed.type = ['string']
+
+                    //set the ed type from the item type
+                    //todo - could be an externa; function - and add the others......
+                    let edType = 'string'
+                    switch (item.type) {
+                        case "integer" :
+                            edType = "integer"
+                            break
+                        case "decimal" :
+                            edType = "decimal"
+                            break
+                    }
+
+
+                    ed.type = [edType]
+
+
                     ed.mult = '0..'
                     if (item.required) {
                         ed.mult = '1..'
@@ -86,9 +103,26 @@ angular.module("pocApp")
                                 concept.system = ao.valueCoding.system
                                 ed.options.push(concept)
                             }
-
                         }
                     }
+
+                    if (item.extension) {
+                        for (const ext of item.extension) {
+
+                            switch (ext.url) {
+                                case extensionUrls.itemControl :
+                                    if (ext.valueCodeableConcept && ext.valueCodeableConcept.coding) {
+                                        if (ext.valueCodeableConcept.coding[0].code == 'radio-button') {
+                                            ed.controlHint = 'radio'
+                                        }
+                                    }
+                                    break
+
+                            }
+                            
+                        }
+                    }
+
 
 
                     dg.diff.push(ed)
@@ -154,6 +188,7 @@ angular.module("pocApp")
 
                     }
 */
+
 
 
                     if (item.item) {
