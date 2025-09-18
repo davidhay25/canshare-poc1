@@ -1536,7 +1536,7 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
                                 //we don't want to re-add it - but do need to copy all the attributes across
                                 Object.assign(hashItems[path],currentItem)
                                 delete  hashItems[path].placeHolder
-                                hashItems[path].type = 'group'      //this must be a froup if it has children...
+                                //temp Sep182025 hashItems[path].type = 'group'      //this must be a group if it has children...
                                 canAdd = false  //nothing else to do...
                             }
                         }
@@ -1546,7 +1546,7 @@ iif(%country.answer.value.code == 'AU', 'http://example.org/Valueset/Au-States')
                             //hashItems[parentItemPath] = hashItems[parentItemPath] || {}     //in theory, the parent should always have been added
                             hashItems[parentItemPath].item = hashItems[parentItemPath].item || []
                             hashItems[parentItemPath].item.push(currentItem)
-                            hashItems[parentItemPath].type = "group"
+                            //temp Sep182025 hashItems[parentItemPath].type = "group"
                             hashItems[path] = currentItem   //ready to act as a parent...
 
                             //We also need to process 'other' items. These are used in choice elements when the desired option is not in the options list

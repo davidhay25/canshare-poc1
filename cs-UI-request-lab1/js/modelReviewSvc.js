@@ -8,13 +8,25 @@ angular.module("pocApp")
 
         return {
             makeDG: function(Q){
+                //create a DG from a Q
+                //currently only used when importing ICCR
+
+                //hash keyed on linkId to id. needed in EnableWhen
+                //todo - assumption that an enablewhen always refers to something earlier in the Q - may need to revisit
+                //todo - potentially a 2 pass process is required - create dg first, then add EW after
+
+                let hashLinkId = {}
 
                 let dg = {kind:'dg',id: 'newdg', name:Q.name,title:Q.title,active:true}
 
+                dg.id = utilsSvc.getUUID()
                 dg.diff = []
                 function processItem(item,parentPath) {
 
                     let ed = {}
+                    ed.id = utilsSvc.getUUID()
+                    hashLinkId[item.linkId] = ed.id
+
                     ed.type = ['string']
                     ed.mult = '0..'
                     if (item.required) {
@@ -31,7 +43,24 @@ angular.module("pocApp")
                         ed.itemCode = item.code[0]
                     }
 
-                    ed.mult = '0..1'
+                    if (item.enableWhen) {
+                        ed.enableWhen = []
+                        for (const ew of item.enableWhen) {
+                            if (ew.answerCoding) {
+                                //only support answerCoding
+                                ed.enableWhen = ed.enableWhen || []
+                                let dgEW = {source:ew.question,operator:ew.operator}
+                                dgEW.value = ew.answerCoding
+                                dgEW.sourceId = hashLinkId[ew.question] //the unique id of the controller
+
+
+
+                                ed.enableWhen.push(dgEW)
+                            }
+                        }
+                    }
+
+                    //ed.mult = '0..1'
 
                     switch (item.type) {
                         case 'choice' :
@@ -66,7 +95,7 @@ angular.module("pocApp")
 
 
                     if (item.item) {
-                        ed.type = ['group']
+                       // ed.type = ['group']
 
                         for (let child of item.item) {
                             processItem(child,ed.path)
@@ -88,11 +117,11 @@ angular.module("pocApp")
 
 
             },
-            convertR4: function(Q,makeGroup,source){
-                //convert an R5 Q to R4 (at least the bits I care about)
-                //todo - make specific (if needed) for source of Q
+            convertICCR: function(Q,makeGroup,source){
+                //convert an ICCR sourced Q (R5) to R4 (at least the bits I care about)
                 //todo - need to think of the best way to do this
                 //if makeGroup true, then if a non-group has child items, they are all pushed into a separate group type parent
+                makeGroup = false //disable make group for now
                 let log = []
 
                 function processItem(item) {
@@ -110,7 +139,7 @@ angular.module("pocApp")
                         delete item.answerConstraint
                         log.push({linkId : item.linkId,msg:"Deleted item.answerConstraint"})
                     }
-
+/*
                     if (makeGroup && item.item && item.type !== 'group') {
                         //if the item has children and is not a group, then create a group and add the item to it
                         let clone = angular.copy(item)
@@ -124,7 +153,7 @@ angular.module("pocApp")
                         item.item.splice(0,0,clone)
 
                     }
-
+*/
 
 
                     if (item.item) {
