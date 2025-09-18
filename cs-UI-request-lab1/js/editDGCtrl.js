@@ -15,8 +15,12 @@ angular.module("pocApp")
             $scope.input.fixedValues = []   //all the fixed values defined by this DG (not shared like Named Queries)
 
 
-            $scope.input.pastedQ = $localStorage.pastedQ    //todo just when developing
+            //$scope.input.pastedQ = $localStorage.pastedQ    //todo just when developing
             $scope.input.parseMakeGroup = true
+
+            $scope.fillQ = function () {
+                $scope.input.pastedQ = $localStorage.pastedQ
+            }
 
             //when a DG is to be created from a Q
             $scope.pasteQ = function (Qstring) {
