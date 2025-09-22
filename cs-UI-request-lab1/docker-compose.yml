@@ -1,0 +1,34 @@
+# docker-compose.yml
+# start with   docker-compose up -d
+version: '3.9'
+
+services:
+  mongodb:
+    image: mongo                 # the most current MongoDB version
+    container_name: mongodbCS1
+    restart: always
+    networks:
+      - canshare-network
+    ports:
+      - "27017:27017"               # expose MongoDB to host
+    volumes:
+      - mongodb_data:/data/db       # named volume for persistence
+
+  canshare:
+    image: canshare
+    container_name: canshare
+    depends_on:
+      - mongodb                      # ensures MongoDB starts first
+    environment:
+      MONGOHOSTNAME: mongodb
+    ports:
+      - "9500:9500"                  # hostPort:containerPort for web access
+    networks:
+      - canshare-network
+
+networks:
+  canshare-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:                      # named volume definition

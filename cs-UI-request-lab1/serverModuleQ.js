@@ -3,9 +3,9 @@
 let MongoClient = require('mongodb').MongoClient;
 let database        //this will be the database connection
 
-async function setup(app,mongoDbName) {
+async function setup(app,mongoDbName,uri) {
 
-    const uri = "mongodb://127.0.0.1:27017"  //local machine
+    //const uri = "mongodb://127.0.0.1:27017"  //local machine
     const client = new MongoClient(uri);
     database = client.db(mongoDbName)
 
@@ -76,7 +76,8 @@ async function setup(app,mongoDbName) {
 
         try {
             let name = req.params.name
-            let version = parseInt( req.params.version)
+            let version =  req.params.version
+            //let version = parseInt( req.params.version)
             let query={name:name,version:version}
 
             console.log(query)
@@ -87,10 +88,12 @@ async function setup(app,mongoDbName) {
                     res.status(404).json({msg:"No matching Q found"})
                     break
                 case 1 :
-                    res.json(cursor[0])
+                    let q = cursor[0]
+                    delete q['_id']
+                    res.json(q)
                     break
                 default :
-                    res.status(400).json({msg:`${cursor.length}  Q found`})
+                    res.status(400).json({msg:`${cursor.length}  Questionnaires with the version ${version} found`})
                     break
 
             }

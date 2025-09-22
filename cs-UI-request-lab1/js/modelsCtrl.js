@@ -339,7 +339,7 @@ angular.module("pocApp")
                         config.fhirType = dg.type// Used for definition based extraction
                         config.expandVS = false     //use proxy to expand vs
                         config.name = qName
-                        config.version = dg.qVersion +1
+                        config.version = String(dg.qVersion +1)
                         //we make the Q with the new version. If it is not published, then the dg won't be updated so all good
 
                         config.url = $scope.world.name + '-' + dg.name
@@ -362,7 +362,7 @@ angular.module("pocApp")
                         }).result.then(function (Q) {
 
                             //update the version in the DG
-                            $scope.hashAllDG[dg.name].qVersion = Q.version
+                            $scope.hashAllDG[dg.name].qVersion = parseInt(Q.version)
                             $scope.updatePlayground(true)
 
                         })
@@ -513,7 +513,7 @@ angular.module("pocApp")
 
 
             //make a release candidate for this collection.
-            $scope.savePGRC = function () {
+            $scope.savePGRCDEP = function () {
                 $localStorage.world.publishedVersion = $localStorage.world.publishedVersion || 1
                 $localStorage.world.publishedRCCount = $localStorage.world.publishedRCCount || 0
 
@@ -548,7 +548,7 @@ angular.module("pocApp")
             //save the current Collection/PG as a version
             //the 'publishedVersion' refers to the latest version that was published. This is incremented
             //at the time the version is published
-            $scope.savePGVersion = function () {
+            $scope.savePGVersionDEP = function () {
                 //$localStorage.world.publishedVersion = $localStorage.world.publishedVersion || 1
                 let currentVersion = $localStorage.world.publishedVersion || 1
                 let msg = `This will create a new version (${currentVersion + 1}) of this Collection. It will also update the Repository. Are you sure?`

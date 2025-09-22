@@ -63,21 +63,8 @@ angular.module("pocApp")
                     const features = 'noopener,noreferrer'
                     window.open(url, '_blank', features)
 
-                    /*
-                    let qry = `/q/${$scope.selectedQVersion.name}/v/${$scope.selectedQVersion.version}`
-                    $http.get(qry).then(
-                        function (data) {
-                            console.log(data)
-                        }, function (err) {
-                            console.log(err)
-                            alert("Q version not found")
-                        }
-                    )
-                    */
-
                 }
-                //selectedQVersion
-                //'/q/:name/v/:version'
+
 
 
             }

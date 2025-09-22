@@ -476,8 +476,10 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                 if (type == 'Value Set') {
                     let vsUrl = cols[4]
                     if (! vsUrl)  { logger(rowNumber,"For a valueSet, Col E must have a value")}
+
                     if (vsUrl && ! hashValueSetNames[vsUrl]) {{
-                        logger(rowNumber,`The valueSet ${vsUrl} in col ${4} does not exist on the terminology server`)}
+                        //this is picked up below...
+                        //logger(rowNumber,`The valueSet ${vsUrl} in col ${4} does not exist on the terminology server`)}
                     }
 
                     if (vsUrl) {
@@ -490,7 +492,8 @@ angular.module("pocApp").service('terminologyUpdateSvc', function() {
                             hashVSUsed[vsUrl] = hashVSUsed[vsUrl] || []
                             hashVSUsed[vsUrl].push({type:'target',row:rowNumber})
                         } else {
-                            logger(rowNumber,`The valueSet ${vsUrl} in col ${4} is unknown.`)
+                            logger(rowNumber,`The valueSet ${vsUrl} in col ${4} does not exist on the terminology server`)}
+                            //logger(rowNumber,`The valueSet ${vsUrl} in col ${4} is unknown.`)
                         }
 
 

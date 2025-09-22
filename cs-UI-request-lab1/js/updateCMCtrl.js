@@ -9,7 +9,7 @@
 
 angular.module("pocApp")
     .controller('updateCMCtrl',
-        function ($scope,$http,$uibModal,$q,updateVSSvc,utilsSvc,terminologyUpdateSvc,$localStorage,$interval,cmTesterSvc) {
+        function ($scope,$http,$uibModal,$q,updateVSSvc,utilsSvc,terminologyUpdateSvc,$localStorage,$interval,cmTesterSvc,querySvc) {
 
             $scope.version = utilsSvc.getVersion()
 
@@ -75,6 +75,11 @@ angular.module("pocApp")
 
                             entry.item = {concept:{code:$scope.input.code}}
                             entry.item.UI = $scope.input.display
+
+                            //set staging1 true so will appear in the bottom left
+                            if (type == 'stagingProperties') {
+                                entry.item.staging1 = true
+                            }
 
 
                            // entry.code = $scope.input.code
@@ -328,8 +333,6 @@ angular.module("pocApp")
                 checkConcepts($scope.cmConfig.gradingProperties)
                 checkConcepts($scope.cmConfig.diagnosticProperties)
                 checkConcepts($scope.cmConfig.tnmLUT)
-
-
             }
 
 
@@ -421,14 +424,34 @@ angular.module("pocApp")
 
                 function parse() {
                     arLines.splice(0, 2)     //the first 2 lines are header lines
-                    let vo1 = terminologyUpdateSvc.auditCMFile(arLines, $scope.allVSItem)
-                    $scope.arLog = vo1.log
-
-                    let vo = terminologyUpdateSvc.makeCM(arLines,$scope.input.selectedDomain,description)
-                    $scope.conceptMap = vo.cm
+                    //https://docs.google.com/spreadsheets/d/1S-08cA1m-CAy8humztO0S5Djr_wtXibmNn6w4_uFCIE/edit?gid=484629798#gid=484629798
 
 
-                    $scope.canUpload = true
+                    //let allVSItem = []
+                    querySvc.getValueSets("authoring").then(
+                        function (ar) {
+                            //allVSItem = ar
+                            completeParse(ar)
+                            //console.log($scope.allVSItem)
+                            },
+                        function (err) {
+                            alert("I couldn't access the terminology server. There will be a lot of errors in the audit ")
+                            completeParse([])
+                        }
+                    )
+
+                    function completeParse(allVSItem) {
+                        //$scope.allVSItem = []
+                        let vo1 = terminologyUpdateSvc.auditCMFile(arLines, allVSItem)
+                        $scope.arLog = vo1.log
+
+                        let vo = terminologyUpdateSvc.makeCM(arLines,$scope.input.selectedDomain,description)
+                        $scope.conceptMap = vo.cm
+
+                        $scope.canUpload = true
+                    }
+
+
                 }
 
 
@@ -455,7 +478,7 @@ angular.module("pocApp")
                 })
             }
 
-            $scope.canShowRowDEP = function (row) {
+            $scope.canShowRow = function (row) {
                 //to show / hide specific rows in the audit
                 if ($scope.input.hideVSIssues && row.msg.indexOf('does not exist on the terminology server') !== -1) {
                     return false

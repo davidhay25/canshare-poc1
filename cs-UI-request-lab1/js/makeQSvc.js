@@ -1257,7 +1257,6 @@ angular.module("pocApp")
 
                 let startInx = config.startInx || 0     //the start index for re-numbering the linkIds
 
-
                 if (! lstElements || lstElements.length == 0) {
                     return  {allEW:[],hashEd :{} ,hashVS:{}, errorLog:[] }    //this results when there is a missing DG referenced...
                 }
@@ -1311,9 +1310,7 @@ angular.module("pocApp")
                                 okToAdd = false
                                 break
                             }
-
                         }
-
                     }
 
                     //now we need to look at the conditional ValueSets. If an item has condtional ValueSets defined
@@ -1337,16 +1334,18 @@ angular.module("pocApp")
                     lstQElements[0].ed.type=['group']      //todo - not sure about this...
                 }
 
+                //now can create the actual Q
+
 
                 let Q = {resourceType:'Questionnaire'}
-                //Q.id = `canshare-${firstElement.ed.path}`
-                Q.id = `canshare-${dg.name}`
+
+                Q.id = `canshare-${dg.name}`    //todo adjust for environment
                 Q.name = config.name || dg.name //firstElement.ed.path
                 Q.title = dg.title //firstElement.title
                 Q.status = 'active'
                 Q.title = dg.title
 
-                let qUrl = config.url || dg.name
+                let qUrl = config.url || dg.name  //todo adjust for environment
                 Q.url = `http://canshare.co.nz/questionnaire/${qUrl}`
                 Q.version = config.version
 
@@ -1368,8 +1367,6 @@ angular.module("pocApp")
                 Q.extension = Q.extension || []
                 let ext = {url:extAllocateIdUrl,valueString:'patientID'}
                 Q.extension.push(ext)
-
-
 
 
 
@@ -1461,6 +1458,7 @@ angular.module("pocApp")
                     hashEd[newLink] = ed
 
                     if (currentItem) {
+                        //this is not the first
                         let parentItemPath = $filter('dropLastInPath')(path)
                         currentItem = {linkId:`${pathPrefix}${path}`,type:'string',text:ed.title}
 
@@ -1468,11 +1466,10 @@ angular.module("pocApp")
                         let vo = decorateItem(currentItem,ed,extractionContext,dg,config,hashItems)
                         extractionContext = vo.extractionContext
 
-                        //console.log(path,extractionContext)
+
 
                         if (config.enableWhen) {
                             let ar =  addEnableWhen(ed,currentItem,config.pathPrefix,errorLog)
-                         //   allEW.push(...ar)
                         }
 
                         if (ed.mult.indexOf('..*')> -1) {
@@ -1519,10 +1516,6 @@ angular.module("pocApp")
                             //temp Sep182025 hashItems[parentItemPath].type = "group"
 
 
-
-
-
-
                             hashItems[path] = currentItem   //ready to act as a parent...
 
                             //We also need to process 'other' items. These are used in choice elements when the desired option is not in the options list
@@ -1554,8 +1547,6 @@ angular.module("pocApp")
 
                         decorateItem(currentItem,ed,extractionContext,dg,config)
 
-
-
                         if (dg.isTabbedContainer) {
                             let ext = {url: extItemControlUrl}
                             ext.valueCodeableConcept = {
@@ -1571,7 +1562,6 @@ angular.module("pocApp")
 
                         if (config.enableWhen) {
                             let ar = addEnableWhen(ed,currentItem,config.pathPrefix,errorLog)
-                        //    allEW.push(...ar)
                         }
 
                         //this is the first item in the Q. We place any extraction context defined on the DG
@@ -1619,7 +1609,6 @@ angular.module("pocApp")
 
 
                             //does this resource need a reference to patient?
-
 
                             //This is a resource that should have a patient reference
                             if (resourcesForPatientReference[dg.type]) {
@@ -1730,10 +1719,9 @@ angular.module("pocApp")
                     //save the original path. useful when tracking down the origin of things...
                     makeQHelperSvc.addExtensionOnce(item,{url:extOriginalPath,valueString:ed.path})
 
+                    let edType = ed.type[0]     //actually be the name of a contained DG
 
-                    let edType = ed.type[0]     //actually be the name of the DG
-
-                    //If this ed is a reference to another, it can have a different extraction context...
+                    //If this ed is a reference to another DG, it can have a different extraction context...
                     if (config.hashAllDG[edType]) {
 
                         let referencedDG = config.hashAllDG[edType]
@@ -1856,10 +1844,13 @@ angular.module("pocApp")
                         addPopulationContext (ed.selectedNQ,item)
                     }
 
+                    /* duplicate
                     //Will display child elements in a table
                     if (ed.gTable) {
                         addItemControl(item,'gtable')
                     }
+*/
+
 
                     if (ed.itemCode && ed.itemCode.code) {
 
@@ -1923,6 +1914,8 @@ angular.module("pocApp")
                     //set the ValueSet or options from the ed to the item
                     //the fixed takes precedence, then ValueSet then options
                     //todo - need to look for other datatypes than can be fixed
+
+
 
                     if (edType == 'code') {
                         if (ed.fixedCode) {
@@ -2212,13 +2205,7 @@ angular.module("pocApp")
                     }
 
                     addAdHocExtension(Q,item,ed.adHocExtension)
-                    /*
-                    if (ed.adHocExt) {
 
-                        addAdHocExt(item,ed.adHocExt)
-
-                    }
-*/
                     //fixed values assigned to the ED
                     //todo - use of these has been deprecated - to be removed DEP
                     if (false && ed.qFixedValues) {

@@ -826,8 +826,20 @@ angular.module("pocApp")
                             type = "BackboneElement"
                         }
 
+                        //this segment uses the path as the first word - useful for our models
                         let ar =  ed.path.split('.')
                         let name = ar[ar.length-1].replace(/slice:/g, '')
+/*
+                        //this segment uses the title - better for iccr
+                        let name = ed.title.trim()
+                        name = name.replace(/ /g,'_')
+                        name = name.replace(/\./g, "_")
+                        name = name.replace(/\(/g, "_")
+                        name = name.replace(/\)/g, "_")
+                        name = name.replace(/\,/g, "_")
+                        name = name.replace(/\//g, "_")
+
+*/
 
                         lne = `* ${name}`
                         let mult = ed.mult || '0..1'

@@ -293,7 +293,7 @@ angular.module("pocApp")
 
                         }, function (err) {
                             console.log(err)
-                            alert("Q version not found")
+                            alert(err.data.msg)
                         }
                     )
 

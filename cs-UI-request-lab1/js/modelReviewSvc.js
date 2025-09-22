@@ -93,8 +93,6 @@ angular.module("pocApp")
                     ed.title = ar[0]
                     ed.description = ar[1]
 
-
-
                     if (item.answerOption) {
                         ed.options = []
                         for (const ao of item.answerOption) {
@@ -119,7 +117,7 @@ angular.module("pocApp")
                                     break
 
                             }
-                            
+
                         }
                     }
 

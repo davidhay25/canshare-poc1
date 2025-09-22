@@ -53,17 +53,15 @@ function isDifferent(model1,model2) {
     if (JSON.stringify(model1) !== JSON.stringify(model2)) {
         return true
     }
-
 }
 
-async function setup(app,mongoDbName) {
+async function setup(app,mongoDbName,uri) {
     console.log("Setting up connection to mongodb in serverModuleModel")
 
     //const uri = "mongodb+srv://canshare:meUQP7RjdaVVTMuS@cluster0.okom61e.mongodb.net/?retryWrites=true&w=majority"
 
-    const uri = "mongodb://127.0.0.1:27017"  //local machine
+   // const uri = "mongodb://127.0.0.1:27017"  //local machine
     const client = new MongoClient(uri);
-    //database = client.db("canShare")
     database = client.db(mongoDbName)
 
 

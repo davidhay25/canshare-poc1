@@ -27,9 +27,9 @@ const mongoDbName = process.env.MONGODB || "canShare"
 const bodyParser = require('body-parser')
 
 console.log(`Server: Localserver root from env is ${process.env.POCSERVERBASE}`)
-console.log(`Server: FHIR server root from env is ${process.env.SERVERBASE}`)
-console.log(`Server: Log database from env is ${process.env.LOGDB}`)
-console.log(`Server: Custom ops from env is ${process.env.CUSTOMOPS}`)
+//console.log(`Server: FHIR server root from env is ${process.env.SERVERBASE}`)
+//console.log(`Server: Log database from env is ${process.env.LOGDB}`)
+//console.log(`Server: Custom ops from env is ${process.env.CUSTOMOPS}`)
 console.log(`Server: Mongo database name is ${mongoDbName}`)
 console.log("")
 
@@ -42,13 +42,13 @@ const commonModule = require("./serverModuleCommonUI.js")
 //const clinicalViewerModule = require("./serverModuleClinicalViewerUI")
 const terminologyModule = require("./serverModuleTerminologyUI")
 const modelModule = require("./serverModuleModel")
-const reviewModule = require("./serverModuleReview")
+//const reviewModule = require("./serverModuleReview")
 const validatorModule = require("./serverModuleValidator")
 const QModule = require("./serverModuleQ")
 const libraryModule = require("./serverModuleLibrary")
 const playgroundModule = require("./serverModulePlayground")
 
-const compVersionsModule = require("./serverModuleCompVersions")
+//const compVersionsModule = require("./serverModuleCompVersions")
 
 
 //let config = require("./config.json")
@@ -71,27 +71,23 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-/*
-//disable any cache - https://stackoverflow.com/questions/22632593/how-to-disable-webpage-caching-in-expressjs-nodejs
-app.use((req, res, next) => {
-    res.set('Cache-Control', 'no-store')
-    next()
-})
+let mongoHostName = process.env.MONGOHOSTNAME || "127.0.0.1"
 
-*/
+const mongoUri = `mongodb://${mongoHostName}:27017`  //local machine
+console.log(`Mongo connection uri is ${mongoUri}`)
 
 requesterModule.setup(app)
 //labModule.setup(app)
 //dashBoardModule.setup(app)
 //clinicalViewerModule.setup(app)
 terminologyModule.setup(app)
-modelModule.setup(app,mongoDbName)      //pass in the mongo database name to use
-reviewModule.setup(app,mongoDbName)
+modelModule.setup(app,mongoDbName,mongoUri)      //pass in the mongo database name to use
+//reviewModule.setup(app,mongoDbName,uri)
 validatorModule.setup(app)
-QModule.setup(app,mongoDbName)
-compVersionsModule.setup(app)
+QModule.setup(app,mongoDbName,mongoUri)
+//compVersionsModule.setup(app)
 libraryModule.setup(app)
-playgroundModule.setup(app,mongoDbName)
+playgroundModule.setup(app,mongoDbName,mongoUri)
 
 //common calls (not specifically related to requester or lab. ?move to separate module
 
@@ -162,7 +158,7 @@ app.post('/multiquery',async function(req,res){
 
     if (arQueries.length > 0) {
         for (const qry of arQueries) {
-            //await executeQuery(fullBundle,qry)
+
 
             let resource = await commonModule.singleQuery(qry)  //will follow any paging
 
@@ -181,25 +177,12 @@ app.post('/multiquery',async function(req,res){
                 }
             }
 
-
-
-
-
         }
     }
 
     res.json(fullBundle)
 
-    async function executeQueryDEP(fullBundle,qry) {
 
-        let bundle = await commonModule.singleQuery(qry)
-        if (bundle.entry) {
-            console.log('multi query:',qry,bundle.entry.length)
-            bundle.entry.forEach(function (entry) {
-                fullBundle.entry.push(entry)
-            })
-        }
-    }
 })
 
 
@@ -221,7 +204,7 @@ console.log(query)
 
 
     return
-
+/*
     //now we need to replace any | with %. Only this character should be encoded. Not sure why...
     query = query.replace("|","%7C")    //there will only ever be one...
     let qry = serverBase + query
@@ -282,6 +265,8 @@ console.log(query)
         return url
 
     }
+
+    */
 
 })
 
