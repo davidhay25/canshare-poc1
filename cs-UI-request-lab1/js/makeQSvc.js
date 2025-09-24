@@ -1724,6 +1724,9 @@ angular.module("pocApp")
                     //If this ed is a reference to another DG, it can have a different extraction context...
                     if (config.hashAllDG[edType]) {
 
+
+
+
                         let referencedDG = config.hashAllDG[edType]
                         let extractType = snapshotSvc.getExtractResource(edType)    //the FHIR type this DG extracts to, if any... Follows the parental hierarchy
 
@@ -2463,10 +2466,15 @@ angular.module("pocApp")
 
                     //determine if this is a referece to another DG
                     //make a display if so as we're not nesting in the Q in the same way as in th emodel
+                    //??? why display - this must be a group surely!
                     let type = ed.type[0]
                     if (snapshotSvc.getDG(ed.type[0])) {
-                        controlHint = "display"
-                        controlType = "display"
+                        //controlHint = "display"
+                        //controlType = "display"
+
+                        controlHint = "group"
+                        controlType = "group"
+
                     }
 
                 }

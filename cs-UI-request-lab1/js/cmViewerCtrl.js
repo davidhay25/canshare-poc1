@@ -45,6 +45,13 @@ angular.module("pocApp")
             $scope.conceptMap = conceptMap
             //$scope.updateVSSvc = updateVSSvc
 
+            //create a hash of propertynames by snomed code
+            //for (const )
+
+
+
+
+
             $scope.getCMOperator = function(don) {
                 let op = '='
                 if (don.extension) {

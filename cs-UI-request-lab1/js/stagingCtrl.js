@@ -89,9 +89,7 @@ angular.module("pocApp")
 
                     //when setting the prefix, we need to re-calculate all the tnm cateories that have been selected
                     $scope.processTNMSelect(key,value)
-
                 }
-
             }
 
 
@@ -246,15 +244,12 @@ angular.module("pocApp")
                         let vo = cmTesterSvc.rulesEngine($scope.local.cmPropertyValue,cmElement,$scope.hashExpandedVs)
 
                         let concepts = cmTesterSvc.getConceptsFromTarget(vo.lstMatchingTargets,$scope.hashExpandedVs)
-//console.log(key,concepts)
+
                         value.options = concepts
 
                         if (value.options.length == 1) {
                          //   $scope.local.cmPropertyValue[key] = value.options[0]
                         }
-
-
-
 
                         $scope.processTNMSelect(key,value)      //update the prefixed displays
                     } else {

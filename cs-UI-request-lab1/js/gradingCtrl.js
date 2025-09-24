@@ -16,9 +16,9 @@ angular.module("pocApp")
             }
 
 
-            //called when any elements in the diagnostic group change (via the 'dxChanged' event.
+            //called when any elements in the diagnostic group change (via the 'dxChanged' event. as well as within the grading pane
             // Sets the values for all elements in this group
-            //if called with a property name, then don't update that proiperty (used when called from within the grading section)
+            //if called with a property name, then don't update that property (used when called from within the grading section)
             function updateGrading(excludeProperty) {
                 for (const key of Object.keys($scope.cmConfig.gradingProperties)) {
 

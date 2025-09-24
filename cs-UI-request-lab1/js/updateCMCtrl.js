@@ -436,6 +436,7 @@ angular.module("pocApp")
                             },
                         function (err) {
                             alert("I couldn't access the terminology server. There will be a lot of errors in the audit ")
+                            alert(angular.toJson(err.data))
                             completeParse([])
                         }
                     )
