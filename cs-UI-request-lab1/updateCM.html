@@ -260,7 +260,10 @@
                         <br/>
                         <strong>Diagnostic properties</strong>
                         <table class="table-bordered table">
-                            <tr><th>Property</th><th>OE Code</th><th>UI display</th><th>Next property</th><th>Previous property</th><th>Full VS</th></tr>
+                            <tr><th style="width:15%">Property</th>
+                                <th style="width:25%">OE Code</th>
+                                <th style="width:15%">UI display</th>
+                                <th>Next property</th><th>Previous property</th><th>Full VS</th></tr>
                             <tr ng-repeat = "(k,v) in cmConfig.diagnosticProperties">
                                 <td style="width: 15%">{{k}}</td>
                                 <td ng-class="{invalidCode:hashInvalidCode[v.concept.code]}">
@@ -284,7 +287,11 @@
                         <br/>
                         <strong>Staging properties</strong>
                         <table class="table-bordered table">
-                            <tr><th>Property</th><th>OE Code</th><th>UI display</th><th>Group</th></tr>
+                            <tr><th style="width:15%">Property</th>
+                                <th  style="width:25%">OE Code</th>
+                                <th style="width:15%">UI display</th>
+                                <th>Group</th>
+                                <th>Hide if empty</th></tr>
                             <tr ng-repeat = "(k,v) in cmConfig.stagingProperties">
                                 <td>{{k}}</td>
 
@@ -299,6 +306,9 @@
                                     <div ng-if="v.staging1">Section 1</div>
                                     <div ng-if="v.staging2">Section 2</div>
                                 </td>
+                                <td>
+                                    {{v.hideIfNoOptions}}
+                                </td>
 
                             </tr>
                         </table>
@@ -307,7 +317,10 @@
                         <br/>
                         <strong>Grading properties</strong>
                         <table class="table-bordered table">
-                            <tr><th>Property</th><th>OE Code</th><th>UI display</th><th>Group</th></tr>
+                            <tr><th style="width:15%">Property</th>
+                                <th style="width:25%">OE Code</th>
+                                <th style="width:15%">UI display</th>
+                                <th>Group</th></tr>
                             <tr ng-repeat = "(k,v) in cmConfig.gradingProperties">
                                 <td>{{k}}</td>
 

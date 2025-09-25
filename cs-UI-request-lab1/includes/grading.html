@@ -10,7 +10,7 @@
         <td>
             <div class="row">
                 <div class="col-md-10">
-                    <div>
+                    <div ng-show="v.options.length > 0">
 
 
                         <select class="form-control" ng-model="local.cmPropertyValue[k]"
@@ -21,7 +21,7 @@
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <span class="pull-right"> {{v.options.length}}</span>
+                    <span class="pull-right" ng-show = "v.options.length > 0"> {{v.options.length}}</span>
 
 
                 </div>

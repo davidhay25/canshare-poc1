@@ -1312,6 +1312,8 @@ angular.module("pocApp")
                             return property
                         }, data : function() {
                             return $scope.local.cmPropertyValue
+                        }, config : function () {
+                            return $scope.cmConfig
                         }
                     }
 

@@ -324,7 +324,7 @@ angular.module("pocApp")
                 let testQ = {}
                 try {
 
-                    let vo = modelReviewSvc.convertR4(JSON.parse(Qstring),$scope.input.parseMakeGroup)
+                    let vo = modelReviewSvc.convertICCR(JSON.parse(Qstring),$scope.input.parseMakeGroup)
                     testQ = vo.Q
                     console.log(vo.log)
 /*

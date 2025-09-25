@@ -21,28 +21,28 @@
           <div class="col-md-10">
             <div>
 
-              <div ng-show = "v.options.length > 1">
+              <!-- <div ng-show = "v.options.length > 1"> -->
+              <div ng-show = "v.options.length > 0">
+
                 <select class="form-control" ng-model="local.cmPropertyValue[k]"
                         ng-change="updateStaging(k)"
                         ng-options="v1.display for (k1,v1) in v.options">
                 </select>
+
               </div>
 
-
+<!--
               <div ng-show = "v.options.length == 1">
-                <!--
-                {{v.options[0].display}}
-                -->
+
                 <input type="text" class="form-control"  disabled="disabled" value="{{v.options[0].display}}"/>
 
               </div>
+              -->
 
             </div>
           </div>
             <div class="col-md-2">
-
-
-
+              <div ng-show = "v.options.length > 0">{{v.options.length}}</div>
             </div>
           </div>
       </td>
@@ -157,6 +157,7 @@
             </div>
           </div>
           <div class="col-md-2">
+            <div ng-show = "v.options.length > 0">{{v.options.length}}</div>
 
 
 

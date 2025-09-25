@@ -109,11 +109,12 @@ angular.module("pocApp")
                             let concepts = cmTesterSvc.getConceptsFromTarget(vo.lstMatchingTargets,$scope.hashExpandedVs)
 
                             property.options = concepts
+/* 25 sep - don't select if only 1
 
                             if (property.options.length == 1) {
                                 $scope.local.cmPropertyValue[key] = property.options[0]
                             }
-
+*/
 
                             // console.log(vo,concepts)
                         } else {

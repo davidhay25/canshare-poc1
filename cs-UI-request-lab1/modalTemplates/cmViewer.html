@@ -1,6 +1,12 @@
 <div>
   <!--<div ng-controller="newResourceCtrl">-->
 
+  <style>
+    .missingConfig {
+      color: red;
+    }
+  </style>
+
   <div class="modal-header">
     <div class="row">
       <div class="col-md-8 col-sm-8">
@@ -47,6 +53,10 @@
             <div class="banner">
               {{input.cmElement.display}}
               <div>{{input.cmElement.code}} {{conceptMap.group[0].source}}</div>
+              <div>{{hashPropertyForCode[input.cmElement.code].prop}}</div>
+              <div class="missingConfig" ng-hide="hashPropertyForCode[input.cmElement.code].prop">
+                This element has no definition in the Config file so it can't be a 'dependsOn' selector
+              </div>
             </div>
 
 
@@ -230,6 +240,18 @@
         </div>
 
       </uib-tab>
+
+      <uib-tab heading="Property names for code">
+        <table class="table table-bordered">
+          <tr><th>Code</th><th>Display from config</th><th>Property name from config</th></tr>
+          <tr ng-repeat="(k,v) in hashPropertyForCode">
+            <td><div class="clickable" ng-click="lookup(k)"> {{k}}</div></td>
+            <td>{{v.display}}</td>
+            <td>{{v.prop}}</td>
+          </tr>
+        </table>
+      </uib-tab>
+
       <uib-tab ng-if="data" heading="Current Data">
         <table class="table-bordered table">
           <tr><th>Property</th><th>Result display</th><th>Result code</th>

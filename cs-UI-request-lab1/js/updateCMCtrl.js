@@ -206,6 +206,8 @@ angular.module("pocApp")
                             return ""
                         }, data : function() {
                             return null
+                        }, config : function () {
+                            return $scope.cmConfig
                         }
 
                     }
@@ -767,6 +769,9 @@ angular.module("pocApp")
             }
 
 
+
+
+            //------------ everything below here deprecated - can be deleted when ready --------------
 
 
             $scope.getConceptMapVersionsSAVE = function (domain) {

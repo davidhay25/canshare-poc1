@@ -6,8 +6,10 @@ There's no update capability - concept maps are authored in a spreadsheet and im
 
 angular.module("pocApp")
     .controller('cmViewerCtrl',
-        function ($scope,conceptMap,$uibModal,cmTesterSvc,hashExpandedVs,selectedProperty,data,$http,$timeout) {
+        function ($scope,conceptMap,$uibModal,cmTesterSvc,hashExpandedVs,selectedProperty,data,$http,config,$timeout) {
             $scope.input = {}
+
+            console.log(config)
 
             $scope.data = data
 
@@ -49,6 +51,60 @@ angular.module("pocApp")
             //for (const )
 
 
+//Create the display of property name vs snomed code
+            function makePropertyAudit() {
+                $scope.hashPropertyNames = {}      //all the codes for the properties
+                $scope.hashPropertyForCode = {}    //the property name for a code
+
+                //pass 1 - get all the propertyname / codes from the config file
+                for (const [key, value] of Object.entries(config.tnmLUT)) {
+                    $scope.hashPropertyNames[key] = {code: value}
+                    $scope.hashPropertyForCode[value] = {prop:key}
+                }
+
+                //add the diagnostirProperties, stagingProperties and gradingProperties to the hash
+                for (let root of ['diagnosticProperties','stagingProperties','gradingProperties']) {
+                    let branch = config[root]
+                    for (const [key, value] of Object.entries(branch)) {
+                        $scope.hashPropertyNames[key] = {code: value.concept}
+                        $scope.hashPropertyForCode[value.concept.code] = {prop:key,display:value.concept.display}
+                    }
+                }
+
+console.log($scope.hashPropertyNames,$scope.hashPropertyForCode)
+
+                //pass 2 - get all the properties referenced in the current map
+                //and the element codes in use
+                    let hashDON = {}    //all the dependsOn properties in all elements
+                    let hashElementCode = {}    //all the codes in the elements
+                    for (const element of conceptMap.group[0].element) {
+                        hashElementCode[element.code] = {}
+
+                        if (! $scope.hashPropertyForCode[element.code]) {
+                            $scope.hashPropertyForCode[element.code] = {} //{prop:"No property name from Config"}
+                        } else {
+                            if (! $scope.hashPropertyForCode[element.code].display) {
+                                $scope.hashPropertyForCode[element.code].display = element.display + " from CM"
+                            }
+                        }
+
+                        for (const target of element.target) {
+                            if (target.dependsOn) {
+                                for (const don of target.dependsOn) {
+                                    hashDON[don.property] = {}
+                                }
+                            }
+                        }
+                    }
+                    //console.log(hashDON,hashElementCode)
+
+
+
+
+                //pass 2 - add the snomed code from the config file
+
+            }
+            makePropertyAudit()
 
 
 

@@ -277,7 +277,9 @@
                                        ng-click="selectConcept(k,v)"></i>
 
 
-
+                                    <div class="pull-right" ng-show="v.options.length > 0">
+                                        {{v.options.length}}
+                                    </div>
 
                                 </div>
                             </div>
@@ -319,8 +321,9 @@
                 </div>
 
 
+                <!-- <uib-tabset  ng-show="stagingProperties['staging-system'].options.length > 0" > -->
 
-                <uib-tabset  ng-show="stagingProperties['staging-system'].options.length > 0" >
+                <uib-tabset >
                     <uib-tab heading="Staging selection">
                         <div ng-controller="stagingCtrl">
                             <ng-include src = "'./includes/staging.html'"></ng-include>
