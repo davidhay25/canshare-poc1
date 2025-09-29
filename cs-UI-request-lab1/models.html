@@ -75,10 +75,6 @@
 
             </div>
 
-
-
-
-
             <div class="col-md-1 col-sm-1">
                 <div class="navbar-text btn">
                     <button ng-if="userMode == 'playground'" class="btn btn-primary pull-right"
@@ -165,11 +161,25 @@
             </div>
 
             <div class="col-md-1">
-                <a href="https://teaho.govt.nz/" target="_blank">
-                    <img width="150" height="auto" class="pull-right"
-                         style="padding: 3px"
-                         src="images/canshareLogo.png"/>
-                </a>
+
+                <div ng-if = "systemConfig">
+
+                    <a href="https://teaho.govt.nz/" target="_blank">
+
+                        <img width="150" height="auto" class="pull-right"
+                             style="padding: 3px"
+                             ng-src="{{systemConfig.logoUrl}}"/>
+
+                        <!--
+                        <img width="150" height="auto" class="pull-right"
+                             style="padding: 3px"
+                             src="images/canshareLogo.png"/>
+                        -->
+                    </a>
+                </div>
+
+
+
             </div>
 
         </div>
@@ -894,6 +904,9 @@
         $locationProvider.hashPrefix('!');
 
     });
+
+
+
     angular.module("pocApp").constant("moment", moment);
 
     angular.module("pocApp").config(['$compileProvider', function ($compileProvider) {
@@ -913,7 +926,6 @@
     app.config(function ($provide) {
 
         $provide.decorator('$exceptionHandler', function ($delegate) {
-
             return function (exception, cause) {
                 //  $delegate(exception, cause);
 //console.log(cause)
@@ -1003,36 +1015,26 @@
 <script src="js/traceSvc.js"></script>
 <script src="js/utilsSvc.js"></script>
 
+<script>
+    angular.module('pocApp').run(function(utilsSvc) {
+        console.log(utilsSvc)
+        utilsSvc.loadConfig();
+    });
+</script>
+
+
 <script src="js/cmTesterSvc.js"></script>
 
 <script src="js/codedOptionsSvc.js"></script>
 <script src="js/vsSvc.js"></script>
 <script src="js/exportSvc.js"></script>
 
-<!-- Taken out 23 Nov
-<script src="js/cmSvc.js"></script>
 
-<script src="directive/renderForm/renderFormSvc.js"></script>
-<script src="directive/renderForm/renderFormDir.js"></script>
-<script src="directive/renderSingleItem/renderSingleItemDir.js"></script>
-
-<script src="js/libs/codemirror.js"></script>
-
-<script src="js/libs/foldcode.js"></script>
-
-
-<script src="js/libs/comment-fold.js"></script>
-
-
-
--->
 
 <script src="js/qHelperSvc.js"></script>
 <script src="js/xquery.js"></script>
 
 <link rel="stylesheet" type="text/css" href="css/jsTreeStyle.css"/>
-
-
 
 <script src="js/compSectionsCtrl.js"></script>
 <script src="js/publishCompCtrl.js"></script>

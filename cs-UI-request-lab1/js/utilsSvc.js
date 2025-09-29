@@ -36,7 +36,15 @@ angular.module("pocApp")
         objColours.Immunization = '#aeb76c';
         objColours.Procedure = '#aeb76c';
 
+        let config = null;
 
+        this.loadConfig = function() {
+            return $http.get('/config').then(res => {
+                config = res.data;
+                console.log(config)
+                return config;
+            });
+        };
 
         $http.get("/model/namedquery").then(
             function (data) {
@@ -52,6 +60,17 @@ angular.module("pocApp")
         return {
             getVersion : function(){
                 return "2.0.1"
+            },
+            loadConfig :function() {
+                return $http.get('/config').then(res => {
+                    config = res.data;
+                    console.log(config)
+                    return config;
+                })},
+
+            getConfig : function () {
+                console.log(config)
+                return config
             },
             getUUID : function () {
                 return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {

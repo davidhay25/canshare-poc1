@@ -4,7 +4,8 @@ angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,orderingSvc,
                   snapshotSvc,vsSvc,makeQSvc,playgroundsSvc,$localForage,documentSvc, reportSvc,
-                  $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,utilsSvc,$location) {
+                  $timeout,$uibModal,$filter,modelTermSvc,modelDGSvc,igSvc,librarySvc,traceSvc,
+                  utilsSvc,$location) {
 
             //change the background colour of the DG summary according to the environment
             $scope.modelInfoClass = 'modelInfo'
@@ -25,6 +26,13 @@ angular.module("pocApp")
 
             $scope.userMode = $localStorage.userMode || "playground"      //possible modes are 'library' or 'playground'
             //$scope.userMode = "library"
+
+
+            $timeout(function () {
+                $scope.systemConfig = utilsSvc.getConfig()
+                console.log($scope.systemConfig)
+            },500)
+
 
             $scope.version = utilsSvc.getVersion()
             $scope.input = {}

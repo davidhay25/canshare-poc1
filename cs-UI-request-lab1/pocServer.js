@@ -57,8 +57,8 @@ let express = require('express');
 //const fle = require("./samples/valenciaMay.json");
 let app = express();
 app.use(bodyParser.json({limit:'50mb',type:['application/json+fhir','application/fhir+json','application/json']}))
-app.use('/', express.static(__dirname,{index:'/poc.html'}));
-
+//app.use('/', express.static(__dirname,{index:'/poc.html'}));
+app.use('/', express.static(__dirname,{index:'/csFrontPage.html'}));
 
 //from chatGPT to allow call from elsewhere
 app.use((req, res, next) => {
@@ -77,25 +77,24 @@ const mongoUri = `mongodb://${mongoHostName}:27017`  //local machine
 console.log(`Mongo connection uri is ${mongoUri}`)
 
 requesterModule.setup(app)
-//labModule.setup(app)
-//dashBoardModule.setup(app)
-//clinicalViewerModule.setup(app)
 terminologyModule.setup(app)
 modelModule.setup(app,mongoDbName,mongoUri)      //pass in the mongo database name to use
-//reviewModule.setup(app,mongoDbName,uri)
 validatorModule.setup(app)
 QModule.setup(app,mongoDbName,mongoUri)
-//compVersionsModule.setup(app)
 libraryModule.setup(app)
 playgroundModule.setup(app,mongoDbName,mongoUri)
 
 //common calls (not specifically related to requester or lab. ?move to separate module
 
 
-app.get('/sampleAN',function (req,res) {
-    let fle = require("./samples/valenciaMay11.json")
-    res.json(fle)
-})
+app.get('/config', (req, res) => {
+    res.json({
+        logoUrl: process.env.APP_LOGO_URL || 'images/canshareLogo.png'
+        //logoUrl: process.env.APP_LOGO_URL || 'images/sb-intersystems.png'
+    });
+});
+
+
 
 app.get('/validatorHints',function (req,res) {
     let fle = require("./validatorHints.json")
@@ -274,4 +273,4 @@ server = http.createServer(app).listen(port);
 console.log("Server listening on port " + port)
 
 //the default page
-app.use('/', express.static(__dirname,{index:'/monitor.html'}));
+//app.use('/', express.static(__dirname,{index:'/monitor.html'}));

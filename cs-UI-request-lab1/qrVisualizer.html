@@ -187,6 +187,8 @@
 
             <uib-tabset>
 
+
+
                 <uib-tab heading="Report">
                     <br/>
                     <div class="myScroll">
@@ -269,11 +271,7 @@
 
                 </uib-tab>
 
-                <uib-tab ng-show="false" heading="QR tree">
-                    Tree view of QR
 
-
-                </uib-tab>
 
                 <uib-tab ng-show="false" heading="Extract">
                     Invoke $extract on the lab to get back the extracted resources.
@@ -344,6 +342,18 @@
 
                 </uib-tab>
 
+                <uib-tab ng-show="selectedItem.invalidJson" heading="Invalid json">
+
+                    {{selectedItem.errorMsg}}
+                    <br/><br/>
+                    <pre>
+                        {{selectedItem.invalidJson}}
+
+                    </pre>
+
+
+
+                </uib-tab>
 
             </uib-tabset>
 

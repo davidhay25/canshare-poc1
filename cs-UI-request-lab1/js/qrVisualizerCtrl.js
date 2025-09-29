@@ -1,6 +1,5 @@
 /*
- The front page for the CanShare suite
- Note that the collections are called palygrounds for historical reasons
+Visualizer for  path AI
 */
 angular.module("pocApp")
     .controller('qrVisualizerCtrl',
@@ -41,6 +40,15 @@ angular.module("pocApp")
 
 
                                 let content = lne["Content"]
+
+                                const match = content.match(/```([\s\S]*?)```/);
+                                if (match) {
+                                    console.log(match[1]); // "this is the content"
+                                    content = "```" + match[1] + "```"
+                                }
+
+
+
                                 // Remove markdown fences if present
                                 content = content.replace(/```json|```/g, "").trim();
 
@@ -60,6 +68,9 @@ angular.module("pocApp")
                                 } catch (ex) {
                                     console.log('Parse fail',ex.message)
                                     item.error = "Failed parsing"
+                                    item.invalidJson = content
+                                    item.inputName += " Failed Parsing"
+                                    item.errorMsg = ex.message
                                 }
 
                                 $scope.items.push(item)
@@ -226,6 +237,7 @@ angular.module("pocApp")
 
                 delete $scope.textReport
                 delete $scope.selectedQ
+               delete $scope.qBasedReport
 
                 $scope.codedItems = []
 
