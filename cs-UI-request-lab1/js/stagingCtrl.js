@@ -78,10 +78,10 @@ angular.module("pocApp")
                     let prefixPropName = "cancer-staging-prefix"
                     switch (prefix) {
                         case "y":
-                            $scope.local.cmPropertyValue[prefixPropName] = {code:"576031000210100",display:"Cancer staging prefix",system:"http://snomed.info/ct"}
+                            $scope.local.cmPropertyValue[prefixPropName] = {code:"1370922008",display:"Cancer staging prefix",system:"http://snomed.info/ct"}
                             break
                         case "r":
-                            $scope.local.cmPropertyValue[prefixPropName] = {code:"361271000210107",display:"Cancer staging prefix",system:"http://snomed.info/ct"}
+                            $scope.local.cmPropertyValue[prefixPropName] = {code:"1370923003",display:"Cancer staging prefix",system:"http://snomed.info/ct"}
                             break
                         default:
                             delete $scope.local.cmPropertyValue[prefixPropName]

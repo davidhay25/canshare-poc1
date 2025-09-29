@@ -43,7 +43,7 @@ angular.module("pocApp")
 
                                 const match = content.match(/```([\s\S]*?)```/);
                                 if (match) {
-                                    console.log(match[1]); // "this is the content"
+                                    //console.log(match[1]); // "this is the content"
                                     content = "```" + match[1] + "```"
                                 }
 
@@ -55,8 +55,21 @@ angular.module("pocApp")
                                 // Fix double quotes from CSV escaping
                                 content = content.replace(/""/g, '"');
 
+
+                                /*
+
+                                //There were invalid characters in the json string....
+                                content = content
+                                    .replace(/\r/g, '')       // remove CR
+                                    .replace(/\n/g, '\\n')    // escape LF
+                                    .replace(/\t/g, '\\t');   // escape tabs
+
+                                */
+                                content = content.replace(/[\x00-\x1F]/g, ''); // removes invisible control chars
+
+
                                 if (inx == 0) {
-                                    console.log(content)
+                                    //console.log(content)
                                 }
 
                                 try {
@@ -67,6 +80,7 @@ angular.module("pocApp")
 
                                 } catch (ex) {
                                     console.log('Parse fail',ex.message)
+                                    console.log(content)
                                     item.error = "Failed parsing"
                                     item.invalidJson = content
                                     item.inputName += " Failed Parsing"
