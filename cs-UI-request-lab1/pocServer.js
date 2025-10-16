@@ -118,6 +118,7 @@ app.post('/validateBundle', async function (req,res) {
     }
 })
 
+/*
 //validate a StructureDefiniton
 app.post('/validateSD', async function (req,res) {
     let SD = req.body
@@ -133,7 +134,7 @@ app.post('/validateSD', async function (req,res) {
     }
 
 })
-
+*/
 
 app.get('/config', async function(req,res){
 

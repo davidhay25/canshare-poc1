@@ -64,7 +64,7 @@ angular.module("pocApp")
             $scope.allTypes = angular.copy(hashTypes)
 
             //frozen DG - ie components - for the linked option
-            $http.get('/allfrozen').then(
+            $http.get('allfrozen').then(
                 function (data) {
 
                     //only from library (LIM)
@@ -154,7 +154,7 @@ angular.module("pocApp")
 
             //Load all the Named queries
             function loadNamedQueries() {
-                let qry = "/model/namedquery"
+                let qry = "model/namedquery"
                 $http.get(qry).then(
                     function (data) {
                         $scope.namedQueries = data.data

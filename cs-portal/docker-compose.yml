@@ -1,0 +1,99 @@
+# docker-compose.yml for inte
+# start with   docker-compose up -d
+# needs to align with the nginx from portal image
+
+services:
+
+  # main portal app with Portal page. built on nginx with the nginx config there
+  # don't need a separate nginx here
+  portal:
+    image: davidhay25/portal
+    container_name: portal
+    ports:
+      - "80:80"
+    networks:
+      - clinfhir-network
+    depends_on:
+      - forms
+      - clinfhir
+
+
+  netshoot: # handy network troubleshooting container
+    image: nicolaka/netshoot
+    container_name: netshoot
+    command: sleep infinity   # Keeps the container running
+    networks:
+      - clinfhir-network
+    tty: true
+    stdin_open: true
+
+  mongodb:
+    image: mongo                 # the most current MongoDB version
+    container_name: mongodbCS1
+    restart: unless-stopped
+    networks:
+      - clinfhir-network
+    ports:
+      - "27017:27017"               # expose MongoDB to host
+    volumes:
+      - mongodb_data:/data/db       # named volume for persistence
+
+
+  hapi-fhir:
+      image: hapiproject/hapi:latest
+      container_name: hapi-fhir
+      ports:
+        - "9090:8080"          # Host port : Container port
+      volumes:
+        - hapi_data:/data      # optional: persist data (if using embedded DB)
+      restart: unless-stopped  
+     
+      networks:
+      - clinfhir-network    
+
+  forms:
+    image: davidhay25/forms
+    container_name: forms
+    depends_on:
+      - mongodb                      # ensures MongoDB starts first
+    environment:
+      MONGOHOSTNAME: mongodb
+    ports:
+      - "9500:9500"                  # hostPort:containerPort for web access
+    networks:
+      - clinfhir-network
+
+  clinfhir:
+    image: davidhay25/cf
+    container_name: clinfhir
+    depends_on:
+      - mongodb                      # ensures MongoDB starts first
+    environment:
+      #MONGOHOSTNAME: mongodb
+      MONGO_URL: mongodb://mongodb:27017/clinfhir
+      HAPISERVER: http://hapi-fhir:8080/fhir # internal URL for HAPI server - used by serverModuleProxy in clinfhir
+    ports:
+      - "8080:8080"                  # hostPort:containerPort for web access
+    networks:
+      - clinfhir-network
+
+  gb2:
+    image: davidhay25/gb2
+    container_name: gb2
+    depends_on:
+      - mongodb                      # ensures MongoDB starts first
+    environment:
+      MONGOHOSTNAME: mongodb
+    ports:
+      - "8090:8090"                  # hostPort:containerPort for web access
+    networks:
+      - clinfhir-network
+
+
+networks:
+  clinfhir-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:                      # named volume definition
+  hapi_data:

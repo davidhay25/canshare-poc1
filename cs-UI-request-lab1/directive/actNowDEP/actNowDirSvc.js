@@ -29,7 +29,7 @@ angular.module("formsApp")
                 //todo - this is *really* inefficient!
                 let url = `Patient/${patient.id}/$everything`
                 let encodedQry = encodeURIComponent(url)
-                $http.get(`/proxy?qry=${encodedQry}`).then(
+                $http.get(`proxy?qry=${encodedQry}`).then(
                     function (data) {
                         console.log(data.data)
                         let summary = process(data.data.entry)

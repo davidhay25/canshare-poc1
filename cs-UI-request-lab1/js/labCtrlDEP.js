@@ -82,7 +82,7 @@ angular.module("pocApp")
             }
 
             //load the list of possible report templates (questionnaires)
-            $http.get("/lab/templates").then(
+            $http.get("lab/templates").then(
                 function(data) {
                     //returns a bundle in data.data
                     //copy into a simpler structure for ease of handling

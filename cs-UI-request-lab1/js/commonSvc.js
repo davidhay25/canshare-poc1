@@ -254,7 +254,7 @@ angular.module("pocApp")
                 let deferred = $q.defer()
                 let that = this
 
-                $http.get("/config").then(
+                $http.get("config").then(
                     function(data) {
                         that.config = data.data  // save in service {SERVERBASE: CUSTOMOPS}}
                         deferred.resolve(that.config)
@@ -272,7 +272,7 @@ angular.module("pocApp")
                 let deferred = $q.defer()
 
                 let qry = encodeURIComponent(`ServiceRequest?patient=${patientId}`)
-                $http.get(`/proxy?qry=${qry}`).then(
+                $http.get(`proxy?qry=${qry}`).then(
                     function (data) {
                         console.log(data.data)
                         deferred.resolve(data.data)

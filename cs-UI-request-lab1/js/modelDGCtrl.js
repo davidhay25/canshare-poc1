@@ -116,7 +116,7 @@ angular.module("pocApp")
 
             $scope.testxquery = function (queryName) {
 
-                $http.get(`/model/namedquery/${queryName}`).then(
+                $http.get(`model/namedquery/${queryName}`).then(
 
                     function (data) {
                         $uibModal.open({

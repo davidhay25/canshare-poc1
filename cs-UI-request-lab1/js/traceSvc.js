@@ -26,7 +26,7 @@ angular.module("pocApp")
                     if (user && user.email) {
                         serverCopy.userEmail = user.email
                     }
-                    $http.post('/trace',serverCopy).then(
+                    $http.post('trace',serverCopy).then(
                         function () {
 
                         },function () {

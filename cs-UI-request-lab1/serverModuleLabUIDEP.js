@@ -76,7 +76,7 @@ function setup(app) {
     // resources returned are the QR, Patient and any previous report resources (DR / Obs) that may have been created
     // This is to support interim and final reports
     //when a report is submitted, any previous DR is updated and Observations are set to 'cancelled' status. This could be improved...
-    app.get('/lab/SRDetails', async function(req,res){
+    app.get('lab/SRDetails', async function(req,res){
 
         //console.log(req.params)
         let identifier = req.query.identifier

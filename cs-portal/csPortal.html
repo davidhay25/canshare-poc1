@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>CanShare front page</title>
+
+    <script src="./angular.min1-5.js"></script>
+    <script src="./ui-bootstrap-tpls-2.0.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./bootstrap.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <script>
+        angular.module("portalApp",['ui.bootstrap',"firebase"]).config(function($locationProvider) {
+            $locationProvider.html5Mode(true);
+            $locationProvider.hashPrefix('!');
+        });
+
+        angular.module("portalApp").config(['$compileProvider', function ($compileProvider) {
+            $compileProvider.aHrefSanitizationWhitelist(/^\s*(http|https?|ftp|mailto|blob):/);
+        }]);
+
+
+
+/*
+angular.module("pocApp").constant("moment", moment);
+        angular.module("formsApp",[])
+        angular.module('topApp', ['pocApp', 'formsApp'])
+        */
+
+    </script>
+    <script src="./firebase.js"></script>
+    <script src="./angularfire.min.js"></script>
+
+    <script src="./csPortalCtrl.js"></script>
+    <script src="./loginCtrl.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDG1ToLHycsMUX0CfX0OZVSRUUpFQeKE9o",
+            authDomain: "canshare-730e6.firebaseapp.com",
+            projectId: "canshare-730e6",
+            storageBucket: "canshare-730e6.appspot.com",
+            messagingSenderId: "12147821347",
+            appId: "1:12147821347:web:5963d577cb050259475a96"
+        };
+        if (firebase) {
+            console.log('init firebase')
+            firebase.initializeApp(firebaseConfig);
+
+        }
+    </script>
+
+    <style>
+
+        .clickable {
+            color: rgb(79, 155, 214);
+            cursor: pointer;
+        }
+
+        .heading {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            background-color: #fff7ed;
+            margin-bottom: 8px;
+        }
+
+        .heading1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            font-color: #2c463b;
+        }
+
+        .text {
+            font-family: 'Fira Sans', sans-serif;
+            font-size: 16px;
+
+        }
+
+        .title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;       /* bold */
+            text-transform: uppercase; /* all caps */
+            font-size: 24px;
+        }
+    </style>
+
+</head>
+<body style="padding: 8px;padding-top: 80px">
+<div ng-app="portalApp" ng-controller="csPortalCtrl" class="container-fluid">
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+        <div class="container-fluid">
+            <div class="col-md-2">
+                <a href="https://teaho.govt.nz/" target="_blank">
+                    <img width="150" height="auto"
+                         style="padding: 3px"
+                         src="./CanShare%20Logo-min.png"/>
+                </a>
+
+            </div>
+
+            <div class="col-md-7">
+                <div class="navbar-text">
+                    <div class="title">
+                        CanShare - Te Aho o Te Kahu, the Cancer Control Agency
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-1">
+                <div class="navbar-text " ng-hide="user">
+                    <div style="padding: 8px">
+                        <span style="font-size:1.2em; cursor: pointer" uib-popover="Click to log in"
+                              class="pull-right"
+                              popover-placement="left"
+                              popover-trigger="'mouseenter'">
+                            <div ng-click="login()">
+                                <i class="glyphicon glyphicon-log-in"></i>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="navbar-text"  ng-show="user">
+                    <div style="padding: 8px">
+                        <span style="font-size:1.2em;  cursor: pointer" uib-popover="{{user.email}}"
+                              popover-placement="left"
+                              class="pull-right"
+                              popover-trigger="'mouseenter'">
+                            <div ng-click="logout()">
+                                <i class="glyphicon glyphicon-log-out"></i>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <a href="https://teaho.govt.nz/" target="_blank">
+                    <img width="150" height="auto" class="pull-right"
+                         style="padding: 3px"
+                         src="./TAK-logo-midgreen.png"/>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <br/><br/>
+
+
+    <div class="text">
+    Te Aho o Te Kahu is fully committed to working in partnership with the sector to enable the collection of complete and accurate cancer data, join currently disparate data silos, and to provide a means to share timely cancer information throughout the health care system to support clinical care and patient/whānau needs.
+    </div>
+
+    <br/>
+    <div class="text">
+    We are currently working with the sector to support data flow across the cancer continuum.
+        For information on the CanShare programme, please visit
+        <a target="_blank" href="https://teaho.govt.nz/index.php/our-work/canshare">CanShare :: Te Aho o Te Kahu - Cancer Control Agency.</a>
+    </div>
+
+    <div class="text">
+    This site is intended for use by implementers and internal CanShare team members.
+    </div>
+
+    <div class="heading1">
+    CanShare Data Standards
+    </div>
+
+    <div class="text">
+    A revision of the CanShare data standards is underway. These updates will enhance the standards further through use of SNOMED CT coding. For further information on data standards, please contact canshare@teaho.govt.nz.
+    </div>
+
+    <div class="heading1">
+    CanShare Modules
+    </div>
+
+    <div class="text">
+    The full range of CanShare modules is below, each includes a summary and convenient links to assist with workflow.
+    </div>
+
+    <br/><br/>
+
+
+
+
+    <div ng-repeat = "option in options">
+        <div class="heading">{{option.display}}</div>
+
+        <div ng-repeat="cmd in option.options">
+
+
+            <div ng-show="canShow(cmd)" class="row">
+                <div class="col-md-3 text">
+                    <a target="_blank" ng-href="{{cmd.url}}">
+                        {{cmd.display}}
+                    </a>
+
+                </div>
+                <div class="col-md-9 text">
+                    <div ng-show="canShow(cmd)">
+                        {{cmd.text}}
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <br/>
+    </div>
+
+
+
+
+</div>
+</body>

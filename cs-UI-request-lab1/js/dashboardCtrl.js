@@ -149,7 +149,7 @@ angular.module("pocApp")
             $scope.validateSD = function (Q) {
                 $scope.SD = dashboardSvc.makeSD(Q)
 
-                $http.post('/validateSD',$scope.SD).then(
+                $http.post('validateSD',$scope.SD).then(
                     function (data) {
                         console.log(data)
                         $scope.SDOutcome = data.data
@@ -379,7 +379,7 @@ angular.module("pocApp")
 
             function getLogs() {
                 let module = 'request'      //todo - support other modules
-                $http.get(`/telemetry`).then(
+                $http.get(`telemetry`).then(
                     // $http.get(`/logs/${module}`).then(
                     function (data) {
                         $scope.logs = data.data

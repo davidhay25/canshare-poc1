@@ -185,6 +185,10 @@
         </div>
     </nav>
 
+    <div class="alert alert-warning">
+        This is the LIM version only
+    </div>
+
     <div style="padding-top: 8px">
 
         <div class="btn btn-primary pull-right"
@@ -361,7 +365,7 @@
                 <div ng-class="rightPanel">
 
                     <div ng-show="!showDGList && selectedModel.kind == 'dg'">
-                        <ng-include src="'/includes/showDG.html'"></ng-include>
+                        <ng-include src="'includes/showDG.html'"></ng-include>
                     </div>
 
 
@@ -574,7 +578,7 @@
 
                 </div>
                 <div ng-class="rightPanel">
-                    <ng-include src="'/includes/showComposition.html'"></ng-include>
+                    <ng-include src="'includes/showComposition.html'"></ng-include>
                 </div>
             </div>
 
@@ -814,7 +818,7 @@
 
                 <uib-tab heading="Component Diff">
                     <div ng-controller="componentDiffCtrl">
-                        <ng-include src="'/includes/componentDiff.html'"></ng-include>
+                        <ng-include src="'includes/componentDiff.html'"></ng-include>
                     </div>
 
                 </uib-tab>
@@ -835,7 +839,7 @@
 
           <uib-tab heading="Reports"  select="setInitialTab(2)">
 
-              <ng-include src="'/includes/terminology.html'"></ng-include>
+              <ng-include src="'includes/terminology.html'"></ng-include>
 
           </uib-tab>
 
@@ -937,7 +941,7 @@
                 let obj = {type:'err',module:'model',msg:exception.stack}
                 $.ajax({
                     type: "POST",
-                    url: "/telemetry",
+                    url: "telemetry",
                     contentType: "application/json",
                     data: JSON.stringify(obj)
                 });

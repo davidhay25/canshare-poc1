@@ -277,7 +277,7 @@ angular.module("formsApp")
 
                 let encodedQry = encodeURIComponent(qry)
 
-                $http.get(`/proxy?qry=${encodedQry}`).then(
+                $http.get(`proxy?qry=${encodedQry}`).then(
                     function (data) {
                         $scope.expandedVS = data.data
                        // console.log($scope.expandedVS)

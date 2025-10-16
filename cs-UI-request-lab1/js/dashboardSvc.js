@@ -497,7 +497,7 @@ angular.module("pocApp").service('dashboardSvc', function($q,$http,questionnaire
                 function (data) {
                     let Q = data.data
                     Q.status = miniQ.status
-                    $http.put("/dashboard/Questionnaire",Q).then(
+                    $http.put("dashboard/Questionnaire",Q).then(
                         function (data) {
                             deferred.resolve()
 

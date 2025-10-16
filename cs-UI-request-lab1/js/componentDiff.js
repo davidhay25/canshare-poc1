@@ -18,7 +18,7 @@ angular.module("pocApp")
             //imported from the component store so we can use that.
             //let key = $scope.localDG.key || $scope.localDG.name
 
-            $http.get(`/frozen/${$scope.localDG.name}`).then(
+            $http.get(`frozen/${$scope.localDG.name}`).then(
                 function (data) {
                     $scope.componentDG = data.data
                   //  console.log(data.data)

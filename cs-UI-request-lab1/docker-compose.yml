@@ -1,22 +1,23 @@
 # docker-compose.yml
 # start with   docker-compose up -d
-version: '3.9'
+# version: '3.9'
 
 services:
-  mongodb:
-    image: mongo                 # the most current MongoDB version
-    container_name: mongodbCS1
-    restart: always
+
+  portal:       # based on nginx build. Has the config file in it.
+    image: davidhay25/canshare-portal
+    container_name: portal
+    ports:
+      - "80:80"
     networks:
       - canshare-network
-    ports:
-      - "27017:27017"               # expose MongoDB to host
-    volumes:
-      - mongodb_data:/data/db       # named volume for persistence
+    depends_on:
+      - forms
+      - canshare
 
-  canshare:
-    image: canshare
-    container_name: canshare
+  forms:
+    image: davidhay25/forms
+    container_name: forms
     depends_on:
       - mongodb                      # ensures MongoDB starts first
     environment:
@@ -26,9 +27,31 @@ services:
     networks:
       - canshare-network
 
+  # mongo port is not exposed outside of the docker network...
+  mongodb:
+    image: mongo:4.4
+    platform: linux/amd64     # 👈 force Intel-compatible build <<< only on mac - need to fix b4 deploy
+    restart: always
+    networks:
+      - canshare-network
+    volumes:
+      - ./mongodb_data:/data/db       # bind to a path - won't get deleted with docker compose down -v
+
+  canshare:
+    image: davidhay25/canshare
+    container_name: canshare
+    depends_on:
+      - mongodb                      # ensures MongoDB starts first
+    environment:
+      MONGOHOSTNAME: mongodb
+      POCSERVERBASE: "9400"           # set the canshare server to start on port 9400 (must match dockerfile)
+    ports:
+      - "9400:9400"                  # hostPort:containerPort for web access
+    networks:
+      - canshare-network
+
 networks:
   canshare-network:
     driver: bridge
 
-volumes:
-  mongodb_data:                      # named volume definition
+

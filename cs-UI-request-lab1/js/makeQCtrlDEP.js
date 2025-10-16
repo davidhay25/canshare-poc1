@@ -12,7 +12,7 @@ angular.module("pocApp")
             //all QO are stored in the library (not like Comp & DG ATM)
             //copies being edited are saved in $localStorage.allQObject
             function loadAllQO() {
-                $http.get("/model/allQObject").then(
+                $http.get("model/allQObject").then(
                     function (data) {
                         $scope.hashLibraryQO = data.data
                         // $scope.allQObject = data.data
@@ -97,7 +97,7 @@ angular.module("pocApp")
             function saveToLibrary() {
                 $scope.currentQObject.content = $scope.treeData
 
-                $http.put(`/model/QObject/${$scope.currentQObject.name}`,$scope.currentQObject).then(
+                $http.put(`model/QObject/${$scope.currentQObject.name}`,$scope.currentQObject).then(
                     function () {
                         console.log('save')
 
@@ -254,7 +254,7 @@ angular.module("pocApp")
                     //$scope.currentQObject = QObject
 
                     //save the QO to the library.
-                    $http.put(`/model/QObject/${QObject.name}`,QObject).then(
+                    $http.put(`model/QObject/${QObject.name}`,QObject).then(
                         function () {
                             loadAllQO()
                         },

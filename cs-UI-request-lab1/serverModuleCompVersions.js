@@ -16,7 +16,7 @@ async function setup(app) {
 
 
     //get a complete single version
-    app.get('/comp/version/:name/:version', async function(req,res) {
+    app.get('comp/version/:name/:version', async function(req,res) {
         let version = parseInt(req.params.version)
         let qry = {name:req.params.name,version:version}
 
@@ -56,7 +56,7 @@ async function setup(app) {
     })
 
     //get a list of versions (partial content only)
-    app.get('/comp/version/:name', async function(req,res) {
+    app.get('comp/version/:name', async function(req,res) {
         let qry = {name:req.params.name}
 
         try {

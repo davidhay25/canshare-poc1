@@ -48,7 +48,7 @@ angular.module("pocApp")
                 $scope.downloadLinkJsonName = `cmConfig.json`
             }
 
-            $http.get('/cmConfig').then(
+            $http.get('cmConfig').then(
                 function (data) {
                     setUpConfigFile(data.data)
                 }
@@ -160,7 +160,7 @@ angular.module("pocApp")
             $scope.updateConfigOnServer = function () {
                 if (confirm("Are you sure you wish to update the ConceptMap configuration file")) {
                     //update the server
-                    $http.put('/cmConfig',$scope.cmConfig).then(
+                    $http.put('cmConfig',$scope.cmConfig).then(
                         function (data) {
                             alert("CM config updated on server")
                             delete $scope.dirty
@@ -174,7 +174,7 @@ angular.module("pocApp")
 
             $scope.getAnalyticsConceptMaps = function () {
                 //get all the analytic conceptmaps. These are the ones uploaded using the 'analytics' tab
-                $http.get('/nzhts/ConceptMap/allAnalytic').then(
+                $http.get('nzhts/ConceptMap/allAnalytic').then(
                     function (data) {
                         $scope.allAnalyticCMBundle = data.data
                     }, function (err) {
@@ -1178,7 +1178,7 @@ angular.module("pocApp")
 
                     //return
 
-                    $http.post('/nzhts/setSyndication').then(function (data) {
+                    $http.post('nzhts/setSyndication').then(function (data) {
                         jobId = data.data.jobId
                         //alert(`The Syndication process has been initiated. You can see progress in the `)
                         //Now start the polling to get the job status...
@@ -1609,7 +1609,7 @@ angular.module("pocApp")
                 updateVSSvc.updateCodeSystem($scope.prePubCS,$scope.csDirty).then(
                     function () {
                         $scope.csDirty = false
-                        let qry = '/nzhts/ValueSet'
+                        let qry = 'nzhts/ValueSet'
                         $http.put(qry,vs).then(
                             function (data) {
                                 if (! $scope.csDirty) {

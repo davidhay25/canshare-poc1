@@ -300,7 +300,7 @@ angular.module("pocApp")
 
 
 
-                    $http.put(`/frozen/${frozen.name}`,frozen).then(
+                    $http.put(`frozen/${frozen.name}`,frozen).then(
                         function (data) {
                             alert("Component updated")
                         }, function (err) {
@@ -599,7 +599,7 @@ angular.module("pocApp")
                 //save the current playground to the library
                 $scope.world.id = $scope.world.id || utilsSvc.getUUID()
 
-                $http.get(`/playground/${$localStorage.world.id}`).then(
+                $http.get(`playground/${$localStorage.world.id}`).then(
                     function (data) {
                         let pgFromServer = data.data
                         if (pgFromServer.lockedTo) {
@@ -628,7 +628,7 @@ angular.module("pocApp")
 
 
 
-                    $http.put(`/playground/${$localStorage.world.id}`,$localStorage.world).then(
+                    $http.put(`playground/${$localStorage.world.id}`,$localStorage.world).then(
                         function (data) {
 
                             //reset the change checked
@@ -697,7 +697,7 @@ angular.module("pocApp")
 
                     if (newName !== name) {
                         //this is a new component - check to see if there is already one with  that name
-                        $http.get(`/frozen/${newName}`).then(
+                        $http.get(`frozen/${newName}`).then(
                             function () {
                                 alert("There is already a component with that name. You will need to choose another.")
                             }, function (err) {
@@ -2583,7 +2583,7 @@ angular.module("pocApp")
                 }
 */
                 //get the current component version of this (if any) for the diff...
-                $http.get(`/frozen/${name}`).then(
+                $http.get(`frozen/${name}`).then(
                     function (data) {
                         $scope.componentVersion = data.data
                         console.log(data.data)

@@ -25,7 +25,7 @@ angular.module("pocApp")
             $scope.input = {selected:{},newPath:{}};
 
 
-            $http.get(`/frozen/${$scope.linkedDGName}`).then(
+            $http.get(`frozen/${$scope.linkedDGName}`).then(
                 function (data) {
                     $scope.linkedDG = data.data
 

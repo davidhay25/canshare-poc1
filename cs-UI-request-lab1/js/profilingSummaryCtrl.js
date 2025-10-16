@@ -3,7 +3,7 @@ angular.module("pocApp")
         function ($scope,$http) {
 
             function loadSummary() {
-                $http.get('/fsh/summary').then(
+                $http.get('fsh/summary').then(
                     function (data) {
                         $scope.profileSummary = data.data
                     }

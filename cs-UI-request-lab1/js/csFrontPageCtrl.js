@@ -11,7 +11,7 @@ angular.module("pocApp")
 
 
             //get all published Q
-            $http.get('/q/all').then(
+            $http.get('q/all').then(
                 function (data) {
 
 
@@ -40,18 +40,6 @@ angular.module("pocApp")
                 }
             )
 
-
-/*
-                $http.get('playgroundSummary?publishedOnly=true').then(
-                    function (data) {
-                        $scope.playgrounds = data.data
-                        console.log($scope.playgrounds)
-
-                    }, function (err) {
-                            alert(angular.toJson(err.data))
-                    }
-                )
-*/
             $scope.viewQ = function (pg) {
 
 
@@ -82,7 +70,7 @@ angular.module("pocApp")
 
             $scope.selectQ = function (Q) {
                 $scope.selectedQ = Q
-                let qry = `/q/${Q.name}/versions`
+                let qry = `q/${Q.name}/versions`
                 $http.get(qry).then(
                     function (data) {
                         console.log(data.data)

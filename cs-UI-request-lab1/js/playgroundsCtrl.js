@@ -31,7 +31,7 @@ angular.module("pocApp")
             $scope.lock = function (row) {
                 let vo = {email:user.email,id:row.id}
 
-                $http.post(`/playground/lock`,vo).then(
+                $http.post(`playground/lock`,vo).then(
                     function (data) {
                         alert("This form can now only be updated by you!")
                         row.lockedTo = user.email   //just to update the UI
@@ -45,7 +45,7 @@ angular.module("pocApp")
             $scope.unlock = function (row) {
                 let vo = {id:row.id}
 
-                $http.post(`/playground/unlock`,vo).then(
+                $http.post(`playground/unlock`,vo).then(
                     function (data) {
                         alert("This form can now locked by someone else")
                         delete row.lockedTo  //just to update the UI
@@ -170,7 +170,7 @@ angular.module("pocApp")
                 if (confirm(msg)) {
                     if (source == 'repo') {
                         //from the library repository
-                        $http.get(`/playground/${playground.id}`).then(
+                        $http.get(`playground/${playground.id}`).then(
                             function (data) {
                                 convertAdHoc(data.data)
                                 $scope.$close(data.data)
@@ -200,7 +200,7 @@ angular.module("pocApp")
                 let name = prompt("What name do you want to use for the copy")
                 if (name) {
                     if (source == 'repo') {
-                        $http.get(`/playground/${playgroundSummary.id}`).then(
+                        $http.get(`playground/${playgroundSummary.id}`).then(
                             function (data) {
                                 let playground = data.data      //the playground being copied
                                 playground.name = name

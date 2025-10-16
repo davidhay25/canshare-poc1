@@ -550,7 +550,7 @@ angular.module("pocApp")
                     //size : 'xlg',
                     controller: function ($scope,$http,resourceType,elementType) {
                         if (resourceType) {
-                            $http.get(`/fsh/fhirtype/${resourceType}`).then(
+                            $http.get(`fsh/fhirtype/${resourceType}`).then(
                                 function (data) {
                                     $scope.resourceElements = data.data
                                 }

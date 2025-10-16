@@ -27,7 +27,7 @@ angular.module("pocApp")
                 //only these will be in the version
 
                 //post the playground to the version API. It will be rejected is there are duplicate versions
-                $http.post(`/playgroundVersion`,pg).then(
+                $http.post(`playgroundVersion`,pg).then(
                     function (data) {
                         deferred.resolve()
                     }, function (err) {
@@ -111,7 +111,7 @@ angular.module("pocApp")
 
             savePlaygroundDEP : function (pg,email) {
                 let deferred = $q.defer()
-                $http.get(`/playground/${$localStorage.world.id}`).then(
+                $http.get(`playground/${$localStorage.world.id}`).then(
 
 
                 )
@@ -126,7 +126,7 @@ angular.module("pocApp")
                 //These are DG's that have been exported as 'frozen'
                 //re-named as 'componnets
                 let arImport = []
-                $http.get('/allfrozen').then(
+                $http.get('allfrozen').then(
                     function (data) {
 
                         for (const dg of data.data) {
@@ -196,7 +196,7 @@ angular.module("pocApp")
 
 
                         //now get the frozen DGs
-                        $http.get('/allfrozen').then(
+                        $http.get('allfrozen').then(
                             function (data) {
                                 data.data.forEach(function (dg) {
                                     //can import if not already marked for import & the name is not already used...

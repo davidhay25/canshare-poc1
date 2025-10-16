@@ -305,7 +305,7 @@ angular.module("pocApp")
 
 
             function loadAllQNames() {
-                $http.get('/Questionnaire/getSummary').then(
+                $http.get('Questionnaire/getSummary').then(
                     function (data) {
                         $scope.lstQ = data.data.lstQ
                     }, function (err) {
@@ -354,7 +354,8 @@ angular.module("pocApp")
                     $scope.input.mainTabActive = 1
 
 
-                } catch {
+                } catch (ex) {
+                    console.log(ex)
                     alert("This is a valid Json string, but there were errors parsing it.")
 
                 }

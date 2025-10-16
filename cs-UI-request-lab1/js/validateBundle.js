@@ -29,7 +29,7 @@ angular.module("pocApp")
                 $scope.allPatients = []
                 let qry = `${$scope.server}/Patient?_count=200`
                 let encodedQry = encodeURIComponent(qry)
-                $http.get(`/proxy?qry=${encodedQry}`).then(
+                $http.get(`proxy?qry=${encodedQry}`).then(
                     function (data) {
                         for (entry of data.data.entry) {
                             let resource = entry.resource
@@ -72,7 +72,7 @@ angular.module("pocApp")
                 delete $scope.input.bundle
                 let qry = `${$scope.server}/${query}`
                 let encodedQry = encodeURIComponent(qry)
-                $http.get(`/proxy?qry=${encodedQry}`).then(
+                $http.get(`proxy?qry=${encodedQry}`).then(
 
                     function (data) {
                         let bundle = data.data
@@ -137,7 +137,7 @@ angular.module("pocApp")
                         vo.content = dr
                         vo.qry = $scope.server //only the server root is needed. The server will construct the PUT url from that
 
-                        $http.put('/validator/proxy',vo).then(
+                        $http.put('validator/proxy',vo).then(
                         //$http.put(qry,dr).then(
                             function (data) {
                                 alert('updated')
@@ -158,7 +158,7 @@ angular.module("pocApp")
                 let qry = `${$scope.server}/DocumentReference/fpTemplate`
 
                 let encodedQry = encodeURIComponent(qry)
-                $http.get(`/proxy?qry=${encodedQry}`).then(
+                $http.get(`proxy?qry=${encodedQry}`).then(
                 //$http.get(qry).then(
                     function (data) {
 
@@ -230,7 +230,7 @@ angular.module("pocApp")
                     vo.qry = `${$scope.server}`
                     vo.content = $scope.inputtedBundle
 
-                    $http.post('/validator/proxy',vo).then(
+                    $http.post('validator/proxy',vo).then(
                         function (data) {
                             alert("Processed OK")
 
@@ -249,7 +249,7 @@ angular.module("pocApp")
 
                 //let url = `Patient/${patient.id}/$everything`
                 let encodedQry = encodeURIComponent(url)
-                $http.get(`/proxy?qry=${encodedQry}`).then(
+                $http.get(`proxy?qry=${encodedQry}`).then(
 
                     function (data) {
                         $scope.libraryResultBundle = data.data
@@ -279,7 +279,7 @@ angular.module("pocApp")
                 let resource = entry.resource
                 let qry = `${$scope.server}/DocumentReference/${resource.id}`
                 let encodedQry = encodeURIComponent(qry)
-                $http.get(`/proxy?qry=${encodedQry}`).then(
+                $http.get(`proxy?qry=${encodedQry}`).then(
 
                 //$http.get(qry).then(
                     function (data) {
@@ -337,7 +337,7 @@ angular.module("pocApp")
                 vo.content = dr
                 vo.qry = $scope.server //only the server root is needed. The server will construct the PUT url from that
 
-                $http.put('/validator/proxy',vo).then(
+                $http.put('validator/proxy',vo).then(
                     function (data) {
                         alert(`bundle updated in library: DocumentReference/${bundleId}`)
                     }, function (err) {
@@ -366,7 +366,7 @@ angular.module("pocApp")
                     vo.qry = `${$scope.server}/DocumentReference`
                     vo.content = dr
 
-                    $http.post('/validator/proxy',vo).then(
+                    $http.post('validator/proxy',vo).then(
 
                         function (data) {
                             //returns the updated resource

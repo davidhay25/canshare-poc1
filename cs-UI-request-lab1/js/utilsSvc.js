@@ -39,14 +39,14 @@ angular.module("pocApp")
         let config = null;
 
         this.loadConfig = function() {
-            return $http.get('/config').then(res => {
+            return $http.get('config').then(res => {
                 config = res.data;
                 console.log(config)
                 return config;
             });
         };
 
-        $http.get("/model/namedquery").then(
+        $http.get("model/namedquery").then(
             function (data) {
 
                 data.data.forEach(function (nq) {
@@ -62,7 +62,7 @@ angular.module("pocApp")
                 return "2.0.1"
             },
             loadConfig :function() {
-                return $http.get('/config').then(res => {
+                return $http.get('config').then(res => {
                     config = res.data;
                     console.log(config)
                     return config;

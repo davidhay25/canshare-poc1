@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo
-echo "This will build a multi-platform image of the app and upload it to Docker Hub"
+echo "This will build a multi-platform image of the canshare app and upload it to Docker Hub"
 echo
 read -n 1 -s -r -p "Press any key to continue or <ctrl>C to cancel"
 

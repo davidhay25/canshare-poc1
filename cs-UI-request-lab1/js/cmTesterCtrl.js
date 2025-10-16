@@ -76,7 +76,7 @@ angular.module("pocApp")
                 });
             }
 
-            $http.get('/nzhts/ConceptMap/allVersions').then(
+            $http.get('nzhts/ConceptMap/allVersions').then(
                 function (data) {
                     $scope.allCM = []
                     data.data.entry.forEach(function (entry) {
@@ -1226,7 +1226,7 @@ angular.module("pocApp")
                 $scope.local.cmPropertyValue = {}
                 //these are the properties
 
-                $http.get('/cmConfig').then(
+                $http.get('cmConfig').then(
                     function (data) {
                         let config = data.data
 

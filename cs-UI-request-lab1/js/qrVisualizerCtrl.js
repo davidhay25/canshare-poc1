@@ -11,7 +11,7 @@ angular.module("pocApp")
             $scope.serverbase = "https://fhir.forms-lab.com/"
 
             //get all the QR's that have been uploaded
-            $http.get('/qr/all').then(
+            $http.get('qr/all').then(
                 function (data) {
                     $scope.items = data.data
                 }, function (err) {
@@ -40,31 +40,17 @@ angular.module("pocApp")
 
 
                                 let content = lne["Content"]
-
+                                //ignore leading & training text
                                 const match = content.match(/```([\s\S]*?)```/);
                                 if (match) {
-                                    //console.log(match[1]); // "this is the content"
                                     content = "```" + match[1] + "```"
                                 }
-
-
 
                                 // Remove markdown fences if present
                                 content = content.replace(/```json|```/g, "").trim();
 
                                 // Fix double quotes from CSV escaping
                                 content = content.replace(/""/g, '"');
-
-
-                                /*
-
-                                //There were invalid characters in the json string....
-                                content = content
-                                    .replace(/\r/g, '')       // remove CR
-                                    .replace(/\n/g, '\\n')    // escape LF
-                                    .replace(/\t/g, '\\t');   // escape tabs
-
-                                */
                                 content = content.replace(/[\x00-\x1F]/g, ''); // removes invisible control chars
 
 

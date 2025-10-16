@@ -7,7 +7,7 @@ angular.module("pocApp")
                 //Q.qVersion ++
 
                 Q.date = new Date().toISOString()
-                $http.post(`/q/publish`,Q).then(
+                $http.post(`q/publish`,Q).then(
                     function () {
                         alert(`Questionnaire published with version ${Q.version}`)
                         $scope.$close(Q)

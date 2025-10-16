@@ -205,7 +205,7 @@ angular.module('formsApp')
                     let newNote = {note:note, userName : user, path: ed.path,modelName:$scope.q.name,version:$scope.q.version}
 
 
-                    $http.post('/review',newNote).then(
+                    $http.post('review',newNote).then(
                         function () {
                             $scope.hashNotes[newNote.path] = $scope.hashNotes[newNote.path] || []
 

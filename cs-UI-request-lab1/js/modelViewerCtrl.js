@@ -17,7 +17,7 @@ angular.module("pocApp")
             //retrieve a summary of all the published comps (no snapshot)
             //there may be multiple entries for a single comp if there are multiple versions
             $scope.arHisoStatus = []
-            $http.get('/publish/comp').then(
+            $http.get('publish/comp').then(
                 //return a hash keyed on name
                 function (data) {
                     console.log(data.data)
@@ -50,7 +50,7 @@ angular.module("pocApp")
                 //delete $scope.selectedComp
 
                 //now load the full version (all versions)
-                $http.get(`/publish/comp/${comp.name}`).then(
+                $http.get(`publish/comp/${comp.name}`).then(
                     function (data) {
                         //returns the most recent comp
                         $scope.selectedComp = data.data.comp

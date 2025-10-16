@@ -656,7 +656,7 @@ angular.module("pocApp")
         let services =  {
 
             getNamedQueries : function (cb) {
-                let qry = "/model/namedquery"
+                let qry = "model/namedquery"
                 $http.get(qry).then(
                     function (data) {
                         let hash = {}

@@ -297,7 +297,7 @@ angular.module("pocApp")
                 }
                 let encodedQry = encodeURIComponent(qry)
                 $scope.showWaiting = true
-                $http.get(`/termQuery?qry=${encodedQry}`).then(
+                $http.get(`termQuery?qry=${encodedQry}`).then(
                     function (data) {
 
                         $scope.vsExpanded = data.data    //a bundle containing all the DR versions

@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy everything including node_modules
 COPY . .
 
-# Expose the port your app uses
-EXPOSE 9500
+# Expose the port used
+EXPOSE 9400
 
-# Run your app
+# Run the app
 CMD ["./localrun.sh"]

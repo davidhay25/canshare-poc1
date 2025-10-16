@@ -96,10 +96,10 @@ angular.module("pocApp")
                 let msg = "Are you sure you wish to update this valueSet and CodeSystem"
 
                 if (confirm(msg)) {
-                    let qry = '/nzhts/CodeSystem'
+                    let qry = 'nzhts/CodeSystem'
                     $http.put(qry,$scope.cs).then(
                         function () {
-                            let qry = '/nzhts/ValueSet'
+                            let qry = 'nzhts/ValueSet'
                             $http.put(qry,$scope.vs).then(
                                 function (data) {
                                     alert('Both ValueSet and CodeSystem update complete')

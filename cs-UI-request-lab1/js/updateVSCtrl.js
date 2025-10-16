@@ -30,14 +30,7 @@ angular.module("pocApp")
             let systemPrePub = "http://canshare.co.nz/fhir/CodeSystem/snomed-unpublished"
             let csId = "canshare-unpublished-concepts"   //the id for the CodeSystem
 
-/*
-            $http.get('/cmConfig').then(
-                function (data) {
-                    $scope.cmConfig = data.data
-                    cmTesterSvc.setConfig(data.data)
-                }
-            )
-            */
+
 
             //get the CodeSystem used for pre published codes
             updateVSSvc.getCodeSystem(csId, systemPrePub).then(
@@ -56,7 +49,7 @@ angular.module("pocApp")
 
             $scope.getAnalyticsConceptMapsDEP = function () {
                 //get all the analytic conceptmaps. These are the ones uploaded using the 'external upload' option
-                $http.get('/nzhts/ConceptMap/allAnalytic').then(
+                $http.get('nzhts/ConceptMap/allAnalytic').then(
                     function (data) {
                         $scope.allAnalyticCMBundle = data.data
                     }, function (err) {
@@ -96,7 +89,7 @@ angular.module("pocApp")
             $scope.updateTest = function () {
                 if (confirm("This will copy all DG & Compositions from the Production Library to the Test Library. Are you sure?")) {
                     $scope.showWaiting = true
-                    $http.post('/library/backupProdToTest', {}).then(
+                    $http.post('library/backupProdToTest', {}).then(
                         function (data) {
                             $scope.showWaiting = false
                             alert("Backup complete. All DataGroups & Compositions have been copied from the Production Library to the Test Library.")
@@ -908,7 +901,7 @@ angular.module("pocApp")
 
                     //return
 
-                    $http.post('/nzhts/setSyndication').then(function (data) {
+                    $http.post('nzhts/setSyndication').then(function (data) {
                         jobId = data.data.jobId
                         //alert(`The Syndication process has been initiated. You can see progress in the `)
                         //Now start the polling to get the job status...
@@ -962,7 +955,7 @@ angular.module("pocApp")
 
             $scope.analyseUnpublished = function () {
                 $scope.analysingUnpublished = true
-                let url = "/analyseUnpublished"
+                let url = "analyseUnpublished"
                 $http.get(url).then(
                     function (data) {
                         $scope.unpublishedReport = data.data
@@ -1338,7 +1331,7 @@ angular.module("pocApp")
                 updateVSSvc.updateCodeSystem($scope.prePubCS,$scope.csDirty).then(
                     function () {
                         $scope.csDirty = false
-                        let qry = '/nzhts/ValueSet'
+                        let qry = 'nzhts/ValueSet'
                         $http.put(qry,vs).then(
                             function (data) {
                                 if (! $scope.csDirty) {
@@ -1829,7 +1822,7 @@ angular.module("pocApp")
                 vs.version = versionString
                 vs.identifier = [{system:"http://canshare.co.nz/fhir/NamingSystem/valuesets",value:vo.id}]
                 vs.publisher = "Te Aho o Te Kahu"
-                vs.contact = [{telecom:[{system:"email",value:"info@teaho.govt.nz"}]}]
+                vs.contact = [{telecom:[{system:"email",value:"canshare@teaho.govt.nz"}]}]
                 if (vo.description) {
                     vs.description = vo.description
                 }

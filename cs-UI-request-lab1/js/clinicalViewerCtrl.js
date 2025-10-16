@@ -116,7 +116,7 @@ angular.module("pocApp")
                         //now, get all the versions of this resource
                         let url = `DiagnosticReport/${resource.id}/_history`
                         let encodedQry = encodeURIComponent(url)
-                        $http.get(`/proxy?qry=${encodedQry}`).then(
+                        $http.get(`proxy?qry=${encodedQry}`).then(
                             function (data) {
                                 console.log(data.data)
                                 $scope.DRhistory = data.data    //a bundle containing all the DR versions
@@ -146,7 +146,7 @@ angular.module("pocApp")
                     })
 
                     let encodedQry = encodeURIComponent(qry)
-                    $http.get(`/proxy?qry=${encodedQry}`).then(
+                    $http.get(`proxy?qry=${encodedQry}`).then(
                         function (data) {
                             console.log(data.data)
                             //$scope.DRhistory = data.data    //a bundle containing all the DR versions
@@ -188,7 +188,7 @@ angular.module("pocApp")
                 let url1 = `ServiceRequest?_id=${SR.id}&_include=ServiceRequest:supportingInfo&_include=ServiceRequest:subject&_include=ServiceRequest:requester`
 
                 let encodedQry = encodeURIComponent(url1)
-                $http.get(`/proxy?qry=${encodedQry}`).then(
+                $http.get(`proxy?qry=${encodedQry}`).then(
 
                     function (data) {
                         //console.log(data)
@@ -214,7 +214,7 @@ angular.module("pocApp")
 
                                 //Finally retrieve the Proveenance resource/s
                                 let url2 = encodeURIComponent(`Provenance?entity=${SR.id}&_include=Provenance:target`)
-                                $http.get(`/proxy?qry=${url2}`).then(
+                                $http.get(`proxy?qry=${url2}`).then(
                                     function (data) {
                                         //console.log(data)
                                         if (data.data && data.data.entry) {

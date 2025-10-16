@@ -29,7 +29,7 @@ angular.module("pocApp")
             }
 
             $scope.loadAllQNames = function () {
-                $http.get('/Questionnaire/getSummary').then(
+                $http.get('Questionnaire/getSummary').then(
                     function (data) {
                         $scope.lstQ = data.data.lstQ
                     }, function (err) {
@@ -62,7 +62,7 @@ angular.module("pocApp")
             $scope.deleteComponent = function (dg) {
                 if (confirm(`Are you sure you wish to delete the component: ${dg.name}`)) {
                     dg.deleted = true
-                    $http.put(`/frozen/${dg.name}`,dg).then(
+                    $http.put(`frozen/${dg.name}`,dg).then(
                         function () {
                             alert("Component has been removed (It's still there, but hidden ")
                             playgroundsSvc.getImportableDG(allDG).then(
@@ -150,7 +150,7 @@ angular.module("pocApp")
             }
 
             function loadNamedQueries() {
-                let qry = "/model/namedquery"
+                let qry = "model/namedquery"
                 $http.get(qry).then(
                     function (data) {
                         $scope.namedQueries = data.data
@@ -264,7 +264,7 @@ angular.module("pocApp")
             //create a playground in the Models repository
             $scope.createPlayground = function (name,description) {
                 if (confirm(`Are you sure you wish to create a playground in the Models Repository named ${name}`)) {
-                    $http.get(`/playgroundByName/${name}`).then(
+                    $http.get(`playgroundByName/${name}`).then(
                         function (data) {
                             alert("Sorry, there is already a playground with this name")
                         }, function (err) {
@@ -290,7 +290,7 @@ angular.module("pocApp")
 
                                 console.log(pg)
 
-                                $http.put(`/playground/${pg.id}`,pg).then(
+                                $http.put(`playground/${pg.id}`,pg).then(
                                     function (data) {
                                         let msg = "The playground has been created."
                                         alert(msg)
@@ -684,7 +684,7 @@ angular.module("pocApp")
                     return
                 }
                 if (confirm(`Are you sure you wish to refresh your local DGs from the Library.`)) {
-                    let qry = '/model/allDG'
+                    let qry = 'model/allDG'
                     $http.get(qry).then(
                         function (data) {
                             //console.log(data)
