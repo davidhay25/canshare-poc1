@@ -118,23 +118,7 @@ app.post('/validateBundle', async function (req,res) {
     }
 })
 
-/*
-//validate a StructureDefiniton
-app.post('/validateSD', async function (req,res) {
-    let SD = req.body
 
-    let validationEP = `${serverBase}StructureDefinition/$validate`
-    console.log(validationEP)
-    try {
-        let response = await axios.post(validationEP,SD)
-        res.json(response.data)
-    } catch (ex) {
-        //console.log(ex.response.data)
-        res.status(400).json(ex.response.data)
-    }
-
-})
-*/
 
 app.get('/config', async function(req,res){
 
@@ -192,7 +176,7 @@ app.get('/proxy',async function(req,res){
 
     //the query was url encoded so it could be passed to the server
     let query = decodeURIComponent(req.query.qry);
-console.log(query)
+
     try {
         let bundle = await commonModule.singleQuery(query)
         //console.log(bundle)
@@ -203,70 +187,6 @@ console.log(query)
     }
 
 
-    return
-/*
-    //now we need to replace any | with %. Only this character should be encoded. Not sure why...
-    query = query.replace("|","%7C")    //there will only ever be one...
-    let qry = serverBase + query
-
-    console.log('qry=',qry)
-    let config = {headers:{'cache-control':'no-cache'}}     //otherwise the hapi server will cache for a minute
-
-    try {
-        let response = await axios.get(qry,config)
-        let ctr = 0
-        let bundle = response.data       //the first bundle
-
-        //console.log(ctr++,bundle.entry.length)
-
-        let nextPageUrl = getNextPageUrl(bundle)
-        while (nextPageUrl) {
-            let nextResponse = await axios.get(nextPageUrl,config)
-            let nextBundle = nextResponse.data
-            if (nextBundle.entry) {
-                nextBundle.entry.forEach(function (entry) {
-                    bundle.entry.push(entry)
-                })
-            }
-            console.log(ctr++,nextBundle.entry.length)
-            nextPageUrl = getNextPageUrl(nextBundle)
-        }
-        bundle.total = 0
-        if (bundle.entry) {
-            bundle.total = bundle.entry.length
-        }
-
-
-        res.json(bundle)
-    } catch (ex) {
-        if (ex.response && ex.response.status == 404) {
-            //if it's a 404 then just return an empty bundle
-            res.json({responseType:"Bundle"})
-
-        } else {
-            console.log(ex)
-            res.status(500).json(ex)
-        }
-
-    }
-
-
-    function getNextPageUrl(bundle) {
-        //console.log('gm' + bundle.resourceType)
-        let url = null
-        if (bundle && bundle.link) {
-            bundle.link.forEach(function (link){
-                if (link.relation == 'next') {
-                    url = link.url
-                }
-            })
-        }
-        console.log('next',url)
-        return url
-
-    }
-
-    */
 
 })
 

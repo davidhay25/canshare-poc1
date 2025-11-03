@@ -6,7 +6,7 @@ angular.module("pocApp")
             $scope.comp = comp
             //download the current composition with this name
 
-            let qry = `/model/comp/${comp.name}`
+            let qry = `model/comp/${comp.name}`
             $http.get(qry).then(
                 function (data) {
                     $scope.libraryComp = data.data
@@ -31,7 +31,7 @@ angular.module("pocApp")
 
             $scope.upload = function () {
                 if (confirm("Are you sure you wish to upload this Composition")) {
-                    let qry = `/model/comp/${comp.name}`
+                    let qry = `model/comp/${comp.name}`
                     $http.put(qry,comp).then(
                         function (data) {
                             alert("Composition uploaded to Library")

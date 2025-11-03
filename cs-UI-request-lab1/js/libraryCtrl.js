@@ -23,7 +23,7 @@ angular.module("pocApp")
                 //a function to copy all the DG to the libraray. Only for me running locally.
                 //for use after importing a json file.
                 if (! user) {return false}
-                if (user.email == 'david.hay25@gmail.com' && $window.location.hostname == 'localhost') {
+                if (user.email == 'david.hay25@gmail.com') {
                     return true
                 }
             }
@@ -177,7 +177,7 @@ angular.module("pocApp")
                     }
                 }
 
-                let qry = `/model/namedquery/${name}`
+                let qry = `model/namedquery/${name}`
                 let nq = {name:name,itemName:itemName,description:description,contents:contents,active:active}
 
                 $http.put(qry,nq).then(
@@ -215,7 +215,7 @@ angular.module("pocApp")
 
                         xqry.contents = vo.expression
 
-                        let qry = `/model/namedquery/${name}`
+                        let qry = `model/namedquery/${name}`
                         //let nq = {name:name,itemName:itemName,description:description,contents:contents,active:active}
 
                         $http.put(qry,xqry).then(
@@ -362,7 +362,7 @@ angular.module("pocApp")
 
             //get all the DG
             $scope.refreshDGSummary = function (includeDeleted) {
-                let qry = `/model/allDG`
+                let qry = `model/allDG`
                 if (includeDeleted){
                     qry += "?includeDeleted=true"
                 }
@@ -382,7 +382,7 @@ angular.module("pocApp")
 
             $scope.refreshCompSummary = function (includeDeleted) {
                 //get all the compositions
-                let qryComp = `/model/allCompositions`
+                let qryComp = `model/allCompositions`
                 if (includeDeleted){
                     qryComp += "?includeDeleted=true"
                 }
@@ -625,7 +625,7 @@ angular.module("pocApp")
 
                 if (confirm(`Are you sure you wish to remove the ${dg.title} DG from the library AND the local store. It will mark it as inactive in the library, and remove it from the local store. `)) {
 
-                    let url = `/model/DG/${dg.name}/delete`
+                    let url = `model/DG/${dg.name}/delete`
                     let config = {headers:{'x-user-email': user.email}}
 
                     $http.put(url,dg,config).then(
@@ -657,7 +657,7 @@ angular.module("pocApp")
 
                 if (confirm(`Are you sure you wish to remove the ${comp.title} Composition from the library AND the local store. It will mark it as inactive in the library, and remove it from the local store. `)) {
 
-                    let url = `/model/comp/${comp.name}/delete`
+                    let url = `model/comp/${comp.name}/delete`
                     let config = {headers:{'x-user-email': user.email}}
 
                     $http.put(url,comp,config).then(

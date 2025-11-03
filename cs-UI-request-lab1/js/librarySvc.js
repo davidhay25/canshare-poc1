@@ -64,7 +64,7 @@ angular.module("pocApp")
                     kind = 'comp'
                 }
 
-                let url = `/model/${kind}/${model.name}/revert`
+                let url = `model/${kind}/${model.name}/revert`
 
                 let config = {headers:{'x-user-email': user.email}}
                 $http.put(url,model,config).then(      //the model isn't used by the revert function
@@ -91,7 +91,7 @@ angular.module("pocApp")
                 }
 
 
-                let url = `/model/${kind}/${model.name}`  //todo check type of model -
+                let url = `model/${kind}/${model.name}`  //todo check type of model -
 
 
                 $http.get(url,model).then(
@@ -148,7 +148,7 @@ angular.module("pocApp")
 
                 delete model.checkedOut
 
-                let url = `/model/${kind}/${model.name}`  //todo check type of model -
+                let url = `model/${kind}/${model.name}`  //todo check type of model -
                 let config = {headers:{'x-user-email': user.email}}
                 $http.put(url,model,config).then(
                     function (data) {

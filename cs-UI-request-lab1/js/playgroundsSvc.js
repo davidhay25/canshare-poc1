@@ -168,7 +168,7 @@ angular.module("pocApp")
                 let fhirDT = utilsSvc.fhirDataTypes()
                 let arImport = []
 
-                let qry = `/model/allDG`
+                let qry = `model/allDG`
                     $http.get(qry).then(
                     function (data) {
                         let libraryDG = data.data

@@ -138,9 +138,9 @@ angular.module("pocApp")
                 //just check the library
 
 
-                let url = `/model/DG/${name}`
+                let url = `model/DG/${name}`
                 if (modelType == 'comp') {
-                    url = `/model/comp/${name}`
+                    url = `model/comp/${name}`
                 }
 
                 $http.get(url).then(

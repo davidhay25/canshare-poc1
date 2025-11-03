@@ -25,7 +25,7 @@ angular.module("pocApp")
 
             $scope.DG = DG
             //download the current DG
-            let qry = `/model/DG/${DG.name}`
+            let qry = `model/DG/${DG.name}`
             $http.get(qry).then(
                 function (data) {
                     $scope.serverDG = data.data
@@ -109,7 +109,7 @@ angular.module("pocApp")
                 alert("disabled")
                 return
 
-                let qry = `/model/DG/${DG.name}`
+                let qry = `model/DG/${DG.name}`
                 $http.put(qry,DG).then(
                     function (data) {
                         alert("DG uploaded to Library")

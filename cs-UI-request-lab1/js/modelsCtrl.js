@@ -1,5 +1,6 @@
 //https://imagemap.org/
 //https://www.joelonsoftware.com/2000/04/06/things-you-should-never-do-part-i/
+//Now only used for the LIM - a clone was split off - cfForms
 angular.module("pocApp")
     .controller('modelsCtrl',
         function ($scope,$http,$localStorage,modelsSvc,modelCompSvc,$window,orderingSvc,
@@ -18,13 +19,15 @@ angular.module("pocApp")
 
 
 
+
            // $scope.fhirBase = "http://hl7.org/fhir/R4B/"
 
             $scope.Math = Math;
 
             let snomed = "http://snomed.info/sct"
 
-            $scope.userMode = $localStorage.userMode || "playground"      //possible modes are 'library' or 'playground'
+            $scope.userMode = 'library'     //<<< hard code to the LIM
+            //$scope.userMode = $localStorage.userMode || "playground"      //possible modes are 'library' or 'playground'
             //$scope.userMode = "library"
 
 
@@ -148,9 +151,9 @@ angular.module("pocApp")
             } else {
 
                 if ($scope.userMode == 'library') {
-                    if (confirm("There don't appear to be any local DataGroups's. Would you like to refresh from the Library?")) {
+                    if (confirm("There don't appear to be any local DataGroups. Would you like to refresh from the Library?")) {
 
-                        let qry = '/model/allDG'
+                        let qry = 'model/allDG'
                         $http.get(qry).then(
                             function (data) {
 

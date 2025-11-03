@@ -6,7 +6,7 @@ services:
 
   portal:       # based on nginx build. Has the config file in it.
     image: davidhay25/canshare-portal
-    container_name: portal
+    container_name: canshare-portal
     ports:
       - "80:80"
     networks:
@@ -44,9 +44,21 @@ services:
       - mongodb                      # ensures MongoDB starts first
     environment:
       MONGOHOSTNAME: mongodb
+      MONGODB: canshare-lim           # use a separate database for the canshare app. models.html will then use a separate db to cfForms
       POCSERVERBASE: "9400"           # set the canshare server to start on port 9400 (must match dockerfile)
     ports:
       - "9400:9400"                  # hostPort:containerPort for web access
+    networks:
+      - canshare-network
+
+  oldforms:
+    image: davidhay25/oldforms
+    container_name: oldforms
+    depends_on:
+      - mongodb                      # ensures MongoDB starts first
+
+    ports:
+      - "9090:9090"                  # hostPort:containerPort for web access
     networks:
       - canshare-network
 
