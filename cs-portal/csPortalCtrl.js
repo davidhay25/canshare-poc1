@@ -58,11 +58,28 @@ angular.module("portalApp")
             let arc = {display:"Archives",options:[]}
 
             arc.options.push({display:"Data Standards Manager",
-                text:"A historical site where pathology requests, reports, and other cancer-related data  requirements are documented."})
+                text:"A historical site where pathology requests, reports, and other cancer-related data  requirements are documented.",
+                url: 'oldforms/dataStandards.html'})
+
+            arc.options.push({display:"Dispositions",loggedIn:true,
+                text:"A historical site where standard reviewer comments were formally disposed.",
+                url: 'oldforms/disposer.html'})
+
+
             arc.options.push({display:"Logical Information Model",loggedIn:true,
                 url:'canshare/models.html',
-                text:"The original Logical Information Model"})
+                text:"The original Logical Information Model (used before 2025)."})
+
             $scope.options.push(arc)
+/*
+            let admin = {display:"Admin",options:[]}
+
+            admin.options.push({display:"Admin",loggedIn:true,
+                text:"Dispositions",
+                url: 'canshare/admin.html'})
+
+            $scope.options.push(admin)
+            */
 
             //--------- login stuff
             //called whenever the auth state changes - eg login/out, initial load, create user etc.
