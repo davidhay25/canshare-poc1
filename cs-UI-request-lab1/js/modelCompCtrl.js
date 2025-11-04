@@ -165,7 +165,7 @@ angular.module("pocApp")
 
                 //save the comp logical fsh to the library. Could do this in the library I guess, but easy here
                 if ($scope.compFsh) {
-                    let url = `/fsh/comp/logical/${$scope.selectedComposition.name}`
+                    let url = `fsh/comp/logical/${$scope.selectedComposition.name}`
                     let vo = {name:$scope.selectedComposition.name,fsh:$scope.compFsh}
                     let config = {headers:{'x-user-email': $scope.user.email}}
 

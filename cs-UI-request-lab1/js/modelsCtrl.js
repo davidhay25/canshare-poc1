@@ -31,6 +31,9 @@ angular.module("pocApp")
             //$scope.userMode = "library"
 
 
+            delete $localStorage.initialPlayground //not used im LIM mode
+            delete $localStorage.qrCsv //takes up space
+
             $timeout(function () {
                 $scope.systemConfig = utilsSvc.getConfig()
                 console.log($scope.systemConfig)
@@ -78,8 +81,33 @@ angular.module("pocApp")
 
 
             //This is the browser cache object.
-            $localStorage.world = $localStorage.world || {dataGroups:{},compositions:{},Q:{}}
-            $localStorage.world.Q =  $localStorage.world.Q || {}
+
+            //is the world object a collection? Can occur when loading the LIM after locding collections
+            if ($localStorage.world) {
+                $localStorage.world.Q =  $localStorage.world.Q || {}
+                let name = $localStorage.world.name
+                if ($localStorage.world &&
+                    $localStorage.world.type == 'lim' ||
+                    ($localStorage.world.dataGroups && Object.keys($localStorage.world.dataGroups).length > 250)) {
+                    //must surely be the LIM ! it has 293 DGs...
+                } else {
+                    if (name) {
+                        if (!confirm(`Warning! The collection '${name}' is loaded. If you load the LIM then the collection will be deleted. Are you sure you wish to continue?`)) {
+                            alert("I'll cancel the load, but the app is in an unstable state, so re-start the browser then save the collection before returning and deleting it here.")
+                            return
+                        } else {
+                            $localStorage.world = {type:"lim",dataGroups:{},compositions:{},Q:{}}
+                        }
+                    }
+                }
+
+            } else {
+                $localStorage.world = {dataGroups:{},compositions:{},Q:{}}
+            }
+
+
+            //$localStorage.world = $localStorage.world || {dataGroups:{},compositions:{},Q:{}}
+
 
             $scope.world = $localStorage.world
 
@@ -161,9 +189,13 @@ angular.module("pocApp")
                                 arDG.forEach(function (dg) {
                                     if (dg.kind == 'dg') {
                                         $scope.hashAllDG[dg.name] = dg
+
                                     }
 
                                 })
+
+                                $localStorage.world = {type:"lim",dataGroups:$scope.hashAllDG,compositions:{},Q:{}}
+                                $scope.init()
                                 alert("All DataGroups have been downloaded. To access Compositions, click the Library button at the top of the screen, then the Compositions tab and select the Compositions you wish to download and view")
 
                             })
@@ -494,7 +526,7 @@ angular.module("pocApp")
                             $localStorage.world = playground
                             $scope.world = playground
 
-                            $localStorage.initialPlayground = angular.copy(playground) //save the loaded version so we know if it has been changed
+                          //  $localStorage.initialPlayground = angular.copy(playground) //save the loaded version so we know if it has been changed
 
 /*
                             //reset the dirty flag of all DGs
@@ -635,7 +667,7 @@ angular.module("pocApp")
                         function (data) {
 
                             //reset the change checked
-                            $localStorage.initialPlayground = angular.copy($localStorage.world)
+                           // $localStorage.initialPlayground = angular.copy($localStorage.world)
 
                             if (both) {
                                 //update repo and local
@@ -1260,7 +1292,7 @@ angular.module("pocApp")
 
                 }).result.then(function (vo) {
                     //vo is actually the downloaded world object
-                    $localStorage.initialPlayground = vo    //so we can track changes
+                  //  $localStorage.initialPlayground = vo    //so we can track changes
 
 
                     if (vo.dg) {
