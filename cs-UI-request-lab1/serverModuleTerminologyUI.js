@@ -112,16 +112,22 @@ function setup(app) {
 
 
     app.get('/cmConfig',function (req,res) {
+        let cmconfig = JSON.parse(fs.readFileSync(path_to_config).toString())
         res.json(cmconfig)
     })
 
     app.put('/cmConfig',function (req,res) {
         //when the config file is updated from the UI
 
-        cmconfig = req.body
+        //let cmconfig = JSON.parse(fs.readFileSync(path_to_config).toString()) //not const as can be changed
+
+        let cmConfigUpdate = req.body
+        //console.log(cmConfigUpdate)
         try {
-            let json = JSON.stringify(cmconfig)
+            let json = JSON.stringify(cmConfigUpdate,null,2)
             fs.writeFileSync(path_to_config,json)
+            //this doesn't seem to be udpated so the GET reads the file every time...
+            cmConfig = cmConfigUpdate   //sets the global server variable so the server does not need to be re-started
             res.json({msg: 'config updated'})
         } catch (ex) {
             console.log(ex)
@@ -178,7 +184,6 @@ function setup(app) {
 
             }
 
-//console.log('ver',csVersion)
 
             //get all the CanShare valuesets...
             axios.get(qry,config).then(async function(data) {
@@ -807,6 +812,31 @@ function setup(app) {
         config['Content-Type'] = "application/fhir+json"
         try {
 
+            let cmSystem = "http://canshare.co.nz/fhir/NamingSystem/conceptmaps"
+            let cmQry = `${csServerRoot}ConceptMap?identifier=${cmSystem}%7c&_summary=false`
+
+            let config = {headers: {authorization: 'Bearer ' + token}}
+            config['content-type'] = "application/fhir+json"
+
+            let cmResponse = await axios.get(cmQry,config)
+            let cmBundle = cmResponse.data
+
+            for (let entry of cmBundle.entry || []) {
+                console.log(entry)
+                let cmId = entry.resource.id
+
+                const options = {
+                    method: 'POST',
+                    url: `${serverHost}synd/setSyndicationStatus`,
+                    params: {resourceType: 'ConceptMap', id: cmId, syndicate: 'true'},
+                    headers: {'Content-Type': 'application/json', authorization:'Bearer ' + token},
+                };
+
+                const { data } = await axios.request(options);
+                jobs[jobId].progress = `${cmId} done`
+
+            }
+
             //set the codesystem
             let csId = "canshare-unpublished-concepts"
 
@@ -819,6 +849,13 @@ function setup(app) {
 
             const { csData } = await axios.request(csOptions)
             jobs[jobId].progress = `${csId} done`
+
+
+
+
+            /*
+
+                getCM(req,res,"http://canshare.co.nz/fhir/NamingSystem/conceptmaps")
 
             //Set ConceptMaps.
             for (let cmId of ['canshare-select-valueset-map','canshare-select-valueset-map-dev']) {
@@ -833,6 +870,8 @@ function setup(app) {
                 const { data } = await axios.request(options);
                 jobs[jobId].progress = `${cmId} done`
             }
+
+            */
 
             //now the ValueSets
             //get the canshare valueset list
@@ -886,9 +925,6 @@ function setup(app) {
     }
 
     //=========================
-
-
-
 
 
     //use when updating a CodeSystem
@@ -981,7 +1017,10 @@ function setup(app) {
     })
 
     let getCM = async function (req,res,system) {
-        let qry = `${csServerRoot}ConceptMap?identifier=${system}%7c&_summary=false`
+
+        //todo - will break some functionity - check!
+        //let qry = `${csServerRoot}ConceptMap?identifier=${system}%7c&_summary=true`
+        let qry = `${csServerRoot}ConceptMap?identifier=${system}%7c&_summary=true`
         if (devMode) {
             console.log('get',qry)
             qry += "&_count=50"
@@ -1003,7 +1042,7 @@ function setup(app) {
             }
 
         } else {
-            res.status(ex.response.status).json({msg:"Unable to get Access Token."})
+            res.status(500).json({msg:"Unable to get Access Token."})
         }
 
     }

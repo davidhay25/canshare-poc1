@@ -27,7 +27,8 @@ angular.module("pocApp")
 
             $scope.version = utilsSvc.getVersion()
 
-            $scope.input.tsInstance = "authoring"
+            //$scope.input.tsInstance = "authoring"
+            $scope.input.tsInstance = "prod"        //Nove20 - set to default to prod
 
             $scope.languages = []       //languages that can be used for the expansion
             $scope.languages.push({display:"Default",code:""})

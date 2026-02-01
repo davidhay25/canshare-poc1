@@ -164,11 +164,12 @@ Updates the ValueSets. Has functions for direct editing and importing from sprea
         </div>
     </nav>
 
-    <button ng-hide = "showWaitingTimeout" style="margin-right: 8px"
+    <!-- Temp to disable button until ready to test (in case I need to updat ebefore then... -->
+    <button ng-hide = "true || showWaitingTimeout" style="margin-right: 8px"
             ng-click="setSyndicationStatus()"
             class="btn-danger btn pull-right">Set Syndication status</button>
 
-    <button ng-if = "user.email" class="pull-right btn-link btn" ng-click="updateTest()">Update Test</button>
+    <button ng-if = "false && user.email" class="pull-right btn-link btn" ng-click="updateTest()">Update Test</button>
 
     <button class="btn btn-info pull-right" ng-show = "showWaitingTimeout" style="margin-right: 8px">
         Syndicating. Progress: {{syndProgress}}
@@ -748,22 +749,13 @@ Updates the ValueSets. Has functions for direct editing and importing from sprea
 
                                 </div>
                             </div>
-
-
-
                         </uib-tab>
-
                     </uib-tabset>
-
-
-
                 </div>
             </div>
 
 
         </uib-tab>
-
-
 
         <uib-tab>
             <uib-tab-heading>Unpublished concepts
@@ -774,10 +766,10 @@ Updates the ValueSets. Has functions for direct editing and importing from sprea
 
             <uib-tabset>
                 <uib-tab heading="List">
-                    <em>This is the custom CodeSystem for unpublished concepts. These are concepts that have been defined
+                    <em>This is the custom CodeSystem (<strong>{{prePubCS.id}}</strong>) for unpublished concepts. These are concepts that have been defined
                         in SNOMED-CT but not yet published. They have a different system url (as they don't yet exist in the
                         Terminology Server). If they are used by an implementer, then they will be responsible for making
-                        any changes required once the concepts are formally published. </em>
+                        any changes required once the concepts are formally published.  There are {{prePubCS.concept.length}} concepts in this CodeSystem.</em>
                     <uib-tabset>
                         <uib-tab heading="Table">
                             <br/>

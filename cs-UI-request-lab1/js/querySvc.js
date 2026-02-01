@@ -362,7 +362,7 @@ angular.module("pocApp")
                     let deferred = $q.defer()
 
                     //Mar5 - change to use specific id (derived Url
-                    let qry = `nzhts/ConceptMap/${id}`
+                    let qry = `nzhts/ConceptMap/${id}?dummy=${new Date().getTime()}`
                     $http.get(qry).then(
                         function (data) {
                             deferred.resolve(data.data)     //return the CM

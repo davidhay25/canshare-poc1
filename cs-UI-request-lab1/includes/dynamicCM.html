@@ -34,7 +34,8 @@
       </div>
       <div class="col-md-4">
         <div class="pull-right" ng-show="conceptMap && user.email && canUpload ">
-          <button style="padding-top: 8px"  class="btn btn-danger " ng-click="uploadConceptMap(input.publishCMVer)">Upload ConceptMap</button>
+          <button style="padding-top: 8px"  class="btn btn-danger "
+                  ng-click="uploadConceptMap(input.publishCMVer)">Upload ConceptMap</button>
 
           <span  ng-if="activeRC">
             <checkbox ng-model="input.publishCMVer"></checkbox> Release Candidate {{previousVersion}}

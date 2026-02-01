@@ -16,12 +16,14 @@ services:
       - canshare
 
   forms:
-    image: davidhay25/forms
+    image: davidhay25/forms:v1.0.0
     container_name: forms
     depends_on:
       - mongodb                      # ensures MongoDB starts first
     environment:
       MONGOHOSTNAME: mongodb
+      ENVIRONMENT: canshare    # some options are hidden in canshare
+      MONGODB: clinfhir        # name of the mongo database. Only accessed by this container as the monodb is internal
     ports:
       - "9500:9500"                  # hostPort:containerPort for web access
     networks:
@@ -65,5 +67,3 @@ services:
 networks:
   canshare-network:
     driver: bridge
-
-

@@ -223,7 +223,7 @@ angular.module("pocApp")
             if (isNew) {
                 $scope.input.types = Object.keys(hashTypes) //an array for the new type dropdown
 
-                $scope.input.termSvr = 'https://test.canshare.co.nz/proxy'
+                $scope.input.termSvr = 'https://canshare.co.nz/canshare/proxy'
 
 
             } else {

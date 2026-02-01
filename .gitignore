@@ -2,6 +2,6 @@
 Thumbs.db
 .idea
 **/*.config
-
+artifacts/
 
 /cs-UI-request-lab1/canshare-730e6-firebase-adminsdk-aandk-4c9804a887.json

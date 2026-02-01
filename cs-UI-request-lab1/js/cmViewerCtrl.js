@@ -11,6 +11,12 @@ angular.module("pocApp")
 
             console.log(config)
 
+            if (! conceptMap.group) {
+                alert("There is no group element in the ConceptMap so it cannot be viewed")
+                $scope.$dismiss()
+                return
+            }
+
             $scope.data = data
 
             let snomed = "http://snomed.info/sct"
@@ -71,7 +77,7 @@ angular.module("pocApp")
                     }
                 }
 
-console.log($scope.hashPropertyNames,$scope.hashPropertyForCode)
+//console.log($scope.hashPropertyNames,$scope.hashPropertyForCode)
 
                 //pass 2 - get all the properties referenced in the current map
                 //and the element codes in use

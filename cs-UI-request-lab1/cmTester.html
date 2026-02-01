@@ -133,14 +133,31 @@
 
 -->
     <div ng-show="input.showHelp">
+        <!--
         <div class="pull-right">
             <a target="_blank"
                href="https://docs.google.com/document/d/1MNutsIBRlSE0Z7ZfxuKk7mC1_kEFwnhNvWRBqdOWouE/edit">
                 ConceptMap Documentation
             </a>
         </div>
+        -->
         <div class="alert alert-info">
-            This tab represents a Cancer assessment
+
+            The Concept Map Viewer demonstrates a user interface using a canshare-select-[domain]-valueset-map.
+            The domain represents a specific use case.
+
+            The viewer focuses on three main areas:
+            <ul>
+                <li><strong>Diagnostic properties</strong> – such as type of cancer, body site, and histology</li>
+                <li><strong>Grading and prognostic properties</strong> – such as grading system, histological grade,
+                    prognostic scoring system, and prognostic score
+                </li>
+                <li><strong>Staging properties</strong> – such as staging system, stage, and prognostic factors related to stage.</li>
+            </ul>
+
+
+            Not all the information in a CanShare concept map is shown in the user interface.
+            Please contact canshare@teaho.govt.nz for interface help guide, content details, and implementation advice.
 
         </div>
     </div>
@@ -216,7 +233,7 @@
         <div class="row">
             <div class="col-md-6">
 
-
+                <h4>Diagnostic properties</h4>
                 <table class="table table-bordered">
                     <tr ng-repeat = "(k,v) in cmProperties" ng-hide="k == 'patient-sex'">
                         <td width = "30%">
@@ -287,6 +304,7 @@
                     </tr>
                 </table>
 
+                <h4>Grading and prognostic properties</h4>
                 <div ng-controller="gradingCtrl">
                     <ng-include src = "'includes/grading.html'"></ng-include>
                 </div>
@@ -303,7 +321,7 @@
 
             </div>
             <div class="col-md-6">
-                <div ng-show="input.showHelp" class="alert-info alert">
+                <div ng-show="false && input.showHelp" class="alert-info alert">
                     <p>Select the values from the top, heading down. </p>
                     <p>When a property value is selected in a control,
                         the next property control in order will be automatically populated. </p>
@@ -324,11 +342,12 @@
                 <!-- <uib-tabset  ng-show="stagingProperties['staging-system'].options.length > 0" > -->
 
                 <uib-tabset >
-                    <uib-tab heading="Staging selection">
+                    <uib-tab heading="Staging properties">
                         <div ng-controller="stagingCtrl">
                             <ng-include src = "'includes/staging.html'"></ng-include>
                         </div>
                     </uib-tab>
+
                     <uib-tab ng-show="localStorage.technicalView" heading="Data">
                         <em>Current values for properties</em>
                         <div class="myScrollSmall">
@@ -506,7 +525,7 @@
                                     <div class="col-md-4">
                                         <select class="form-control" ng-model="default.service"
                                                 ng-change = "setDefaultService(default.service)"
-                                                ng-options="concept.display for concept in input.allService"/>
+                                                ng-options="concept.display for concept in input.allService"></select>
                                     </div>
                                 </div>
 
@@ -718,7 +737,7 @@
                                     <uib-tab heading="Lookup target by row number">
                                         <div class="row">
                                             <div class="col-md-2">
-                                                <input type="text" class="form-control" ng-model="input.rowNumber">
+                                                <input type="text" class="form-control" ng-model="input.rowNumber"/>
                                                 <div><button class="btn btn-link" ng-click="lookupByRowNumber(input.rowNumber)">Get target</button> </div>
                                             </div>
                                             <div class="col-md-10">

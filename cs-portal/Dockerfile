@@ -1,7 +1,12 @@
-FROM nginx:alpine
+FROM nginx:1.27-bookworm
 
-# Copy our HTML landing page
+RUN apt-get update && apt-get install -y \
+    curl \
+    iputils-ping \
+    iproute2 \
+    netcat-traditional \
+    nano \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY . /usr/share/nginx/html/
-
-# Replace the default nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf

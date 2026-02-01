@@ -975,8 +975,6 @@ angular.module("pocApp")
                 })
 
 
-
-                //terminologyUpdateSvc.checkUnpublishedCodes($scope.allVSItem)
             }
 
             $scope.updateUnpublished = function () {

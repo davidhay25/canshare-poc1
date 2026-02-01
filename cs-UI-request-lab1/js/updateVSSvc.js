@@ -198,7 +198,7 @@ angular.module("pocApp")
 
                 if (isDirty){
                     cs.version = "1"
-console.log('uodating cs')
+
                     let qry = 'nzhts/CodeSystem'
                     $http.put(qry,cs).then(
                         function (data) {

@@ -258,6 +258,9 @@ angular.module("pocApp")
                     let qName = modelName.slice(2)
                     $scope.loadQ(qName)
 
+                    $scope.input.mainTabActive = 2
+
+
                 } else if (modelName.startsWith('url-')) {
                     //a url was passed. This will be retrieved from the lab server
                     let qUrl = modelName.slice(4)
@@ -273,6 +276,7 @@ angular.module("pocApp")
                                 $scope.fullQ = data.data.entry[0].resource
                                 processQ($scope.fullQ)  //update internal variables
                                 $scope.input.mainTabActive = 1
+                                //$scope.input.mainTabActive = 2
 
                             } else {
                                 alert(`Error contacting server: ${qry}`)

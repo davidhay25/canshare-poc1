@@ -1,0 +1,72 @@
+services:
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.le.acme.httpchallenge=true"
+      - "--certificatesresolvers.le.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.le.acme.email=david.hay25@gmail.com"
+      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+    networks:
+      - canshare-network
+
+  portal:
+    image: davidhay25/canshare-portal
+    container_name: canshare-portal
+    networks:
+      - canshare-network
+    depends_on:
+      - forms
+      - canshare
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portal.rule=Host(`canshare.co.nz`)"
+      - "traefik.http.routers.portal.entrypoints=websecure"
+      - "traefik.http.routers.portal.tls.certresolver=le"
+      - "traefik.http.services.portal.loadbalancer.server.port=80"
+
+  forms:
+    image: davidhay25/forms
+    container_name: forms
+    networks:
+      - canshare-network
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:4.4
+    restart: always
+    networks:
+      - canshare-network
+    volumes:
+      - ./mongodb_data:/data/db
+
+  canshare:
+    image: davidhay25/canshare
+    container_name: canshare
+    networks:
+      - canshare-network
+    depends_on:
+      - mongodb
+
+  oldforms:
+    image: davidhay25/oldforms
+    container_name: oldforms
+    networks:
+      - canshare-network
+    depends_on:
+      - mongodb
+
+networks:
+  canshare-network:
+    driver: bridge

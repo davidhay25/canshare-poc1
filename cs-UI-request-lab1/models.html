@@ -43,7 +43,45 @@
 
     </style>
 
-    <!-- Note that all scripts are at the bottom-->
+    <!-- Note that most scripts are at the bottom-->
+
+    <script>
+        (function() {
+            // Generate a unique ID for this tab
+            const tabId = Math.random().toString(36).slice(2);
+
+            // Create a BroadcastChannel for this page
+            const bc = new BroadcastChannel('page-status');
+
+            let anotherTabOpen = false;
+
+            // Listen for messages from other tabs
+            bc.onmessage = (e) => {
+                if (e.data.type === 'model' && e.data.id !== tabId) {
+                    anotherTabOpen = true;
+                    // Use AngularJS $apply to update UI if needed
+                    if (window.angular) {
+                        const $rootScope = angular.element(document.body).scope().$root;
+                        $rootScope.$apply(() => {
+                            alert('This page is already open in another tab!');
+                        });
+                    } else {
+                        alert('This page is already open in another tab!');
+                    }
+                }
+            };
+
+            // Announce this tab
+            bc.postMessage({ type: 'hello', id: tabId });
+
+            // Notify others when this tab closes
+            window.addEventListener('beforeunload', () => {
+                bc.postMessage({ type: 'bye', id: tabId });
+                bc.close();
+            });
+        })();
+    </script>
+
 
 </head>
 <body style="padding: 8px;padding-top: 80px" >
@@ -67,13 +105,7 @@
             </div>
 
             <div class="col-md-1 col-sm-1">
-                <div class="navbar-text btn">
-                    <button ng-if="userMode == 'playground'" class="btn btn-primary pull-right"
-                            ng-click="openPlaygrounds()">Collections</button>
 
-
-
-                </div>
             </div>
 
             <div class="col-md-1">
@@ -85,27 +117,13 @@
 
 
             <div ng-if="false" class="col-md-1">
-                <div class="navbar-text">
-                    <div style="padding-top: 6px" ng-click="changeUserMode($event,'library')"
-                         ng-if="userMode == 'playground'">Builder mode</div>
-                    <div style="padding-top: 6px" ng-click="changeUserMode($event,'playground')"
-                         ng-if="userMode == 'library'">Library mode</div>
 
-                </div>
 
             </div>
 
             <div class="col-md-2">
 
-                <div class="navbar-text" ng-if="userMode == 'library'">
-                    <a href="query.html"
-                       target="_blank">Terminology</a>
 
-                    <div ng-if = "user.email">
-                        <a href="https://docs.google.com/document/d/1InT4HDIudFl4gUAF5htUNeLJG2QT8rBnMjB_E1fe78s"
-                           target="_blank">Documentation</a>
-                    </div>
-                </div>
 
             </div>
 

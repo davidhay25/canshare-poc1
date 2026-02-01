@@ -102,7 +102,7 @@ angular.module("pocApp").constant("moment", moment);
 
             </div>
 
-            <div class="col-md-7">
+            <div class="col-md-6">
                 <div class="navbar-text">
                     <div class="title">
                         CanShare - Te Aho o Te Kahu, the Cancer Control Agency
@@ -113,7 +113,7 @@ angular.module("pocApp").constant("moment", moment);
 
 
             <div class="col-md-1">
-                <div class="navbar-text " ng-hide="user">
+                <div class="navbar-text " ng-hide="user.email">
                     <div style="padding: 8px">
                         <span style="font-size:1.2em; cursor: pointer" uib-popover="Click to log in"
                               class="pull-right"
@@ -126,19 +126,44 @@ angular.module("pocApp").constant("moment", moment);
                     </div>
                 </div>
 
-                <div class="navbar-text"  ng-show="user">
+                <div class="navbar-text"  ng-show="user.email">
                     <div style="padding: 8px">
+
                         <span style="font-size:1.2em;  cursor: pointer" uib-popover="{{user.email}}"
                               popover-placement="left"
-                              class="pull-right"
                               popover-trigger="'mouseenter'">
-                            <div ng-click="logout()">
+                            <span ng-click="logout()">
                                 <i class="glyphicon glyphicon-log-out"></i>
-                            </div>
+                            </span>
                         </span>
+
+
+
                     </div>
                 </div>
             </div>
+
+
+            <div class="col-md-1">
+
+                <div class="navbar-text" style="padding: 8px" ng-show="user.email"
+                     uib-popover="Admin module"
+                     popover-placement="left"
+                     popover-trigger="'mouseenter'" >
+
+                    <span style="font-size:1.2em;  cursor: pointer">
+
+                         <a class="glyphicon glyphicon-cog" target="_blank" href="forms/admin.html">
+                            {{cmd.display}}
+                        </a>
+
+                    </span>
+                </div>
+
+
+            </div>
+
+
 
             <div class="col-md-2">
                 <a href="https://teaho.govt.nz/" target="_blank">

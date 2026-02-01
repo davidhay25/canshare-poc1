@@ -1,0 +1,108 @@
+version: "3.9"
+# compose file for the canshare backup environment
+
+services:
+  # ---------------- Traefik Reverse Proxy ----------------
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.le.acme.httpchallenge=true"
+      - "--certificatesresolvers.le.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.le.acme.email=david.hay25@gmail.com"
+      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+      - "--log.level=INFO"
+      - "--api.dashboard=true"  # optional dashboard
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"   # dashboard port, optional
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+    networks:
+      - canshare-network
+
+  # ---------------- Portal (nginx) ----------------
+  portal:
+    image: davidhay25/canshare-portal
+    container_name: canshare-portal
+    networks:
+      - canshare-network
+    depends_on:
+      - forms
+      - canshare
+      - oldforms
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portal.rule=Host(`backup.canshare.co.nz`)"
+      - "traefik.http.routers.portal.entrypoints=websecure"
+      - "traefik.http.routers.portal.tls.certresolver=le"
+      - "traefik.http.services.portal.loadbalancer.server.port=80"
+      # Forward HTTPS info to backend
+      - "traefik.http.middlewares.portal-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.portal.middlewares=portal-headers"
+
+      # HTTP router → redirect to HTTPS
+      - "traefik.http.routers.portal-http.entrypoints=web"
+      - "traefik.http.routers.portal-http.rule=Host(`backup.canshare.co.nz`)"
+      - "traefik.http.routers.portal-http.middlewares=redirect-to-https"
+
+      # middleware for redirect
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+
+  # ---------------- Forms ----------------
+  forms:
+    image: davidhay25/forms:v1.0.0
+    container_name: forms
+    depends_on:
+      - mongodb
+    environment:
+      MONGOHOSTNAME: mongodb
+      MONGODB: clinfhir
+      SETTING: backup
+    networks:
+      - canshare-network
+
+  # ---------------- Canshare ----------------
+  canshare:
+    image: davidhay25/canshare
+    container_name: canshare
+    depends_on:
+      - mongodb
+    environment:
+      MONGOHOSTNAME: mongodb
+      MONGODB: canshare-lim
+      POCSERVERBASE: "9400"
+    networks:
+      - canshare-network
+
+  # ---------------- Oldforms ----------------
+  oldforms:
+    image: davidhay25/oldforms
+    container_name: oldforms
+    depends_on:
+      - mongodb
+    networks:
+      - canshare-network
+
+
+  # ---------------- MongoDB ----------------
+  mongodb:
+    image: mongo:4.4
+    container_name: mongodb
+    restart: always
+    networks:
+      - canshare-network
+    volumes:
+      - ./mongodb_data:/data/db
+
+# ---------------- Docker network ----------------
+networks:
+  canshare-network:
+    driver: bridge

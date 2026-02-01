@@ -291,8 +291,8 @@ angular.module("pocApp")
                     $scope.populateUIControl(def.next)  //populate the UI with the set of possible values. Will check all following properties
 
                     //if the property that was selected (propKey) is the cancer type, then it may be possible
-                    //to default the primary site.
-                    if (propKey == 'cancer-type') {
+                    //to default the primary site. - disabled.
+                    if (false && propKey == 'cancer-type') {
                         getDefaultPrimarySite(value,function (value) {
                             if (value) {
                                 //there was a single primary site which was set.
@@ -1091,7 +1091,7 @@ angular.module("pocApp")
 
                             lstVsUrl.sort()
                             lstVsUrl.forEach(function (url) {
-                                console.log('|' + url + '|  ' + url.length)
+                                //console.log('|' + url + '|  ' + url.length)
                                 // console.log(url.match(/[^\x20-\x7E]/g))
                             })
 

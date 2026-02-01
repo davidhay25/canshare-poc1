@@ -291,25 +291,49 @@
                                 <th  style="width:25%">OE Code</th>
                                 <th style="width:15%">UI display</th>
                                 <th>Group</th>
-                                <th>Hide if empty</th></tr>
+                                <th>Hide if empty</th><th>Move</th><th>Edit</th><th>Delete</th></tr>
                             <tr ng-repeat = "(k,v) in cmConfig.stagingProperties">
                                 <td>{{k}}</td>
 
                                 <td ng-class="{invalidCode:hashInvalidCode[v.concept.code]}">
                                     <div class="clickable" ng-click="lookup(v.concept.code)">
-                                        {{v.concept.code}} ({{v.concept.display}})
+                                        {{v.concept.code}}
                                     </div>
                                 </td>
 
                                 <td>{{v.UI}}</td>
                                 <td>
-                                    <div ng-if="v.staging1">Section 1</div>
-                                    <div ng-if="v.staging2">Section 2</div>
+                                    <div ng-if="v.staging1">Staging 1</div>
+                                    <div ng-if="v.staging3">Staging 3</div>
                                 </td>
                                 <td>
-                                    {{v.hideIfNoOptions}}
+                                    <div ng-show="v.hideIfNoOptions">Yes</div>
+
+                                </td>
+                                <td style="width: 10%">
+
+                                    <div class="glyphicon glyphicon-arrow-up clickable"
+                                         style="padding-right: 10px"
+                                         ng-show="canShowArrow('stagingProperties',$index,'up')"
+                                         ng-click="move('stagingProperties',$index,'up')">
+
+                                    </div>
+
+                                    <span ng-show="! canShowArrow('stagingProperties',$index,'up')">
+                                        <span style="padding-right: 20px">&nbsp;</span>
+                                    </span>
+
+
+
+                                    <div class="glyphicon glyphicon-arrow-down clickable"
+                                         ng-show="canShowArrow('stagingProperties',$index,'dn')"
+                                         ng-click="move('stagingProperties',$index,'dn')">
+
+                                    </div>
                                 </td>
 
+                                <td style="width: 8px"><div class="clickable" ng-click="editConfigLine('stagingProperties',k,v)">Edit</div></td>
+                                <td style="width: 8px"><div class="clickable" ng-click="deleteConfigLine('stagingProperties',k)">Delete</div></td>
                             </tr>
                         </table>
                         <div style="padding: 8px" class="pull-right clickable" ng-click="addConfigLine('stagingProperties')">Add new Staging property</div>
@@ -319,24 +343,44 @@
                         <table class="table-bordered table">
                             <tr><th style="width:15%">Property</th>
                                 <th style="width:25%">OE Code</th>
-                                <th style="width:15%">UI display</th>
-                                <th>Group</th></tr>
+                                <th style="width:52%">UI display</th>
+                                <th>Move</th><th>Edit</th><th> Delete</th>
+                            </tr>
                             <tr ng-repeat = "(k,v) in cmConfig.gradingProperties">
                                 <td>{{k}}</td>
 
                                 <td ng-class="{invalidCode:hashInvalidCode[v.concept.code]}">
                                     <div class="clickable" ng-click="lookup(v.concept.code)">
-                                        {{v.concept.code}} ({{v.concept.display}})
+                                        {{v.concept.code}}
                                     </div>
                                 </td>
 
                                 <td>{{v.UI}}</td>
-                                <td>
-                                    <div ng-if="v.staging1">Section 1</div>
-                                    <div ng-if="v.staging2">Section 2</div>
+
+                                <td style="width: 10%">
+
+                                    <div class="glyphicon glyphicon-arrow-up clickable"
+                                         style="padding-right: 10px"
+                                         ng-show="canShowArrow('gradingProperties',$index,'up')"
+                                         ng-click="move('gradingProperties',$index,'up')">
+                                    </div>
+
+                                    <span ng-show="! canShowArrow('gradingProperties',$index,'up')">
+                                        <span style="padding-right: 20px">&nbsp;</span>
+                                    </span>
+
+
+                                    <div class="glyphicon glyphicon-arrow-down clickable"
+                                         ng-show="canShowArrow('gradingProperties',$index,'dn')"
+                                         ng-click="move('gradingProperties',$index,'dn')">
+                                    </div>
                                 </td>
 
 
+                                <td style="width: 8px"><div class="clickable pull-right"
+                                                            ng-click="editConfigLine('gradingProperties',k,v)">Edit</div></td>
+
+                                <td style="width: 8px"><div class="clickable" ng-click="deleteConfigLine('gradingProperties',k)">Delete</div></td>
 
 
                             </tr>

@@ -66,6 +66,18 @@ angular.module("pocApp")
                 //console.log($scope.TNMhash)
             })
 
+
+            //the ycm & ypm prefixed properties do not exist so don't show them
+            $scope.prefixedPropertyDisplay = function (prefixedProperty) {
+                if (prefixedProperty?.indexOf('ycM') > -1 || prefixedProperty?.indexOf('ypM') > -1) {
+                    return "(Not applicable)"
+                } else {
+                    return prefixedProperty
+                }
+
+            }
+
+
             $scope.selectPrefix = function (prefix) {
                 //when the prefix is selected we need to adjust the values in the TNMhasha
                 for (const [key, value] of Object.entries($scope.TNMhash)) {
@@ -147,10 +159,11 @@ angular.module("pocApp")
             //called when the prefix free version of tnm is changed (ie the dropdown). Separate functionity (for now) as
             //we need to process the prefixed version. processes a single TNM value
             //also called when any of the other properties change
+            //k can be 'y' or 'r'
             $scope.processTNMSelect = function (k) {
 
 
-                let v = $scope.TNMhash[k]
+                let v = $scope.TNMhash[k]   //eg  {display:'cT',baseProperty:'cT',propName:"ct-category-prefix-free",
 
                 //clear the current value
                 delete $scope.staging.prefixedTNM[k]
@@ -169,9 +182,10 @@ angular.module("pocApp")
 
                 //the element from the CM
                 let cmElement = cmTesterSvc.getElementByCode($scope.fullSelectedCM,prefixedPropertyCode)    //get the element
+
                 if (cmElement && cmElement.code) {
                     let vo = cmTesterSvc.rulesEngine($scope.local.cmPropertyValue, cmElement, $scope.hashExpandedVs)
-                    console.log(vo)
+                    //console.log(vo)
                     //we look at the list of matching targets (rather than matching VS) as that will give us the display. lstVs has only the code when it's a concept not a VS
 
 

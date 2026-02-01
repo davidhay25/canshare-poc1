@@ -17,9 +17,6 @@ angular.module("pocApp")
                 $scope.modelInfoClass = 'modelInfoTest'
             }
 
-
-
-
            // $scope.fhirBase = "http://hl7.org/fhir/R4B/"
 
             $scope.Math = Math;
@@ -27,8 +24,6 @@ angular.module("pocApp")
             let snomed = "http://snomed.info/sct"
 
             $scope.userMode = 'library'     //<<< hard code to the LIM
-            //$scope.userMode = $localStorage.userMode || "playground"      //possible modes are 'library' or 'playground'
-            //$scope.userMode = "library"
 
 
             delete $localStorage.initialPlayground //not used im LIM mode
@@ -84,6 +79,23 @@ angular.module("pocApp")
 
             //is the world object a collection? Can occur when loading the LIM after locding collections
             if ($localStorage.world) {
+
+                /* just finding the ratio elements
+                for (let key of Object.keys($localStorage.world.dataGroups)) {
+
+                    let dg = $localStorage.world.dataGroups[key]
+
+                    for (let ed of dg.diff || []) {
+                        if (ed.type && ed.type[0] == "Ratio") {
+                            console.log(`DG: ${dg.title}  Path: ${ed.path}`)
+                        }
+
+                    }
+                }
+
+*/
+
+
                 $localStorage.world.Q =  $localStorage.world.Q || {}
                 let name = $localStorage.world.name
                 if ($localStorage.world &&
@@ -92,7 +104,7 @@ angular.module("pocApp")
                     //must surely be the LIM ! it has 293 DGs...
                 } else {
                     if (name) {
-                        if (!confirm(`Warning! The collection '${name}' is loaded. If you load the LIM then the collection will be deleted. Are you sure you wish to continue?`)) {
+                        if (!confirm(`Warning! The collection '${name}' is currently loaded in this browser. If you load the LIM then the collection will be removed (as they cannot co-exist in the same browser). Are you sure you wish to continue?`)) {
                             alert("I'll cancel the load, but the app is in an unstable state, so re-start the browser then save the collection before returning and deleting it here.")
                             return
                         } else {
@@ -181,6 +193,7 @@ angular.module("pocApp")
                 if ($scope.userMode == 'library') {
                     if (confirm("There don't appear to be any local DataGroups. Would you like to refresh from the Library?")) {
 
+                        $scope.showWaiting = true
                         let qry = 'model/allDG'
                         $http.get(qry).then(
                             function (data) {
@@ -191,13 +204,14 @@ angular.module("pocApp")
                                         $scope.hashAllDG[dg.name] = dg
 
                                     }
-
                                 })
 
                                 $localStorage.world = {type:"lim",dataGroups:$scope.hashAllDG,compositions:{},Q:{}}
                                 $scope.init()
                                 alert("All DataGroups have been downloaded. To access Compositions, click the Library button at the top of the screen, then the Compositions tab and select the Compositions you wish to download and view")
 
+                            }).finally(function () {
+                                $scope.showWaiting = false
                             })
                     } else {
                         alert("The app won't work correctly. I suggest you start again and agree to the Library refresh")

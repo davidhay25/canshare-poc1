@@ -5,32 +5,29 @@
     <div class="row">
       <div class="col-md-8 col-sm-8">
         <h3 class="modal-title">
-          Add a new entry to the CM config
+          <div ng-show="mode=='edit'">
+            Edit config entry
+          </div>
+          <div ng-hide="mode=='edit'">
+            Add new config entry
+          </div>
+
         </h3>
       </div>
 
 
       <div class="col-md-4 col-sm-4">
-        <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
+
         <button ng-show = "input.property && input.code && input.display"
-                class="btn btn-primary pull-right" ng-click="save()">Close</button>
+                class="btn btn-primary pull-right" ng-click="save()">Save</button>
+        <button class="btn btn-link pull-right" ng-click="$dismiss()">Cancel</button>
       </div>
     </div>
 
   </div>
 
   <div class="modal-body">
-<!--
-    <div class="row">
-      <div class="col-md-3">
-        Type
-      </div>
-      <div class="col-md-9">
-        <select class="form-control" ng-model="input.type"
-                ng-options="t.display for t in types"></select>
-      </div>
-    </div>
-    -->
+
 
     <div class="row">
       <div class="col-md-5">
@@ -40,15 +37,20 @@
         <input type="text" class="form-control" ng-model="input.property"/>
       </div>
     </div>
-
+  <br/>
     <div class="row">
       <div class="col-md-5">
         OE SNOMED code
       </div>
-      <div class="col-md-7">
+      <div class="col-md-5">
         <input type="text" class="form-control" ng-model="input.code"/>
       </div>
+      <div class="col-md-2">
+        <button ng-show="input.code" class="btn-primary btn" ng-click="lookup(input.code)">Lookup</button>
+      </div>
+
     </div>
+    <br/>
 
     <div class="row">
       <div class="col-md-5">
@@ -59,12 +61,57 @@
       </div>
     </div>
 
+      <br/>
+      <div ng-show = "type == 'stagingProperties'" class="row">
+        <div class="col-md-5">
+          Staging 1
+        </div>
+        <div class="col-md-1">
+          <checkbox ng-model="input.staging1"></checkbox>
+        </div>
+        <div class="col-md-6">
+          Will appear in the upper right pane
+        </div>
+
+    </div>
+      <br/>
+      <div ng-show = "type == 'stagingProperties'"  class="row">
+        <div class="col-md-5">
+          Staging 3
+        </div>
+        <div class="col-md-1">
+          <checkbox ng-model="input.staging3"></checkbox>
+        </div>
+        <div class="col-md-6">
+          Will appear in the lower right pane
+        </div>
+
+      </div>
+      <br/>
+
+
+      <div ng-show = "type == 'stagingProperties'"  class="row">
+        <div class="col-md-5">
+          Hide if no options
+        </div>
+        <div class="col-md-1">
+          <checkbox ng-model="input.hideIfNoOptions"></checkbox>
+        </div>
+        <div class="col-md-6">
+          Not shown if no options
+        </div>
+      </div>
+
+
+
+
+
+
 
 
 
   </div>
   <div class="modal-header">
-    <em>Import a Json config file into the current environment. Should really be an export from
-    the app - perhaps modified but the structure is fixed.</em>
+
   </div>
 </div>
