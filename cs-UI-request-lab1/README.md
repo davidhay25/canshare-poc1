@@ -59,7 +59,7 @@ untouched:
 1. Move to the **cs-UI-request-lab1** folder 
 2. execute **docker-build.sh**
 3. ssh to the remote server
-4. cd **/opt/canshare**
+4. cd **/opt/canshare-docker**
 5. either:
     * execute **refresh.sh** for a full rebuild
     * or (assuming it's the canshare service that is to be updated)
