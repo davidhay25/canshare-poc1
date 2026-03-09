@@ -105,7 +105,7 @@ angular.module("pocApp")
 
             $scope.executeBespoke = function (qry) {
                 let encodedQry = encodeURIComponent(qry)
-                let fullQry = `/nzhts?qry=${encodedQry}`
+                let fullQry = `nzhts?qry=${encodedQry}`
                 $http.get(fullQry).then(
                     function (data) {
                         console.log(data)
@@ -315,7 +315,7 @@ angular.module("pocApp")
 
                     // return  //temp
 
-                    let url = `/nzhts/ConceptMap/${$scope.conceptMap.id}`
+                    let url = `nzhts/ConceptMap/${$scope.conceptMap.id}`
                     $http.put(url, $scope.conceptMap).then(
                         function (data) {
                             alert("Map updated")
@@ -554,7 +554,7 @@ angular.module("pocApp")
             $scope.selectCMDEP = function (cmId) {
                 $scope.canUpload = false    //to prevent it being uploaded again...
                 //alert("will retrieve the CM and display it in the table view")
-                let qry = `/nzhts/ConceptMap/${cmId}`
+                let qry = `nzhts/ConceptMap/${cmId}`
                 $scope.showWaiting = true
                 $http.get(qry).then(
                     function (data) {
@@ -690,13 +690,13 @@ angular.module("pocApp")
                         }
                     });
 
-                    let url = `/nzhts/bundle`
+                    let url = `nzhts/bundle`
                     $http.post(url,$scope.vsBatch).then(
                         function (data) {
                             jobId = data.data.jobId
                             //let errs = []
                             intervalPromiseVS = $interval(function() {
-                                let qry = `/job/status/${jobId}`
+                                let qry = `job/status/${jobId}`
                                 $http.get(qry).then(
                                     function (data) {
                                         let jobStatus = data.data
@@ -823,13 +823,13 @@ angular.module("pocApp")
                         }
                     });
 
-                    let url = `/memberCount`
+                    let url = `memberCount`
                     $http.get(url).then(
                         function (data) {
                             jobId = data.data.jobId
 
                             intervalPromiseVS = $interval(function() {
-                                let qry = `/job/status/${jobId}`
+                                let qry = `job/status/${jobId}`
                                 $http.get(qry).then(
                                     function (data) {
                                         let jobStatus = data.data
@@ -906,7 +906,7 @@ angular.module("pocApp")
                         //alert(`The Syndication process has been initiated. You can see progress in the `)
                         //Now start the polling to get the job status...
                         intervalPromise = $interval(function() {
-                            let qry = `/job/status/${jobId}`
+                            let qry = `job/status/${jobId}`
                             $http.get(qry).then(
                                 function (data) {
                                     let jobStatus = data.data
@@ -990,7 +990,7 @@ angular.module("pocApp")
                     //return
 
 
-                    let url = `/nzhts/bundlewait`
+                    let url = `nzhts/bundlewait`
 
                     $http.post(url,updateBatch).then(
                         function (data) {
@@ -1581,7 +1581,7 @@ angular.module("pocApp")
                 )
 
                 delete $scope.syndicationStatus
-                let syndQry = `/nzhts/syndStatus?resourceType=ValueSet&id=${item.vs.id}`
+                let syndQry = `nzhts/syndStatus?resourceType=ValueSet&id=${item.vs.id}`
                 $http.get(syndQry).then(
                     function (data) {
                         let param = data.data

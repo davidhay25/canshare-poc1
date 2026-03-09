@@ -21,6 +21,7 @@ angular.module("pocApp")
 
             //parse the input CSV file containing multiple QRs...
             $scope.parseQRFile = function (file) {
+                delete $scope.parsedFile
                 $scope.items = []
                 Papa.parse(file, {
                     header: true, // true = return objects with column headers as keys
@@ -76,6 +77,7 @@ angular.module("pocApp")
                                 $scope.items.push(item)
                                 //console.log(item.qr)
 
+                                $scope.parsedFile = true
                             }
                            // console.log(lne["Run ID"])
                         })
@@ -87,7 +89,7 @@ angular.module("pocApp")
             }
 
             $scope.upload = function () {
-                let qry = "/qr/upload"
+                let qry = "qr/upload"
                 $http.post(qry,$scope.items).then(
                     function (data) {
                         alert("Upload complete")

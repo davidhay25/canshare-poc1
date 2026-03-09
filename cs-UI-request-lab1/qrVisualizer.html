@@ -43,7 +43,9 @@
     <script src="js/filters.js"></script>
     <script src="js/viewVSCtrl.js"></script>
     <script src="js/qrVisualizerSvc.js"></script>
+
     <script src="js/viewItemCtrl.js"></script>
+
     <script src="js/makeQHelperSvc.js"></script>
     <script src="js/utilsSvc.js"></script>
 
@@ -149,8 +151,8 @@
                 <uib-tab heading="Raw file">
                     <button ng-show="input.qrCsv"
                             class="btn-link btn" ng-click="parseQRFile(input.qrCsv)">Parse content</button>
-                    <button ng-show="items"
-                            class="btn-link btn" ng-click="upload(input.qrCsv)">Upload</button>
+                    <button ng-show="parsedFile"
+                            class="btn-link btn"  ng-click="upload(input.qrCsv)">Upload</button>
 
 
                     <div class="myScroll">
