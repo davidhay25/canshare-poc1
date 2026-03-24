@@ -548,7 +548,9 @@ angular.module("pocApp")
                 //given a set of  targets, return all the concepts as an array
                 let concepts = []
                 for (const target of lstTarget) {
+
                     if (target.code.indexOf('http') > -1) {
+                        //this is a valueset
                         let ar = hashAllVS[target.code]
                         if (ar) {
                             concepts.push(...ar)

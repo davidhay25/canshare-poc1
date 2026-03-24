@@ -41,7 +41,7 @@ angular.module("portalApp")
             $scope.options.push(q)
             q.options.push({display:"Questionnaire Editor",loggedIn:true,
                 url:'forms/models.html',
-                text:"A module to create, update and import Collections/FHIR Questionnaires/forms using the Logical Information Model (LIM)/Collections tooling modes. "})
+                text:"A module to create, update and import Collections and FHIR Questionnaires. "})
 
             q.options.push({display:"Questionnaire Viewer",
                 url:'forms/modelReview.html',

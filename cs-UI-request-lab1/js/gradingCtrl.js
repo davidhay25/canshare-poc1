@@ -37,7 +37,16 @@ angular.module("pocApp")
 
                             let concepts = cmTesterSvc.getConceptsFromTarget(vo.lstMatchingTargets,$scope.hashExpandedVs)
 
-                            property.options = concepts
+
+                            //20260317 - issue with a s
+
+                            //if the  options have not changed, then don't alter the options property
+                            //if it has, then changing the options can well invalidate and previously selected value.
+                            if (angular.toJson(property.options) !== angular.toJson(concepts)) {
+                                property.options = concepts
+                            }
+
+                            // this is what it was property.options = concepts
 
                             // - don't set a default value$scope.local.cmPropertyValue[key] = property.options[0]
 
