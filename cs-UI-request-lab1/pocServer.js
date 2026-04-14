@@ -77,7 +77,8 @@ const mongoUri = `mongodb://${mongoHostName}:27017`  //local machine
 console.log(`Mongo connection uri is ${mongoUri}`)
 
 requesterModule.setup(app)
-terminologyModule.setup(app)
+terminologyModule.setup(app,mongoDbName,mongoUri)
+
 modelModule.setup(app,mongoDbName,mongoUri)      //pass in the mongo database name to use
 validatorModule.setup(app)
 QModule.setup(app,mongoDbName,mongoUri)

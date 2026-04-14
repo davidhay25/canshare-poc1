@@ -20,12 +20,17 @@ angular.module("pocApp")
             //$scope.input.mainTabActive = 1
 
             $scope.canBulkUpdateDGLibrary = function () {
-                //a function to copy all the DG to the libraray. Only for me running locally.
+                //a function to copy all the DG to the libraray.
                 //for use after importing a json file.
+                //so long as logged in then can update. This app only runs the LIM (forms is a separate module)
                 if (! user) {return false}
+                return true
+
+                /*
                 if (user.email == 'david.hay25@gmail.com') {
                     return true
                 }
+                */
             }
 
             $scope.loadAllQNames = function () {

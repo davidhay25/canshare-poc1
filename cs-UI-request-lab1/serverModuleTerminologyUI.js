@@ -9,17 +9,22 @@ const commonModule = require("./serverModuleCommonUI.js")
 let jwt_decode = require( "jwt-decode")
 const domain = require("domain");
 
+//const {MongoClient} = require("mongodb");
+
 //A hash to hold async long running jobs - eg batch updating Valuesets or setting sync
 let jobs = {}
 
 //load the config file for accessing NZHTS (the file is excluded from git)
-const nzhtsconfig = JSON.parse(fs.readFileSync("./nzhtsconfig.config").toString())
+const nzhtsconfig = JSON.parse(fs.readFileSync("./secrets/nzhtsconfig.config").toString())
 
 const path_to_config = "./artifacts/cmConfig.json"
 
-let cmconfig = JSON.parse(fs.readFileSync(path_to_config).toString()) //not const as can be changed
 
+//The default CM config file
+//let cmconfig = JSON.parse(fs.readFileSync(path_to_config).toString()) //not const as can be changed
 
+let MongoClient = require('mongodb').MongoClient;
+let database        //this will be the database connection
 
 
 
@@ -58,9 +63,10 @@ async function getNZHTSAccessToken() {
 }
 
 
-function setup(app) {
+function setup(app,mongoDbName,uri) {
 
-
+    const client = new MongoClient(uri);
+    database = client.db(mongoDbName)
 
 
 
@@ -104,35 +110,67 @@ function setup(app) {
 
             res.status(500).json({msg:"Unable to get Access Token."})
         }
-
-
-
     })
 
 
 
-    app.get('/cmConfig',function (req,res) {
-        let cmconfig = JSON.parse(fs.readFileSync(path_to_config).toString())
-        res.json(cmconfig)
+    //get the CM configuration file
+    app.get('/cmConfig',async function (req,res) {
+
+        //save the CM file in a confg collection. If it doesn't exist then add the one from the file
+        //and use that. note: when creating a new instance, the updated file will need to be added
+
+        try {
+            const config = await database.collection("config").findOne({ name: "cmConfig" })
+
+            if (config) {
+                res.json(config)
+            } else {
+                //no record found. Read the default from the filesystem, insert & return
+                let cmConfig = JSON.parse(fs.readFileSync(path_to_config).toString())
+                cmConfig.name = "cmConfig"
+
+                await database.collection("config").updateOne(
+                    { name: cmConfig.name },   // filter
+                    { $set: cmConfig },        // use the existing object
+                    { upsert: true }
+                )
+                res.json(cmConfig)
+
+            }
+        } catch (ex) {
+            res.status(500).json({msg:ex.message})
+        }
+
     })
 
-    app.put('/cmConfig',function (req,res) {
-        //when the config file is updated from the UI
+    app.put('/cmConfig',async function (req,res) {
+        //when the config file is updated from the UI. Update the config database.
 
         //let cmconfig = JSON.parse(fs.readFileSync(path_to_config).toString()) //not const as can be changed
 
         let cmConfigUpdate = req.body
-        //console.log(cmConfigUpdate)
+        cmConfigUpdate.name = "cmConfig"    //just in case - it's the key
         try {
-            let json = JSON.stringify(cmConfigUpdate,null,2)
-            fs.writeFileSync(path_to_config,json)
-            //this doesn't seem to be udpated so the GET reads the file every time...
-            cmConfig = cmConfigUpdate   //sets the global server variable so the server does not need to be re-started
+
+            await database.collection("config").updateOne(
+                { name: cmConfigUpdate.name },   // filter
+                { $set: cmConfigUpdate },        // use the existing object
+                { upsert: true }
+            )
             res.json({msg: 'config updated'})
+
+          //  fs.writeFileSync(path_to_config,json)
+            //this doesn't seem to be udpated so the GET reads the file every time...
+          //  cmConfig = cmConfigUpdate   //sets the global server variable so the server does not need to be re-started
+           /// res.json({msg: 'config updated'})
         } catch (ex) {
             console.log(ex)
-            res.status(400).json({msg:ex.message})
+            res.status(500).json({msg:ex.message})
         }
+
+
+
 
     })
 
@@ -1104,9 +1142,7 @@ function setup(app) {
 
         domain = domain.toLowerCase()
 
-     //   console.log(domain,version)
-       // res.json()
-      //  return
+
 
         let nameRoot = `canshare-select-${domain}-valueset-map`
 

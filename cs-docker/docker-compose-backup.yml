@@ -4,7 +4,7 @@ version: "3.9"
 services:
   # ---------------- Traefik Reverse Proxy ----------------
   traefik:
-    image: traefik:v3.0
+    image: traefik:v2.11
     container_name: traefik
     command:
       - "--providers.docker=true"
@@ -22,7 +22,7 @@ services:
       - "443:443"
       - "8080:8080"   # dashboard port, optional
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/docker.sock:/var/run/docker.sock:rw
       - ./letsencrypt:/letsencrypt
     networks:
       - canshare-network
@@ -43,6 +43,7 @@ services:
       - "traefik.http.routers.portal.entrypoints=websecure"
       - "traefik.http.routers.portal.tls.certresolver=le"
       - "traefik.http.services.portal.loadbalancer.server.port=80"
+
       # Forward HTTPS info to backend
       - "traefik.http.middlewares.portal-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.portal.middlewares=portal-headers"
@@ -62,10 +63,14 @@ services:
     container_name: forms
     depends_on:
       - mongodb
+    volumes:
+      - /opt/canshare-docker/secrets:/app/secrets
     environment:
       MONGOHOSTNAME: mongodb
       MONGODB: clinfhir
       SETTING: backup
+      CONFIG_PATH: /app/secrets/nzhtsconfig.config
+      TERM_SERVER_URL: https://canshare.co.nz/canshare/proxy/
     networks:
       - canshare-network
 
@@ -75,6 +80,9 @@ services:
     container_name: canshare
     depends_on:
       - mongodb
+    volumes:
+      - ./secrets:/secrets:ro       # bind to a path - won't get deleted with docker compose down -v
+      - ./config:/config:rw
     environment:
       MONGOHOSTNAME: mongodb
       MONGODB: canshare-lim

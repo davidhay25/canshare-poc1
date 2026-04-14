@@ -3,7 +3,7 @@ version: "3.9"
 services:
   # ---------------- Traefik Reverse Proxy ----------------
   traefik:
-    image: traefik:v3.0
+    image: traefik:v2.11
     container_name: traefik
     command:
       - "--providers.docker=true"
@@ -21,7 +21,7 @@ services:
       - "443:443"
       - "8080:8080"   # dashboard port, optional
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/docker.sock:/var/run/docker.sock:rw
       - ./letsencrypt:/letsencrypt
     networks:
       - canshare-network
@@ -62,10 +62,14 @@ services:
     container_name: forms
     depends_on:
       - mongodb
+    volumes:
+      - /opt/canshare-docker/secrets:/app/secrets
     environment:
       MONGOHOSTNAME: mongodb
       MONGODB: clinfhir
       SETTING: production
+      CONFIG_PATH: /app/secrets/nzhtsconfig.config
+      TERM_SERVER_URL: https://canshare.co.nz/canshare/proxy/
     networks:
       - canshare-network
 

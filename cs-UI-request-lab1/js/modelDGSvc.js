@@ -279,34 +279,7 @@ angular.module("pocApp")
                 return allDependencies
 
             },
-            auditDGDEP : function (hashAllDG) {
-                //compare the DG hash with $localStorage. There could be a bug where localStorage is not being updated
-                Object.keys(hashAllDG).forEach(function (key) {
-                    let dg = hashAllDG[key]
-                    if (angular.toJson(dg) !== $localStorage.world.dataGroups[dg.name]) {
-                        alert(`Warning! the Browser copy of the DG ${dg.name} doesn't match the copy in memory! You should re-load the page and check it. From modelDGSvc`)
 
-
-                    }
-                })
-            },
-
-            checkAllDGDEP : function (hashAllDG) {
-                //check DG for invalid construction that can crash the browser
-                let that = this
-                Object.keys(hashAllDG).forEach(function (key) {
-                    let dg = hashAllDG[key]
-
-                    if (that.hasDuplicatedParent(dg,hashAllDG)){
-                        //oops - there's a loop!
-                        delete dg.parent
-                        alert(`The DG: ${key} has a duplicated parent in the inheritance chain. The parent has been removed.`)
-                    }
-
-                })
-
-
-            },
 
             hasDuplicatedParent : function(dg,hashAllDG) {
                 //is there a repeated parent in the inheritance chain (will crash the browser
@@ -747,45 +720,6 @@ angular.module("pocApp")
                 };
 
                 return {graphData:graphData}
-
-            },
-
-            updateChangesDEP : function (DG,change,scope) {
-                DG.changes = DG.changes || []
-                DG.changes.push(change)
-               // console.log('emitting')
-                scope.$emit("dgUpdated",{})
-
-            },
-
-
-
-            makeUpdateListDEP: function (allDG,xref) {
-                //create a list of all DG updates
-                //let report = {newDG:[],newElement:[],changedElement:[]}
-                let report = []
-
-              //  console.log(xref)
-
-                Object.keys(allDG).forEach(function (key) {
-                    let dg = allDG[key]
-                    if (dg.status == 'new') {
-                        let item = {DGName:dg.name,msg:"New DataGroup",xref:xref[dg.name]}
-                        report.push(item)
-
-                    } else {
-                        if (dg.changes) {
-                            dg.changes.forEach(function (change) {
-                                //{edPath: msg: }
-                                let item = {DGName:dg.name,msg:change.msg,path:change.edPath,xref:xref[dg.name]}
-                                report.push(item)
-                            })
-                        }
-
-                    }
-                })
-
-                return report
 
             }
         }
