@@ -70,7 +70,7 @@ services:
       MONGODB: clinfhir
       SETTING: backup
       CONFIG_PATH: /app/secrets/nzhtsconfig.config
-      TERM_SERVER_URL: https://canshare.co.nz/canshare/proxy/
+      TERM_SERVER_URL: https://canshnano are.co.nz/canshare/proxy/
     networks:
       - canshare-network
 
@@ -81,12 +81,12 @@ services:
     depends_on:
       - mongodb
     volumes:
-      - ./secrets:/secrets:ro       # bind to a path - won't get deleted with docker compose down -v
-      - ./config:/config:rw
+      - /opt/canshare-docker/secrets:/app/secrets
     environment:
       MONGOHOSTNAME: mongodb
       MONGODB: canshare-lim
       POCSERVERBASE: "9400"
+      CONFIG_PATH: /app/secrets/nzhtsconfig.config
     networks:
       - canshare-network
 

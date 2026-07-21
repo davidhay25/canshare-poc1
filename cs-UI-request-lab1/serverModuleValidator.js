@@ -2,7 +2,12 @@ const axios = require("axios");
 const commonModule = require("./serverModuleCommonUI");
 
 
-let serverBase = "http://test.canshare.co.nz:8080/fhir/"
+//let serverBase = "http://test.canshare.co.nz:8080/fhir/"
+
+
+let serverBase = "https://test.clinfhir.com/fhir/"
+
+
 async function setup(app) {
 
 

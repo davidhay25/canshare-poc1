@@ -273,6 +273,7 @@ angular.module("pocApp")
                     $scope.input.sourceReference = model.sourceReference
                     $scope.input.newModelDescription = model.description
                     $scope.input.isContainer = model.isContainer
+                    $scope.input.isComponent = model.isComponent
                     $scope.input.isTabbedContainer = model.isTabbedContainer
 
                     $scope.input.idVariable = model.idVariable
@@ -520,6 +521,7 @@ angular.module("pocApp")
                 $scope.model.fixedValues = $scope.input.fixedValues
                 $scope.model.resourceReferences = $scope.input.resourceReferences
                 $scope.model.isContainer = $scope.input.isContainer
+                $scope.model.isComponent = $scope.input.isComponent
                 $scope.model.qUrl = $scope.input.qUrl
 
                 delete $scope.model.isTabbedContainer

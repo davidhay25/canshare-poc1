@@ -290,10 +290,16 @@
 
                             <div class="myScroll background">
                                 <div class="list-group">
-                                    <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}" style="cursor: pointer"
+                                    <div ng-class="{'list-group-item':true,listItemSelected:selectedModel == v}"
+                                         style="cursor: pointer"
                                          ng-click="selectModel(v)"
                                          ng-if="showDG(v,input.dgFilter)"
                                          ng-repeat="v in sortedDGList">
+
+                                        <span ng-if="v.isComponent" >🧩</span>
+
+
+
 
                                         <i ng-if="canEdit(v)"
                                            class="glyphicon glyphicon-edit pull-right clickable"

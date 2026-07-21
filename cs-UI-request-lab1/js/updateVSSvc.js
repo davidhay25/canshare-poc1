@@ -228,7 +228,11 @@ angular.module("pocApp")
                 $http.get(`nzhts?qry=${encodedQry}`).then(
                     function (data) {
                         //the CodeSystem was found
-                        deferred.resolve(data.data)
+                        let cs = data.data
+                        cs.concept = cs.concept || []
+
+
+                        deferred.resolve(cs)
 /*
                         let bundle = data.data
                         console.log(bundle)

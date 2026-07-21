@@ -15,8 +15,20 @@ const domain = require("domain");
 let jobs = {}
 
 //load the config file for accessing NZHTS (the file is excluded from git)
-const nzhtsconfig = JSON.parse(fs.readFileSync("./secrets/nzhtsconfig.config").toString())
 
+
+
+const configPath = process.env.CONFIG_PATH || require('path').join(__dirname, 'secrets', 'nzhtsconfig.config');
+
+
+console.log('configPath',configPath)
+//const nzhtsconfig = JSON.parse(fs.readFileSync("./secrets/nzhtsconfig.config").toString())
+
+const config = fs.readFileSync(configPath);
+const nzhtsconfig = JSON.parse(config.toString())
+
+
+//note this path is wrong in a container - or is it????
 const path_to_config = "./artifacts/cmConfig.json"
 
 

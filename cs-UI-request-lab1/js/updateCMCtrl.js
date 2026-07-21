@@ -277,6 +277,7 @@ angular.module("pocApp")
 
                 }).result.then(function (configJson) {
                     //This should be a config file - though minimal validation
+                    delete configJson['_id']    //the internal mongodb id
                     $scope.dirty = true
                     $scope.cmConfig = configJson
                     setUpConfigFile($scope.cmConfig)

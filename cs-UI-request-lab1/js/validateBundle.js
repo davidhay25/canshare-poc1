@@ -8,7 +8,12 @@ angular.module("pocApp")
             $scope.ui.tabList = 1;
             $scope.ui.tabOO = 1;
 
-            $scope.server = "http://test.canshare.co.nz:8080/fhir/"
+            //$scope.server = "http://test.canshare.co.nz:8080/fhir/"
+
+            $scope.server = "https://test.clinfhir.com/fhir/"
+
+
+
             $scope.input = {}
 
             //$scope.input.mainTabActive = 1 // $scope.ui.tabTrack;
@@ -151,9 +156,72 @@ angular.module("pocApp")
                 })
 
             }
+
+
+            $scope.makeTemplateDownload = function (template) {
+
+                let ar = []
+                ar.push(`Title\tFHIRPath\n`)
+
+                template.items.forEach(function (item) {
+                    let lne = tidyText(item.title)
+                    lne += `\t${item.fp}`
+                    ar.push(lne)
+                })
+
+                let download = ar.join('\n')
+                $scope.downloadLinkCsv = window.URL.createObjectURL(new Blob([download],{type:"text/tsv"}))
+                $scope.downloadLinkCsvName = `allFHIRPath.tsv`
+
+
+
+                function tidyText(s) {
+                    if (s) {
+                        s = s.replace(/\t/g, " ");
+                        s = s.replace(/\n/g, " ");
+                        s = s.replace(/\r/g, " ");
+                        return s
+                    } else {
+                        return ""
+                    }
+                }
+
+            }
+
+
+
             $scope.loadTemplate = function (cb) {
                 //load a template from the Decref
                 //start with fixedid
+
+
+/*
+                //------------- Jine17 - just create the default template
+
+                $scope.input.template = {items:[]}
+                $scope.makeTemplateDownload($scope.input.template)
+                if (cb) {
+                    let dr = {resourceType:"DocumentReference",status:"current"}
+                    dr.id = "fpTemplate"
+                    dr.type = {coding:[{system:"http://canshare.co.nz/fhir/NamingSystem/bv",code:"fhirpath"}]}
+                    dr.description = "fhirPath queries for default template"
+                    dr.date = new Date().toISOString()
+
+                    let json = angular.toJson($scope.input.template)
+
+                    let att = {data:btoa(json)}
+
+
+
+                    dr.content=[{attachment:att}]
+                    cb(dr,$scope.input.template)
+                }
+
+                return
+
+                //-------------------
+
+*/
 
                 let qry = `${$scope.server}/DocumentReference/fpTemplate`
 
@@ -403,36 +471,6 @@ angular.module("pocApp")
                     } catch (ex) {
                         console.log(ex)
                         return ex
-                    }
-                }
-
-            }
-
-            $scope.makeTemplateDownload = function (template) {
-
-                let ar = []
-                ar.push(`Title\tFHIRPath\n`)
-
-                template.items.forEach(function (item) {
-                    let lne = tidyText(item.title)
-                    lne += `\t${item.fp}`
-                    ar.push(lne)
-                })
-
-                let download = ar.join('\n')
-                $scope.downloadLinkCsv = window.URL.createObjectURL(new Blob([download],{type:"text/tsv"}))
-                $scope.downloadLinkCsvName = `allFHIRPath.tsv`
-
-
-
-                function tidyText(s) {
-                    if (s) {
-                        s = s.replace(/\t/g, " ");
-                        s = s.replace(/\n/g, " ");
-                        s = s.replace(/\r/g, " ");
-                        return s
-                    } else {
-                        return ""
                     }
                 }
 

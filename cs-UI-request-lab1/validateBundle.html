@@ -290,6 +290,7 @@
                                 </div>
                             </div>
                         </uib-tab>
+
                         <uib-tab heading="Conditional update">
                             <uib-tab-heading>Conditional update
                                 <span ng-show="countConditionalErrors > 0" class="badge">{{countConditionalErrors}}</span> </uib-tab-heading>
@@ -318,7 +319,7 @@
 
                                 </div>
                                 <div class="col-md-6">
-                                    <pre>{{input.selectedEntryFromConditional | json}}</pre>
+                                    <pre class="myScroll">{{input.selectedEntryFromConditional | json}}</pre>
                                 </div>
 
                             <!--    <pre>{{conditionalValidation | json}}</pre> -->
@@ -414,7 +415,7 @@
 
                                         <button class="btn-link btn" ng-click="saveFhirPath(input.fhirPath)">Add to template</button>
 
-                                        <button class="btn-link btn" ng-click="selectFhirPath(input.fhirPath)">Select</button>
+                                        <button ng-show="false" class="btn-link btn" ng-click="selectFhirPath(input.fhirPath)">Select</button>
 
                                     </div>
 

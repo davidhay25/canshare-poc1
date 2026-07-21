@@ -58,7 +58,7 @@ services:
 
   # ---------------- Forms ----------------
   forms:
-    image: davidhay25/forms:v1.0.0
+    image: davidhay25/forms:2.0
     container_name: forms
     depends_on:
       - mongodb
@@ -75,14 +75,17 @@ services:
 
   # ---------------- Canshare ----------------
   canshare:
-    image: davidhay25/canshare
+    image: davidhay25/canshare:2.0
     container_name: canshare
     depends_on:
       - mongodb
+    volumes:
+      - /opt/canshare-docker/secrets:/app/secrets
     environment:
       MONGOHOSTNAME: mongodb
       MONGODB: canshare-lim
       POCSERVERBASE: "9400"
+      CONFIG_PATH: /app/secrets/nzhtsconfig.config
     networks:
       - canshare-network
 
